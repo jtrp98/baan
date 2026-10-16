@@ -1,22 +1,51 @@
-// การตั้งค่าและการ resolve: mycelium.json (workspace), agents.json (ตัวรัน+tier), roles/, targets
-import { readFileSync, readdirSync } from "node:fs";
+// การตั้งค่าและการ resolve: workspace config (discovery จากที่เรียก), agents.json (ตัวรัน+tier), roles/, targets
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 export const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); // รากของ package
 export const ROLES_DIR = path.join(TEAM_DIR, "roles");
 export const REPORTS_DIR = path.join(TEAM_DIR, "reports");
-const WS_CONFIG = path.join(TEAM_DIR, "mycelium.json");
 
 export function loadAgentsConfig() {
   return JSON.parse(readFileSync(path.join(TEAM_DIR, "agents.json"), "utf8"));
 }
 
-export function loadWorkspace() {
-  // ไฟล์หรือ field ที่ไม่มี = ใช้ default ไม่ถือเป็น error (เครื่องอื่นแก้ path ใน mycelium.json เองได้)
+// config ของ workspace เก็บ path ของเครื่องนี้ จึงต้องอยู่ "นอก" package —
+// ไม่งั้นการ update version/clone package ใหม่จะทับ config ของ workspace ทุกครั้ง
+// หาโดยเดินขึ้นจากจุดที่เรียก จนเจอ <dir>/mycelium/mycelium.json (เช่น C:\src\schoolbright\mycelium\mycelium.json)
+export function findWorkspaceConfig(startDir) {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    const candidate = path.join(dir, "mycelium", "mycelium.json");
+    if (existsSync(candidate)) return candidate;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+// ลำดับ: --config ที่ส่งมา > env MYCELIUM_CONFIG > discovery จากไดเรกทอรีที่เรียก
+export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
+  const check = (p, label) => {
+    const resolved = path.resolve(p);
+    if (!existsSync(resolved)) throw new Error(`${label} ชี้ไฟล์ที่ไม่มี: ${resolved}`);
+    return resolved;
+  };
+  if (explicitPath) return check(explicitPath, "--config");
+  if (process.env.MYCELIUM_CONFIG) return check(process.env.MYCELIUM_CONFIG, "MYCELIUM_CONFIG");
+  return findWorkspaceConfig(startDir);
+}
+
+export function loadWorkspace(configPath = null) {
+  // ไม่พบ config = ใช้ default ในโค้ด (ไม่มี targets/knowledge) พร้อมแจ้งให้ผู้ใช้รู้ตอน --list
   let raw = {};
-  try { raw = JSON.parse(readFileSync(WS_CONFIG, "utf8")); } catch { /* ไม่มีไฟล์ = ใช้ default */ }
+  if (configPath) {
+    try { raw = JSON.parse(readFileSync(configPath, "utf8")); }
+    catch (e) { throw new Error(`อ่าน config ไม่ได้ (${configPath}): ${e.message}`); }
+  }
   return {
+    source: configPath ?? null,
     main_root: raw.main_root ?? "",
     knowledge_roots: Array.isArray(raw.knowledge_roots) ? raw.knowledge_roots : [],
     defaults: {

@@ -94,7 +94,9 @@ mycelium-role --agent codex --role business-analyst --tier t2 --task "คำส�
   รายงานสถานะให้ PM อัปเดต backlog → จบ run สรุปกลับผู้ใช้ + ประตูมนุษย์ที่เหลือ
 - **รอบถัดไป**: ผู้ใช้บอกแค่ "ต่อจาก <โปรเจกต์>" — คุณอ่าน state จาก knowledge base กลับมาทำต่อได้เอง ไม่ต้องสั่งใหม่
 
-## การตั้งค่า (แก้ที่ mycelium.json ของ package)
+## การตั้งค่า (อยู่นอก package — กัน update version ทับ)
 
-knowledge_roots (ที่เก็บเอกสาร) + targets (ที่เก็บ code) + defaults (agent/tier/timeout) —
+config ของ workspace (knowledge_roots + targets + defaults) เก็บที่ `<ราก workspace>\mycelium\mycelium.json`
+เช่น `C:\src\schoolbright\mycelium\mycelium.json` — ตัว mycelium จะเดินหาไฟล์นี้ขึ้นจากไดเรกทอรีที่เรียกโดยอัตโนมัติ
+(หรือระบุด้วย `--config <file>` / env `MYCELIUM_CONFIG`) — ตัวอย่างรูปแบบ: `mycelium.example.json` ใน package ·
 ดูค่าปัจจุบันด้วย `mycelium --list`
