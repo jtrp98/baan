@@ -2,6 +2,15 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## 0.6.0 — 2026-10-16 · `mycelium --init` ติดตั้ง workspace ครั้งเดียว จบเรื่องสวมบท
+
+### เพิ่ม
+- **`mycelium --init`** — รันครั้งเดียวที่ราก workspace (เช่น `C:\src\schoolbright`):
+  - สร้าง `mycelium\mycelium.json` จากตัวอย่าง (ถ้ายังไม่มี — ถ้ามีอยู่แล้วไม่แตะ)
+  - สร้าง **`CLAUDE.md`** (Claude Code โหลดอัตโนมัติ) และ **`AGENTS.md`** (codex และ agent อื่นโหลดอัตโนมัติ) ที่ราก workspace
+  - สองไฟล์นี้เป็น "ทางเข้า" ที่ชี้ไป charter `MYCELIUM.md` ตัวจริงใน package — เปิด AI session ที่ workspace ได้เลย สวมบท MYCELIUM เองโดยไม่ต้องพิมพ์คำสั่ง และ charter ตกรุ่นไม่ได้เพราะไม่มีสำเนา
+- รัน `--init` ซ้ำได้: config ของผู้ใช้ไม่ถูกแตะ · stub ที่เราสร้างไว้ถูก regenerate · ไฟล์ CLAUDE.md ที่ผู้ใช้เขียนเองจะถูกข้ามพร้อมเตือน (ไม่ทับเด็ดขาด)
+
 ## 0.5.0 — 2026-10-16 · แยก config ออกจาก package
 
 config ของ workspace (targets/knowledge paths ของแต่ละเครื่อง) ย้ายออกจาก package — update version หรือ clone package ใหม่จะไม่ทับ config อีกต่อไป
