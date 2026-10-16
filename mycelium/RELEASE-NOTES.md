@@ -2,6 +2,23 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## 0.5.0 — 2026-10-16 · แยก config ออกจาก package
+
+config ของ workspace (targets/knowledge paths ของแต่ละเครื่อง) ย้ายออกจาก package — update version หรือ clone package ใหม่จะไม่ทับ config อีกต่อไป
+
+### เพิ่ม
+- **config discovery**: เดินหา `<dir>\mycelium\mycelium.json` ขึ้นจากไดเรกทอรีที่เรียก (เช่นเรียกจากใน `C:\src\schoolbright\...` จะเจอ `C:\src\schoolbright\mycelium\mycelium.json` เอง)
+- `--config <file>` และ env `MYCELIUM_CONFIG` สำหรับระบุตำแหน่งตรงๆ (ชนะ discovery)
+- `mycelium --list` แสดงว่าอ่าน config จากไหน · ไม่พบ target จะบอกตำแหน่ง config ที่ใช้อยู่ด้วย
+- `mycelium.example.json` — template ตัวอย่างใน package แทนไฟล์จริง
+
+### เปลี่ยน
+- `mycelium.json` หายไปจาก package (ย้ายเป็นของ workspace แต่ละที่) — `files` ใน package.json ใช้ example แทน
+- เรียกจากนอก workspace ที่ไม่มี config → ใช้ default ในโค้ด (ไม่มี targets) พร้อมข้อความแนะนำ
+
+### ⚠ ต้องทำตอนอัปเกรด
+- ย้าย config เดิมไปวางที่ `<ราก workspace>\mycelium\mycelium.json` (เช่น `C:\src\schoolbright\mycelium\mycelium.json`) หรือส่ง `--config` ทุกครั้ง
+
 ## 0.4.0 — 2026-10-16 · แยกโครงสร้างไฟล์
 
 แยกโค้ดจาก 2 ไฟล์ใหญ่ (938 บรรทัดรวม) เป็น `bin/` + `src/` ตามโครงสร้างที่ AUDIT ข้อ 7 แนะนำ

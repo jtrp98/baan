@@ -13,6 +13,12 @@ test('files รวม CONVENTIONS.md (สัญญาบังคับที่
   assert.ok(pkg.files.includes("CONVENTIONS.md"), `files ปัจจุบัน: ${pkg.files.join(", ")}`);
 });
 
+test("package ห้ามมี config ของเครื่อง — มีแค่ template ตัวอย่าง", () => {
+  assert.ok(pkg.files.includes("mycelium.example.json"), "ต้องมี mycelium.example.json");
+  assert.ok(!pkg.files.includes("mycelium.json"), "mycelium.json เป็นของ workspace ต้องไม่ติด package");
+  assert.ok(!existsSync(path.join(pkgDir, "mycelium.json")), "ใน package ต้องไม่มีไฟล์ mycelium.json จริง");
+});
+
 test("ไฟล์ประกาศใน files มีอยู่จริงทุกไฟล์บนดิสก์", () => {
   for (const f of pkg.files) {
     const p = path.join(pkgDir, f);

@@ -5,7 +5,7 @@
 // การตั้งค่าอยู่ที่ mycelium.json ข้าง package · วิธีใช้เต็ม: mycelium/README.md
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, tierMatrixText } from "../src/config.mjs";
+import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, tierMatrixText } from "../src/config.mjs";
 import { extractJson, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
@@ -14,7 +14,7 @@ import { buildArgs, runCli } from "../src/runner.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -31,8 +31,9 @@ function parseArgs(argv) {
       case "--cwd": opts.cwd = argv[++i] ?? ""; opts.explicit.add("cwd"); break;
       case "--timeout": opts.timeoutSec = Number(argv[++i]) || 0; opts.explicit.add("timeoutSec"); break;
       case "--write": opts.write = true; opts.explicit.add("write"); break;
+      case "--config": opts.config = argv[++i] ?? ""; opts.explicit.add("config"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--write]`);
         process.exit(2);
     }
   }
@@ -40,6 +41,7 @@ function parseArgs(argv) {
 }
 
 function printWorkspace(ws) {
+  console.log(`config   : ${ws.source ?? "(ไม่พบ config ของ workspace — ใช้ default ในโค้ด · วางที่ <ราก workspace>\\mycelium\\mycelium.json หรือใช้ --config · ตัวอย่าง: mycelium.example.json)"}`);
   console.log(`main_root : ${ws.main_root || "(ไม่ได้ตั้ง)"}`);
   for (const kr of ws.knowledge_roots) {
     console.log(`knowledge : ${kr.name} → ${kr.path}`);
@@ -51,7 +53,13 @@ function printWorkspace(ws) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const ws = loadWorkspace();
+  let ws;
+  try {
+    ws = loadWorkspace(resolveWorkspaceConfig(opts.config || null));
+  } catch (e) {
+    console.error(e.message);
+    process.exit(2);
+  }
   const cfg = loadAgentsConfig();
   cfg.roleNames = listRoles().map((r) => r.name);
 
@@ -84,7 +92,7 @@ async function main() {
     const hit = resolveTarget(ws, opts.target);
     if (!hit) {
       const all = ws.knowledge_roots.flatMap((kr) => (kr.targets ?? []).map((tg) => `${kr.name}/${tg.name}`));
-      console.error(`ไม่พบ target: ${opts.target}\nที่มี: ${all.join(", ") || "(ไม่มี — เพิ่มใน mycelium.json)"}`);
+      console.error(`ไม่พบ target: ${opts.target}\nที่มี: ${all.join(", ") || "(ไม่มี)"}${ws.source ? `\nconfig: ${ws.source}` : `\nไม่พบ config ของ workspace — เรียกจากภายใน workspace ที่มี mycelium\\mycelium.json หรือใช้ --config <file> (ตัวอย่าง: mycelium.example.json)`}`);
       process.exit(2);
     }
     if (!existsSync(hit.target.path)) { console.error(`path ของ target ไม่มีจริง: ${hit.target.path}`); process.exit(2); }

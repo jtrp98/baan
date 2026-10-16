@@ -20,7 +20,7 @@ AI session ใดก็ได้ (claude/codex/agy/ZCode/...)
 1. **โหมดหลัก** — AI session สวม MYCELIUM แล้วคุมเอง (อ่าน `MYCELIUM.md`)
 2. **โหมดอัตโนมัติ** — `mycelium --goal "..."` (PM → planner → execute เป็นสคริปต์ ตาม DAG)
 
-โครงสร้างข้อมูล (กำหนดใน `mycelium.json`): **ที่เก็บเอกสาร** (`knowledge_roots` เช่น `C:\src\schoolbright\knowledge`) · **ที่เก็บ code** (`targets` เช่น `C:\src\schoolbright\target\*`) — โหมดอัตโนมัติใช้ผ่าน `--target <ชื่อ>`
+โครงสร้างข้อมูล (config ของ workspace อยู่**นอก package** ที่ `<ราก workspace>\mycelium\mycelium.json` เช่น `C:\src\schoolbright\mycelium\mycelium.json` — กัน update version ทับ config): **ที่เก็บเอกสาร** (`knowledge_roots` เช่น `C:\src\schoolbright\knowledge`) · **ที่เก็บ code** (`targets` เช่น `C:\src\schoolbright\target\*`) — ตัว mycelium เดินหา config ขึ้นจากไดเรกทอรีที่เรียกอัตโนมัติ (หรือ `--config <file>` / env `MYCELIUM_CONFIG`) — โหมดอัตโนมัติใช้ผ่าน `--target <ชื่อ>` · ตัวอย่างรูปแบบไฟล์: `mycelium.example.json`
 
 ```
 C:\src\AICode\project-ai\mycelium\            ← ตัว package (npm link แล้วใช้ได้จากทุกที่)
@@ -35,7 +35,7 @@ C:\src\AICode\project-ai\mycelium\            ← ตัว package (npm link �
     plan.mjs                ← schema แผน DAG + validation (id, types, cycle) + FIXED_ROLE_TIER
     scheduler.mjs           ← สถานะงาน (state/marker) + dependency + execute ตาม wave + dry-run guard
     run-store.mjs           ← checkpoint ราย task + manifest ของ run (run.json) + resume
-  mycelium.json             ← การตั้งค่า: knowledge_roots + targets + defaults
+  mycelium.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\mycelium\mycelium.json)
   agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
   roles\                    ← 11 ตำแหน่งในทีม
   tests\                    ← regression tests (npm test)
