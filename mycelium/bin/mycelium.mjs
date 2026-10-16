@@ -9,12 +9,13 @@ import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, reso
 import { extractJson, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
+import { performInit } from "../src/init.mjs";
 import { pmPrompt, plannerPrompt } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -24,6 +25,7 @@ function parseArgs(argv) {
       case "--plan-file": opts.planFile = argv[++i] ?? ""; opts.explicit.add("planFile"); break;
       case "--resume": opts.resume = argv[++i] ?? ""; opts.explicit.add("resume"); break;
       case "--list": opts.list = true; break;
+      case "--init": opts.init = true; break;
       case "--target": opts.target = argv[++i] ?? ""; opts.explicit.add("target"); break;
       case "--agent": opts.agent = argv[++i] ?? ""; opts.explicit.add("agent"); break;
       case "--planner-tier": opts.plannerTier = argv[++i] ?? ""; opts.explicit.add("plannerTier"); break;
@@ -33,7 +35,7 @@ function parseArgs(argv) {
       case "--write": opts.write = true; opts.explicit.add("write"); break;
       case "--config": opts.config = argv[++i] ?? ""; opts.explicit.add("config"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--init] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--write]`);
         process.exit(2);
     }
   }
@@ -110,6 +112,14 @@ async function main() {
   opts.projectCtx = projectCtx;
 
   console.log(`🍄 MYCELIUM — สมองของทีม (คุม ${cfg.roleNames.length} role)${opts.target ? ` · target: ${opts.target}` : ""}`);
+
+  // --init: ติดตั้งลง workspace ครั้งเดียว — config + CLAUDE.md/AGENTS.md ให้ session สวมบทเอง
+  if (opts.init) {
+    console.log(`ติดตั้ง MYCELIUM ลง workspace นี้: ${process.cwd()}`);
+    performInit(process.cwd(), TEAM_DIR);
+    console.log(`\nเสร็จแล้ว — เปิด AI session ที่ ${process.cwd()} ได้เลย มันจะสวมบท MYCELIUM เอง ไม่ต้องพิมพ์คำสั่งสวมบทอีก`);
+    return;
+  }
 
   if (opts.list) {
     printWorkspace(ws);

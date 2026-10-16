@@ -2,7 +2,8 @@
 
 บ้านของ **🍄 MYCELIUM** — local npm package "สมองของทีม AI" อยู่ที่ `mycelium\` (ติดตั้งแล้วผ่าน `npm link` — ใช้คำสั่ง `mycelium` / `mycelium-role` ได้จากทุกที่)
 
-- สวมบท MYCELIUM: `อ่าน C:\src\AICode\project-ai\mycelium\MYCELIUM.md แล้วสวมบทบาท MYCELIUM`
+- ติดตั้งลง workspace (ครั้งเดียว): `cd <ราก workspace> && mycelium --init` — สร้าง CLAUDE.md/AGENTS.md ให้ AI session สวมบท MYCELIUM เอง + config ของ workspace
+- สวมบท MYCELIUM (ถ้าไม่ได้ init): `อ่าน C:\src\AICode\project-ai\mycelium\MYCELIUM.md แล้วสวมบทบาท MYCELIUM`
 - เอกสารทั้งหมด: `mycelium\README.md` · ประวัติแต่ละรุ่น: `mycelium\RELEASE-NOTES.md`
 
 ## โมเดล branch / release
