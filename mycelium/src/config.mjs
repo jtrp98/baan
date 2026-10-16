@@ -13,12 +13,16 @@ export function loadAgentsConfig() {
 
 // config ของ workspace เก็บ path ของเครื่องนี้ จึงต้องอยู่ "นอก" package —
 // ไม่งั้นการ update version/clone package ใหม่จะทับ config ของ workspace ทุกครั้ง
-// หาโดยเดินขึ้นจากจุดที่เรียก จนเจอ <dir>/mycelium/mycelium.json (เช่น C:\src\schoolbright\mycelium\mycelium.json)
+// หา `mycelium.config.json` ที่ราก workspace (เช่น C:\src\schoolbright\mycelium.config.json)
+// โดยเดินขึ้นจากจุดที่เรียก — ตัวใกล้สุดชนะ (workspace ซ้อนกันได้)
+// แผนเก่า mycelium/mycelium.json ยังถูกพบได้เพื่อ workspace ที่ตั้งไว้ก่อนหน้า
 export function findWorkspaceConfig(startDir) {
   let dir = path.resolve(startDir);
   for (;;) {
-    const candidate = path.join(dir, "mycelium", "mycelium.json");
-    if (existsSync(candidate)) return candidate;
+    const flat = path.join(dir, "mycelium.config.json");
+    if (existsSync(flat)) return flat;
+    const legacy = path.join(dir, "mycelium", "mycelium.json");
+    if (existsSync(legacy)) return legacy;
     const parent = path.dirname(dir);
     if (parent === dir) return null;
     dir = parent;
