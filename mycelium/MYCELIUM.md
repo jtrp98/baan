@@ -96,7 +96,7 @@ mycelium-role --agent codex --role business-analyst --tier t2 --task "คำส�
 
 ## การตั้งค่า (อยู่นอก package — กัน update version ทับ)
 
-config ของ workspace (knowledge_roots + targets + defaults) เก็บที่ `<ราก workspace>\mycelium\mycelium.json`
-เช่น `C:\src\schoolbright\mycelium\mycelium.json` — ตัว mycelium จะเดินหาไฟล์นี้ขึ้นจากไดเรกทอรีที่เรียกโดยอัตโนมัติ
-(หรือระบุด้วย `--config <file>` / env `MYCELIUM_CONFIG`) — ตัวอย่างรูปแบบ: `mycelium.example.json` ใน package ·
-ดูค่าปัจจุบันด้วย `mycelium --list`
+config ของ workspace (knowledge_roots + targets + defaults) เก็บที่ `<ราก workspace>\mycelium.config.json`
+เช่น `C:\src\schoolbright\mycelium.config.json` — ตัว mycelium จะเดินหาไฟล์นี้ขึ้นจากไดเรกทอรีที่เรียกโดยอัตโนมัติ
+(หรือระบุด้วย `--config <file>` / env `MYCELIUM_CONFIG`) — ติดตั้ง workspace ใหม่ด้วย `mycelium --init` ·
+ตัวอย่างรูปแบบ: `mycelium.example.json` ใน package · ดูค่าปัจจุบันด้วย `mycelium --list`

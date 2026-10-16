@@ -1,5 +1,5 @@
 // Regression: config ของ workspace อยู่นอก package (กัน update version ทับ config)
-// หาโดยเดินขึ้นจากจุดที่เรียกจนเจอ <dir>/mycelium/mycelium.json
+// แผนปัจจุบัน: <ราก workspace>\mycelium.config.json · แผนเก่า mycelium\mycelium.json ยังรองรับ
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -7,20 +7,45 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { findWorkspaceConfig, loadWorkspace, resolveWorkspaceConfig } from "../src/config.mjs";
 
-test("findWorkspaceConfig เดินขึ้นจากไดเรกทอรีลึกๆ จนเจอ", () => {
+const realConfig = { main_root: "C:/src", knowledge_roots: [{ name: "k", path: "C:/k", targets: [] }], defaults: { agent: "codex" } };
+
+test("ค้นพบ mycelium.config.json ที่ราก workspace จากไดเรกทอรีลึกๆ", () => {
   const root = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
   try {
-    const cfgDir = path.join(root, "mycelium");
-    mkdirSync(cfgDir);
-    writeFileSync(path.join(cfgDir, "mycelium.json"), "{}", "utf8");
+    writeFileSync(path.join(root, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
     const deep = path.join(root, "target", "some-repo", "src");
     mkdirSync(deep, { recursive: true });
-    assert.equal(findWorkspaceConfig(deep), path.join(cfgDir, "mycelium.json"));
-    assert.equal(findWorkspaceConfig(root), path.join(cfgDir, "mycelium.json"), "เรียกจากตำแหน่งราก workspace ก็ต้องเจอ");
+    assert.equal(findWorkspaceConfig(deep), path.join(root, "mycelium.config.json"));
+    assert.equal(findWorkspaceConfig(root), path.join(root, "mycelium.config.json"));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test("findWorkspaceConfig ไม่เจอ = null (เดินถึงรากของ drive)", () => {
+test("ตัวใกล้สุดชนะ (workspace ซ้อนกันได้)", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  try {
+    writeFileSync(path.join(root, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
+    const nested = path.join(root, "sub-workspace");
+    mkdirSync(nested);
+    writeFileSync(path.join(nested, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
+    assert.equal(findWorkspaceConfig(path.join(nested, "repo")), path.join(nested, "mycelium.config.json"));
+    assert.equal(findWorkspaceConfig(root), path.join(root, "mycelium.config.json"));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("แผนเก่า mycelium\\mycelium.json ยังถูกพบ และแผนใหม่ชนะเมื่อมีทั้งคู่ระดับเดียวกัน", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  try {
+    const legacyDir = path.join(root, "mycelium");
+    mkdirSync(legacyDir);
+    writeFileSync(path.join(legacyDir, "mycelium.json"), JSON.stringify(realConfig), "utf8");
+    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(legacyDir, "mycelium.json"));
+
+    writeFileSync(path.join(root, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
+    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(root, "mycelium.config.json"));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("ไม่เจออะไรเลย = null (ไม่ throw)", () => {
   const root = mkdtempSync(path.join(tmpdir(), "mycelium-empty-"));
   try {
     assert.equal(findWorkspaceConfig(root), null);
@@ -30,10 +55,8 @@ test("findWorkspaceConfig ไม่เจอ = null (เดินถึงรา
 test("resolveWorkspaceConfig: --config และ env ชนะ discovery และชี้ไฟล์ที่ไม่มีต้อง error", () => {
   const root = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
   try {
-    const cfgDir = path.join(root, "mycelium");
-    mkdirSync(cfgDir);
-    const configFile = path.join(cfgDir, "mycelium.json");
-    writeFileSync(configFile, "{}", "utf8");
+    const configFile = path.join(root, "any-name.json");
+    writeFileSync(configFile, JSON.stringify(realConfig), "utf8");
 
     const elsewhere = mkdtempSync(path.join(tmpdir(), "mycelium-elsewhere-"));
     try {

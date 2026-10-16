@@ -43,7 +43,7 @@ function parseArgs(argv) {
 }
 
 function printWorkspace(ws) {
-  console.log(`config   : ${ws.source ?? "(ไม่พบ config ของ workspace — ใช้ default ในโค้ด · วางที่ <ราก workspace>\\mycelium\\mycelium.json หรือใช้ --config · ตัวอย่าง: mycelium.example.json)"}`);
+  console.log(`config   : ${ws.source ?? "(ไม่พบ config ของ workspace — ใช้ default ในโค้ด · วางที่ <ราก workspace>\\mycelium.config.json หรือใช้ --config · ตัวอย่าง: mycelium.example.json)"}`);
   console.log(`main_root : ${ws.main_root || "(ไม่ได้ตั้ง)"}`);
   for (const kr of ws.knowledge_roots) {
     console.log(`knowledge : ${kr.name} → ${kr.path}`);
@@ -94,7 +94,7 @@ async function main() {
     const hit = resolveTarget(ws, opts.target);
     if (!hit) {
       const all = ws.knowledge_roots.flatMap((kr) => (kr.targets ?? []).map((tg) => `${kr.name}/${tg.name}`));
-      console.error(`ไม่พบ target: ${opts.target}\nที่มี: ${all.join(", ") || "(ไม่มี)"}${ws.source ? `\nconfig: ${ws.source}` : `\nไม่พบ config ของ workspace — เรียกจากภายใน workspace ที่มี mycelium\\mycelium.json หรือใช้ --config <file> (ตัวอย่าง: mycelium.example.json)`}`);
+      console.error(`ไม่พบ target: ${opts.target}\nที่มี: ${all.join(", ") || "(ไม่มี)"}${ws.source ? `\nconfig: ${ws.source}` : `\nไม่พบ config ของ workspace — เรียกจากภายใน workspace ที่มี mycelium.config.json หรือใช้ --config <file> (ตัวอย่าง: mycelium.example.json)`}`);
       process.exit(2);
     }
     if (!existsSync(hit.target.path)) { console.error(`path ของ target ไม่มีจริง: ${hit.target.path}`); process.exit(2); }

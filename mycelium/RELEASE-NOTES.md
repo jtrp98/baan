@@ -2,6 +2,18 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## 0.7.0 — 2026-10-16 · config เหลือไฟล์เดียว `mycelium.config.json` ที่ราก workspace
+
+### เปลี่ยน
+- config ของ workspace จาก `<workspace>\mycelium\mycelium.json` (โฟลเดอร์ซ้อนชื่อไฟล์) → **`<workspace>\mycelium.config.json`** ไฟล์เดียว
+- discovery เดินหาขึ้นจากจุดที่เรียก **ตัวใกล้สุดชนะ** — workspace ซ้อนกันได้ · แผนเก่า `mycelium\mycelium.json` ยังถูกพบได้ (ไม่พังทันทีเมื่ออัปเกรด)
+- `mycelium --init` ย้าย config แผนเก่าให้อัตโนมัติ + ทำไฟล์นำทาง (CLAUDE.md/AGENTS.md) ใหม่ให้ชี้ตำแหน่งถูก
+
+### ⚠ ต้องทำตอนอัปเกรด
+- workspace ที่ตั้งไว้สมัย 0.5–0.6: รัน `mycelium --init` ที่ราก workspace หนึ่งครั้ง ระบบจะย้าย config เป็นแผนใหม่ให้เอง
+
+(พร้อมกันนี้เพิ่ม `mycelium --init` ใน 0.6.0 สำหรับผู้ที่พลาด: สร้าง CLAUDE.md/AGENTS.md ให้ AI session สวมบท MYCELIUM เอง + config จาก template)
+
 ## 0.6.0 — 2026-10-16 · `mycelium --init` ติดตั้ง workspace ครั้งเดียว จบเรื่องสวมบท
 
 ### เพิ่ม
