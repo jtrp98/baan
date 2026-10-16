@@ -1,0 +1,52 @@
+# CONVENTIONS — กติกากลางที่ทุก role ต้องถือ
+
+> ระบบจะแนบไฟล์นี้ให้ทุก role อัตโนมัติ (คู่กับไฟล์ role ของตัวเอง) — ถือเป็นส่วนหนึ่งของสัญญา
+
+## 1. อ่านแบบ index-first
+
+อ่าน index ของหมวดที่ถูกชี้ก่อน (`requirement\index.md`, `design\index.md`, `plan\index.md` ฯลฯ) แล้วเปิด**เฉพาะไฟล์ที่ brief/task ระบุเป็น path ตรง** — ห้าม `ls` ไล่หา ห้ามอ่านข้ามหมวด · grep ภายในไฟล์ที่ได้รับอนุญาต · **Status อยู่ที่ index เท่านั้น**
+
+## 2. เขียนเฉพาะของตัวเอง (Owns)
+
+แต่ละ role เขียนได้เฉพาะไฟล์/โฟลเดอร์ที่ตัวเองเป็นเจ้าของ (ตารางในไฟล์ role) — **engineer เขียนได้เฉพาะ code roots ห้ามแตะ knowledge\ ฝั่งเขียนเด็ดขาด** · ถ้าคิดว่าต้องแก้ไฟล์คนอื่น = หยุดและ route กลับ ไม่ใช่แก้เอง
+
+## 3. Amend ไม่ regenerate
+
+ไฟล์ที่มีอยู่แล้ว = แก้เฉพาะจุด (`Edit`) ห้าม `Write` ทับทั้งไฟล์ · เติมบรรทัด `## Change Log` พร้อมวันที่ทุกครั้ง · ไฟล์ append-only (backlog, security findings) ห้ามแก้แถวเก่า · **IDs ห้าม renumber** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN)
+
+## 4. วันที่มาจากผู้ใช้
+
+ก่อนเขียน entry ที่มีวันที่ ถามผู้ใช้รอบเดียวต่อ session (ถ้าไม่รู้) ใช้รูปแบบ `YYYY-MM-DD` — **ห้ามเดาวันที่ ห้ามก๊อปจากแถวอื่น**
+
+## 5. ข้อเท็จจริงกับสมมติฐานแยกกัน
+
+ตัวเลข/ข้อเท็จจริงที่ไม่มีแหล่งที่มา = ติดป้าย `(สมมติฐาน — ยังไม่ยืนยัน)` จนกว่าคนจะยืนยัน · **ของจริงชนะความจำ** — ถ้าสิ่งที่จำได้ขัดกับไฟล์/โค้ดจริง ให้ไฟล์ชนะ และตรวจโค้ด as-built จริงเสมอก่อนอ้าง
+
+## 6. ห้าม state-changing git
+
+`status/log/diff/show` อ่านได้ — `commit/push/branch/merge/rebase/reset` เป็นของผู้ใช้เสมอ
+
+## 7. ห้ามเรียก role ต่อกันเอง
+
+จบงานด้วย **handoff สั้น**: ผลลัพธ์ (lead with result) → หลักฐาน (ไฟล์/บรรทัดที่แก้-อ่าน) → blockers → role ถัดไปที่ควรรับ — แล้วหยุด · ห้ามสมมติว่า output ตัวเองถูกยอมรับ
+
+## 8. Output state — จบ handoff ด้วยสถานะเดียว
+
+`DONE` · `PASS` · `FAIL` · `BLOCKED` · `NEEDS_DESIGN_CHANGE` · `NEEDS_REQUIREMENT_CHANGE` · `NEEDS_HUMAN`
+- engineer ใช้: DONE / BLOCKED / NEEDS_DESIGN_CHANGE / NEEDS_REQUIREMENT_CHANGE / NEEDS_HUMAN
+- qa ใช้: PASS / FAIL (ราย task) ในไฟล์ round ของตัวเอง
+- blocker รูปแบบ: `NEEDS_DESIGN_CHANGE` (อ้าง DES-id) / `NEEDS_REQUIREMENT_CHANGE` (อ้าง REQ/AC-id) / `NEEDS_HUMAN` (คำถามตรงๆ) — ทุกอันระบุ **Task / Reference / Reason**
+- งานที่ติดให้ทำต่อเฉพาะส่วนที่ไม่ติด แล้วรายงานส่วนที่หยุด
+
+## 9. ประตูมนุษย์ (7 จุด — หยุดถามทั้งสองโหมด)
+
+1. ทางเลือกธุรกิจสำคัญหรือเจ้าของยืนยันหาย · 2. schema/migration/breaking contract · 3. UX sign-off ก่อน FE ที่พึ่งมัน · 4. QA: Critical หรือตกซ้ำรอบที่ 3 ของ task เดิม · 5. Security: Critical/Important ทุกข้อ (แก้ หรือรับความเสี่ยงเป็นลายลักษณ์อักษร) · 6. deploy/migration จริงบน shared environment · 7. ตัด release scope
+การอนุมัติ/เซ็น เป็นการกระทำของคน — agent บันทึก (ใคร/เมื่อไหร่) ตามที่ผู้ใช้พูดเท่านั้น ห้ามเขียนแทน
+
+## 10. Finish rules
+
+**Done = released** (ไม่ใช่ verified) · release scope frozen — ของใหม่เข้า backlog ไม่ใช่ plan ยกเว้นผู้ใช้ย้ายเอง · findings ที่ไม่บล็อก = เข้า backlog ไม่เปิด task เอง · **แก้ซ้ำสูงสุด 2 รอบต่อ task แล้วให้คนตัดสิน** (ยอมรับ/re-scope/drop) · งานที่รอคำตอบคน = รายงานก่อนเสมอ อย่าสะสมงานหลังคำถามค้าง · เอกสารเกินงบขนาด (ไฟล์ย่อย ~4–10 KB ตามประเภท) = archive/split ไม่ใช่เขียนต่อยาว
+
+## 11. ภาษา
+
+เอกสารเป็นภาษาไทย (ศัพท์เทคนิค/โค้ด/ID เป็นอังกฤษได้) — ตาม convention ของโปรเจกต์นั้นถ้ามี

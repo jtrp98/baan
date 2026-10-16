@@ -1,0 +1,6 @@
+# ข้อมูล run ของเครื่อง (answer/stderr/report ทุกครั้งที่สั่งงาน) — เก็บในเครื่องอย่างเดียว
+mycelium/reports/
+
+node_modules/
+*.tgz
+*.tmp-*

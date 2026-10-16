@@ -1,0 +1,70 @@
+{
+  "agents": {
+    "claude": {
+      "label": "Claude Code",
+      "command": "claude",
+      "useShell": true,
+      "promptVia": "stdin",
+      "modelArgs": ["--model", "<MODEL>"],
+      "effortArgs": ["--effort", "<EFFORT>"],
+      "readArgs": ["-p", "--output-format", "text"],
+      "writeArgs": ["-p", "--output-format", "text", "--permission-mode", "acceptEdits"],
+      "answerFrom": "stdout"
+    },
+    "codex": {
+      "label": "Codex CLI",
+      "command": "codex",
+      "useShell": true,
+      "promptVia": "stdin",
+      "modelArgs": ["-m", "<MODEL>"],
+      "effortArgs": ["-c", "model_reasoning_effort=<EFFORT>"],
+      "readArgs": ["exec", "--skip-git-repo-check", "-s", "read-only", "-o", "<ANSWER>", "-"],
+      "writeArgs": ["exec", "--skip-git-repo-check", "-s", "workspace-write", "-o", "<ANSWER>", "-"],
+      "answerFrom": "answerFile"
+    },
+    "agy": {
+      "label": "Agy",
+      "command": "agy",
+      "useShell": false,
+      "promptVia": "arg",
+      "modelArgs": ["--model", "<MODEL>"],
+      "effortArgs": ["--effort", "<EFFORT>"],
+      "readArgs": ["--print"],
+      "writeArgs": ["--print", "--mode", "accept-edits"],
+      "answerFrom": "stdout"
+    }
+  },
+  "tiers": {
+    "t0": {
+      "_timeoutSec": 900,
+      "claude": { "model": "opus", "effort": "max" },
+      "codex": { "model": "gpt-6-astra", "effort": "max" },
+      "agy": null
+    },
+    "t1": {
+      "claude": { "model": "opus", "effort": "high" },
+      "codex": { "model": "gpt-6-astra", "effort": "high" },
+      "agy": null
+    },
+    "t2": {
+      "claude": { "model": "sonnet", "effort": "high" },
+      "codex": { "model": "gpt-6.1-sol", "effort": "high" },
+      "agy": null
+    },
+    "t3": {
+      "claude": { "model": "sonnet", "effort": "medium" },
+      "codex": { "model": "gpt-6.1-sol", "effort": "medium" },
+      "agy": { "model": "gemini-3.8-flash-medium" }
+    },
+    "t4": {
+      "claude": { "model": "haiku", "effort": "medium" },
+      "codex": { "model": "gpt-6-luna", "effort": "medium" },
+      "agy": { "model": "gemini-3.8-flash-medium" }
+    },
+    "t5": {
+      "claude": { "model": "haiku", "effort": "low" },
+      "codex": { "model": "gpt-6-luna", "effort": "low" },
+      "agy": { "model": "gemini-3.8-flash-low" }
+    }
+  }
+}

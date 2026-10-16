@@ -1,0 +1,29 @@
+{
+  "name": "mycelium",
+  "version": "0.4.0",
+  "description": "🍄 MYCELIUM — สมองของทีม AI: AI session สวมบท MYCELIUM แล้วเปิด session ของ 11 role (claude/codex/agy) ได้เอง",
+  "type": "module",
+  "bin": {
+    "mycelium": "./bin/mycelium.mjs",
+    "mycelium-role": "./bin/mycelium-role.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "roles/",
+    "agents.json",
+    "mycelium.json",
+    "CONVENTIONS.md",
+    "MYCELIUM.md",
+    "README.md",
+    "RELEASE-NOTES.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

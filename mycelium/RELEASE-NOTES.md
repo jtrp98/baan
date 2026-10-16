@@ -1,0 +1,58 @@
+# Release Notes — 🍄 MYCELIUM
+
+ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
+
+## 0.4.0 — 2026-10-16 · แยกโครงสร้างไฟล์
+
+แยกโค้ดจาก 2 ไฟล์ใหญ่ (938 บรรทัดรวม) เป็น `bin/` + `src/` ตามโครงสร้างที่ AUDIT ข้อ 7 แนะนำ
+
+### เปลี่ยน
+- `bin/mycelium.mjs` + `bin/mycelium-role.mjs` — entrypoint เหลือแค่ parse args และลำดับใหญ่ (~195 บรรทัด/ไฟล์)
+- `src/` แยกหน้าที่: `config` (การตั้งค่า/targets/roles) · `runner` (spawn AI CLI) · `prompts` (ประกอบ prompt) · `plan` (validation แผน DAG) · `scheduler` (สถานะงาน/execute) · `run-store` (checkpoint/manifest/resume)
+- กลไก spawn/args/stdin/timeout ที่เคยซ้ำในสองคำสั่ง รวมเป็น `src/runner.mjs` ชุดเดียว
+- comment เหลือเฉพาะเหตุผล (why) ที่โค้ดบอกเองไม่ได้ · ลบของไม่ใช้ (`PLANNER_TIERS_ROLES`, ตัวช่วย smoke ชั่วคราว)
+
+### ⚠ ต้องทำตอนอัปเกรด
+- path ของ bin เปลี่ยน — เครื่องที่ link ไว้ต้อง `npm link` ใหม่หนึ่งครั้ง
+
+## 0.3.0 — 2026-10-16 · แก้ความถูกต้องตาม AUDIT.md (2026-10-15)
+
+แก้ P1 ครบ 5 ข้อ + P2 สองข้อ พร้อม regression tests 35 กรณี (`npm test` — จำลอง provider ไม่ใช้โควตา)
+
+### เพิ่ม
+- **สถานะงานแยกจาก exit code** — task เป็น `completed` เฉพาะเมื่อรันจบ + มีคำตอบ + output state ท้ายคำตอบ (CONVENTIONS §8) เป็น `DONE`/`PASS`; role ตอบ `NEEDS_*`/`FAIL`/`BLOCKED` ถือว่างานล้มแม้ exit code เป็น 0
+- **checkpoint ราย task** (`<id>.status.json`) เขียนทันทีแบบ atomic พร้อม attempt และ artifact paths
+- **manifest ของ run** (`run.json`) เก็บ resolved target/cwd/write/projectCtx — `--resume` คืนบริบทเดิมอัตโนมัติ (flag ที่ส่งเองชนะเสมอ)
+- **exit code ใหม่**: 0 เมื่อทุก task completed เท่านั้น · 1 เมื่อมี needs_*/fail/timeout/blocked พร้อมสาเหตุราย task
+- context ส่งต่อระหว่าง task แนบสถานะ + path ฉบับเต็ม และแจ้งเมื่อถูกตัดที่ 6,000 ตัวอักษร
+
+### แก้
+- **dependency ผ่านเฉพาะงานที่ completed** — เดิมงาน fail แล้วงานลูกยังรันต่อและ pipeline จบ exit 0 ได้; ตอนนี้งานลูกถูก mark `blocked` แต่งานอิสระยังทำต่อจนจบ
+- **resume เลิกเชื่อไฟล์คำตอบลอยๆ** — เดิมมี answer ไม่ว่าง = สำเร็จ ทำให้งาน timeout ที่มี output บางส่วนถูกข้าม; ตอนนี้เชื่อเฉพาะ checkpoint completed ที่มีคำตอบจริง
+- **`--dry-run` ถูกกันทุก route** — เดิม `--plan-file`/`--resume` ข้ามจุดตรวจจนเรียก provider จริง; ตอนนี้การ์ดอยู่ใน `execute` จุดเดียว
+- **plan validation ก่อน spawn ใดๆ** — id จำกัด pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (กัน path traversal เพราะ id คือชื่อไฟล์), ตรวจ types ของ tasks/dependsOn/humanGates, self-dependency, cycle, และขอบเขต `--max-parallel`/`--timeout`
+- **CONVENTIONS.md ติด package** แล้ว (`npm pack` ยืนยัน) — เดิมติดตั้งจาก tarball แล้วกติกากลางหายเงียบๆ; ตอนนี้อ่านไม่ได้ = หยุดชัดเจน · planner ได้กติกากลางครบเหมือน role อื่น
+
+### ⚠ ต้องทำตอนอัปเกรด
+- run ที่สร้างก่อน 0.3.0 ไม่มี checkpoint — `--resume` จะรันงานใหม่ทั้งหมด (โดย design เพื่อไม่เชื่อผลที่ไม่รู้สถานะ)
+
+## 0.2.0 — 2026-10-15 · ทีม 11 role + CONVENTIONS + โหมดอัตโนมัติ
+
+### เพิ่ม
+- บทบาททีม 11 ตำแหน่งใน `roles/` (planner ถึง security) พร้อม `CONVENTIONS.md` เป็นกติกากลางที่แนบให้ทุก role อัตโนมัติ
+- โหมดอัตโนมัติทั้งก้อน: `mycelium --goal "..."` — goal → PM → planner (แผน DAG) → execute ตาม wave · planner เลือก tier ได้เฉพาะ frontend/backend-engineer
+- output state มาตรฐานตาม charter: `DONE`/`PASS`/`FAIL`/`BLOCKED`/`NEEDS_*`
+- tier ladder t0–t5 (claude/codex/agy) + FIXED_ROLE_TIER + humanGates รวมรายงานตอนจบ
+
+### แก้
+- ข้อความ console อ้าง path เก่า `ai-team/roles/` → `roles/`
+
+## ก่อน 0.2.0 (ช่วง POC — 2026-10-14)
+
+พิสูจน์กลไกก่อนตั้งทีม: agent CLI ทั้งสาม (claude/codex/agy) อ่านไฟล์จริงได้, เปลี่ยน model/effort ตาม tier ได้จริง (ผ่าน 15/15), role directive ส่งถึง agent จริง — รายละเอียดอยู่ใน `README.md` หัวข้อผลการทดสอบ
+
+## ถัดไป (ยังค้างจาก audit)
+
+- task-level write scope + จัดคิวงานที่เขียน path เดียวกัน — ก่อนใช้ `--write` กับงานจริง
+- humanGate เป็น object ผูกกับ task พร้อมหลักฐานการอนุมัติ
+- Git baseline ของทั้ง workspace เพื่อรีวิว/ย้อนการเปลี่ยนแปลง

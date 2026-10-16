@@ -1,0 +1,33 @@
+{
+  "main_root": "C:/src",
+  "knowledge_roots": [
+    {
+      "name": "schoolbright-knowledge",
+      "path": "C:/src/schoolbright/knowledge",
+      "targets": [
+        {
+          "name": "sb-api-academic-timetable-ai",
+          "path": "C:/src/schoolbright/target/sb-api-academic-timetable-ai"
+        },
+        {
+          "name": "sb-api-gateway",
+          "path": "C:/src/schoolbright/target/sb-api-gateway"
+        },
+        {
+          "name": "sb-tech-upgrade-academic",
+          "path": "C:/src/schoolbright/target/sb-tech-upgrade-academic"
+        },
+        {
+          "name": "sb-tech-upgrade-web-system",
+          "path": "C:/src/schoolbright/target/sb-tech-upgrade-web-system"
+        }
+      ]
+    }
+  ],
+  "defaults": {
+    "agent": "codex",
+    "planner_tier": "t2",
+    "timeout_sec": 600,
+    "max_parallel": 3
+  }
+}
