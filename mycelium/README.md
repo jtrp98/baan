@@ -37,10 +37,13 @@ C:\src\AICode\project-ai\mycelium\            ← ตัว package (npm link �
     plan.mjs                ← schema แผน DAG + validation (id, types, cycle) + FIXED_ROLE_TIER
     scheduler.mjs           ← สถานะงาน (state/marker) + dependency + execute ตาม wave + dry-run guard
     run-store.mjs           ← checkpoint ราย task + manifest ของ run (run.json) + resume
+    role-guard.mjs          ← ป้าย [mycelium-role: <ID>] + ประโยคข้อยกเว้น ใช้ร่วมใน prompt ของ role และ stub ของ --init
     role-session.mjs        ← แกนของ mycelium-role: parse args, runDir ไม่ชน, สถานะงาน + fallback ราย agent
   mycelium.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\mycelium.config.json)
   agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
   roles\                    ← 11 ตำแหน่งในทีม
+  setup\agy\                ← profile mycelium-readonly ของ agy (agent.md + guard hook) — ติดตั้งครั้งเดียวต่อเครื่อง
+  scripts\                  ← live-smoke.mjs (npm run smoke:live — ใช้โควตาจริง)
   tests\                    ← regression tests (npm test)
   reports\                  ← ผลการรันทุกครั้ง
 ```
@@ -85,6 +88,7 @@ mycelium-role --list              # ดูรายชื่อ agent + tier
 - **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
 - **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
+- **ป้าย `[mycelium-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท MYCELIUM ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ PM/planner ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `mycelium` และ `mycelium-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
 
 # กำหนดบทบาท (role) — ตำแหน่งในทีม
@@ -194,12 +198,16 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 | Agent | คำสั่งที่ mycelium-role ใช้ | รับ prompt ทาง | คำตอบอ่านจาก |
 |---|---|---|---|
-| claude | `claude -p --output-format text` | stdin | stdout |
+| claude | `claude -p --output-format text --allowedTools <ตามโหมด>` (write เพิ่ม `--permission-mode acceptEdits`) | stdin | stdout |
 | codex | `codex exec --skip-git-repo-check -s read-only -o <answer.txt> -` | stdin | ไฟล์ answer.txt (option `-o`) |
-| agy | `agy --print` | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
+| agy | `agy --agent mycelium-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
+  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent mycelium-readonly` (custom agent profile ระดับผู้ใช้ที่ตัด write/edit tools ออกจาก schema + `PreToolUse` guard hook ใน `~/.gemini/config/hooks.json` ที่บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly` เพราะ `--mode plan` เดิมกันการเขียนไม่ได้) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
+  - **agy ต้องติดตั้ง profile `mycelium-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
+  - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
+- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
 - เกิน timeout (default 240 วินาที/ตัว) จะถูก kill ทั้ง process tree อัตโนมัติ
 

@@ -4,7 +4,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText } from "../src/config.mjs";
-import { localDate, roleDirective } from "../src/prompts.mjs";
+import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
 import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
@@ -91,7 +91,7 @@ async function main() {
   }
 
   const workDate = opts.date || localDate();
-  let fullTask = task;
+  let fullTask = adhocDirective(task);
   if (opts.role) {
     const roleFile = path.join(ROLES_DIR, `${opts.role}.md`);
     if (!existsSync(roleFile)) {

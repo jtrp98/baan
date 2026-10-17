@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { ROLES_DIR, TEAM_DIR, listRoles, resolveRoleName, tierMatrixText } from "./config.mjs";
 import { FIXED_ROLE_TIER, IMPLEMENT_TIER_RANGE } from "./plan.mjs";
+import { roleSessionHeader } from "./role-guard.mjs";
 
 // CONVENTIONS.md เป็นสัญญาบังคับของทุก role — อ่านไม่ได้ให้หยุด ไม่ข้ามเงียบๆ
 // (มิฉะนั้น package ที่ติดตั้งแล้วขาดไฟล์นี้จะทำงานโดยไร้กติกากลางโดยไม่มีใครรู้)
@@ -35,12 +36,19 @@ function dateSection(date) {
   return `## วันที่ของงาน: ${date}\nใช้วันที่นี้กับ Change Log และทุก entry ที่มีวันที่ (ผู้คุมระบุมาแล้วตาม CONVENTIONS §4 — ไม่ต้องถามผู้ใช้ซ้ำ)`;
 }
 
+// งานที่ไม่ผูก role (mycelium-role ไม่ส่ง --role) ก็ยังต้องมีป้าย — ไม่งั้น session ใน workspace จะสวมบท MYCELIUM
+// และอาจเปิด mycelium-role ซ้อนต่อเอง
+export function adhocDirective(task) {
+  return `${roleSessionHeader("adhoc")}\n\n${task}`;
+}
+
 export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = localDate()) {
-  const roleContent = readFileSync(path.join(ROLES_DIR, `${resolveRoleName(roleName)}.md`), "utf8").trim();
+  const id = resolveRoleName(roleName);
+  const roleContent = readFileSync(path.join(ROLES_DIR, `${id}.md`), "utf8").trim();
   const conv = `\n\n---\n\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n---\n\n${dateSection(date)}`;
   const pc = projectCtx ? `\n\n---\n\n## บริบทโปรเจกต์:\n${projectCtx}` : "";
   const ctx = ctxBlocks?.length ? `\n\n---\n\n## ข้อมูลจากงานก่อนหน้า:\n${ctxBlocks.join("\n\n")}` : "";
-  return `คุณกำลังปฏิบัติหน้าที่ในทีมพัฒนาซอฟต์แวร์ตามบทบาทต่อไปนี้อย่างเคร่งครัด:\n\n${roleContent}${conv}${pc}\n\n---\n\n## งานที่ได้รับมอบหมาย:\n${task}${ctx}`;
+  return `${roleSessionHeader(id)}\n\nคุณกำลังปฏิบัติหน้าที่ในทีมพัฒนาซอฟต์แวร์ตามบทบาทต่อไปนี้อย่างเคร่งครัด:\n\n${roleContent}${conv}${pc}\n\n---\n\n## งานที่ได้รับมอบหมาย:\n${task}${ctx}`;
 }
 
 export function pmPrompt(goal, projectCtx, date = localDate()) {
@@ -55,7 +63,9 @@ export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDa
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
   const conv = `\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n${dateSection(date)}\n`;
   const pc = projectCtx ? `\n## บริบทโปรเจกต์ (ใส่ให้ทุก task ที่เกี่ยวกับโค้ด/เอกสาร):\n${projectCtx}\n` : "";
-  return `คุณกำลังปฏิบัติหน้าที่ planner ตามบทบาทต่อไปนี้อย่างเคร่งครัด:
+  return `${roleSessionHeader("planner")}
+
+คุณกำลังปฏิบัติหน้าที่ planner ตามบทบาทต่อไปนี้อย่างเคร่งครัด:
 
 ${roleContent}
 
