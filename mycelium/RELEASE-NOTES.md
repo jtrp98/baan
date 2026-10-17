@@ -2,6 +2,23 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## ยังไม่ release (dev/golf) · mycelium-role ได้กติกาสถานะงาน/fallback เดียวกับโหมดอัตโนมัติ
+
+### เปลี่ยน
+- **`mycelium-role` cwd เริ่มต้น = ไดเรกทอรีที่เรียก** (เดิม = โฟลเดอร์แม่ของ package → role อ่านผิด repo เงียบๆ เมื่อลืม `--cwd`)
+- **`mycelium-role` ตัดสินผลด้วย output state ท้ายคำตอบ** — role ตอบ `NEEDS_*`/`FAIL`/`BLOCKED` = งานไม่สำเร็จแม้ CLI exit 0 · exit 0 เฉพาะเมื่อทุกตัว completed
+- โฟลเดอร์ผลของ `mycelium-role` มีชื่อ role + suffix สุ่ม — เปิดหลาย role พร้อมกันในวินาทีเดียวไม่เขียนทับกันอีก
+
+### เพิ่ม
+- `mycelium-role` สลับตัวรันเมื่อติดโควตาตาม `_fallback` ของ tier (agent เดียว + `--tier`) · `--no-fallback` ปิดได้ · `report.json` มี `state`/`marker`/`fallback`
+- **วันที่ของงานใน prompt ทุก role** + PM/planner — ค่าเริ่มต้น = วันที่ local ของเครื่อง · `--date YYYY-MM-DD` ทั้งสองคำสั่ง · CONVENTIONS §4 ให้ role ใช้วันที่นี้แทนการถาม (role รัน non-interactive ถามไม่ได้)
+- กลไก fallback รวมเป็น `runWithFallback` ชุดเดียว (งานในแผน, PM/planner, mycelium-role) · `mycelium-role` ประกอบ prompt ผ่าน `roleDirective` ร่วมกับโหมดอัตโนมัติ
+- tests 65 กรณี (+11: cwd, runDir ไม่ชน, state/fallback ของ mycelium-role, วันที่ใน prompt)
+
+### ⚠ ต้องทำตอนอัปเกรด
+- สคริปต์/session ที่เรียก `mycelium-role` โดยไม่ส่ง `--cwd` และพึ่ง cwd เดิม (โฟลเดอร์แม่ของ package) — ส่ง `--cwd` ให้ชัด
+- ผู้ที่ใช้ exit code ของ `mycelium-role`: ตอนนี้ role ที่ตอบ `NEEDS_*`/`FAIL`/`BLOCKED` ได้ exit 1 (เดิม 0) — อ่านบรรทัด `สรุป:` เพื่อดูสถานะราย agent
+
 ## 0.8.0 — 2026-10-17 · เติม agy กลับทุก tier ด้วย Gemini 4 Argon
 
 ### เปลี่ยน

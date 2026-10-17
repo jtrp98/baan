@@ -70,7 +70,7 @@ async function runRoleTask(cfg, opts, runDir, t, ctxBlocks, agent = t.agent) {
   const conf = cfg.tiers[t.tier]?.[agent] ?? {};
   const answerFile = path.join(runDir, `${t.id}.answer.txt`);
   const timeoutSec = cfg.tiers[t.tier]?._timeoutSec ?? opts.timeoutSec;
-  const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx);
+  const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx, opts.date || undefined);
   const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile);
   if (def.promptVia === "arg") args.push(prompt);
   return runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile);
@@ -85,6 +85,22 @@ export function looksLikeLimitError(r) {
   if (r.ok || r.timedOut) return false;
   const hay = `${r.error ?? ""}\n${r.stderr ?? ""}\n${r.answer ?? ""}`.toLowerCase();
   return LIMIT_ERROR_PATTERNS.some((p) => hay.includes(p));
+}
+
+// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit
+// ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ mycelium-role เพื่อให้กติกาการสลับเป็นชุดเดียว
+export async function runWithFallback(chain, attempt, onSwitch = () => {}) {
+  const trail = [];
+  let r = null;
+  let agent = chain[0];
+  for (let i = 0; i < chain.length; i++) {
+    agent = chain[i];
+    r = await attempt(agent);
+    if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) break;
+    trail.push(`${chain[i]}→${chain[i + 1]}`);
+    onSwitch(chain[i], chain[i + 1]);
+  }
+  return { r, agent, trail };
 }
 
 // execute คือจุดกัน --dry-run เดียวของทุก route (goal / --plan-file / --resume) —
@@ -115,16 +131,11 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       // (cfg ที่ไม่รู้จัก agent เลย เช่นตอนทดสอบ = เรียกตัวเดิมหนึ่งครั้งตามปกติ)
       const tryChain = fallbackChainFor(cfg, t.tier, t.agent);
       const chain = tryChain.length ? tryChain : [t.agent];
-      let r = null;
-      let usedAgent = t.agent;
-      const fallbackTrail = [];
-      for (let i = 0; i < chain.length; i++) {
-        usedAgent = chain[i];
-        r = await runTask(cfg, opts, runDir, t, ctxBlocks, usedAgent);
-        if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) break;
-        fallbackTrail.push(`${chain[i]}→${chain[i + 1]}`);
-        console.log(`  ${t.id}: ${chain[i]} ติดโควตา/limit — สลับไป ${chain[i + 1]} (ตามลำดับ fallback ของ tier ${t.tier})`);
-      }
+      const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
+        chain,
+        (agent) => runTask(cfg, opts, runDir, t, ctxBlocks, agent),
+        (from, to) => console.log(`  ${t.id}: ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
+      );
       t.agent = usedAgent;
       return { t, r, fallbackTrail };
     }));

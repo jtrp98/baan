@@ -16,25 +16,44 @@ export function readConventions() {
   }
 }
 
-export function roleDirective(roleName, task, ctxBlocks, projectCtx) {
+// role รันแบบ non-interactive จึงถามวันที่จากผู้ใช้ตาม CONVENTIONS §4 ไม่ได้ —
+// ไม่ใส่วันที่ใน prompt = role ต้องหยุดด้วย NEEDS_HUMAN หรือเดาวันที่ลง Change Log เอง
+// ค่าเริ่มต้นคือวันที่ตามนาฬิกาเครื่องแบบ local (ไม่ใช่ UTC — ช่วงเช้าในไทย UTC ยังเป็นเมื่อวาน)
+export function localDate(d = new Date()) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function parseWorkDate(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s ?? "");
+  const d = m && new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  if (!d || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) throw new Error(`--date ต้องเป็นวันที่จริงรูปแบบ YYYY-MM-DD (ได้: ${JSON.stringify(s ?? "")})`);
+  return s;
+}
+
+function dateSection(date) {
+  return `## วันที่ของงาน: ${date}\nใช้วันที่นี้กับ Change Log และทุก entry ที่มีวันที่ (ผู้คุมระบุมาแล้วตาม CONVENTIONS §4 — ไม่ต้องถามผู้ใช้ซ้ำ)`;
+}
+
+export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = localDate()) {
   const roleContent = readFileSync(path.join(ROLES_DIR, `${roleName}.md`), "utf8").trim();
-  const conv = `\n\n---\n\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}`;
+  const conv = `\n\n---\n\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n---\n\n${dateSection(date)}`;
   const pc = projectCtx ? `\n\n---\n\n## บริบทโปรเจกต์:\n${projectCtx}` : "";
   const ctx = ctxBlocks?.length ? `\n\n---\n\n## ข้อมูลจากงานก่อนหน้า:\n${ctxBlocks.join("\n\n")}` : "";
   return `คุณกำลังปฏิบัติหน้าที่ในทีมพัฒนาซอฟต์แวร์ตามบทบาทต่อไปนี้อย่างเคร่งครัด:\n\n${roleContent}${conv}${pc}\n\n---\n\n## งานที่ได้รับมอบหมาย:\n${task}${ctx}`;
 }
 
-export function pmPrompt(goal, projectCtx) {
-  return `${roleDirective("project-manager", `ผู้ใช้ส่งเป้าหมายมาถึงคุณ (PM) จงประมวลเป้าหมายนี้แล้วเขียน "คำมอบหมายให้ planner" แบบกระชับ (ไม่เกิน 10 บรรทัด): สิ่งที่ต้องได้, ขอบเขต in/out, ข้อจำกัดที่รู้ และสิ่งที่ต้องระวัง — อย่าวางแผนเอง หน้าที่นี้เป็นของ planner\n\n## เป้าหมายจากผู้ใช้:\n${goal}`, null, projectCtx)}
+export function pmPrompt(goal, projectCtx, date = localDate()) {
+  return `${roleDirective("project-manager", `ผู้ใช้ส่งเป้าหมายมาถึงคุณ (PM) จงประมวลเป้าหมายนี้แล้วเขียน "คำมอบหมายให้ planner" แบบกระชับ (ไม่เกิน 10 บรรทัด): สิ่งที่ต้องได้, ขอบเขต in/out, ข้อจำกัดที่รู้ และสิ่งที่ต้องระวัง — อย่าวางแผนเอง หน้าที่นี้เป็นของ planner\n\n## เป้าหมายจากผู้ใช้:\n${goal}`, null, projectCtx, date)}
 
 ตอบกลับเฉพาะข้อความคำมอบหมาย (ไม่ต้องเป็น JSON)`;
 }
 
-export function plannerPrompt(pmDirective, goal, cfg, projectCtx) {
+export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate()) {
   const roleContent = readFileSync(path.join(ROLES_DIR, "planner.md"), "utf8").trim();
   const roles = listRoles().map((r) => `- ${r.name} — ${r.title}${FIXED_ROLE_TIER[r.name] ? ` (tier คงที่ ${FIXED_ROLE_TIER[r.name]})` : " (planner เลือก tier)"}`).join("\n");
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
-  const conv = `\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n`;
+  const conv = `\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n${dateSection(date)}\n`;
   const pc = projectCtx ? `\n## บริบทโปรเจกต์ (ใส่ให้ทุก task ที่เกี่ยวกับโค้ด/เอกสาร):\n${projectCtx}\n` : "";
   return `คุณกำลังปฏิบัติหน้าที่ planner ตามบทบาทต่อไปนี้อย่างเคร่งครัด:
 

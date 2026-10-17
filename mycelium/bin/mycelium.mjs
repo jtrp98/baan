@@ -2,20 +2,20 @@
 // 🍄 MYCELIUM (โหมดอัตโนมัติ) — goal → PM → planner → execute ตามแผน DAG
 // โหมดหลักของ MYCELIUM คือ "AI session สวมบท" ตาม MYCELIUM.md แล้วเปิด session ราย role
 // ด้วย mycelium-role — ไฟล์นี้คือทางเลือกอัตโนมัติทั้งก้อนเมื่อไม่ต้องมีคน/session คุมเอง
-// การตั้งค่าอยู่ที่ mycelium.json ข้าง package · วิธีใช้เต็ม: mycelium/README.md
+// การตั้งค่าอยู่ที่ <ราก workspace>\mycelium.config.json (นอก package) · วิธีใช้เต็ม: mycelium/README.md
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, tierMatrixText } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
-import { execute, looksLikeLimitError } from "../src/scheduler.mjs";
+import { execute, runWithFallback } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
-import { pmPrompt, plannerPrompt } from "../src/prompts.mjs";
+import { localDate, parseWorkDate, pmPrompt, plannerPrompt } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -34,8 +34,11 @@ function parseArgs(argv) {
       case "--timeout": opts.timeoutSec = Number(argv[++i]) || 0; opts.explicit.add("timeoutSec"); break;
       case "--write": opts.write = true; opts.explicit.add("write"); break;
       case "--config": opts.config = argv[++i] ?? ""; opts.explicit.add("config"); break;
+      case "--date":
+        try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
+        opts.explicit.add("date"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--init] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: mycelium [--list] [--init] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
         process.exit(2);
     }
   }
@@ -55,18 +58,19 @@ function printWorkspace(ws) {
 
 // ขั้นต้นทางหนึ่งขั้น (PM/planner) — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
 async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptText) {
-  const chain = fallbackChainFor(cfg, tier, opts.agent);
-  for (let i = 0; i < chain.length; i++) {
-    const agent = chain[i];
-    const def = cfg.agents[agent];
-    const conf = cfg.tiers[tier]?.[agent] ?? {};
-    const answerFile = path.join(runDir, fileName);
-    const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile);
-    if (def.promptVia === "arg") args.push(promptText);
-    const r = await runCli(def, args, def.promptVia, promptText, opts.cwd, cfg.tiers[tier]?._timeoutSec ?? opts.timeoutSec, def.answerFrom === "answerFile" ? answerFile : undefined);
-    if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) return { r, agent, answerFile };
-    console.log(`[${fileName.split(".")[0]}] ${agent} ติดโควตา/limit — สลับไป ${chain[i + 1]} (ตามลำดับ fallback ของ tier ${tier})`);
-  }
+  const answerFile = path.join(runDir, fileName);
+  const { r, agent } = await runWithFallback(
+    fallbackChainFor(cfg, tier, opts.agent),
+    (agent) => {
+      const def = cfg.agents[agent];
+      const conf = cfg.tiers[tier]?.[agent] ?? {};
+      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile);
+      if (def.promptVia === "arg") args.push(promptText);
+      return runCli(def, args, def.promptVia, promptText, opts.cwd, cfg.tiers[tier]?._timeoutSec ?? opts.timeoutSec, def.answerFrom === "answerFile" ? answerFile : undefined);
+    },
+    (from, to) => console.log(`[${fileName.split(".")[0]}] ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
+  );
+  return { r, agent, answerFile };
 }
 
 async function main() {
@@ -85,6 +89,8 @@ async function main() {
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;
   opts.timeoutSec = opts.timeoutSec || ws.defaults.timeout_sec;
   opts.maxParallel = opts.maxParallel || ws.defaults.max_parallel;
+  // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง Change Log ด้วยวันที่รันจริง
+  opts.date = opts.date || localDate();
   if (!Number.isInteger(opts.maxParallel) || opts.maxParallel < 1 || opts.maxParallel > 64) { console.error(`--max-parallel ต้องเป็นจำนวนเต็ม 1–64 (ได้: ${opts.maxParallel})`); process.exit(2); }
   if (!Number.isInteger(opts.timeoutSec) || opts.timeoutSec < 1 || opts.timeoutSec > 86400) { console.error(`--timeout ต้องเป็นจำนวนเต็ม 1–86400 วินาที (ได้: ${opts.timeoutSec})`); process.exit(2); }
 
@@ -191,13 +197,13 @@ async function main() {
   writeManifest(runDir, opts); // บันทึกบริบทก่อนเรียก provider ใดๆ — crash กลางทางก็ resume ได้ครบ
 
   console.log(`[pm] ${opts.agent} @ t2 รับ goal แล้วเขียนคำมอบหมาย...`);
-  const pm = await callStageWithFallback(cfg, opts, runDir, "t2", "pm.answer.txt", pmPrompt(goal, projectCtx));
+  const pm = await callStageWithFallback(cfg, opts, runDir, "t2", "pm.answer.txt", pmPrompt(goal, projectCtx, opts.date));
   const pmDirective = pm.r.answer || "(PM ไม่ตอบ — planner ใช้ goal ตรงๆ)";
   writeAtomic(pm.answerFile, pmDirective);
   console.log(`[pm] ${pm.agent} คำมอบหมาย: ${pmDirective.split("\n")[0].slice(0, 100)}...`);
 
   console.log(`[planner] ${opts.agent} @ ${opts.plannerTier} กำลังวางแผน...`);
-  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx));
+  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx, opts.date));
   writeAtomic(p.answerFile, p.r.answer);
   if (!p.r.ok) { console.error(`planner ล้มเหลว: exit=${p.r.exitCode} ${p.r.error} (agent สุดท้าย: ${p.agent})`); process.exit(1); }
   let plan;

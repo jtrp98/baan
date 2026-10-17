@@ -53,8 +53,12 @@ mycelium-role --agent codex --role business-analyst --tier t2 --task "คำส�
 ```
 
 - คำสั่งนี้**แนบไฟล์ role + `CONVENTIONS.md` (กติกากลางทุก role ต้องถือ)** ให้อัตโนมัติ — คุณไม่ต้องเล่ากติกาซ้ำใน task
-- คำตอบของ role จะพิมพ์ออกมาทาง stdout และเก็บที่ `reports/` ของ package
-- ตัวเลือกที่ใช้บ่อย: `--cwd <path>` (โปรเจกต์เป้าหมาย) · `--write` (อนุญาตให้แก้ไฟล์ — default read-only) · `--timeout <sec>`
+- คำตอบของ role จะพิมพ์ออกมาทาง stdout และเก็บที่ `reports/` ของ package (โฟลเดอร์ต่อ run มีชื่อ role + suffix สุ่ม — เปิดหลาย role พร้อมกันได้ไม่ชนกัน)
+- **cwd เริ่มต้น = ไดเรกทอรีที่คุณเรียกคำสั่ง** — อยู่ที่ราก workspace แล้วจะให้ role ดู repo ไหน ส่ง `--cwd <path ของ target>` เสมอ
+- **วันที่ของงาน** แนบให้ role อัตโนมัติ (ค่าเริ่มต้น = วันที่ของเครื่อง) — ถ้าผู้ใช้บอกวันที่ไว้ ส่ง `--date YYYY-MM-DD` ทุกครั้ง role จะใช้ลง Change Log โดยไม่ต้องถาม
+- **อ่านผลจากบรรทัด `สรุป:` ท้ายสุด + exit code**: exit 0 = ทุกตัว `completed` (DONE/PASS) · exit 1 = มีตัวที่ `needs_*`/`fail`/`blocked`/`timeout`/`failed` → route ต่อตามหัวข้อ handoff ด้านล่าง
+- ติดโควตา/limit: สั่ง agent เดียวพร้อม `--tier` แล้วระบบสลับไปตัวถัดไปตาม `_fallback` ของ tier เอง (ปิดได้ด้วย `--no-fallback`)
+- ตัวเลือกที่ใช้บ่อย: `--cwd <path>` (โปรเจกต์เป้าหมาย) · `--write` (อนุญาตให้แก้ไฟล์ — default read-only) · `--timeout <sec>` · `--date YYYY-MM-DD`
 - agent เลือกได้: `codex` (default, ประหยัดโควตา claude) · `claude` · `agy` (gemini-4-argon ครบทุก tier)
 - โหมดอัตโนมัติทั้งก้อน (ไม่ต้องคุมเอง): `mycelium --goal "..."` — PM/planner/execute ทำงานเองตามแผน DAG
 
