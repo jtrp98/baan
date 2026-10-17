@@ -69,8 +69,9 @@ for (const file of ["MYCELIUM.md", "README.md"]) {
   });
 }
 
-// fe/be เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทั้งสองไฟล์ (แก้ที่เดียวแล้วลืมอีกที่ = role ได้กติกาไม่เท่ากัน)
-test("fe/be มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
+// fe/be/qa เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทุกไฟล์ (แก้ที่เดียวแล้วลืมที่อื่น = role ได้กติกาไม่เท่ากัน)
+const CODE_WRITING_ROLES = ["fe", "be", "qa"];
+test("fe/be/qa มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
   const section = (id) => {
     const text = readFileSync(path.join(pkgDir, "roles", `${id}.md`), "utf8");
     const start = text.indexOf("## สไตล์โค้ดและ comment");
@@ -79,7 +80,7 @@ test("fe/be มีหมวดสไตล์โค้ดและ comment ช�
     return text.slice(start, end === -1 ? undefined : end).trim();
   };
   const fe = section("fe");
-  assert.equal(fe, section("be"), "หมวดนี้ของ fe กับ be ต้องเหมือนกันทุกตัวอักษร");
+  for (const id of CODE_WRITING_ROLES) assert.equal(section(id), fe, `หมวดนี้ของ ${id} ต้องเหมือนของ fe ทุกตัวอักษร`);
   for (const must of ["เหมือนโค้ดรอบข้างใน target", "comment เฉพาะ \"why\"", "ห้าม comment ที่เล่าว่าโค้ดทำอะไร", "ห้ามใส่ task id"]) {
     assert.ok(fe.includes(must), `ขาด: ${must}`);
   }

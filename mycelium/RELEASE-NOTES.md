@@ -11,7 +11,7 @@
 - tests 72 → 77 กรณี
 
 ### เพิ่ม
-- **กติกาสไตล์โค้ดและ comment ของ `fe`/`be`** (หมวดเดียวกันทั้งสองไฟล์ + test กันไม่ให้ต่างกัน): เขียนให้เหมือนโค้ดรอบข้างใน target ห้ามเปลี่ยนสไตล์/reformat/refactor นอก task · comment เฉพาะ "why" ห้าม comment what · ห้ามใส่ task id หรือ ID เอกสาร (T1/BL/REQ/DES ฯลฯ) ลงในโค้ดหรือ comment — การโยงงานอยู่ใน handoff เท่านั้น
+- **กติกาสไตล์โค้ดและ comment ของ `fe`/`be`/`qa`** (role ที่เขียนโค้ดลง target — หมวดเดียวกันทั้งสามไฟล์ + test กันไม่ให้ต่างกัน): เขียนให้เหมือนโค้ดรอบข้างใน target ห้ามเปลี่ยนสไตล์/reformat/refactor นอก task · comment เฉพาะ "why" ห้าม comment what · ห้ามใส่ task id หรือ ID เอกสาร (T1/BL/REQ/DES ฯลฯ) ลงในโค้ดหรือ comment — การโยงงานอยู่ใน handoff เท่านั้น (สำหรับ `qa` รวมถึงชื่อเคส test — traceability AC ↔ test อยู่ใน test plan ของ `tp`)
 
 ### ⚠ ต้องทำตอนอัปเกรด
 - workspace ที่ `--init` ไว้แล้ว: รัน `mycelium --init` ที่ราก workspace อีกครั้งเพื่อให้ CLAUDE.md/AGENTS.md มีข้อยกเว้น (ไฟล์ที่ผู้ใช้เขียนเองจะถูกข้าม — เพิ่มประโยคข้อยกเว้นจาก `src/role-guard.mjs` เอง)
