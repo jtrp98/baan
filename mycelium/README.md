@@ -37,6 +37,7 @@ C:\src\AICode\project-ai\mycelium\            ← ตัว package (npm link �
     plan.mjs                ← schema แผน DAG + validation (id, types, cycle) + FIXED_ROLE_TIER
     scheduler.mjs           ← สถานะงาน (state/marker) + dependency + execute ตาม wave + dry-run guard
     run-store.mjs           ← checkpoint ราย task + manifest ของ run (run.json) + resume
+    role-guard.mjs          ← ป้าย [mycelium-role: <ID>] + ประโยคข้อยกเว้น ใช้ร่วมใน prompt ของ role และ stub ของ --init
     role-session.mjs        ← แกนของ mycelium-role: parse args, runDir ไม่ชน, สถานะงาน + fallback ราย agent
   mycelium.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\mycelium.config.json)
   agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
@@ -85,6 +86,7 @@ mycelium-role --list              # ดูรายชื่อ agent + tier
 - **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
 - **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
+- **ป้าย `[mycelium-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท MYCELIUM ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ PM/planner ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `mycelium` และ `mycelium-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
 
 # กำหนดบทบาท (role) — ตำแหน่งในทีม

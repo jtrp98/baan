@@ -2,6 +2,17 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## ยังไม่ release (dev/golf) · role ไม่สวมบท MYCELIUM ซ้อนตาม CLAUDE.md/AGENTS.md ของ workspace
+
+### แก้
+- **session ที่ถูกเปิดเป็น role ไม่สวมบท MYCELIUM ซ้อนแล้ว** — CLAUDE.md/AGENTS.md ที่ `--init` วางไว้ถูก AI CLI โหลดเองอัตโนมัติ (claude อ่านของโฟลเดอร์แม่ด้วย) role จึงได้คำสั่ง "คุณคือ MYCELIUM" ซ้อนกับบทบาทของตัวเอง (พบจาก smoke จริงที่ schoolbright: codex ที่เปิดเป็น `ba` พยายามเปิด charter ก่อนทำงาน)
+  - prompt ของทุก role (รวม PM/planner และงานไม่ผูก role = `adhoc`) ขึ้นต้นด้วยป้าย `[mycelium-role: <ID>]` + ประโยคข้อยกเว้น
+  - stub ของ `--init` มีประโยคข้อยกเว้นเดียวกันอยู่ก่อนคำสั่งสวมบท — เจอป้ายนี้ = ทำตามบทบาท ไม่อ่าน charter ไม่เรียก mycelium/mycelium-role ต่อ
+- tests 72 → 76 กรณี
+
+### ⚠ ต้องทำตอนอัปเกรด
+- workspace ที่ `--init` ไว้แล้ว: รัน `mycelium --init` ที่ราก workspace อีกครั้งเพื่อให้ CLAUDE.md/AGENTS.md มีข้อยกเว้น (ไฟล์ที่ผู้ใช้เขียนเองจะถูกข้าม — เพิ่มประโยคข้อยกเว้นจาก `src/role-guard.mjs` เอง)
+
 ## 0.9.0 — 2026-10-17 · โหมดหลักได้สถานะงาน/fallback เดียวกับโหมดอัตโนมัติ + ID role สั้น
 
 ### เปลี่ยน
