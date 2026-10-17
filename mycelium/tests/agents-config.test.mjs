@@ -45,13 +45,15 @@ test("agy ครบทุก tier แล้วหลัง Argon เปิดต
 
 // agy: --print กลืน argument ถัดไปเป็น prompt — flag อื่นต้องอยู่ก่อน --print เสมอ
 // (เคยวาง --mode หลัง --print จน --write ของ agy ล้มด้วย exit 2 ทุกครั้ง — พบจาก live smoke 2026-10-17)
-test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --mode plan · write ใช้ --mode accept-edits", () => {
+test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --agent mycelium-readonly · write ใช้ --mode accept-edits", () => {
   const { readArgs, writeArgs } = cfg.agents.agy;
   for (const args of [readArgs, writeArgs]) assert.equal(args.at(-1), "--print", `ต้องจบด้วย --print: ${JSON.stringify(args)}`);
-  const mode = (args) => args[args.indexOf("--mode") + 1];
-  assert.equal(mode(readArgs), "plan", "read-only ต้องไม่ใช่ default mode ของ agy (default เขียนไฟล์ได้ — พบจาก live smoke)");
+  // --mode plan ไม่ได้กันการเขียนไฟล์ จึงใช้ custom agent profile mycelium-readonly (ตัด write tools + PreToolUse guard hook)
+  const agent = (args) => args[args.indexOf("--agent") + 1];
+  assert.equal(agent(readArgs), "mycelium-readonly", "read-only ต้องใช้ --agent mycelium-readonly เพื่อบังคับห้ามเขียนไฟล์จริง");
   // ไม่ใส่ --sandbox: live smoke พบว่ากันแค่ terminal (อ่าน/รันคำสั่งไม่ได้เลย) แต่ edit tool ยังเขียนไฟล์ได้ — แย่กว่าไม่ใส่
   assert.ok(!readArgs.includes("--sandbox"));
+  const mode = (args) => args[args.indexOf("--mode") + 1];
   assert.equal(mode(writeArgs), "accept-edits");
 });
 

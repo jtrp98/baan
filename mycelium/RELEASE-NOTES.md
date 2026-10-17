@@ -15,6 +15,7 @@
 
 ### แก้ (จาก live smoke ทั้ง 3 ค่าย 2026-10-17)
 - **agy `--write` ใช้ได้แล้ว** — `--mode accept-edits` เคยอยู่หลัง `--print` จน `--print` กลืนเป็น prompt แล้วล้ม exit 2 ทุกครั้ง · ย้ายไว้ก่อน `--print` + test กันลำดับ
+- **agy read-only บังคับห้ามเขียนได้จริงแล้ว** — `--mode plan` เดิมยังเขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal · เปลี่ยน `readArgs` เป็น `["--agent", "mycelium-readonly", "--print"]` คู่กับ custom agent profile ระดับผู้ใช้ (`~/.gemini/config/agents/mycelium-readonly/agent.md` ตัด write tools ออกจาก schema) และ `PreToolUse` guard hook (`~/.gemini/config/mycelium-readonly-guard.js` บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly`) · ผ่าน `npm run smoke:live -- --tier t3 --agents agy` ครบทุกช่อง
 - **claude รันคำสั่งได้ตามโหมด** — `-p` ไม่มีคนกดอนุมัติ tool จึงเคยรันคำสั่งไม่ได้เลย · read-only: `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) · write: เพิ่ม Edit/Write/Bash/PowerShell
 - **CONVENTIONS §8: ทำไม่ได้เพราะสภาพแวดล้อม = `BLOCKED`** — เคยเห็น role จบ `DONE` ทั้งที่รันคำสั่งไม่ได้ จนนับเป็น completed
 
@@ -22,7 +23,6 @@
 - **`npm run smoke:live`** (`scripts/live-smoke.mjs`) — ทดสอบตัวรันจริงทุกค่ายด้วยค่าที่เดาไม่ได้และตรวจบนดิสก์: อ่านไฟล์ · คำสั่งอ่านอย่างเดียว · รันโค้ด · read-only กันเขียนจริง · `--write` · สถานะไม่เกินจริง (ใช้โควตาจริง ไม่อยู่ใน `npm test`)
 
 ### ⚠ ข้อจำกัดที่รู้แล้ว
-- **agy ยังไม่มี read-only จริง** — default/plan mode เขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal · agy อยู่ใน fallback ทุก tier
 - **shell ของ codex พังบนเครื่องนี้** (`setup refresh had errors`, codex-cli 0.162.1) — ต้องแก้ฝั่ง codex · บางครั้งทำงานผ่าน MCP `node_repl` แทน
 
 ### ⚠ ต้องทำตอนอัปเกรด

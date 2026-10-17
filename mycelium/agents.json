@@ -29,7 +29,7 @@
       "promptVia": "arg",
       "modelArgs": ["--model", "<MODEL>"],
       "effortArgs": ["--effort", "<EFFORT>"],
-      "readArgs": ["--mode", "plan", "--print"],
+      "readArgs": ["--agent", "mycelium-readonly", "--print"],
       "writeArgs": ["--mode", "accept-edits", "--print"],
       "answerFrom": "stdout"
     }
