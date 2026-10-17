@@ -73,3 +73,22 @@ test("claude: read-only อนุญาตเฉพาะ tool/คำสั่�
   for (const t of ["Edit", "Write", "Bash", "PowerShell"]) assert.ok(rw.includes(t), `write ต้องมี ${t}`);
   assert.equal(writeArgs[writeArgs.indexOf("--permission-mode") + 1], "acceptEdits");
 });
+
+// profile ของ agy ต้องมากับ package — readArgs อ้างชื่อ profile นี้ เครื่องที่ไม่มีจะล้มทุกงาน read-only
+test("setup/agy มี profile ที่ readArgs อ้างถึง: ชื่อตรง · ไม่มี tool เขียนไฟล์ · hook ชี้ guard · guard parse ได้", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const setup = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "setup", "agy");
+  const { readArgs } = cfg.agents.agy;
+  const profile = readArgs[readArgs.indexOf("--agent") + 1];
+  const agentMd = readFileSync(path.join(setup, "agents", profile, "agent.md"), "utf8");
+  assert.equal(agentMd.match(/^name:\s*(\S+)\s*$/m)?.[1], profile, "name ใน agent.md ต้องตรงกับ --agent ใน readArgs");
+  const tools = agentMd.split("---")[1].split("\n").filter((l) => /^\s*-\s+/.test(l)).map((l) => l.replace(/^\s*-\s+/, "").trim());
+  assert.ok(tools.includes("view_file") && tools.includes("run_command"), "ต้องอ่านไฟล์และรันคำสั่งอ่านได้");
+  for (const t of tools) assert.ok(!/write|replace|edit|create|delete|sed_file/.test(t), `toolset ห้ามมี tool เขียนไฟล์: ${t}`);
+  const hooks = JSON.parse(readFileSync(path.join(setup, "hooks.example.json"), "utf8"));
+  const cmd = hooks["mycelium-readonly-guard"].PreToolUse[0].hooks[0].command;
+  assert.match(cmd, /<HOME>\/\.gemini\/config\/mycelium-readonly-guard\.js$/, "ตัวอย่างต้องใช้ <HOME> ไม่ใช่ path ของเครื่องใดเครื่องหนึ่ง");
+  assert.match(hooks["mycelium-readonly-guard"].PreToolUse[0].matcher, /write_to_file/);
+  const check = spawnSync(process.execPath, ["--check", path.join(setup, "mycelium-readonly-guard.js")], { encoding: "utf8" });
+  assert.equal(check.status, 0, check.stderr);
+});

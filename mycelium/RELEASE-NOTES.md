@@ -2,30 +2,30 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
-## ยังไม่ release (dev/golf) · role ไม่สวมบท MYCELIUM ซ้อนตาม CLAUDE.md/AGENTS.md ของ workspace
+## 0.10.0 — 2026-10-17 · ตัวรันทั้ง 3 ค่ายผ่าน live smoke + role ไม่สวมบท MYCELIUM ซ้อน + กติกาสไตล์โค้ด
 
 ### แก้
 - **session ที่ถูกเปิดเป็น role ไม่สวมบท MYCELIUM ซ้อนแล้ว** — CLAUDE.md/AGENTS.md ที่ `--init` วางไว้ถูก AI CLI โหลดเองอัตโนมัติ (claude อ่านของโฟลเดอร์แม่ด้วย) role จึงได้คำสั่ง "คุณคือ MYCELIUM" ซ้อนกับบทบาทของตัวเอง (พบจาก smoke จริงที่ schoolbright: codex ที่เปิดเป็น `ba` พยายามเปิด charter ก่อนทำงาน)
   - prompt ของทุก role (รวม PM/planner และงานไม่ผูก role = `adhoc`) ขึ้นต้นด้วยป้าย `[mycelium-role: <ID>]` + ประโยคข้อยกเว้น
   - stub ของ `--init` มีประโยคข้อยกเว้นเดียวกันอยู่ก่อนคำสั่งสวมบท — เจอป้ายนี้ = ทำตามบทบาท ไม่อ่าน charter ไม่เรียก mycelium/mycelium-role ต่อ
-- tests 72 → 77 กรณี
-
-### เพิ่ม
-- **กติกาสไตล์โค้ดและ comment ของ `fe`/`be`/`qa`** (role ที่เขียนโค้ดลง target — หมวดเดียวกันทั้งสามไฟล์ + test กันไม่ให้ต่างกัน): เขียนให้เหมือนโค้ดรอบข้างใน target ห้ามเปลี่ยนสไตล์/reformat/refactor นอก task · comment เฉพาะ "why" ห้าม comment what · ห้ามใส่ task id หรือ ID เอกสาร (T1/BL/REQ/DES ฯลฯ) ลงในโค้ดหรือ comment — การโยงงานอยู่ใน handoff เท่านั้น (สำหรับ `qa` รวมถึงชื่อเคส test — traceability AC ↔ test อยู่ใน test plan ของ `tp`)
-
-### แก้ (จาก live smoke ทั้ง 3 ค่าย 2026-10-17)
 - **agy `--write` ใช้ได้แล้ว** — `--mode accept-edits` เคยอยู่หลัง `--print` จน `--print` กลืนเป็น prompt แล้วล้ม exit 2 ทุกครั้ง · ย้ายไว้ก่อน `--print` + test กันลำดับ
-- **agy read-only บังคับห้ามเขียนได้จริงแล้ว** — `--mode plan` เดิมยังเขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal · เปลี่ยน `readArgs` เป็น `["--agent", "mycelium-readonly", "--print"]` คู่กับ custom agent profile ระดับผู้ใช้ (`~/.gemini/config/agents/mycelium-readonly/agent.md` ตัด write tools ออกจาก schema) และ `PreToolUse` guard hook (`~/.gemini/config/mycelium-readonly-guard.js` บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly`) · ผ่าน `npm run smoke:live -- --tier t3 --agents agy` ครบทุกช่อง
+- **agy read-only บังคับห้ามเขียนได้จริงแล้ว** — `--mode plan` เดิมยังเขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal · `readArgs` เป็น `["--agent", "mycelium-readonly", "--print"]` คู่กับ custom agent profile ระดับผู้ใช้ (`~/.gemini/config/agents/mycelium-readonly/agent.md` ตัด write tools ออกจาก toolset) และ `PreToolUse` guard hook (`~/.gemini/config/mycelium-readonly-guard.js` บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly`)
 - **claude รันคำสั่งได้ตามโหมด** — `-p` ไม่มีคนกดอนุมัติ tool จึงเคยรันคำสั่งไม่ได้เลย · read-only: `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) · write: เพิ่ม Edit/Write/Bash/PowerShell
 - **CONVENTIONS §8: ทำไม่ได้เพราะสภาพแวดล้อม = `BLOCKED`** — เคยเห็น role จบ `DONE` ทั้งที่รันคำสั่งไม่ได้ จนนับเป็น completed
 
 ### เพิ่ม
+- **กติกาสไตล์โค้ดและ comment ของ `fe`/`be`/`qa`** (role ที่เขียนโค้ดลง target — หมวดเดียวกันทั้งสามไฟล์ + test กันไม่ให้ต่างกัน): เขียนให้เหมือนโค้ดรอบข้างใน target ห้ามเปลี่ยนสไตล์/reformat/refactor นอก task · comment เฉพาะ "why" ห้าม comment what · ห้ามใส่ task id หรือ ID เอกสาร (T1/BL/REQ/DES ฯลฯ) ลงในโค้ดหรือ comment — การโยงงานอยู่ใน handoff เท่านั้น (สำหรับ `qa` รวมถึงชื่อเคส test — traceability AC ↔ test อยู่ใน test plan ของ `tp`)
+- **`setup/agy/`** — profile `mycelium-readonly` ของ agy (agent.md + guard hook + ตัวอย่าง hooks.json + ขั้นตอนติดตั้ง) มากับ package
 - **`npm run smoke:live`** (`scripts/live-smoke.mjs`) — ทดสอบตัวรันจริงทุกค่ายด้วยค่าที่เดาไม่ได้และตรวจบนดิสก์: อ่านไฟล์ · คำสั่งอ่านอย่างเดียว · รันโค้ด · read-only กันเขียนจริง · `--write` · สถานะไม่เกินจริง (ใช้โควตาจริง ไม่อยู่ใน `npm test`)
+- tests 72 (0.9.0) → 80 กรณี
 
-### ⚠ ข้อจำกัดที่รู้แล้ว
-- **shell ของ codex พังบนเครื่องนี้** (`setup refresh had errors`, codex-cli 0.162.1) — ต้องแก้ฝั่ง codex · บางครั้งทำงานผ่าน MCP `node_repl` แทน
+### ผลทดสอบจริงก่อนปล่อย (2026-10-17)
+- `npm run smoke:live -- --tier t3`: **claude / codex / agy PASS ครบทุกช่อง** (อ่านไฟล์ · git log · read-only กันเขียนบนดิสก์ · `--write` · สถานะตรงจริง) — claude ผ่านที่ t1/t3/t5 ด้วย
+- e2e งานจริง (โปรเจกต์จำลองที่มีสไตล์เฉพาะ + spec 5 AC): `be` → `DONE`, `qa` → `PASS` **ทั้งสามค่าย** · test ลับ 8/8 · สไตล์ตรง target · ไม่มี task/AC id ในโค้ด · ไม่เพิ่ม comment · ไม่มี state-changing git ค้าง
+- shell ของ codex (`setup refresh had errors`) แก้ที่เครื่องแล้ว — `codex doctor` = `✓ sandbox` (เป็นเรื่องของเครื่อง ไม่เกี่ยวกับ package)
 
 ### ⚠ ต้องทำตอนอัปเกรด
+- **ใช้ agy แบบ read-only (ค่าเริ่มต้น และ fallback ทุก tier) ต้องมี agent profile `mycelium-readonly` ในเครื่อง** — ไม่มี = agy ล้มทุกงาน read-only (ไม่ใช่ข้อผิดพลาดโควตา จึงไม่สลับตัวรัน) · ไฟล์ทั้งหมดมากับ package ที่ `setup/agy/` — ทำตาม `setup/agy/README.md` (คัดลอก `agent.md` + `mycelium-readonly-guard.js` ไป `~/.gemini/config/` และรวม entry จาก `hooks.example.json` เข้า `hooks.json` ของเครื่องเอง โดยไม่ทับ hook เดิม) · ตรวจด้วย `agy agents` (ต้องเห็น `mycelium-readonly`) แล้ว `npm run smoke:live -- --agents agy`
 - workspace ที่ `--init` ไว้แล้ว: รัน `mycelium --init` ที่ราก workspace อีกครั้งเพื่อให้ CLAUDE.md/AGENTS.md มีข้อยกเว้น (ไฟล์ที่ผู้ใช้เขียนเองจะถูกข้าม — เพิ่มประโยคข้อยกเว้นจาก `src/role-guard.mjs` เอง)
 
 ## 0.9.0 — 2026-10-17 · โหมดหลักได้สถานะงาน/fallback เดียวกับโหมดอัตโนมัติ + ID role สั้น

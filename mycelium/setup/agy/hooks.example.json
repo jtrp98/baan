@@ -1,0 +1,15 @@
+{
+  "mycelium-readonly-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content|edit_file|sed_file|notebook_edit|create_file|delete_file|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node <HOME>/.gemini/config/mycelium-readonly-guard.js"
+          }
+        ]
+      }
+    ]
+  }
+}
