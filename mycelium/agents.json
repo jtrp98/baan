@@ -37,31 +37,37 @@
   "tiers": {
     "t0": {
       "_timeoutSec": 900,
+      "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "opus", "effort": "max" },
       "codex": { "model": "gpt-6-astra", "effort": "max" },
       "agy": { "model": "gemini-4-argon-high" }
     },
     "t1": {
+      "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "opus", "effort": "high" },
       "codex": { "model": "gpt-6-astra", "effort": "high" },
       "agy": { "model": "gemini-4-argon-high" }
     },
     "t2": {
+      "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "sonnet", "effort": "high" },
       "codex": { "model": "gpt-6.1-sol", "effort": "high" },
       "agy": { "model": "gemini-4-argon-medium" }
     },
     "t3": {
+      "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "sonnet", "effort": "medium" },
       "codex": { "model": "gpt-6.1-sol", "effort": "medium" },
       "agy": { "model": "gemini-3.8-flash-medium" }
     },
     "t4": {
+      "_fallback": ["agy", "codex", "claude"],
       "claude": { "model": "haiku", "effort": "medium" },
       "codex": { "model": "gpt-6-luna", "effort": "medium" },
       "agy": { "model": "gemini-3.8-flash-medium" }
     },
     "t5": {
+      "_fallback": ["agy", "codex", "claude"],
       "claude": { "model": "haiku", "effort": "low" },
       "codex": { "model": "gpt-6-luna", "effort": "low" },
       "agy": { "model": "gemini-3.8-flash-low" }

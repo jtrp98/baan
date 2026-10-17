@@ -6,8 +6,8 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, tierMatrixText } from "../src/config.mjs";
-import { extractJson, printPlan, validateAndFixPlan } from "../src/plan.mjs";
-import { execute } from "../src/scheduler.mjs";
+import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
+import { execute, looksLikeLimitError } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { pmPrompt, plannerPrompt } from "../src/prompts.mjs";
@@ -51,6 +51,22 @@ function printWorkspace(ws) {
   }
   const d = ws.defaults;
   console.log(`defaults : agent=${d.agent} · planner_tier=${d.planner_tier} · timeout=${d.timeout_sec}s · max_parallel=${d.max_parallel}`);
+}
+
+// ขั้นต้นทางหนึ่งขั้น (PM/planner) — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
+async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptText) {
+  const chain = fallbackChainFor(cfg, tier, opts.agent);
+  for (let i = 0; i < chain.length; i++) {
+    const agent = chain[i];
+    const def = cfg.agents[agent];
+    const conf = cfg.tiers[tier]?.[agent] ?? {};
+    const answerFile = path.join(runDir, fileName);
+    const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile);
+    if (def.promptVia === "arg") args.push(promptText);
+    const r = await runCli(def, args, def.promptVia, promptText, opts.cwd, cfg.tiers[tier]?._timeoutSec ?? opts.timeoutSec, def.answerFrom === "answerFile" ? answerFile : undefined);
+    if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) return { r, agent, answerFile };
+    console.log(`[${fileName.split(".")[0]}] ${agent} ติดโควตา/limit — สลับไป ${chain[i + 1]} (ตามลำดับ fallback ของ tier ${tier})`);
+  }
 }
 
 async function main() {
@@ -175,32 +191,20 @@ async function main() {
   writeManifest(runDir, opts); // บันทึกบริบทก่อนเรียก provider ใดๆ — crash กลางทางก็ resume ได้ครบ
 
   console.log(`[pm] ${opts.agent} @ t2 รับ goal แล้วเขียนคำมอบหมาย...`);
-  const pmDef = cfg.agents[opts.agent];
-  const pmConf = cfg.tiers.t2[opts.agent] ?? {};
-  const pmAnswer = path.join(runDir, "pm.answer.txt");
-  const pmPromptText = pmPrompt(goal, projectCtx);
-  const pmArgs = buildArgs(pmDef, pmConf.model ?? "", pmConf.effort ?? "", false, pmAnswer);
-  if (pmDef.promptVia === "arg") pmArgs.push(pmPromptText);
-  const pmr = await runCli(pmDef, pmArgs, pmDef.promptVia, pmPromptText, opts.cwd, opts.timeoutSec, pmDef.answerFrom === "answerFile" ? pmAnswer : undefined);
-  const pmDirective = pmr.answer || "(PM ไม่ตอบ — planner ใช้ goal ตรงๆ)";
-  writeAtomic(pmAnswer, pmDirective);
-  console.log(`[pm] คำมอบหมาย: ${pmDirective.split("\n")[0].slice(0, 100)}...`);
+  const pm = await callStageWithFallback(cfg, opts, runDir, "t2", "pm.answer.txt", pmPrompt(goal, projectCtx));
+  const pmDirective = pm.r.answer || "(PM ไม่ตอบ — planner ใช้ goal ตรงๆ)";
+  writeAtomic(pm.answerFile, pmDirective);
+  console.log(`[pm] ${pm.agent} คำมอบหมาย: ${pmDirective.split("\n")[0].slice(0, 100)}...`);
 
   console.log(`[planner] ${opts.agent} @ ${opts.plannerTier} กำลังวางแผน...`);
-  const pDef = cfg.agents[opts.agent];
-  const pConf = cfg.tiers[opts.plannerTier][opts.agent] ?? {};
-  const pAnswer = path.join(runDir, "planner.answer.txt");
-  const plannerPromptText = plannerPrompt(pmDirective, goal, cfg, projectCtx);
-  const pArgs = buildArgs(pDef, pConf.model ?? "", pConf.effort ?? "", false, pAnswer);
-  if (pDef.promptVia === "arg") pArgs.push(plannerPromptText);
-  const pr = await runCli(pDef, pArgs, pDef.promptVia, plannerPromptText, opts.cwd, opts.timeoutSec, pDef.answerFrom === "answerFile" ? pAnswer : undefined);
-  writeAtomic(pAnswer, pr.answer);
-  if (!pr.ok) { console.error(`planner ล้มเหลว: exit=${pr.exitCode} ${pr.error}`); process.exit(1); }
+  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx));
+  writeAtomic(p.answerFile, p.r.answer);
+  if (!p.r.ok) { console.error(`planner ล้มเหลว: exit=${p.r.exitCode} ${p.r.error} (agent สุดท้าย: ${p.agent})`); process.exit(1); }
   let plan;
   try {
-    plan = validateAndFixPlan(extractJson(pr.answer), cfg, opts);
+    plan = validateAndFixPlan(extractJson(p.r.answer), cfg, opts);
   } catch (e) {
-    console.error(`แผนจาก planner ใช้ไม่ได้: ${e.message}\nดูผลดิบที่ ${pAnswer}`);
+    console.error(`แผนจาก planner ใช้ไม่ได้: ${e.message}\nดูผลดิบที่ ${p.answerFile}`);
     process.exit(1);
   }
   writeAtomic(path.join(runDir, "plan.json"), JSON.stringify({ goal, target: opts.target || null, ...plan }, null, 2));

@@ -21,6 +21,19 @@ test("ทุก tier ประกาศครบทั้งสาม agent แ�
   }
 });
 
+test("_fallback ของทุก tier ต้องเป็นลำดับ agent ที่รู้จัก ไม่ซ้ำ ไม่ว่าง", () => {
+  for (const [tier, conf] of Object.entries(cfg.tiers)) {
+    const fb = conf._fallback;
+    assert.ok(Array.isArray(fb) && fb.length > 0, `tier ${tier}: ต้องมี _fallback`);
+    for (const a of fb) assert.ok(AGENTS.includes(a), `tier ${tier}: _fallback มี agent ที่ไม่รู้จัก (${a})`);
+    assert.equal(new Set(fb).size, fb.length, `tier ${tier}: _fallback ห้ามซ้ำ`);
+    // ทุก agent ที่ใช้ได้ใน tier ควรอยู่ใน chain เพื่อกันตายก่อนเกินจำเป็น
+    for (const a of AGENTS) {
+      if (conf[a] !== null) assert.ok(fb.includes(a), `tier ${tier}: ${a} ใช้ได้แต่ไม่อยู่ใน _fallback`);
+    }
+  }
+});
+
 test("agy ครบทุก tier แล้วหลัง Argon เปิดตัว (2026-10-17)", () => {
   for (const tier of ["t0", "t1", "t2"]) {
     assert.match(cfg.tiers[tier].agy.model, /^gemini-4-argon-(high|medium|low)$/, `tier ${tier}: agy ต้องใช้ gemini-4-argon`);

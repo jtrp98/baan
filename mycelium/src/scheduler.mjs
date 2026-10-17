@@ -2,6 +2,7 @@
 import path from "node:path";
 import { roleDirective } from "./prompts.mjs";
 import { buildArgs, runCli } from "./runner.mjs";
+import { fallbackChainFor } from "./plan.mjs";
 import { readCheckpoint, writeAtomic, writeCheckpoint } from "./run-store.mjs";
 
 const CONTEXT_CHAR_CAP = 6000; // ตัดรายละเอียด output ของ task ก่อนหน้ายาวเกิน (ส่ง path ฉบับเต็มแทน)
@@ -64,15 +65,26 @@ function buildCtxBlocks(runDir, t, states) {
   });
 }
 
-async function runRoleTask(cfg, opts, runDir, t, ctxBlocks) {
-  const def = cfg.agents[t.agent];
-  const conf = cfg.tiers[t.tier]?.[t.agent] ?? {};
+async function runRoleTask(cfg, opts, runDir, t, ctxBlocks, agent = t.agent) {
+  const def = cfg.agents[agent];
+  const conf = cfg.tiers[t.tier]?.[agent] ?? {};
   const answerFile = path.join(runDir, `${t.id}.answer.txt`);
   const timeoutSec = cfg.tiers[t.tier]?._timeoutSec ?? opts.timeoutSec;
   const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx);
   const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile);
   if (def.promptVia === "arg") args.push(prompt);
   return runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile);
+}
+
+// ตรวจว่าความล้มเหลวเกิดจากโควตา/limit หรือไม่ — ใช้ข้อความจริงที่แต่ละ CLI แจ้ง
+// (claude: "usage limit reached" · codex: "usage limit" · agy: "credits balance ... too low to continue")
+// จำกัดไว้เฉพาะรูปแบบเหล่านี้ เพราะ fail ด้วยเหตุอื่นต้องไม่สลับตัวรัน (กันเผาโควตาซ้ำหลายเท่า)
+const LIMIT_ERROR_PATTERNS = ["usage limit", "rate limit", "ratelimit", "quota", "limit reached", "credits balance", "too low to continue"];
+
+export function looksLikeLimitError(r) {
+  if (r.ok || r.timedOut) return false;
+  const hay = `${r.error ?? ""}\n${r.stderr ?? ""}\n${r.answer ?? ""}`.toLowerCase();
+  return LIMIT_ERROR_PATTERNS.some((p) => hay.includes(p));
 }
 
 // execute คือจุดกัน --dry-run เดียวของทุก route (goal / --plan-file / --resume) —
@@ -99,11 +111,25 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
 
     const results = await Promise.all(batch.map(async (t) => {
       const ctxBlocks = buildCtxBlocks(runDir, t, states);
-      const r = await runTask(cfg, opts, runDir, t, ctxBlocks);
-      return { t, r };
+      // ลำดับตัวรัน: ตัวที่เลือกมาก่อน — สลับตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
+      // (cfg ที่ไม่รู้จัก agent เลย เช่นตอนทดสอบ = เรียกตัวเดิมหนึ่งครั้งตามปกติ)
+      const tryChain = fallbackChainFor(cfg, t.tier, t.agent);
+      const chain = tryChain.length ? tryChain : [t.agent];
+      let r = null;
+      let usedAgent = t.agent;
+      const fallbackTrail = [];
+      for (let i = 0; i < chain.length; i++) {
+        usedAgent = chain[i];
+        r = await runTask(cfg, opts, runDir, t, ctxBlocks, usedAgent);
+        if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) break;
+        fallbackTrail.push(`${chain[i]}→${chain[i + 1]}`);
+        console.log(`  ${t.id}: ${chain[i]} ติดโควตา/limit — สลับไป ${chain[i + 1]} (ตามลำดับ fallback ของ tier ${t.tier})`);
+      }
+      t.agent = usedAgent;
+      return { t, r, fallbackTrail };
     }));
 
-    for (const { t, r } of results) {
+    for (const { t, r, fallbackTrail } of results) {
       pending.splice(pending.findIndex((p) => p.id === t.id), 1);
       writeAtomic(path.join(runDir, `${t.id}.answer.txt`), r.answer ?? "");
       writeAtomic(path.join(runDir, `${t.id}.stderr.txt`), r.stderr ?? "");
@@ -111,6 +137,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       const prior = readCheckpoint(runDir, t.id);
       const rec = {
         id: t.id,
+        agent: t.agent,
         state: cls.state,
         ok: cls.ok,
         marker: cls.marker,
@@ -119,13 +146,14 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
         error: r.error || "",
         durationMs: r.durationMs ?? 0,
         attempt: (typeof prior?.attempt === "number" ? prior.attempt : 0) + 1,
+        fallback: fallbackTrail,
         finishedAt: new Date().toISOString(),
         answerFile: path.join(runDir, `${t.id}.answer.txt`),
         stderrFile: path.join(runDir, `${t.id}.stderr.txt`),
       };
       writeCheckpoint(runDir, rec);
       states.set(t.id, { ...rec, answer: r.answer ?? "" });
-      console.log(`  ${t.id} ${statusLabel(rec)} in ${((r.durationMs ?? 0) / 1000).toFixed(1)}s — ${t.title}`);
+      console.log(`  ${t.id} ${statusLabel(rec)} in ${((r.durationMs ?? 0) / 1000).toFixed(1)}s${fallbackTrail.length ? ` (สลับตัวรัน: ${fallbackTrail.join(", ")})` : ""} — ${t.title}`);
       if (!rec.ok) console.log(`    สถานะ: ${rec.state} · stderr: ${rec.stderrFile}`);
     }
   }
@@ -143,7 +171,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
     tasks: plan.tasks.map((t) => {
       const s = states.get(t.id);
       return {
-        id: t.id, role: t.role, agent: t.agent, tier: t.tier, title: t.title,
+        id: t.id, role: t.role, agent: s?.agent ?? t.agent, tier: t.tier, title: t.title,
         state: s?.state ?? "pending", ok: s?.ok ?? false, marker: s?.marker ?? null,
         blockedBy: s?.blockedBy, durationMs: s?.durationMs ?? 0,
       };
