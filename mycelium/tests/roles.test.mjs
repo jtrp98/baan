@@ -68,3 +68,19 @@ for (const file of ["MYCELIUM.md", "README.md"]) {
     }
   });
 }
+
+// fe/be เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทั้งสองไฟล์ (แก้ที่เดียวแล้วลืมอีกที่ = role ได้กติกาไม่เท่ากัน)
+test("fe/be มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
+  const section = (id) => {
+    const text = readFileSync(path.join(pkgDir, "roles", `${id}.md`), "utf8");
+    const start = text.indexOf("## สไตล์โค้ดและ comment");
+    assert.ok(start !== -1, `${id}: ไม่มีหมวดสไตล์โค้ดและ comment`);
+    const end = text.indexOf("\n## ", start + 1);
+    return text.slice(start, end === -1 ? undefined : end).trim();
+  };
+  const fe = section("fe");
+  assert.equal(fe, section("be"), "หมวดนี้ของ fe กับ be ต้องเหมือนกันทุกตัวอักษร");
+  for (const must of ["เหมือนโค้ดรอบข้างใน target", "comment เฉพาะ \"why\"", "ห้าม comment ที่เล่าว่าโค้ดทำอะไร", "ห้ามใส่ task id"]) {
+    assert.ok(fe.includes(must), `ขาด: ${must}`);
+  }
+});
