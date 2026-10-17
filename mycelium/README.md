@@ -208,6 +208,10 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - tests เดิม 35 กรณีผ่านครบหลังย้าย (import ชี้ src โมดูลตรงตัว) + `npm link` ใหม่ + smoke `--plan-file --dry-run` ผ่าน bin ใหม่ + `npm pack` ยืนยัน bin/ และ src/ ติด package (25 ไฟล์)
 - หมายเหตุ: path ของ bin เปลี่ยน — ใคร link ไว้บนเครื่องอื่นต้อง `npm link` ใหม่หนึ่งครั้ง
 
+## ผลการทดสอบ release 0.8.0 (2026-10-17 — Argon ผ่าน agy)
+
+1. **Gemini 4 Argon ใช้งานจริงผ่าน agy**: โจทย์ smoke คลาสสิก (อ่าน `demo-notes.md` แล้วตอบคำลับ) — `t1 = gemini-4-argon-high` ตอบ `MANGO-77` ถูกต้องใน 25.6 วิ · `t2 = gemini-4-argon-medium` ถูกต้องใน 11.6 วิ — ผ่านทั้งคู่แปลว่า model รันจริงและใช้ tool อ่านไฟล์ได้ (ไม่ใช่แค่ตอบแชท) · รายงาน: `reports\2026-10-17-04-11-59-tier-t1-1agents` และ `reports\2026-10-17-04-12-32-tier-t2-1agents`
+
 ## ผลการทดสอบ release 0.3.0 (2026-10-16 — แก้ตาม AUDIT.md 2026-10-15)
 
 แก้ P1 ครบ 5 ข้อ + P2 สองข้อ พร้อม regression tests 35 กรณี (`npm test` — node:test ล้วน จำลอง provider ไม่ใช้โควตา):
