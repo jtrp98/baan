@@ -2,6 +2,7 @@
 // แยกจาก bin เพื่อให้ทดสอบได้โดยไม่เรียก AI CLI จริง
 import { mkdirSync, mkdtempSync } from "node:fs";
 import path from "node:path";
+import { resolveRoleName } from "./config.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { parseWorkDate } from "./prompts.mjs";
 import { classifyOutcome, runWithFallback } from "./scheduler.mjs";
@@ -15,7 +16,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
     agents: [], task: "", taskFile: "", write: false, seq: false, list: false,
     cwd: path.resolve(baseCwd), timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false,
-    tier: "", model: "", effort: "", role: "", date: "", fallback: true,
+    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", fallback: true,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -32,7 +33,12 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
       case "--tier": opts.tier = argv[++i] ?? ""; break;
       case "--model": opts.model = argv[++i] ?? ""; break;
       case "--effort": opts.effort = argv[++i] ?? ""; break;
-      case "--role": opts.role = argv[++i] ?? ""; break;
+      case "--role": {
+        const given = argv[++i] ?? "";
+        opts.role = resolveRoleName(given);
+        opts.roleAlias = opts.role !== given ? given : "";
+        break;
+      }
       case "--date": opts.date = parseWorkDate(argv[++i]); break;
       case "--no-fallback": opts.fallback = false; break;
       default: throw new Error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\n${ROLE_USAGE}`);

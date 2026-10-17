@@ -3,7 +3,7 @@
 // ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ mycelium
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig } from "../src/config.mjs";
+import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText } from "../src/config.mjs";
 import { localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
@@ -38,7 +38,7 @@ async function main() {
     const roles = listRoles();
     if (roles.length) {
       console.log("roles (ใช้กับ --role <name>):");
-      for (const r of roles) console.log(`  ${r.name.padEnd(23)} ${r.title}`);
+      console.log(roleListText(roles));
     }
     return;
   }
@@ -98,6 +98,7 @@ async function main() {
       console.error(`ไม่พบ role: ${opts.role} (ไม่มีไฟล์ ${roleFile} — ดูรายชื่อทั้งหมดด้วย --list)`);
       process.exit(2);
     }
+    if (opts.roleAlias) console.log(`(--role ${opts.roleAlias} = ชื่อเดิมของ ${opts.role} — ใช้ชื่อสั้นได้เลยครั้งหน้า)`);
     fullTask = roleDirective(opts.role, task, null, "", workDate);
   }
 

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { validateAndFixPlan, findDependencyCycle } from "../src/plan.mjs";
 
 const cfg = {
-  roleNames: ["qa", "business-analyst", "frontend-engineer"],
+  roleNames: ["qa", "ba", "fe"],
   agents: { codex: {}, claude: {}, agy: {} },
   tiers: {
     t2: { codex: { model: "m" }, claude: { model: "m" }, agy: null },
@@ -21,13 +21,20 @@ test("แผนปกติผ่าน validation และ dependsOn ที่
   assert.equal(plan.tasks[0].agent, "codex");
 });
 
-test("tier คงที่ของ role ถูก force เสมอ (business-analyst → t2)", () => {
-  const plan = validateAndFixPlan({ tasks: [task({ role: "business-analyst", tier: "t3" })] }, cfg, opts);
+test("tier คงที่ของ role ถูก force เสมอ (ba → t2)", () => {
+  const plan = validateAndFixPlan({ tasks: [task({ role: "ba", tier: "t3" })] }, cfg, opts);
   assert.equal(plan.tasks[0].tier, "t2");
 });
 
+test("แผนเก่าที่ใช้ชื่อ role แบบยาว (ก่อนย่อ ID) ยังผ่าน และถูกแปลงเป็น ID สั้น — resume run เดิมได้", () => {
+  const plan = validateAndFixPlan({ tasks: [task({ role: "business-analyst", tier: "t3" }), task({ id: "T2", role: "frontend-engineer", tier: "t3" })] }, cfg, opts);
+  assert.deepEqual(plan.tasks.map((t) => t.role), ["ba", "fe"]);
+  assert.equal(plan.tasks[0].tier, "t2", "tier คงที่ยังถูก force หลังแปลงชื่อ");
+  assert.equal(plan.tasks[1].tier, "t3", "fe เลือก tier เองได้");
+});
+
 test("agent ที่ null ใน tier ถูก fallback ไปตัวที่ใช้ได้", () => {
-  const plan = validateAndFixPlan({ tasks: [task({ role: "frontend-engineer", tier: "t5" })] }, cfg, opts);
+  const plan = validateAndFixPlan({ tasks: [task({ role: "fe", tier: "t5" })] }, cfg, opts);
   assert.equal(plan.tasks[0].agent, "agy"); // codex เป็น null ที่ t5
 });
 

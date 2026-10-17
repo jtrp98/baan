@@ -1,4 +1,6 @@
-# 🍄 MYCELIUM — สมองของทีม AI
+# 🍄 MYCELIUM — ผู้คุมทีม AI 11 role
+
+> แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์
 
 > ประวัติรุ่นและสิ่งที่เปลี่ยนแต่ละเวอร์ชัน: `RELEASE-NOTES.md`
 
@@ -61,10 +63,10 @@ session นั้นจะกลายเป็นสมอง — รับ goa
 mycelium --list
 
 # เปิด session ของ role เดียว (มือของ MYCELIUM)
-mycelium-role --agent codex --role business-analyst --tier t2 --task "เขียน requirement ของ..."
+mycelium-role --agent codex --role ba --tier t2 --task "เขียน requirement ของ..."
 mycelium-role --agent codex --role qa --tier t2 --cwd C:\path\to\repo --task "เขียน unit test ของ utils.js"
-mycelium-role --all --role security --tier t2 --task "รีวิว API..."      # ทุก agent พร้อมกัน
-mycelium-role --agent codex --role backend-engineer --tier t3 --write --task "แก้บั๊ก..."  # อนุญาตแก้ไฟล์
+mycelium-role --all --role sec --tier t2 --task "รีวิว API..."      # ทุก agent พร้อมกัน
+mycelium-role --agent codex --role be --tier t3 --write --task "แก้บั๊ก..."  # อนุญาตแก้ไฟล์
 
 # โหมดอัตโนมัติทั้งก้อน
 mycelium --target sb-api-academic-timetable-ai --goal "..." --dry-run
@@ -87,43 +89,43 @@ mycelium-role --list              # ดูรายชื่อ agent + tier
 
 # กำหนดบทบาท (role) — ตำแหน่งในทีม
 
-ไฟล์นิยามบทบาทอยู่ที่ `roles/<ชื่อ>.md` ใช้กับ flag `--role` โดย mycelium-role จะผูกบทบาทเข้ากับ task ให้ agent ก่อนส่งงาน:
+ไฟล์นิยามบทบาทอยู่ที่ `roles/<ID>.md` (หัวไฟล์มี `# บทบาท:` ชื่อแสดง · `> หน้าที่:` หนึ่งบรรทัด · `> tier:` — `--list` และ prompt ของ planner อ่านจากตรงนี้) ใช้กับ flag `--role` โดย mycelium-role จะผูกบทบาทเข้ากับ task ให้ agent ก่อนส่งงาน:
 
 ```bash
 mycelium-role --agent agy --role qa --tier t3 --task "เขียน unit test ของ utils.js ตาม acceptance criteria ใน SPEC.md"
-mycelium-role --all --role security --tier t1 --task "รีวิวความปลอดภัยของ API ที่เพิ่งสร้าง"
+mycelium-role --all --role sec --tier t1 --task "รีวิวความปลอดภัยของ API ที่เพิ่งสร้าง"
 ```
 
-| role | ตำแหน่ง | tier แนะนำ | ขอบเขตที่ตกลงกับผู้ใช้ (2026-10-14) |
-|---|---|---|---|
-| `planner` | Planner | t1–t2 | วางแผน/แตก task/dependency — แยกจาก PM |
-| `project-manager` | Project Manager (PM) | t1–t2 | **coordinator — เรียกใช้คนในทีม** ตามแผนของ planner + backlog + release scope |
-| `business-analyst` | Business Analyst (BA) | t2 | เต็ม: REQ/AC/BR + ทะเบียน OQ รอคนตัดสิน |
-| `system-analyst` | System Analyst (SA) | t0–t1 | เต็ม: DES + สัญญา API + ตรวจโค้ด as-built จริง |
-| `uxui-designer` | UX/UI Designer | t2 | ทั้งร่าง UX artifact ราย feature รอคนเซ็น และดูแล design system กลาง |
-| `frontend-engineer` | Frontend Engineer (FE) | t2–t3 | เคร่ง: implement ตาม **signed UX artifact เท่านั้น** |
-| `backend-engineer` | Backend Engineer (BE) | t2–t3 | เต็มตามสัญญา: validation + error contract ครบ |
-| `database-administrator` | Database Administrator (DBA) | t2–t3 | ที่ปรึกษา — **เขียน SQL เองได้ แต่ห้ามรันโดยเด็ดขาด** (คนเท่านั้นรัน) |
-| `test-planner` | Test Planner | t2–t3 | เต็ม: TP index + test matrix + traceability ทุก AC |
-| `qa` | QA (unit test อิสระ) | t2–t3 | เขียน test จาก spec ไม่ใช่โค้ด dev + รายงานเป็นรอบ + แนะนำ backlog |
-| `security` | Security & Compliance | t1–t2 | เต็ม: OWASP + PDPA/GDPR + dependency + ประกาศ blocker |
+| ID | ชื่อ | หน้าที่ | tier | ชื่อเดิม (alias) |
+|---|---|---|---|---|
+| `planner` | Planner | แตก goal ใหญ่เป็นแผน DAG แล้วส่งให้ PM (เฉพาะงานใหญ่) | t2 | — |
+| `pm` | Project Manager | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run (เฉพาะงานใหญ่) | t2 | `project-manager` |
+| `ba` | Business Analyst | เขียน REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 | `business-analyst` |
+| `sa` | System Analyst | ออกแบบ DES และสัญญา API แล้วตรวจกับโค้ดจริง (as-built) | t1 | `system-analyst` |
+| `ux` | UX/UI Designer | ร่าง UX ราย feature รอคนเซ็น และดูแล design system | t2 | `uxui-designer` |
+| `fe` | Frontend Engineer | implement ตาม UX ที่เซ็นแล้ว และสัญญา backend ตัวจริง | **MYCELIUM/planner เลือกราย task (t2–t5 ตามความยาก)** | `frontend-engineer` |
+| `be` | Backend Engineer | implement ตามสัญญา โดย validation และ error contract ต้องครบ | **MYCELIUM/planner เลือกราย task (t2–t5 ตามความยาก)** | `backend-engineer` |
+| `dba` | Database Advisor | ออกแบบ schema และเขียน SQL พร้อม rollback แต่ห้ามรันเอง | t2 | `database-administrator` |
+| `tp` | Test Planner | ทำ TP, test matrix และ traceability ครบทุก AC | t2 | `test-planner` |
+| `qa` | QA | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task | t2 | — |
+| `sec` | Security & Compliance | ตรวจ OWASP และ PDPA/GDPR แล้วประกาศ blocker | t2 | `security` |
 
 หลักการแบ่งหน้าที่ที่ฝังไว้ใน role (สอดคล้อง convention ของโปรเจกต์ timetableai):
 - **วางแผนกับสั่งงานแยกกัน** — planner วางแผน, PM เป็นคนเรียกใช้ทีมตามแผน
 - **QA แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) QA เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
-- **Artifact ต้องเซ็นก่อนใช้** — UX draft ของ uxui-designer ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
+- **Artifact ต้องเซ็นก่อนใช้** — UX draft ของ `ux` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
 - **DBA ห้ามรัน SQL ทุกกรณี** — เขียน script พร้อม rollback plan ให้คนรันเท่านั้น
 - ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log
 - **เพิ่ม/ลดตำแหน่งได้อิสระ** — แค่เพิ่ม/ลบไฟล์ `.md` ใน `roles/` ระบบหาอัตโนมัติ (ดูรายชื่อด้วย `--list`)
 
-ตัวอย่าง flow งานเต็มรูปแบบ: `planner` วางแผน → `project-manager` เรียกทีมตามแผน → `business-analyst` เขียน REQ/AC → `uxui-designer` ร่าง UX รอผู้ใช้เซ็น → `system-analyst` ออกแบบ DES/สัญญา → `database-administrator` รีวิม schema + เขียน SQL (คนรัน) → `frontend-engineer`/`backend-engineer` implement ตาม signed artifact → `test-planner` วางแผนทดสอบ → `qa` เขียน unit test อิสระ + รายงานรอบ → `security` รีวิวก่อนขึ้น production
+ตัวอย่าง flow งานเต็มรูปแบบ: `planner` วางแผน → `pm` เรียกทีมตามแผน → `ba` เขียน REQ/AC → `ux` ร่าง UX รอผู้ใช้เซ็น → `sa` ออกแบบ DES/สัญญา → `dba` รีวิม schema + เขียน SQL (คนรัน) → `fe`/`be` implement ตาม signed artifact → `tp` วางแผนทดสอบ → `qa` เขียน unit test อิสระ + รายงานรอบ → `sec` รีวิวก่อนขึ้น production
 
 ## โหมดอัตโนมัติ (`mycelium`)
 
 สำหรับงานที่อยากให้รันทั้งก้อนโดยไม่ต้องมี session คุมเอง — การไหล: **goal → PM (จุดเข้า เขียนคำมอบหมาย) → planner (วางแผนเป็น DAG) → execute ตามแผน** (สคริปต์ทำหน้าที่เป็น "มือของ PM" แทน session ที่สวม MYCELIUM)
 
 กติกาสำคัญที่ฝังไว้:
-- **planner เลือก tier ได้เฉพาะ task ของ `frontend-engineer` / `backend-engineer`** (งาน implement ที่ผ่าน design ของ SA มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน mycelium.mjs
+- **planner เลือก tier ได้เฉพาะ task ของ `fe` / `be`** (งาน implement ที่ผ่าน design ของ SA มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน `src/plan.mjs` (บรรทัด `> tier:` ในไฟล์ role และตาราง role ถูก test ให้ตรงกับค่านี้เสมอ)
 - task ที่ไม่พึ่งกัน (dependsOn ว่าง) **รันขนานกัน** ตามลำดับ wave
 - งานง่าย planner ให้น้อย task เอง — ไม่ต้องใช้ทั้งทีม
 - สิ่งที่ต้องเป็นประตูมนุษย์ (sign-off UX / รัน SQL / ตัดสินธุรกิจ) รวมเป็น `humanGates` รายงานตอนจบ — ไม่ทำแทน

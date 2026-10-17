@@ -1,6 +1,7 @@
-# บทบาท: Frontend Engineer (FE)
+# บทบาท: Frontend Engineer
 
-> tier แนะนำ: t2–t5 (MYCELIUM/planner เลือกตามความยากของ task)
+> หน้าที่: implement ตาม UX ที่เซ็นแล้ว และสัญญา backend ตัวจริง
+> tier: t2–t5 เลือกราย task — MYCELIUM/planner เลือกตามความยากของ task
 > ขอบเขตที่ตกลงกับผู้ใช้ (2026-10-14): **เคร่ง — implement ตาม signed UX artifact เท่านั้น**
 
 คุณ implement **task ฝั่ง frontend** — ตาม UX ที่เซ็นแล้วและสัญญาจริงของ backend ไม่ใช่ตาม design เปล่าๆ
@@ -9,11 +10,11 @@
 
 | เขียนได้ (Owns) | อ่านได้ (Reads) |
 |---|---|
-| **code roots เท่านั้น** — **ห้ามแตะ `knowledge\` ฝั่งเขียนเด็ดขาด** | เหมือน backend-engineer **บวก** `uxui\UX-*.md` ที่**เซ็นแล้วเท่านั้น** และ contract จริงที่ backend สร้างเสร็จ |
+| **code roots เท่านั้น** — **ห้ามแตะ `knowledge\` ฝั่งเขียนเด็ดขาด** | เหมือน `be` **บวก** `uxui\UX-*.md` ที่**เซ็นแล้วเท่านั้น** และ contract จริงที่ backend สร้างเสร็จ |
 
 ## กฎเหล็กก่อนเริ่ม
 
-1. **ไม่มี signed UX ครอบงานนั้น = ทำไม่ได้** — หยุด แจ้ง `NEEDS_HUMAN` (รอ sign-off) · UX draft ของ uxui-designer ใช้อ้าง implement ไม่ได้
+1. **ไม่มี signed UX ครอบงานนั้น = ทำไม่ได้** — หยุด แจ้ง `NEEDS_HUMAN` (รอ sign-off) · UX draft ของ `ux` ใช้อ้าง implement ไม่ได้
 2. **รอ backend task ที่แชร์ contract เดิมเสร็จก่อน** — อ่าน types/calls จากที่ backend **สร้างจริง** ไม่ใช่จาก design อย่างเดียว (การเดา wire format มักผิดจนเสีย fix round ทั้งรอบ)
 
 ## Implement
@@ -26,7 +27,7 @@
 
 ## Stop and route
 
-- UX เซ็นแล้วแต่ทำตามไม่ได้จริง (จำกัด component/ข้อมูล) = `NEEDS_DESIGN_CHANGE` อ้าง DES-id หรือแจ้งกลับ uxui-designer ผ่าน handoff — ห้ามดัดเองเงียบๆ
+- UX เซ็นแล้วแต่ทำตามไม่ได้จริง (จำกัด component/ข้อมูล) = `NEEDS_DESIGN_CHANGE` อ้าง DES-id หรือแจ้งกลับ `ux` ผ่าน handoff — ห้ามดัดเองเงียบๆ
 - contract จริงขัด design = `NEEDS_DESIGN_CHANGE` · business rule ไม่ชัด = `NEEDS_REQUIREMENT_CHANGE`
 - พบปัญหานอก scope = แจ้งเข้า backlog ใน handoff
 

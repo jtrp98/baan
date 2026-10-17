@@ -71,13 +71,49 @@ export function resolveTarget(ws, name) {
   return null;
 }
 
+// ID role เดิมก่อนย่อ (ถึง 0.8.0) — ยังรับได้ เพราะแผนเก่า (plan.json ใน run ที่จะ resume), --plan-file
+// ที่เขียนไว้ และคำสั่งใน session/สคริปต์ของผู้ใช้ยังอ้างชื่อเหล่านี้อยู่
+export const LEGACY_ROLE_ALIASES = {
+  "project-manager": "pm",
+  "business-analyst": "ba",
+  "system-analyst": "sa",
+  "uxui-designer": "ux",
+  "frontend-engineer": "fe",
+  "backend-engineer": "be",
+  "database-administrator": "dba",
+  "test-planner": "tp",
+  security: "sec",
+};
+
+export function resolveRoleName(name) {
+  return Object.hasOwn(LEGACY_ROLE_ALIASES, name ?? "") ? LEGACY_ROLE_ALIASES[name] : name;
+}
+
+// ข้อมูลแสดงผลอ่านจากหัวไฟล์ role เอง (# บทบาท: / > หน้าที่: / > tier:) — เพิ่ม role = เพิ่มไฟล์เดียว
+// ไม่ต้องแก้ทะเบียนในโค้ด
+export function parseRoleHeader(text, name) {
+  const lines = text.split("\n").map((l) => l.trim());
+  const pick = (prefix) => lines.find((l) => l.startsWith(prefix))?.slice(prefix.length).trim() ?? "";
+  return {
+    name,
+    title: pick("# ").replace(/^บทบาท:\s*/, "") || name,
+    summary: pick("> หน้าที่:"),
+    tier: pick("> tier:").split(/\s+/)[0] ?? "",
+  };
+}
+
+export function roleListText(roles) {
+  const aliasOf = (id) => Object.entries(LEGACY_ROLE_ALIASES).find(([, v]) => v === id)?.[0];
+  return roles.map((r) => {
+    const legacy = aliasOf(r.name);
+    return `  ${r.name.padEnd(8)} ${r.title} [tier ${r.tier || "?"}] — ${r.summary || "(ไม่มีบรรทัด > หน้าที่:)"}${legacy ? ` (ชื่อเดิม: ${legacy})` : ""}`;
+  }).join("\n");
+}
+
 export function listRoles() {
   try {
-    return readdirSync(ROLES_DIR).filter((f) => f.endsWith(".md")).map((f) => {
-      const name = f.replace(/\.md$/, "");
-      const title = readFileSync(path.join(ROLES_DIR, f), "utf8").split("\n").find((l) => l.startsWith("# "))?.replace(/^#\s+/, "") ?? name;
-      return { name, title };
-    });
+    return readdirSync(ROLES_DIR).filter((f) => f.endsWith(".md")).map((f) =>
+      parseRoleHeader(readFileSync(path.join(ROLES_DIR, f), "utf8"), f.replace(/\.md$/, "")));
   } catch { return []; }
 }
 

@@ -38,12 +38,12 @@ test("createRunDir: เรียกพร้อมกันในวินาท
   const reports = mkdtempSync(path.join(tmpdir(), "mycelium-reports-"));
   try {
     const now = new Date("2026-10-17T04:11:59Z");
-    const spec = { role: "business-analyst", tier: "t2", write: false, count: 1 };
+    const spec = { role: "ba", tier: "t2", write: false, count: 1 };
     const a = createRunDir(reports, spec, now);
     const b = createRunDir(reports, spec, now);
     assert.notEqual(a, b);
     assert.ok(existsSync(a) && existsSync(b));
-    assert.match(path.basename(a), /^2026-10-17-04-11-59-business-analyst-tier-t2-1agents-/, "ชื่อบอก role ด้วย");
+    assert.match(path.basename(a), /^2026-10-17-04-11-59-ba-tier-t2-1agents-/, "ชื่อบอก role ด้วย");
     const nested = createRunDir(path.join(reports, "ยังไม่มี"), { role: "", tier: "", write: true, count: 2 }, now);
     assert.match(path.basename(nested), /-write-2agents-/, "สร้าง reports dir ให้ถ้ายังไม่มี");
   } finally { rmSync(reports, { recursive: true, force: true }); }

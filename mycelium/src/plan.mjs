@@ -2,18 +2,24 @@
 // id ของ task ถูกใช้ประกอบชื่อไฟล์ใน runDir ทั้งอ่านและเขียน จึงต้องจำกัดด้วย pattern
 export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
-// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น frontend/backend-engineer
+import { resolveRoleName } from "./config.mjs";
+
+// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น fe/be
+// เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน MYCELIUM.md/README ถูก test ให้ตรงกับค่านี้
 export const FIXED_ROLE_TIER = {
   planner: "t2",
-  "project-manager": "t2",
-  "business-analyst": "t2",
-  "system-analyst": "t1",
-  "uxui-designer": "t2",
-  "database-administrator": "t2",
-  "test-planner": "t2",
+  pm: "t2",
+  ba: "t2",
+  sa: "t1",
+  ux: "t2",
+  dba: "t2",
+  tp: "t2",
   qa: "t2",
-  security: "t2",
+  sec: "t2",
 };
+// ช่วงที่ MYCELIUM/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
+// เพราะผู้ใช้อาจตั้งใจรัน fe/be ที่ t0/t1 ผ่าน --plan-file)
+export const IMPLEMENT_TIER_RANGE = "t2–t5";
 
 // ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
 export const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
@@ -74,6 +80,11 @@ export function validateAndFixPlan(plan, cfg, opts) {
     if (ids.has(t.id)) errors.push(`id ซ้ำ: ${t.id}`);
     ids.add(t.id);
     if (typeof t.task !== "string" || !t.task.trim()) errors.push(`${t.id}: ไม่มีคำสั่งงาน (task)`);
+    const canonicalRole = resolveRoleName(t.role);
+    if (canonicalRole !== t.role) {
+      console.log(`  แก้ ${t.id}: role "${t.role}" → ${canonicalRole} (ชื่อเดิมก่อนย่อ ID)`);
+      t.role = canonicalRole;
+    }
     if ("title" in t && typeof t.title !== "string") errors.push(`${t.id}: title ต้องเป็น string`);
     if (!t.role || !cfg.roleNames.includes(t.role)) errors.push(`${t.id}: role ไม่รู้จัก "${t.role}"`);
     if (t.dependsOn === undefined || t.dependsOn === null) t.dependsOn = [];

@@ -5,7 +5,7 @@
 // การตั้งค่าอยู่ที่ <ราก workspace>\mycelium.config.json (นอก package) · วิธีใช้เต็ม: mycelium/README.md
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, tierMatrixText } from "../src/config.mjs";
+import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
@@ -133,7 +133,7 @@ async function main() {
   }
   opts.projectCtx = projectCtx;
 
-  console.log(`🍄 MYCELIUM — สมองของทีม (คุม ${cfg.roleNames.length} role)${opts.target ? ` · target: ${opts.target}` : ""}`);
+  console.log(`🍄 MYCELIUM — ผู้คุมทีม AI (คุม ${cfg.roleNames.length} role)${opts.target ? ` · target: ${opts.target}` : ""}`);
 
   // --init: ติดตั้งลง workspace ครั้งเดียว — config + CLAUDE.md/AGENTS.md ให้ session สวมบทเอง
   if (opts.init) {
@@ -147,7 +147,7 @@ async function main() {
     printWorkspace(ws);
     console.log(`cwd      : ${opts.cwd}`);
     console.log("roles    :");
-    for (const r of listRoles()) console.log(`  ${r.name.padEnd(23)} ${r.title}`);
+    console.log(roleListText(listRoles()));
     console.log("tiers (agents.json):");
     console.log(tierMatrixText(cfg.tiers, cfg.agents));
     return;
