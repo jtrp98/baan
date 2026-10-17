@@ -211,6 +211,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 ## ผลการทดสอบ release 0.8.0 (2026-10-17 — Argon ผ่าน agy)
 
 1. **Gemini 4 Argon ใช้งานจริงผ่าน agy**: โจทย์ smoke คลาสสิก (อ่าน `demo-notes.md` แล้วตอบคำลับ) — `t1 = gemini-4-argon-high` ตอบ `MANGO-77` ถูกต้องใน 25.6 วิ · `t2 = gemini-4-argon-medium` ถูกต้องใน 11.6 วิ — ผ่านทั้งคู่แปลว่า model รันจริงและใช้ tool อ่านไฟล์ได้ (ไม่ใช่แค่ตอบแชท) · รายงาน: `reports\2026-10-17-04-11-59-tier-t1-1agents` และ `reports\2026-10-17-04-12-32-tier-t2-1agents`
+2. **claude/codex ยังใช้ได้เต็มรูปแบบรอบนี้**: รันคู่กันที่ `t1` (opus/high + gpt-6-astra/high) — ตอบ `MANGO-77` ถูกทั้งคู่ (claude 11.6 วิ · codex 96.3 วิ) · โควตา claude ที่เคยใกล้หมด (10-14) กลับมาใช้ได้แล้ว · รายงาน: `reports\2026-10-17-04-14-42-tier-t1-2agents` — สรุป: **สาม agent ผ่าน smoke t1 ครบในวันเดียว (2026-10-17)**
 
 ## ผลการทดสอบ release 0.3.0 (2026-10-16 — แก้ตาม AUDIT.md 2026-10-15)
 
