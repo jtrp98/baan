@@ -2,22 +2,22 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
-## ยังไม่ release (dev/golf) · mycelium-role ได้กติกาสถานะงาน/fallback เดียวกับโหมดอัตโนมัติ
+## 0.9.0 — 2026-10-17 · โหมดหลักได้สถานะงาน/fallback เดียวกับโหมดอัตโนมัติ + ID role สั้น
 
 ### เปลี่ยน
 - **`mycelium-role` cwd เริ่มต้น = ไดเรกทอรีที่เรียก** (เดิม = โฟลเดอร์แม่ของ package → role อ่านผิด repo เงียบๆ เมื่อลืม `--cwd`)
 - **`mycelium-role` ตัดสินผลด้วย output state ท้ายคำตอบ** — role ตอบ `NEEDS_*`/`FAIL`/`BLOCKED` = งานไม่สำเร็จแม้ CLI exit 0 · exit 0 เฉพาะเมื่อทุกตัว completed
 - โฟลเดอร์ผลของ `mycelium-role` มีชื่อ role + suffix สุ่ม — เปิดหลาย role พร้อมกันในวินาทีเดียวไม่เขียนทับกันอีก
+- **ID role สั้นลง**: `pm` `ba` `sa` `ux` `fe` `be` `dba` `tp` `sec` (`planner`/`qa` เท่าเดิม) — ไฟล์ย้ายเป็น `roles/<ID>.md` · ชื่อยาวเดิม (เช่น `business-analyst`) ยังใช้ได้เป็น alias ทั้ง `--role` และในแผน (plan.json เก่า/`--plan-file` ถูกแปลงให้เอง จึง resume run เดิมได้)
+- **tier ตรงกันทุกที่**: แก้บรรทัด tier ในไฟล์ role และตาราง README ที่เพี้ยนจากโค้ด (SA เคยเขียน t0–t1 แต่ใช้จริง t1 · PM/security t1–t2 แต่ใช้จริง t2 · FE/BE t2–t3 แต่เลือกได้ t2–t5)
+- คำอธิบายใหม่: "ผู้คุมทีม AI 11 role: แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์" · `dba` แสดงชื่อเป็น Database Advisor (ตรงกับหน้าที่ที่ปรึกษา ห้ามรัน SQL)
 
 ### เพิ่ม
 - `mycelium-role` สลับตัวรันเมื่อติดโควตาตาม `_fallback` ของ tier (agent เดียว + `--tier`) · `--no-fallback` ปิดได้ · `report.json` มี `state`/`marker`/`fallback`
 - **วันที่ของงานใน prompt ทุก role** + PM/planner — ค่าเริ่มต้น = วันที่ local ของเครื่อง · `--date YYYY-MM-DD` ทั้งสองคำสั่ง · CONVENTIONS §4 ให้ role ใช้วันที่นี้แทนการถาม (role รัน non-interactive ถามไม่ได้)
+- หัวไฟล์ role รูปแบบเดียว: `# บทบาท:` ชื่อแสดง · `> หน้าที่:` หนึ่งบรรทัด · `> tier:` — `--list` แสดง ID/ชื่อ/tier/หน้าที่/ชื่อเดิม และ prompt ของ planner ได้หน้าที่ของแต่ละ role ด้วย
 - กลไก fallback รวมเป็น `runWithFallback` ชุดเดียว (งานในแผน, PM/planner, mycelium-role) · `mycelium-role` ประกอบ prompt ผ่าน `roleDirective` ร่วมกับโหมดอัตโนมัติ
-- tests 65 กรณี (+11: cwd, runDir ไม่ชน, state/fallback ของ mycelium-role, วันที่ใน prompt)
-- **ID role สั้นลง**: `pm` `ba` `sa` `ux` `fe` `be` `dba` `tp` `sec` (`planner`/`qa` เท่าเดิม) — ไฟล์ย้ายเป็น `roles/<ID>.md` · ชื่อยาวเดิม (เช่น `business-analyst`) ยังใช้ได้เป็น alias ทั้ง `--role` และในแผน (plan.json เก่า/--plan-file ถูกแปลงให้เอง จึง resume run เดิมได้)
-- หัวไฟล์ role มีรูปแบบเดียว: `# บทบาท:` ชื่อแสดง · `> หน้าที่:` หนึ่งบรรทัด · `> tier:` — `--list` แสดง ID/ชื่อ/tier/หน้าที่/ชื่อเดิม และ prompt ของ planner ได้หน้าที่ของแต่ละ role ด้วย
-- tier ตรงกันทุกที่: แก้บรรทัด tier ในไฟล์ role และตาราง README ที่เพี้ยนจากโค้ด (เช่น SA เคยเขียน t0–t1 แต่ใช้จริง t1, PM/security t1–t2 แต่ใช้จริง t2, FE/BE t2–t3 แต่เลือกได้ t2–t5) · ตาราง role ใน charter/README มาจากหัวไฟล์ role และมี test กันเพี้ยน (72 กรณี)
-- คำอธิบายใหม่: "ผู้คุมทีม AI 11 role: แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์" · `database-administrator` แสดงชื่อเป็น Database Advisor (ตรงกับหน้าที่ที่ปรึกษา ห้ามรัน SQL)
+- tests 54 → 72 กรณี: cwd, runDir ไม่ชน, state/fallback ของ mycelium-role, วันที่ใน prompt, alias ชื่อ role และ test กันตาราง role/tier เพี้ยนจากโค้ด
 
 ### ⚠ ต้องทำตอนอัปเกรด
 - สคริปต์/session ที่เรียก `mycelium-role` โดยไม่ส่ง `--cwd` และพึ่ง cwd เดิม (โฟลเดอร์แม่ของ package) — ส่ง `--cwd` ให้ชัด
