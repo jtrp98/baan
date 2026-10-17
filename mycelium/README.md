@@ -1,4 +1,6 @@
-# 🍄 MYCELIUM — สมองของทีม AI
+# 🍄 MYCELIUM — ผู้คุมทีม AI 11 role
+
+> แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์
 
 > ประวัติรุ่นและสิ่งที่เปลี่ยนแต่ละเวอร์ชัน: `RELEASE-NOTES.md`
 
@@ -35,6 +37,7 @@ C:\src\AICode\project-ai\mycelium\            ← ตัว package (npm link �
     plan.mjs                ← schema แผน DAG + validation (id, types, cycle) + FIXED_ROLE_TIER
     scheduler.mjs           ← สถานะงาน (state/marker) + dependency + execute ตาม wave + dry-run guard
     run-store.mjs           ← checkpoint ราย task + manifest ของ run (run.json) + resume
+    role-session.mjs        ← แกนของ mycelium-role: parse args, runDir ไม่ชน, สถานะงาน + fallback ราย agent
   mycelium.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\mycelium.config.json)
   agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
   roles\                    ← 11 ตำแหน่งในทีม
@@ -60,10 +63,10 @@ session นั้นจะกลายเป็นสมอง — รับ goa
 mycelium --list
 
 # เปิด session ของ role เดียว (มือของ MYCELIUM)
-mycelium-role --agent codex --role business-analyst --tier t2 --task "เขียน requirement ของ..."
+mycelium-role --agent codex --role ba --tier t2 --task "เขียน requirement ของ..."
 mycelium-role --agent codex --role qa --tier t2 --cwd C:\path\to\repo --task "เขียน unit test ของ utils.js"
-mycelium-role --all --role security --tier t2 --task "รีวิว API..."      # ทุก agent พร้อมกัน
-mycelium-role --agent codex --role backend-engineer --tier t3 --write --task "แก้บั๊ก..."  # อนุญาตแก้ไฟล์
+mycelium-role --all --role sec --tier t2 --task "รีวิว API..."      # ทุก agent พร้อมกัน
+mycelium-role --agent codex --role be --tier t3 --write --task "แก้บั๊ก..."  # อนุญาตแก้ไฟล์
 
 # โหมดอัตโนมัติทั้งก้อน
 mycelium --target sb-api-academic-timetable-ai --goal "..." --dry-run
@@ -76,45 +79,53 @@ mycelium-role --agent claude --model haiku --effort low --task "..."
 mycelium-role --list              # ดูรายชื่อ agent + tier
 ```
 
+### สัญญาของ `mycelium-role` (โหมดหลัก — ใช้กติกาเดียวกับโหมดอัตโนมัติ)
+
+- **cwd เริ่มต้น = ไดเรกทอรีที่เรียก** (เดิมคือโฟลเดอร์แม่ของ package ซึ่งทำให้ role อ่านผิด repo เมื่อลืม `--cwd`) · `--cwd` แบบ relative อิงจากที่เรียก
+- **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
+- **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
+- **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
+- **วันที่ของงาน** ใส่ใน prompt ทุก role (และ PM/planner ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `mycelium` และ `mycelium-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
+
 # กำหนดบทบาท (role) — ตำแหน่งในทีม
 
-ไฟล์นิยามบทบาทอยู่ที่ `roles/<ชื่อ>.md` ใช้กับ flag `--role` โดย mycelium-role จะผูกบทบาทเข้ากับ task ให้ agent ก่อนส่งงาน:
+ไฟล์นิยามบทบาทอยู่ที่ `roles/<ID>.md` (หัวไฟล์มี `# บทบาท:` ชื่อแสดง · `> หน้าที่:` หนึ่งบรรทัด · `> tier:` — `--list` และ prompt ของ planner อ่านจากตรงนี้) ใช้กับ flag `--role` โดย mycelium-role จะผูกบทบาทเข้ากับ task ให้ agent ก่อนส่งงาน:
 
 ```bash
 mycelium-role --agent agy --role qa --tier t3 --task "เขียน unit test ของ utils.js ตาม acceptance criteria ใน SPEC.md"
-mycelium-role --all --role security --tier t1 --task "รีวิวความปลอดภัยของ API ที่เพิ่งสร้าง"
+mycelium-role --all --role sec --tier t1 --task "รีวิวความปลอดภัยของ API ที่เพิ่งสร้าง"
 ```
 
-| role | ตำแหน่ง | tier แนะนำ | ขอบเขตที่ตกลงกับผู้ใช้ (2026-10-14) |
-|---|---|---|---|
-| `planner` | Planner | t1–t2 | วางแผน/แตก task/dependency — แยกจาก PM |
-| `project-manager` | Project Manager (PM) | t1–t2 | **coordinator — เรียกใช้คนในทีม** ตามแผนของ planner + backlog + release scope |
-| `business-analyst` | Business Analyst (BA) | t2 | เต็ม: REQ/AC/BR + ทะเบียน OQ รอคนตัดสิน |
-| `system-analyst` | System Analyst (SA) | t0–t1 | เต็ม: DES + สัญญา API + ตรวจโค้ด as-built จริง |
-| `uxui-designer` | UX/UI Designer | t2 | ทั้งร่าง UX artifact ราย feature รอคนเซ็น และดูแล design system กลาง |
-| `frontend-engineer` | Frontend Engineer (FE) | t2–t3 | เคร่ง: implement ตาม **signed UX artifact เท่านั้น** |
-| `backend-engineer` | Backend Engineer (BE) | t2–t3 | เต็มตามสัญญา: validation + error contract ครบ |
-| `database-administrator` | Database Administrator (DBA) | t2–t3 | ที่ปรึกษา — **เขียน SQL เองได้ แต่ห้ามรันโดยเด็ดขาด** (คนเท่านั้นรัน) |
-| `test-planner` | Test Planner | t2–t3 | เต็ม: TP index + test matrix + traceability ทุก AC |
-| `qa` | QA (unit test อิสระ) | t2–t3 | เขียน test จาก spec ไม่ใช่โค้ด dev + รายงานเป็นรอบ + แนะนำ backlog |
-| `security` | Security & Compliance | t1–t2 | เต็ม: OWASP + PDPA/GDPR + dependency + ประกาศ blocker |
+| ID | ชื่อ | หน้าที่ | tier | ชื่อเดิม (alias) |
+|---|---|---|---|---|
+| `planner` | Planner | แตก goal ใหญ่เป็นแผน DAG แล้วส่งให้ PM (เฉพาะงานใหญ่) | t2 | — |
+| `pm` | Project Manager | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run (เฉพาะงานใหญ่) | t2 | `project-manager` |
+| `ba` | Business Analyst | เขียน REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 | `business-analyst` |
+| `sa` | System Analyst | ออกแบบ DES และสัญญา API แล้วตรวจกับโค้ดจริง (as-built) | t1 | `system-analyst` |
+| `ux` | UX/UI Designer | ร่าง UX ราย feature รอคนเซ็น และดูแล design system | t2 | `uxui-designer` |
+| `fe` | Frontend Engineer | implement ตาม UX ที่เซ็นแล้ว และสัญญา backend ตัวจริง | **MYCELIUM/planner เลือกราย task (t2–t5 ตามความยาก)** | `frontend-engineer` |
+| `be` | Backend Engineer | implement ตามสัญญา โดย validation และ error contract ต้องครบ | **MYCELIUM/planner เลือกราย task (t2–t5 ตามความยาก)** | `backend-engineer` |
+| `dba` | Database Advisor | ออกแบบ schema และเขียน SQL พร้อม rollback แต่ห้ามรันเอง | t2 | `database-administrator` |
+| `tp` | Test Planner | ทำ TP, test matrix และ traceability ครบทุก AC | t2 | `test-planner` |
+| `qa` | QA | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task | t2 | — |
+| `sec` | Security & Compliance | ตรวจ OWASP และ PDPA/GDPR แล้วประกาศ blocker | t2 | `security` |
 
 หลักการแบ่งหน้าที่ที่ฝังไว้ใน role (สอดคล้อง convention ของโปรเจกต์ timetableai):
 - **วางแผนกับสั่งงานแยกกัน** — planner วางแผน, PM เป็นคนเรียกใช้ทีมตามแผน
 - **QA แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) QA เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
-- **Artifact ต้องเซ็นก่อนใช้** — UX draft ของ uxui-designer ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
+- **Artifact ต้องเซ็นก่อนใช้** — UX draft ของ `ux` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
 - **DBA ห้ามรัน SQL ทุกกรณี** — เขียน script พร้อม rollback plan ให้คนรันเท่านั้น
 - ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log
 - **เพิ่ม/ลดตำแหน่งได้อิสระ** — แค่เพิ่ม/ลบไฟล์ `.md` ใน `roles/` ระบบหาอัตโนมัติ (ดูรายชื่อด้วย `--list`)
 
-ตัวอย่าง flow งานเต็มรูปแบบ: `planner` วางแผน → `project-manager` เรียกทีมตามแผน → `business-analyst` เขียน REQ/AC → `uxui-designer` ร่าง UX รอผู้ใช้เซ็น → `system-analyst` ออกแบบ DES/สัญญา → `database-administrator` รีวิม schema + เขียน SQL (คนรัน) → `frontend-engineer`/`backend-engineer` implement ตาม signed artifact → `test-planner` วางแผนทดสอบ → `qa` เขียน unit test อิสระ + รายงานรอบ → `security` รีวิวก่อนขึ้น production
+ตัวอย่าง flow งานเต็มรูปแบบ: `planner` วางแผน → `pm` เรียกทีมตามแผน → `ba` เขียน REQ/AC → `ux` ร่าง UX รอผู้ใช้เซ็น → `sa` ออกแบบ DES/สัญญา → `dba` รีวิม schema + เขียน SQL (คนรัน) → `fe`/`be` implement ตาม signed artifact → `tp` วางแผนทดสอบ → `qa` เขียน unit test อิสระ + รายงานรอบ → `sec` รีวิวก่อนขึ้น production
 
 ## โหมดอัตโนมัติ (`mycelium`)
 
 สำหรับงานที่อยากให้รันทั้งก้อนโดยไม่ต้องมี session คุมเอง — การไหล: **goal → PM (จุดเข้า เขียนคำมอบหมาย) → planner (วางแผนเป็น DAG) → execute ตามแผน** (สคริปต์ทำหน้าที่เป็น "มือของ PM" แทน session ที่สวม MYCELIUM)
 
 กติกาสำคัญที่ฝังไว้:
-- **planner เลือก tier ได้เฉพาะ task ของ `frontend-engineer` / `backend-engineer`** (งาน implement ที่ผ่าน design ของ SA มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน mycelium.mjs
+- **planner เลือก tier ได้เฉพาะ task ของ `fe` / `be`** (งาน implement ที่ผ่าน design ของ SA มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน `src/plan.mjs` (บรรทัด `> tier:` ในไฟล์ role และตาราง role ถูก test ให้ตรงกับค่านี้เสมอ)
 - task ที่ไม่พึ่งกัน (dependsOn ว่าง) **รันขนานกัน** ตามลำดับ wave
 - งานง่าย planner ให้น้อย task เอง — ไม่ต้องใช้ทั้งทีม
 - สิ่งที่ต้องเป็นประตูมนุษย์ (sign-off UX / รัน SQL / ตัดสินธุรกิจ) รวมเป็น `humanGates` รายงานตอนจบ — ไม่ทำแทน
@@ -171,6 +182,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 | t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / low | gemini-3.8-flash-low |
 
 หมายเหตุ:
+- **ลำดับสลับตัวรันเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ --agent) เป็นตัวแรกเสมอ — ถ้าตัวปัจจุบันล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที ทั้งงานในแผนและขั้น PM/planner · **ความล้มเหลวด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint (`fallback`) และ summary · ค่าตั้งปัจจุบัน: t0–t3 = codex → agy → claude, t4–t5 = agy → codex → claude (claude ท้ายสุดทุก tier — โควตาแพงสุด เก็บไว้งานหนัก)
 - **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที (กันสงสัยว่าทำไมไม่ทำงาน)
 - **Argon เปิดตัวแล้ว (เติมครบ 2026-10-17)** — `agy models` มี `gemini-4-argon-low/medium/high` จึงเติม agy กลับที่ t0–t2 ได้ครบ · ข้อจำกัด: agy ไม่มี effort `max` ให้ ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด · ชื่อ model ล่าสุดเช็คได้เสมอด้วย `agy models`
 - **t0 ยืด timeout อัตโนมัติเป็น 900 วินาที/agent** (ปกติ 240) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
@@ -188,7 +200,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
-- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>/`
+- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
 - เกิน timeout (default 240 วินาที/ตัว) จะถูก kill ทั้ง process tree อัตโนมัติ
 
 ## ผลการทดสอบ (2026-10-14)
@@ -207,6 +219,11 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - **comment เหลือเฉพาะ why** (เหตุผล/ข้อจำกัดที่โค้ดบอกเองไม่ได้) + ลบของไม่ใช้ (`PLANNER_TIERS_ROLES`, ตัวช่วย smoke ชั่วคราว)
 - tests เดิม 35 กรณีผ่านครบหลังย้าย (import ชี้ src โมดูลตรงตัว) + `npm link` ใหม่ + smoke `--plan-file --dry-run` ผ่าน bin ใหม่ + `npm pack` ยืนยัน bin/ และ src/ ติด package (25 ไฟล์)
 - หมายเหตุ: path ของ bin เปลี่ยน — ใคร link ไว้บนเครื่องอื่นต้อง `npm link` ใหม่หนึ่งครั้ง
+
+## ผลการทดสอบ release 0.8.0 (2026-10-17 — Argon ผ่าน agy)
+
+1. **Gemini 4 Argon ใช้งานจริงผ่าน agy**: โจทย์ smoke คลาสสิก (อ่าน `demo-notes.md` แล้วตอบคำลับ) — `t1 = gemini-4-argon-high` ตอบ `MANGO-77` ถูกต้องใน 25.6 วิ · `t2 = gemini-4-argon-medium` ถูกต้องใน 11.6 วิ — ผ่านทั้งคู่แปลว่า model รันจริงและใช้ tool อ่านไฟล์ได้ (ไม่ใช่แค่ตอบแชท) · รายงาน: `reports\2026-10-17-04-11-59-tier-t1-1agents` และ `reports\2026-10-17-04-12-32-tier-t2-1agents`
+2. **claude/codex ยังใช้ได้เต็มรูปแบบรอบนี้**: รันคู่กันที่ `t1` (opus/high + gpt-6-astra/high) — ตอบ `MANGO-77` ถูกทั้งคู่ (claude 11.6 วิ · codex 96.3 วิ) · โควตา claude ที่เคยใกล้หมด (10-14) กลับมาใช้ได้แล้ว · รายงาน: `reports\2026-10-17-04-14-42-tier-t1-2agents` — สรุป: **สาม agent ผ่าน smoke t1 ครบในวันเดียว (2026-10-17)**
 
 ## ผลการทดสอบ release 0.3.0 (2026-10-16 — แก้ตาม AUDIT.md 2026-10-15)
 

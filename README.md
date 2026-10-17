@@ -1,6 +1,6 @@
 # project-ai
 
-บ้านของ **🍄 MYCELIUM** — local npm package "สมองของทีม AI" อยู่ที่ `mycelium\` (ติดตั้งแล้วผ่าน `npm link` — ใช้คำสั่ง `mycelium` / `mycelium-role` ได้จากทุกที่)
+บ้านของ **🍄 MYCELIUM** — local npm package "ผู้คุมทีม AI 11 role" (แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์) อยู่ที่ `mycelium\` (ติดตั้งแล้วผ่าน `npm link` — ใช้คำสั่ง `mycelium` / `mycelium-role` ได้จากทุกที่)
 
 - ติดตั้งลง workspace (ครั้งเดียว): `cd <ราก workspace> && mycelium --init` — สร้าง CLAUDE.md/AGENTS.md ให้ AI session สวมบท MYCELIUM เอง + config ของ workspace
 - สวมบท MYCELIUM (ถ้าไม่ได้ init): `อ่าน C:\src\AICode\project-ai\mycelium\MYCELIUM.md แล้วสวมบทบาท MYCELIUM`

@@ -2,20 +2,37 @@
 // id ของ task ถูกใช้ประกอบชื่อไฟล์ใน runDir ทั้งอ่านและเขียน จึงต้องจำกัดด้วย pattern
 export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
-// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น frontend/backend-engineer
+import { resolveRoleName } from "./config.mjs";
+
+// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น fe/be
+// เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน MYCELIUM.md/README ถูก test ให้ตรงกับค่านี้
 export const FIXED_ROLE_TIER = {
   planner: "t2",
-  "project-manager": "t2",
-  "business-analyst": "t2",
-  "system-analyst": "t1",
-  "uxui-designer": "t2",
-  "database-administrator": "t2",
-  "test-planner": "t2",
+  pm: "t2",
+  ba: "t2",
+  sa: "t1",
+  ux: "t2",
+  dba: "t2",
+  tp: "t2",
   qa: "t2",
-  security: "t2",
+  sec: "t2",
 };
+// ช่วงที่ MYCELIUM/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
+// เพราะผู้ใช้อาจตั้งใจรัน fe/be ที่ t0/t1 ผ่าน --plan-file)
+export const IMPLEMENT_TIER_RANGE = "t2–t5";
 
-const AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
+// ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
+export const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
+
+// ลำดับตัวรันจริงของงานหนึ่งงาน: agent ที่เลือกมาเป็นตัวแรกเสมอ แล้วไล่ตาม _fallback ของ tier
+// (ข้าม agent ที่ไม่รู้จักหรือเป็น null ใน tier นั้น) — ใช้ทั้งตอน validate แผน (เลือกตัวแรกที่ใช้ได้)
+// และตอน execute เมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
+export function fallbackChainFor(cfg, tierName, chosenAgent) {
+  const tierConf = cfg.tiers[tierName] ?? {};
+  const order = Array.isArray(tierConf._fallback) && tierConf._fallback.length ? tierConf._fallback : DEFAULT_AGENT_FALLBACK_ORDER;
+  const usable = (a) => a in cfg.agents && tierConf[a] !== null;
+  return [...new Set([chosenAgent, ...order].filter(usable))];
+}
 
 export function extractJson(text) {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -63,6 +80,11 @@ export function validateAndFixPlan(plan, cfg, opts) {
     if (ids.has(t.id)) errors.push(`id ซ้ำ: ${t.id}`);
     ids.add(t.id);
     if (typeof t.task !== "string" || !t.task.trim()) errors.push(`${t.id}: ไม่มีคำสั่งงาน (task)`);
+    const canonicalRole = resolveRoleName(t.role);
+    if (canonicalRole !== t.role) {
+      console.log(`  แก้ ${t.id}: role "${t.role}" → ${canonicalRole} (ชื่อเดิมก่อนย่อ ID)`);
+      t.role = canonicalRole;
+    }
     if ("title" in t && typeof t.title !== "string") errors.push(`${t.id}: title ต้องเป็น string`);
     if (!t.role || !cfg.roleNames.includes(t.role)) errors.push(`${t.id}: role ไม่รู้จัก "${t.role}"`);
     if (t.dependsOn === undefined || t.dependsOn === null) t.dependsOn = [];
@@ -76,13 +98,10 @@ export function validateAndFixPlan(plan, cfg, opts) {
       t.tier = FIXED_ROLE_TIER[t.role];
     }
     if (!t.tier || !(t.tier in cfg.tiers)) errors.push(`${t.id}: tier ไม่รู้จัก "${t.tier}"`);
-    const tierConf = cfg.tiers[t.tier] ?? {};
-    t.agent = opts.agent;
-    if (!(t.agent in cfg.agents) || tierConf[t.agent] === null) {
-      const fixed = AGENT_FALLBACK_ORDER.find((a) => a in cfg.agents && tierConf[a] !== null);
-      if (!fixed) errors.push(`${t.id}: tier ${t.tier} ไม่มี agent ว่างเลย (ทุกตัว null)`);
-      else { console.log(`  แก้ ${t.id}: agent "${t.agent}" → ${fixed} (null ใน tier นี้)`); t.agent = fixed; }
-    }
+    const chain = fallbackChainFor(cfg, t.tier, opts.agent);
+    if (chain.length === 0) errors.push(`${t.id}: tier ${t.tier} ไม่มี agent ที่ใช้ได้เลย (ทุกตัว null)`);
+    t.agent = chain[0] ?? opts.agent;
+    if (t.agent !== opts.agent) console.log(`  แก้ ${t.id}: agent "${opts.agent}" → ${t.agent} (ตามลำดับ fallback ของ tier ${t.tier})`);
   }
   const cycle = findDependencyCycle(plan.tasks);
   if (cycle) errors.push(`dependency วนลูป: ${cycle.join(" → ")}`);

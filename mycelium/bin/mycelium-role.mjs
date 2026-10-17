@@ -1,60 +1,27 @@
 #!/usr/bin/env node
 // 🍄 MYCELIUM — มือระดับล่าง: เปิด session ของ role เดียวหรือหลาย agent พร้อมกัน (คำสั่ง mycelium-role)
-// ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs ใช้ร่วมกับ mycelium
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+// ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ mycelium
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { REPORTS_DIR, ROLES_DIR, TEAM_DIR, loadAgentsConfig } from "../src/config.mjs";
-import { readConventions } from "../src/prompts.mjs";
+import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText } from "../src/config.mjs";
+import { localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
-
-const DEFAULT_TIMEOUT_SEC = 240;
-const PROJECT_ROOT = path.resolve(TEAM_DIR, ".."); // default cwd = โฟลเดอร์แม่ของ package (ต่างจาก pipeline ที่ default = TEAM_DIR)
-
-function parseArgs(argv) {
-  const opts = { agents: [], task: "", taskFile: "", write: false, seq: false, list: false, cwd: PROJECT_ROOT, timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false, tier: "", model: "", effort: "", role: "" };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    switch (a) {
-      case "--agent": opts.agents.push(argv[++i]); break;
-      case "--all": opts.agents.push("*"); break;
-      case "--task": opts.task = argv[++i] ?? ""; break;
-      case "--task-file": opts.taskFile = argv[++i] ?? ""; break;
-      case "--write": opts.write = true; break;
-      case "--seq": opts.seq = true; break;
-      case "--list": opts.list = true; break;
-      case "--cwd": opts.cwd = path.resolve(argv[++i] ?? "."); break;
-      case "--timeout": opts.timeoutSec = Number(argv[++i]) || DEFAULT_TIMEOUT_SEC; opts.timeoutSet = true; break;
-      case "--tier": opts.tier = argv[++i] ?? ""; break;
-      case "--model": opts.model = argv[++i] ?? ""; break;
-      case "--effort": opts.effort = argv[++i] ?? ""; break;
-      case "--role": opts.role = argv[++i] ?? ""; break;
-      default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--write] [--seq] [--timeout <sec>] [--cwd <dir>] [--list]`);
-        process.exit(2);
-    }
-  }
-  return opts;
-}
-
-async function runAgent(name, def, task, opts, runDir, model, effort) {
-  const answerFile = path.join(runDir, `${name}.answer.txt`);
-  const args = buildArgs(def, model, effort, opts.write, answerFile);
-  if (def.promptVia === "arg") args.push(task);
-  const r = await runCli(def, args, def.promptVia, task, opts.cwd, opts.timeoutSec, answerFile);
-  return { ...r, agent: name, label: def.label, model, effort };
-}
+import { statusLabel } from "../src/scheduler.mjs";
+import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
 
 function printResult(r) {
-  const status = r.timedOut ? "TIMEOUT" : r.ok ? "OK" : `FAIL(exit=${r.exitCode})`;
   const tier = [r.model && `model=${r.model}`, r.effort && `effort=${r.effort}`].filter(Boolean).join(" ");
-  console.log(`\n── ${r.agent} (${r.label})${tier ? ` [${tier}]` : ""} ── ${status} in ${(r.durationMs / 1000).toFixed(1)}s`);
+  const via = r.fallback.length ? ` (สลับตัวรัน: ${r.fallback.join(", ")})` : "";
+  console.log(`\n── ${r.agent} (${r.label})${tier ? ` [${tier}]` : ""} ── ${statusLabel(r)} in ${(r.durationMs / 1000).toFixed(1)}s${via}`);
   if (r.error) console.log(`   spawn error: ${r.error}`);
   if (r.timedOut) console.log("   ถูกยกเลิกเพราะเกิน timeout");
   console.log((r.answer || "(ไม่มีคำตอบ — ดู raw output ใน reports/) ").split("\n").map((l) => `   ${l}`).join("\n"));
+  if (!r.ok) console.log(`   สถานะงาน: ${r.state}${r.marker ? ` (${r.marker})` : ""} — งานไม่สำเร็จ`);
 }
 
 async function main() {
-  const opts = parseArgs(process.argv.slice(2));
+  let opts;
+  try { opts = parseRoleArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
   const cfg = loadAgentsConfig();
   const agents = cfg.agents ?? {};
   const tiers = cfg.tiers ?? {};
@@ -65,18 +32,13 @@ async function main() {
     console.log("tiers:");
     for (const [tname, conf] of Object.entries(tiers)) {
       const agentsLine = Object.entries(conf).filter(([a]) => !a.startsWith("_")).map(([a, c]) => `${a}: ${c === null ? "— (null)" : [c.model, c.effort].filter(Boolean).join("/")}`).join(", ");
-      const extra = conf._timeoutSec ? ` (timeout ${conf._timeoutSec}s)` : "";
-      console.log(`  ${tname.padEnd(8)} ${agentsLine}${extra}`);
+      const extra = [conf._timeoutSec && `timeout ${conf._timeoutSec}s`, conf._fallback && `fallback ${conf._fallback.join("→")}`].filter(Boolean).join(" · ");
+      console.log(`  ${tname.padEnd(8)} ${agentsLine}${extra ? ` (${extra})` : ""}`);
     }
-    let roleFiles = [];
-    try { roleFiles = readdirSync(ROLES_DIR).filter((f) => f.endsWith(".md")); } catch { /* ไม่มีโฟลเดอร์ roles */ }
-    if (roleFiles.length) {
+    const roles = listRoles();
+    if (roles.length) {
       console.log("roles (ใช้กับ --role <name>):");
-      for (const f of roleFiles) {
-        const name = f.replace(/\.md$/, "");
-        const title = readFileSync(path.join(ROLES_DIR, f), "utf8").split("\n").find((l) => l.startsWith("# "))?.replace(/^#\s+/, "") ?? name;
-        console.log(`  ${name.padEnd(13)} ${title}`);
-      }
+      console.log(roleListText(roles));
     }
     return;
   }
@@ -90,6 +52,10 @@ async function main() {
   if (tierTimeout && !opts.timeoutSet) opts.timeoutSec = tierTimeout;
 
   const selected = opts.agents.includes("*") ? Object.keys(agents) : [...new Set(opts.agents)];
+  if (selected.length === 0) {
+    console.error("ระบุ --agent <name> อย่างน้อยหนึ่งตัว หรือ --all");
+    process.exit(2);
+  }
   const unknown = selected.filter((n) => !(n in agents));
   if (unknown.length) {
     console.error(`ไม่พบ agent: ${unknown.join(", ")} (ที่มี: ${Object.keys(agents).join(", ")})`);
@@ -111,8 +77,8 @@ async function main() {
     console.error(`ไม่มี agent ที่รันได้ใน tier ${opts.tier} (ทุกตัวเป็น null)`);
     process.exit(2);
   }
-  if (selected.length === 0) {
-    console.error("ระบุ --agent <name> อย่างน้อยหนึ่งตัว หรือ --all");
+  if (!existsSync(opts.cwd)) {
+    console.error(`--cwd ชี้โฟลเดอร์ที่ไม่มี: ${opts.cwd}`);
     process.exit(2);
   }
 
@@ -124,53 +90,44 @@ async function main() {
     process.exit(2);
   }
 
+  const workDate = opts.date || localDate();
   let fullTask = task;
   if (opts.role) {
     const roleFile = path.join(ROLES_DIR, `${opts.role}.md`);
-    let roleContent = "";
-    try {
-      roleContent = readFileSync(roleFile, "utf8").trim();
-    } catch {
+    if (!existsSync(roleFile)) {
       console.error(`ไม่พบ role: ${opts.role} (ไม่มีไฟล์ ${roleFile} — ดูรายชื่อทั้งหมดด้วย --list)`);
       process.exit(2);
     }
-    const conv = `\n\n---\n\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}`;
-    fullTask = `คุณกำลังปฏิบัติหน้าที่ในทีมพัฒนาซอฟต์แวร์ตามบทบาทต่อไปนี้อย่างเคร่งครัด:\n\n${roleContent}${conv}\n\n---\n\n## งานที่ได้รับมอบหมาย:\n${task}`;
+    if (opts.roleAlias) console.log(`(--role ${opts.roleAlias} = ชื่อเดิมของ ${opts.role} — ใช้ชื่อสั้นได้เลยครั้งหน้า)`);
+    fullTask = roleDirective(opts.role, task, null, "", workDate);
   }
 
-  const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-  const runDir = path.join(REPORTS_DIR, `${stamp}-${opts.tier ? `tier-${opts.tier}` : opts.write ? "write" : "read"}-${runnable.length}agents`);
-  mkdirSync(runDir, { recursive: true });
+  const runDir = createRunDir(REPORTS_DIR, { role: opts.role, tier: opts.tier, write: opts.write, count: runnable.length });
 
-  const resolveME = (name) => {
+  const resolveME = (name, isRequested) => {
     const t = (tiers[opts.tier] ?? {})[name] ?? {};
+    if (!isRequested) return { model: t.model || "", effort: t.effort || "" };
     return { model: opts.model || t.model || "", effort: opts.effort || t.effort || "" };
   };
 
   console.log(`task    : ${task}`);
-  if (opts.role) console.log(`role    : ${opts.role} (บทบาทจาก roles/${opts.role}.md ผูกอยู่กับ task)`);
+  if (opts.role) console.log(`role    : ${opts.role} (บทบาทจาก roles/${opts.role}.md + CONVENTIONS ผูกอยู่กับ task) · วันที่ของงาน ${workDate}`);
   console.log(`agents  : ${runnable.join(", ")}`);
-  if (opts.tier) console.log(`tier    : ${opts.tier} -> ${runnable.map((n) => `${n}=${[resolveME(n).model, resolveME(n).effort].filter(Boolean).join("/")}`).join(", ")}`);
+  if (opts.tier) console.log(`tier    : ${opts.tier} -> ${runnable.map((n) => `${n}=${[resolveME(n, true).model, resolveME(n, true).effort].filter(Boolean).join("/")}`).join(", ")}`);
   console.log(`mode    : ${opts.write ? "write (อนุญาตให้แก้ไขไฟล์)" : "read-only"}${opts.seq ? " (ทีละตัว)" : " (ขนาน)"}`);
   console.log(`cwd     : ${opts.cwd}`);
   console.log(`timeout : ${opts.timeoutSec}s/agent — กำลังรัน...`);
 
-  const results = [];
-  if (opts.seq) {
-    for (const name of runnable) {
-      const { model, effort } = resolveME(name);
-      const r = await runAgent(name, agents[name], fullTask, opts, runDir, model, effort);
-      results.push(r);
-      printResult(r);
-    }
-  } else {
-    const rs = await Promise.all(runnable.map((name) => {
-      const { model, effort } = resolveME(name);
-      return runAgent(name, agents[name], fullTask, opts, runDir, model, effort);
-    }));
-    results.push(...rs);
-    rs.forEach(printResult);
-  }
+  const attempt = async (name, isRequested) => {
+    const def = agents[name];
+    const { model, effort } = resolveME(name, isRequested);
+    const answerFile = path.join(runDir, `${name}.answer.txt`);
+    const args = buildArgs(def, model, effort, opts.write, answerFile);
+    if (def.promptVia === "arg") args.push(fullTask);
+    const r = await runCli(def, args, def.promptVia, fullTask, opts.cwd, opts.timeoutSec, answerFile);
+    return { ...r, label: def.label, model, effort };
+  };
+  const results = await runRoleAgents({ cfg, opts, selected: runnable, attempt, onResult: printResult });
 
   for (const r of results) {
     writeFileSync(path.join(runDir, `${r.agent}.stdout.txt`), r.stdout, "utf8");
@@ -181,14 +138,16 @@ async function main() {
     task,
     role: opts.role || null,
     tier: opts.tier || null,
+    date: opts.role ? workDate : null,
     mode: opts.write ? "write" : "read-only",
     cwd: opts.cwd,
     results: results.map(({ stdout, stderr, ...rest }) => rest),
   };
   writeFileSync(path.join(runDir, "report.json"), JSON.stringify(report, null, 2), "utf8");
 
+  // exit 0 เฉพาะเมื่อทุกตัว completed — ผู้คุมใช้ exit code ตัดสินได้ทันทีว่าต้อง route ต่อหรือไม่ (เหมือนโหมดอัตโนมัติ)
   const okCount = results.filter((r) => r.ok).length;
-  console.log(`\nสรุป: สำเร็จ ${okCount}/${results.length} — รายงานฉบับเต็มอยู่ที่ ${runDir}`);
+  console.log(`\nสรุป: completed ${okCount}/${results.length} · ${results.map((r) => `${r.requested}${r.agent !== r.requested ? `→${r.agent}` : ""}=${r.state}`).join(", ")} — รายงานฉบับเต็มอยู่ที่ ${runDir}`);
   process.exitCode = okCount === results.length ? 0 : 1;
 }
 
