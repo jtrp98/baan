@@ -161,18 +161,18 @@ mycelium --plan-file <f>          # รันแผนที่แก้เอ�
 
 tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค่ายอื่นจัดตัวทัดเทียมตามระดับ, T0 = overdrive):
 
-| tier | เหมาะกับ | claude | codex | agy (ชั่วคราว: flash-only รอ Argon) |
+| tier | เหมาะกับ | claude | codex | agy |
 |---|---|---|---|---|
-| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | **null** |
-| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | **null** |
-| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | **null** |
+| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | gemini-4-argon-high |
+| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | gemini-4-argon-high |
+| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | gemini-4-argon-medium |
 | t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / medium | gemini-3.8-flash-medium |
 | t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / medium | gemini-3.8-flash-medium |
 | t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / low | gemini-3.8-flash-low |
 
 หมายเหตุ:
 - **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที (กันสงสัยว่าทำไมไม่ทำงาน)
-- **agy เป็น null ที่ t0–t2 ชั่วคราว** เพราะ gemini-3.8-flash สูงสุดแค่ระดับ sonnet-medium ลงมา ไม่ทัดเทียบ opus/astra หรือ sonnet-high — เมื่อ Argon เปิดตัว (เช็คด้วย `agy models`) ให้เติมกลับเป็น `{ "model": "argon-..." }` ใน `agents.json`
+- **Argon เปิดตัวแล้ว (เติมครบ 2026-10-17)** — `agy models` มี `gemini-4-argon-low/medium/high` จึงเติม agy กลับที่ t0–t2 ได้ครบ · ข้อจำกัด: agy ไม่มี effort `max` ให้ ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด · ชื่อ model ล่าสุดเช็คได้เสมอด้วย `agy models`
 - **t0 ยืด timeout อัตโนมัติเป็น 900 วินาที/agent** (ปกติ 240) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
 - effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ (ตามที่ UI เตือน) — ใช้เฉพาะ t0 จริงๆ
 - agy ยังมี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่ออยากทำ tier bulk สำหรับงาน mass

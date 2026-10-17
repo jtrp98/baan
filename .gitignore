@@ -1,6 +1,10 @@
 # ข้อมูล run ของเครื่อง (answer/stderr/report ทุกครั้งที่สั่งงาน) — เก็บในเครื่องอย่างเดียว
 mycelium/reports/
 
+# ไฟล์นำทาง AI session ของ repo นี้ — ใช้ local อย่างเดียว ไม่อัพขึ้น git
+/CLAUDE.md
+/AGENTS.md
+
 node_modules/
 *.tgz
 *.tmp-*

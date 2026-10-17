@@ -2,6 +2,16 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## 0.8.0 — 2026-10-17 · เติม agy กลับทุก tier ด้วย Gemini 4 Argon
+
+### เปลี่ยน
+- **agy ใช้ได้ครบทุก tier แล้ว** หลัง Gemini 4 Argon เปิดตัว: t0/t1 = `gemini-4-argon-high` · t2 = `gemini-4-argon-medium` (t3–t5 คง `gemini-3.8-flash` เดิม)
+- ข้อจำกัด: agy ไม่มี effort `max` ให้ — ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด (ต่างจาก claude/codex ที่ได้ max)
+- ตรวจชื่อ model จริงจาก `agy models` ก่อนเติม · อัปเดตตาราง tier ladder ใน README + charter ให้ตรง
+
+### เพิ่ม
+- tests ตรวจ `agents.json` (ทุก tier ประกาศครบสาม agent · รูปแบบ entry ถูกต้อง · argon อยู่ t0–t2, flash อยู่ t3–t5) — รวม 48 กรณี
+
 ## 0.7.0 — 2026-10-16 · config เหลือไฟล์เดียว `mycelium.config.json` ที่ราก workspace
 
 ### เปลี่ยน

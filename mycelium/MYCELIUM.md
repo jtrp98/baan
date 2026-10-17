@@ -55,7 +55,7 @@ mycelium-role --agent codex --role business-analyst --tier t2 --task "คำส�
 - คำสั่งนี้**แนบไฟล์ role + `CONVENTIONS.md` (กติกากลางทุก role ต้องถือ)** ให้อัตโนมัติ — คุณไม่ต้องเล่ากติกาซ้ำใน task
 - คำตอบของ role จะพิมพ์ออกมาทาง stdout และเก็บที่ `reports/` ของ package
 - ตัวเลือกที่ใช้บ่อย: `--cwd <path>` (โปรเจกต์เป้าหมาย) · `--write` (อนุญาตให้แก้ไฟล์ — default read-only) · `--timeout <sec>`
-- agent เลือกได้: `codex` (default, ประหยัดโควตา claude) · `claude` · `agy` (มีแค่ t3–t5)
+- agent เลือกได้: `codex` (default, ประหยัดโควตา claude) · `claude` · `agy` (gemini-4-argon ครบทุก tier)
 - โหมดอัตโนมัติทั้งก้อน (ไม่ต้องคุมเอง): `mycelium --goal "..."` — PM/planner/execute ทำงานเองตามแผน DAG
 
 ## อ่าน handoff ของ role — ทุก role จบด้วย output state เดียว

@@ -1,6 +1,6 @@
 {
   "name": "mycelium",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "🍄 MYCELIUM — สมองของทีม AI: AI session สวมบท MYCELIUM แล้วเปิด session ของ 11 role (claude/codex/agy) ได้เอง",
   "type": "module",
   "bin": {

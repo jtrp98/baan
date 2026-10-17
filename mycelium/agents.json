@@ -39,17 +39,17 @@
       "_timeoutSec": 900,
       "claude": { "model": "opus", "effort": "max" },
       "codex": { "model": "gpt-6-astra", "effort": "max" },
-      "agy": null
+      "agy": { "model": "gemini-4-argon-high" }
     },
     "t1": {
       "claude": { "model": "opus", "effort": "high" },
       "codex": { "model": "gpt-6-astra", "effort": "high" },
-      "agy": null
+      "agy": { "model": "gemini-4-argon-high" }
     },
     "t2": {
       "claude": { "model": "sonnet", "effort": "high" },
       "codex": { "model": "gpt-6.1-sol", "effort": "high" },
-      "agy": null
+      "agy": { "model": "gemini-4-argon-medium" }
     },
     "t3": {
       "claude": { "model": "sonnet", "effort": "medium" },
