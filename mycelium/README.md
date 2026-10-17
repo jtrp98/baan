@@ -196,12 +196,15 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 | Agent | คำสั่งที่ mycelium-role ใช้ | รับ prompt ทาง | คำตอบอ่านจาก |
 |---|---|---|---|
-| claude | `claude -p --output-format text` | stdin | stdout |
+| claude | `claude -p --output-format text --allowedTools <ตามโหมด>` (write เพิ่ม `--permission-mode acceptEdits`) | stdin | stdout |
 | codex | `codex exec --skip-git-repo-check -s read-only -o <answer.txt> -` | stdin | ไฟล์ answer.txt (option `-o`) |
-| agy | `agy --print` | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
+| agy | `agy --mode plan --print` (write: `--mode accept-edits --print`) — ⚠ read-only ไม่ถูกบังคับ | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
+  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--mode plan` แต่**ยังบังคับไม่ได้จริง** — live smoke พบว่าทั้ง default และ plan mode เขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal (edit tool ยังเขียนได้ ส่วนการอ่าน/รันคำสั่งกลับใช้ไม่ได้) · ทางเดียวที่เห็นคือ `permissions` ใน settings.json ของ agy เอง — **ถือว่า agy ไม่มี read-only** จนกว่าจะตั้ง · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
+  - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
+- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
 - เกิน timeout (default 240 วินาที/ตัว) จะถูก kill ทั้ง process tree อัตโนมัติ
 

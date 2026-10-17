@@ -13,6 +13,18 @@
 ### เพิ่ม
 - **กติกาสไตล์โค้ดและ comment ของ `fe`/`be`/`qa`** (role ที่เขียนโค้ดลง target — หมวดเดียวกันทั้งสามไฟล์ + test กันไม่ให้ต่างกัน): เขียนให้เหมือนโค้ดรอบข้างใน target ห้ามเปลี่ยนสไตล์/reformat/refactor นอก task · comment เฉพาะ "why" ห้าม comment what · ห้ามใส่ task id หรือ ID เอกสาร (T1/BL/REQ/DES ฯลฯ) ลงในโค้ดหรือ comment — การโยงงานอยู่ใน handoff เท่านั้น (สำหรับ `qa` รวมถึงชื่อเคส test — traceability AC ↔ test อยู่ใน test plan ของ `tp`)
 
+### แก้ (จาก live smoke ทั้ง 3 ค่าย 2026-10-17)
+- **agy `--write` ใช้ได้แล้ว** — `--mode accept-edits` เคยอยู่หลัง `--print` จน `--print` กลืนเป็น prompt แล้วล้ม exit 2 ทุกครั้ง · ย้ายไว้ก่อน `--print` + test กันลำดับ
+- **claude รันคำสั่งได้ตามโหมด** — `-p` ไม่มีคนกดอนุมัติ tool จึงเคยรันคำสั่งไม่ได้เลย · read-only: `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) · write: เพิ่ม Edit/Write/Bash/PowerShell
+- **CONVENTIONS §8: ทำไม่ได้เพราะสภาพแวดล้อม = `BLOCKED`** — เคยเห็น role จบ `DONE` ทั้งที่รันคำสั่งไม่ได้ จนนับเป็น completed
+
+### เพิ่ม
+- **`npm run smoke:live`** (`scripts/live-smoke.mjs`) — ทดสอบตัวรันจริงทุกค่ายด้วยค่าที่เดาไม่ได้และตรวจบนดิสก์: อ่านไฟล์ · คำสั่งอ่านอย่างเดียว · รันโค้ด · read-only กันเขียนจริง · `--write` · สถานะไม่เกินจริง (ใช้โควตาจริง ไม่อยู่ใน `npm test`)
+
+### ⚠ ข้อจำกัดที่รู้แล้ว
+- **agy ยังไม่มี read-only จริง** — default/plan mode เขียนไฟล์ได้ และ `--sandbox` กันแค่ terminal · agy อยู่ใน fallback ทุก tier
+- **shell ของ codex พังบนเครื่องนี้** (`setup refresh had errors`, codex-cli 0.162.1) — ต้องแก้ฝั่ง codex · บางครั้งทำงานผ่าน MCP `node_repl` แทน
+
 ### ⚠ ต้องทำตอนอัปเกรด
 - workspace ที่ `--init` ไว้แล้ว: รัน `mycelium --init` ที่ราก workspace อีกครั้งเพื่อให้ CLAUDE.md/AGENTS.md มีข้อยกเว้น (ไฟล์ที่ผู้ใช้เขียนเองจะถูกข้าม — เพิ่มประโยคข้อยกเว้นจาก `src/role-guard.mjs` เอง)
 

@@ -42,3 +42,32 @@ test("agy ครบทุก tier แล้วหลัง Argon เปิดต
     assert.match(cfg.tiers[tier].agy.model, /^gemini-3\.8-flash-/, `tier ${tier}: agy คงเป็น flash`);
   }
 });
+
+// agy: --print กลืน argument ถัดไปเป็น prompt — flag อื่นต้องอยู่ก่อน --print เสมอ
+// (เคยวาง --mode หลัง --print จน --write ของ agy ล้มด้วย exit 2 ทุกครั้ง — พบจาก live smoke 2026-10-17)
+test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --mode plan · write ใช้ --mode accept-edits", () => {
+  const { readArgs, writeArgs } = cfg.agents.agy;
+  for (const args of [readArgs, writeArgs]) assert.equal(args.at(-1), "--print", `ต้องจบด้วย --print: ${JSON.stringify(args)}`);
+  const mode = (args) => args[args.indexOf("--mode") + 1];
+  assert.equal(mode(readArgs), "plan", "read-only ต้องไม่ใช่ default mode ของ agy (default เขียนไฟล์ได้ — พบจาก live smoke)");
+  // ไม่ใส่ --sandbox: live smoke พบว่ากันแค่ terminal (อ่าน/รันคำสั่งไม่ได้เลย) แต่ edit tool ยังเขียนไฟล์ได้ — แย่กว่าไม่ใส่
+  assert.ok(!readArgs.includes("--sandbox"));
+  assert.equal(mode(writeArgs), "accept-edits");
+});
+
+// claude -p ไม่มีคนกดอนุมัติ — tool ที่ไม่อยู่ใน --allowedTools ใช้ไม่ได้เลย (เคยรันคำสั่งไม่ได้ทั้งสองโหมด)
+test("claude: read-only อนุญาตเฉพาะ tool/คำสั่งอ่านอย่างเดียว · write อนุญาตแก้ไฟล์และรันคำสั่ง", () => {
+  const tools = (args) => args[args.indexOf("--allowedTools") + 1].split(",");
+  const { readArgs, writeArgs } = cfg.agents.claude;
+  const ro = tools(readArgs);
+  for (const t of ["Read", "Grep", "Glob"]) assert.ok(ro.includes(t), `read-only ต้องมี ${t}`);
+  assert.ok(ro.some((t) => t.startsWith("Bash(git log")), "read-only ต้องรันคำสั่งอ่านอย่างเดียวได้ (เช่น git log)");
+  for (const t of ro) {
+    assert.ok(!["Bash", "PowerShell", "Edit", "MultiEdit", "Write", "NotebookEdit"].includes(t), `read-only ห้ามมี ${t} แบบไม่จำกัด`);
+    assert.ok(!/^(Bash|PowerShell)\((node|npm|python|pwsh|powershell|cmd|git (commit|push|checkout|reset|branch|merge|rebase))/.test(t), `read-only ห้ามคำสั่งที่เขียนได้: ${t}`);
+  }
+  assert.ok(!readArgs.includes("--permission-mode"), "read-only ต้องไม่ auto-accept การแก้ไฟล์");
+  const rw = tools(writeArgs);
+  for (const t of ["Edit", "Write", "Bash", "PowerShell"]) assert.ok(rw.includes(t), `write ต้องมี ${t}`);
+  assert.equal(writeArgs[writeArgs.indexOf("--permission-mode") + 1], "acceptEdits");
+});
