@@ -36,7 +36,7 @@
   },
   "tiers": {
     "t0": {
-      "_timeoutSec": 900,
+      "_timeoutSec": 3600,
       "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "opus", "effort": "max" },
       "codex": { "model": "gpt-6-astra", "effort": "max" },

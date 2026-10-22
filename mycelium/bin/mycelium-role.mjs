@@ -7,7 +7,7 @@ import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText } fro
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
-import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
+import { createRunDir, parseRoleArgs, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
 
 function printResult(r) {
   const tier = [r.model && `model=${r.model}`, r.effort && `effort=${r.effort}`].filter(Boolean).join(" ");
@@ -47,9 +47,7 @@ async function main() {
     console.error(`ไม่พบ tier: ${opts.tier} (ที่มี: ${Object.keys(tiers).join(", ") || "ไม่มี"})`);
     process.exit(2);
   }
-  // tier ระบุ timeout เริ่มต้นไว้ (เช่น t0 = งานยาก) แต่ --timeout ที่ส่งมาเองชนะเสมอ
-  const tierTimeout = (tiers[opts.tier] ?? {})._timeoutSec;
-  if (tierTimeout && !opts.timeoutSet) opts.timeoutSec = tierTimeout;
+  try { opts.timeoutSec = resolveRoleTimeout(opts, cfg); } catch (e) { console.error(e.message); process.exit(2); }
 
   const selected = opts.agents.includes("*") ? Object.keys(agents) : [...new Set(opts.agents)];
   if (selected.length === 0) {

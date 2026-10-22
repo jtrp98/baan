@@ -12,7 +12,7 @@
   "defaults": {
     "agent": "codex",
     "planner_tier": "t2",
-    "timeout_sec": 600,
+    "timeout_sec": 1800,
     "max_parallel": 3
   }
 }

@@ -155,7 +155,11 @@ mycelium --plan-file <f>          # รันแผนที่แก้เอ�
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
-หมายเหตุจากการทดสอบ: task ที่ผลิตเอกสารยาว (เช่น SA @ t1) ใช้เวลาเกิน 240 วินาที — MYCELIUM ตั้ง default timeout 600 วินาทีแล้ว และถ้ายังช้าอยู่ใช้ `--timeout` เพิ่มได้
+งานที่ผลิตเอกสารยาว (เช่น SA @ t1) อาจใช้เวลานาน — ทั้ง `mycelium` และ `mycelium-role` ใช้ timeout เริ่มต้น 1800 วินาทีต่อ AI CLI job (t0 ใช้ 3600 วินาที)
+
+ลำดับ timeout ของทั้งสองคำสั่ง รวม PM/planner, scheduler task และ fallback: **`--timeout` ที่ระบุเอง > tier `_timeoutSec` ใน `agents.json` > workspace `defaults.timeout_sec` > 1800 วินาที** ค่าที่เลือกใช้ต้องเป็นจำนวนเต็ม 1–86400; ค่าผิดจะ error ไม่เปลี่ยนเป็น default เงียบๆ ตัวอย่าง: `mycelium-role --agent codex --role sa --tier t1 --timeout 3600 --task "วิเคราะห์ระบบ"`
+
+`mycelium-role` อ่านเฉพาะ timeout จาก workspace config ผ่าน loader ร่วม: `MYCELIUM_CONFIG` ชนะ discovery ซึ่งเดินขึ้นจาก `--cwd` หรือไดเรกทอรีที่เรียกเมื่อไม่ได้ส่ง `--cwd` (รองรับทั้ง `mycelium.config.json` และชื่อเก่า `mycelium/mycelium.json`) โดยไม่เปลี่ยน agent, cwd หรือโหมดสิทธิ์จาก workspace defaults ส่วน `mycelium` คง discovery จากไดเรกทอรีที่เรียก และรับ `--config` ตามเดิม การ resume ไม่คืน timeout จาก manifest ตามพฤติกรรมเดิม
 
 ## การเปลี่ยน model / effort (สำหรับแบ่ง tier)
 
@@ -189,7 +193,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - **ลำดับสลับตัวรันเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ --agent) เป็นตัวแรกเสมอ — ถ้าตัวปัจจุบันล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที ทั้งงานในแผนและขั้น PM/planner · **ความล้มเหลวด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint (`fallback`) และ summary · ค่าตั้งปัจจุบัน: t0–t3 = codex → agy → claude, t4–t5 = agy → codex → claude (claude ท้ายสุดทุก tier — โควตาแพงสุด เก็บไว้งานหนัก)
 - **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที (กันสงสัยว่าทำไมไม่ทำงาน)
 - **Argon เปิดตัวแล้ว (เติมครบ 2026-10-17)** — `agy models` มี `gemini-4-argon-low/medium/high` จึงเติม agy กลับที่ t0–t2 ได้ครบ · ข้อจำกัด: agy ไม่มี effort `max` ให้ ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด · ชื่อ model ล่าสุดเช็คได้เสมอด้วย `agy models`
-- **t0 ยืด timeout อัตโนมัติเป็น 900 วินาที/agent** (ปกติ 240) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
+- **t0 ยืด timeout อัตโนมัติเป็น 3600 วินาที/agent** (ปกติ 1800) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
 - effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ (ตามที่ UI เตือน) — ใช้เฉพาะ t0 จริงๆ
 - agy ยังมี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่ออยากทำ tier bulk สำหรับงาน mass
 - แก้/เพิ่ม tier ได้ที่ส่วน `"tiers"` ใน `agents.json`
@@ -209,7 +213,11 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
 - **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
-- เกิน timeout (default 240 วินาที/ตัว) จะถูก kill ทั้ง process tree อัตโนมัติ
+- เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
+
+## Change Log
+
+- 2026-10-21: เพิ่ม timeout เริ่มต้นและอธิบาย priority, workspace discovery ของ role และ validation ที่ใช้ร่วมกัน
 
 ## ผลการทดสอบ (2026-10-14)
 

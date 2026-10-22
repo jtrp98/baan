@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { DEFAULT_TIMEOUT_SEC } from "./timeout.mjs";
 
 export const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); // รากของ package
 export const ROLES_DIR = path.join(TEAM_DIR, "roles");
@@ -55,7 +56,7 @@ export function loadWorkspace(configPath = null) {
     defaults: {
       agent: raw.defaults?.agent ?? "codex",
       planner_tier: raw.defaults?.planner_tier ?? "t2",
-      timeout_sec: raw.defaults?.timeout_sec ?? 600,
+      timeout_sec: Object.hasOwn(raw.defaults ?? {}, "timeout_sec") ? raw.defaults.timeout_sec : DEFAULT_TIMEOUT_SEC,
       max_parallel: raw.defaults?.max_parallel ?? 3,
     },
   };

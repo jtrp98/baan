@@ -2,6 +2,17 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## Unreleased — 2026-10-21
+
+- เพิ่ม timeout เริ่มต้นของ `mycelium` และ `mycelium-role` เป็น 1800 วินาที และ t0 เป็น 3600 วินาที (AI CLI job เท่านั้น)
+- `mycelium-role` อ่าน `defaults.timeout_sec` ด้วย workspace loader ร่วม ค้นจาก `--cwd` หรือไดเรกทอรีที่เรียก และรองรับ `MYCELIUM_CONFIG` โดยไม่เปลี่ยน defaults อื่น
+- ใช้ priority เดียวกันทั้ง role, PM/planner, scheduler task และ fallback: explicit `--timeout` > tier `_timeoutSec` > workspace/default พร้อมตรวจค่าที่เลือกเป็น integer 1–86400 และปฏิเสธค่าผิดแทนการ fallback เงียบๆ
+- เพิ่ม behavioral tests ด้วย provider จำลอง; ไม่เปลี่ยน version และไม่เปลี่ยนการคืนค่าจาก manifest ตอน resume
+
+## Change Log
+
+- 2026-10-21: บันทึก timeout fix ที่ยังไม่ release
+
 ## 0.10.0 — 2026-10-17 · ตัวรันทั้ง 3 ค่ายผ่าน live smoke + role ไม่สวมบท MYCELIUM ซ้อน + กติกาสไตล์โค้ด
 
 ### แก้
