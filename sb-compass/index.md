@@ -14,9 +14,12 @@
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | พร้อม |
 | `test-plan\index.md` | สารบัญ test plan — ตาราง TP | พร้อม |
 | `review\index.md` | สารบัญ review findings | พร้อม |
+| `uxui\index.md` | สารบัญ UX/UI — ตาราง artifact + สถานะ sign-off | พร้อม |
 | `security.md` | บันทึกความปลอดภัยและการประเมิน 🔒 security gates | พร้อม |
 
 ## Change Log
+
+- 2026-10-22 — เพิ่มสารบัญหมวด uxui (`uxui\index.md` — แถว UXUI-001 artifact `design.md` FE-001/FE-002 สถานะ Approved signed off by dev 2026-09-15 โดย `uxui-designer`) และเพิ่มแถว `uxui\index.md` ในตาราง Documents — การปรับโครงสร้างให้เข้ามาตรฐาน baan (นายช่างบันทึกแถว module index)
 
 - 2026-10-07 — แปลงเอกสารโมดูลเข้าโครงสร้าง split layout (DES-014)
 - 2026-08-24 — สร้างเอกสารครั้งแรก สถานะ `draft`. เนื้อหา REQ-001..REQ-011 มาจากการอ่านโค้ดที่ทำงานอยู่จริงเท่านั้น (ถือเป็น "ของที่ตกลงแล้ว" ตามที่ผู้ใช้ระบุ) **ยังไม่ได้สัมภาษณ์ผู้ใช้** — คำถามทั้ง 11 ข้อใน `## Open Questions` ยังไม่มีคำตอบ ห้ามส่งต่อ `system-analyst` จนกว่าจะมีคนตอบ (`policies/agent-boundaries.md` §6 จุดหยุดที่ 1)
