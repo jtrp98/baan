@@ -1,4 +1,4 @@
-// Regression ของ mycelium-role (โหมดหลัก): cwd เริ่มต้น, runDir ไม่ชนเมื่อรันขนาน, สถานะงานจาก output state + fallback
+// Regression ของ baan-role (โหมดหลัก): cwd เริ่มต้น, runDir ไม่ชนเมื่อรันขนาน, สถานะงานจาก output state + fallback
 // ใช้ attempt จำลองแทนการเรียก AI CLI จริง ไม่ใช้โควตา
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
 
-const BIN = fileURLToPath(new URL("../bin/mycelium-role.mjs", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/baan-role.mjs", import.meta.url));
 const cfg = {
   agents: { codex: {}, agy: {}, claude: {} },
   tiers: { t2: { _fallback: ["codex", "agy", "claude"], codex: { model: "m" }, agy: { model: "m" }, claude: { model: "m" } } },
@@ -35,15 +35,15 @@ test("parseRoleArgs: --date ตรวจรูปแบบและวันท�
 });
 
 test("createRunDir: เรียกพร้อมกันในวินาทีเดียว role/tier เดียวกันได้คนละโฟลเดอร์ (P1 ข้อ 2)", () => {
-  const reports = mkdtempSync(path.join(tmpdir(), "mycelium-reports-"));
+  const reports = mkdtempSync(path.join(tmpdir(), "baan-reports-"));
   try {
     const now = new Date("2026-10-17T04:11:59Z");
-    const spec = { role: "ba", tier: "t2", write: false, count: 1 };
+    const spec = { role: "spec", tier: "t2", write: false, count: 1 };
     const a = createRunDir(reports, spec, now);
     const b = createRunDir(reports, spec, now);
     assert.notEqual(a, b);
     assert.ok(existsSync(a) && existsSync(b));
-    assert.match(path.basename(a), /^2026-10-17-04-11-59-ba-tier-t2-1agents-/, "ชื่อบอก role ด้วย");
+    assert.match(path.basename(a), /^2026-10-17-04-11-59-spec-tier-t2-1agents-/, "ชื่อบอก role ด้วย");
     const nested = createRunDir(path.join(reports, "ยังไม่มี"), { role: "", tier: "", write: true, count: 2 }, now);
     assert.match(path.basename(nested), /-write-2agents-/, "สร้าง reports dir ให้ถ้ายังไม่มี");
   } finally { rmSync(reports, { recursive: true, force: true }); }

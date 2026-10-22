@@ -1,4 +1,4 @@
-// ตัวเรียก AI CLI (claude/codex/agy) — ใช้ร่วมทั้ง mycelium และ mycelium-role
+// ตัวเรียก AI CLI (claude/codex/agy) — ใช้ร่วมทั้ง baan และ baan-role
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 

@@ -45,12 +45,12 @@ test("agy ครบทุก tier แล้วหลัง Argon เปิดต
 
 // agy: --print กลืน argument ถัดไปเป็น prompt — flag อื่นต้องอยู่ก่อน --print เสมอ
 // (เคยวาง --mode หลัง --print จน --write ของ agy ล้มด้วย exit 2 ทุกครั้ง — พบจาก live smoke 2026-10-17)
-test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --agent mycelium-readonly · write ใช้ --mode accept-edits", () => {
+test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --agent baan-readonly · write ใช้ --mode accept-edits", () => {
   const { readArgs, writeArgs } = cfg.agents.agy;
   for (const args of [readArgs, writeArgs]) assert.equal(args.at(-1), "--print", `ต้องจบด้วย --print: ${JSON.stringify(args)}`);
-  // --mode plan ไม่ได้กันการเขียนไฟล์ จึงใช้ custom agent profile mycelium-readonly (ตัด write tools + PreToolUse guard hook)
+  // --mode plan ไม่ได้กันการเขียนไฟล์ จึงใช้ custom agent profile baan-readonly (ตัด write tools + PreToolUse guard hook)
   const agent = (args) => args[args.indexOf("--agent") + 1];
-  assert.equal(agent(readArgs), "mycelium-readonly", "read-only ต้องใช้ --agent mycelium-readonly เพื่อบังคับห้ามเขียนไฟล์จริง");
+  assert.equal(agent(readArgs), "baan-readonly", "read-only ต้องใช้ --agent baan-readonly เพื่อบังคับห้ามเขียนไฟล์จริง");
   // ไม่ใส่ --sandbox: live smoke พบว่ากันแค่ terminal (อ่าน/รันคำสั่งไม่ได้เลย) แต่ edit tool ยังเขียนไฟล์ได้ — แย่กว่าไม่ใส่
   assert.ok(!readArgs.includes("--sandbox"));
   const mode = (args) => args[args.indexOf("--mode") + 1];
@@ -58,7 +58,7 @@ test("agy: --print เป็น arg สุดท้ายทั้งสอง�
 });
 
 // jetski ของ agy ปฏิเสธการอ่านไฟล์นอก workspace ใน headless โดยไม่ถาม (ได้คำตอบว่างเปล่า) —
-// พบจริง 2026-10-22 จาก SA @ schoolbright ที่ cwd=target อ่าน knowledge/ ไม่ได้ตอน fallback จาก codex
+// พบจริง 2026-10-22 จาก ARCH @ schoolbright ที่ cwd=target อ่าน knowledge/ ไม่ได้ตอน fallback จาก codex
 // ทางแก้คือส่ง --add-dir <ราก workspace> เฉพาะโหมดอ่าน (โหมดเขียนไม่ใส่ เพราะ --add-dir ขยายขอบเขตเขียนตามไปด้วย)
 test("agy: workspaceDirArgs ใส่ --add-dir เฉพาะโหมดอ่านและเมื่อรู้ราก workspace และต้องมาก่อน --print", async () => {
   const { buildArgs } = await import("../src/runner.mjs");
@@ -105,9 +105,9 @@ test("setup/agy มี profile ที่ readArgs อ้างถึง: ชื�
   assert.ok(tools.includes("view_file") && tools.includes("run_command"), "ต้องอ่านไฟล์และรันคำสั่งอ่านได้");
   for (const t of tools) assert.ok(!/write|replace|edit|create|delete|sed_file/.test(t), `toolset ห้ามมี tool เขียนไฟล์: ${t}`);
   const hooks = JSON.parse(readFileSync(path.join(setup, "hooks.example.json"), "utf8"));
-  const cmd = hooks["mycelium-readonly-guard"].PreToolUse[0].hooks[0].command;
-  assert.match(cmd, /<HOME>\/\.gemini\/config\/mycelium-readonly-guard\.js$/, "ตัวอย่างต้องใช้ <HOME> ไม่ใช่ path ของเครื่องใดเครื่องหนึ่ง");
-  assert.match(hooks["mycelium-readonly-guard"].PreToolUse[0].matcher, /write_to_file/);
-  const check = spawnSync(process.execPath, ["--check", path.join(setup, "mycelium-readonly-guard.js")], { encoding: "utf8" });
+  const cmd = hooks["baan-readonly-guard"].PreToolUse[0].hooks[0].command;
+  assert.match(cmd, /<HOME>\/\.gemini\/config\/baan-readonly-guard\.js$/, "ตัวอย่างต้องใช้ <HOME> ไม่ใช่ path ของเครื่องใดเครื่องหนึ่ง");
+  assert.match(hooks["baan-readonly-guard"].PreToolUse[0].matcher, /write_to_file/);
+  const check = spawnSync(process.execPath, ["--check", path.join(setup, "baan-readonly-guard.js")], { encoding: "utf8" });
   assert.equal(check.status, 0, check.stderr);
 });

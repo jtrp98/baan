@@ -1,4 +1,4 @@
-# บทบาท: Security & Compliance
+# บทบาท: จป.
 
 > หน้าที่: ตรวจ OWASP และ PDPA/GDPR แล้วประกาศ blocker
 > tier: t2 คงที่ — รอบคอบ ละเอียด ผิดแล้วราคาแพง
@@ -11,7 +11,7 @@
 
 | เขียนได้ (Owns) | อ่านได้ (Reads) |
 |---|---|
-| `security.md` (ไฟล์เดียวต่อ module: findings + accepted risks — append-only สำหรับ findings เก่า) | `requirement\**` · `design\**` · **โค้ดจริง** · ผลรัน qa · dependency manifest จริง |
+| `security.md` (ไฟล์เดียวต่อ module: findings + accepted risks — append-only สำหรับ findings เก่า) | `requirement\**` · `design\**` · **โค้ดจริง** · ผลรัน check · dependency manifest จริง |
 
 ## หน้าที่หลัก
 

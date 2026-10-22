@@ -1,4 +1,4 @@
-// แกนของ mycelium-role (มือของ MYCELIUM ในโหมดหลัก): parse args, สร้าง runDir, รันพร้อมสถานะงาน + fallback
+// แกนของ baan-role (มือของ นายช่าง ในโหมดหลัก): parse args, สร้าง runDir, รันพร้อมสถานะงาน + fallback
 // แยกจาก bin เพื่อให้ทดสอบได้โดยไม่เรียก AI CLI จริง
 import { mkdirSync, mkdtempSync } from "node:fs";
 import path from "node:path";
@@ -11,7 +11,7 @@ import { classifyOutcome, runWithFallback } from "./scheduler.mjs";
 export { DEFAULT_TIMEOUT_SEC };
 export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--timeout <sec>] [--cwd <dir>] [--list]`;
 
-// cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ MYCELIUM ที่อยู่ใน
+// cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ นายช่าง ที่อยู่ใน
 // workspace จริงแต่ลืมส่ง --cwd ได้ role ที่อ่านไฟล์ผิด repo โดยไม่มีอะไรเตือน
 export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
@@ -53,7 +53,7 @@ export function resolveRoleTimeout(opts, cfg) {
   return resolveTimeout({ ...opts, timeoutSec: opts.timeoutSet ? opts.timeoutSec : ws.defaults.timeout_sec }, cfg.tiers?.[opts.tier]);
 }
 
-// ชื่อโฟลเดอร์ต้องไม่ชนเมื่อเปิดหลาย mycelium-role พร้อมกัน (charter ข้อ 7) — timestamp ระดับวินาทีอย่างเดียว
+// ชื่อโฟลเดอร์ต้องไม่ชนเมื่อเปิดหลาย baan-role พร้อมกัน (charter ข้อ 7) — timestamp ระดับวินาทีอย่างเดียว
 // ทำให้สอง role ที่ tier เดียวกันเขียนทับ <agent>.answer.txt ของกันและกัน · mkdtemp เติม suffix สุ่มแบบ atomic
 export function createRunDir(reportsDir, { role, tier, write, count }, now = new Date()) {
   mkdirSync(reportsDir, { recursive: true });

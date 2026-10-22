@@ -89,7 +89,7 @@ export function looksLikeLimitError(r) {
 }
 
 // ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit
-// ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ mycelium-role เพื่อให้กติกาการสลับเป็นชุดเดียว
+// ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ baan-role เพื่อให้กติกาการสลับเป็นชุดเดียว
 export async function runWithFallback(chain, attempt, onSwitch = () => {}) {
   const trail = [];
   let r = null;
@@ -196,7 +196,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
   const allCompleted = plan.tasks.every((t) => states.get(t.id)?.state === "completed");
   const counts = {};
   for (const t of plan.tasks) { const s = states.get(t.id)?.state ?? "pending"; counts[s] = (counts[s] ?? 0) + 1; }
-  console.log(`\n======== สรุป MYCELIUM ========`);
+  console.log(`\n======== สรุป นายช่าง ========`);
   console.log(`สถานะ ${plan.tasks.length} task: ${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(" · ")} · ${wave} wave (รอบนี้) · รายงาน: ${runDir}`);
   const needs = plan.tasks.filter((t) => (states.get(t.id)?.state ?? "").startsWith("needs_"));
   if (needs.length) {
@@ -212,6 +212,6 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
     console.log(`ประตูมนุษย์ที่รอคำตัดสิน:`);
     summary.humanGates.forEach((g, i) => console.log(`  ${i + 1}. ${g}`));
   }
-  if (!allCompleted) console.log(`แก้ปัญหาแล้วต่อได้ด้วย: mycelium --resume "${runDir}" (task ที่ completed แล้วจะถูกข้าม)`);
+  if (!allCompleted) console.log(`แก้ปัญหาแล้วต่อได้ด้วย: baan --resume "${runDir}" (task ที่ completed แล้วจะถูกข้าม)`);
   return { ok: allCompleted, dryRun: false, summary };
 }

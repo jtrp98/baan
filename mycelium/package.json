@@ -1,9 +1,11 @@
 {
-  "name": "mycelium",
+  "name": "baan",
   "version": "0.11.0",
-  "description": "🍄 MYCELIUM — ผู้คุมทีม AI 11 role: แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์",
+  "description": "🏗️ BAAN — นายช่างผู้คุมทีม AI 11 ตำแหน่งในไซต์งาน: แตกงาน เปิด session รายช่าง ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์",
   "type": "module",
   "bin": {
+    "baan": "./bin/baan.mjs",
+    "baan-role": "./bin/baan-role.mjs",
     "mycelium": "./bin/mycelium.mjs",
     "mycelium-role": "./bin/mycelium-role.mjs"
   },
@@ -14,9 +16,9 @@
     "roles/",
     "setup/",
     "agents.json",
-    "mycelium.example.json",
+    "baan.example.json",
     "CONVENTIONS.md",
-    "MYCELIUM.md",
+    "BAAN.md",
     "README.md",
     "RELEASE-NOTES.md"
   ],

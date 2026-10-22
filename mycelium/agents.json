@@ -30,7 +30,7 @@
       "modelArgs": ["--model", "<MODEL>"],
       "effortArgs": ["--effort", "<EFFORT>"],
       "workspaceDirArgs": ["--add-dir", "<WORKSPACE_ROOT>"],
-      "readArgs": ["--agent", "mycelium-readonly", "--print"],
+      "readArgs": ["--agent", "baan-readonly", "--print"],
       "writeArgs": ["--mode", "accept-edits", "--print"],
       "answerFrom": "stdout"
     }

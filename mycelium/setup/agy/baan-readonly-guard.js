@@ -63,7 +63,7 @@ function isMyceliumReadonlySession(parsed) {
       encoding: 'utf8',
       timeout: 4000
     }).trim();
-    if (/(?:^|\s)--agent(?:=|\s+)["']?mycelium-readonly["']?(?:\s|$)/i.test(cmdLine)) {
+    if (/(?:^|\s)--agent(?:=|\s+)["']?baan-readonly["']?(?:\s|$)/i.test(cmdLine)) {
       readonly = true;
     }
   } catch {}
@@ -86,18 +86,18 @@ function checkSingleSegment(seg, cwd) {
     .replace(/[12]?>\s*nul\b/gi, '')
     .replace(/[12]?>&[12]/g, '');
   if (/(?:^|[^-=<>])>>?(?![=>&])/.test(noNullRedirects)) {
-    return 'Blocked in mycelium-readonly mode: shell output redirection (> / >>) is not allowed.';
+    return 'Blocked in baan-readonly mode: shell output redirection (> / >>) is not allowed.';
   }
 
   // Reject subshells / dynamic command evaluation
   if (/\$\(|\b(?:Invoke-Expression|iex|Start-Process|saps)\b/i.test(s)) {
-    return 'Blocked in mycelium-readonly mode: subshell or dynamic execution is not allowed.';
+    return 'Blocked in baan-readonly mode: subshell or dynamic execution is not allowed.';
   }
 
   // 1. Check git commands
   if (/^git(?:\.exe)?\b/i.test(s)) {
     if (/(?:^|\s)(?:--output|-o)(?:=|\s|$)/.test(s)) {
-      return 'Blocked in mycelium-readonly mode: git --output is not allowed.';
+      return 'Blocked in baan-readonly mode: git --output is not allowed.';
     }
     const tokens = s.split(/\s+/).slice(1);
     let i = 0;
@@ -127,7 +127,7 @@ function checkSingleSegment(seg, cwd) {
         const rest = tokens.slice(i + 1).join(' ');
         if (!rest || /^(?:-l|--list)\b/.test(rest)) return null;
       }
-      return `Blocked in mycelium-readonly mode: git subcommand "${sub}" is not in the read-only allowlist.`;
+      return `Blocked in baan-readonly mode: git subcommand "${sub}" is not in the read-only allowlist.`;
     }
     return null;
   }
@@ -153,7 +153,7 @@ function checkSingleSegment(seg, cwd) {
     }
   }
 
-  return `Blocked in mycelium-readonly mode: command "${s.slice(0, 80)}" is not in the read-only allowlist.`;
+  return `Blocked in baan-readonly mode: command "${s.slice(0, 80)}" is not in the read-only allowlist.`;
 }
 
 function checkReadonlyCommand(cmd, cwd) {
@@ -178,7 +178,7 @@ function handle(parsed) {
   if (WRITE_TOOLS.has(toolName)) {
     console.log(JSON.stringify({
       decision: 'deny',
-      reason: `Blocked in mycelium-readonly mode: tool "${toolName}" is disabled.`
+      reason: `Blocked in baan-readonly mode: tool "${toolName}" is disabled.`
     }));
     return;
   }

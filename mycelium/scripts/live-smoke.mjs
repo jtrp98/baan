@@ -1,4 +1,4 @@
-// live smoke ของตัวรันทุกค่ายผ่าน mycelium-role จริง — ใช้โควตาจริง จึงไม่อยู่ใน npm test
+// live smoke ของตัวรันทุกค่ายผ่าน baan-role จริง — ใช้โควตาจริง จึงไม่อยู่ใน npm test
 // พิสูจน์ด้วยค่าที่ AI เดาไม่ได้ (nonce สุ่ม, sha256, commit hash) และตรวจผลจากดิสก์เอง ไม่เชื่อคำตอบของ AI
 // ใช้: npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]
 import { spawn, spawnSync } from "node:child_process";
@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const BIN = fileURLToPath(new URL("../bin/mycelium-role.mjs", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/baan-role.mjs", import.meta.url));
 
 function parseArgs(argv) {
   const o = { tier: "t3", agents: ["claude", "codex", "agy"] };
@@ -73,14 +73,14 @@ const mark = (b) => (b === null ? "–" : b ? "✅" : "❌");
 
 async function main() {
   const { tier, agents } = parseArgs(process.argv.slice(2));
-  const base = mkdtempSync(path.join(tmpdir(), "mycelium-live-smoke-"));
+  const base = mkdtempSync(path.join(tmpdir(), "baan-live-smoke-"));
   // ปลอม sandbox ให้เป็นรูป workspace จริง: config ที่ราก + ไฟล์ลับนอก cwd ของ agent
   // (jetski ของ agy กันอ่านนอก workspace และ headless ปฏิเสธแทนการถาม — sandbox เดิมที่อยู่ใน %TEMP%
   //  safe area ทั้งหมดเลยตรวจไม่พบบั๊กนี้ จน SA จริงที่ schoolbright fallback ไป agy ได้คำตอบว่าง 2026-10-22)
   const outerSecret = `OUTER-${randomBytes(6).toString("hex").toUpperCase()}`;
   const outerFile = path.join(base, "outer-secret.txt");
   writeFileSync(outerFile, outerSecret + "\n");
-  writeFileSync(path.join(base, "mycelium.config.json"), "{}\n");
+  writeFileSync(path.join(base, "baan.config.json"), "{}\n");
   console.log(`live smoke @ ${tier}: ${agents.join(", ")} · sandbox: ${base} (ใช้โควตาจริง ${agents.length * 2} session)`);
 
   const results = await Promise.all(agents.flatMap((agent) => {

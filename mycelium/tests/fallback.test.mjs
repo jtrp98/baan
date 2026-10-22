@@ -37,11 +37,11 @@ test("looksLikeLimitError: จับข้อความ limit ของทั�
 
 const okRun = (answer = "ผลลัพธ์\nDONE") => ({ ok: true, exitCode: 0, durationMs: 5, timedOut: false, answer, error: "", stdout: "", stderr: "" });
 const limitRun = () => ({ ok: false, exitCode: 1, durationMs: 5, timedOut: false, answer: "", error: "", stdout: "", stderr: "usage limit reached — resets in 3h" });
-const T = (id, tier, agent) => ({ id, role: "qa", agent, tier, title: `งาน ${id}`, task: `ทำ ${id}`, dependsOn: [] });
+const T = (id, tier, agent) => ({ id, role: "check", agent, tier, title: `งาน ${id}`, task: `ทำ ${id}`, dependsOn: [] });
 const mkOpts = (over = {}) => ({ cwd: tmpdir(), maxParallel: 3, dryRun: false, write: false, timeoutSec: 60, projectCtx: "", ...over });
 
 test("execute: ตัวแรกติดโควตา → สลับตัวถัดไปตาม _fallback งานสำเร็จ และบันทึกว่าสลับด้วยอะไร", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const seen = [];
     const runner = async (_cfg, _opts, _d, t, _ctx, agent) => {
@@ -60,7 +60,7 @@ test("execute: ตัวแรกติดโควตา → สลับตั
 });
 
 test("execute: fail ด้วยเหตุอื่น (ไม่ใช่ limit) ต้องไม่สลับ — กันเผาโควตาซ้ำ", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const seen = [];
     const runner = async (_cfg, _opts, _d, t, _ctx, agent) => { seen.push(agent); return { ...limitRun(), stderr: "module not found บรรทัด 429 ของโค้ด" }; };
@@ -73,7 +73,7 @@ test("execute: fail ด้วยเหตุอื่น (ไม่ใช่ lim
 });
 
 test("execute: ทั้ง chain ติดโควตาหมด = งาน failed (ไม่วนซ้ำ ไม่ปล่อยผ่าน)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const seen = [];
     const runner = async (_cfg, _opts, _d, t, _ctx, agent) => { seen.push(agent); return limitRun(); };

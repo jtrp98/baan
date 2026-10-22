@@ -36,8 +36,8 @@ function dateSection(date) {
   return `## วันที่ของงาน: ${date}\nใช้วันที่นี้กับ Change Log และทุก entry ที่มีวันที่ (ผู้คุมระบุมาแล้วตาม CONVENTIONS §4 — ไม่ต้องถามผู้ใช้ซ้ำ)`;
 }
 
-// งานที่ไม่ผูก role (mycelium-role ไม่ส่ง --role) ก็ยังต้องมีป้าย — ไม่งั้น session ใน workspace จะสวมบท MYCELIUM
-// และอาจเปิด mycelium-role ซ้อนต่อเอง
+// งานที่ไม่ผูก role (baan-role ไม่ส่ง --role) ก็ยังต้องมีป้าย — ไม่งั้น session ใน workspace จะสวมบท นายช่าง
+// และอาจเปิด baan-role ซ้อนต่อเอง
 export function adhocDirective(task) {
   return `${roleSessionHeader("adhoc")}\n\n${task}`;
 }
@@ -52,18 +52,18 @@ export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = loca
 }
 
 export function pmPrompt(goal, projectCtx, date = localDate()) {
-  return `${roleDirective("pm", `ผู้ใช้ส่งเป้าหมายมาถึงคุณ (PM) จงประมวลเป้าหมายนี้แล้วเขียน "คำมอบหมายให้ planner" แบบกระชับ (ไม่เกิน 10 บรรทัด): สิ่งที่ต้องได้, ขอบเขต in/out, ข้อจำกัดที่รู้ และสิ่งที่ต้องระวัง — อย่าวางแผนเอง หน้าที่นี้เป็นของ planner\n\n## เป้าหมายจากผู้ใช้:\n${goal}`, null, projectCtx, date)}
+  return `${roleDirective("gm", `ผู้ใช้ส่งเป้าหมายมาถึงคุณ (PM) จงประมวลเป้าหมายนี้แล้วเขียน "คำมอบหมายให้นักวางผัง" แบบกระชับ (ไม่เกิน 10 บรรทัด): สิ่งที่ต้องได้, ขอบเขต in/out, ข้อจำกัดที่รู้ และสิ่งที่ต้องระวัง — อย่าวางแผนเอง หน้าที่นี้เป็นของนักวางผัง\n\n## เป้าหมายจากผู้ใช้:\n${goal}`, null, projectCtx, date)}
 
 ตอบกลับเฉพาะข้อความคำมอบหมาย (ไม่ต้องเป็น JSON)`;
 }
 
 export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate()) {
-  const roleContent = readFileSync(path.join(ROLES_DIR, "planner.md"), "utf8").trim();
+  const roleContent = readFileSync(path.join(ROLES_DIR, "plan.md"), "utf8").trim();
   const roles = listRoles().map((r) => `- ${r.name} — ${r.title}: ${r.summary}${FIXED_ROLE_TIER[r.name] ? ` (tier คงที่ ${FIXED_ROLE_TIER[r.name]})` : ` (planner เลือก tier ${IMPLEMENT_TIER_RANGE} ตามความยาก)`}`).join("\n");
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
   const conv = `\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n${dateSection(date)}\n`;
   const pc = projectCtx ? `\n## บริบทโปรเจกต์ (ใส่ให้ทุก task ที่เกี่ยวกับโค้ด/เอกสาร):\n${projectCtx}\n` : "";
-  return `${roleSessionHeader("planner")}
+  return `${roleSessionHeader("plan")}
 
 คุณกำลังปฏิบัติหน้าที่ planner ตามบทบาทต่อไปนี้อย่างเคร่งครัด:
 
@@ -85,7 +85,7 @@ ${matrix}
 
 ## กติกาการวางแผน (สำคัญ):
 1. งานง่าย = จำนวน task น้อย (อาจ 1–2 task หรือ task เดียว) — เลือกเฉพาะ role ที่จำเป็น ไม่ต้องใช้ทั้งทีม
-2. **tier ของ task เลือกได้เฉพาะ role = fe / be** (งาน implement ที่ผ่านการออกแบบจาก sa มาแล้ว — เลือกในช่วง ${IMPLEMENT_TIER_RANGE} ตามความยากจริง) — role อื่นทุกตัวใช้ tier คงที่ตามรายการด้านบน
+2. **tier ของ task เลือกได้เฉพาะ role = front / sys** (งาน implement ที่ผ่านการออกแบบจาก arch มาแล้ว — เลือกในช่วง ${IMPLEMENT_TIER_RANGE} ตามความยากจริง) — role อื่นทุกตัวใช้ tier คงที่ตามรายการด้านบน
 3. task ที่ไม่พึ่งกัน (dependsOn ว่าง) จะถูกรันขนานกัน — จัด dependency ให้ตรงความจำเป็นจริงเท่านั้น
 4. ทุก task ทำงานแบบ read-only (ยังไม่แก้ไฟล์) — output เป็นเอกสาร/ข้อความ
 5. สิ่งที่ต้องเป็น "ประตูมนุษย์" (เช่น sign-off UX, การรัน SQL, การตัดสินธุรกิจ) ใส่ใน humanGates
@@ -96,7 +96,7 @@ ${matrix}
   "tasks": [
     {
       "id": "T1",
-      "role": "ba",
+      "role": "spec",
       "tier": "t2",
       "title": "ชื่อสั้นของงาน",
       "task": "คำสั่งงานเต็มให้ role นี้ทำ (ภาษาไทย ชัดเจน ระบุ output ที่ต้องส่งออก)",

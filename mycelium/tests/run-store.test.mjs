@@ -16,7 +16,7 @@ function mkOpts(over = {}) {
 }
 
 test("เขียน/อ่าน manifest ครบถ้วน (round-trip)", () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const opts = mkOpts({ target: "sb-api-gateway", cwd: "C:/repo/gateway", write: true, projectCtx: "บริบทโปรเจกต์" });
     writeManifest(runDir, opts);
@@ -32,14 +32,14 @@ test("เขียน/อ่าน manifest ครบถ้วน (round-trip)",
 });
 
 test("อ่าน manifest จาก directory ที่ไม่มี = null (run เก่าก่อน v0.3)", () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     assert.equal(readManifest(runDir), null);
   } finally { rmSync(runDir, { recursive: true, force: true }); }
 });
 
 test("resume ไม่ได้ส่ง flag มาเอง → คืน cwd/write/projectCtx จาก manifest", () => {
-  const realDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const realDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const manifest = { cwd: realDir, write: true, target: "sb-api-gateway", projectCtx: "บริบทเดิม" };
     const opts = applyManifestToOpts(mkOpts(), manifest);
@@ -50,7 +50,7 @@ test("resume ไม่ได้ส่ง flag มาเอง → คืน cwd/
 });
 
 test("flag ที่ผู้ใช้ส่งเองชนะ manifest เสมอ (explicit ชนะ / cwd ตั้งไว้ชนะ / write=false ใน manifest ไม่เปิด write)", () => {
-  const realDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const realDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const manifest = { cwd: realDir, write: true, target: "sb-api-gateway", projectCtx: "บริบทเดิม" };
     const explicitCwd = applyManifestToOpts(mkOpts({ explicit: new Set(["cwd"]), cwd: "C:/อื่น" }), manifest);
@@ -67,6 +67,6 @@ test("flag ที่ผู้ใช้ส่งเองชนะ manifest เ�
 });
 
 test("cwd ของ run เดิมถูกลบไปแล้ว → โยน error ไม่ใช่เงียบๆ เขียนผิดที่", () => {
-  const gone = path.join(tmpdir(), "mycelium-test-แน่นอนว่าไม่มีจริง");
+  const gone = path.join(tmpdir(), "baan-test-แน่นอนว่าไม่มีจริง");
   assert.throws(() => applyManifestToOpts(mkOpts(), { cwd: gone }), /ไม่มีอยู่อีกแล้ว/);
 });

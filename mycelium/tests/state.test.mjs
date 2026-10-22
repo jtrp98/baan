@@ -4,12 +4,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { detectStateMarker, classifyOutcome } from "../src/scheduler.mjs";
 
-test("marker ท้ายคำตอบ: ครอบ markdown bold ก็อ่านได้ (กรณีจริงของ TP-001)", () => {
+test("marker ท้ายคำตอบ: ครอบ markdown bold ก็อ่านได้ (กรณีจริงของ INSPECT-001)", () => {
   const answer = "สรุปแผนทดสอบยาว... ต้องแก้ requirement ก่อน\n\n**NEEDS_REQUIREMENT_CHANGE**";
   assert.equal(detectStateMarker(answer), "NEEDS_REQUIREMENT_CHANGE");
 });
 
-test("marker ที่มีข้อความต่อท้ายอีก ~400 ตัวอักษรก็ยังอยู่ในหน้าต่างสแกน (กรณีจริงของ BA-001)", () => {
+test("marker ที่มีข้อความต่อท้ายอีก ~400 ตัวอักษรก็ยังอยู่ในหน้าต่างสแกน (กรณีจริงของ SPEC-001)", () => {
   const answer = `สรุปงาน\n\nNEEDS_HUMAN\n\nต้องการผู้ใช้ยืนยันว่าต้องการหน้าจอค้นหาขั้นสูงหรือไม่ และรายละเอียดวิธีกรองข้อมูล ควรทำตารางรายการวิดีโอ หรือแถบเลื่อนดูภาพต่อเนื่อง และ${"คำถามเพิ่มเติม".repeat(30)}`;
   assert.equal(detectStateMarker(answer), "NEEDS_HUMAN");
 });

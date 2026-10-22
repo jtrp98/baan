@@ -14,9 +14,9 @@ test('files รวม CONVENTIONS.md (สัญญาบังคับที่
 });
 
 test("package ห้ามมี config ของเครื่อง — มีแค่ template ตัวอย่าง", () => {
-  assert.ok(pkg.files.includes("mycelium.example.json"), "ต้องมี mycelium.example.json");
-  assert.ok(!pkg.files.includes("mycelium.json"), "mycelium.json เป็นของ workspace ต้องไม่ติด package");
-  assert.ok(!existsSync(path.join(pkgDir, "mycelium.json")), "ใน package ต้องไม่มีไฟล์ mycelium.json จริง");
+  assert.ok(pkg.files.includes("baan.example.json"), "ต้องมี baan.example.json");
+  assert.ok(!pkg.files.includes("baan.json"), "baan.json เป็นของ workspace ต้องไม่ติด package");
+  assert.ok(!existsSync(path.join(pkgDir, "baan.json")), "ใน package ต้องไม่มีไฟล์ baan.json จริง");
 });
 
 test("ไฟล์ประกาศใน files มีอยู่จริงทุกไฟล์บนดิสก์", () => {
@@ -27,13 +27,13 @@ test("ไฟล์ประกาศใน files มีอยู่จริง�
 });
 
 test("entrypoints และโมดูลหลักอยู่ครบใน package", () => {
-  for (const f of ["bin/", "src/", "agents.json", "roles/", "CONVENTIONS.md", "MYCELIUM.md", "README.md"]) {
+  for (const f of ["bin/", "src/", "agents.json", "roles/", "CONVENTIONS.md", "BAAN.md", "README.md"]) {
     assert.ok(pkg.files.includes(f), `ขาด ${f}`);
   }
-  assert.equal(pkg.bin.mycelium, "./bin/mycelium.mjs");
-  assert.equal(pkg.bin["mycelium-role"], "./bin/mycelium-role.mjs");
-  assert.ok(existsSync(path.join(pkgDir, "bin", "mycelium.mjs")), "ไฟล์ bin ต้องมีจริง");
-  assert.ok(existsSync(path.join(pkgDir, "bin", "mycelium-role.mjs")), "ไฟล์ bin ต้องมีจริง");
+  assert.equal(pkg.bin.baan, "./bin/baan.mjs");
+  assert.equal(pkg.bin["baan-role"], "./bin/baan-role.mjs");
+  assert.ok(existsSync(path.join(pkgDir, "bin", "baan.mjs")), "ไฟล์ bin ต้องมีจริง");
+  assert.ok(existsSync(path.join(pkgDir, "bin", "baan-role.mjs")), "ไฟล์ bin ต้องมีจริง");
 });
 
 test("ข้อมูล run (reports/) และ tests ต้องไม่ติดเข้า package", () => {

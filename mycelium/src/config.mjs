@@ -14,14 +14,17 @@ export function loadAgentsConfig() {
 
 // config ของ workspace เก็บ path ของเครื่องนี้ จึงต้องอยู่ "นอก" package —
 // ไม่งั้นการ update version/clone package ใหม่จะทับ config ของ workspace ทุกครั้ง
-// หา `mycelium.config.json` ที่ราก workspace (เช่น C:\src\schoolbright\mycelium.config.json)
+// หา `baan.config.json` ที่ราก workspace (เช่น C:\src\schoolbright\baan.config.json)
 // โดยเดินขึ้นจากจุดที่เรียก — ตัวใกล้สุดชนะ (workspace ซ้อนกันได้)
-// แผนเก่า mycelium/mycelium.json ยังถูกพบได้เพื่อ workspace ที่ตั้งไว้ก่อนหน้า
+// ชื่อเก่าทั้งสองแบบ (mycelium.config.json และ mycelium/mycelium.json) ยังถูกพบได้
+// เพราะ workspace ที่ตั้งไว้ก่อนการเปลี่ยนชื่อ project ยังใช้ชื่อเหล่านั้นอยู่
 export function findWorkspaceConfig(startDir) {
   let dir = path.resolve(startDir);
   for (;;) {
-    const flat = path.join(dir, "mycelium.config.json");
+    const flat = path.join(dir, "baan.config.json");
     if (existsSync(flat)) return flat;
+    const prev = path.join(dir, "mycelium.config.json");
+    if (existsSync(prev)) return prev;
     const legacy = path.join(dir, "mycelium", "mycelium.json");
     if (existsSync(legacy)) return legacy;
     const parent = path.dirname(dir);
@@ -30,7 +33,7 @@ export function findWorkspaceConfig(startDir) {
   }
 }
 
-// ลำดับ: --config ที่ส่งมา > env MYCELIUM_CONFIG > discovery จากไดเรกทอรีที่เรียก
+// ลำดับ: --config ที่ส่งมา > env BAAN_CONFIG > env MYCELIUM_CONFIG (ชื่อเก่า) > discovery จากไดเรกทอรีที่เรียก
 export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
   const check = (p, label) => {
     const resolved = path.resolve(p);
@@ -38,7 +41,8 @@ export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
     return resolved;
   };
   if (explicitPath) return check(explicitPath, "--config");
-  if (process.env.MYCELIUM_CONFIG) return check(process.env.MYCELIUM_CONFIG, "MYCELIUM_CONFIG");
+  if (process.env.BAAN_CONFIG) return check(process.env.BAAN_CONFIG, "BAAN_CONFIG");
+  if (process.env.MYCELIUM_CONFIG) return check(process.env.MYCELIUM_CONFIG, "MYCELIUM_CONFIG (ชื่อเก่า)");
   return findWorkspaceConfig(startDir);
 }
 
@@ -79,18 +83,30 @@ export function resolveTarget(ws, name) {
   return null;
 }
 
-// ID role เดิมก่อนย่อ (ถึง 0.8.0) — ยังรับได้ เพราะแผนเก่า (plan.json ใน run ที่จะ resume), --plan-file
-// ที่เขียนไว้ และคำสั่งใน session/สคริปต์ของผู้ใช้ยังอ้างชื่อเหล่านี้อยู่
+// ID role เดิมทั้งสองรุ่น (ชื่อยาวก่อน 0.8.0 และชื่อย่อ ba/sa/fe ก่อนเปลี่ยนธีมงานก่อสร้าง) —
+// ยังรับได้ทั้งหมด เพราะแผนเก่า (plan.json ใน run ที่จะ resume), --plan-file ที่เขียนไว้
+// และคำสั่งใน session/สคริปต์ของผู้ใช้ยังอ้างชื่อเหล่านี้อยู่
 export const LEGACY_ROLE_ALIASES = {
-  "project-manager": "pm",
-  "business-analyst": "ba",
-  "system-analyst": "sa",
-  "uxui-designer": "ux",
-  "frontend-engineer": "fe",
-  "backend-engineer": "be",
-  "database-administrator": "dba",
-  "test-planner": "tp",
-  security: "sec",
+  planner: "plan",
+  pm: "gm",
+  "project-manager": "gm",
+  ba: "spec",
+  "business-analyst": "spec",
+  sa: "arch",
+  "system-analyst": "arch",
+  ux: "int",
+  "uxui-designer": "int",
+  fe: "front",
+  "frontend-engineer": "front",
+  be: "sys",
+  "backend-engineer": "sys",
+  dba: "vault",
+  "database-administrator": "vault",
+  tp: "inspect",
+  "test-planner": "inspect",
+  qa: "check",
+  sec: "jpo",
+  security: "jpo",
 };
 
 export function resolveRoleName(name) {

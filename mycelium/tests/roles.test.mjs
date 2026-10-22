@@ -11,7 +11,7 @@ import { roleDirective } from "../src/prompts.mjs";
 import { parseRoleArgs } from "../src/role-session.mjs";
 
 const pkgDir = path.dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
-const IMPLEMENT_ROLES = ["fe", "be"];
+const IMPLEMENT_ROLES = ["front", "sys"];
 const roles = listRoles();
 const byName = new Map(roles.map((r) => [r.name, r]));
 
@@ -35,14 +35,14 @@ test("ชื่อเดิมแบบยาวทุกตัวชี้ไ�
   }
   for (const id of byName.keys()) assert.equal(resolveRoleName(id), id);
   assert.equal(resolveRoleName("toString"), "toString", "ไม่หลุดไปเจอ property ของ Object");
-  assert.equal(roleDirective("business-analyst", "x", null, "", "2026-10-17"), roleDirective("ba", "x", null, "", "2026-10-17"));
+  assert.equal(roleDirective("business-analyst", "x", null, "", "2026-10-17"), roleDirective("spec", "x", null, "", "2026-10-17"));
 });
 
-test("mycelium-role --role รับชื่อเดิมแล้วแปลงเป็น ID สั้น", () => {
+test("baan-role --role รับชื่อเดิมแล้วแปลงเป็น ID สั้น", () => {
   const opts = parseRoleArgs(["--role", "system-analyst"]);
-  assert.equal(opts.role, "sa");
+  assert.equal(opts.role, "arch");
   assert.equal(opts.roleAlias, "system-analyst");
-  assert.equal(parseRoleArgs(["--role", "sa"]).roleAlias, "");
+  assert.equal(parseRoleArgs(["--role", "arch"]).roleAlias, "");
 });
 
 // แถวตารางรูปแบบ | `id` | ชื่อ | หน้าที่ | tier | ... — ตรวจว่าทุก role อยู่ในตารางและ tier ตรงกับโค้ด
@@ -55,7 +55,7 @@ function roleTable(file) {
   return rows;
 }
 
-for (const file of ["MYCELIUM.md", "README.md"]) {
+for (const file of ["BAAN.md", "README.md"]) {
   test(`ตาราง role ใน ${file} ตรงกับหัวไฟล์ role และ FIXED_ROLE_TIER`, () => {
     const rows = roleTable(file);
     assert.deepEqual([...rows.keys()].sort(), [...byName.keys()].sort(), "ต้องมีครบทุก role");
@@ -69,9 +69,9 @@ for (const file of ["MYCELIUM.md", "README.md"]) {
   });
 }
 
-// fe/be/qa เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทุกไฟล์ (แก้ที่เดียวแล้วลืมที่อื่น = role ได้กติกาไม่เท่ากัน)
-const CODE_WRITING_ROLES = ["fe", "be", "qa"];
-test("fe/be/qa มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
+// front/sys/check เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทุกไฟล์ (แก้ที่เดียวแล้วลืมที่อื่น = role ได้กติกาไม่เท่ากัน)
+const CODE_WRITING_ROLES = ["front", "sys", "check"];
+test("front/sys/check มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
   const section = (id) => {
     const text = readFileSync(path.join(pkgDir, "roles", `${id}.md`), "utf8");
     const start = text.indexOf("## สไตล์โค้ดและ comment");
@@ -79,9 +79,9 @@ test("fe/be/qa มีหมวดสไตล์โค้ดและ comment �
     const end = text.indexOf("\n## ", start + 1);
     return text.slice(start, end === -1 ? undefined : end).trim();
   };
-  const fe = section("fe");
-  for (const id of CODE_WRITING_ROLES) assert.equal(section(id), fe, `หมวดนี้ของ ${id} ต้องเหมือนของ fe ทุกตัวอักษร`);
+  const front = section("front");
+  for (const id of CODE_WRITING_ROLES) assert.equal(section(id), front, `หมวดนี้ของ ${id} ต้องเหมือนของ front ทุกตัวอักษร`);
   for (const must of ["เหมือนโค้ดรอบข้างใน target", "comment เฉพาะ \"why\"", "ห้าม comment ที่เล่าว่าโค้ดทำอะไร", "ห้ามใส่ task id"]) {
-    assert.ok(fe.includes(must), `ขาด: ${must}`);
+    assert.ok(front.includes(must), `ขาด: ${must}`);
   }
 });

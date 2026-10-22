@@ -9,7 +9,7 @@ import { execute } from "../src/scheduler.mjs";
 import { preloadDone, writeCheckpoint } from "../src/run-store.mjs";
 
 const cfg = { agents: {}, tiers: {} };
-const T = (id, dependsOn = [], extra = {}) => ({ id, role: "qa", agent: "codex", tier: "t5", title: `งาน ${id}`, task: `ทำ ${id}`, dependsOn, ...extra });
+const T = (id, dependsOn = [], extra = {}) => ({ id, role: "check", agent: "codex", tier: "t5", title: `งาน ${id}`, task: `ทำ ${id}`, dependsOn, ...extra });
 const mkPlan = (tasks) => ({ summary: "แผนทดสอบ", tasks, humanGates: [] });
 const okRun = (answer = "ผลลัพธ์ของงาน\nDONE") => ({ ok: true, exitCode: 0, durationMs: 5, timedOut: false, answer, error: "", stdout: "", stderr: "" });
 const failRun = () => ({ ok: false, exitCode: 1, durationMs: 5, timedOut: false, answer: "", error: "", stdout: "", stderr: "boom" });
@@ -19,7 +19,7 @@ function mkOpts(over = {}) {
 }
 
 test("งาน fail (exit 1) → งานลูกถูก block, งานอิสระยังทำต่อ, run ไม่ ok (AUDIT ข้อ 1)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const calls = [];
     const runner = async (_cfg, _opts, _runDir, t) => { calls.push(t.id); return t.id === "A" ? failRun() : okRun(); };
@@ -37,7 +37,7 @@ test("งาน fail (exit 1) → งานลูกถูก block, งาน�
 });
 
 test("role ตอบ NEEDS_HUMAN (exit 0) → งานนั้นไม่สำเร็จ งานลูกถูก block และ exit ไม่ใช่ 0 (AUDIT ข้อ 1)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const runner = async (_cfg, _opts, _runDir, t) =>
       t.id === "A" ? okRun("ต้องถามผู้ใช้เรื่องขอบเขตก่อน\n\n**NEEDS_HUMAN**") : okRun();
@@ -51,7 +51,7 @@ test("role ตอบ NEEDS_HUMAN (exit 0) → งานนั้นไม่ส�
 });
 
 test("ทุกงานสำเร็จ → ok=true, ลูกโซ่ A→B รันเป็นคลื่นตามลำดับ, context ส่งต่อพร้อมสถานะและ path ฉบับเต็ม", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const seen = [];
     const runner = async (_cfg, _opts, _runDir, t, ctxBlocks) => { seen.push({ id: t.id, ctx: ctxBlocks ?? [] }); return okRun(`ผลของ ${t.id}\nDONE`); };
@@ -66,7 +66,7 @@ test("ทุกงานสำเร็จ → ok=true, ลูกโซ่ A→B
 });
 
 test("context ที่ถูกตัดต้องแจ้งว่าถูกตัดและชี้ path ฉบับเต็ม (AUDIT ข้อ 8)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     let bCtx = "";
     const runner = async (_cfg, _opts, _runDir, t, ctxBlocks) => {
@@ -80,7 +80,7 @@ test("context ที่ถูกตัดต้องแจ้งว่าถู
 });
 
 test("--dry-run ต้องไม่เรียก provider เลยและไม่เขียน checkpoint (AUDIT ข้อ 4)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     let invoked = 0;
     const runner = async () => { invoked++; return okRun(); };
@@ -92,7 +92,7 @@ test("--dry-run ต้องไม่เรียก provider เลยและ
 });
 
 test("preloadDone ข้ามเฉพาะ completed ที่มีคำตอบจริง — fail/timeout รันใหม่ (AUDIT ข้อ 2)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     writeCheckpoint(runDir, { id: "A", state: "completed", ok: true, exitCode: 0, marker: "DONE", attempt: 1, durationMs: 9 });
     writeFileSync(path.join(runDir, "A.answer.txt"), "ผลเก่าของ A", "utf8");
@@ -117,7 +117,7 @@ test("preloadDone ข้ามเฉพาะ completed ที่มีคำต
 });
 
 test("run เก่าก่อน v0.3 (มีแต่ answer.txt ไม่มี checkpoint) ต้องรันใหม่ทั้งหมด ไม่ถือว่าสำเร็จ (AUDIT ข้อ 2)", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     writeFileSync(path.join(runDir, "A.answer.txt"), "คำตอบเก่าที่ไม่รู้สถานะ", "utf8");
     const plan = mkPlan([T("A"), T("B", ["A"])]);
@@ -132,7 +132,7 @@ test("run เก่าก่อน v0.3 (มีแต่ answer.txt ไม่ม
 });
 
 test("checkpoint เขียนทันทีทีละงานพร้อม artifact references", async () => {
-  const runDir = mkdtempSync(path.join(tmpdir(), "mycelium-test-"));
+  const runDir = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
     const runner = async (_cfg, _opts, _runDir, t) => t.id === "A" ? failRun() : okRun();
     await execute(mkPlan([T("A"), T("B", ["A"]), T("C")]), mkOpts({ maxParallel: 1 }), runDir, cfg, new Map(), runner);

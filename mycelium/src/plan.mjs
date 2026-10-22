@@ -4,21 +4,21 @@ export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
 import { resolveRoleName } from "./config.mjs";
 
-// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น fe/be
-// เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน MYCELIUM.md/README ถูก test ให้ตรงกับค่านี้
+// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น front/sys
+// เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน BAAN.md/README ถูก test ให้ตรงกับค่านี้
 export const FIXED_ROLE_TIER = {
-  planner: "t2",
-  pm: "t2",
-  ba: "t2",
-  sa: "t1",
-  ux: "t2",
-  dba: "t2",
-  tp: "t2",
-  qa: "t2",
-  sec: "t2",
+  plan: "t2",
+  gm: "t2",
+  spec: "t2",
+  arch: "t1",
+  int: "t2",
+  vault: "t2",
+  inspect: "t2",
+  check: "t2",
+  jpo: "t2",
 };
-// ช่วงที่ MYCELIUM/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
-// เพราะผู้ใช้อาจตั้งใจรัน fe/be ที่ t0/t1 ผ่าน --plan-file)
+// ช่วงที่ นายช่าง/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
+// เพราะผู้ใช้อาจตั้งใจรัน front/sys ที่ t0/t1 ผ่าน --plan-file)
 export const IMPLEMENT_TIER_RANGE = "t2–t5";
 
 // ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
@@ -39,7 +39,7 @@ export function extractJson(text) {
   const raw = fenced ? fenced[1] : text;
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("ไม่พบ JSON ในคำตอบของ planner");
+  if (start === -1 || end === -1) throw new Error("ไม่พบ JSON ในคำตอบของนักวางผัง");
   return JSON.parse(raw.slice(start, end + 1));
 }
 
@@ -110,7 +110,7 @@ export function validateAndFixPlan(plan, cfg, opts) {
 }
 
 export function printPlan(plan) {
-  console.log(`\nแผนของ planner: ${plan.summary ?? ""}`);
+  console.log(`\nแผนของนักวางผัง: ${plan.summary ?? ""}`);
   console.log("┌─────┬─────────────────────┬─────────┬──────┬──────────┬─────────────────────────────┐");
   console.log("│ id  │ role                │ agent   │ tier │ depends  │ title                       │");
   console.log("├─────┼─────────────────────┼─────────┼──────┼──────────┼─────────────────────────────┤");

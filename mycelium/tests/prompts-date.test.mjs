@@ -12,7 +12,7 @@ test("localDate ใช้เวลา local ในรูปแบบ YYYY-MM-DD"
 
 test("roleDirective / pmPrompt / plannerPrompt แนบวันที่ของงานที่ส่งมา", () => {
   for (const p of [
-    roleDirective("qa", "เขียน test", null, "", "2026-10-17"),
+    roleDirective("check", "เขียน test", null, "", "2026-10-17"),
     pmPrompt("goal", "", "2026-10-17"),
     plannerPrompt("คำมอบหมาย", "goal", cfg, "", "2026-10-17"),
   ]) {
@@ -22,6 +22,6 @@ test("roleDirective / pmPrompt / plannerPrompt แนบวันที่ขอ
 });
 
 test("ไม่ส่งวันที่ = ใช้วันที่ของเครื่อง (ไม่มี prompt ไหนหลุดไปโดยไม่มีวันที่)", () => {
-  assert.match(roleDirective("qa", "เขียน test", null, ""), new RegExp(`## วันที่ของงาน: ${localDate()}`));
-  assert.match(roleDirective("qa", "เขียน test", null, "", undefined), new RegExp(`## วันที่ของงาน: ${localDate()}`));
+  assert.match(roleDirective("check", "เขียน test", null, ""), new RegExp(`## วันที่ของงาน: ${localDate()}`));
+  assert.match(roleDirective("check", "เขียน test", null, "", undefined), new RegExp(`## วันที่ของงาน: ${localDate()}`));
 });
