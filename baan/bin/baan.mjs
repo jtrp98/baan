@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback } from "../src/scheduler.mjs";
+import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { localDate, parseWorkDate, pmPrompt, plannerPrompt } from "../src/prompts.mjs";
@@ -17,7 +18,7 @@ import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, commit: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -28,6 +29,7 @@ function parseArgs(argv) {
       case "--resume": opts.resume = argv[++i] ?? ""; opts.explicit.add("resume"); break;
       case "--list": opts.list = true; break;
       case "--init": opts.init = true; break;
+      case "--commit": opts.commit = true; break;
       case "--target": opts.target = argv[++i] ?? ""; opts.explicit.add("target"); break;
       case "--agent": opts.agent = argv[++i] ?? ""; opts.explicit.add("agent"); break;
       case "--planner-tier": opts.plannerTier = argv[++i] ?? ""; opts.explicit.add("plannerTier"); break;
@@ -40,7 +42,7 @@ function parseArgs(argv) {
         try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
         opts.explicit.add("date"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init] [--commit] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
         process.exit(2);
     }
   }
@@ -73,6 +75,16 @@ export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, p
     (from, to) => console.log(`[${fileName.split(".")[0]}] ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
   );
   return { r, agent, answerFile };
+}
+
+// เก็บกวาด knowledge repo หลังจบ run — git พัง/ไม่มีสิทธิ์ต้องไม่ลากผล run ไปตายด้วย
+function autoCommitKnowledge(ws) {
+  try {
+    const commits = commitKnowledge(ws, (m) => console.log(`📚 knowledge: ${m}`));
+    if (commits.length) console.log(`📚 knowledge: auto commit ${commits.length} รายการ`);
+  } catch (e) {
+    console.warn(`⚠ auto commit knowledge ไม่สำเร็จ (ไม่กระทบผล run): ${e.message}`);
+  }
 }
 
 async function main() {
@@ -157,6 +169,13 @@ async function main() {
     return;
   }
 
+  // --commit: เก็บกวาดของที่ค้างใน knowledge repo เท่านั้น — ไม่ต้องมี goal
+  if (opts.commit) {
+    const commits = commitKnowledge(ws, (m) => console.log(`📚 knowledge: ${m}`));
+    console.log(commits.length ? `\ncommit แล้ว ${commits.length} รายการ` : "ไม่มีการเปลี่ยนแปลงใน knowledge ที่เป็น git repo");
+    return;
+  }
+
   if (opts.resume || opts.planFile) {
     let plan;
     try {
@@ -182,6 +201,7 @@ async function main() {
     const done = opts.resume ? preloadDone(runDir, plan) : new Map(); // plan-file = run ใหม่ ไม่มีของเก่าให้ preload
     printPlan(plan);
     const { ok } = await execute(plan, opts, runDir, cfg, done);
+    autoCommitKnowledge(ws);
     process.exitCode = ok ? 0 : 1;
     return;
   }
@@ -221,6 +241,7 @@ async function main() {
 
   printPlan(plan);
   const { ok } = await execute(plan, opts, runDir, cfg, new Map());
+  autoCommitKnowledge(ws);
   process.exitCode = ok ? 0 : 1;
 }
 

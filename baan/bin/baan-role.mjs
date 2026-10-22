@@ -3,7 +3,8 @@
 // ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ baan
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
+import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
+import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
@@ -144,6 +145,15 @@ async function main() {
     results: results.map(({ stdout, stderr, ...rest }) => rest),
   };
   writeFileSync(path.join(runDir, "report.json"), JSON.stringify(report, null, 2), "utf8");
+
+  // เก็บกวาด knowledge repo ของ workspace ที่ run นี้แตะ (role โหมดเขียนอาจเขียนเอกสาร) —
+  // ต้องไม่มี config/ไม่ใช่ git repo ก็ผ่านได้เงียบๆ และห้ามลาก exit code ของงานจริงไปตายด้วย
+  try {
+    const commits = commitKnowledge(loadWorkspace(resolveWorkspaceConfig(null, opts.cwd)), (m) => console.log(`📚 knowledge: ${m}`));
+    if (commits.length) console.log(`📚 knowledge: auto commit ${commits.length} รายการ`);
+  } catch (e) {
+    console.warn(`⚠ auto commit knowledge ไม่สำเร็จ (ไม่กระทบผลงาน): ${e.message}`);
+  }
 
   // exit 0 เฉพาะเมื่อทุกตัว completed — ผู้คุมใช้ exit code ตัดสินได้ทันทีว่าต้อง route ต่อหรือไม่ (เหมือนโหมดอัตโนมัติ)
   const okCount = results.filter((r) => r.ok).length;
