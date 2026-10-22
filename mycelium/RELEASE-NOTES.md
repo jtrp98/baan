@@ -2,6 +2,36 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
 
+## 0.11.0 — 2026-10-22 · timeout รวมศูนย์ + tier กลาง–ล่างตาม Intelligence Index + agy อ่านไฟล์นอก workspace ได้
+
+### ⚠ ต้องทำตอนอัปเกรด (รู้ไว้)
+- **tier t3–t5 เปลี่ยน model/effort ของ codex และ agy** — t3 codex `gpt-6.1-sol` medium→**low** · t4 codex `gpt-6-luna` medium→**high** + agy `gemini-3.8-flash-medium`→**flash-low** · t5 codex `gpt-6-luna` low→**medium** · เหตุผล: จัดตาม Intelligence Index ให้สติปาร์ตี้ใน tier เดียวกันใกล้กัน (เดิม t3 ของ codex สูงกว่าเพื่อน 7–8 คะแนนจนเผาโควตาเกินจำเป็น และตอน fallback ความสามารถกระโดดหนักในแผนเดียว) · ผู้ใช้ที่แก้ `agents.json` ของตัวเองไว้ = ยังใช้ของตัวเองต่อ (ไม่พัง แค่ไม่ได้รับการจัดใหม่)
+- **timeout เริ่มต้นขยับ 600 → 1800 วินาที (t0: 900 → 3600)** — งานที่ค้างจะถูก kill ช้าขึ้นกว่าเดิม · คุมค่าเดิมได้ด้วย `defaults.timeout_sec` ใน workspace config, `_timeoutSec` ของ tier หรือ `--timeout` เหมือนเดิม
+
+### เปลี่ยน
+- **priority ของ timeout เป็นชุดเดียวทุกจุด** (role, PM/planner, งานในแผน, fallback): `--timeout` ที่ระบุเอง > `_timeoutSec` ของ tier > `defaults.timeout_sec` ของ workspace > 1800 วินาที · ค่าที่เลือกต้องเป็น integer 1–86400 — ค่าผิด = error ทันที ไม่เปลี่ยนเป็น default เงียบๆ
+- `mycelium-role` อ่าน `defaults.timeout_sec` ด้วย workspace loader ร่วม (ค้นจาก `--cwd` หรือไดเรกทอรีที่เรียก รองรับ `MYCELIUM_CONFIG`) โดยไม่เปลี่ยน agent, cwd หรือโหมดสิทธิ์จาก workspace defaults
+
+### แก้
+- **agy เคยได้คำตอบว่างเปล่าเมื่องานอ้างไฟล์นอก cwd** (เช่น SA @ t1 ที่ cwd=target อ่าน `knowledge/` ไม่ได้ตอน fallback จาก codex — พบจริงที่ schoolbright 2026-10-22) — jetski ของ agy กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม · ตอนนี้ MYCELIUM ส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก `mycelium.config.json` เดินขึ้นจาก cwd — ไม่เจอ config = ไม่ส่ง) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขต *การเขียน* ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาใน task หรือรัน read แยกก่อน
+
+### เพิ่ม
+- **`workspaceDirArgs` ใน `agents.json`** — กลไกส่ง `--add-dir` ของ agy แบบ placeholder `<WORKSPACE_ROOT>` (ใช้ได้กับ agent อื่นด้วยถ้า CLI นั้นมี flag แบบเดียวกัน)
+- **`smoke:live` ปลอม sandbox เป็นรูป workspace จริง** (มี `mycelium.config.json` ที่ราก + ไฟล์ลับนอก cwd ของ agent) และเพิ่มช่องตรวจ "อ่านนอก cwd" — sandbox เดิมอยู่ใน %TEMP% ซึ่งเป็น safe area ของ jetski จึงตรวจไม่พบบั๊กแบบที่เจอจริง
+- จัดส่ง `scripts/live-smoke.mjs` มากับ package ด้วย (0.10.0 ลืมใส่ `files` — ผู้ติดตั้งรัน `npm run smoke:live` ไม่ได้ทั้งที่เอกสารสั่งใช้)
+- tests 80 (0.10.0) → 86 กรณี
+
+### ผลทดสอบจริงก่อนปล่อย (2026-10-22)
+- `npm run smoke:live -- --tier t1 --agents agy` และ `--tier t4 --agents agy`: **PASS ครบทุกช่อง** (t4 รวมคอลัมน์ใหม่ "อ่านนอก cwd")
+- งานจริงที่ schoolbright: `mycelium-role --agent agy --role sa --tier t1` ที่ cwd=target อ่าน `req-043.md`/`des-008.md` ใน `knowledge/` ได้ (completed + อ้าง path จริง) — คือกรณีเดิมที่ได้คำตอบว่างตอน fallback จาก codex
+- codex ติดโควตาถึง 27 ต.ค. 2026 — config ใหม่ของ codex ทุกตัว (sol-low @ t3, luna-high @ t4, luna-medium @ t5) ผ่านการเปิด session จริง (CLI รับ model/effort ถูกต้อง) แต่ยังตรวจพฤติกรรมเต็มไม่ได้ · เมื่อโควตากลับ รัน `npm run smoke:live -- --tier t3 --agents codex` และ `--tier t4 --agents codex` ได้เลย
+
+## Change Log
+
+- 2026-10-21: บันทึก timeout fix ที่ยังไม่ release
+- 2026-10-22: ปรับ t3–t5 ตาม Intelligence Index (fallback parity) — แยก commit จาก timeout
+- 2026-10-22: แก้ agy อ่านนอก workspace ไม่ได้ใน headless + smoke ครอบคลุมกรณีนี้
+
 ## 0.10.0 — 2026-10-17 · ตัวรันทั้ง 3 ค่ายผ่าน live smoke + role ไม่สวมบท MYCELIUM ซ้อน + กติกาสไตล์โค้ด
 
 ### แก้

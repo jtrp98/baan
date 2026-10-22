@@ -29,6 +29,7 @@
       "promptVia": "arg",
       "modelArgs": ["--model", "<MODEL>"],
       "effortArgs": ["--effort", "<EFFORT>"],
+      "workspaceDirArgs": ["--add-dir", "<WORKSPACE_ROOT>"],
       "readArgs": ["--agent", "mycelium-readonly", "--print"],
       "writeArgs": ["--mode", "accept-edits", "--print"],
       "answerFrom": "stdout"
@@ -36,7 +37,7 @@
   },
   "tiers": {
     "t0": {
-      "_timeoutSec": 900,
+      "_timeoutSec": 3600,
       "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "opus", "effort": "max" },
       "codex": { "model": "gpt-6-astra", "effort": "max" },
@@ -57,19 +58,19 @@
     "t3": {
       "_fallback": ["codex", "agy", "claude"],
       "claude": { "model": "sonnet", "effort": "medium" },
-      "codex": { "model": "gpt-6.1-sol", "effort": "medium" },
+      "codex": { "model": "gpt-6.1-sol", "effort": "low" },
       "agy": { "model": "gemini-3.8-flash-medium" }
     },
     "t4": {
       "_fallback": ["agy", "codex", "claude"],
       "claude": { "model": "haiku", "effort": "medium" },
-      "codex": { "model": "gpt-6-luna", "effort": "medium" },
-      "agy": { "model": "gemini-3.8-flash-medium" }
+      "codex": { "model": "gpt-6-luna", "effort": "high" },
+      "agy": { "model": "gemini-3.8-flash-low" }
     },
     "t5": {
       "_fallback": ["agy", "codex", "claude"],
       "claude": { "model": "haiku", "effort": "low" },
-      "codex": { "model": "gpt-6-luna", "effort": "low" },
+      "codex": { "model": "gpt-6-luna", "effort": "medium" },
       "agy": { "model": "gemini-3.8-flash-low" }
     }
   }

@@ -3,15 +3,17 @@
 // โหมดหลักของ MYCELIUM คือ "AI session สวมบท" ตาม MYCELIUM.md แล้วเปิด session ราย role
 // ด้วย mycelium-role — ไฟล์นี้คือทางเลือกอัตโนมัติทั้งก้อนเมื่อไม่ต้องมีคน/session คุมเอง
 // การตั้งค่าอยู่ที่ <ราก workspace>\mycelium.config.json (นอก package) · วิธีใช้เต็ม: mycelium/README.md
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
-import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText } from "../src/config.mjs";
+import { fileURLToPath } from "node:url";
+import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { localDate, parseWorkDate, pmPrompt, plannerPrompt } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
+import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
@@ -31,7 +33,7 @@ function parseArgs(argv) {
       case "--planner-tier": opts.plannerTier = argv[++i] ?? ""; opts.explicit.add("plannerTier"); break;
       case "--max-parallel": opts.maxParallel = Number(argv[++i]) || 0; opts.explicit.add("maxParallel"); break;
       case "--cwd": opts.cwd = argv[++i] ?? ""; opts.explicit.add("cwd"); break;
-      case "--timeout": opts.timeoutSec = Number(argv[++i]) || 0; opts.explicit.add("timeoutSec"); break;
+      case "--timeout": opts.timeoutSec = validateTimeout(Number(argv[++i])); opts.explicit.add("timeoutSec"); break;
       case "--write": opts.write = true; opts.explicit.add("write"); break;
       case "--config": opts.config = argv[++i] ?? ""; opts.explicit.add("config"); break;
       case "--date":
@@ -57,16 +59,16 @@ function printWorkspace(ws) {
 }
 
 // ขั้นต้นทางหนึ่งขั้น (PM/planner) — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
-async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptText) {
+export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptText, runner = runCli) {
   const answerFile = path.join(runDir, fileName);
   const { r, agent } = await runWithFallback(
     fallbackChainFor(cfg, tier, opts.agent),
     (agent) => {
       const def = cfg.agents[agent];
       const conf = cfg.tiers[tier]?.[agent] ?? {};
-      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile);
+      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile, opts.workspaceRoot);
       if (def.promptVia === "arg") args.push(promptText);
-      return runCli(def, args, def.promptVia, promptText, opts.cwd, cfg.tiers[tier]?._timeoutSec ?? opts.timeoutSec, def.answerFrom === "answerFile" ? answerFile : undefined);
+      return runner(def, args, def.promptVia, promptText, opts.cwd, resolveTimeout(opts, cfg.tiers[tier]), def.answerFrom === "answerFile" ? answerFile : undefined);
     },
     (from, to) => console.log(`[${fileName.split(".")[0]}] ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
   );
@@ -74,7 +76,8 @@ async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptTe
 }
 
 async function main() {
-  const opts = parseArgs(process.argv.slice(2));
+  let opts;
+  try { opts = parseArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
   let ws;
   try {
     ws = loadWorkspace(resolveWorkspaceConfig(opts.config || null));
@@ -84,15 +87,16 @@ async function main() {
   }
   const cfg = loadAgentsConfig();
   cfg.roleNames = listRoles().map((r) => r.name);
+  // รากของ workspace (จาก config เดียวกับที่โหลดไป) — ให้ runner ส่ง --add-dir ให้ agy โหมดอ่าน อ่าน knowledge/ นอก cwd ได้
+  opts.workspaceRoot = workspaceRootOf(opts.config || null);
 
   opts.agent = opts.agent || ws.defaults.agent;
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;
-  opts.timeoutSec = opts.timeoutSec || ws.defaults.timeout_sec;
+  if (!opts.explicit.has("timeoutSec")) opts.timeoutSec = ws.defaults.timeout_sec;
   opts.maxParallel = opts.maxParallel || ws.defaults.max_parallel;
   // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง Change Log ด้วยวันที่รันจริง
   opts.date = opts.date || localDate();
   if (!Number.isInteger(opts.maxParallel) || opts.maxParallel < 1 || opts.maxParallel > 64) { console.error(`--max-parallel ต้องเป็นจำนวนเต็ม 1–64 (ได้: ${opts.maxParallel})`); process.exit(2); }
-  if (!Number.isInteger(opts.timeoutSec) || opts.timeoutSec < 1 || opts.timeoutSec > 86400) { console.error(`--timeout ต้องเป็นจำนวนเต็ม 1–86400 วินาที (ได้: ${opts.timeoutSec})`); process.exit(2); }
 
   if (opts.resume && opts.planFile) { console.error("ใช้ --resume กับ --plan-file พร้อมกันไม่ได้ — resume ใช้แผนใน run เดิมอยู่แล้ว"); process.exit(2); }
   if (opts.resume && (opts.explicit.has("goal") || opts.goalFile)) console.log("(--goal/--goal-file ถูกละเว้น — resume ใช้ goal จาก run เดิม)");
@@ -220,4 +224,6 @@ async function main() {
   process.exitCode = ok ? 0 : 1;
 }
 
-main().catch((e) => { console.error(e); process.exitCode = 1; });
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(e); process.exitCode = 1; });
+}

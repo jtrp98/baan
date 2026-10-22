@@ -155,7 +155,11 @@ mycelium --plan-file <f>          # รันแผนที่แก้เอ�
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
-หมายเหตุจากการทดสอบ: task ที่ผลิตเอกสารยาว (เช่น SA @ t1) ใช้เวลาเกิน 240 วินาที — MYCELIUM ตั้ง default timeout 600 วินาทีแล้ว และถ้ายังช้าอยู่ใช้ `--timeout` เพิ่มได้
+งานที่ผลิตเอกสารยาว (เช่น SA @ t1) อาจใช้เวลานาน — ทั้ง `mycelium` และ `mycelium-role` ใช้ timeout เริ่มต้น 1800 วินาทีต่อ AI CLI job (t0 ใช้ 3600 วินาที)
+
+ลำดับ timeout ของทั้งสองคำสั่ง รวม PM/planner, scheduler task และ fallback: **`--timeout` ที่ระบุเอง > tier `_timeoutSec` ใน `agents.json` > workspace `defaults.timeout_sec` > 1800 วินาที** ค่าที่เลือกใช้ต้องเป็นจำนวนเต็ม 1–86400; ค่าผิดจะ error ไม่เปลี่ยนเป็น default เงียบๆ ตัวอย่าง: `mycelium-role --agent codex --role sa --tier t1 --timeout 3600 --task "วิเคราะห์ระบบ"`
+
+`mycelium-role` อ่านเฉพาะ timeout จาก workspace config ผ่าน loader ร่วม: `MYCELIUM_CONFIG` ชนะ discovery ซึ่งเดินขึ้นจาก `--cwd` หรือไดเรกทอรีที่เรียกเมื่อไม่ได้ส่ง `--cwd` (รองรับทั้ง `mycelium.config.json` และชื่อเก่า `mycelium/mycelium.json`) โดยไม่เปลี่ยน agent, cwd หรือโหมดสิทธิ์จาก workspace defaults ส่วน `mycelium` คง discovery จากไดเรกทอรีที่เรียก และรับ `--config` ตามเดิม การ resume ไม่คืน timeout จาก manifest ตามพฤติกรรมเดิม
 
 ## การเปลี่ยน model / effort (สำหรับแบ่ง tier)
 
@@ -181,16 +185,17 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 | t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | gemini-4-argon-high |
 | t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | gemini-4-argon-high |
 | t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | gemini-4-argon-medium |
-| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / medium | gemini-3.8-flash-medium |
-| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / medium | gemini-3.8-flash-medium |
-| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / low | gemini-3.8-flash-low |
+| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / low | gemini-3.8-flash-medium |
+| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / high | gemini-3.8-flash-low |
+| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / medium | gemini-3.8-flash-low |
 
 หมายเหตุ:
 - **ลำดับสลับตัวรันเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ --agent) เป็นตัวแรกเสมอ — ถ้าตัวปัจจุบันล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที ทั้งงานในแผนและขั้น PM/planner · **ความล้มเหลวด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint (`fallback`) และ summary · ค่าตั้งปัจจุบัน: t0–t3 = codex → agy → claude, t4–t5 = agy → codex → claude (claude ท้ายสุดทุก tier — โควตาแพงสุด เก็บไว้งานหนัก)
 - **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที (กันสงสัยว่าทำไมไม่ทำงาน)
 - **Argon เปิดตัวแล้ว (เติมครบ 2026-10-17)** — `agy models` มี `gemini-4-argon-low/medium/high` จึงเติม agy กลับที่ t0–t2 ได้ครบ · ข้อจำกัด: agy ไม่มี effort `max` ให้ ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด · ชื่อ model ล่าสุดเช็คได้เสมอด้วย `agy models`
-- **t0 ยืด timeout อัตโนมัติเป็น 900 วินาที/agent** (ปกติ 240) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
+- **t0 ยืด timeout อัตโนมัติเป็น 3600 วินาที/agent** (ปกติ 1800) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
 - effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ (ตามที่ UI เตือน) — ใช้เฉพาะ t0 จริงๆ
+- **t3–t5 จัดตาม Intelligence Index ให้สติปาร์ตี้ใกล้กันใน tier เดียว (2026-10-22)** — ก่อนหน้านี้ t3 ของ codex (sol/medium = 48) ฉลาดกว่าเพื่อนใน tier ถึง 7–8 คะแนนจนเผาโควตาเกินจำเป็น และ t4 ของ codex/agy ห่าง anchor ถึง ±4–6 คะแนน คู่ปัจจุบัน: t3 = 41/42/40 · t4 = 34/33/34 · t5 = 29/30/34 — เหตุผลหลักคือ fallback parity (codex ติดโควตาแล้วตกไป agy ที่ t3 เดิมหาย 8 คะแนนกลางแผน) · agy ใช้ flash-low ซ้ำทั้ง t4/t5 เพราะ Gemini มีขั้นระดับจริงแค่ 34/40/41/53 (แบบเดียวกับ argon-high ที่ซ้ำ t0/t1) · ยืนยันแล้ว: agy@t4 ผ่าน live smoke · codex รอโควตากลับ (27 ต.ค. 2026) — CLI รับ config และเริ่ม session ได้ปกติ แต่ยังตรวจพฤติกรรมจริงไม่ได้
 - agy ยังมี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่ออยากทำ tier bulk สำหรับงาน mass
 - แก้/เพิ่ม tier ได้ที่ส่วน `"tiers"` ใน `agents.json`
 
@@ -200,16 +205,22 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 |---|---|---|---|
 | claude | `claude -p --output-format text --allowedTools <ตามโหมด>` (write เพิ่ม `--permission-mode acceptEdits`) | stdin | stdout |
 | codex | `codex exec --skip-git-repo-check -s read-only -o <answer.txt> -` | stdin | ไฟล์ answer.txt (option `-o`) |
-| agy | `agy --agent mycelium-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
+| agy | `agy --add-dir <ราก workspace> --agent mycelium-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
   - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent mycelium-readonly` (custom agent profile ระดับผู้ใช้ที่ตัด write/edit tools ออกจาก schema + `PreToolUse` guard hook ใน `~/.gemini/config/hooks.json` ที่บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly` เพราะ `--mode plan` เดิมกันการเขียนไม่ได้) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
   - **agy ต้องติดตั้ง profile `mycelium-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
+  - **agy (jetski) กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม** จนได้คำตอบว่างเปล่า — พบจริง 2026-10-22 จาก SA ที่ cwd=target อ่าน `knowledge/` ไม่ได้ตอน fallback จาก codex (sandbox ของ smoke เดิมอยู่ใน %TEMP% ซึ่งเป็น safe area จึงตรวจไม่พบ) · MYCELIUM จึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก `mycelium.config.json` เดินขึ้นจาก cwd — ไม่เจอ config = ไม่ส่ง) · โหมด `--write` ไม่ส่งเพราะ `--add-dir` ขยายขอบเขต *การเขียน* ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาใน task หรือรัน read แยกก่อน
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
-- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
+- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox ปลอมเป็นรูป workspace จริง (มี `mycelium.config.json` ที่ราก + ไฟล์ลับนอก cwd) แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ใน cwd และนอก cwd (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
-- เกิน timeout (default 240 วินาที/ตัว) จะถูก kill ทั้ง process tree อัตโนมัติ
+- เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
+
+## Change Log
+
+- 2026-10-22: แก้ agy อ่านไฟล์นอก workspace ไม่ได้ใน headless (ส่ง `--add-dir` ราก workspace เฉพาะโหมดอ่าน) + `smoke:live` ปลอม sandbox เป็นรูป workspace และตรวจอ่านนอก cwd
+- 2026-10-21: เพิ่ม timeout เริ่มต้นและอธิบาย priority, workspace discovery ของ role และ validation ที่ใช้ร่วมกัน
 
 ## ผลการทดสอบ (2026-10-14)
 

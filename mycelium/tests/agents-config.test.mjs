@@ -57,6 +57,25 @@ test("agy: --print เป็น arg สุดท้ายทั้งสอง�
   assert.equal(mode(writeArgs), "accept-edits");
 });
 
+// jetski ของ agy ปฏิเสธการอ่านไฟล์นอก workspace ใน headless โดยไม่ถาม (ได้คำตอบว่างเปล่า) —
+// พบจริง 2026-10-22 จาก SA @ schoolbright ที่ cwd=target อ่าน knowledge/ ไม่ได้ตอน fallback จาก codex
+// ทางแก้คือส่ง --add-dir <ราก workspace> เฉพาะโหมดอ่าน (โหมดเขียนไม่ใส่ เพราะ --add-dir ขยายขอบเขตเขียนตามไปด้วย)
+test("agy: workspaceDirArgs ใส่ --add-dir เฉพาะโหมดอ่านและเมื่อรู้ราก workspace และต้องมาก่อน --print", async () => {
+  const { buildArgs } = await import("../src/runner.mjs");
+  const def = cfg.agents.agy;
+  assert.deepEqual(def.workspaceDirArgs, ["--add-dir", "<WORKSPACE_ROOT>"], "agy ต้องประกาศ workspaceDirArgs");
+  const ro = buildArgs(def, "gemini-4-argon-high", "", false, "a.txt", "C:/ws");
+  assert.deepEqual(ro.slice(ro.indexOf("--add-dir"), ro.indexOf("--add-dir") + 2), ["--add-dir", "C:/ws"], "โหมดอ่านต้องมี --add-dir <ราก workspace>");
+  assert.ok(ro.indexOf("--add-dir") < ro.indexOf("--print"), "--add-dir ต้องอยู่ก่อน --print");
+  for (const args of [
+    buildArgs(def, "gemini-4-argon-high", "", true, "a.txt", "C:/ws"), // โหมดเขียน: ห้ามขยายขอบเขตเขียน
+    buildArgs(def, "gemini-4-argon-high", "", false, "a.txt", ""),    // ไม่เจอ workspace config: ไม่มี flag ค้าง
+  ]) assert.ok(!args.includes("--add-dir"), `ห้ามมี --add-dir: ${JSON.stringify(args)}`);
+  for (const name of ["claude", "codex"]) {
+    assert.ok(!cfg.agents[name].workspaceDirArgs, `${name} ไม่มี workspaceDirArgs (จำกัดการอ่านไม่ใช่ข้อจำกัดของตัวนี้)`);
+  }
+});
+
 // claude -p ไม่มีคนกดอนุมัติ — tool ที่ไม่อยู่ใน --allowedTools ใช้ไม่ได้เลย (เคยรันคำสั่งไม่ได้ทั้งสองโหมด)
 test("claude: read-only อนุญาตเฉพาะ tool/คำสั่งอ่านอย่างเดียว · write อนุญาตแก้ไฟล์และรันคำสั่ง", () => {
   const tools = (args) => args[args.indexOf("--allowedTools") + 1].split(",");

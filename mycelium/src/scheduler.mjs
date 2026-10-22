@@ -4,6 +4,7 @@ import { roleDirective } from "./prompts.mjs";
 import { buildArgs, runCli } from "./runner.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { readCheckpoint, writeAtomic, writeCheckpoint } from "./run-store.mjs";
+import { resolveTimeout } from "./timeout.mjs";
 
 const CONTEXT_CHAR_CAP = 6000; // ตัดรายละเอียด output ของ task ก่อนหน้ายาวเกิน (ส่ง path ฉบับเต็มแทน)
 // สแกน state marker เฉพาะท้ายคำตอบตามสัญญา CONVENTIONS §8 "จบ handoff ด้วยสถานะเดียว" —
@@ -69,9 +70,9 @@ async function runRoleTask(cfg, opts, runDir, t, ctxBlocks, agent = t.agent) {
   const def = cfg.agents[agent];
   const conf = cfg.tiers[t.tier]?.[agent] ?? {};
   const answerFile = path.join(runDir, `${t.id}.answer.txt`);
-  const timeoutSec = cfg.tiers[t.tier]?._timeoutSec ?? opts.timeoutSec;
+  const timeoutSec = opts.timeoutSec;
   const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx, opts.date || undefined);
-  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile);
+  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile, opts.workspaceRoot);
   if (def.promptVia === "arg") args.push(prompt);
   return runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile);
 }
@@ -133,7 +134,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       const chain = tryChain.length ? tryChain : [t.agent];
       const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
         chain,
-        (agent) => runTask(cfg, opts, runDir, t, ctxBlocks, agent),
+        (agent) => runTask(cfg, { ...opts, timeoutSec: resolveTimeout(opts, cfg.tiers?.[t.tier]) }, runDir, t, ctxBlocks, agent),
         (from, to) => console.log(`  ${t.id}: ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
       );
       t.agent = usedAgent;

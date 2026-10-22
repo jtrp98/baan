@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { DEFAULT_TIMEOUT_SEC } from "./timeout.mjs";
 
 export const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); // รากของ package
 export const ROLES_DIR = path.join(TEAM_DIR, "roles");
@@ -41,6 +42,13 @@ export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
   return findWorkspaceConfig(startDir);
 }
 
+// โฟลเดอร์แม่ของ workspace config = ขอบเขต workspace จริง (มีทั้ง knowledge/ และ target repo)
+// runner ใช้ค่านี้ส่ง --add-dir ให้ agy ในโหมดอ่าน — ไม่เจอ config = คืน "" (ไม่ส่ง flag)
+export function workspaceRootOf(explicitPath, startDir = process.cwd()) {
+  const found = resolveWorkspaceConfig(explicitPath, startDir);
+  return found ? path.dirname(found) : "";
+}
+
 export function loadWorkspace(configPath = null) {
   // ไม่พบ config = ใช้ default ในโค้ด (ไม่มี targets/knowledge) พร้อมแจ้งให้ผู้ใช้รู้ตอน --list
   let raw = {};
@@ -55,7 +63,7 @@ export function loadWorkspace(configPath = null) {
     defaults: {
       agent: raw.defaults?.agent ?? "codex",
       planner_tier: raw.defaults?.planner_tier ?? "t2",
-      timeout_sec: raw.defaults?.timeout_sec ?? 600,
+      timeout_sec: Object.hasOwn(raw.defaults ?? {}, "timeout_sec") ? raw.defaults.timeout_sec : DEFAULT_TIMEOUT_SEC,
       max_parallel: raw.defaults?.max_parallel ?? 3,
     },
   };

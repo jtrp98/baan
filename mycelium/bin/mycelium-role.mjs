@@ -3,11 +3,11 @@
 // ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ mycelium
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText } from "../src/config.mjs";
+import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
-import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
+import { createRunDir, parseRoleArgs, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
 
 function printResult(r) {
   const tier = [r.model && `model=${r.model}`, r.effort && `effort=${r.effort}`].filter(Boolean).join(" ");
@@ -47,9 +47,7 @@ async function main() {
     console.error(`ไม่พบ tier: ${opts.tier} (ที่มี: ${Object.keys(tiers).join(", ") || "ไม่มี"})`);
     process.exit(2);
   }
-  // tier ระบุ timeout เริ่มต้นไว้ (เช่น t0 = งานยาก) แต่ --timeout ที่ส่งมาเองชนะเสมอ
-  const tierTimeout = (tiers[opts.tier] ?? {})._timeoutSec;
-  if (tierTimeout && !opts.timeoutSet) opts.timeoutSec = tierTimeout;
+  try { opts.timeoutSec = resolveRoleTimeout(opts, cfg); } catch (e) { console.error(e.message); process.exit(2); }
 
   const selected = opts.agents.includes("*") ? Object.keys(agents) : [...new Set(opts.agents)];
   if (selected.length === 0) {
@@ -81,6 +79,8 @@ async function main() {
     console.error(`--cwd ชี้โฟลเดอร์ที่ไม่มี: ${opts.cwd}`);
     process.exit(2);
   }
+  // workspace ที่เจอจาก --cwd (เดินขึ้นหา mycelium.config.json) — ใช้ส่ง --add-dir ให้ agy โหมดอ่าน
+  const workspaceRoot = workspaceRootOf(null, opts.cwd);
 
   let task = opts.task;
   if (!task && opts.taskFile) task = readFileSync(opts.taskFile, "utf8");
@@ -115,14 +115,14 @@ async function main() {
   console.log(`agents  : ${runnable.join(", ")}`);
   if (opts.tier) console.log(`tier    : ${opts.tier} -> ${runnable.map((n) => `${n}=${[resolveME(n, true).model, resolveME(n, true).effort].filter(Boolean).join("/")}`).join(", ")}`);
   console.log(`mode    : ${opts.write ? "write (อนุญาตให้แก้ไขไฟล์)" : "read-only"}${opts.seq ? " (ทีละตัว)" : " (ขนาน)"}`);
-  console.log(`cwd     : ${opts.cwd}`);
+  console.log(`cwd     : ${opts.cwd}${workspaceRoot ? ` (workspace: ${workspaceRoot})` : ""}`);
   console.log(`timeout : ${opts.timeoutSec}s/agent — กำลังรัน...`);
 
   const attempt = async (name, isRequested) => {
     const def = agents[name];
     const { model, effort } = resolveME(name, isRequested);
     const answerFile = path.join(runDir, `${name}.answer.txt`);
-    const args = buildArgs(def, model, effort, opts.write, answerFile);
+    const args = buildArgs(def, model, effort, opts.write, answerFile, workspaceRoot);
     if (def.promptVia === "arg") args.push(fullTask);
     const r = await runCli(def, args, def.promptVia, fullTask, opts.cwd, opts.timeoutSec, answerFile);
     return { ...r, label: def.label, model, effort };

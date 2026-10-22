@@ -2,12 +2,13 @@
 // แยกจาก bin เพื่อให้ทดสอบได้โดยไม่เรียก AI CLI จริง
 import { mkdirSync, mkdtempSync } from "node:fs";
 import path from "node:path";
-import { resolveRoleName } from "./config.mjs";
+import { loadWorkspace, resolveRoleName, resolveWorkspaceConfig } from "./config.mjs";
+import { DEFAULT_TIMEOUT_SEC, resolveTimeout, validateTimeout } from "./timeout.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { parseWorkDate } from "./prompts.mjs";
 import { classifyOutcome, runWithFallback } from "./scheduler.mjs";
 
-export const DEFAULT_TIMEOUT_SEC = 240;
+export { DEFAULT_TIMEOUT_SEC };
 export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--timeout <sec>] [--cwd <dir>] [--list]`;
 
 // cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ MYCELIUM ที่อยู่ใน
@@ -29,7 +30,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
       case "--seq": opts.seq = true; break;
       case "--list": opts.list = true; break;
       case "--cwd": opts.cwd = path.resolve(baseCwd, argv[++i] ?? "."); break;
-      case "--timeout": opts.timeoutSec = Number(argv[++i]) || DEFAULT_TIMEOUT_SEC; opts.timeoutSet = true; break;
+      case "--timeout": opts.timeoutSec = validateTimeout(Number(argv[++i])); opts.timeoutSet = true; break;
       case "--tier": opts.tier = argv[++i] ?? ""; break;
       case "--model": opts.model = argv[++i] ?? ""; break;
       case "--effort": opts.effort = argv[++i] ?? ""; break;
@@ -45,6 +46,11 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
     }
   }
   return opts;
+}
+
+export function resolveRoleTimeout(opts, cfg) {
+  const ws = loadWorkspace(resolveWorkspaceConfig(null, opts.cwd));
+  return resolveTimeout({ ...opts, timeoutSec: opts.timeoutSet ? opts.timeoutSec : ws.defaults.timeout_sec }, cfg.tiers?.[opts.tier]);
 }
 
 // ชื่อโฟลเดอร์ต้องไม่ชนเมื่อเปิดหลาย mycelium-role พร้อมกัน (charter ข้อ 7) — timestamp ระดับวินาทีอย่างเดียว
