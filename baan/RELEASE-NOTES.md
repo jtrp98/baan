@@ -1,14 +1,23 @@
 # Release Notes — 🏗️ BAAN
 
-ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json` · ผลทดสอบละเอียดอยู่ใน `README.md`
+ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## Unreleased — 2026-10-22
+## 0.12.0 — 2026-10-22 · เปลี่ยนชื่อ MYCELIUM→BAAN + prompt อังกฤษทั้งระบบ + auto commit ที่เก็บเอกสาร
 
+### ⚠ ต้องทำตอนอัปเกรด
+- **เปลี่ยนชื่อ project ทั้งระบบ: MYCELIUM → BAAN (🏗️ นายช่าง) ธีมงานก่อสร้าง** — คำสั่ง `mycelium`/`mycelium-role` → `baan`/`baan-role` (คำสั่งเก่ายังใช้ได้ผ่าน bin compat) · role ทั้ง 11 เปลี่ยน ID+ตำแหน่ง: `planner→plan` นักวางผัง · `pm→gm` ผู้จัดการหน้างาน · `ba→spec` ผู้เขียนข้อกำหนด · `sa→arch` สถาปนิก · `ux→int` นักออกแบบตกแต่งภายใน · `fe→front` ช่างหน้างาน · `be→sys` ช่างระบบ · `dba→vault` ผู้ดูแลห้องนิรภัย · `tp→inspect` หัวหน้าตรวจรับ · `qa→check` ผู้ตรวจงานอิสระ · `sec→jpo` จป. — **ID เก่าทุกรุ่น (ba/sa/fe และชื่อยาว business-analyst ฯลฯ) ยังใช้ได้เป็น alias** ทั้ง `--role`, แผนเก่าและ `--plan-file`
+- **repo ย้ายราก `project-ai` → `baan` และย้ายโฟลเดอร์ package `mycelium/` → `baan/`** — ใคร `npm link` จาก path เก่าต้อง clone ใหม่ที่ path ปัจจุบันแล้ว `npm link` อีกครั้ง (ตัวคำสั่งและพฤติกรรมไม่เปลี่ยน)
+- config ของ workspace เปลี่ยนชื่อเป็น `baan.config.json` — ชื่อเก่า `mycelium.config.json` และ `mycelium/mycelium.json` ยังถูกพบอัตโนมัติ (อยากได้ชื่อใหม่ให้รัน `baan --init` ที่ราก workspace ซึ่งจะย้ายให้เอง) · env `BAAN_CONFIG` มาแทน `MYCELIUM_CONFIG` (ตัวเก่ายังรับ) · ตัวอย่างใน package เป็น `baan.example.json`
+- **ผู้ใช้ agy ต้องติดตั้ง agent profile `baan-readonly` ต่อเครื่อง** (เดิม `mycelium-readonly`) — ไฟล์อยู่ที่ `setup/agy/` เหมือนเดิม แค่ชื่อใหม่ (profile เก่าที่ติดตั้งไว้ไม่ถูกอ้างอีกต่อไป ลบได้) · charter เปลี่ยนชื่อไฟล์ `MYCELIUM.md` → `BAAN.md` · workspace ที่ `--init` ไว้แล้ว: รัน `baan --init` อีกครั้งเพื่ออัปเดต CLAUDE.md/AGENTS.md stub
+
+### เปลี่ยน
 - **prompt ที่ส่งเข้า AI ทั้งหมดเป็นภาษาอังกฤษ** — เนื้อหา role ทั้ง 11 ไฟล์, CONVENTIONS.md, ป้าย `[baan-role:]`/ข้อยกเว้น, หัวข้อประกอบ prompt (date/assignment/context) และบล็อก context ระหว่าง task · **ผลลัพธ์ยังเป็นไทยเหมือนเดิม** — บังคับด้วยกฎ "Working language" ในทุก role + CONVENTIONS §11 (เอกสาร/คำตอบไทย ศัพท์เทคนิค/โค้ด/ID อังกฤษ) · หัวไฟล์ role (`# บทบาท:`/`> หน้าที่:`/`> tier:`) คงไว้เป็นไทยเพื่อ `--list` และตารางเอกสาร · ตรวจจริงแล้วกับ agy: prompt อังกฤษ ตอบไทยครบทั้งฉบับ (schoolbright 2026-10-22)
 - **ยกระดับบทบาททุกตำแหน่งให้คมขึ้น มี "philosophy" เฉพาะตัว** — spec เค้นความต้องการจริงด้วยคำถามเชิงรุก (ห้ามยอมรับคำกำกวม ถามจนทดสอบได้) · arch เรียบง่ายก่อนเสมอ (ของเดิมที่ใช้ได้ชนะท่ายาก แต่กล้าเปลี่ยนรากฐานเมื่อผิดทาง — "เสาหลักของบ้าน รากฐานไม่ดีไม่ใช่บ้านที่ดี") · plan แผนเล็กที่สุดที่ได้งาน (task เกินความจำเป็น = แผนบกพร่อง) · gm คุ้มกัน scope creep · front ทำเป๊ะตามที่ขอ ไม่เพิ่มของที่ไม่ได้ขอ · sys validation ทุกขาเข้า + boring defensive code · vault schema ที่ทำให้บั๊กเป็นไปไม่ได้ · inspect ล่าช่องโหว่ ไม่ใช่แค่ครอบคลุม · check เดินหน้าเป็นศัตรูของโค้ด (สมมติว่าพังจนพิสูจน์ว่าไม่พัง) · jpo ตรวจตามพื้นผิวจริง จัดระดับตามความเสี่ยงจริง
-- ⚠ **เปลี่ยนชื่อ project ทั้งระบบ: MYCELIUM → BAAN (🏗️ นายช่าง) ธีมงานก่อสร้าง** — คำสั่ง `mycelium`/`mycelium-role` → `baan`/`baan-role` (คำสั่งเก่ายังใช้ได้ผ่าน bin compat) · role ทั้ง 11 เปลี่ยน ID+ตำแหน่ง: `planner→plan` นักวางผัง · `pm→gm` ผู้จัดการหน้างาน · `ba→spec` ผู้เขียนข้อกำหนด · `sa→arch` สถาปนิก · `ux→int` นักออกแบบตกแต่งภายใน · `fe→front` ช่างหน้างาน · `be→sys` ช่างระบบ · `dba→vault` ผู้ดูแลห้องนิรภัย · `tp→inspect` หัวหน้าตรวจรับ · `qa→check` ผู้ตรวจงานอิสระ · `sec→jpo` จป. — **ID เก่าทุกรุ่น (ba/sa/fe และชื่อยาว business-analyst ฯลฯ) ยังใช้ได้เป็น alias** ทั้ง `--role`, แผนเก่าและ `--plan-file`
-- ⚠ config ของ workspace เปลี่ยนชื่อเป็น `baan.config.json` — ชื่อเก่า `mycelium.config.json` และ `mycelium/mycelium.json` ยังถูกพบอัตโนมัติ (อยากได้ชื่อใหม่ให้รัน `baan --init` ที่ราก workspace ซึ่งจะย้ายให้เอง) · env `BAAN_CONFIG` มาแทน `MYCELIUM_CONFIG` (ตัวเก่ายังรับ) · ตัวอย่างใน package เป็น `baan.example.json`
-- ⚠ **ผู้ใช้ agy ต้องติดตั้ง agent profile `baan-readonly` ต่อเครื่อง** (เดิม `mycelium-readonly`) — ไฟล์อยู่ที่ `setup/agy/` เหมือนเดิม แค่ชื่อใหม่ (profile เก่าที่ติดตั้งไว้ไม่ถูกอ้างอีกต่อไป ลบได้) · charter เปลี่ยนชื่อไฟล์ `MYCELIUM.md` → `BAAN.md` · workspace ที่ `--init` ไว้แล้ว: รัน `baan --init` อีกครั้งเพื่ออัปเดต CLAUDE.md/AGENTS.md stub
+
+### เพิ่ม
+- **auto commit ที่เก็บเอกสาร (knowledge) หลังจบ run** — knowledge root ที่เป็น git repo ถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` · commit ของ module หนึ่งไม่กลืนของที่ staged ค้างข้าม module · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังไม่กระทบผล run · เรียกด้วยมือได้ด้วย `baan --commit`
+- **เอกสารเขียนใหม่เป็นการแนะนำโปรเจกต์** — `README.md` ของ package มี "BAAN คืออะไร / เริ่มต้นใช้งาน" ตอนต้น ตัดเหตุผลเฉพาะวงในออก (ประวัติทดสอบรายรุ่นอยู่ที่ RELEASE-NOTES ฉบับนี้) · README ราก repo เป็นหน้าแรกบางๆ ชี้มาคู่มือเดียว
+- tests 87 → 94 กรณี (ชุดใหม่: parse/group/ข้อความของ auto commit รวม integration กับ git repo จริงใน temp dir)
 
 ## 0.11.0 — 2026-10-22 · timeout รวมศูนย์ + tier กลาง–ล่างตาม Intelligence Index + agy อ่านไฟล์นอก workspace ได้
 
