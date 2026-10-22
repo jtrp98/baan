@@ -72,7 +72,7 @@ async function runRoleTask(cfg, opts, runDir, t, ctxBlocks, agent = t.agent) {
   const answerFile = path.join(runDir, `${t.id}.answer.txt`);
   const timeoutSec = opts.timeoutSec;
   const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx, opts.date || undefined);
-  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile);
+  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile, opts.workspaceRoot);
   if (def.promptVia === "arg") args.push(prompt);
   return runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile);
 }

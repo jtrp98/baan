@@ -205,19 +205,21 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 |---|---|---|---|
 | claude | `claude -p --output-format text --allowedTools <ตามโหมด>` (write เพิ่ม `--permission-mode acceptEdits`) | stdin | stdout |
 | codex | `codex exec --skip-git-repo-check -s read-only -o <answer.txt> -` | stdin | ไฟล์ answer.txt (option `-o`) |
-| agy | `agy --agent mycelium-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
+| agy | `agy --add-dir <ราก workspace> --agent mycelium-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
   - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent mycelium-readonly` (custom agent profile ระดับผู้ใช้ที่ตัด write/edit tools ออกจาก schema + `PreToolUse` guard hook ใน `~/.gemini/config/hooks.json` ที่บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `mycelium-readonly` เพราะ `--mode plan` เดิมกันการเขียนไม่ได้) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
   - **agy ต้องติดตั้ง profile `mycelium-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
+  - **agy (jetski) กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม** จนได้คำตอบว่างเปล่า — พบจริง 2026-10-22 จาก SA ที่ cwd=target อ่าน `knowledge/` ไม่ได้ตอน fallback จาก codex (sandbox ของ smoke เดิมอยู่ใน %TEMP% ซึ่งเป็น safe area จึงตรวจไม่พบ) · MYCELIUM จึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก `mycelium.config.json` เดินขึ้นจาก cwd — ไม่เจอ config = ไม่ส่ง) · โหมด `--write` ไม่ส่งเพราะ `--add-dir` ขยายขอบเขต *การเขียน* ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาใน task หรือรัน read แยกก่อน
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
-- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
+- **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox ปลอมเป็นรูป workspace จริง (มี `mycelium.config.json` ที่ราก + ไฟล์ลับนอก cwd) แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ใน cwd และนอก cwd (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
 - เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
 
 ## Change Log
 
+- 2026-10-22: แก้ agy อ่านไฟล์นอก workspace ไม่ได้ใน headless (ส่ง `--add-dir` ราก workspace เฉพาะโหมดอ่าน) + `smoke:live` ปลอม sandbox เป็นรูป workspace และตรวจอ่านนอก cwd
 - 2026-10-21: เพิ่ม timeout เริ่มต้นและอธิบาย priority, workspace discovery ของ role และ validation ที่ใช้ร่วมกัน
 
 ## ผลการทดสอบ (2026-10-14)

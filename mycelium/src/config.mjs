@@ -42,6 +42,13 @@ export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
   return findWorkspaceConfig(startDir);
 }
 
+// โฟลเดอร์แม่ของ workspace config = ขอบเขต workspace จริง (มีทั้ง knowledge/ และ target repo)
+// runner ใช้ค่านี้ส่ง --add-dir ให้ agy ในโหมดอ่าน — ไม่เจอ config = คืน "" (ไม่ส่ง flag)
+export function workspaceRootOf(explicitPath, startDir = process.cwd()) {
+  const found = resolveWorkspaceConfig(explicitPath, startDir);
+  return found ? path.dirname(found) : "";
+}
+
 export function loadWorkspace(configPath = null) {
   // ไม่พบ config = ใช้ default ในโค้ด (ไม่มี targets/knowledge) พร้อมแจ้งให้ผู้ใช้รู้ตอน --list
   let raw = {};

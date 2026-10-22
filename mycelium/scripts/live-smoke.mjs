@@ -59,8 +59,8 @@ function run(agent, tier, sb, write, task) {
   });
 }
 
-const READ_TASK = `งานทดสอบระบบ (smoke) — ตอบสั้นๆ ตามข้อ:
-1) อ่านไฟล์ secret.txt ในโฟลเดอร์ปัจจุบัน แล้วตอบค่าข้างในตรงตัว
+const READ_TASK = (outerFile) => `งานทดสอบระบบ (smoke) — ตอบสั้นๆ ตามข้อ:
+1) อ่านไฟล์ secret.txt ในโฟลเดอร์ปัจจุบัน และไฟล์ ${outerFile} (อยู่นอกโฟลเดอร์ปัจจุบัน) แล้วตอบค่าจากทั้งสองไฟล์ตรงตัว ไฟล์ละหนึ่งบรรทัด
 2) รันคำสั่ง \`git log -1 --format=%H\` ในโฟลเดอร์ปัจจุบัน แล้วตอบ output ตรงตัว
 3) รันคำสั่ง \`node probe.js\` ในโฟลเดอร์ปัจจุบัน แล้วตอบ output ตรงตัว
 4) ลองสร้างไฟล์ ro-probe.txt เนื้อหา "x" — ข้อนี้คาดว่าทำไม่ได้ในโหมดอ่านอย่างเดียว ถ้าระบบไม่อนุญาตให้ตอบว่า "เขียนไม่ได้" (ไม่นับเป็นข้อที่ล้ม)
@@ -74,13 +74,20 @@ const mark = (b) => (b === null ? "–" : b ? "✅" : "❌");
 async function main() {
   const { tier, agents } = parseArgs(process.argv.slice(2));
   const base = mkdtempSync(path.join(tmpdir(), "mycelium-live-smoke-"));
+  // ปลอม sandbox ให้เป็นรูป workspace จริง: config ที่ราก + ไฟล์ลับนอก cwd ของ agent
+  // (jetski ของ agy กันอ่านนอก workspace และ headless ปฏิเสธแทนการถาม — sandbox เดิมที่อยู่ใน %TEMP%
+  //  safe area ทั้งหมดเลยตรวจไม่พบบั๊กนี้ จน SA จริงที่ schoolbright fallback ไป agy ได้คำตอบว่าง 2026-10-22)
+  const outerSecret = `OUTER-${randomBytes(6).toString("hex").toUpperCase()}`;
+  const outerFile = path.join(base, "outer-secret.txt");
+  writeFileSync(outerFile, outerSecret + "\n");
+  writeFileSync(path.join(base, "mycelium.config.json"), "{}\n");
   console.log(`live smoke @ ${tier}: ${agents.join(", ")} · sandbox: ${base} (ใช้โควตาจริง ${agents.length * 2} session)`);
 
   const results = await Promise.all(agents.flatMap((agent) => {
     const ro = sandbox(base, `${agent}-ro`);
     const rw = sandbox(base, `${agent}-rw`);
     return [
-      run(agent, tier, ro, false, READ_TASK).then((r) => ({ agent, kind: "ro", sb: ro, r })),
+      run(agent, tier, ro, false, READ_TASK(outerFile)).then((r) => ({ agent, kind: "ro", sb: ro, r })),
       run(agent, tier, rw, true, WRITE_TASK).then((r) => ({ agent, kind: "rw", sb: rw, r })),
     ];
   }));
@@ -93,13 +100,14 @@ async function main() {
     if (/mcp: node_repl/.test(r.stderr)) x.notes.push(`${kind}: ใช้ MCP node_repl แทน shell`);
     if (kind === "ro") {
       x.readFile = r.answer.includes(sb.secret);
+      x.readOuter = r.answer.includes(outerSecret);
       x.readCmd = r.answer.includes(sb.commit);
       x.runCode = r.answer.includes(sb.hash);
       x.roBlocked = !existsSync(path.join(sb.dir, "ro-probe.txt"));
       x.roState = r.state;
       x.roSecs = r.secs;
       // completed ทั้งที่ข้อบังคับล้ม = role รายงานสถานะเกินจริง (CONVENTIONS §8)
-      x.roStateHonest = !(r.state === "completed" && !(x.readFile && x.readCmd && x.runCode));
+      x.roStateHonest = !(r.state === "completed" && !(x.readFile && x.readOuter && x.readCmd && x.runCode));
     } else {
       const f = path.join(sb.dir, "result.txt");
       x.writeFile = existsSync(f) && readFileSync(f, "utf8").trim() === sb.hash;
@@ -109,13 +117,14 @@ async function main() {
     }
   }
 
-  // เกณฑ์ผ่าน: อ่านไฟล์ + รันคำสั่งอ่านอย่างเดียว + read-only กันเขียนจริง + --write รันโค้ดแล้วเขียนได้ + สถานะไม่เกินจริง
-  // runCode ใน read-only เป็นข้อมูลประกอบ — claude อนุญาตเฉพาะคำสั่งอ่านอย่างเดียวในโหมดนี้โดยตั้งใจ
-  const rows = Object.values(v).map((x) => ({ ...x, pass: !!(x.readFile && x.readCmd && x.roBlocked && x.writeFile && x.roStateHonest && x.rwStateHonest) }));
-  console.log("\n| agent | อ่านไฟล์ | คำสั่งอ่าน (git log) | รันโค้ดใน RO | RO กันเขียน | --write | สถานะ RO / RW | สถานะตรงจริง | ผล |");
-  console.log("|---|---|---|---|---|---|---|---|---|");
+  // เกณฑ์ผ่าน: อ่านไฟล์ (ใน cwd และนอก cwd แบบ absolute path) + รันคำสั่งอ่านอย่างเดียว + read-only กันเขียนจริง
+  // + --write รันโค้ดแล้วเขียนได้ + สถานะไม่เกินจริง · runCode ใน read-only เป็นข้อมูลประกอบ
+  // (claude อนุญาตเฉพาะคำสั่งอ่านอย่างเดียวในโหมดนี้โดยตั้งใจ)
+  const rows = Object.values(v).map((x) => ({ ...x, pass: !!(x.readFile && x.readOuter && x.readCmd && x.roBlocked && x.writeFile && x.roStateHonest && x.rwStateHonest) }));
+  console.log("\n| agent | อ่านไฟล์ | อ่านนอก cwd | คำสั่งอ่าน (git log) | รันโค้ดใน RO | RO กันเขียน | --write | สถานะ RO / RW | สถานะตรงจริง | ผล |");
+  console.log("|---|---|---|---|---|---|---|---|---|---|");
   for (const x of rows) {
-    console.log(`| ${x.agent} | ${mark(x.readFile)} | ${mark(x.readCmd)} | ${mark(x.runCode)} | ${mark(x.roBlocked)} | ${mark(x.writeFile)} | ${x.roState} (${x.roSecs}s) / ${x.rwState} (${x.rwSecs}s) | ${mark(x.roStateHonest && x.rwStateHonest)} | ${x.pass ? "PASS" : "FAIL"} |`);
+    console.log(`| ${x.agent} | ${mark(x.readFile)} | ${mark(x.readOuter)} | ${mark(x.readCmd)} | ${mark(x.runCode)} | ${mark(x.roBlocked)} | ${mark(x.writeFile)} | ${x.roState} (${x.roSecs}s) / ${x.rwState} (${x.rwSecs}s) | ${mark(x.roStateHonest && x.rwStateHonest)} | ${x.pass ? "PASS" : "FAIL"} |`);
   }
   for (const x of rows) for (const n of [...new Set(x.notes)]) console.log(`  · ${x.agent}: ${n}`);
   console.log("\nรายงาน:");

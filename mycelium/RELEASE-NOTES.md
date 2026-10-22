@@ -4,6 +4,7 @@
 
 ## Unreleased — 2026-10-21
 
+- แก้ agy ได้คำตอบว่างเปล่าเมื่องานอ้างไฟล์นอก cwd (เช่น SA @ t1 ที่ cwd=target อ่าน `knowledge/` ไม่ได้ตอน fallback จาก codex) — jetski ของ agy กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม · ตอนนี้ MYCELIUM ส่ง `--add-dir <ราก workspace>` ให้ agy เฉพาะโหมดอ่าน (โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนด้วย) และ `smoke:live` ปลอม sandbox เป็นรูป workspace จริง + ตรวจอ่านไฟล์นอก cwd เพื่อไม่ให้บั๊กแบบนี้หลุดอีก
 - ⚠ ปรับ tier ladder กลาง–ล่างให้สติปาร์ตี้ใน tier เดียวกันใกล้เคียงกัน (จัดตาม Intelligence Index): t3 codex `gpt-6.1-sol` effort medium → **low** · t4 codex `gpt-6-luna` medium → **high** และ agy `gemini-3.8-flash-medium` → **flash-low** · t5 codex `gpt-6-luna` low → **medium** — ก่อนหน้านี้ t3 ของ codex สูงกว่าเพื่อนใน tier 7–8 คะแนน (เผาโควตาเกินจำเป็น) และ t4 เหลื่อมถึง ±6 คะแนน ทำให้ตอน fallback ความสามารถกระโดดหนักในแผนเดียว · ผู้ใช้ที่แก้ `agents.json` ของตัวเองไว้ไม่ได้รับผลกระทบ
 - เพิ่ม timeout เริ่มต้นของ `mycelium` และ `mycelium-role` เป็น 1800 วินาที และ t0 เป็น 3600 วินาที (AI CLI job เท่านั้น)
 - `mycelium-role` อ่าน `defaults.timeout_sec` ด้วย workspace loader ร่วม ค้นจาก `--cwd` หรือไดเรกทอรีที่เรียก และรองรับ `MYCELIUM_CONFIG` โดยไม่เปลี่ยน defaults อื่น
@@ -14,6 +15,7 @@
 
 - 2026-10-21: บันทึก timeout fix ที่ยังไม่ release
 - 2026-10-22: ปรับ t3–t5 ตาม Intelligence Index (fallback parity) — แยก commit จาก timeout
+- 2026-10-22: แก้ agy อ่านนอก workspace ไม่ได้ใน headless + smoke ครอบคลุมกรณีนี้
 
 ## 0.10.0 — 2026-10-17 · ตัวรันทั้ง 3 ค่ายผ่าน live smoke + role ไม่สวมบท MYCELIUM ซ้อน + กติกาสไตล์โค้ด
 

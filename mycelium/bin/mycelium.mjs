@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText } from "../src/config.mjs";
+import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback } from "../src/scheduler.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
@@ -66,7 +66,7 @@ export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, p
     (agent) => {
       const def = cfg.agents[agent];
       const conf = cfg.tiers[tier]?.[agent] ?? {};
-      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile);
+      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile, opts.workspaceRoot);
       if (def.promptVia === "arg") args.push(promptText);
       return runner(def, args, def.promptVia, promptText, opts.cwd, resolveTimeout(opts, cfg.tiers[tier]), def.answerFrom === "answerFile" ? answerFile : undefined);
     },
@@ -87,6 +87,8 @@ async function main() {
   }
   const cfg = loadAgentsConfig();
   cfg.roleNames = listRoles().map((r) => r.name);
+  // รากของ workspace (จาก config เดียวกับที่โหลดไป) — ให้ runner ส่ง --add-dir ให้ agy โหมดอ่าน อ่าน knowledge/ นอก cwd ได้
+  opts.workspaceRoot = workspaceRootOf(opts.config || null);
 
   opts.agent = opts.agent || ws.defaults.agent;
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;

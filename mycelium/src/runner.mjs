@@ -11,11 +11,16 @@ function killTree(child) {
 
 // buildArgs: วาง model/effort ก่อน args หลักเสมอ — agy ต้องการ --model มาก่อน --print
 // (เพราะ --print กลืน argument ถัดไปเป็น prompt)
-export function buildArgs(def, model, effort, write, answerFile) {
-  const fill = (arr) => arr.map((a) => a.replaceAll("<ANSWER>", answerFile).replaceAll("<MODEL>", model).replaceAll("<EFFORT>", effort));
+// workspaceDirArgs (--add-dir ของ agy) ใส่เฉพาะโหมดอ่านและเมื่อเจอ workspace config:
+// jetski ของ agy กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม จนได้คำตอบว่างเปล่า
+// (พบจริงจาก SA ที่ cwd=target อ่าน knowledge/ ไม่ได้) · โหมดเขียนไม่ใส่ เพราะ --add-dir
+// ขยายขอบเขต "การเขียน" ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนจึงต้องอยู่ใน cwd เท่านั้น
+export function buildArgs(def, model, effort, write, answerFile, workspaceRoot = "") {
+  const fill = (arr) => arr.map((a) => a.replaceAll("<ANSWER>", answerFile).replaceAll("<MODEL>", model).replaceAll("<EFFORT>", effort).replaceAll("<WORKSPACE_ROOT>", workspaceRoot));
   return [
     ...(model && def.modelArgs ? fill(def.modelArgs) : []),
     ...(effort && def.effortArgs ? fill(def.effortArgs) : []),
+    ...(!write && workspaceRoot && def.workspaceDirArgs ? fill(def.workspaceDirArgs) : []),
     ...fill(write ? def.writeArgs : def.readArgs),
   ];
 }
