@@ -1,0 +1,70 @@
+{
+  "work_date": "2026-10-21",
+  "kind": "orchestrator_preflight_not_qa_verdict",
+  "packages": [
+    {
+      "Path": "C:\\src\\schoolbright\\target\\school-bot-v2\\dist\\installers\\school-bot-0.1.5-windows-amd64-setup.exe",
+      "Bytes": 74988927,
+      "Sha256": "54cd856c014364df134447ba441be8b35c4392daae0ae170d7053467a98bcb6f",
+      "SidecarMatches": true,
+      "Signature": "NotSigned",
+      "ProductVersion": "0.1.5",
+      "FileVersion": "0.1.5.0"
+    },
+    {
+      "Path": "C:\\src\\schoolbright\\target\\school-bot-v2\\dist\\installers\\school-bot-0.1.5-windows-amd64.msi",
+      "Bytes": 13848576,
+      "Sha256": "e4bd619d349d2c4556bd21c4fa23bff0b563a3499158668607067bb2d2dc258c",
+      "SidecarMatches": true,
+      "Signature": "NotSigned",
+      "ProductVersion": null,
+      "FileVersion": null
+    }
+  ],
+  "inventory": {
+    "OperatingSystem": {
+      "Caption": "Microsoft Windows 11 Home Single Language",
+      "Version": "10.0.26300",
+      "OSArchitecture": "64-bit"
+    },
+    "ProviderCommands": [],
+    "ProviderPaths": [
+      {
+        "Path": "C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe",
+        "Exists": false
+      },
+      {
+        "Path": "C:\\Program Files (x86)\\VMware\\VMware Workstation\\vmrun.exe",
+        "Exists": false
+      },
+      {
+        "Path": "C:\\Program Files\\VMware\\VMware Workstation\\vmrun.exe",
+        "Exists": false
+      },
+      {
+        "Path": "C:\\Windows\\System32\\WindowsSandbox.exe",
+        "Exists": false
+      },
+      {
+        "Path": "C:\\Windows\\System32\\vmconnect.exe",
+        "Exists": false
+      }
+    ]
+  },
+  "msi_static_check": {
+    "command": "scripts/tests/installer-package.test.ps1 -InstallerPath dist/installers/school-bot-0.1.5-windows-amd64.msi",
+    "exit_code": 0,
+    "result": "MSI package checks passed: cross-language upgrades, launch checkbox, six launch conditions, user context, success-only UI and dialog bounds. No installation or app launch was performed."
+  },
+  "current_app_bin": {
+    "product_version": "0.1.3",
+    "file_version": "0.1.3",
+    "bytes": 16657920
+  },
+  "runtime_test": {
+    "windows10": "NOT_RUN_CANCELLED_BY_DECISIONS_019",
+    "installed_or_launched": false,
+    "reason": "ผู้ใช้ปรับ Windows target เป็น Windows 11 ตามข้อเสนอแรก ก่อนมี Win10 environment"
+  },
+  "scope_decision": "requirement/decisions-019.md"
+}

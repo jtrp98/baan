@@ -1,0 +1,36 @@
+# Design archive
+
+เก็บ Rev1 ก่อนใช้ amendment ของ SA ตาม decisions-010/011 วันที่ 2026-10-21 เนื้อหาแต่ละไฟล์เป็นสำเนา byte-for-byte ไม่ใช่แบบใช้งานปัจจุบัน อ่าน [index.md](index.md) สำหรับแบบล่าสุด
+
+| ฉบับเดิม | Bytes | SHA-256 |
+|---|---:|---|
+| [design/index.md](archive/2026-10-21-identity-rev1/index.md) | 5489 | `a2ed01607cb9ee3d0ade5f5bfc3d8d6d0e01adc65a9508a61ec63c210af8a085` |
+| [design/modules.md](archive/2026-10-21-identity-rev1/modules.md) | 3888 | `2868c1bcc8df01256474502864d2188d1ce8be23d812ffb52bb5b0e4a2d12b60` |
+| [design/data-model.md](archive/2026-10-21-identity-rev1/data-model.md) | 7096 | `a6d935cd9c3049f19f8c158196754023a186463ace89adb839cee5ddda27bda7` |
+| [design/data-contract-rules.md](archive/2026-10-21-identity-rev1/data-contract-rules.md) | 5274 | `8b6dc9ea9666383ba6e8b317991515d4f1d0030a7776745691335265fb23a718` |
+| [design/des-003.md](archive/2026-10-21-identity-rev1/des-003.md) | 8004 | `305e5729a4d58e77a73960557d5afc7c44b41a54226dab8684547c78740000e8` |
+| [design/des-004.md](archive/2026-10-21-identity-rev1/des-004.md) | 5500 | `215965aed870d644916f503634958d8be0923df89c9360f0a7495de96ebe2117` |
+| [design/des-005.md](archive/2026-10-21-identity-rev1/des-005.md) | 8982 | `97baf3c55e92bad00d88a671eadfeb72ce5b2d416663ed115972cb4bf93f9161` |
+| [design/risks.md](archive/2026-10-21-identity-rev1/risks.md) | 6493 | `9eb13895cfa13d1de12be601f2ba996de6efcde1b791f12b3e634699e81405ec` |
+| [source-review-002.md](archive/2026-10-21-identity-rev1/source-review-002.md) | 4611 | `08cea97cead7d0b7781c5d15629cbe54a3ea328c73b15764658feb297280a159` |
+
+## ก่อนเปลี่ยน PK int4 — 2026-10-21
+
+สำเนา byte-for-byte ก่อน apply SA ตาม decisions-012; Rev เดิมของแต่ละไฟล์คงครบ
+
+| ฉบับเดิม | Bytes | SHA-256 |
+|---|---:|---|
+| [index.md](archive/2026-10-21-before-int4/index.md) | 5965 | `cda223c060b443926d6d10aea6ebbd94c9850e69bc8a6caba187440b76589329` |
+| [data-model.md](archive/2026-10-21-before-int4/data-model.md) | 8893 | `98e0258166494aeec023fc8b37669a02ce2942cea656f5d54c60eb6f3c272c0c` |
+| [data-contract-rules.md](archive/2026-10-21-before-int4/data-contract-rules.md) | 5966 | `753679393a20abc2efc165adb542d02a91fb41839d9d43b30d659576053b2282` |
+| [des-002.md](archive/2026-10-21-before-int4/des-002.md) | 9201 | `e44b875806306e75a75988d2f2979283cdf8bcf70698e8d33aa5e450d0adb6a2` |
+| [des-003.md](archive/2026-10-21-before-int4/des-003.md) | 8149 | `094d1d035c26e78e949c4893bcc742340df6feb1088635133f7cab78bec0aa3d` |
+| [des-004.md](archive/2026-10-21-before-int4/des-004.md) | 9414 | `d6aededb4e9a2a3365e4d8d208b5ccc7aaf20a564fd03a7897d06d582618fee1` |
+| [des-005.md](archive/2026-10-21-before-int4/des-005.md) | 9322 | `b8d2d54ebd3bf4f1f90a820d652d54397348f064b28c60f380e5f74295e674eb` |
+| [des-007.md](archive/2026-10-21-before-int4/des-007.md) | 6914 | `f4b249b4fbabf0219a35c977bb0ea3bc4cff6bab4a5fa67e5518fb0e4cc1642c` |
+| [risks.md](archive/2026-10-21-before-int4/risks.md) | 7133 | `c1205ae1fc82083cef6a4f04ab4752ffd77b5bc3b49c6a672e20e0c3c335cd22` |
+
+## Change Log
+- 2026-10-21 — เก็บอีก 9 ไฟล์ก่อนแก้ PK int4 และตรวจ hash ก่อน apply
+
+- 2026-10-21 — MYCELIUM แยก archive ตามไฟล์เพื่อคุมขนาดและตรวจ hash ตรงต้นฉบับทั้ง 9 ไฟล์ก่อน apply patch SA
