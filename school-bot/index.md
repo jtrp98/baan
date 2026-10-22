@@ -1,55 +1,30 @@
-# school-bot — Knowledge Index
+# school-bot — Module Index
 
-## สถานะปัจจุบัน
+> หน่วยอ่าน = ไฟล์ · สารบัญล้วน — เนื้อหา module-level ทั้งหมดอยู่ที่ `requirement\scope.md` · เขียนโดย `business-analyst`
+> วิธีอ่าน: อ่าน index ของหมวดที่ packet/brief ชี้ก่อน แล้วเปิดเฉพาะไฟล์ที่ระบุ — ห้าม ls ห้ามอ่านข้ามหมวด
 
-- สร้าง knowledge ใหม่ตามคำสั่งผู้ใช้
-- ตาราง SchoolBot อยู่ SchoolBot DB 10.0.0.128:9499 ตาม [decisions-027](requirement/decisions-027.md) (ไม่ใช่ School DB)
-- PK ของตาราง SchoolBot ใหม่เป็น `int4` ตาม [มติผู้ใช้](requirement/decisions-012.md); มี [DBML](design/schoolbot.dbml) สำหรับ dbdiagram.io และปรับ timeout MYCELIUM แล้ว
-- API ทั้งหมดรวม Login อยู่ `target/school-bot-v2/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](requirement/decisions-010.md), [มติ DB](requirement/decisions-011.md) และ [ผลตรวจบัญชีเดิม](design/source-review-002.md)
-- เป้าหมายล่าสุดจากผู้ใช้: ทำระบบเต็มใช้งานจริงครบทุกส่วน ดู [มติระบบเต็ม](requirement/decisions-002.md)
-- โครงสร้างหลัก: Block / Arm / Code มีหน้าบทเรียนแยกจากพื้นที่สร้างงาน ดู [ผลตรวจโค้ด](design/source-review-001.md) และ [มติ 3 โหมด](requirement/decisions-003.md)
-- Windows และ macOS ต้องควบคุมหุ่นจริงได้ทั้งคู่ ดู [มติ OS](requirement/decisions-008.md); ฝั่ง macOS ยังต้องพัฒนาจากโค้ดเดิม
-- เป้าหมาย OS ล่าสุด Windows11 25H2 x64 และ macOS15+ Intel/AppleSilicon ตาม [decisions-019](requirement/decisions-019.md) แทนข้อกำหนด Windows10 เดิม
-- Guest และ Login เก็บหลายโครงงานทุกโหมด; Code/Block ประเมินอัตโนมัติ Arm ให้ครูตรวจ ดู [มติผู้ประเมิน](requirement/decisions-009.md); Guest ใช้พื้นที่ร่วมและเลือกนำเข้างาน/ประวัติหลัง Login ตาม [มติ Guest](requirement/decisions-014.md)
-- Guest ลบเข้าถังขยะกู้ได้ 30 วัน; ทีมร่างหลักสูตรสามโหมดให้ผู้ใช้ตรวจ ครูดูแลเฉพาะรายชื่อนักเรียนที่ผู้ดูแลกำหนด ดู [มติชุด 2](requirement/decisions-015.md)
-- ต้องมี License ก่อนใช้แอปทั้ง Guest/Login; ตาราง `SchoolBotLicense` ใช้ PK `SchoolBotLicenseId` และฟิลด์มาตรฐาน ดู [มติ License/DB](requirement/decisions-004.md)
-- ครั้งแรกตรวจ License ออนไลน์ แล้วใช้สิทธิ์ในเครื่องได้ 3 วัน ครบกำหนดต้องตรวจ Key ว่ายัง Active ก่อนต่อสิทธิ์ ดู [มติออฟไลน์](requirement/decisions-005.md)
-- 1 Key ผูก 1 เครื่อง; ผู้ดูแลปลดก่อนย้าย Key เดิมได้ทันที เครื่องเดิมอาจใช้ออฟไลน์จนสิทธิ์เดิมหมด ดู [มติย้ายสิทธิ์](requirement/decisions-007.md)
-- BA amend แล้ว: 44 REQ / 174 AC ยังเป็น DRAFT (เพิ่ม REQ-043..052 หลักสูตร Level/ข้อสอบ/ส่งคะแนน) ดู [ผลตรวจเอกสาร](planning/ba-review-001.md); คงรหัสเดิมครบ เพิ่ม REQ-040..042
-- logical baseline ยืนยันแล้ว; [แผนหลัก](plan/index.md) 74 งาน / 8 phases / 17 gates ทุกงาน pending ยังอ้าง 31/109 ให้ PM/TP ปรับ mapping ตาม AC ใหม่ 23 ข้อ; ยังไม่เริ่ม implementation SchoolBot
-- หลักสูตรเปลี่ยนเป็นหลักสูตรกลางแบบ Level ต่อภาคเรียน ผูกชั้น/วิชาได้ ตาม [decisions-020](requirement/decisions-020.md); ยังไม่ amend REQ/DES
-- ส่งคะแนนเป็นช่องย่อยต่อกิจกรรม SchoolBot เขียนระบบเกรดเองผ่านหน้า mapping โดยไม่เปลี่ยนโครงสร้างเดิม ตาม [decisions-021](requirement/decisions-021.md)
-- มี 12 ประเด็นคำถาม: 5 PARTIAL / 7 CLOSED (ไม่มี OPEN); OQ-006/007/010 ได้ข้อยุติธุรกิจแล้ว งาน contract ส่ง SA ส่วนเนื้อหา/หุ่น/ส่งมอบรอทีมเสนอให้ผู้ใช้ตรวจ
-- หลักฐานเป็น working tree ณ 2026-10-21; source repository ยังไม่มี commit ให้อ้าง hash
+## Documents
 
-## เอกสาร
-
-| หมวด | ตำแหน่งเมื่อมีเอกสาร | สถานะ |
+| ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| Requirements | [requirement/index.md](requirement/index.md) | 44 REQ / 174 AC — DRAFT |
-| Scope | [requirement/scope.md](requirement/scope.md) | ภาพรวม ความสามารถปัจจุบัน ข้อจำกัด และแหล่งที่มา |
-| Source Review | [source-review-001.md](design/source-review-001.md) | ตรวจเส้นทางบทเรียนและสร้างงาน 3 โหมด |
-| Existing User Review | [source-review-002.md](design/source-review-002.md) | ตรวจ account/profile/tenant ของ Academic เพื่อแก้แบบ |
-| Course Plan Review | [source-review-003.md](design/source-review-003.md) | ตรวจ Google Sheet หลักสูตร ป.1–ป.6 และข้อเสนอโครงที่ยังไม่ยืนยัน |
-| Grade System Review | [source-review-004.md](design/source-review-004.md) | SA ตรวจ PGGradeDB; ผู้ใช้เลือกทาง A (decisions-021) |
-| Score Writer Review | [source-review-005.md](design/source-review-005.md) | writer จริงอยู่ service `sb-service-academic-score-record` ที่ไม่อยู่ใน workspace — BLOCKED |
-| Design | [design/index.md](design/index.md) | DES-001..007 และแบบ PK int4/DBML; เก็บ archive — PROPOSED |
-| DBML | [design/schoolbot.dbml](design/schoolbot.dbml) | 16 ตาราง / 243 คอลัมน์ / 14 refs; ผ่าน parser สองแบบ |
-| Logical Data Model | [design/data-model.md](design/data-model.md) | ผู้ใช้ยืนยัน logical baseline แล้ว; physical DDL เป็นขั้นถัดไป |
-| Design Review Decisions | [design/risks.md](design/risks.md) | สิ่งที่ต้องยืนยันก่อน implementation ที่พึ่งพา |
-| Hardware/OS Survey | [hardware](design/hardware-survey-001.md), [OS ปัจจุบัน](requirement/decisions-019.md), [preflight](planning/installer-preflight-001.md) | เลือก target Win11/macOS แล้ว; Win10 survey เก็บเป็นประวัติ ยังรอผลตรวจจริง |
-| Plan | [plan/index.md](plan/index.md) | PM รับแล้ว; 74 tasks pending พร้อมใบงานราย task และ gates |
-| Backlog | [backlog.md](backlog.md) | PM เป็นเจ้าของ; ยังไม่มี BL entry |
-| Planner Proposal | [planning/index.md](planning/index.md) | เก็บข้อเสนอเดิม; PM รับเป็นแผนหลักแล้ว |
-| Open Questions | [open-questions/index.md](open-questions/index.md) | 3 PARTIAL / 3 CLOSED |
-| Human Gate Questions | [ชุด 1](planning/human-questions-001.md), [ชุด 2](planning/human-questions-002.md), [ชุด 3](planning/human-questions-003.md), [ตรวจ OS](planning/human-questions-004.md), [Setup](planning/human-questions-005.md), [environment](planning/human-questions-006.md) | ตอบครบแล้ว; ยุติคำถาม Win10 ตามมติผู้ใช้ เปลี่ยนเป็น Win11 |
-| DB / SQL | [review-005](db/review-005.md) (ล่าสุด), [001](db/review-001.md)–[004](db/review-004.md) | DRAFT Rev5 — ไฟล์เดียว `schoolbot_db.sql` + rollback สำหรับ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, ไม่มี index เพื่อความเร็ว, FK คอลัมน์เดียว); ไม่แตะ School DB/PGGradeDB; ยังไม่รัน |
-| Test Plan | `test-plan/index.md` | ยังไม่มีเอกสาร |
-| QA | `qa/index.md` | ยังไม่มีเอกสาร |
-| Review | `review/index.md` | ยังไม่มีเอกสาร |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 174 AC — DRAFT; decisions-001..030 |
+| `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
+| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | Rev3 — data-model/rules/DBML Rev3 (32 ตาราง) CONFIRMED; DES-001..012 PROPOSED |
+| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks | 74 tasks pending (8 phases / 17 gates) |
+| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 5 PARTIAL / 7 CLOSED |
+| `test-plan\index.md` | สารบัญ test plan | ยังไม่มีเอกสาร |
+| `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
+| `qa\index.md` | สารบัญ QA findings | ยังไม่มีเอกสาร |
+| `uxui` | สารบัญ/เอกสาร UX/UI | ยังไม่มีเอกสาร |
+| `security.md` | ผลตรวจความปลอดภัย | ยังไม่มีเอกสาร — จป. ยังไม่ได้รัน |
+| `backlog.md` | งานที่ทำทีหลัง (append-only) | ยังไม่มี BL entry |
+| `db\` | SQL DDL/rollback + review (`review-001..005.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน) |
+| `planning\` | ข้อเสนอ planner เดิม + ใบงาน run/ประวัติเก่า (task*.md, history*.md) — convention เฉพาะโปรเจกต์ (อ่านอย่างเดียว) | ADOPTED_BY_PM |
+| `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
 
+- 2026-10-22 — ปรับโครงสร้าง `index.md` เป็นสารบัญล้วนตามมาตรฐาน baan และย้ายเนื้อหาสถานะปัจจุบันระดับโมดูลไป `requirement\scope.md` โดยคงถ้อยคำและ Change Log เดิมครบถ้วน
 - 2026-10-22 — SA (agy) NEEDS_HUMAN: sync เอกสารแบบให้ตรง SQL ปัจจุบัน (DBML Rev3 32 ตาราง ผ่าน parser, ชื่อตารางตรง SQL); เสนอแก้ LearnerId ที่ [db/proposal-learnerkind.md](db/proposal-learnerkind.md) รอผู้ใช้เลือก A/B
 - 2026-10-22 — บันทึก [decisions-030](requirement/decisions-030.md): ถอนคอลัมน์ Version ทั้งหมด (SQL 20 จุด, DBML, data-model) ใช้ UpdateDate เป็น concurrency token แทน (ผู้ใช้เลือก)
 - 2026-10-22 — DBA (agy) DONE Rev5 ตามคำสั่ง "อะไรไม่จำเป็นไม่ต้องใส่ / เอา index ออก": 33→32 ตาราง (ตัด TeacherGrant), ix_* 0, composite FK → single-column, Version 17 ตาราง, CHECK 117→53; Rev4 เก็บที่ db/archive/rev4/; design (data-model/DBML/DES) ยังไม่ sync
