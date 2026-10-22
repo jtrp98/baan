@@ -71,17 +71,17 @@ for (const file of ["BAAN.md", "README.md"]) {
 
 // front/sys/check เขียนโค้ดลง target จริง — กติกาสไตล์/comment ต้องมีและเหมือนกันทุกไฟล์ (แก้ที่เดียวแล้วลืมที่อื่น = role ได้กติกาไม่เท่ากัน)
 const CODE_WRITING_ROLES = ["front", "sys", "check"];
-test("front/sys/check มีหมวดสไตล์โค้ดและ comment ชุดเดียวกัน: ยึดสไตล์ target · comment เฉพาะ why · ห้าม task id ในโค้ด", () => {
+test("front/sys/check share one identical code-style & comment section: follow target style · comments only why · no task ids in code", () => {
   const section = (id) => {
     const text = readFileSync(path.join(pkgDir, "roles", `${id}.md`), "utf8");
-    const start = text.indexOf("## สไตล์โค้ดและ comment");
-    assert.ok(start !== -1, `${id}: ไม่มีหมวดสไตล์โค้ดและ comment`);
+    const start = text.indexOf("## Code style and comments");
+    assert.ok(start !== -1, `${id}: missing the code-style & comment section`);
     const end = text.indexOf("\n## ", start + 1);
     return text.slice(start, end === -1 ? undefined : end).trim();
   };
   const front = section("front");
-  for (const id of CODE_WRITING_ROLES) assert.equal(section(id), front, `หมวดนี้ของ ${id} ต้องเหมือนของ front ทุกตัวอักษร`);
-  for (const must of ["เหมือนโค้ดรอบข้างใน target", "comment เฉพาะ \"why\"", "ห้าม comment ที่เล่าว่าโค้ดทำอะไร", "ห้ามใส่ task id"]) {
-    assert.ok(front.includes(must), `ขาด: ${must}`);
+  for (const id of CODE_WRITING_ROLES) assert.equal(section(id), front, `${id}'s section must match front's character-for-character`);
+  for (const must of ["Match the surrounding code in the target", 'Comments only explain "why"', "never write comments that describe what the code does", "Never put task ids"]) {
+    assert.ok(front.includes(must), `missing: ${must}`);
   }
 });

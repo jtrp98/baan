@@ -33,7 +33,7 @@ export function parseWorkDate(s) {
 }
 
 function dateSection(date) {
-  return `## วันที่ของงาน: ${date}\nใช้วันที่นี้กับ Change Log และทุก entry ที่มีวันที่ (ผู้คุมระบุมาแล้วตาม CONVENTIONS §4 — ไม่ต้องถามผู้ใช้ซ้ำ)`;
+  return `## วันที่ของงาน (date of work): ${date}\nUse this date for the Change Log and every dated entry (the controller already specified it per CONVENTIONS §4 — do not ask the user again).`;
 }
 
 // งานที่ไม่ผูก role (baan-role ไม่ส่ง --role) ก็ยังต้องมีป้าย — ไม่งั้น session ใน workspace จะสวมบท นายช่าง
@@ -45,65 +45,65 @@ export function adhocDirective(task) {
 export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = localDate()) {
   const id = resolveRoleName(roleName);
   const roleContent = readFileSync(path.join(ROLES_DIR, `${id}.md`), "utf8").trim();
-  const conv = `\n\n---\n\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n---\n\n${dateSection(date)}`;
-  const pc = projectCtx ? `\n\n---\n\n## บริบทโปรเจกต์:\n${projectCtx}` : "";
-  const ctx = ctxBlocks?.length ? `\n\n---\n\n## ข้อมูลจากงานก่อนหน้า:\n${ctxBlocks.join("\n\n")}` : "";
-  return `${roleSessionHeader(id)}\n\nคุณกำลังปฏิบัติหน้าที่ในทีมพัฒนาซอฟต์แวร์ตามบทบาทต่อไปนี้อย่างเคร่งครัด:\n\n${roleContent}${conv}${pc}\n\n---\n\n## งานที่ได้รับมอบหมาย:\n${task}${ctx}`;
+  const conv = `\n\n---\n\n## Shared conventions every role must follow (binding contract):\n${readConventions()}\n\n---\n\n${dateSection(date)}`;
+  const pc = projectCtx ? `\n\n---\n\n## Project context:\n${projectCtx}` : "";
+  const ctx = ctxBlocks?.length ? `\n\n---\n\n## Output from previous tasks:\n${ctxBlocks.join("\n\n")}` : "";
+  return `${roleSessionHeader(id)}\n\nYou are now operating in a software development team, strictly under the following role:\n\n${roleContent}${conv}${pc}\n\n---\n\n## Your assignment:\n${task}${ctx}`;
 }
 
 export function pmPrompt(goal, projectCtx, date = localDate()) {
-  return `${roleDirective("gm", `ผู้ใช้ส่งเป้าหมายมาถึงคุณ (PM) จงประมวลเป้าหมายนี้แล้วเขียน "คำมอบหมายให้นักวางผัง" แบบกระชับ (ไม่เกิน 10 บรรทัด): สิ่งที่ต้องได้, ขอบเขต in/out, ข้อจำกัดที่รู้ และสิ่งที่ต้องระวัง — อย่าวางแผนเอง หน้าที่นี้เป็นของนักวางผัง\n\n## เป้าหมายจากผู้ใช้:\n${goal}`, null, projectCtx, date)}
+  return `${roleDirective("gm", `The user sent you (the site manager) a goal. Digest it and write a concise "brief for the master planner" (max 10 lines): what must be delivered, scope in/out, known constraints, and things to watch out for — do not plan it yourself, that is the master planner's job.\n\n## Goal from the user:\n${goal}`, null, projectCtx, date)}
 
-ตอบกลับเฉพาะข้อความคำมอบหมาย (ไม่ต้องเป็น JSON)`;
+Reply with the brief text only (no JSON). Write it in Thai.`;
 }
 
 export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate()) {
   const roleContent = readFileSync(path.join(ROLES_DIR, "plan.md"), "utf8").trim();
-  const roles = listRoles().map((r) => `- ${r.name} — ${r.title}: ${r.summary}${FIXED_ROLE_TIER[r.name] ? ` (tier คงที่ ${FIXED_ROLE_TIER[r.name]})` : ` (planner เลือก tier ${IMPLEMENT_TIER_RANGE} ตามความยาก)`}`).join("\n");
+  const roles = listRoles().map((r) => `- ${r.name} — ${r.title}: ${r.summary}${FIXED_ROLE_TIER[r.name] ? ` (fixed tier ${FIXED_ROLE_TIER[r.name]})` : ` (planner picks tier ${IMPLEMENT_TIER_RANGE} by difficulty)`}`).join("\n");
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
-  const conv = `\n## กติกากลางทุก role ต้องถือ (ถือเป็นสัญญา):\n${readConventions()}\n\n${dateSection(date)}\n`;
-  const pc = projectCtx ? `\n## บริบทโปรเจกต์ (ใส่ให้ทุก task ที่เกี่ยวกับโค้ด/เอกสาร):\n${projectCtx}\n` : "";
+  const conv = `\n## Shared conventions every role must follow (binding contract):\n${readConventions()}\n\n${dateSection(date)}\n`;
+  const pc = projectCtx ? `\n## Project context (attach to every task touching code/documents):\n${projectCtx}\n` : "";
   return `${roleSessionHeader("plan")}
 
-คุณกำลังปฏิบัติหน้าที่ planner ตามบทบาทต่อไปนี้อย่างเคร่งครัด:
+You are now operating as the master planner, strictly under the following role:
 
 ${roleContent}
 
 ---
 
-## เป้าหมายจากผู้ใช้:
+## Goal from the user:
 ${goal}
 
-## คำมอบหมายจาก PM:
+## Brief from the site manager:
 ${pmDirective}
 ${conv}${pc}
-## ทีมที่เรียกใช้ได้ (role — ใช้ ID หน้าขีดในช่อง "role"):
+## Team you may call (roles — use the ID before the dash in the "role" field):
 ${roles}
 
-## ตัวรัน (agent) และ tier ที่ใช้ได้จริง:
+## Runners (agents) and tiers actually available:
 ${matrix}
 
-## กติกาการวางแผน (สำคัญ):
-1. งานง่าย = จำนวน task น้อย (อาจ 1–2 task หรือ task เดียว) — เลือกเฉพาะ role ที่จำเป็น ไม่ต้องใช้ทั้งทีม
-2. **tier ของ task เลือกได้เฉพาะ role = front / sys** (งาน implement ที่ผ่านการออกแบบจาก arch มาแล้ว — เลือกในช่วง ${IMPLEMENT_TIER_RANGE} ตามความยากจริง) — role อื่นทุกตัวใช้ tier คงที่ตามรายการด้านบน
-3. task ที่ไม่พึ่งกัน (dependsOn ว่าง) จะถูกรันขนานกัน — จัด dependency ให้ตรงความจำเป็นจริงเท่านั้น
-4. ทุก task ทำงานแบบ read-only (ยังไม่แก้ไฟล์) — output เป็นเอกสาร/ข้อความ
-5. สิ่งที่ต้องเป็น "ประตูมนุษย์" (เช่น sign-off UX, การรัน SQL, การตัดสินธุรกิจ) ใส่ใน humanGates
+## Planning rules (important):
+1. Easy work = few tasks (maybe 1–2, or a single task) — pick only the roles that are needed, never the whole team.
+2. **Task tier is selectable only for roles = front / sys** (implementation work already designed by arch — pick within ${IMPLEMENT_TIER_RANGE} by real difficulty) — every other role uses its fixed tier from the list above.
+3. Tasks without dependencies (empty dependsOn) run in parallel — add a dependency only when genuinely required.
+4. Every task works read-only (no file edits yet) — output is documents/text.
+5. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
 
-## ตอบกลับเป็น JSON เท่านั้น (ไม่มีข้อความอื่นนอก JSON):
+## Reply with JSON only (no text outside the JSON):
 {
-  "summary": "สรุปแผนหนึ่งบรรทัด",
+  "summary": "one-line plan summary (Thai)",
   "tasks": [
     {
       "id": "T1",
       "role": "spec",
       "tier": "t2",
-      "title": "ชื่อสั้นของงาน",
-      "task": "คำสั่งงานเต็มให้ role นี้ทำ (ภาษาไทย ชัดเจน ระบุ output ที่ต้องส่งออก)",
+      "title": "short task title (Thai)",
+      "task": "full work instruction for this role (in Thai, unambiguous, stating the required output)",
       "dependsOn": []
     }
   ],
-  "humanGates": ["สิ่งที่ต้องให้ผู้ใช้ตัดสิน (ถ้าไม่มีใช้ [])"]
+  "humanGates": ["what needs a human decision (use [] if none) — in Thai"]
 }
-(ไม่ต้องระบุ agent — ระบบกำหนดให้ทุก task เอง)`;
+(Do not specify agent — the system assigns it to every task.)`;
 }

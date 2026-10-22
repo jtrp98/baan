@@ -55,14 +55,14 @@ function buildCtxBlocks(runDir, t, states) {
     const prev = states.get(d);
     const answerFile = path.join(runDir, `${d}.answer.txt`);
     if (!prev || prev.state !== "completed") {
-      return `### ผลลัพธ์ของงาน ${d}: **งานนี้ไม่สำเร็จ (${prev?.state ?? "ไม่มีสถานะ"})** — ทำงานของคุณโดยอาศัยข้อมูลจาก task อื่น และระบุ assumption ที่ใช้`;
+      return `### Result of task ${d}: **this task did not succeed (${prev?.state ?? "no state"})** — do your work using information from the other tasks, and state the assumptions you used.`;
     }
     const full = prev.answer ?? "";
     const clipped = full.length > CONTEXT_CHAR_CAP;
     const body = clipped
-      ? `${full.slice(0, CONTEXT_CHAR_CAP)}\n\n(⚠ รายละเอียดถูกตัดจากฉบับเต็ม ${full.length.toLocaleString()} ตัวอักษร — อ่านฉบับเต็มได้ที่ ${answerFile})`
-      : `${full}\n\n(ฉบับเต็มของงานนี้อยู่ที่ ${answerFile})`;
-    return `### ผลลัพธ์ของงาน ${d} (สถานะ: completed):\n${body}`;
+      ? `${full.slice(0, CONTEXT_CHAR_CAP)}\n\n(⚠ truncated from the full ${full.length.toLocaleString()} characters — read the full version at ${answerFile})`
+      : `${full}\n\n(the full version of this task's output is at ${answerFile})`;
+    return `### Result of task ${d} (state: completed):\n${body}`;
   });
 }
 

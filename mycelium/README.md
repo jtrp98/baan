@@ -102,17 +102,17 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 
 | ID | ชื่อ | หน้าที่ | tier | ชื่อเดิม (alias) |
 |---|---|---|---|---|
-| `plan` | นักวางผัง | แตก goal ใหญ่เป็นแผน DAG แล้วส่งให้ gm (เฉพาะงานใหญ่) | t2 | — |
-| `gm` | ผู้จัดการหน้างาน | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run (เฉพาะงานใหญ่) | t2 | `project-manager` |
-| `spec` | ผู้เขียนข้อกำหนด | เขียน REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 | `business-analyst` |
-| `arch` | สถาปนิก | ออกแบบ DES และสัญญา API แล้วตรวจกับโค้ดจริง (as-built) | t1 | `system-analyst` |
+| `plan` | นักวางผัง | แตก goal ใหญ่เป็นแผน DAG ที่เล็กที่สุดที่ได้งาน แล้วส่งให้ gm (เฉพาะงานใหญ่) | t2 | — |
+| `gm` | ผู้จัดการหน้างาน | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run — คุ้มกัน scope creep (เฉพาะงานใหญ่) | t2 | `project-manager` |
+| `spec` | ผู้เขียนข้อกำหนด | เค้นความต้องการจริงออกจากผู้ใช้ แปลงเป็น REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 | `business-analyst` |
+| `arch` | สถาปนิก | ออกแบบ DES และสัญญา API แบบเรียบง่าย ตรวจกับโค้ดจริง (as-built) เสมอ | t1 | `system-analyst` |
 | `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น และดูแล design system | t2 | `uxui-designer` |
-| `front` | ช่างหน้างาน | implement ตาม UX ที่เซ็นแล้ว และสัญญา backend ตัวจริง | **นายช่าง/plan เลือกราย task (t2–t5 ตามความยาก)** | `frontend-engineer` |
-| `sys` | ช่างระบบ | implement ตามสัญญา โดย validation และ error contract ต้องครบ | **นายช่าง/plan เลือกราย task (t2–t5 ตามความยาก)** | `backend-engineer` |
-| `vault` | ผู้ดูแลห้องนิรภัย | ออกแบบ schema และเขียน SQL พร้อม rollback แต่ห้ามรันเอง | t2 | `database-administrator` |
-| `inspect` | หัวหน้าตรวจรับ | ทำ TP, test matrix และ traceability ครบทุก AC | t2 | `test-planner` |
-| `check` | ผู้ตรวจงานอิสระ | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task | t2 | — |
-| `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR แล้วประกาศ blocker | t2 | `security` |
+| `front` | ช่างหน้างาน | implement ตาม UX ที่เซ็นแล้วเป๊ะ และสัญญา backend ตัวจริง — ไม่เพิ่มของที่ไม่ได้ขอ | **นายช่าง/plan เลือกราย task (t2–t5 ตามความยาก)** | `frontend-engineer` |
+| `sys` | ช่างระบบ | implement ตามสัญญาเป๊ะ — validation ครบทุกขาเข้า และ error contract สมบูรณ์ | **นายช่าง/plan เลือกราย task (t2–t5 ตามความยาก)** | `backend-engineer` |
+| `vault` | ผู้ดูแลห้องนิรภัย | ออกแบบ schema กันบั๊กและเขียน SQL พร้อม rollback — แต่ห้ามรันเองเด็ดขาด | t2 | `database-administrator` |
+| `inspect` | หัวหน้าตรวจรับ | ทำ TP, test matrix และ traceability ครบทุก AC — ล่าช่องโหว่ ไม่ใช่แค่ครอบคลุม | t2 | `test-planner` |
+| `check` | ผู้ตรวจงานอิสระ | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task — ทำหน้าที่ศัตรูของโค้ด | t2 | — |
+| `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR ตามพื้นผิวจริง แล้วประกาศ blocker ตามความเสี่ยงจริง | t2 | `security` |
 
 หลักการแบ่งหน้าที่ที่ฝังไว้ใน role (สอดคล้อง convention ของโปรเจกต์ timetableai):
 - **วางแผนกับสั่งงานแยกกัน** — plan วางแผน, gm เป็นคนเรียกใช้ทีมตามแผน

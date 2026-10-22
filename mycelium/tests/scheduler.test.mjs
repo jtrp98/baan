@@ -59,7 +59,7 @@ test("ทุกงานสำเร็จ → ok=true, ลูกโซ่ A→B
     assert.equal(res.ok, true);
     assert.deepEqual(seen.map((s) => s.id), ["A", "B"], "B ต้องรันหลัง A เสร็จเท่านั้น");
     const bCtx = seen[1].ctx.join("\n");
-    assert.match(bCtx, /สถานะ: completed/);
+    assert.match(bCtx, /state: completed/);
     assert.match(bCtx, /ผลของ A/);
     assert.match(bCtx, /A\.answer\.txt/);
   } finally { rmSync(runDir, { recursive: true, force: true }); }
@@ -74,7 +74,7 @@ test("context ที่ถูกตัดต้องแจ้งว่าถู
       return okRun(t.id === "A" ? `${"x".repeat(7000)}\nDONE` : "ผล\nDONE");
     };
     await execute(mkPlan([T("A"), T("B", ["A"])]), mkOpts(), runDir, cfg, new Map(), runner);
-    assert.match(bCtx, /ถูกตัดจากฉบับเต็ม/);
+    assert.match(bCtx, /truncated from the full/);
     assert.match(bCtx, /A\.answer\.txt/);
   } finally { rmSync(runDir, { recursive: true, force: true }); }
 });

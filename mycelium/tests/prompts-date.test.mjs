@@ -16,12 +16,12 @@ test("roleDirective / pmPrompt / plannerPrompt แนบวันที่ขอ
     pmPrompt("goal", "", "2026-10-17"),
     plannerPrompt("คำมอบหมาย", "goal", cfg, "", "2026-10-17"),
   ]) {
-    assert.match(p, /## วันที่ของงาน: 2026-10-17/);
-    assert.match(p, /ไม่ต้องถามผู้ใช้ซ้ำ/);
+    assert.match(p, /## วันที่ของงาน \(date of work\): 2026-10-17/);
+    assert.match(p, /do not ask the user again/);
   }
 });
 
 test("ไม่ส่งวันที่ = ใช้วันที่ของเครื่อง (ไม่มี prompt ไหนหลุดไปโดยไม่มีวันที่)", () => {
-  assert.match(roleDirective("check", "เขียน test", null, ""), new RegExp(`## วันที่ของงาน: ${localDate()}`));
-  assert.match(roleDirective("check", "เขียน test", null, "", undefined), new RegExp(`## วันที่ของงาน: ${localDate()}`));
+  assert.match(roleDirective("check", "เขียน test", null, ""), new RegExp(`## วันที่ของงาน \\(date of work\\): ${localDate()}`));
+  assert.match(roleDirective("check", "เขียน test", null, "", undefined), new RegExp(`## วันที่ของงาน \\(date of work\\): ${localDate()}`));
 });
