@@ -4,7 +4,7 @@
 
 ## ผล
 
-BA DONE, CLI exit0, เวลา 622.2 วินาที; เรียก `mycelium-role --agent codex --role ba --tier t2 --date 2026-10-22` แบบ read-only, timeout1800s ตาม [ใบงาน](../task-008.md)
+BA DONE, CLI exit0, เวลา 622.2 วินาที; เรียก `mycelium-role --agent codex --role ba --tier t2 --date 2026-10-22` แบบ read-only, timeout1800s ตาม [ใบงาน](task-008.md)
 
 บันทึก amendment 17 ไฟล์เดิมและ 4 ไฟล์ใหม่ รวม **34 REQ / 132 AC** เพิ่ม 3 REQ และ 23 AC; ยืนยันธุรกิจจากคำตอบผู้ใช้วันที่ 2026-10-21 โดยคงวันที่เดิม ไม่ถือว่าผู้ใช้อนุมัติทุก AC
 

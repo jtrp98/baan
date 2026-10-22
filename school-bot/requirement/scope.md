@@ -14,7 +14,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 
 ผู้ดูแลปลด/ย้าย License ตาม decisions-007; กลุ่มผู้ดูแล release เพิ่มเติมยังเป็น `(สมมติฐาน — ยังไม่ยืนยัน)`
 
-โค้ด SchoolBot ต้นทางยังไม่เชื่อมบัญชี/สิทธิ์จริง; Academic มีข้อมูลบัญชี นักเรียน และบุคลากรเดิมแล้ว ดู [review เพิ่มเติม](../source-review-002.md) และ [มติ API/บัญชี](decisions-010.md) ครูดู/ตรวจเฉพาะรายชื่อนักเรียนที่ผู้ดูแลกำหนดต่อครู ตาม decisions-015
+โค้ด SchoolBot ต้นทางยังไม่เชื่อมบัญชี/สิทธิ์จริง; Academic มีข้อมูลบัญชี นักเรียน และบุคลากรเดิมแล้ว ดู [review เพิ่มเติม](../design/source-review-002.md) และ [มติ API/บัญชี](decisions-010.md) ครูดู/ตรวจเฉพาะรายชื่อนักเรียนที่ผู้ดูแลกำหนดต่อครู ตาม decisions-015
 
 ## Release Scope
 
@@ -54,7 +54,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 
 ### ช่องว่างของหลักฐาน
 
-SA ตรวจ 3 โหมดเพิ่มใน [source review](../source-review-001.md); ยังไม่ได้ตรวจทุกเส้นทางแบบ end-to-end หรือทดสอบหุ่นจริง
+SA ตรวจ 3 โหมดเพิ่มใน [source review](../design/source-review-001.md); ยังไม่ได้ตรวจทุกเส้นทางแบบ end-to-end หรือทดสอบหุ่นจริง
 
 เอกสารภาพรวม `docs/ARCHITECTURE.md:5` ยังใช้ชื่อ Robot Simulator แต่รายละเอียด `docs/ARCHITECTURE.md:49` และ source native ระบุเส้นทางหุ่นจริง จึงใช้รายละเอียดและ source ประกอบ ไม่ตีความว่าทั้ง mode เป็น simulator
 

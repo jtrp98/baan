@@ -21,7 +21,7 @@
 
 - Browser `?preview=1` เลือกการจำลองโดยชัดแจ้งและบันทึกใน localStorage
 - Home มีชื่อ/ดาวตัวอย่างและรายการโฟลเดอร์ตัวอย่าง; รายการ native ตรวจพบงานที่บันทึกไว้ของ Robot และ Blocks
-- Arm เปิด LearnMap ซึ่งยังจำลองดาว/การเชื่อมต่อ; บทเรียน Block/Code ยัง unavailable ดู [ผลตรวจ](../source-review-001.md)
+- Arm เปิด LearnMap ซึ่งยังจำลองดาว/การเชื่อมต่อ; บทเรียน Block/Code ยัง unavailable ดู [ผลตรวจ](../design/source-review-001.md)
 - เมนูครูจำลอง restart/reset/console ผ่าน state และ timer; ไม่ใช่ระบบดูแลบอร์ดหรือสิทธิ์ครูจริง
 - WorksScreen มีรายการและการคัดลอก USB จำลอง จึงไม่ใช่หลักฐาน multi-project หรืออ่าน USB จริง
 - บางหน้าจำลองถูกเรียกจากเส้นทาง Desktop ได้ การมีหน้าจอบน Desktop ไม่ยืนยันว่าเชื่อมบริการจริง

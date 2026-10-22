@@ -5,9 +5,9 @@
 - สร้าง knowledge ใหม่ตามคำสั่งผู้ใช้
 - ตาราง SchoolBot อยู่ SchoolBot DB 10.0.0.128:9499 ตาม [decisions-027](requirement/decisions-027.md) (ไม่ใช่ School DB)
 - PK ของตาราง SchoolBot ใหม่เป็น `int4` ตาม [มติผู้ใช้](requirement/decisions-012.md); มี [DBML](design/schoolbot.dbml) สำหรับ dbdiagram.io และปรับ timeout MYCELIUM แล้ว
-- API ทั้งหมดรวม Login อยู่ `target/school-bot-v2/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](requirement/decisions-010.md), [มติ DB](requirement/decisions-011.md) และ [ผลตรวจบัญชีเดิม](source-review-002.md)
+- API ทั้งหมดรวม Login อยู่ `target/school-bot-v2/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](requirement/decisions-010.md), [มติ DB](requirement/decisions-011.md) และ [ผลตรวจบัญชีเดิม](design/source-review-002.md)
 - เป้าหมายล่าสุดจากผู้ใช้: ทำระบบเต็มใช้งานจริงครบทุกส่วน ดู [มติระบบเต็ม](requirement/decisions-002.md)
-- โครงสร้างหลัก: Block / Arm / Code มีหน้าบทเรียนแยกจากพื้นที่สร้างงาน ดู [ผลตรวจโค้ด](source-review-001.md) และ [มติ 3 โหมด](requirement/decisions-003.md)
+- โครงสร้างหลัก: Block / Arm / Code มีหน้าบทเรียนแยกจากพื้นที่สร้างงาน ดู [ผลตรวจโค้ด](design/source-review-001.md) และ [มติ 3 โหมด](requirement/decisions-003.md)
 - Windows และ macOS ต้องควบคุมหุ่นจริงได้ทั้งคู่ ดู [มติ OS](requirement/decisions-008.md); ฝั่ง macOS ยังต้องพัฒนาจากโค้ดเดิม
 - เป้าหมาย OS ล่าสุด Windows11 25H2 x64 และ macOS15+ Intel/AppleSilicon ตาม [decisions-019](requirement/decisions-019.md) แทนข้อกำหนด Windows10 เดิม
 - Guest และ Login เก็บหลายโครงงานทุกโหมด; Code/Block ประเมินอัตโนมัติ Arm ให้ครูตรวจ ดู [มติผู้ประเมิน](requirement/decisions-009.md); Guest ใช้พื้นที่ร่วมและเลือกนำเข้างาน/ประวัติหลัง Login ตาม [มติ Guest](requirement/decisions-014.md)
@@ -28,11 +28,11 @@
 |---|---|---|
 | Requirements | [requirement/index.md](requirement/index.md) | 44 REQ / 174 AC — DRAFT |
 | Scope | [requirement/scope.md](requirement/scope.md) | ภาพรวม ความสามารถปัจจุบัน ข้อจำกัด และแหล่งที่มา |
-| Source Review | [source-review-001.md](source-review-001.md) | ตรวจเส้นทางบทเรียนและสร้างงาน 3 โหมด |
-| Existing User Review | [source-review-002.md](source-review-002.md) | ตรวจ account/profile/tenant ของ Academic เพื่อแก้แบบ |
-| Course Plan Review | [source-review-003.md](source-review-003.md) | ตรวจ Google Sheet หลักสูตร ป.1–ป.6 และข้อเสนอโครงที่ยังไม่ยืนยัน |
-| Grade System Review | [source-review-004.md](source-review-004.md) | SA ตรวจ PGGradeDB; ผู้ใช้เลือกทาง A (decisions-021) |
-| Score Writer Review | [source-review-005.md](source-review-005.md) | writer จริงอยู่ service `sb-service-academic-score-record` ที่ไม่อยู่ใน workspace — BLOCKED |
+| Source Review | [source-review-001.md](design/source-review-001.md) | ตรวจเส้นทางบทเรียนและสร้างงาน 3 โหมด |
+| Existing User Review | [source-review-002.md](design/source-review-002.md) | ตรวจ account/profile/tenant ของ Academic เพื่อแก้แบบ |
+| Course Plan Review | [source-review-003.md](design/source-review-003.md) | ตรวจ Google Sheet หลักสูตร ป.1–ป.6 และข้อเสนอโครงที่ยังไม่ยืนยัน |
+| Grade System Review | [source-review-004.md](design/source-review-004.md) | SA ตรวจ PGGradeDB; ผู้ใช้เลือกทาง A (decisions-021) |
+| Score Writer Review | [source-review-005.md](design/source-review-005.md) | writer จริงอยู่ service `sb-service-academic-score-record` ที่ไม่อยู่ใน workspace — BLOCKED |
 | Design | [design/index.md](design/index.md) | DES-001..007 และแบบ PK int4/DBML; เก็บ archive — PROPOSED |
 | DBML | [design/schoolbot.dbml](design/schoolbot.dbml) | 16 ตาราง / 243 คอลัมน์ / 14 refs; ผ่าน parser สองแบบ |
 | Logical Data Model | [design/data-model.md](design/data-model.md) | ผู้ใช้ยืนยัน logical baseline แล้ว; physical DDL เป็นขั้นถัดไป |
@@ -68,9 +68,9 @@
 - 2026-10-22 — BA NEEDS_HUMAN: บันทึก REQ-043..052 (10 REQ/42 AC), amend REQ-037/038, เปิด OQ-013..017; เพิ่ม BR ที่อยู่หน้าจอตาม decisions-022
 - 2026-10-22 — บันทึก [decisions-022](requirement/decisions-022.md): admin เป็น Next.js ใน school-bot-v2/web, หน้าครูอยู่ใน sb-tech-upgrade-web-system, Desktop ใช้เรียนอย่างเดียว
 - 2026-10-22 — บันทึก [decisions-021](requirement/decisions-021.md) ปิด OQ-012; ยังไม่ amend REQ/DES/plan
-- 2026-10-22 — SA NEEDS_HUMAN: บันทึกผลตรวจระบบเกรด [source-review-004](source-review-004.md); ไม่มี API เขียนคะแนน รอผู้ใช้เลือก A/B/C ใน OQ-012
+- 2026-10-22 — SA NEEDS_HUMAN: บันทึกผลตรวจระบบเกรด [source-review-004](design/source-review-004.md); ไม่มี API เขียนคะแนน รอผู้ใช้เลือก A/B/C ใน OQ-012
 - 2026-10-22 — บันทึก [decisions-020](requirement/decisions-020.md): หลักสูตรกลางแบบ Level ต่อภาคเรียน เลื่อนทั้งห้องเมื่อครูยืนยัน quiz ตั้งรายหลักสูตร ส่งคะแนนเมื่อครูยืนยัน; เปิด OQ-012 ปลายทางคะแนน ส่ง SA ตรวจระบบเกรด
-- 2026-10-22 — MYCELIUM ตรวจ Course Plan Sheet ของผู้ใช้ บันทึก [source-review-003](source-review-003.md); ยังไม่ amend REQ/DES รอคำตอบธุรกิจ
+- 2026-10-22 — MYCELIUM ตรวจ Course Plan Sheet ของผู้ใช้ บันทึก [source-review-003](design/source-review-003.md); ยังไม่ amend REQ/DES รอคำตอบธุรกิจ
 - 2026-10-22 — BA DONE; บันทึก amendment 34/132 และปิดธุรกิจ OQ-007; ส่ง [handoff](planning/ba-review-001.md) ให้ PM/TP และ SA ไม่เปลี่ยนสถานะงานจากเอกสาร
 - 2026-10-21 — บันทึก decisions-018/019; MSI preflight ผ่านโดยไม่ติดตั้ง ผู้ใช้เปลี่ยนเป็น Win11 ตามข้อเสนอแรก ยุติสาขา Win10
 - 2026-10-21 — SA ส่ง Windows10 review และ OS Rev2 แล้ว; เก็บผลตรวจรอบต่อและถามแนวทาง Home/Pro ไม่ปิด gates
@@ -78,4 +78,4 @@
 - 2026-10-21 — SA survey DONE; เก็บหลักฐาน hardware/OS และข้อเสนอแบบมีเงื่อนไข ไม่ปิด gates หรืออ้างว่าควบคุมหุ่นบน Mac ได้แล้ว
 - 2026-10-21 — บันทึก decisions-016 ปิด OQ-006; ผู้ใช้ตรวจรับภาพรวม ทีมเสนอรุ่นหุ่น/OS ให้ตรวจภายหลัง
 - 2026-10-21 — บันทึก decisions-015: ถังขยะ 30 วัน ทีมร่างหลักสูตรให้ตรวจ และกำหนด scope ครูรายชื่อนักเรียน
-- ประวัติก่อนหน้า: [ชุด 1](history-001.md), [ชุด 2](history-002.md)
+- ประวัติก่อนหน้า: [ชุด 1](planning/history-001.md), [ชุด 2](planning/history-002.md)

@@ -7,8 +7,8 @@
 - Mode read-only; ไม่แก้ code/plan/requirement, ไม่ build/install/deploy/SQL, ไม่เปิดพอร์ต/ส่ง probe/motion/upload/torque หรือสั่งอุปกรณ์ ไม่มีการยอมรับ risk แทนคน
 - Dispatch แล้ว: mycelium-role --agent codex --role sa --tier t1 --date 2026-10-21 --cwd C:/src/schoolbright/target/school-bot-v2 --task-file C:/src/schoolbright/knowledge/school-bot/task-005.md; session 56654, gpt-6-astra/high, timeout 1800s
 - Report directory: C:/src/AICode/baan/baan/reports/2026-10-21-13-34-47-sa-tier-t1-1agents-HjWmXL
-- ผลส่งกลับ DONE/exit 0 ใน 626.4s; บันทึก [hardware survey](design/hardware-survey-001.md), [OS proposal](design/os-compatibility-001.md) และ patch index ของ SA แล้ว ดู [ผลตรวจ](planning/sa-survey-review-001.md) การสำรวจ source เสร็จ แต่ยังไม่มี physical/hardware/install acceptance
-- หลักฐานเพิ่มเติมจากผู้คุม: [ข้อมูลเครื่องปัจจุบัน](planning/host-inventory-001.md) อ่าน OS/Serial inventory อย่างเดียว แยกจาก machine/hardware acceptance ของโรงเรียน
+- ผลส่งกลับ DONE/exit 0 ใน 626.4s; บันทึก [hardware survey](../design/hardware-survey-001.md), [OS proposal](../design/os-compatibility-001.md) และ patch index ของ SA แล้ว ดู [ผลตรวจ](sa-survey-review-001.md) การสำรวจ source เสร็จ แต่ยังไม่มี physical/hardware/install acceptance
+- หลักฐานเพิ่มเติมจากผู้คุม: [ข้อมูลเครื่องปัจจุบัน](host-inventory-001.md) อ่าน OS/Serial inventory อย่างเดียว แยกจาก machine/hardware acceptance ของโรงเรียน
 
 ## Inputs — index first / explicit allowlist
 

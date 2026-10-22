@@ -1,6 +1,6 @@
 # Source review 004 — ระบบเกรด SchoolBright (PGGradeDB)
 
-SA (codex t1) ตรวจ 2026-10-22 แบบ static read-only ใน `target/sb-tech-upgrade-academic` ตาม [decisions-020](requirement/decisions-020.md) และ [OQ-012](open-questions/oq-012.md) ไม่แก้ไฟล์ ไม่รัน SQL/build ไม่อ่าน secret ผลยืนยันโค้ดใน checkout เท่านั้น ไม่ยืนยัน schema/trigger/พฤติกรรม production · handoff: NEEDS_HUMAN · รายงานเต็ม `C:\src\AICode\baan\baan\reports\2026-10-22-07-18-30-sa-tier-t1-1agents-3h2Tl5`
+SA (codex t1) ตรวจ 2026-10-22 แบบ static read-only ใน `target/sb-tech-upgrade-academic` ตาม [decisions-020](../requirement/decisions-020.md) และ [OQ-012](../open-questions/oq-012.md) ไม่แก้ไฟล์ ไม่รัน SQL/build ไม่อ่าน secret ผลยืนยันโค้ดใน checkout เท่านั้น ไม่ยืนยัน schema/trigger/พฤติกรรม production · handoff: NEEDS_HUMAN · รายงานเต็ม `C:\src\AICode\baan\baan\reports\2026-10-22-07-18-30-sa-tier-t1-1agents-3h2Tl5`
 
 พาธอ้างจาก academic root
 

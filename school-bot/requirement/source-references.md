@@ -27,6 +27,6 @@
 
 - 2026-10-22 — เพิ่มมติปัจจุบันและอ้างหลักฐานเดิมที่แยกจาก scope
 
-- 2026-10-21 — เพิ่มหลักฐานข้าม repository ของบัญชี/4 DB เดิมใน [source-review-002.md](../source-review-002.md); พาธใน review นั้นอ้าง academic root ไม่ใช่ school-bot-v2
+- 2026-10-21 — เพิ่มหลักฐานข้าม repository ของบัญชี/4 DB เดิมใน [source-review-002.md](../design/source-review-002.md); พาธใน review นั้นอ้าง academic root ไม่ใช่ school-bot-v2
 
 - 2026-10-21 — ย้าย References จาก scope.md แบบคงเนื้อหาเดิมเพื่อลดขนาดไฟล์

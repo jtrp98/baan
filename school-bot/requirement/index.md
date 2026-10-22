@@ -69,7 +69,7 @@
 - Block Lab: REQ-026
 - Arm Lab: REQ-014..024 และข้อมูลโครงงานใน REQ-011/017
 - Code Lab: REQ-025
-- บทเรียนเลือก Block/Arm/Code แยกจาก Lab; ณ source ที่ตรวจ Arm เปิด LearnMap ส่วน Block/Code แสดงว่ายังไม่มีบทเรียน ดู [ผลตรวจโค้ด](../source-review-001.md) และ [มติ 3 โหมด](decisions-003.md)
+- บทเรียนเลือก Block/Arm/Code แยกจาก Lab; ณ source ที่ตรวจ Arm เปิด LearnMap ส่วน Block/Code แสดงว่ายังไม่มีบทเรียน ดู [ผลตรวจโค้ด](../design/source-review-001.md) และ [มติ 3 โหมด](decisions-003.md)
 - REQ อื่นเป็นระบบกลาง; การจัดหมวดนี้ไม่เพิ่มโหมดหรือเปลี่ยน IDs
 
 ## ประเด็นรอยืนยัน

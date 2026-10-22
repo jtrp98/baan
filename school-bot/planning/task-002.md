@@ -1,7 +1,7 @@
 # SchoolBot — PK int4 / DBML / MYCELIUM timeout
 
 - วันที่: 2026-10-21
-- ที่มา: [decisions-012.md](requirement/decisions-012.md)
+- ที่มา: [decisions-012.md](../requirement/decisions-012.md)
 - เป้าหมาย: ปรับแบบ PK/FK เป็น int4, ส่งไฟล์ DBML เปิดใน dbdiagram.io และแก้ timeout ที่ใช้งานจริง
 - ขอบเขต: แบบ/diagram และโค้ดตัวรัน MYCELIUM; ไม่แก้ implementation SchoolBot หรือรัน SQL
 - สถานะ: ส่ง DBML และ amend แบบตาม PK int4 แล้ว; timeout แก้และตรวจผ่าน ครบงานรอบนี้ ส่วน schema/placement ที่ยังเป็นข้อเสนอยังไม่อนุมัติให้รัน SQL หรือ implementation SchoolBot

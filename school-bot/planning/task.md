@@ -12,11 +12,11 @@
 
 ## SA dispatch — 2026-10-21
 
-- งานต่อจากคำชี้แจงล่าสุด: ตรวจ Entities ของ `sb-tech-upgrade-academic` และแก้แบบเฉพาะ identity integration ตาม [decisions-010.md](requirement/decisions-010.md) โดยรักษามติและ REQ/AC เดิม
+- งานต่อจากคำชี้แจงล่าสุด: ตรวจ Entities ของ `sb-tech-upgrade-academic` และแก้แบบเฉพาะ identity integration ตาม [decisions-010.md](../requirement/decisions-010.md) โดยรักษามติและ REQ/AC เดิม
 - เรียก SA จริงสำหรับงานทบทวนนี้ด้วย `mycelium-role --agent codex --role sa --tier t1 --date 2026-10-21 --cwd C:/src/schoolbright/target/sb-tech-upgrade-academic` แบบ read-only; รายงาน `C:/src/AICode/baan/baan/reports/2026-10-21-07-26-39-sa-tier-t1-1agents-qybkoL` ผลส่งกลับและ amendment บันทึกแล้ว
 - SA รอบบัญชีเดิมส่ง source-review-002 และร่าง patch พร้อม NEEDS_HUMAN แล้ว; MYCELIUM บันทึก review และยังไม่ apply patch แรก เพราะมีคำชี้แจง API/4 DB ระหว่างงาน
 - ผู้ใช้ตอบชัดว่า API ทั้งหมดรวม Login อยู่ `school-bot-v2/web` แอปเรียกใช้; ต่อ SA session เดิม `01a15d5a-e232-7d60-99c1-a120c4eda683` แบบ read-only ให้แก้ร่างตาม decisions-010/011 คำตอบ/JSONL เก็บชื่อ `codex.clarified.*` ในรายงานรอบบัญชีเดิม
-- Session ที่ต่อจบ exit 0 พร้อมร่าง NEEDS_HUMAN; MYCELIUM เก็บต้นฉบับ 9 ไฟล์แบบ byte-for-byte พร้อม hash ใน [archive](design/archive.md) แล้ว apply patch 8 ไฟล์ design และ source-review-002 เป็น Rev2
+- Session ที่ต่อจบ exit 0 พร้อมร่าง NEEDS_HUMAN; MYCELIUM เก็บต้นฉบับ 9 ไฟล์แบบ byte-for-byte พร้อม hash ใน [archive](../design/archive.md) แล้ว apply patch 8 ไฟล์ design และ source-review-002 เป็น Rev2
 - ผลล่าสุด: ถอนบัญชี SchoolBotUser ซ้ำ; legacy refs ใช้ int+SchoolId+kind; เสนอ SchoolBotSession/API ใน web และ colocate ตารางใหม่ใน School DB เพื่อไม่อ้าง atomic ข้าม DB ตำแหน่ง API ยืนยันแล้ว แต่ schema/placement/password compatibility ยังเป็นข้อเสนอ/หลักฐานที่ต้องตรวจต่อก่อน implementation
 - เรียก `mycelium-role --role sa --tier t1` แบบ read-only จาก `target/school-bot-v2` หลังคำตอบหลักครบ
 - รายงานตัวรัน: `C:/src/AICode/baan/baan/reports/2026-10-21-06-47-27-sa-tier-t1-1agents-khRokk`
@@ -24,8 +24,8 @@
 - รอบแรกหมดเวลา 900 วินาทีก่อนมีคำตอบสุดท้าย; ไม่มีไฟล์ design จากรอบนั้น จึงต่อ session SA เดิม `01a15d37-067d-7093-88f9-8af6bed0822f` ด้วย `codex exec resume` แบบ read-only ภายใต้ model/effort เดิม ไม่ได้เปิด role สมมติในแชตนี้
 - หลักฐานการต่อ session: `codex.resumed.stdout.jsonl`, `codex.resumed.stderr.txt` และไฟล์คำตอบเมื่อเสร็จ อยู่ในโฟลเดอร์รายงานเดิม; สถานะ timeout เดิมยังคงไว้ตามจริง
 - การต่อ session จบ exit 0 และมี `codex.resumed.answer.txt`; SA ส่ง 12 file blocks และ handoff NEEDS_HUMAN ผู้คุมบันทึกเป็น 13 ไฟล์โดยแยก constraints/HTTP จาก data-model เพื่อให้ทุกไฟล์ไม่เกิน 10 KiB
-- ผลส่งมอบ: [design/index.md](design/index.md), [data-model](design/data-model.md), [กฎข้อมูล/HTTP](design/data-contract-rules.md), DES-001..007, modules, quality-attributes และ risks
-- ยังรอทบทวน schema/placement/password compatibility, breaking API/host behavior, storage migration และ trust ตาม [รายการของ SA](design/risks.md); ชนิด SchoolId และตำแหน่ง API ยืนยันแล้ว ไม่เปิด DBA/implementation ต่อเองในงานนี้
+- ผลส่งมอบ: [design/index.md](../design/index.md), [data-model](../design/data-model.md), [กฎข้อมูล/HTTP](../design/data-contract-rules.md), DES-001..007, modules, quality-attributes และ risks
+- ยังรอทบทวน schema/placement/password compatibility, breaking API/host behavior, storage migration และ trust ตาม [รายการของ SA](../design/risks.md); ชนิด SchoolId และตำแหน่ง API ยืนยันแล้ว ไม่เปิด DBA/implementation ต่อเองในงานนี้
 
 ## ผลตรวจเอกสาร
 

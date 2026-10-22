@@ -46,9 +46,9 @@ Logical model และ DBML ยืนยันแล้วตาม decisions-0
 
 ## Output protocol
 
-เก็บข้อความ protocol ที่ใช้เปิด PM ครบที่ [pm-render-001.md](planning/pm-render-001.md); output จริงอยู่ [pm-response-001.json](planning/pm-response-001.json)
+เก็บข้อความ protocol ที่ใช้เปิด PM ครบที่ [pm-render-001.md](pm-render-001.md); output จริงอยู่ [pm-response-001.json](pm-response-001.json)
 
 ## Change Log
 
-- 2026-10-21 — PM รับ 74 tasks / 8 phases / 17 gates; MYCELIUM บันทึก canonical plan/74 ใบงาน/backlog แล้ว ตรวจ 31 REQ / 109 AC, DAG และ 988 links ผ่าน ดู [ผลตรวจ](planning/pm-review-001.md) ยังไม่เปิด implementation roles
+- 2026-10-21 — PM รับ 74 tasks / 8 phases / 17 gates; MYCELIUM บันทึก canonical plan/74 ใบงาน/backlog แล้ว ตรวจ 31 REQ / 109 AC, DAG และ 988 links ผ่าน ดู [ผลตรวจ](pm-review-001.md) ยังไม่เปิด implementation roles
 - 2026-10-21 — MYCELIUM เตรียม PM dispatch ตามคำสั่งผู้ใช้ รับ Planner โดยไม่แต่ง canonical plan แทน PM

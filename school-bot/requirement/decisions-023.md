@@ -2,7 +2,7 @@
 
 ## คำตอบผู้ใช้ — 2026-10-22
 
-ผู้ตอบ: ผู้ใช้ในแชตนี้ หลังอ่านผล SA ([source-review-005](../source-review-005.md)) และ OQ-014/016/017
+ผู้ตอบ: ผู้ใช้ในแชตนี้ หลังอ่านผล SA ([source-review-005](../design/source-review-005.md)) และ OQ-014/016/017
 
 1. writer เดิม (`sb-service-academic-score-record` ไม่อยู่ใน workspace): "แค่หน้า fe ทำหน้าใหม่เลย ใน folder school-bot แล้ว backend อยู่ ฝั่งนี้"
 2. ปัดเศษ: "ปัดขึ้นตั้งแต่ .5"

@@ -5,7 +5,7 @@
 - บทบาท: Planner t2 ผ่าน MYCELIUM แบบ read-only
 - Code root: `C:/src/schoolbright/target/school-bot-v2`
 - Knowledge root: `C:/src/schoolbright/knowledge/school-bot`
-- สถานะ: Planner DONE; บันทึกร่างและตรวจแล้ว ดู [planning/index.md](planning/index.md) พร้อมส่ง PM
+- สถานะ: Planner DONE; บันทึกร่างและตรวจแล้ว ดู [planning/index.md](index.md) พร้อมส่ง PM
 - คำสั่งจริง: `mycelium-role --agent codex --role planner --tier t2 --date 2026-10-21 --cwd C:/src/schoolbright/target/school-bot-v2 --task-file C:/src/schoolbright/knowledge/school-bot/task-003.md`
 - Timeout ที่ตัวรัน resolve จริง: 1800 วินาที แบบ read-only
 - รายงาน: `C:/src/AICode/baan/baan/reports/2026-10-21-12-05-17-planner-tier-t2-1agents-BsBOdk`
@@ -52,7 +52,7 @@ UX sign-off ก่อน FE ที่พึ่ง flow; physical schema/breaking
 
 ## รูปแบบผลส่งมอบ
 
-ดู [brief-output-001.md](planning/brief-output-001.md) ซึ่งเก็บข้อกำหนด output ที่ส่งให้ Planner ครบโดยไม่เปลี่ยนเนื้อหา
+ดู [brief-output-001.md](brief-output-001.md) ซึ่งเก็บข้อกำหนด output ที่ส่งให้ Planner ครบโดยไม่เปลี่ยนเนื้อหา
 
 ## Change Log
 

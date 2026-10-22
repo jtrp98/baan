@@ -46,9 +46,9 @@ Knowledge root: C:/src/schoolbright/knowledge/school-bot
 
 ## Output protocol
 
-ข้อความ protocol ที่ใช้เรียก BA เก็บครบที่ [ba-output-protocol-001.md](planning/ba-output-protocol-001.md)
+ข้อความ protocol ที่ใช้เรียก BA เก็บครบที่ [ba-output-protocol-001.md](ba-output-protocol-001.md)
 
 ## Change Log
 
-- 2026-10-22 — BA DONE, exit0; บันทึก 34 REQ / 132 AC ตรวจ IDs/ยอด/ลิงก์/ขนาดผ่าน ดู [ผลและ handoff](planning/ba-review-001.md); ไม่มีคำถามธุรกิจใหม่
+- 2026-10-22 — BA DONE, exit0; บันทึก 34 REQ / 132 AC ตรวจ IDs/ยอด/ลิงก์/ขนาดผ่าน ดู [ผลและ handoff](ba-review-001.md); ไม่มีคำถามธุรกิจใหม่
 - 2026-10-22 — MYCELIUM เตรียม BA amendment ตามคำสั่งผู้ใช้ โดยใช้มติล่าสุดและรักษาownership

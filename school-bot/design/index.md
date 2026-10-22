@@ -10,7 +10,7 @@
 
 | ส่วน | ข้อเท็จจริงจากโค้ด | ข้อเสนอ |
 |---|---|---|
-| Identity/DB | academic มีบัญชี/profile และ Npgsql 4 context; [review](../source-review-002.md) | web ทำ Login/API บนข้อมูลเดิม |
+| Identity/DB | academic มีบัญชี/profile และ Npgsql 4 context; [review](source-review-002.md) | web ทำ Login/API บนข้อมูลเดิม |
 | Desktop | มี Go/Wails, React และ trusted engine routing | ใช้โครงสร้างเดิม เพิ่ม host authorization และหลายโครงงาน |
 | License/API | Memory Store, device limit ปรับได้, ไม่มี signed entitlement | persistent transactions, 1 binding ปัจจุบัน, สิทธิ์ออฟไลน์ 3 วัน |
 | การเรียน | Code/Block มี bounded execution; Lessons ยังมี sample | curriculum ที่มี version, submission และผลประเมินจริง |

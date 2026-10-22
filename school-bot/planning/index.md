@@ -2,17 +2,23 @@
 
 ## สถานะ
 
-ADOPTED_BY_PM — PM รับเป็น [แผนหลัก](../plan/index.md) แล้ว เก็บหมวดนี้เป็นข้อเสนอเดิมและหลักฐานการรับช่วง
+ADOPTED_BY_PM — PM รับเป็น [แผนหลัก](../plan/index.md) แล้ว เก็บหมวดนี้เป็นข้อเสนอเดิม หลักฐานการรับช่วง และเอกสาร run/ประวัติเก่าของโมดูล (ย้ายมาจาก root วันที่ 2026-10-22 ตามการปรับโครงสร้างให้เข้ามาตรฐาน baan)
 
 74 tasks / 8 phases / 17 gates ครบ 31 REQ / 109 AC; effort 136 person-days เป็นสมมติฐาน ไม่ใช่กำหนดส่ง
 
 - [ข้อเสนอเดิม](proposal-001.md)
 - [tasks และ gates](tasks-001.json)
 - [ผลตรวจและประเด็นส่ง PM](review-001.md)
-- [brief ที่เปิดงาน](../task-003.md)
+- [brief ที่เปิดงาน](task-003.md)
 - [PM adoption/render contract](pm-response-001.json)
 - [ผลตรวจหลังบันทึกแผน PM](pm-review-001.md)
-- [ใบงานเปิด PM](../task-004.md)
+- [ใบงานเปิด PM](task-004.md)
+
+## เอกสาร run และประวัติเก่า (ย้ายมาจาก root 2026-10-22)
+
+- ใบงาน run หลัก: [task.md](task.md) · ต่อเนื่อง [task-history-001.md](task-history-001.md)
+- ใบงานย่อยรายรอบ: [task-002](task-002.md) · [task-003](task-003.md) · [task-004](task-004.md) · [task-005](task-005.md) · [task-006](task-006.md) · [task-007](task-007.md) · [task-008](task-008.md)
+- ประวัติ knowledge ก่อนหน้า: [ชุด 1](history-001.md) · [ชุด 2](history-002.md)
 
 ## Phases
 
@@ -50,5 +56,6 @@ PM รับแล้วผ่าน mycelium-role pm/t2 แบบ read-only; re
 
 ## Change Log
 
+- 2026-10-22 — ย้ายเอกสาร run/ประวัติเก่าจาก root ของโมดูลเข้าหมวดนี้ (task.md, task-002..008, task-history-001, history-001/002) พร้อมแก้ลิงก์ที่ชี้ path เดิม — การปรับโครงสร้างตามมาตรฐาน baan โดยนายช่าง
 - 2026-10-21 — บันทึก PM acceptance และชี้ไป canonical plan โดยรักษา Planner artifacts เดิม
 - 2026-10-21 — เก็บผล Planner พร้อมฉบับอ่านง่ายและการตรวจ ไม่เปิด implementation หรือสร้าง plan.md แทน PM

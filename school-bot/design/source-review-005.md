@@ -1,6 +1,6 @@
 # Source review 005 — writer คะแนนเดิม (score-record)
 
-SA (codex t1) ตรวจ 2026-10-22 แบบ static read-only ใน `C:/src/schoolbright/target` ตาม [decisions-021](requirement/decisions-021.md) ไม่แก้ไฟล์ ไม่รัน SQL/build ไม่อ่าน secret · handoff: BLOCKED (ขาด source writer) · รายงานเต็ม `C:/src/AICode/baan/baan/reports/2026-10-22-07-35-43-sa-tier-t1-1agents-6X8T00`
+SA (codex t1) ตรวจ 2026-10-22 แบบ static read-only ใน `C:/src/schoolbright/target` ตาม [decisions-021](../requirement/decisions-021.md) ไม่แก้ไฟล์ ไม่รัน SQL/build ไม่อ่าน secret · handoff: BLOCKED (ขาด source writer) · รายงานเต็ม `C:/src/AICode/baan/baan/reports/2026-10-22-07-35-43-sa-tier-t1-1agents-6X8T00`
 
 สรุป: เว็บ score-record → gateway → gRPC `academicscorerecordservice.AssessmentService.SaveAssessmentDraft` ของ service `sb-service-academic-score-record` ซึ่ง **ไม่อยู่ใน workspace** จึงยังยืนยันการ merge ScoreData, สูตรคำนวณ, CAS (`xmin`), การตรวจสิทธิ์/ล็อก และ audit ไม่ได้ — ห้ามเปิดการเขียนคะแนนจนตรวจ source นี้
 

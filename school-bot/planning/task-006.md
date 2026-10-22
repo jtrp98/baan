@@ -5,8 +5,8 @@
 - คำตอบใหม่ผู้ใช้: ต้องรองรับ Windows 10 x64 ด้วย ให้ทีมตรวจ edition/build และปรับข้อเสนอขั้นต่ำก่อนยืนยัน ตาม decisions-017
 - ทำ technical review และ patch เอกสาร ไม่แก้ code, ไม่ build/install/SQL/อุปกรณ์จริง, ไม่เปลี่ยน plan/REQ, ไม่อนุมัติ scope หรือ risk แทนผู้ใช้
 - Dispatch: ต่อ Codex CLI session SA เดิมแบบ read-only, gpt-6-astra/high, exec session 24579; ผลเก็บ codex.windows10.answer.txt/jsonl/stderr.txt ใน report directory C:/src/AICode/baan/baan/reports/2026-10-21-13-34-47-sa-tier-t1-1agents-HjWmXL
-- ผล: CLI exit 0, role NEEDS_HUMAN สำหรับทางเลือก Home/Pro; บันทึก [Windows10 review](design/windows10-compatibility-001.md) และ OS Rev2 แล้ว ดู [ผลตรวจ](planning/sa-survey-review-002.md) ส่ง [คำถามแนวทาง Setup](planning/human-questions-005.md) รอผู้ใช้เลือก ไม่มีการแก้โค้ดหรือทดสอบติดตั้งจริง
-- ข้อยุติถัดมา: ผู้ใช้เปลี่ยนเป็น Windows11 ตาม [decisions-019](requirement/decisions-019.md) สาขา Win10/คำถาม Home-Pro ยุติ ดูผล preflight และมติใหม่ที่ [task-007](task-007.md)
+- ผล: CLI exit 0, role NEEDS_HUMAN สำหรับทางเลือก Home/Pro; บันทึก [Windows10 review](../design/windows10-compatibility-001.md) และ OS Rev2 แล้ว ดู [ผลตรวจ](sa-survey-review-002.md) ส่ง [คำถามแนวทาง Setup](human-questions-005.md) รอผู้ใช้เลือก ไม่มีการแก้โค้ดหรือทดสอบติดตั้งจริง
+- ข้อยุติถัดมา: ผู้ใช้เปลี่ยนเป็น Windows11 ตาม [decisions-019](../requirement/decisions-019.md) สาขา Win10/คำถาม Home-Pro ยุติ ดูผล preflight และมติใหม่ที่ [task-007](task-007.md)
 
 ## Inputs — index first
 

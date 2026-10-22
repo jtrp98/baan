@@ -14,7 +14,7 @@
 ## วิธีที่ MYCELIUM เลือกแทน (สมมติฐาน — ยังไม่ยืนยัน)
 
 - ใช้ system column `xmin` ของ PostgreSQL เป็น concurrency token: ทุกแถวมีอยู่แล้วโดยไม่ต้องสร้างคอลัมน์ และเปลี่ยนเองทุกครั้งที่แถวถูก UPDATE
-- EF Core/Npgsql รองรับตรง (`UseXminAsConcurrencyToken` / `[Timestamp] uint xmin`); ระบบเกรดเดิม (score-record) ก็ใช้ `xmin` เป็น row version ตาม proto ที่ SA พบ ([source-review-005](../source-review-005.md))
+- EF Core/Npgsql รองรับตรง (`UseXminAsConcurrencyToken` / `[Timestamp] uint xmin`); ระบบเกรดเดิม (score-record) ก็ใช้ `xmin` เป็น row version ตาม proto ที่ SA พบ ([source-review-005](../design/source-review-005.md))
 - API ยังใช้ `ETag`/`If-Match` เหมือนเดิม แต่ค่าเป็น xmin; UPDATE ใช้ `WHERE "Id" = @id AND xmin = @expected` → 0 แถว = `412 VERSION_CONFLICT`
 - ข้อจำกัด: ค่า xmin เปลี่ยนหลัง dump/restore หรือย้ายเครื่อง — ไม่เป็นปัญหาเพราะ ETag เป็นค่าชั่วคราวระหว่างอ่าน–แก้ ห้ามเก็บ xmin ไว้ถาวรหรือใช้เทียบข้ามเวลานาน
 - ทางสำรองถ้าไม่ใช้ xmin: ใช้ `UpdateDate` (timestamptz ระดับ microsecond) เป็น token
