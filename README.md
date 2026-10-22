@@ -10,10 +10,4 @@
 - ติดตั้งแบบย่อ: `cd baan && npm link` แล้วใช้คำสั่ง `baan` / `baan-role` ได้จากทุกโปรเจกต์
 - ประวัติแต่ละรุ่น: `baan/RELEASE-NOTES.md` · charter ของทีม: `baan/BAAN.md`
 
-## โมเดล branch / release
-
-- `dev/golf` — branch ทำงาน รับ commit ทุกอย่าง
-- `release` — เก็บของรุ่นล่าสุดที่ release แล้วเสมอ
-- `releases/x.x.x` — branch ของแต่ละรอบ release ตัดจาก `dev/golf` พร้อม tag `v<x.x.x>` ที่หัว branch
-  (ใช้ `releases/` เพราะ git สร้าง `release/x.x.x` คู่กับ branch ชื่อ `release` ไม่ได้)
-- พิธีต่อรอบ: ตัด `releases/x.x.x` จาก `dev/golf` → ติด tag → **PR จาก `dev/golf` เข้า `release`** → merge แล้ว push branch + tag
+> branch ทำงานคือ `dev/golf` (commit/PR เข้านี่) · `release` เก็บของรุ่นล่าสุดที่ปล่อยแล้ว
