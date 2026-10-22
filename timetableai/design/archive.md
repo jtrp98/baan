@@ -2739,3 +2739,860 @@ Material ambiguity: none
 > **Archive pointer (Rev 20, 2026-10-04):** ไม่มีข้อความใดต้องย้าย — TP-Q10/TP-Q11 ถูกบันทึกใน `test-plan.md` (ไม่เคยอยู่ใน design.md); การปิดคำถามใน `test-plan.md` เป็นของ `test-planner` · ข้อความเดิมของข้อ 2–4 ไม่ถูกแทน (เพิ่มเท่านั้น) · ไม่มี Change Log entry ใดต้องย้าย · คำถามที่ยังเปิดของ DES-018: SA-Q14, SA-Q15 *(SA-Q24 ปิด 2026-10-04 = OQ-42 = A — ดูบรรทัดถัดไป)*
 > **Archive pointer (Rev 20 ปิด SA-Q24 / clarification 2026-10-04):** ย้าย §21.3 แถว SA-Q24 (คำถาม/ทางเลือก/คำตอบ) และ §43.2b 5.4 วลีระหว่างรอเดิม ไป design-archive.md verbatim แล้ว; §43.4 วลีเก่าที่ขีดฆ่าคงเป็นประวัติในที่ · คำถาม DES-018 ที่ยังเปิด: SA-Q14, SA-Q15
 | 2026-10-05 | — | ผู้ใช้สั่ง "เอางบออกให้หมด": ยกเลิกเพดานขนาดเอกสาร; ย้าย Change Log เดิมที่อ้างเพดาน verbatim ไป design-archive.md; ไม่เปลี่ยน DES/AC/schema/contract หรือ approvals | การแก้กติกาเอกสารตามคำสั่งผู้ใช้ |
+
+
+## DES-009 — หัวประวัติ gate ที่ถูกแทน (archive 2026-10-09)
+
+> **สถานะสัญญา: `target` ไม่ใช่ `current`** — §1–§33 ยังบรรยาย as-built ที่ไม่มีเทอม หัวข้อนี้คือสิ่งที่ต้องเป็นจริงหลังงาน REQ-012 เสร็จ · **ประตูมนุษย์เปิดอยู่: schema confirmation + OQ-8** — ห้าม engineer เริ่มก่อนปิดทั้งสอง · *Rev 8: OQ-8 ปิดแล้ว (S1 — §34.3 BR-17a); เหลือ schema confirmation + SA-Q1..SA-Q3* · *Rev 11: SA-Q2 ปิด (OQ-36) → เหลือ schema confirmation + migration/backfill (พร้อมเงื่อนไขยืนยันว่าไม่มีข้อมูล production) + SA-Q1, SA-Q3* · *Rev 12: SA-Q3 ปิด (cutover = release, ไม่มี grace), OQ-37 ปิด (AC-028 คงอยู่สำหรับปีที่มี `TTerm`), เงื่อนไขข้อมูล production ผ่าน (ผู้ใช้ยืนยันข้อมูลทดสอบ) → เหลือ schema confirmation §27.5 + migration/backfill (คนสั่งรัน) + SA-Q1 · breaking ตั้งแต่ release (ผู้ใช้เลือก "เริ่มเลย")*
+
+
+## DES-016 — superseded active provenance/source metadata และ Change Log (archive 2026-10-09)
+
+> **อัปเดต 2026-10-09 (SA code check):** ประตูใน Rev 6 ปิดหมดแล้วตามการปิด human gate 2026-10-04 — schema §27.6 เซ็น · SA-Q6/SA-Q11 ยืนยันตามข้อเสนอ §41.7 · **SA-Q7 = A (browser)** · **SA-Q12 = T1** · ที่ยังเปิด: รอบ `security` (DES-018 ร่วมกัน) + **สัญญา concrete ของ T1 endpoint ใหม่ของ Service Academic ต้องร่าง/ยืนยันกับเจ้าของก่อน implement Phase 13** — ตรวจ code จริงแล้วยังไม่มี endpoint นั้น (§41.1a/§41.4)
+
+**41.3 ทางเลือกตำแหน่ง orchestrate — เลือก A แล้ว (SA-Q7 ปิด 2026-10-04; B/C เหลือเป็นบันทึก)**
+
+- **ไม่มี distributed transaction** (โมดูล ↔ Service Academic ↔ บันทึกผล) · หน่วย atomic ที่ต้องการ = **หนึ่ง (ห้องเรียน, เทอม)** · ทางเลือก (SA-Q12 — **ตัดสินแล้ว 2026-10-04: T1**; T2 เหลือเป็นบันทึกทางเลือก ไม่ใช้):
+
+- **สถานะ T1 ใน code (ตรวจ 2026-10-09):** endpoint atomic แทนที่ต่อ (ห้องเรียน, เทอม) **ยังไม่มีใน repo ใด** — target `sb-tech-upgrade-academic` มี scaffold `ServiceAcademic.Application/Domain/Infrastructure` แบบ untracked แต่**ยังไม่มี source ส่วน timetable**; gateway มีเพียง upsert ทีละแถว 2 รูปแบบ (§41.1a) · **งานก่อน Phase 13:** ร่างสัญญา concrete ของ T1 endpoint (ชื่อ, request = ฟิลด์ครบตาม §41.7 + รายการ `scheduleId` เดิม/ลายนิ้วมือเป็นเงื่อนไข, พฤติกรรม = ลบของเดิม + ใส่ของใหม่ใน transaction เดียวของ `/academic`, error/ผลรายแถว) แล้วยืนยันกับเจ้าของ Service Academic ก่อน implement
+
+Fallback: *(อัปเดต 2026-10-09 — เงื่อนไขเดิม "ก่อน SA-Q6/SA-Q11/SA-Q12 ยืนยันและ schema เซ็น" ผ่านไปแล้วทั้งหมด)* จนกว่า T1 endpoint ถูกสร้าง + สัญญา concrete ยืนยันกับเจ้าของ + รอบ `security` ผ่าน → ฟีเจอร์ **ไม่ถูกเปิดใช้** (ไม่มี code path ใดส่งข้อมูล) และ toggle `isActive` คงพฤติกรรม as-built · หลังเปิด: Service Academic ล้ม/503 → คู่นั้น `Failed` ไม่ retry อัตโนมัติแบบเงียบ แสดงให้ผู้ใช้ส่งซ้ำ · ส่งสำเร็จบางคู่ → ไม่ rollback คู่ที่สำเร็จ แสดงสถานะรายคู่ครบ · T2 ค้าง `Partial` → แสดงชัดและให้ส่งซ้ำ (ลู่เข้า) · **ห้าม T3 เด็ดขาด** · ตาราง `isActive=false` ณ เวลา Apply → `NotSendable(NotActive)` · ≥ 2 ตารางครอบคู่เดียวกัน → ไม่ส่งคู่นั้นจนกว่าผู้ใช้เลือกชุดเดียว (BR-60 — ยืนยันธุรกิจ OQ-27)
+
+Material ambiguity: resolved
+
+> ความกำกวม (รายละเอียด — อัปเดต 2026-10-09): **SA-Q6/SA-Q7/SA-Q11/SA-Q12 ปิดแล้ว (ปิด human gate 2026-10-04 — ยืนยันตามข้อเสนอของ §41)** · ไม่มีคำถามธุรกิจค้าง: **OQ-27 ปิด 2026-09-29**, OQ-12/OQ-13/OQ-18 ปิด 2026-09-28 (บันทึกเดิมอยู่ใน `design-archive.md`) · ที่ยังไม่ใช่ ambiguity แต่เป็นงานก่อน Phase 13: ร่าง+ยืนยันสัญญา concrete ของ T1 endpoint (§41.4) กับเจ้าของ Service Academic · ตรวจค่าจริงใน `/academic` ภายหลังได้ตามเงื่อนไขการปิดประตู
+
+> path `src/…` (frontend) @ `205999b271cc43f15363542733f3aa3951667605` (tree สะอาด — commit ครบแล้ว) · `AITimeTableBackend/…` @ `2941f434569d7c2082b406818fc977ed3dc79ed0` · gateway `src/ApiGateway…/Timetable*` @ `ccaf2988d2d034e2a810e30e3616e560d81c28ad` (confirmed จาก source — แทนข้อสังเกต inferred จาก spec) · **source ของ Service Academic เริ่มมี scaffold ที่ target `sb-tech-upgrade-academic` (untracked) แต่ยังไม่มี code ส่วน timetable** (ตรวจ 2026-10-09) · `school_db.sql` dump ล้าสมัย — `state=inferred` คงเดิม
+
+- 2026-10-09 — SA code check + amend (ที่มาของวันที่: วันที่ของ session): (1) บันทึกการปิดประตู 2026-10-04 ลงสัญญา — SA-Q6/SA-Q11 ยืนยันตามข้อเสนอ §41.7, SA-Q7 = A, SA-Q12 = **T1**; Material ambiguity → resolved; Fallback ปรับเงื่อนไขเป็น "จนกว่า T1 endpoint + รอบ security" (2) **เพิ่ม §41.1a** ผิว REST ปัจจุบันของ gateway (confirmed จาก `TimetableController.cs` @ `ccaf298` — มี endpoint ที่ §41.1 เดิมไม่เคยบันทึก: `by-plan-course-section-period`, `copy`, `rooms`, `import/individual-registration`; ยืนยัน schoolId/userId จาก context ไม่รับจาก client — แทนข้อสังเกต D54) (3) **T1 สถานะใน code:** ยังไม่มี endpoint atomic ใน repo ใด — scaffold `ServiceAcademic.*` ของ target `sb-tech-upgrade-academic` ยังไม่มี code ส่วน timetable; งานก่อน Phase 13 = ร่าง+ยืนยันสัญญา concrete ของ T1 (4) **BL-021 คำตอบ:** `PlanCourseSectionPeriodId` (ACA-4945) = additive ฝั่งอ่าน ไม่กระทบ payload `POST by-room` — §41.7 ไม่ต้องแก้ (5) refresh Evidence: EVD-065/066/069 → frontend @ `205999b` (บรรทัด 213/16/91), EVD-070 → backend @ `2941f43` บรรทัด 283, เพิ่ม EVD-117..119 (gateway controller/DTO/proto) · ไม่เปลี่ยนกติกา/พื้นผิว API ของโมดูล · สัญญาคง `.v1`
+
+
+### DES-016 — superseded import spec guarantee summary (2026-10-09)
+
+- write API ที่มีอยู่แล้ว (client code — EVD-065; พฤติกรรมฝั่ง server = inferred จาก spec — EVD-064): `POST timetables/import` `{nTerm, nTermSubLevel2, rows:[{day, courseCode, timeStart, timeEnd, userName?, teacherName?}]}` → ผลตรวจรายแถว `isValid/invalidReason`, all-or-nothing ต่อ request · `POST timetables/by-room` upsert ทีละแถว `{sScheduleId, nTerm, nTermSubLevel2, nPlaneDay, timeStart, timeEnd, active, planeId, roomId?, teacherIds?, calculate, …}` · `DELETE timetables/{scheduleId}` · `GET timetables/by-room?nTerm&nTermSubLevel2` · envelope `{code, message, messageTh, results}` (400 validation, 401, 503 maintenance)
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+**(ก2) REQ-016 — ความจุ + ครูผู้ดูแลห้อง ต่อ (ปี, เทอม) (Rev 7 — AC-038a + OQ-26 ก/ข ปิด 2026-09-29) · ที่เก็บ = SA-Q9**
+
+ข้อเท็จจริง: `TRoom` (dump) มีเพียง `sRoomID varchar(10)`, `sRoomName`, `cDel`, `SchoolID` + audit — **ไม่มีคอลัมน์ความจุ/ครูผู้ดูแล** (EVD-072) · worktree frontend ยังไม่มี UI ตั้งค่าทั้งสอง (EVD-084) · Rev 7: ธุรกิจยืนยันว่าค่าทั้งสองเป็น **ของ (โรงเรียน, ปี, เทอม, ห้อง)** ไม่ใช่ของห้องกายภาพ → ที่เก็บต้องมีมิติปี/เทอม ซึ่ง `TRoom` (แถวต่อ `(SchoolID, sRoomID)`) ไม่มี
+
+- **C2 — ข้อเสนอ SA:** ตารางใหม่ฝั่งโมดูล `Tbl_RoomSetting` — **ตารางราก ถือขอบเขตเอง** (รูปแบบเดียวกับ `Tbl_SubjectRoom` §27.6 ก และตารางรากของ §27.5 ข)
+
+| คอลัมน์ | ชนิด | ความหมาย |
+|---|---|---|
+| `nRoomSettingID` | int PK | |
+| `nSchoolID` | int | |
+| `nYear` | int | ปีการศึกษาของค่า (OQ-26 ข) |
+| `sTermID` | varchar NULL | = `TTerm.nTerm` ตาม DES-009 (§27.5 ก — ชนิดสุดท้าย = SA-Q1) · NULL = ทั้งปี (legacy ก่อน DES-009 — BR-22/BR-24) |
+| `sRoomID` | varchar(10) | = `TRoom.sRoomID` (ความยาวตาม dump — SA-Q5) |
+| `nCapacity` | int NULL | จำนวนห้องเรียนที่ใช้ห้องพร้อมกันได้ (≥ 1) · NULL = ยังไม่ตั้ง → K = 1 (BR-54) |
+| `nCaretakerTeacherID` | int NULL | ครูผู้ดูแลห้อง → `TEmployees` · **มีผลต่อการจัด** (BR-71) · NULL = ไม่มีผู้ดูแลในหน่วยนี้ (fallback OQ-31 ข) |
+| `isDeleted`, `CreatedBy/At`, `UpdatedBy/At` | | ตามแบบแผนตารางอื่นของโมดูล |
+
+ - uniqueness (app layer): `(nSchoolID, nYear, sTermID, sRoomID)` ที่ `isDeleted=false` · ห้องที่ไม่มีแถวในหน่วยนั้น = ไม่ได้ตั้งทั้งสองค่า → K = 1 และไม่มีข้อบังคับผู้ดูแล (BR-54, BR-71)
+ - **ไม่สืบค่าข้ามหน่วย:** เทอม/ปีใหม่ไม่รับค่าของเทอมก่อนอัตโนมัติ (ตรงคำตอบ "ต่อปี/เทอม") — ทางเดียวที่ได้ค่าเดิมคือการคัดลอก (REQ-013) ซึ่ง requirement ยังไม่ระบุจุด → **จนกว่า OQ-31 (ค) ตอบ: ไม่อยู่ใน scope คัดลอกใด** (§35.8 BR-66)
+ - เหตุผลที่เสนอ C2: โมดูลเขียนเองได้ (DES-004 ห้ามเขียน school DB), คัดลอกข้ามเทอมได้ใน transaction เดียวกับ `Copy/Apply` (§35.3), ไม่ต้องรอทีม school DB
+- **C1′ — ทางเลือก (แทน C1 ของ Rev 6):** ตารางใหม่ใน school DB คีย์ `(SchoolID, nYear, nTerm, sRoomID)` ที่เจ้าของ school DB สร้าง — ระบบอื่นเห็นค่าเดียวกัน แต่ **โมดูลเขียนไม่ได้** → ต้องมีช่องทางแก้ค่านอกโมดูล, `RoomSetting/Set` ไม่มี, และ REQ-013 คัดลอกค่าชุดนี้จากโมดูลไม่ได้ · **คอลัมน์บน `TRoom` ตรง ๆ (C1 เดิม) ตกไป** เพราะไม่มีมิติปี/เทอม
+- ทางที่ไม่เลือก: เก็บความจุ/ผู้ดูแลใน `Tbl_SubjectRoom` ต่อวิชา — ผิดแบบจำลอง (เป็นของห้อง: สองวิชาที่ใช้ห้องเดียวกันต้องเห็นค่าเดียวกัน) · เก็บต่อห้องกายภาพทุกปี (ข้อเสนอ Rev 6) — ธุรกิจปฏิเสธ (OQ-26 ข)
+
+
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+**27.6 Target data model ของ Rev 5 / Rev 6 (REQ-016 / REQ-017 / REQ-018 / REQ-019) — `Data/schema: changed` · รอ human schema/breaking confirmation จากเจ้าของจริง; บันทึก 2026-10-04 ใช้แทนไม่ได้
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+> **สถานะ: ข้อเสนอทางเทคนิคที่ผูกกับ requirement ที่ยืนยันแล้ว — ยังไม่มีตาราง/คอลัมน์ใดถูกแก้** กติกาอยู่ที่ §38–§41 · **ห้าม engineer แตะ schema ก่อนคนเซ็น**
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+- (ก)(ก2)(ค)(ง): ตาราง/คอลัมน์ใหม่แบบ nullable/default → ไม่มี backfill · DDL เป็น SQL มือ (ไม่มี EF Migrations — §27.4)
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+- (ก)(ก2) กับ DES-009 (Rev 7): ถ้า `Tbl_SubjectRoom`/`Tbl_RoomSetting` ออกก่อน DES-009 แถวที่สร้างจะมี `sTermID` NULL (ทั้งปี) และถูก backfill ตาม §27.5 (จ) ข้อ 3 เป็น **เทอมแรกของปี** → เทอมอื่นของปีนั้นเริ่มโดยไม่มี mapping/ค่าห้อง (K = 1, ไม่มีผู้ดูแล) หลัง backfill — ผลที่ต้องแจ้งคนในรายงาน backfill (ขั้น 4) ไม่ใช่การคัดลอกให้อัตโนมัติ · ถ้าออกพร้อม/หลัง DES-009 ทุกแถวใหม่ต้องมี `sTermID` (BR-22) และไม่มี backfill
+
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+- **BR-66 แทนที่ทั้งหมด (AC-031 — OQ-22 ปิด):** ปลายทางมี artifact ของ scope อยู่แล้ว → Preview คืน "ต้องยืนยัน" + รายการสิ่งที่จะถูกลบ/ทับ → Apply ที่มี `isConfirmOverwrite:true` **soft-delete ทุก artifact ของ scope นั้นที่ปลายทาง แล้วเขียนชุดที่คัดลอก ใน transaction เดียวกัน** (§35.3) — ห้ามเพิ่มซ้อน · ต่อ scope: `systemConditions` = ทับเฉพาะคอลัมน์เงื่อนไขระบบของ `Tbl_Setting` รวม `jHomeroomRestrictedTeachers` · `subjectConditions` = ทับ blob continuity ทั้งก้อน (รวม `subjectGroups`) + ลบ/เขียน `Tbl_LinkSubjectSetting(+Detail)` + `Tbl_SubjectRoom` · `classPeriods` = ลบ/เขียน `Tbl_ClassPeriod` · `teacherConditions` = ลบ/เขียน `Tbl_TeacherGroup` · `all` = ทุกข้อข้างบน **+ ตารางสอนทุกชุดของปลายทางถูกแทนด้วยชุดที่เลือก** (คำเตือนต้องแสดงรายชื่อตารางปลายทางที่จะถูกลบทุกชุด) · **Rev 7:** `Tbl_RoomSetting` (ความจุ/ผู้ดูแลห้อง — DES-013) **เป็นค่าต่อ (ปี, เทอม) แล้ว** (OQ-26 ข) แต่ requirement ยังไม่ระบุว่าคัดลอกกับจุดเข้าใด → **จนกว่า OQ-31 (ค) ตอบ: ไม่อยู่ใน scope ใด** — ไม่ถูกคัดลอก และของปลายทางไม่ถูกลบ/ทับ · เมื่อ scope ที่เลือกคัดลอก `Tbl_SubjectRoom` (`all`/`subjectConditions`) และต้นทางมีแถว `Tbl_RoomSetting` ของห้องที่ mapping ใช้ → Preview (§35.2 ค) ต้องเตือน "การตั้งค่าห้อง (ความจุ/ผู้ดูแล) ไม่ถูกคัดลอก" พร้อมรายชื่อห้อง (ไม่บล็อก) · **Rev 9 (OQ-31 ค ปิด 2026-09-29 — แทนข้อความ "ไม่อยู่ใน scope ใด" ข้างบน):** `Tbl_RoomSetting` ของหน่วยปลายทาง **ถูกลบ/เขียนพร้อม scope `subjectConditions`** (และจึงอยู่ใน `all`) คู่กับ `Tbl_SubjectRoom` · `nCaretakerTeacherID` (→ `TEmployees` ของโรงเรียน) และ `sRoomID` (→ `TRoom` ของโรงเรียน) portable ข้ามปี/เทอมในโรงเรียนเดียว ไม่ต้อง re-point · ห้อง/ครูที่ไม่มีแล้วที่ปลายทาง → เข้า BR-68 (`lstUnmatched kind:"room"|"teacher"`) · คำเตือน "ไม่ถูกคัดลอก" ของ Rev 7 หมดผล · **ความไม่ตรงที่ต้องแจ้ง BA (OQ-33):** คำตอบระบุ "เมนูโครงคาบ/เงื่อนไขวิชา" (สองเมนู) แต่ BR-66 เป็น "แทนที่ทั้งหมดต่อ scope" — ถ้าอยู่ทั้ง `classPeriods` และ `subjectConditions` การคัดลอกโครงคาบจะทับค่าห้องที่ผู้ใช้ไม่ได้ตั้งใจแตะ และ `classPeriods` ไม่มีข้อมูลห้องใดเลย · SA เลือก `subjectConditions` อย่างเดียว (ที่เดียวกับ mapping วิชา→ห้อง) — fallback จนกว่า BA ยืนยัน = ตามนี้ (ไม่บล็อก) · **Rev 11: OQ-33 ปิดแล้ว 2026-09-29 (requirement.md) — ยืนยัน `subjectConditions` อย่างเดียว → เป็นกติกาที่ยืนยัน ไม่ใช่ fallback**
+
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+*Traceability เพิ่ม:* AC-030 (BR-69), AC-031 (BR-66), AC-050 (BR-67 + BR-70 — OQ-28 ปิด Rev 7), AC-051 (BR-68) · R25, R29 · OQ-28 (ปิด) · OQ-31 (ค) ปิด Rev 9 — `Tbl_RoomSetting` ใน `subjectConditions` (BR-66) · OQ-33
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+· ถ้ารอบ implement ต้องใช้ batch id หรือ write contract ภายนอกเพิ่ม (C1′) ต้องกลับ SA amend ก่อน ไม่เพิ่มเอง
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+· (Rev 9) การตั้งค่าห้อง `Tbl_RoomSetting` คัดลอกกับ scope `subjectConditions`/`all` (BR-66 — OQ-31 ค)
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+> ความกำกวม (clarification 2026-10-04): OQ-9/OQ-10/OQ-20/OQ-28/OQ-31(ค)/OQ-33 ปิดแล้วตามบันทึกเดิม; gates ที่ Copy consume คือ DES-009 SA-Q1 + schema/migration และ schema ของ DES-013/014/015 ตาม §35.9 · SA-Q9 (C2/C1′) ยังเป็นการตัดสินของคน; ถ้า C1′ ต้องเจ้าของระบุ write/edit/copy contract และ SA amend ก่อน dependent implementation · ไม่เปิดคำถามธุรกิจที่ปิดแล้วซ้ำ ไม่อนุมัติ schema/Target ภายนอกแทนคน · วลี Rev 11 เดิมอยู่ใน design-archive.md
+
+
+## 2026-10-11 — des-010.md ส่วนที่ถูกแทน (verbatim)
+
+**35.9 Dependencies / conditional implementation (clarification 2026-10-04)**
+
+- Copy ครบ 5 scopes ต้องมี term model/API (DES-009, BE-010), mapping/ค่าห้องตาม schema ที่คนเลือก (DES-013, BE-012) และคอลัมน์ชั่วโมง/jHomeroomRestrictedTeachers (DES-014/015, BE-013) ก่อน BE-011 เสร็จ: all/subjectConditions รวมค่าห้องตาม BR-66; all/systemConditions รวมชั่วโมง/flag ตาม §35.7 · ห้ามละ artifact ที่สัญญากำหนดจาก Copy เงียบ ๆ · ไม่ต้องรอ FE-024/FE-025/FE-027 เพื่อเขียน backend Copy แต่ gates ของ schema/API ที่เกี่ยวข้องยังเปิด
+- **SA-Q9 = C2:** คัดลอก Tbl_SubjectRoom และ Tbl_RoomSetting ใน transaction เดียวกับ artifact อื่นตาม scope · **ถ้าเลือก C1′:** §27.6 ก2 ห้ามโมดูลเขียน school DB และไม่มี RoomSetting/Set; การคัดลอกค่าห้องจึงยังไม่มี write contract ที่ทำ BR-66 ได้ · ต้องให้เจ้าของระบบยืนยันช่องทางและให้ SA amend สัญญา edit/copy ก่อน BE-011 และ UI ที่พึ่งสัญญานั้น implement · การเลือก C1′ ไม่ยกเลิก BR-66 อัตโนมัติ ไม่ถือว่าเลือก C2 หรืออนุมัติ Target/การเขียนภายนอกใหม่
+- **Auth ของ endpoint ใหม่เป็นส่วนของ BE-011:** Copy/Preview และ Copy/Apply ใช้สิทธิ์เขียนของ MenuID ตาม parsed scope ทั้งคู่ และสิทธิ์อ่านต้นทางเมนูเดียวกัน (§43.2a); scope ไม่ถูกต้อง = InvalidCopyScope ตาม §35.7 · tenant/audit ใช้ BR-73 (nTeacherID จาก client ไม่ใช่ identity ที่เชื่อถือได้) ซึ่งแทนคำอธิบาย as-built ใน §35.5 · ไม่เพิ่มสิทธิ์หรือข้อยกเว้น authentication
+
+
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+> **สถานะสัญญา: `target`** — กติกาใหม่ ไม่มีคู่ใน as-built · **Rev 6: ออกแบบใหม่เกือบทั้งหมด** — แบบจำลอง "ห้องชนแบบไบนารี" ของ Rev 5 (1 ห้อง 1 การสอนต่อช่วงเวลา) ถูกแทนด้วย **แบบจำลองความจุ** (AC-038a) และเพิ่ม **การอ่านการใช้ห้องข้ามระบบจาก `/academic`** (AC-039 แก้ 2026-09-28) · แก้ในที่ภายใต้ `.v1` (ยังไม่มี caller/implementation — precedent §35.7) · **schema change** (§27.6 ก, ก2) + **cross-system read** · **Rev 7 (OQ-26 ปิด 2026-09-29 — ต่างจาก fallback ของ Rev 6 สองจุด):** ครูผู้ดูแลห้อง **มีผลต่อการจัด** (BR-71 ใหม่) และความจุ/ผู้ดูแลเป็นค่า **ต่อ (ปี, เทอม)** (BR-54 แก้, §27.6 ก2) · ประตูที่เปิด: **schema confirmation** (รูป ก2 ใหม่), **SA-Q5** (schema จริงของ `TRoom`), **SA-Q9** (ที่เก็บ C2/C1′), **SA-Q10** (read path ข้าม `/academic` — ต้องมีเจ้าของ Service Academic/school DB ร่วมเซ็น), **OQ-31** (ช่องว่างจากคำตอบ OQ-26 — มี fallback), DES-009 (มิติเทอมของค่าห้อง), รอบ `security` · **ห้าม implement ก่อนประตูเหล่านี้ปิด แม้คำถามธุรกิจ OQ-15/OQ-24/OQ-26 ปิดแล้ว**
+> **Rev 9:** OQ-31 (ก)(ข)(ค) และ OQ-32 **ปิด 2026-09-29** → BR-71 (อ่านตรงตัว), ไม่ตั้งผู้ดูแล = ไม่บังคับ + `RoomSettingMissing`, ตั้งค่าห้องบน subject-settings + คัดลอกกับ `subjectConditions` (BR-66 — OQ-33 ยืนยัน scope), (ข) ของกฎกำกับ = เทอมเดียวกัน (BR-17a) · ประตูที่ **ยังเปิดจาก Rev 7** ของสัญญานี้: schema confirmation (§27.6 ก, ก2), SA-Q5, SA-Q9, SA-Q10, DES-009, รอบ `security`
+
+
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+· ตำแหน่งหน้าจอยังไม่ถูกกำหนด (ร่วมกับ `uxui-designer`) และ requirement ไม่ระบุจุดคัดลอก → OQ-31 (ค)
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+**38.3 Inputs / outputs**
+
+*backend `sb-api-academic-timetable-ai`:*
+
+- `GET School/{schoolid}/Rooms?nYear&sTermID?` (Rev 7 — รับหน่วยขอบเขต) → `{status, message, data:[{sRoomID, sRoomName, nCapacity, nCaretakerTeacherID, sCaretakerTeacherName}]}` — อ่าน `TRoom` ที่ `SchoolID` ตรงและ `cDel` ≠ '1' (map `TRoom` ใน `StudentDataContext` แบบอ่านอย่างเดียว) รวมกับความจุ/ผู้ดูแล **ของหน่วย (nYear, sTermID) นั้น** ตาม SA-Q9 (C2: left-join `Tbl_RoomSetting` ที่หน่วยตรง; ไม่มีแถว = `nCapacity: null`, `nCaretakerTeacherID: null` → K = 1 และไม่มีข้อบังคับผู้ดูแล — BR-54/BR-71) · `sTermID` ผ่าน VR-8 (DES-009)
+- `RoomSetting/Set` `{nSchoolID, nYear, sTermID?, lstItems:[{sRoomID, nCapacity?, nCaretakerTeacherID?}], nTeacherID}` (Rev 7 — ต่อหน่วย) — **เฉพาะถ้า SA-Q9 = C2** · upsert รายห้องภายในหน่วย ใน DB transaction เดียว (write path ใหม่ — หลักเดียวกับ §35.3) · คืน `lstWarnings:[{sRoomID, reason:"CaretakerNotTeachingMappedSubject", sCourseCode}]` เมื่อผู้ดูแลไม่อยู่ใน `TPlanCourseTeacher` ของวิชาที่ map กับห้องในหน่วยนั้น (**เตือน ไม่ปฏิเสธ** — ลำดับการตั้ง mapping/ผู้ดูแลเป็นอิสระ; ผลจริงถูกบล็อกที่ DES-011) · หน้าที่เรียก (Rev 9) = `/timetable/subject-settings` (MenuID 422 — คู่กับ scope คัดลอก `subjectConditions`, OQ-31 ค/OQ-33) · ตำแหน่งบนหน้า = `uxui-designer`
+- `SubjectRoom/Get?nSchoolID&nYear[&sTermID]` → `{status, data:[{nSubjectRoomID, sCourseCode, sRoomID, sRoomName}]}` (คงเดิม)
+- `SubjectRoom/Set` `{nSchoolID, nYear, sTermID?, lstItems:[{sCourseCode, sRoomID}], nTeacherID}` → full replace ของชุดในหน่วยขอบเขต — **DB transaction เดียว** (คงเดิม)
+- ถ้า SA-Q10 = X1 เท่านั้น: `GET School/{schoolid}/Terms/{nTerm}/AcademicRoomUsage` → `{status, data:[{scheduleId, roomId, nTermSubLevel2, day, timeStart, timeEnd}]}` (อ่านอย่างเดียวผ่าน `StudentDataContext`)
+
+*frontend `sb-tech-upgrade-web-system`:*
+
+- proxy `/api/school/[schoolId]/rooms`, `/api/subject-room/get|set`, `/api/room-setting/set` (ถ้า C2) · **ห้ามต่อยอด** `/api/classroom-list/get|set` (ชี้ `ClassroomList/*` ที่ไม่มีใน backend — EVD-050, D42)
+- โหลดการใช้ห้องของ `/academic` ตอนเปิดหน้า generate (X2: เรียก Service Academic ผ่าน `/api/gateway/service-academic/*` ด้วย JWT ผู้ใช้; X1: เรียก backend โมดูล) + `Timetable/GetAcademicSyncResults` (BR-56)
+- solver/validateDrop: `roomOccupancy` = (ก) + (ข) + ((ค) − BR-56) ต่อ `sRoomID` ต่อวัน → ฟังก์ชันเดียว `canUseRoom(sRoomID, day, start, end, nClassID)` ตาม BR-36/BR-54 ใช้ทั้ง 2 ชั้น · ข้อมูลห้องโหลดด้วย `GET School/{id}/Rooms` ของ **หน่วยของตาราง** (ไม่ใช่หน่วยที่หน้า settings เปิดอยู่)
+- ตัวกรองผู้ดูแล (BR-71): `roomCaretakerBySubject` = map `sCourseCode → T_R` สร้างจาก mapping (BR-34) + ข้อมูลห้องของหน่วย → ใช้ในจุด eligibility เดียวกับ DES-015 (`getEligibleClasses`/teacher-candidate ของ solver, validateDrop, AddCourseModal, DES-011) — ห้ามเขียนตัวกรองซ้ำต่อชั้น
+- หน้า `/timetable/subject-settings`: ตั้ง mapping ต่อวิชา เลือกห้องจาก `TRoom` ได้ 1 ห้อง (BR-34) · หน้าตั้งความจุ/ผู้ดูแลต่อหน่วย (Rev 9) = บน `/timetable/subject-settings` — **ยังไม่มี UI ใน worktree** (EVD-084) และไม่ถูก implement จนกว่า UX มีคนเซ็น
+- ข้อความปฏิเสธ `roomCapacityExceeded` (แทน `roomOverlap` ของ Rev 5) ต้องระบุผู้ใช้ห้องในช่วงนั้น (ตารางของโมดูล หรือ `/academic`) เพราะต้นเหตุอาจอยู่นอกโมดูล
+
+
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+**38.5 Errors / validation**
+
+| รหัส | เงื่อนไข | ผลลัพธ์ |
+|---|---|---|
+| VR-10 | `SubjectRoom/Set`: `sRoomID` ไม่อยู่ใน `TRoom` ของ `nSchoolID` นั้น (หรือ `cDel = '1'`) | `status 0 RoomNotFound` — ไม่เขียนอะไร |
+| VR-11 | `SubjectRoom/Set`: `sCourseCode` ซ้ำในชุดเดียวกัน (1 วิชา : 1 ห้อง — BR-34) | `status 0 DuplicateSubjectRoom` — ไม่เขียนอะไร |
+| VR-15 | `RoomSetting/Set`: `nCapacity` มีค่าแต่ไม่ใช่จำนวนเต็ม ≥ 1 / `sRoomID` ไม่อยู่ใน `TRoom` ของโรงเรียน / `nCaretakerTeacherID` ไม่อยู่ใน `TEmployees` ของโรงเรียน / `sRoomID` ซ้ำใน `lstItems` · (Rev 7) `sTermID` ไม่อยู่ในเทอมของ `nYear` → `TermNotInYear` (VR-8) | `status 0 InvalidRoomSetting` (หรือ `TermNotInYear`) — ไม่เขียนอะไร |
+
+ฝั่ง UI: `roomCapacityExceeded` (AC-039 เทียบ AC-019) · `academicRoomUsageUnavailable` (BR-57) · (Rev 7) `roomCaretakerMismatch` (BR-71) · คำเตือน `RoomSettingMissing` (BR-54/BR-71 — ใน DES-011) และ `CaretakerNotTeachingMappedSubject` (ตอนบันทึก `RoomSetting/Set`) · response ของโมดูลเป็น HTTP 200 + `{status, message, data}` (DES-002); ของ Service Academic เป็น `{code, message, messageTh, results}` — ห้ามตีความปนกัน (§13)
+
+
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+- **C2 เท่านั้น:** BE-012 เพิ่ม RoomSetting/Set + transaction, proxy /api/room-setting/set และ UX-010/FE-024 รับ editor ความจุ/ผู้ดูแลบน subject-settings ตาม §38.3 · **C1′:** โมดูลอ่านค่าที่เจ้าของ school DB จัดให้, ไม่มี endpoint/proxy editor นี้ และห้ามเขียน school DB · ช่องทางแก้ค่า/คัดลอกที่ทำ BR-66 ได้ยังต้องให้เจ้าของและ SA ระบุหลังการเลือกของคน (§35.9) ก่อน UX/engineer implement ส่วนที่พึ่งช่องทางนั้น; ห้ามเลือก schema หรือสร้าง external API แทนคน
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+Data/schema: additive
+> ข้อมูล/schema (รายละเอียด — Rev 10): changed — `Tbl_SubjectRoom` (ใหม่ — §27.6 ก) + ความจุ/ครูผู้ดูแล **ต่อ (ห้อง, ปี, เทอม)** (Rev 7: **C2** `Tbl_RoomSetting` ใหม่ฝั่งโมดูลพร้อม `nYear`/`sTermID` — ข้อเสนอ; หรือ **C1′** ตารางใหม่ใน school DB ที่เจ้าของ school DB ต้องทำ — §27.6 ก2; C1 คอลัมน์บน `TRoom` ตกไป) + key `sRoomID/sRoomName` ใน snapshot (ไม่มี DDL) + map `TRoom` อ่านอย่างเดียว · **ต้องมี schema confirmation จากคน (SA-Q5, SA-Q9) ของรูปใหม่ — SA ไม่เซ็นแทน**
+Migration/backfill: none
+> Migration (รายละเอียด — Rev 10): ไม่มีข้อมูลห้อง/ความจุ/ผู้ดูแลเดิม (D42; ยืนยันการไม่มี UI ที่ c212ca6 — §32.5) · ห้องที่ยังไม่ตั้งความจุในหน่วยใช้ K = 1 (BR-54) · ตารางที่บันทึกก่อนหน้าไม่มีห้องจึงไม่ถูกนับ · (Rev 7) ถ้า (ก)(ก2) ออกก่อน DES-009 → แถว `sTermID` NULL ถูก backfill เป็นเทอมแรกตาม §27.5 (จ) และเทอมอื่นเริ่มว่าง — รายงานให้คนอ่าน (§27.6 จ)
+Security: sensitive
+> ความปลอดภัย (รายละเอียด — Rev 10): (1) endpoint เขียนใหม่ (`SubjectRoom/Set`, `RoomSetting/Set`) บน backend ที่เชื่อ `nSchoolID` จาก client (D1) → VR-10/VR-15 ตรวจกับ `TRoom`/`TEmployees` ของโรงเรียนนั้นทุกครั้ง (2) read ข้ามระบบ: X2 ใช้ JWT ผู้ใช้ผ่าน gateway (school จาก claims) — ห้ามส่ง `schoolId` จาก client · X1 = endpoint อ่านข้อมูลตารางของระบบอื่นบน backend ที่ไม่มี authorization → อ่านข้ามโรงเรียนได้ถ้าไม่มี auth ชั้น gateway (OQ-1) (3) `Tbl_TimetableAcademicSync` ที่ถูกเขียนเท็จทำให้ BR-56 ตัดการใช้ห้องจริงออก → ผูกกับ Security ของ DES-016 (4) (Rev 7) `RoomSetting/Set` เปลี่ยนสิทธิ์สอนจริงผ่านผู้ดูแล (BR-71) บน backend ที่เชื่อ `nSchoolID` จาก client — `nCaretakerTeacherID` ต้องผ่าน VR-15 กับ `TEmployees` ของโรงเรียนนั้น และ `sTermID` ผ่าน VR-8 ทุกครั้ง · ต้องเข้ารอบ `security`
+Fallback: ก่อน SA-Q10 ถูกเซ็นและ read path พร้อม → **ฟีเจอร์ห้องทั้งฟีเจอร์ไม่ถูกเปิดใช้** (ห้ามปล่อยการกันห้องที่ไม่นับ `/academic` เพราะผิด AC-039 เงียบ ๆ) · หลังเปิดใช้: อ่าน `/academic` ไม่ได้ → BR-57 (ระงับ Generate + ปฏิเสธการวางมือวิชาที่มีห้อง พร้อมเหตุผล) · บันทึกผลการส่ง (BR-56) อ่านไม่ได้ → นับแถว `/academic` ทุกแถว (เข้มขึ้น — อาจปฏิเสธเกินจริง แต่ไม่หละหลวม) · ทะเบียนห้องโหลดไม่ได้ → หน้า mapping ไม่ให้บันทึก · ห้องถูกลบจาก `TRoom` หลังตั้ง mapping → "ไม่พบห้อง" + คำเตือนใน DES-011 และไม่ถูกบังคับห้องจนกว่าผู้ใช้แก้ — ห้ามเดาห้องแทน · ความจุไม่ได้ตั้งในหน่วย → K = 1 · (Rev 7) ข้อมูลห้องของหน่วยโหลดไม่ได้ → ถือเป็น conflict data ไม่พร้อม (Generate ระงับ, การวางมือวิชาที่มี mapping ห้องถูกปฏิเสธ — แบบเดียวกับ BR-57) ห้ามถือว่า "ไม่มีผู้ดูแล/K ไม่จำกัด" · ผู้ดูแลไม่มีสิทธิ์สอนวิชา → `NoEligibleTeacher` (`RoomCaretaker`) บล็อก ห้ามเลือกครูอื่นแทน · (Rev 9 — OQ-31 ปิด; ข้อความ "จนกว่า OQ-31 ตอบ" ฉบับ Rev 7/8 อยู่ใน `design-archive.md`) (ก) ผู้สอนทุกคาบ = ผู้ดูแล (ข) ไม่ได้ตั้งผู้ดูแล = ไม่มีข้อบังคับ + `RoomSettingMissing` (ค) การตั้งค่าห้องอยู่หน้า subject-settings และคัดลอกกับ `subjectConditions` · ก่อนหน้าตั้งค่าห้องถูก implement → ทุกห้องใช้ K = 1 ไม่มีผู้ดูแล
+
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+> ความกำกวม (รายละเอียด — Rev 11): OQ-31 **ปิด** 2026-09-29 · OQ-33 **ปิด** 2026-09-29 (scope คัดลอก = `subjectConditions`) · SA-Q5, SA-Q9, SA-Q10 (อำนาจอนุมัติ schema / เจ้าของระบบอื่น) · OQ-15/OQ-24 ปิด 2026-09-28 · **OQ-26 ปิด 2026-09-29** (บันทึกเดิมอยู่ใน `design-archive.md`)
+
+
+## 2026-10-11 — des-014.md ส่วนที่ถูกแทน (verbatim)
+
+ประตูที่เหลือ: **schema confirmation** (SA-Q4 — คอลัมน์ชั่วโมงใหม่) + SA-Q8 (cutover รุ่นเดียว)
+
+
+## 2026-10-11 — des-014.md ส่วนที่ถูกแทน (verbatim)
+
+· **ต้องมี schema confirmation จากคน (SA-Q4)**
+
+
+## 2026-10-11 — des-015.md ส่วนที่ถูกแทน (verbatim)
+
+ประตูที่เหลือ: **schema confirmation** (`jHomeroomRestrictedTeachers`) + **SA-Q8** (ออกรุ่นเดียวกับ DES-011) + UX sign-off
+
+
+## 2026-10-11 — des-015.md ส่วนที่ถูกแทน (verbatim)
+
+→ ต้องยืนยันจากคน
+
+
+## 2026-10-11 — des-015.md ส่วนที่ถูกแทน (verbatim)
+
+· **ต้องมี schema confirmation จากคน**
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+> **สถานะสัญญา: `target`** — **cross-backend integration ใหม่** พลิก §22 และแถว "อย่าปน /academic" ของ DES-008 · **Rev 6:** คำถามธุรกิจปิดครบ (OQ-12, OQ-13, OQ-18 ก–ง — 2026-09-28): ทางเดียว, ไม่มี publish/lock, **แทนที่ทั้งหมดเสมอ**, `calculate=true` + default/null, ส่งหลายชุดพร้อมกันได้, `isActive` เป็น gate · ออกแบบ Preview→Confirm→Apply, บันทึกผลการส่ง (บังคับ) และทางเลือก transaction boundary แล้ว · **ประตูที่เหลือ — ห้าม implement ก่อนปิด:** schema confirmation (`Tbl_TimetableAcademicSync`), **SA-Q6** (สัญญาจริงของ Service Academic), **SA-Q11** (ค่า default ต่อฟิลด์), **SA-Q12** (transaction boundary — T1/T2), SA-Q7, รอบ `security` · **Rev 7:** OQ-27 ปิด 2026-09-29 — BR-60 (`ClassInMultipleTimetables`) เป็นคำตอบทางธุรกิจแล้ว
+> **Active provenance correction / T1 proposal 2026-10-09:** ไม่ถือข้ออ้างปิดทุกประตู/เซ็น schema/SA-Q6/SA-Q7/SA-Q11/SA-Q12 วันที่ 2026-10-04 เป็น approval: `archive.md:2717` ระบุ AskUserQuestion ไม่ได้รับคำตอบแล้วใช้ข้อเสนอเอง · กฎธุรกิจ/OQ ที่มีคำตอบจริงใน REQ-019 และ BR-45..BR-61 คงเดิม; A/browser และ T1/default/schema ยังรอเจ้าของยืนยัน · มี source Academic backend แล้วและยังไม่พบ T1 RPC/route ในผิวที่ตรวจ (§41.4a); §41.4a เป็น concrete proposed contract ห้าม implement จน owner/schema/UX/security พร้อมตาม plan Waiting on Human #4/#5 · เก็บประวัติข้อความที่ถูกแทน verbatim ใน archive.md
+
+
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+**41.3 ทางเลือกตำแหน่ง orchestrate — A/browser เป็นข้อเสนอ SA; ยังไม่มีคำตอบมนุษย์ที่ใช้ยืนยัน SA-Q7 จากบันทึก 2026-10-04 (archive.md:2717)**
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+· SA-Q12 ยังรอเจ้าของยืนยัน: T1 concrete proposal อยู่ §41.4a; T2 เป็นบันทึกทางเลือก ห้าม implement/fallback โดย agent; ข้ออ้างตัดสิน T1 วันที่ 2026-10-04 ใช้เป็น human approval ไม่ได้ (archive.md:2717)
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+| **T1 — แทนที่แบบ atomic ฝั่ง Service Academic (ข้อเสนอ SA)** | endpoint เดียวต่อ (ห้องเรียน, เทอม) ที่ลบของเดิม + ใส่ของใหม่ใน transaction ของ `/academic` เอง และรับฟิลด์ครบ (`calculate`, `roomId`, `teacherIds`, `planeId`) — `timetables/import` วันนี้ all-or-nothing แต่ **แบก `calculate`/`roomId` ไม่ได้** (EVD-077) และไม่ทราบว่าแทนที่หรือเพิ่ม (SA-Q6) → ต้องขยาย/เพิ่ม endpoint (**Target ใหม่** — ยังไม่อยู่ใน `## Targets`) | ห้องเรียนนั้นเป็นของเดิมทั้งหมด หรือของใหม่ทั้งหมด |
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+**ขอบเขต/สถานะ:** ข้อเสนอนี้ทำให้ตรวจ T1 ต่อหนึ่ง (school, `nTermSubLevel2`, `nTerm`) ได้; ไม่เพิ่ม release/task, ไม่เซ็น schema/SA-Q6/7/11/12 แทนมนุษย์ และไม่เปลี่ยน BR-45..BR-61/OQ ธุรกิจ · A/browser และ T1 เป็น candidate ที่รอเจ้าของยืนยัน; source ไม่ใช่ approval · compatibility = proposed additive endpoints; API/schema เดิมยังเป็น authority · ข้อเสนอนี้ trace AC-047/048/049/052/053 และ gate #2/#6 ตาม plan Waiting on Human #5
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+| SA-Q7 / SA-Q12 | ผู้ใช้+Service Academic เลือก A/browser และ atomic T1 ตามข้อเสนอนี้จริง หรือแก้ proposal; คำสั่งให้ร่าง T1 ไม่ใช่ schema/transaction sign-off |
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+SA-Q6/SA-Q7/SA-Q11/SA-Q12 และ concrete T1 §41.4a
+
+
+## 2026-10-11 — des-016.md ส่วนที่ถูกแทน (verbatim)
+
+> ความกำกวม (แก้ provenance 2026-10-09): SA-Q6/SA-Q7/SA-Q11/SA-Q12/schema §27.6 (ง) ยังรอ human/owner confirmation ที่ตรวจได้; บันทึก archive.md:2717 ไม่ใช่คำตอบมนุษย์
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+> **Rev 6:** แก้ในที่ตามคำตอบธุรกิจ 2026-09-28 — (ก) เพิ่มความจุ/ครูผู้ดูแลห้อง (ก2) · (ข) หน่วยเปลี่ยนเป็น **ชั่วโมงเต็ม** · (ค) รูปแบบ H1 เท่านั้น · (ง) **บังคับ** และเปลี่ยนจากคอลัมน์บน `Tbl_Timetable` เป็นตารางใหม่ · (จ) M1 — ไม่มี backfill · สถานะปัจจุบันตามคำยืนยัน 2026-10-11 ด้านล่าง
+
+> **Rev 7:** แก้ในที่เฉพาะ (ก2) ตามคำตอบ OQ-26 (ข) — ความจุ/ครูผู้ดูแลเป็นค่า **ต่อ (ปี, เทอม)** → `Tbl_RoomSetting` ได้ `nYear` + `sTermID` และผู้ดูแลมีผลต่อการจัด (BR-71) · C1 (คอลัมน์บน `TRoom`) ตกไป → C1′ · (จ) เติมผลของ DES-009 backfill ต่อ (ก2) · ข้อความ (ก2) ฉบับ Rev 6 อยู่ใน `design-archive.md` · สถานะปัจจุบันตามคำยืนยัน 2026-10-11 ด้านล่าง — **(ก2) ต้องเซ็นรูปใหม่**
+
+
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+> **Approval provenance (ตรวจ 2026-10-09):** ประวัติที่เคยอ้าง "เซ็นแล้ว 2026-10-04" อยู่ใน `archive.md:2717` verbatim และระบุว่า AskUserQuestion ไม่ได้รับคำตอบแล้วใช้ข้อเสนอของ design เอง จึงไม่ใช่คำยืนยัน/sign-off ของมนุษย์ตาม CLAUDE.md · รูป schema/ชนิด/กติกาทางเทคนิคในหัวข้อนี้คงเดิมในฐานะข้อเสนอ; การทำ dev ตามขอบเขตที่ผู้ใช้อนุญาตและ verdict BE-010 เดิมไม่เปลี่ยน · ห้ามใช้ประวัตินี้เป็นสิทธิ์เริ่ม schema ใหม่/DDL/migration/shared-environment deploy; งานที่รอเจ้าของยืนยันพักตาม `plan/index.md ## Waiting on Human` #4/#5
+
+
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-013 (5 จุดเข้า) | **feasible-with-risk · blocked | กติกาครบและยืนยันธุรกิจทุกข้อ (§35.8 BR-66..BR-70 — OQ-28 ปิ |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-016 ห้อง + ความจุ + ผู้ดูแ | **feasible-with-risk (high)** | `TRoom` ไม่มีความจุ/ผู้ดูแล (EVD-072) · `TSchedule` ไม่มีคอล |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-017 เพดานชั่วโมง | **feasible-with-risk** | เวลาจริงของช่องมีอยู่แล้ว (BR-17, EVD-057) · M1 ไม่ต้อง back |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-018 ครูประจำชั้นจำกัดห้อง | **feasible-with-risk** | จุดกรองเดียว (EVD-060) · `TClassMember` อ่านได้อยู่แล้ว (EVD |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-019 ส่งเข้า `/academic` | **feasible-with-risk (high)** | upsert รายแถวแบก `calculate`/`roomId` ได้ (EVD-076) · import |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+## Unresolved Open Questions
+
+| ID | คำถาม | ผู้ตอบ | Blocking? |
+|---|---|---|---|
+
+
+
+
+## 2026-10-11 — คำตอบจริง jtrp98 (บริบทและถ้อยคำ; history ไม่ขยายสิทธิ์)
+
+- บริบท C1′/C2 capacity/ครูผู้ดูแลราย school/year/term: **"เก็บใน School DB แต่ไม่ต้องสร้างเองนะ ทำแค่ ไฟล์ sql ก็พอ เดี๋ยวฉันไปรันเอง"**
+- บริบท module editor+copy ต้องยกเว้น School DB writer: **"ให้อ่านอย่างเดียว ฉันจัดค่าผ่านระบบอื่นหรือ SQL เอง"**
+- บริบท BE-013 int DEFAULT 0 ใหม่สองค่า/H1 jsonb/คงคอลัมน์เก่า-M1ไม่แปลง-หยุดอ่านหลัง paired cutover: **"อนุมัติรูปนี้สำหรับ dev; ตั้งเพดานใหม่เมื่อเปิดใช้"**
+- บริบท DES-016 §41.4a A/gateway,pure preview,atomic per-class-term replace+rollback,durable receipt กู้ unknown outcome: **"ยืนยัน A + atomic T1 ตามแนวทางนี้ (แนะนำ)"**
+
+ผู้ตอบ jtrp98; วันที่ผู้ใช้ 2026-10-11 · active rules อยู่ data-model §27.6 และ DES-010/013/014/015/016; C1′ exact schema/K=1/Academic owner-default-transaction-receipt/module-sync-schema/runtime/DDL/deploy ไม่ถูกอนุมัติทั้งหมดจากคำตอบเหล่านี้
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+**(ก2) REQ-016 — C1′ ที่ School DB อ่านอย่างเดียว (jtrp98 2026-10-11) · storage/permission ยืนยันแล้ว; schema รายละเอียดต่อไปนี้เป็น proposal สำหรับ SQL artifact review**
+
+ผู้ใช้ตอบ **"เก็บใน School DB แต่ไม่ต้องสร้างเองนะ ทำแค่ ไฟล์ sql ก็พอ เดี๋ยวฉันไปรันเอง"** และ **"ให้อ่านอย่างเดียว ฉันจัดค่าผ่านระบบอื่นหรือ SQL เอง"** → SA-Q9 เลือก C1′; ไม่มี `Tbl_RoomSetting` ฝั่งโมดูล, ไม่มี `RoomSetting/Set`/proxy/editor/การคัดลอก capacity หรือผู้ดูแลทั้ง `subjectConditions`/`all` · mapping `Tbl_SubjectRoom` ยังเขียน/คัดลอกในโมดูลตาม (ก) และ DES-010 BR-66 · C2 เป็นประวัติใน `archive.md` ไม่มีผลเป็นทางเลือก active
+
+**รูป SQL artifact ที่เสนอ — ยังไม่ใช่ schema sign-off:** PostgreSQL relation `public."TRoomTermSetting"` ใหม่ใน School DB; ชื่อ/ชนิด/PK/check นี้เสนอให้ตรวจได้ก่อนผู้ใช้รัน SQL · ไม่มี ALTER `TRoom`, ไม่มี FK อ้าง schema ที่ยังไม่ทราบจริง, ไม่มี EF migration/EnsureCreated/Migrate หรือ startup DDL และไม่มีสิทธิ์ execute จากคำขอส่งไฟล์ SQL
+
+| คอลัมน์ quoted exact | PostgreSQL type | NULL / default / ขอบเขต |
+|---|---|---|
+| `SchoolID` | integer | NOT NULL, ไม่มี default; โรงเรียนของค่า |
+| `nYear` | integer | NOT NULL, ไม่มี default; ปีที่ `TTerm.nYear` ของโรงเรียนตรง |
+| `nTerm` | text | NOT NULL, ไม่มี default; key `TTerm.nTerm` ตรงตัว ไม่ใช้เลขแสดงเทอม; ไม่มี legacy NULL ทั้งปี |
+| `sRoomID` | text | NOT NULL, ไม่มี default; key `TRoom` ตรงตัว; ใช้ text เพื่อไม่อ้าง varchar(10) ของ dump ว่าเป็น runtime length |
+| `nCapacity` | integer | NULL, DEFAULT NULL; CHECK `nCapacity IS NULL OR nCapacity >= 1`; ค่า NULL = ยังไม่ตั้งความจุ |
+| `nCaretakerTeacherID` | integer | NULL, DEFAULT NULL; อ้างเชิงอ่าน `TEmployees.sEmp` ของโรงเรียนเดียวกัน; NULL = ไม่ตั้งผู้ดูแล (OQ-31 ข) |
+
+- **PRIMARY KEY `(SchoolID,nYear,nTerm,sRoomID)`**, ไม่มี surrogate/audit/soft-delete column ที่เดาขึ้น; เจ้าของ external writer จัด/ลบ row ในหน่วยนั้นเอง · ห้ามสร้าง UNIQUE/FK บน `TRoom`/`TTerm`/`TEmployees` จาก dump หรือ model; CHECK/PK ของตารางใหม่เป็นส่วน proposal ที่ต้องยืนยัน
+- หน่วยค่าคือ (school, year, term, room); ไม่อ่านปี/เทอมอื่น ไม่สืบทอด ไม่ backfill/copy ให้อัตโนมัติ; ไม่มีแถวและแถวที่ capacity NULL เป็น "ไม่ได้ตั้ง" ต่างจาก read error · **K=1 ยังข้อเสนอ SA ตาม BR-54/OQ-26 ไม่ได้รับคำยืนยันเพิ่ม**; owner ต้องยืนยันก่อนเปิดใช้ ไม่มี business fallback ใหม่สำหรับค่า invalid
+- **Read contract proposal**: `StudentDataContext` อ่าน relation นี้แบบ read-only/no-tracking โดย filter SchoolID จาก authenticated context และ `nYear`/`nTerm` ของตาราง; validate เทอมของโรงเรียน/ปี, room ของโรงเรียน, caretaker ของโรงเรียนก่อนใช้ · ไม่มี INSERT/UPDATE/DELETE/SaveChanges ต่อ School DB จากโมดูล
+- DTO เดิมของ Rooms คง `nCapacity:int|null,nCaretakerTeacherID:int|null`; `nTerm` บน School DB map กับ query `sTermID:string` ตรงตัว · รายละเอียด successful absence/read failure/invalid external data ใน DES-013 §38.3/§38.5 เป็น proposal ไม่ตีความ read failure ว่า absence
+- Evidence อ่านจริง: `sb-api-academic-timetable-ai/AITimeTableBackend/Helpers/StudentDataContext.cs:20` ใช้ `UseNpgsql`; `Models/TTerm.cs:16,25,32` ให้ nTerm string/SchoolID int/nYear int?; `Models/TEmployees.cs:14,24` ให้ sEmp int/SchoolID int? · `school_db.sql:3799–3809` เป็น dump TRoom เก่า (D24) **inferred เท่านั้น ไม่ใช่ live-schema/length/FK confirmation**
+- **Quality/operations (proposal):** PK สนับสนุน exact school/year/term query และอ่าน room rows แบบ batch ไม่ N+1; ปริมาณ/peak ไม่มีตัวเลขยืนยัน ต้องวัดก่อนเปิดใช้ · ไม่มี cache ข้ามหน่วย/no stale fallback; logs เก็บ school/year/term กับ read-state ไม่เผย PII ชื่อครู/JWT · external writer owner ดูแล retention/delete/SQL rollout; module ไม่เพิ่ม job/vendor/operational writer · School DB unavailable/invalid data เป็น visible fail-closed state ตาม DES-013 ไม่ clamp เป็น default
+- **Schema gate ยังเปิด**: คนต้องยืนยัน exact relation/columns/PK/check/read states ที่เสนอ; SA-Q5 runtime TRoom และ SA-Q10 Academic room mapping/read path ยังเปิด · backend-engineer จัด SQL artifact ตาม PM exact Write paths; artifact review ไม่ใช่ permission execute/live-create; ไม่มีตาราง/คอลัมน์ใดถูกรันจาก amend นี้
+
+
+
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+(ก)(ก2)(ง) ยังรอ exact schema/owner confirmation
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+(ก)(ก2 exact shape)(ง)
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+(ก)(ก2)(ง) ยังเป็น proposal
+
+
+## 2026-10-11 — data-model.md ส่วนที่ถูกแทน (verbatim)
+
+ไม่อนุมัติ (ก)(ก2)(ง), §27.5
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+schema/read contract proposal `data-model.md §27.6 ก/ก2`, K=1 (ข้อเสนอ SA ยังไม่ยืนยัน)
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+C1′ read contract proposal (2026-10-11; exact schema/absence/error contract รอยืนยัน)
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+(ข้อเสนอ SA — เข้มที่สุด; ยืนยันพร้อม schema confirmation)
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+**ยังข้อเสนอ SA ต้องยืนยันก่อนเปิดใช้**
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+**proposed error contract**
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+**proposed fail-closed contract**
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+owner ต้องยืนยัน error contract ไม่สร้าง business fallback ใหม่
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+proposed status 0 InvalidRoomSetting
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+ใช้ K=1 ได้ต่อเมื่อคนยืนยัน proposal
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+exact schema/read proposal/SA-Q5
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+SA-Q5/SA-Q10/exact schema/read gate
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+exact shape เป็น proposal §27.6 ก2
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+module schema (ก) และ School DB shape (ก2) ยังต้องยืนยัน
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+K=1 ยัง unconfirmed SA proposal
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+จนกว่า SA-Q5/SA-Q10/exact schema+read proposal/K=1 ที่เกี่ยวข้องยืนยัน
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+ตาม proposal §38.3
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+capacity absence/NULL→K=1 ยังต้องคนยืนยัน ไม่มีคำตอบจากการเลือก C1′ โดยปริยาย
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+exact schema/read proposal และ K=1 ยังเปิด
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+- **ข้อสรุป: backend เข้ากันได้กับรูปแบบ object ใหม่แล้ว ไม่ต้องแก้ backend** — คอลัมน์ `jsonb` รับได้ทั้ง array และ object
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+backend **เก็บ/คืนเป็นสตริง verbatim ไม่ deserialize** ที่ใดเลย
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+Security: none
+
+
+## 2026-10-11 — des-018.md ส่วนที่ถูกแทน (verbatim)
+
+| `ClassContinuity/Set`, `LinkSubjectSetting/Set|Delete`, `SubjectRoom/Set`, `RoomSetting/Set` (OQ-31 ค — §38.3) · `Copy/*` scope `subjectConditions` | เขียน | 422 |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-016 ห้อง + ความจุ + ผู้ดูแล | **feasible-with-risk (high)** | C1′ School DB read-only chosen 2026-10-11; concrete SQL/read proposal §27.6 ก2/DES-013; runtime TRoom/Academic room mapping/usage และ K=1 ยัง hold |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| SA-Q5 / §27.6 ก2 | live TRoom และ exact C1′ table/read proposal; K=1 ยังไม่ยืนยัน | school DB owner + jtrp98 | BE-012/FE-024 และ consumers ก่อนเปิดใช้ |
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-015 คาบต่อเนื่อง + กลุ่มวิ | **feasible-with-risk** | blob เข้ากันได้ (EVD-045, EVD-046) · กลุ่มวิชาอยู่ใน blob เด |
+
+
+## 2026-10-11 — des-013.md ส่วนที่ถูกแทน (verbatim)
+
+exact schema/read contract proposal อยู่ §27.6 ก2
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+additive ที่ระดับข้อมูล (reader รับทั้ง 2 รูปแบบ, backend ไม่เปลี่ยน)
+
+
+## 2026-10-11 — คำตอบจริงเพิ่มเติม jtrp98: C1′ และ derived warning API
+
+> **คำยืนยันจริงเพิ่มเติม jtrp98 2026-10-11:** ผู้ใช้ตรวจ concrete SQL `room-term-setting-school-db.sql:14–22` (six columns+PK/check ตรงรูปนี้; review14/QA17 เป็น static partial ไม่ใช่ runtime) แล้วตอบ **"ยืนยันตารางและสัญญาอ่านนี้ (แนะนำ)"** — ยืนยัน exact C1′ schema/DTO/read scopes/ownership และ read failure/invalid external data BLOCK ตาม DES-013 §38.3/38.5 · ตอบ **"ใช้ความจุ 1 พร้อมคำเตือน (แนะนำ)"** — successful absence ไม่มี row หรือ capacity NULL เท่านั้นใช้ K=1+RoomSettingMissing; ไม่ใช้เมื่ออ่านล้ม/ข้อมูล invalid · ไม่ยืนยัน live TRoom/Academic/module mapping schema (ก)/DDL execution/shared DB/migration/deploy/release/security
+
+> ผู้ใช้ตอบ **"ส่งผลคำเตือนผ่าน API กติกาวิชา (แนะนำ)"** หลังอธิบาย gap: subject-settings-only 422 อ่าน Setting/Get ไม่ได้ (403/401); API ต้องคืน derived warning outcomes scoped school/year/term โดยคงสิทธิ์เดิมและ BR-53 Save/Generate nonblocking ไม่เผย raw teacher configuration/caps · DES-012 §37.2a กำหนด additive existing response พร้อม complete/partial/unavailable ที่อ้าง final eligible subset จริง; รูป DTO เป็น SA technical contract ตามทิศทางที่อนุญาต ไม่ใช่คำพูดมนุษย์หรือ schema/breaking/DDL approval · UX-009 states/copy ใหม่รอ owner amendment/sign-off ไม่เปิดถาม approved whole-block flow ซ้ำ
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+PMวางbackendstageภายในFE-023เดิม แล้วFEconsumeactualresponseหลังcontextready
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+malformed blob = assessment unavailable/InvalidContinuityBlob ไม่ตีความเป็น safe no-warning
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+FE-023 backend stage + UX-009 partial/unavailable states ก่อน FE integration
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+FE-023 backend stage/UX-009 diagnostic states;
+
+
+## 2026-10-11 — des-012.md ส่วนที่ถูกแทน (verbatim)
+
+sort/deduplicate ด้วย (nPlanID,nClassID,sCourseCode,code); ชื่อวิชาสำหรับข้อความใช้ catalogที่ FEมีอยู่
+
+
+## 2026-10-11 — des-015.md ส่วนที่ถูกแทน (verbatim)
+
+**SA-Q8** คู่ FE-025/DES-011 และ UX sign-off ยัง hold release
+
+
+## 2026-10-11 — des-015.md ส่วนที่ถูกแทน (verbatim)
+
+Security: none
+
+
+## 2026-10-11 — index.md ส่วนที่ถูกแทน (verbatim)
+
+| REQ-018 ครูประจำชั้นจำกัดห้อง | **feasible-with-risk; dev approved** | jtrp98 2026-10-11 ยืนยัน H1 jsonb schema/breaking เฉพาะ dev; DES-015/§27.6 คจ; BR-42 สามบทบาทเดิมคง; paired cutover/UX hold release |
+
+
+## 2026-10-11 — des-015.md technical wording superseded; ไม่ใช่คำอนุมัติ (verbatim)
+
+homeroomResponsibility={scope:{nSchoolID:int,nYear:int,sTermID:string|null},state:"complete"|"unavailable",lstTeacherResponsibilities:TeacherResponsibility[]|null,reason:null|"ResponsibilityReadFailed"|"InvalidResponsibilityData"|"ContextNotSelected"}
+
+
+## 2026-10-11 — des-015.md technical wording superseded; ไม่ใช่คำอนุมัติ (verbatim)
+
+scope เป็น **request context ที่ validate แล้ว** แม้ setting fallback BR-24 มาจาก legacy sTermID=NULL; ห้ามใช้ row setting legacyNULL ไปขยาย responsibility เป็นทุกเทอม · legacy callerที่ไม่ส่ง sTermID คง primary response/lookupเดิมและ projection unavailable/ContextNotSelected/list=null; scope.sTermID=null ไม่เดาเทอม/ขยายปี; FE-025 ต้องเลือกเทอมจริงก่อนโหลด/Save · DTO เป็น transient response ไม่ persist/รับคืนใน Setting/Set; Setrequest/VR-12/VR-13/H1 unchanged
+
+
+## 2026-10-11 — des-015.md technical wording superseded; ไม่ใช่คำอนุมัติ (verbatim)
+
+complete-vs-unavailable/legacycontext/requiredload
+
+
+## 2026-10-11 — des-018.md technical wording superseded; ไม่ใช่คำอนุมัติ (verbatim)
+
+server filter tenant/year/term/3roles และ read-only School DB.
+
+
+## 2026-10-11 — index.md technical wording superseded; ไม่ใช่คำอนุมัติ (verbatim)
+
+DES-015 §40.3a additive Setting/Get scoped responsibility card dataสำหรับ403/401, PM bound BE-013ก่อนFE-025;
+
+
+## 2026-10-11 — TRoom/TRoomTermSetting → TClass/TClassSetting (คำสั่ง jtrp98, req-016.md:17–23) — ข้อความที่ถูกแทน (verbatim)
+
+### des-013.md
+
+(ก2) C1′ schema/read/K1 confirmed จากคำตอบเพิ่มเติม, SA-Q5 live TRoom, SA-Q10
+
+> **คำยืนยันจริงเพิ่มเติม jtrp98 2026-10-11:** ผู้ใช้ตรวจ concrete SQL `room-term-setting-school-db.sql:14–22` (six columns+PK/check ตรงรูปนี้; review14/QA17 เป็น static partial ไม่ใช่ runtime) แล้วตอบ **"ยืนยันตารางและสัญญาอ่านนี้ (แนะนำ)"** — ยืนยัน exact C1′ schema/DTO/read scopes/ownership และ read failure/invalid external data BLOCK ตาม DES-013 §38.3/38.5 · ตอบ **"ใช้ความจุ 1 พร้อมคำเตือน (แนะนำ)"** — successful absence ไม่มี row หรือ capacity NULL เท่านั้นใช้ K=1+RoomSettingMissing; ไม่ใช้เมื่ออ่านล้ม/ข้อมูล invalid · ไม่ยืนยัน live TRoom/Academic/module mapping schema (ก)/DDL execution/shared DB/migration/deploy/release/security
+
+ทะเบียนห้อง = **`TRoom` ของ school DB เดิม** (AC-038)
+
+- `TRoom` (dump — ล้าสมัย D24) มีเพียง `sRoomID varchar(10)`, `sRoomName`, `cDel`, `SchoolID` + audit, PK `(SchoolID, sRoomID)` — **ไม่มีคอลัมน์ความจุหรือครูผู้ดูแล** (EVD-072) → ฟิลด์ที่ AC-038a ต้องการยังไม่มีที่ใดใน school DB ที่ทราบ (SA-Q9)
+- `TSchedule` ของ `/academic` (dump) **ไม่มีคอลัมน์ห้อง** (มี `sClassID`, `sPlaneID`, `sEmp`, `nTermTable`, เวลาเช็คชื่อ, `calculate`, `cActive`, `cDel` — EVD-073) ขณะที่ Service Academic รับ `roomId` ตอน upsert และคืน `roomId` ใน detail (EVD-075) → **ที่เก็บห้องจริงของ `/academic` ไม่ทราบ** (D46)
+
+- snapshot `nClassroomID int?` เดิมชนิดไม่ตรง `sRoomID` และไม่มีแหล่งข้อมูล (EVD-048, EVD-050, EVD-051, D42) — คงข้อห้ามของ Rev 5
+
+- **BR-33** (Rev 6 — ยืนยัน OQ-24) "ห้อง" = แถวของ `TRoom` (school DB, อ่านอย่างเดียว, key `(SchoolID, sRoomID)`) — **ไม่ใช่** ห้องเรียนของนักเรียน (`TTermSubLevel2`) · โมดูลไม่สร้างทะเบียนห้องเอง · ชุดเดียวกับที่ `/academic` ใช้เป็น `roomId` (EVD-052) · schema จริง = SA-Q5
+
+ที่เก็บ C1′ School DB อ่านอย่างเดียว ยืนยัน jtrp98 2026-10-11; exact schema/read contract confirmed อยู่ §27.6 ก2
+
+T_R = `nCaretakerTeacherID` ของ R ในหน่วยของตาราง (BR-54)
+
+  - ผู้ดูแลหนึ่งคนต่อ (ห้อง, หน่วย) ตามถ้อยคำ "ครูผู้ดูแลห้อง" (AC-038a)
+
+**38.3 Inputs / outputs — C1′ read contract confirmed (jtrp98 2026-10-11)**
+
+อ่านทะเบียน TRoom active ของโรงเรียนนั้น แล้ว left join `public."TRoomTermSetting"` ที่ exact SchoolID/nYear/nTerm/sRoomID ตาม data-model §27.6 ก2; query `sTermID` map กับ DB `nTerm` ตรงตัว ไม่มี fallback เทอมอื่น
+
+`sCaretakerTeacherName` อ่าน TEmployees.sEmp ของ SchoolID เดียวกัน ไม่เชื่อ teacher ID ของโรงเรียนอื่น
+
+| VR-10 | SubjectRoom/Set: sRoomID ไม่อยู่ใน TRoom ของ SchoolID หรือถูกลบ |
+
+SA-Q5/live TRoom และ module mapping schema (ก)
+
+> C1′ School DB public."TRoomTermSetting" exact shape/read confirmed §27.6 ก2; Tbl_SubjectRoom/module snapshot sRoomID/sRoomName คง (ก); TRoom read-only; C2 ไม่มี active implementation · module schema (ก) ยังต้องยืนยัน; (ก2) confirmed ไม่มี DDL execution
+
+### data-model.md
+
+(ก)(ง) ยังรอ schema/owner; (ก2) C1′ schema/read/K1 confirmed**
+
+(ก)(ง) ยังเป็น proposal; (ก2) confirmed จากคำตอบเพิ่มเติม — amend นี้ไม่ execute DDL**
+
+| `sRoomID` | varchar(10) | = `TRoom.sRoomID` (ความยาวตาม dump — ยืนยันที่ SA-Q5) |
+
+- school DB: map `TRoom` แบบอ่านอย่างเดียวใน `StudentDataContext` (ไม่เขียน — DES-004 Fallback)
+
+**(ก2) REQ-016 — C1′ ที่ School DB อ่านอย่างเดียว (jtrp98 2026-10-11) · storage/permission ยืนยันแล้ว; exact schema/read/K1 ยืนยันแล้ว 2026-10-11**
+
+**รูป SQL artifact ที่ยืนยันแล้วเฉพาะ C1′ schema:** PostgreSQL relation `public."TRoomTermSetting"` ใหม่ใน School DB; ชื่อ/ชนิด/PK/check ตรง concrete artifact ที่ผู้ใช้ยืนยัน · ไม่มี ALTER `TRoom`, ไม่มี FK อ้าง schema ที่ยังไม่ทราบจริง, ไม่มี EF migration/EnsureCreated/Migrate หรือ startup DDL และไม่มีสิทธิ์ execute จากคำขอส่งไฟล์ SQL
+
+| คอลัมน์ quoted exact | PostgreSQL type | NULL / default / ขอบเขต |
+|---|---|---|
+| `SchoolID` | integer | NOT NULL, ไม่มี default; โรงเรียนของค่า |
+| `nYear` | integer | NOT NULL, ไม่มี default; ปีที่ `TTerm.nYear` ของโรงเรียนตรง |
+| `nTerm` | text | NOT NULL, ไม่มี default; key `TTerm.nTerm` ตรงตัว ไม่ใช้เลขแสดงเทอม; ไม่มี legacy NULL ทั้งปี |
+| `sRoomID` | text | NOT NULL, ไม่มี default; key `TRoom` ตรงตัว; ใช้ text เพื่อไม่อ้าง varchar(10) ของ dump ว่าเป็น runtime length |
+| `nCapacity` | integer | NULL, DEFAULT NULL; CHECK `nCapacity IS NULL OR nCapacity >= 1`; ค่า NULL = ยังไม่ตั้งความจุ |
+| `nCaretakerTeacherID` | integer | NULL, DEFAULT NULL; อ้างเชิงอ่าน `TEmployees.sEmp` ของโรงเรียนเดียวกัน; NULL = ไม่ตั้งผู้ดูแล (OQ-31 ข) |
+
+- **PRIMARY KEY `(SchoolID,nYear,nTerm,sRoomID)`**, ไม่มี surrogate/audit/soft-delete column ที่เดาขึ้น; เจ้าของ external writer จัด/ลบ row ในหน่วยนั้นเอง · ห้ามสร้าง UNIQUE/FK บน `TRoom`/`TTerm`/`TEmployees` จาก dump หรือ model; CHECK/PK ของตารางใหม่ยืนยันแล้ว ไม่ครอบ external schema/FK facts
+
+- DTO เดิมของ Rooms คง `nCapacity:int|null,nCaretakerTeacherID:int|null`;
+
+`Models/TEmployees.cs:14,24` ให้ sEmp int/SchoolID int? · `school_db.sql:3799–3809` เป็น dump TRoom เก่า (D24) **inferred เท่านั้น ไม่ใช่ live-schema/length/FK confirmation**
+
+- **C1′ schema/read/K1 gate ปิดตามคำตอบจริง**; SA-Q5 runtime TRoom/SA-Q10 Academic room mapping/read path และ module mapping schema (ก) ยังเปิด · backend-engineer จัด SQL artifact ตาม PM exact Write paths;
+
+> **คำยืนยันจริงเพิ่มเติม jtrp98 2026-10-11:** ผู้ใช้ตรวจ concrete SQL
+
+(ก2) TRoomTermSetting ใหม่ไม่มี legacy NULL/year-wide row
+
+SA-Q5/runtime TRoom, SA-Q10/Academic mapping/read, exact schema/read/K1 confirmed จากคำตอบเพิ่มเติม;
+
+### des-016.md
+
+| `roomId:string|null` | candidate DES-013 `sRoomID`; ต้อง map/validate กับ academic `Tclasses.SClassId` ก่อน; ห้ามถือ `TRoom.sRoomID` เป็น key เดียวกันโดยไม่มีหลักฐาน |
+
+| Source mapping / DES-013 | Academic+school DB ยืนยัน snapshot canonical planeId และ TRoom↔TClass roomId mapping; source snapshot room field ต้องพร้อมตาม DES-013; ไม่อนุมัติ cast โดย agent |
+
+### des-004.md
+
+ต้องเพิ่ม `GET School/{schoolid}/Rooms` (อ่าน `TRoom` + ความจุ/ผู้ดูแล **ของ (ปี[, เทอม])** — Rev 7)
+
+### index.md
+
+| REQ-016 ห้อง + ความจุ + ผู้ดูแล | **feasible-with-risk (high)** | jtrp98 2026-10-11 ยืนยัน exact C1′ SQL/schema/read/ownership/error BLOCK และ successful absence/NULL K1+warning §27.6 ก2/DES-013; live TRoom/Academic mapping/usage/module mapping schema และ DDL/release/security ยัง hold |
+
+| SA-Q5 / §27.6 ก | live TRoom fields/active predicate และ module SubjectRoom mapping schema; C1′ ก2/read/K1 ยืนยันแล้ว | school DB owner + module owner | BE-012/FE-024 และ consumers ก่อนเปิดใช้ |
+
+## 2026-10-11 — OQ-43/44/45 + SA-Q25 (jtrp98): ผู้ดูแลเดี่ยว `TClassSetting.sEmp` → ชุดผู้ดูแล — ข้อความที่ถูกแทน (verbatim)
+
+### des-013.md
+
+(ก2) read states/K1 confirmed แต่ relation `TClassSetting` (แทน TRoomTermSetting 2026-10-11) รอ gate #2, SA-Q5 live TClass, SA-Q25 cDel, SA-Q10
+
+ชื่อ field API/snapshot `sRoomID`/`sRoomName`/`nCapacity`/`nCaretakerTeacherID`, read states §38.3, K=1 เฉพาะ absence/NULL, ไม่ backfill/copy, BR-36/54–57/71 · **exact shape `TClassSetting` = ข้อเสนอ SA รอ human gate #2 ใหม่** (§27.6 ก2); `nYear` ในคีย์ = สมมติฐาน OQ-43, ผู้ดูแล 1 คน = สมมติฐาน OQ-44 — ยังไม่ยืนยัน (owner jtrp98)
+
+กฎกำกับเพิ่ม (Rev 7 — OQ-26 ก): **ห้องที่มีครูผู้ดูแลในหน่วย (โรงเรียน, ปี[, เทอม]) ของตาราง — ทุกเซลล์ของวิชาที่ใช้ห้องนั้น (ตาม mapping BR-34) ภายในโมดูลนี้ต้องมีผู้สอน = ครูผู้ดูแลห้อง**
+
+**active = ข้อเสนอ `cDel IS NULL OR cDel = '0'`** ตาม Academic `GetRoomsAsync` (ค่าอื่น = ไม่ active, fail-closed) — โมดูลใช้ `cDel != "1"` กับ TTerm (`WebAPIController.cs:63,176`) และ `cDel == null` กับ TEmployees (`:1996`) จึงกำกวม → SA-Q25 · schema จริง = SA-Q5
+
+relation `TClassSetting` (shape รอ gate #2) §27.6 ก2; read states confirmed
+
+- **BR-71** (ใหม่ Rev 7 — OQ-26 ก ปิด) **ครูผู้ดูแลห้องต้องเป็นผู้สอนวิชาที่ใช้ห้องนั้น:** ให้ R = ห้องของวิชา S ตาม mapping (BR-34) และ T_R = `TClassSetting.sEmp` ของ R (DTO `nCaretakerTeacherID`) ในหน่วยของตาราง (BR-54) — ถ้า T_R มีค่า ทุกเซลล์ของ S ในทุกห้องเรียนของตารางนี้ต้องมี `nTeacherID` = T_R
+  - **ลำดับตัวกรองสิทธิ์ (จุดเดียว):** ครูที่สอน (S, ห้องเรียน C) ได้ = [อยู่ใน `TPlanCourseTeacher` ของ S ในแผนของ C (BR-41)] ∩ [ผ่านการจำกัดห้องประจำชั้น (BR-42)] ∩ [**= T_R ถ้า R มีผู้ดูแล**] → ได้ {T_R} หรือว่าง · ผู้ดูแล **ไม่ได้สิทธิ์เพิ่ม**: T_R ที่ไม่อยู่ใน `TPlanCourseTeacher` ของ S หรือถูกจำกัดห้องจนไม่รวม C → ชุดว่าง → DES-011 BR-27 `NoEligibleTeacher` (`sDetail: RoomCaretaker`) บล็อก Generate · ห้ามเลือกครูอื่นแทนผู้ดูแล และห้ามข้ามตัวกรองเมื่อผู้ดูแล "ไม่ว่าง"
+  - **ไม่ยกเว้นกติกาอื่น:** T_R ยังถูกบังคับ
+  - **ผลต่อความจุ ≥ 2 (ข้อเท็จจริงเชิงตรรกะ — OQ-31 ก):** ครูหนึ่งคนสอนหลายห้องเรียนพร้อมกันได้เฉพาะภายในกลุ่ม Link Subject เดียวกัน (BR-11) → ในห้องที่มีผู้ดูแล การใช้พร้อมกัน ≥ 2 ห้องเรียนจากโมดูลเกิดได้เฉพาะผ่าน Link Subject ของ S · การใช้ห้องจาก `/academic` (BR-55) ยังนับเข้าความจุ แต่ **ไม่ถูกตรวจผู้ดูแล** (โมดูลบังคับกติกากับระบบอื่นไม่ได้ และทิศทาง sync เป็นทางเดียว — BR-49) · **ยืนยันธุรกิจ (OQ-31 ก ปิด 2026-09-29):** อ่านตรงตัวคือเจตนา — ผู้ดูแลเป็นผู้สอนทุกคาบที่ใช้ห้อง; ห้องความจุ ≥ 2 ใช้พร้อมกันหลายห้องเรียนได้เฉพาะผ่าน Link Subject เดียวกัน
+  - **Link Subject:** กลุ่ม link ของ S เลือกครูจากชุดที่ผ่านตัวกรองเดียวกัน (= T_R) — ไม่มีกติกาลำดับความสำคัญใหม่ (link ตรึง "เวลา" ส่วนผู้ดูแลกำหนด "ครู") · link ที่ครูในกลุ่มไม่ใช่ T_R ไม่เกิด เพราะไม่มีครูอื่นผ่านตัวกรอง
+  - **การวางมือ:** AddCourseModal ให้เลือกได้เฉพาะครูที่ผ่านตัวกรอง · ลาก/สลับ/เพิ่มที่ทำให้เซลล์ของ S มีครู ≠ T_R → ปฏิเสธด้วยเหตุผล `roomCaretakerMismatch` (ระบุห้อง, ผู้ดูแล, ครูที่พยายามวาง) เทียบ AC-019
+  - **เปิดตารางเดิมมาแก้ (Flow D):** ผู้ดูแลอ่านจากค่าปัจจุบันของหน่วยของตาราง (สอดคล้อง BR-35) · เซลล์ที่ครูใน snapshot ≠ T_R ปัจจุบัน **ไม่ถูกเปลี่ยนครูให้อัตโนมัติ**
+  - **ห้องที่ไม่ได้ตั้งผู้ดูแลในหน่วยนั้น → ไม่มีข้อบังคับผู้ดูแล** + คำเตือน `RoomSettingMissing` (**ยืนยันธุรกิจ — OQ-31 ข ปิด 2026-09-29**; เหตุผลเดิมของข้อเสนอ: ค่าเป็นรายเทอมและเริ่มว่างทุกเทอม ถ้าถือว่า "จัดไม่ได้" วิชาที่มีห้องทุกวิชาจะถูกบล็อกจนกว่าตั้งค่าครบ)
+  - ผู้ดูแลหนึ่งคนต่อ (ห้อง, หน่วย) ตามถ้อยคำ "ครูผู้ดูแลห้อง" (AC-038a) **(สมมติฐาน — ยังไม่ยืนยัน OQ-44)** · ครูที่ถูกลบ/ไม่อยู่ใน `TEmployees` ของโรงเรียนแล้ว → ถือเป็นผู้ดูแลที่ไม่มีสิทธิ์ (ชุดว่าง → `NoEligibleTeacher`) ไม่ใช่ "ไม่มีผู้ดูแล" — ห้ามปลดข้อบังคับเงียบ ๆ
+
+**38.3 Inputs / outputs — C1′ read states confirmed (jtrp98 2026-10-11); relation TClass/TClassSetting รอ gate #2**
+
+`{status:1,message,data:[{sRoomID:string,sRoomName:string|null,nCapacity:int|null,nCaretakerTeacherID:int|null,sCaretakerTeacherName:string|null}]}` · year/term ต้องระบุหน่วยของตาราง; SchoolID binding จาก DES-018 authenticated context, เทอมต้องอยู่ในโรงเรียน/ปีตาม VR-8 · อ่านทะเบียน `TClass` active (BR-33) ของโรงเรียนนั้น แล้ว left join `public."TClassSetting"` ที่ exact SchoolID/nYear(สมมติฐาน OQ-43)/nTerm/sClassID ตาม data-model §27.6 ก2; map `sRoomID←sClassID`, `sRoomName←sClass`, `nCapacity←nCapacity`, `nCaretakerTeacherID←sEmp`; query `sTermID` map กับ DB `nTerm` ตรงตัว ไม่มี fallback เทอมอื่น · setting row ที่ไม่มี TClass active คู่ ไม่ถูก join/คืน (คงเดิม)
+- `nCapacity:null,nCaretakerTeacherID:null` **เมื่ออ่านสำเร็จและไม่พบ row**; row มีค่า NULL คืน null ตามฟิลด์; ไม่คืน effective K ผ่าน DTO นี้ · ไม่ตั้งผู้ดูแล = ไม่มีข้อบังคับตาม OQ-31 ข;
+
+- ตาราง setting ไม่มี/query error/timeout = read failure
+
+· `sCaretakerTeacherName` join `TClassSetting.sEmp = TEmployees.sEmp` (PK int — `Models/TEmployees.cs:13–14`) ของ SchoolID เดียวกัน ไม่เชื่อ teacher ID ของโรงเรียนอื่น
+
+- solver/validateDrop ใช้ canUseRoom ตัวเดียว BR-36/54 และ caretaker eligibility
+
+| confirmed status 0 InvalidRoomSetting หรือ TermNotInYear ตาม VR-8; ไม่ใช้ข้อมูล ไม่ repair/write; state ตาม §38.3 · VR-15 เดิมของ RoomSetting/Set อยู่ archive.md |
+
+UI คง roomCapacityExceeded / academicRoomUsageUnavailable / roomCaretakerMismatch และ RoomSettingMissing ตาม BR-54/71;
+
+สิทธิ์สอนของวิชาที่ใช้ห้องที่มีผู้ดูแลหดเหลือผู้ดูแลคนเดียว (BR-71
+
+> C1′ School DB `public."TClassSetting"` (แทน TRoomTermSetting 2026-10-11) shape รอ gate #2 §27.6 ก2, read states confirmed;
+
+caretaker ไม่มีสิทธิ์สอน → NoEligibleTeacher(RoomCaretaker); caretaker NULL = ไม่มีข้อบังคับตาม OQ-31 ข
+
+· 2026-10-11 TClass/TClassSetting: shape gate #2, OQ-43/OQ-44 (สมมติฐาน), SA-Q25 cDel เปิด
+
+SA-Q5/live TClass, SA-Q25 cDel, gate #2 TClassSetting และ module mapping schema (ก)
+
+- 2026-10-11 — คำสั่ง jtrp98 (req-016.md:17–23): ทะเบียน TRoom→`TClass`, ที่เก็บ TRoomTermSetting→`TClassSetting`(sEmp int ตาม TEmployees PK); BR-33/§38.1/§38.3/VR-10/BR-54/BR-71 อ้างใหม่; API/snapshot field names, read states, K1, ไม่ copy คงเดิม; Academic source ยืนยัน roomId=Tclass.SClassId (D46 อัปเดต); shape รอ gate #2, OQ-43/44 สมมติฐาน, SA-Q25 cDel ใหม่; ส่วนที่แทน archive.md verbatim
+
+### data-model.md
+
+(ก)(ง) ยังรอ schema/owner; (ก2) C1′ read/K1 confirmed แต่ relation `TClassSetting` (2026-10-11) รอ gate #2**
+
+(ก2) read states confirmed แต่ shape `TClassSetting` เป็น proposal — amend นี้ไม่ execute DDL**
+
+- school DB: map `TClass` (+ `TClassSetting` ก2) แบบอ่านอย่างเดียวใน `StudentDataContext` (ไม่เขียน — DES-004 Fallback); active ตาม DES-013 BR-33/SA-Q25
+
+**(ก2) REQ-016 — C1′ ที่ School DB อ่านอย่างเดียว (jtrp98 2026-10-11) · storage/permission/read states/K1 ยืนยันแล้ว; relation `TClassSetting` ตามคำสั่ง jtrp98 2026-10-11 — exact shape = ข้อเสนอ SA รอ gate #2**
+
+**รูป SQL artifact ที่เสนอ (แทน TRoomTermSetting — ยังไม่ยืนยัน gate #2):** PostgreSQL relation `public."TClassSetting"` ใหม่ใน School DB · ชื่อตารางและการมี `nTerm`/`sEmp`/capacity มาจากคำสั่งผู้ใช้ (`requirement\req-016.md:20`); ชนิด/คีย์/null/check/ชื่อ `nCapacity` เป็นข้อเสนอ SA · ไม่ ALTER `TClass`, ไม่มี FK อ้าง schema ที่ยังไม่ยืนยัน, ไม่มี EF migration/EnsureCreated/Migrate/startup DDL, ไม่มีสิทธิ์ execute
+
+| คอลัมน์ quoted exact | PostgreSQL type | NULL / default / ขอบเขต |
+|---|---|---|
+| `SchoolID` | integer | NOT NULL, ไม่มี default; = `TClass.SchoolID` |
+| `nYear` | integer | NOT NULL, ไม่มี default; ปี `TTerm.nYear` · **(สมมติฐาน — ยังไม่ยืนยัน OQ-43)** |
+| `nTerm` | text | NOT NULL, ไม่มี default; key `TTerm.nTerm` (string) ตรงตัว; ไม่มี legacy NULL ทั้งปี |
+| `sClassID` | varchar | NOT NULL, ไม่มี default; key `TClass.sClassID` ตรงตัว; ไม่ระบุความยาวเพราะ varchar(10) ของ dump ไม่ใช่ live |
+| `nCapacity` | integer | NULL, DEFAULT NULL; CHECK `nCapacity IS NULL OR nCapacity >= 1`; NULL = ยังไม่ตั้งความจุ |
+| `sEmp` | integer | NULL, DEFAULT NULL; = `TEmployees.sEmp` (PK int — `Models/TEmployees.cs:13–14`, dump `school_db.sql:1626`) ของโรงเรียนเดียวกัน; NULL = ไม่ตั้งผู้ดูแล (OQ-31 ข) · 1 ค่าต่อแถว = **สมมติฐาน OQ-44** |
+
+- **PRIMARY KEY `(SchoolID,nYear,nTerm,sClassID)`** (nYear = สมมติฐาน OQ-43); ไม่มี surrogate/audit/soft-delete ที่เดา (audit 4 คอลัมน์แบบ `TClass` = ทางเลือกให้ผู้ยืนยันเลือก) · external writer จัด/ลบ row เอง · ห้าม UNIQUE/FK บน `TClass`/`TTerm`/`TEmployees` · `CREATE TABLE` ไม่ใส่ IF NOT EXISTS เพื่อหยุดเมื่อชื่อชน (dump ไม่มี `TClassSetting` — live ไม่ทราบ)
+- ชื่อคอลัมน์ฝั่ง DB (`sClassID`/`sEmp`) ต่างจาก DTO (`sRoomID`/`nCaretakerTeacherID`) โดยตั้งใจ: โมดูลใช้ `sClassIDs`/`nClassID` = ห้องเรียนนักเรียน int — ห้ามผสม
+
+- DTO เดิมของ Rooms คง `nCapacity:int|null,nCaretakerTeacherID:int|null` (map จาก `nCapacity`/`sEmp`); `nTerm` บน School DB map กับ query `sTermID:string` ตรงตัว · รายละเอียด successful absence/read failure/invalid external data ใน DES-013 §38.3/§38.5 ยืนยันแล้ว ไม่ตีความ read failure ว่า absence
+- Evidence อ่านจริง: `sb-api-academic-timetable-ai/AITimeTableBackend/Helpers/StudentDataContext.cs:20` ใช้ `UseNpgsql`; `Models/TTerm.cs:16,25,32` ให้ nTerm string/SchoolID int/nYear int?; `Models/TEmployees.cs:13–14,24` ให้ sEmp int [Key]/SchoolID int? · dump (D24) `school_db.sql:1106–1117` TClass, `:1626` TEmployees.sEmp INTEGER **inferred เท่านั้น ไม่ใช่ live-schema/length/FK confirmation** · Academic source `Tclass.cs:8–14`, `TimetableRepository.cs:621–630` (confirmed เฉพาะ source)
+
+- **read states/K1 ปิดตามคำตอบจริง; shape `TClassSetting` เปิดใหม่ที่ gate #2**; SA-Q5 runtime TClass, SA-Q25 cDel, SA-Q10 Academic read path และ module mapping schema (ก) ยังเปิด · backend-engineer เขียน SQL artifact ใหม่ตาม PM exact Write paths หลัง gate #2; artifact review ไม่ใช่ permission execute/live-create; ไม่มีตาราง/คอลัมน์ใดถูกรันจาก amend นี้
+
+(ก2) TClassSetting ใหม่ไม่มี legacy NULL/year-wide row
+
+- 2026-10-11 — คำสั่ง jtrp98: (ก) sRoomID = TClass.sClassID; (ก2) TRoomTermSetting→`TClassSetting`(SchoolID,nYear,nTerm,sClassID,nCapacity,sEmp int) proposal รอ gate #2, nYear/OQ-43 + ผู้ดูแล1คน/OQ-44 สมมติฐาน, SA-Q25 cDel; read states/K1/DTO คง; ตารางเดิม archive.md verbatim
+
+### des-011.md
+
+(วิชาที่ map กับห้องที่มีผู้ดูแลในหน่วยของตาราง → ชุดครูเหลือผู้ดูแลคนเดียว)
+
+Rev 7: `RoomSettingMissing` — ห้องที่ mapping ใช้ไม่มีค่าความจุ/ผู้ดูแลในหน่วยของตาราง จึงใช้ K = 1 และไม่มีข้อบังคับผู้ดูแล)
+
+### des-004.md
+
+(อ่าน `TClass` + `TClassSetting` — 2026-10-11 แทน TRoom;
+
+### des-008.md / risks.md (R31)
+
+shortfall เพิ่ม (ผู้ดูแลคนเดียวแบกทุกคาบของห้อง ภายใต้เพดาน DES-014)
+
+### index.md
+
+| REQ-016 ห้อง + ความจุ + ผู้ดูแล | **feasible-with-risk (high)** | 2026-10-11 ทะเบียน TClass/ที่เก็บ TClassSetting ตาม jtrp98; read states/K1 ยืนยันคงเดิม; shape TClassSetting รอ gate #2 (OQ-43/44 สมมติฐาน, SA-Q25 cDel); roomId Academic=Tclass.SClassId ตาม source; live TClass/SA-Q10/(ก)/DDL/release/security hold |
+
+| Gate #2 / §27.6 ก2 | ยืนยัน exact shape `TClassSetting` (ชนิด/PK/nYear OQ-43/sEmp 1 ค่า OQ-44/ชื่อ nCapacity/audit?) — DES-013 | jtrp98 | BE-012 SQL artifact ใหม่ + consumers |
+| SA-Q25 | `TClass.cDel` ค่าใดคือ active: ข้อเสนอ `NULL หรือ '0'` (Academic GetRoomsAsync) vs `!= '1'` | school DB owner (jtrp98) | BE-012 Rooms/VR-10 ก่อนเปิดใช้ |
+
+## 2026-10-11 — Gate #2 รูปตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers` ยืนยัน (jtrp98) + OQ-45 (จ) — ข้อความที่ถูกแทน (verbatim)
+
+### des-013.md
+
+(ก2) read states/K1/`TClassSetting` confirmed แต่ตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers` รอ gate #2, SA-Q5 live TClass
+
+· **ยังไม่ยืนยัน (gate #2 ส่วนที่เหลือ — ข้อเสนอ SA):** ตารางลูก `TClassSettingCaretaker` และ DTO `lstCaretakers` แทน `nCaretakerTeacherID`/`sCaretakerTeacherName` (§27.6 ก2)
+
+  - **ชุดว่าง:** CT_R ว่าง หรือ T_R ว่างหลังกรอง → ไม่มีข้อบังคับผู้ดูแล + `RoomSettingMissing` (**ยืนยันธุรกิจ — OQ-31 ข ปิด 2026-09-29**) · อ่านตารางลูกล้ม = `RoomSettingReadFailed` BLOCK ตาม §38.3 ไม่ใช่ชุดว่าง
+
+**38.3 Inputs / outputs — C1′ read states + TClassSetting confirmed (jtrp98 2026-10-11); TClassSettingCaretaker + `lstCaretakers` รอ gate #2**
+
+(**`lstCaretakers` = ข้อเสนอ gate #2** แทน `nCaretakerTeacherID`/`sCaretakerTeacherName`)
+
+→ ต้องยืนยันใหม่พร้อมตารางลูก (gate #2); คง `.v1`
+
+RoomSettingMissing ตาม BR-54/71;
+
+SA-Q5/live TClass, gate #2 ตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers` และ module mapping schema (ก) และ SA-Q10
+
+`public."TClassSettingCaretaker"` ใหม่ (proposal รอ gate #2)
+
+read/K1 confirmed (shape ใหม่รอ gate #2)
+
+เหลือ gate #2 ตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers`;
+
+### des-011.md
+
+ห้องที่ mapping ใช้ไม่มีค่าความจุ/ผู้ดูแลที่นับได้ในหน่วยของตาราง จึงใช้ K = 1 และ/หรือไม่มีข้อบังคับผู้ดูแล
+
+### data-model.md
+
+ตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers` รอ gate #2**
+
+แต่ `TClassSettingCaretaker`/DTO `lstCaretakers` เป็น proposal
+
+`TClassSettingCaretaker` + DTO `lstCaretakers` = ข้อเสนอ SA รอ gate #2**
+
+**`public."TClassSettingCaretaker"` — ข้อเสนอ SA ยังไม่ยืนยัน (gate #2 ส่วนที่เหลือ):**
+
+- DTO Rooms (ข้อเสนอ — gate #2):
+
+- **read states/K1/`TClassSetting`/SA-Q25 ปิดตามคำตอบจริง; `TClassSettingCaretaker` + DTO `lstCaretakers` เปิดที่ gate #2**; SA-Q5 runtime TClass, SA-Q10 Academic read path และ module mapping schema (ก) ยังเปิด · backend-engineer เขียน SQL artifact ใหม่ (`class-setting-school-db.sql` ทั้งสอง relation) ตาม PM exact Write paths **หลังผู้ใช้ยืนยันตารางลูก**;
+
+### index.md
+
+| REQ-016 ห้อง + ความจุ + ผู้ดูแล | **feasible-with-risk (high)** | 2026-10-11 TClass/TClassSetting ยืนยัน (OQ-43/SA-Q25 ปิด); OQ-44/45 ผู้ดูแลหลายคน→ตารางลูก TClassSettingCaretaker+DTO lstCaretakers รอ gate #2; BR-71 ชุด/isInPlan (TPlanCourseTeacher.cs:12–21); live TClass/SA-Q10/(ก)/DDL/release/security hold |
+
+| Gate #2 / §27.6 ก2 | ยืนยันตารางลูก `TClassSettingCaretaker` (PK 5 คอลัมน์+audit, ไม่มี FK) + DTO `lstCaretakers` แทน `nCaretakerTeacherID` — DES-013 | jtrp98 | BE-012 SQL artifact ใหม่ + FE-024/FE-023 consumers |
+
+## 2026-10-11 — DES-013 §38.5a (SA ตัดสินตามที่ผู้ใช้มอบอำนาจ — ไม่ใช่การอนุมัติของมนุษย์): ชื่อรหัส/`sTeacherName`/params — ข้อความที่ถูกแทน (verbatim)
+
+### des-013.md
+
+ตัดออกจาก T_R + คำเตือน **`RoomCaretakerNotInPlan`** (ชื่อเสนอ SA; DES-011 warning ไม่บล็อก; ระบุห้อง/ผู้ดูแล)
+
+วางมือที่ละเมิดถูกปฏิเสธ **`roomCaretakerLinkRequired`** (ชื่อเสนอ SA)
+
+ปฏิเสธด้วยเหตุผล `roomCaretakerMismatch` (ระบุห้อง, ชุดผู้ดูแลที่นับได้, ครูที่พยายามวาง) เทียบ AC-019
+
+ใหม่ (ชื่อเสนอ SA) `roomCaretakerLinkRequired` (ปฏิเสธวางมือ) และ `RoomCaretakerNotInPlan` (เตือนไม่บล็อก) ตาม BR-71; NoEligibleTeacher(RoomCaretaker) เมื่อผู้ดูแลไม่ผ่าน BR-41/42
+
+ชื่อรหัส `RoomCaretakerNotInPlan`/`roomCaretakerLinkRequired` = ข้อเสนอ SA
+
+> **Rev 7 — สถานะหลักฐาน:** BR-54 (ต่อหน่วย) และ BR-71 (ผู้ดูแล) เป็นกติกาเป้าหมายจากคำตอบธุรกิจ OQ-26 — ไม่อ้างข้อเท็จจริงของ code ใหม่ นอกจาก EVD-084 (ยังไม่มี UI ตั้งค่าห้อง — volatile เพราะ worktree ยังไม่ commit) · จุด eligibility เดียวที่ BR-71 ต่อเข้าคือ `getEligibleClasses` (EVD-060 ของ DES-015)
+> **Rev 6 — สถานะหลักฐาน:** ข้อเท็จจริงที่กำหนดแบบจำลองใหม่ (EVD-072..EVD-075) เป็น `inferred` ทั้งหมด (dump ล้าสมัย / spec ของระบบอื่น — ไม่มี source ของ Service Academic) → ต้องยืนยันกับเจ้าของที่ SA-Q5/SA-Q9/SA-Q10 ก่อนถือเป็นข้อเท็จจริงของ implementation · EVD-049 (Rev 5) และ EVD-072 ชี้บรรทัดเดียวกันของ dump — EVD-072 เพิ่มข้อสังเกต "ไม่มีคอลัมน์ความจุ/ผู้ดูแล"
+
+### des-011.md
+
+· 2026-10-11: `RoomCaretakerNotInPlan` (ชื่อเสนอ SA) — ผู้ดูแลที่ตั้งไว้แต่ไม่อยู่ในแผน/หลักสูตรปี/เทอมนั้น ไม่นับ ตาม DES-013 BR-71)
+
+
+## 2026-10-11 — TClass model evidence / SA-Q10 direction+usage — jtrp98
+
+Who/when ตามผู้ใช้: `jtrp98 / 2026-10-11`.
+
+Source statement เดิมของ DES-013 §38.1 (verbatim):
+
+- (2026-10-11) `TClass` dump (D24, `school_db.sql:1106–1117` — inferred): `sClassID varchar(10) NOT NULL`, `sClass varchar(250)`, `sClassIP varchar(15)`, `cDel char(1)`, `SchoolID int NOT NULL` + audit, PK `(SchoolID, sClassID)` ตรง schema ที่ผู้ใช้วาง · ไม่มีความจุ/ผู้ดูแล → `TClassSetting` · Academic source ใช้ `Tclass` เป็นทะเบียนห้อง: `Tclass.cs:8–14` (`SClassId string`, `SClass`, `CDel char?`) และ `GetRoomsAsync` คืน `RoomId=SClassId, RoomName=SClass` เมื่อ `CDel=='0' || CDel==null` (`sb-tech-upgrade-academic/backend/src/ServiceAcademic.Infrastructure/Repositories/Databases/TimetableRepository.cs:621–630`) — confirmed เฉพาะ source ไม่ใช่ live DB
+
+คำตอบจริง (verbatim):
+
+- เพิ่ม API อ่านรวมใน Academic แล้วเรียกผ่าน gateway (แนะนำ: อ่านครั้งเดียวต่อเทอม และ Academic ดูแลข้อมูลของตัวเอง)
+- นับทุกคาบที่ยังไม่ถูกลบในเทอมนั้น แม้ปิด Active (แนะนำแบบกันห้องชนไว้ก่อน แต่อาจกันห้องจากคาบที่ไม่ได้ใช้จริง)
+
+TClass model source จากผู้ใช้อยู่ใน chat; fields/max-length บันทึก DES-013 §38.1/data-model §27.6 ก. ปิดเฉพาะส่วน model evidence/read direction/usage predicate; ไม่มี concrete API/module mapping/T1/security/DDL/deploy/release approval.

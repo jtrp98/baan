@@ -11,13 +11,13 @@
 | REQ-012 รองรับเทอมทั้งโมดูล | **feasible-with-risk** | หน่วยขอบเขตเป็นคอลัมน์ `nYear` บนตารางราก + derive ผ่าน id แ |
 | REQ-013 คัดลอกกติกา/ตารางข้ามเ | **feasible-with-risk · blocked | write path ใหม่ล้วน แต่ปริมาณเล็กและ backend CRUD sync (DES- |
 | REQ | คำวินิจฉัย | เหตุผลที่ตัดสินได้ (หลักฐาน) |
-| REQ-013 (5 จุดเข้า) | **feasible-with-risk · blocked | กติกาครบและยืนยันธุรกิจทุกข้อ (§35.8 BR-66..BR-70 — OQ-28 ปิ |
+| REQ-013 (5 จุดเข้า) | **feasible-with-risk** | DES-010 BR-66: mapping room copy คงเดิม; C1′ capacity/ผู้ดูแลไม่ copy ทุก scope ตาม jtrp98 2026-10-11; term/mapping schema gates ยัง hold |
 | REQ-014 บล็อก Generate | **feasible** | จุดตัดวิชาเงียบจุดเดียว (EVD-042) · แหล่งสิทธิ์ BR-41 อ่านได |
-| REQ-015 คาบต่อเนื่อง + กลุ่มวิ | **feasible-with-risk** | blob เข้ากันได้ (EVD-045, EVD-046) · กลุ่มวิชาอยู่ใน blob เด |
-| REQ-016 ห้อง + ความจุ + ผู้ดูแ | **feasible-with-risk (high)** | `TRoom` ไม่มีความจุ/ผู้ดูแล (EVD-072) · `TSchedule` ไม่มีคอล |
-| REQ-017 เพดานชั่วโมง | **feasible-with-risk** | เวลาจริงของช่องมีอยู่แล้ว (BR-17, EVD-057) · M1 ไม่ต้อง back |
-| REQ-018 ครูประจำชั้นจำกัดห้อง | **feasible-with-risk** | จุดกรองเดียว (EVD-060) · `TClassMember` อ่านได้อยู่แล้ว (EVD |
-| REQ-019 ส่งเข้า `/academic` | **feasible-with-risk (high)** | upsert รายแถวแบก `calculate`/`roomId` ได้ (EVD-076) · import |
+| REQ-015 คาบต่อเนื่อง + กลุ่มวิ | **feasible-with-risk** | DES-012 §37.2a existing subject/ClassContinuity Get/Set เพิ่ม derived warning assessment ตาม jtrp98 2026-10-11; blob/auth unchanged, final eligible support ต้องรู้จริงก่อน complete; PM bound backend owner/dependency ใน existing task IDs + UX-009 partial/unavailable states ก่อน FE-023 integration |
+| REQ-016 ห้อง + ความจุ + ผู้ดูแล | **feasible-with-risk (high)** | 2026-10-11 TClass/TClassSetting ยืนยัน (OQ-43/SA-Q25 ปิด); ตารางลูก TClassSettingCaretaker+DTO lstCaretakers ยืนยัน jtrp98 2026-10-11 (gate #2 รูปปิด); OQ-45(จ) ชุดว่าง=ตามความจุ+เตือน ไม่บังคับ Link; BR-71 ชุด/isInPlan (TPlanCourseTeacher.cs:12–21); live TClass/SA-Q10/(ก)/DDL/release/security hold |
+| REQ-017 เพดานชั่วโมง | **feasible-with-risk; dev approved** | jtrp98 2026-10-11 ยืนยันสอง int DEFAULT 0/M1 เฉพาะ dev; DES-014/§27.6 ขจ; paired FE-025 cutover hold release |
+| REQ-018 ครูประจำชั้นจำกัดห้อง | **feasible-with-risk; dev approved** | H1/dev+BR-42สามบทบาทยืนยันแล้ว; signed UX-011/UX-009 deltaจริง 2026-10-11; DES-015 §40.3a additive Setting/Get scoped responsibility card dataสำหรับ403/401; VR-9 mandatory request termก่อนprojection, legacy rowNULLเฉพาะvalid term; PM bound BE-013ก่อนFE-025; pairedcutover/DDL/release/securityคง |
+| REQ-019 ส่งเข้า `/academic` | **feasible-with-risk (high)** | A+atomic T1 direction chosen jtrp98 2026-10-11; DES-016 §41.4a owner route/default/mapping/transaction/receipt-schema/runtime และ §27.6 งยัง hold |
 | เรื่อง | คำวินิจฉัย | เหตุผลที่ตัดสินได้ (หลักฐาน) |
 | Auth ของ API (DES-018) | **feasible-with-risk (critical | ตัวถอด JWT มีแล้ว (EVD-086) · frontend ส่ง Bearer (EVD-089)  |
 | REQ-002 `nCourseIntensity` (DE | **feasible** | ข้อมูลหน่วยกิต/หมวดมีแล้ว (EVD-099, EVD-100) · soft ผ่าน val |
@@ -66,9 +66,35 @@
 
 | ID | คำถาม | ผู้ตอบ | Blocking? |
 |---|---|---|---|
+| SA-Q5 / §27.6 ก | TClass model fields/max-length answered โดย jtrp98 2026-10-11; module SubjectRoom mapping schema ยังไม่อนุมัติ; live DB ไม่ได้ตรวจ | jtrp98 + module owner | BE-012/FE-024 และ consumers ก่อนเปิดใช้ (remaining schema/runtime) |
+| SA-Q10 | X2 read direction + usage=ทุกคาบไม่ถูกลบในเทอมรวม inactive answered jtrp98 2026-10-11; concrete API/DTO/permissions/runtime ยังรอยืนยัน | jtrp98 | BE-012/FE-024 และ room constraints release (remaining contract/runtime) |
+| SA-Q8 | paired BE-013/FE-025/DES-011 cutover | release owner | release เท่านั้น; BE-013 dev approved หลัง PM bounds |
+| SA-Q6 / SA-Q11 / SA-Q12 details / §27.6 ง | route/default/mapping/locks/revision/receipt/schema/runtime owner; A+T1 direction answered | Academic/Attendance/DB/module owner | BE-014/FE-027 และ dependent release |
 
 ## Change Log
 
+- 2026-10-11 — SA reconcile TClass owner model fields + X2/all-nondeleted usage ตามคำตอบจริง jtrp98 2026-10-11 (DES-013 §38.1/38.4, data-model §27.6 ก); Q&A/source statement เดิมอยู่ archive.md. ไม่ปิด concrete X2/module mapping/T1/runtime/security/DDL/deploy/release และไม่เปลี่ยน task Status.
+
+- 2026-10-11 — DES-013 §38.5a + DES-011 + data-model (ก2): SA ตัดสิน 3 คำถามเทคนิคของ UX-014 ตามที่ jtrp98 มอบอำนาจ ("ได้ ให้ SA ตัดสินและแจ้งทราบ (Recommended)" — ไม่ใช่การอนุมัติของมนุษย์): ชื่อรหัสคงเดิม, `sTeacherName` เฉพาะครู active โรงเรียนเดียวกัน, params เหตุปฏิเสธ FE คำนวณเอง · ไม่มี schema/DTO shape/endpoint/permission ใหม่; ส่วนที่แทน archive.md verbatim
+- 2026-10-11 — jtrp98 "ยืนยันทั้งตารางลูกและ DTO (Recommended)" + OQ-45 (จ) "ใช่ ใช้ได้ตามความจุ + เตือน ไม่บังคับ Link (Recommended)": gate #2 ส่วนรูป `TClassSettingCaretaker`/`lstCaretakers` ปิด (แถว Unresolved ย้าย archive.md verbatim); DES-013 BR-71 ชุดว่าง + รหัสเตือน (กรองหมด=`RoomCaretakerNotInPlan`), DES-011 wording, data-model §27.6 ก2 · ยังเปิด: SA-Q5, SA-Q10, (ก), DDL execution, security, release
+- 2026-10-11 — คำตอบ jtrp98 OQ-43/44/45 + SA-Q25 (req-016): §27.6 ก2 `TClassSetting` ยืนยัน (ไม่มี sEmp) + เสนอ `TClassSettingCaretaker`/DTO `lstCaretakers` รอ gate #2; DES-013 BR-71 ชุดผู้ดูแล/isInPlan/link check; DES-011/004/008, risks.md wording; DES-016 ไม่กระทบ; แถว SA-Q25/Gate #2/REQ-016 เดิม + Change Log 2026-10-11 TClass ของ des-013/data-model ที่ถูกแทน archive.md verbatim
+- 2026-10-11 — คำสั่ง jtrp98 (req-016): DES-013/data-model §27.6 ก,ก2 ทะเบียน TRoom→TClass, TRoomTermSetting→TClassSetting proposal รอ gate #2; DES-016 roomId/mapping, DES-004 API row, DES-005 pointer; SA-Q25 ใหม่; ไม่เปลี่ยน IDs/Status; ส่วนที่แทน archive.md verbatim
+
+- 2026-10-11 — DES-015/018 responsibility projection correction: request missingterm→primary TermRequiredก่อนread/exposure; mandatorystring scope/ไม่มีContextNotSelected, legacy rowNULLไม่ใช่missingrequest; PM/test-planner reconcile referencesก่อนengineer; superseded wording archive.md verbatim ไม่มีใหม่human approval
+
+- 2026-10-11 — DES-015 §40.3a/DES-018 bounded Setting/Get responsibility read projection สำหรับ signed UX-011; all selectable teachers/tenant-year-term/3roles/absence-vs-readfailure/requiredload errorsเดิม; PM amend BE-013/FE-025 bounds ก่อนcode addition; no schema/route/auth/newUXapproval, superseded metadata archive.md verbatim
+
+- 2026-10-11 — ยืนยัน actual C1′ six-column SQL/schema/read/error/K1 ตาม jtrp98 และ DES-012 §37.2a derived warning API direction; backend contract ให้ PM bound owner/dependency ใน existing task IDs และ UX-009 diagnostic states; live TRoom/Academic/module mapping/DDL/release/security holds คง; ส่วนที่แทน archive.md verbatim ไม่เปลี่ยน Task/Status/IDs
+
+- 2026-10-11 — jtrp98 คำตอบจริง 2026-10-11: DES-010/013 และ data-model C1′ read-only/SQL artifact ผู้ใช้รันเอง, no capacity/caretaker editor-copy; BE-013 §27.6 ขคจ/DES-014/015 schema+breaking dev only; DES-016 A+atomic T1 direction chosen; exact C1′ schema/read/K=1/runtime-room, Academic defaults/transaction/receipt/sync-schema/owner holds คง; superseded sections archive.md verbatim; IDs/release/Status ไม่เปลี่ยน
+
+- 2026-10-09 — DES-016 provenance correction: ห้ามใช้ archive.md:2717 ที่ AskUserQuestion ไม่ได้รับคำตอบเป็น human schema/SA-Q6/7/11/12 approval (แก้ข้ออ้างใน entry SA code check เดิมด้านล่าง); superseded DES-016 metadata/Change Log อยู่ archive.md verbatim · §41.4a concrete T1 proposed endpoint/payload/status/atomic guard/receipt พร้อม exact owner questions; real Academic backend source พบแล้ว แต่ T1 ยัง proposed; BR/REQ/release/task Status ไม่เปลี่ยน
+
+- 2026-10-09 — แก้ active approval provenance ของ data-model.md §27.5/§27.6 และหัว DES-009 ตาม archive.md:2717 (AskUserQuestion ไม่มีคำตอบ → ใช้ข้อเสนอเอง): ไม่ถือเป็น human sign-off; ประวัติ verbatim คงเดิม, technical contract/verdict BE-010 ไม่เปลี่ยน; รอ owner confirmation ตาม plan Waiting on Human #4/#5
+
+- 2026-10-09 — DES-009 §34.2a: URL ?term= + preselect เฉพาะเทอมเดียวหรือการเลือกเดิมใน school/year เดียวกันตาม jtrp98 (09/10/2026); bridge workspace คงเดิม ไม่มี API/schema ใหม่; UX รายละเอียดนอกคำอนุมัติยัง draft · หัว gate DES-009 Rev 8–12 ที่ถูกแทนอยู่ archive.md verbatim
+
+- 2026-10-09 — SA code check + amend (ที่มาของวันที่: วันที่ของ session — ผู้ใช้ไม่ได้ระบุแยก): **DES-016** — บันทึกการปิดประตู 2026-10-04 (SA-Q6/SA-Q11 ยืนยันตามข้อเสนอ §41.7, SA-Q7 = A, SA-Q12 = **T1**; Material ambiguity → resolved) · เพิ่ม §41.1a ผิว REST จริงของ gateway (`TimetableController.cs` @ `ccaf298` — มี `by-plan-course-section-period`, `copy`, `rooms`, `import/individual-registration` ที่ไม่เคยบันทึก; ยืนยัน schoolId/userId จาก context) · T1 endpoint ยังไม่มีใน code (scaffold `ServiceAcademic.*` ของ `sb-tech-upgrade-academic` ยังไม่มี code ส่วน timetable) — ต้องร่าง+ยืนยันสัญญา concrete ก่อน Phase 13 · **BL-021 คำตอบ: `PlanCourseSectionPeriodId` = additive ฝั่งอ่าน ไม่กระทบ payload** · refresh Evidence ของ DES-016 (EVD-065/066/069/070 → HEAD ปัจจุบัน + เพิ่ม EVD-117..119) · **DES-018/DES-019/DES-022** — เติมโน้ตลงวันที่ 2026-10-09: งานที่เคยเป็น `inferred` เพราะ "worktree ยังไม่ commit" commit ครบแล้ว (backend `2941f43`, frontend `205999b`) + แผนที่ชื่อไฟล์หลัง refactor kebab-case (`backendProxy.ts`/`authHeaders.ts` → `src/server/upstream`/`src/lib/auth-headers.ts`) — บรรทัดอ้างเดิมต้องยืนยันกับ HEAD ก่อนใช้ · ไม่มีกติกา/พื้นผิว API/schema ของสัญญาใดเปลี่ยน · สัญญาทุกตัวคง `.v1`
 - 2026-10-07 — แปลงเป็น split layout (DES-014)
 
 Back-links: `..\index.md`

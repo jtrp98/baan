@@ -42,7 +42,9 @@ erDiagram
 
 **27.4 ข้อเท็จจริง schema:** PK-only ทุกตาราง (ไม่มี FK/unique/check); **ไม่มี EF Migrations และไม่มี EnsureCreated/Migrate** — schema ดูแลด้วย SQL มือ (dump ใน repo เก่ากว่าจริง — D24); jsonb mapping ผ่าน fluent config เฉพาะ 7 คอลัมน์รายวันของ `Tbl_TimetableClass`; UTC converter กับทุก DateTime; school DB อ่านผ่าน `StudentDataContext` (TYear/TTerm/TSubLevel/TTermSubLevel2/TCurriculum/TPlan/TPlanCourse/TPlane/TPlanCourseTeacher/TEmployees/TClassMember)
 
-**27.5 Target data model ของมิติภาคเรียน (REQ-012) — `Data/schema: changed` · รอ schema confirmation จากคน — เซ็นแล้ว 2026-10-04 (ผู้ใช้ — ดูหมายเหตุหัวเอกสาร 2026-10-04)**
+**27.5 Target data model ของมิติภาคเรียน (REQ-012) — `Data/schema: changed` · ยังไม่มี human schema confirmation ที่ตรวจได้จากบันทึก 2026-10-04**
+
+> **Approval provenance (ตรวจ 2026-10-09):** ประวัติที่เคยอ้าง "เซ็นแล้ว 2026-10-04" อยู่ใน `archive.md:2717` verbatim และระบุว่า AskUserQuestion ไม่ได้รับคำตอบแล้วใช้ข้อเสนอของ design เอง จึงไม่ใช่คำยืนยัน/sign-off ของมนุษย์ตาม CLAUDE.md · รูป schema/ชนิด/กติกาทางเทคนิคในหัวข้อนี้คงเดิมในฐานะข้อเสนอ; การทำ dev ตามขอบเขตที่ผู้ใช้อนุญาตและ verdict BE-010 เดิมไม่เปลี่ยน · ห้ามใช้ประวัตินี้เป็นสิทธิ์เริ่ม schema ใหม่/DDL/migration/shared-environment deploy; งานที่รอเจ้าของยืนยันพักตาม `plan/index.md ## Waiting on Human` #4/#5
 
 > **สถานะ: ข้อเสนอทางเทคนิคที่ผูกกับ requirement ที่ยืนยันแล้ว — ยังไม่มีแถว/คอลัมน์ใดถูกแก้** สัญญาเชิงกติกาอยู่ที่ §34 (DES-009) หัวข้อนี้คือรูป schema เป้าหมายเท่านั้น · **ห้าม engineer แตะ schema ก่อนคนเซ็น** (ประตูมนุษย์: schema change + migration/backfill)
 
@@ -94,15 +96,15 @@ erDiagram
 
 **ผลของการย่อนี้ต่อประตู schema confirmation §27.5 (บันทึกเท่านั้น — ไม่ได้แก้ schema):** DDL ไม่เปลี่ยน (ยังเป็น `sTermID varchar NULL` บน 4 ตาราง + index (ง) — ต้องเป็น nullable ต่อไปเพราะแถวของปีที่ไม่มี `TTerm` ค้าง NULL) · SA-Q2 หลุดจากรายการที่ต้องปิดก่อนเซ็น (เหลือ SA-Q1) · ขั้น 4 ไม่เป็นจุดหยุดรอคนอีก · (Rev 12) **ขั้น 3 (backfill เข้าเทอมแรก) บังคับ — ข้ามไม่ได้** (OQ-37: AC-028 คงอยู่; ทางเลือก "ข้ามขั้น 3" ของ Rev 11 ตกไป — อยู่ใน `design-archive.md`) · migration ทั้งหมดอยู่ใน release window เดียวกับ cutover (SA-Q3)
 
-**27.6 Target data model ของ Rev 5 / Rev 6 (REQ-016 / REQ-017 / REQ-018 / REQ-019) — `Data/schema: changed` · รอ schema confirmation จากคน — เซ็นแล้ว 2026-10-04 (ผู้ใช้ — (ก2) เลือก C2 · ดูหมายเหตุหัวเอกสาร 2026-10-04)**
+**27.6 Target data model ของ REQ-016 / REQ-017 / REQ-018 / REQ-019 — `Data/schema: changed` · (ข)(ค)(จ) ยืนยันสำหรับ dev เท่านั้น 2026-10-11; (ก)(ง) ยืนยัน jtrp98 2026-10-11; (ก2) C1′ read/K1 + `TClassSetting` (ไม่มี sEmp) ยืนยัน 2026-10-11; ตารางลูก `TClassSettingCaretaker` + DTO `lstCaretakers` ยืนยัน 2026-10-11 (gate #2 รูปปิด; DDL execution ไม่อนุมัติ)**
 
-> **Rev 6:** แก้ในที่ตามคำตอบธุรกิจ 2026-09-28 — (ก) เพิ่มความจุ/ครูผู้ดูแลห้อง (ก2) · (ข) หน่วยเปลี่ยนเป็น **ชั่วโมงเต็ม** · (ค) รูปแบบ H1 เท่านั้น · (ง) **บังคับ** และเปลี่ยนจากคอลัมน์บน `Tbl_Timetable` เป็นตารางใหม่ · (จ) M1 — ไม่มี backfill · ทั้ง 4 ส่วนยังรอคนเซ็น
+> **Approval provenance:** archive.md:2717 ที่ AskUserQuestion ไม่มีคำตอบ 2026-10-04 ไม่ใช่ approval และไม่ย้อนอนุมัติทุก schema; ใช้คำตอบจริง 2026-10-11 ตามขอบเขต (ก2) storage/read-only และ (ข)(ค)(จ) dev only ด้านล่าง · (ก)(ง) ยืนยันโดย jtrp98 2026-10-11 (schema/contract confirmed; DDL ให้ผู้ใช้รันเอง); §27.5/DDL/shared deploy ยังรอเจ้าของตาม gate ของตน
 
-> **Rev 7:** แก้ในที่เฉพาะ (ก2) ตามคำตอบ OQ-26 (ข) — ความจุ/ครูผู้ดูแลเป็นค่า **ต่อ (ปี, เทอม)** → `Tbl_RoomSetting` ได้ `nYear` + `sTermID` และผู้ดูแลมีผลต่อการจัด (BR-71) · C1 (คอลัมน์บน `TRoom`) ตกไป → C1′ · (จ) เติมผลของ DES-009 backfill ต่อ (ก2) · ข้อความ (ก2) ฉบับ Rev 6 อยู่ใน `design-archive.md` · ทั้ง 4 ส่วนยังรอคนเซ็น — **(ก2) ต้องเซ็นรูปใหม่**
+> ประวัติ Rev 6/7 (C2/ทั้งสี่ส่วนรอเซ็น) อยู่ archive.md verbatim; สถานะ active ใช้คำตอบจริง 2026-10-11 ใน (ก)(ก2)(ง) และคำยืนยัน BE-013 (ข)(ค)(จ) ด้านล่าง
 
-> **สถานะ: ข้อเสนอทางเทคนิคที่ผูกกับ requirement ที่ยืนยันแล้ว — ยังไม่มีตาราง/คอลัมน์ใดถูกแก้** กติกาอยู่ที่ §38–§41 · **ห้าม engineer แตะ schema ก่อนคนเซ็น** · ตาราง/แถวราก ใหม่ทุกตัวต้องมี `sTermID` ตาม DES-009 **ถ้า** DES-009 ผ่านก่อนหรือพร้อมกัน (รูปแบบเดียวกับ §27.5 ข) · ฐานข้อมูลไม่มี FK/unique (§27.4) — uniqueness บังคับที่ app layer ตาม DES-001 Fallback เว้นแต่ผู้อนุมัติ schema เลือก unique index ในรอบเดียวกัน · REQ-014 และ REQ-015 **ไม่มี DDL** (REQ-015 เปลี่ยนรูปแบบภายใน jsonb เท่านั้น — §37.2)
+> **สถานะ: (ข)(ค)(จ) พร้อม dev ตามคำยืนยันจริงด้านล่าง; (ก)(ง) ยืนยัน schema โดย jtrp98 2026-10-11; (ก2) read states + `TClassSetting` confirmed + `TClassSettingCaretaker`/DTO `lstCaretakers` confirmed (รูปเท่านั้น) — amend นี้ไม่ execute DDL** กติกาอยู่ที่ §38–§41 · engineer ทำเฉพาะส่วน/schema ที่มนุษย์ยืนยันและ PM กำหนด exact Write paths · ตาราง/แถวราก ใหม่ทุกตัวต้องมี `sTermID` ตาม DES-009 **ถ้า** DES-009 ผ่านก่อนหรือพร้อมกัน (รูปแบบเดียวกับ §27.5 ข) · ฐานข้อมูลไม่มี FK/unique (§27.4) — uniqueness บังคับที่ app layer ตาม DES-001 Fallback เว้นแต่ผู้อนุมัติ schema เลือก unique index ในรอบเดียวกัน · REQ-014 และ REQ-015 **ไม่มี DDL** (REQ-015 เปลี่ยนรูปแบบภายใน jsonb เท่านั้น — §37.2)
 
-**(ก) REQ-016 — ตารางใหม่ `Tbl_SubjectRoom` (ตารางราก ถือขอบเขตเอง) + key ห้องใน snapshot**
+**(ก) REQ-016 — ตารางใหม่ `Tbl_SubjectRoom` (ตารางราก ถือขอบเขตเอง) + key ห้องใน snapshot — ยืนยัน schema jtrp98 2026-10-11**
 
 | คอลัมน์ | ชนิด | ความหมาย |
 |---|---|---|
@@ -111,43 +113,63 @@ erDiagram
 | `nYear` | int | |
 | `sTermID` | varchar NULL | ตาม DES-009 (ถ้ามี) |
 | `sCourseCode` | varchar | key เดียวกับแถว continuity และ snapshot `sSBCourseCode` |
-| `sRoomID` | varchar(10) | = `TRoom.sRoomID` (ความยาวตาม dump — ยืนยันที่ SA-Q5) |
+| `sRoomID` | varchar(10) | = `TClass.sClassID` (2026-10-11 แทน TRoom; ชื่อคอลัมน์คงเดิม; ความยาวสูงสุด 10 ตาม [StringLength(10)] ใน EF model PostgreSQL.SchoolDB.TClass ที่ jtrp98 ส่ง 2026-10-11 — SA-Q5 ส่วน model fields ตอบแล้ว; ไม่ได้ตรวจ live DDL) |
 | `isDeleted`, `CreatedBy/At`, `UpdatedBy/At` | | ตามแบบแผนตารางอื่นของโมดูล |
 
 - uniqueness (app layer): `(nSchoolID, nYear, sTermID, sCourseCode)` ที่ `isDeleted=false` (BR-34)
 - snapshot: `ItemTimetableSubject` + `sRoomID string?`, `sRoomName string?` — อยู่ใน jsonb รายวันของ `Tbl_TimetableClass` จึง **ไม่มี DDL** (เพิ่ม property ใน `Request.cs` เท่านั้น) · `nClassroomID/sClassroomName/sClassroomColor` เดิมคงไว้ไม่ใช้ (D42)
-- school DB: map `TRoom` แบบอ่านอย่างเดียวใน `StudentDataContext` (ไม่เขียน — DES-004 Fallback)
+- school DB: map `TClass` (+ `TClassSetting`/`TClassSettingCaretaker` ก2) แบบอ่านอย่างเดียวใน `StudentDataContext` (ไม่เขียน — DES-004 Fallback); active = `cDel IS NULL OR cDel = '0'` (ยืนยัน jtrp98 2026-10-11 SA-Q25 — `requirement\req-016.md:22`; DES-013 BR-33)
 - ทางเลือกที่ไม่เลือก: เก็บ mapping เป็น jsonb ใน `Tbl_Setting` — ไม่เลือกเพราะเป็น collection ที่ต้องตรวจ VR-10/VR-11 รายแถว และ `Tbl_Setting` ถือ 2 เมนูอยู่แล้ว (R25)
 - Rev 6: 1 วิชา : 1 ห้อง ยืนยันแล้ว (OQ-15 ข) → uniqueness `(nSchoolID, nYear, sTermID, sCourseCode)` คงเดิม · ตั้งที่ `/timetable/subject-settings` (OQ-15 จ) → อยู่ในเมนู "กติกาวิชา" ของ REQ-013
 
-**(ก2) REQ-016 — ความจุ + ครูผู้ดูแลห้อง ต่อ (ปี, เทอม) (Rev 7 — AC-038a + OQ-26 ก/ข ปิด 2026-09-29) · ที่เก็บ = SA-Q9**
+**(ก2) REQ-016 — C1′ ที่ School DB อ่านอย่างเดียว (jtrp98 2026-10-11) · storage/permission/read states/K1 ยืนยันแล้ว; `TClassSetting` ยืนยันรูป 2026-10-11 (เอา sEmp ออกตาม OQ-44); `TClassSettingCaretaker` + DTO `lstCaretakers` ยืนยัน jtrp98 2026-10-11**
 
-ข้อเท็จจริง: `TRoom` (dump) มีเพียง `sRoomID varchar(10)`, `sRoomName`, `cDel`, `SchoolID` + audit — **ไม่มีคอลัมน์ความจุ/ครูผู้ดูแล** (EVD-072) · worktree frontend ยังไม่มี UI ตั้งค่าทั้งสอง (EVD-084) · Rev 7: ธุรกิจยืนยันว่าค่าทั้งสองเป็น **ของ (โรงเรียน, ปี, เทอม, ห้อง)** ไม่ใช่ของห้องกายภาพ → ที่เก็บต้องมีมิติปี/เทอม ซึ่ง `TRoom` (แถวต่อ `(SchoolID, sRoomID)`) ไม่มี
+ผู้ใช้ตอบ **"เก็บใน School DB แต่ไม่ต้องสร้างเองนะ ทำแค่ ไฟล์ sql ก็พอ เดี๋ยวฉันไปรันเอง"** และ **"ให้อ่านอย่างเดียว ฉันจัดค่าผ่านระบบอื่นหรือ SQL เอง"** → SA-Q9 เลือก C1′; ไม่มี `Tbl_RoomSetting` ฝั่งโมดูล, ไม่มี `RoomSetting/Set`/proxy/editor/การคัดลอก capacity หรือผู้ดูแลทั้ง `subjectConditions`/`all` · mapping `Tbl_SubjectRoom` ยังเขียน/คัดลอกในโมดูลตาม (ก) และ DES-010 BR-66 · C2 เป็นประวัติใน `archive.md` ไม่มีผลเป็นทางเลือก active
 
-- **C2 — ข้อเสนอ SA:** ตารางใหม่ฝั่งโมดูล `Tbl_RoomSetting` — **ตารางราก ถือขอบเขตเอง** (รูปแบบเดียวกับ `Tbl_SubjectRoom` §27.6 ก และตารางรากของ §27.5 ข)
+**รูป SQL artifact (2026-10-11):** PostgreSQL relations ใหม่สองตัวใน School DB · ไม่ ALTER `TClass`, ไม่มี FK, ไม่มี EF migration/EnsureCreated/Migrate/startup DDL, ไม่มีสิทธิ์ execute · `CREATE TABLE` ไม่ใส่ IF NOT EXISTS เพื่อหยุดเมื่อชื่อชน (dump ไม่มีทั้งสองชื่อ — live ไม่ทราบ)
 
-| คอลัมน์ | ชนิด | ความหมาย |
+**`public."TClassSetting"` — ยืนยัน jtrp98 2026-10-11:** **"ยืนยันรูปนี้ + เพิ่ม audit 4 คอลัมน์"** + OQ-43 **"มี nYear (Recommended)"** (`requirement\req-016.md:22`) · `sEmp` **ถูกเอาออก** เพราะ OQ-44 ผู้ดูแลมีได้หลายคน (`open-questions\oq-44.md:13`) — การเอาออกเป็นผลบังคับของคำตอบนั้น; รูปที่เหลือไม่เปลี่ยน
+
+| คอลัมน์ quoted exact | PostgreSQL type | NULL / default / ขอบเขต |
 |---|---|---|
-| `nRoomSettingID` | int PK | |
-| `nSchoolID` | int | |
-| `nYear` | int | ปีการศึกษาของค่า (OQ-26 ข) |
-| `sTermID` | varchar NULL | = `TTerm.nTerm` ตาม DES-009 (§27.5 ก — ชนิดสุดท้าย = SA-Q1) · NULL = ทั้งปี (legacy ก่อน DES-009 — BR-22/BR-24) |
-| `sRoomID` | varchar(10) | = `TRoom.sRoomID` (ความยาวตาม dump — SA-Q5) |
-| `nCapacity` | int NULL | จำนวนห้องเรียนที่ใช้ห้องพร้อมกันได้ (≥ 1) · NULL = ยังไม่ตั้ง → K = 1 (BR-54) |
-| `nCaretakerTeacherID` | int NULL | ครูผู้ดูแลห้อง → `TEmployees` · **มีผลต่อการจัด** (BR-71) · NULL = ไม่มีผู้ดูแลในหน่วยนี้ (fallback OQ-31 ข) |
-| `isDeleted`, `CreatedBy/At`, `UpdatedBy/At` | | ตามแบบแผนตารางอื่นของโมดูล |
+| `SchoolID` | integer | NOT NULL, ไม่มี default; = `TClass.SchoolID` |
+| `nYear` | integer | NOT NULL, ไม่มี default; ปี `TTerm.nYear` (OQ-43 ปิด) |
+| `nTerm` | text | NOT NULL, ไม่มี default; key `TTerm.nTerm` (string) ตรงตัว; ไม่มี legacy NULL ทั้งปี |
+| `sClassID` | varchar | NOT NULL, ไม่มี default; key `TClass.sClassID` ตรงตัว; ไม่ระบุความยาวเพราะ varchar(10) ของ dump ไม่ใช่ live |
+| `nCapacity` | integer | NULL, DEFAULT NULL; CHECK `nCapacity IS NULL OR nCapacity >= 1`; NULL = ยังไม่ตั้งความจุ |
+| `CreatedBy`, `UpdatedBy` | integer | NULL, DEFAULT NULL — แบบ `TClass` (dump `school_db.sql:1112–1113`, inferred) |
+| `CreatedDate`, `UpdatedDate` | timestamp | NULL, DEFAULT NULL — แบบ `TClass` (dump `:1114–1115`, inferred); external writer เติม, โมดูลไม่อ่าน/ไม่เขียน audit |
 
- - uniqueness (app layer): `(nSchoolID, nYear, sTermID, sRoomID)` ที่ `isDeleted=false` · ห้องที่ไม่มีแถวในหน่วยนั้น = ไม่ได้ตั้งทั้งสองค่า → K = 1 และไม่มีข้อบังคับผู้ดูแล (BR-54, BR-71)
- - **ไม่สืบค่าข้ามหน่วย:** เทอม/ปีใหม่ไม่รับค่าของเทอมก่อนอัตโนมัติ (ตรงคำตอบ "ต่อปี/เทอม") — ทางเดียวที่ได้ค่าเดิมคือการคัดลอก (REQ-013) ซึ่ง requirement ยังไม่ระบุจุด → **จนกว่า OQ-31 (ค) ตอบ: ไม่อยู่ใน scope คัดลอกใด** (§35.8 BR-66)
- - เหตุผลที่เสนอ C2: โมดูลเขียนเองได้ (DES-004 ห้ามเขียน school DB), คัดลอกข้ามเทอมได้ใน transaction เดียวกับ `Copy/Apply` (§35.3), ไม่ต้องรอทีม school DB
-- **C1′ — ทางเลือก (แทน C1 ของ Rev 6):** ตารางใหม่ใน school DB คีย์ `(SchoolID, nYear, nTerm, sRoomID)` ที่เจ้าของ school DB สร้าง — ระบบอื่นเห็นค่าเดียวกัน แต่ **โมดูลเขียนไม่ได้** → ต้องมีช่องทางแก้ค่านอกโมดูล, `RoomSetting/Set` ไม่มี, และ REQ-013 คัดลอกค่าชุดนี้จากโมดูลไม่ได้ · **คอลัมน์บน `TRoom` ตรง ๆ (C1 เดิม) ตกไป** เพราะไม่มีมิติปี/เทอม
-- ทางที่ไม่เลือก: เก็บความจุ/ผู้ดูแลใน `Tbl_SubjectRoom` ต่อวิชา — ผิดแบบจำลอง (เป็นของห้อง: สองวิชาที่ใช้ห้องเดียวกันต้องเห็นค่าเดียวกัน) · เก็บต่อห้องกายภาพทุกปี (ข้อเสนอ Rev 6) — ธุรกิจปฏิเสธ (OQ-26 ข)
+- **PRIMARY KEY `(SchoolID,nYear,nTerm,sClassID)`** (ยืนยัน) · external writer จัด/ลบ row เอง · ห้าม UNIQUE/FK บน `TClass`/`TTerm`/`TEmployees`
+
+**`public."TClassSettingCaretaker"` — ยืนยัน jtrp98 2026-10-11:** **"ยืนยันทั้งตารางลูกและ DTO (Recommended)"** (ไม่แก้ `TClass`/`TClassSetting`; `TClassSetting` เหลือ `nCapacity`+audit ไม่มี `sEmp`) · 1 แถว = ผู้ดูแล 1 คนของ (โรงเรียน, ปี, เทอม, ห้อง)
+
+| คอลัมน์ quoted exact | PostgreSQL type | NULL / default / ขอบเขต |
+|---|---|---|
+| `SchoolID`, `nYear`, `nTerm`, `sClassID` | integer, integer, text, varchar | NOT NULL ทุกตัว ไม่มี default; ความหมายเดียวกับ `TClassSetting` |
+| `sEmp` | integer | NOT NULL; = `TEmployees.sEmp` (PK int — `Models/TEmployees.cs:13–14`) ของ SchoolID เดียวกัน; ไม่มีแถว = ไม่ตั้งผู้ดูแล (OQ-31 ข) |
+| `CreatedBy`, `UpdatedBy` / `CreatedDate`, `UpdatedDate` | integer / timestamp | NULL, DEFAULT NULL — แบบ `TClass` |
+
+- **PRIMARY KEY `(SchoolID,nYear,nTerm,sClassID,sEmp)`** กันผู้ดูแลซ้ำ · ไม่มี FK ไป `TClassSetting`/`TClass`/`TEmployees` · อ่านอิสระจาก `TClassSetting` ด้วยคีย์หน่วยเดียวกัน: มีผู้ดูแลแต่ไม่มีแถว `TClassSetting` = capacity absence (K=1+RoomSettingMissing) และใช้ผู้ดูแลตามปกติ — ไม่ใช่ invalid
+- เหตุผลที่เลือกตารางลูก: PK กันซ้ำที่ DB, external writer ใช้ INSERT/DELETE ตรง, join `TEmployees`/แผนได้ตรง, คง `TClassSetting` ตามรูปที่ยืนยัน · ไม่เลือก `integer[]`/jsonb บน `TClassSetting` (ต้อง validate element null/ซ้ำ/ชนิดที่ app, fail-closed ยากกว่า) · ไม่เลือกหลายแถวต่อห้องใน `TClassSetting` (`sEmp` เข้า PK ทำให้ `nCapacity` ซ้ำ/ขัดกันได้ต่อแถว)
+- ชื่อคอลัมน์ DB (`sClassID`/`sEmp`) ต่างจาก DTO (`sRoomID`/`lstCaretakers[].nTeacherID`) โดยตั้งใจ: โมดูลใช้ `sClassIDs`/`nClassID` = ห้องเรียนนักเรียน int — ห้ามผสม
+- หน่วยค่าคือ (school, year, term, room); ไม่อ่านปี/เทอมอื่น ไม่สืบทอด ไม่ backfill/copy ให้อัตโนมัติ; ไม่มีแถวและแถวที่ capacity NULL เป็น "ไม่ได้ตั้ง" ต่างจาก read error · **successful absence/NULL capacity ใช้ K=1+RoomSettingMissing ยืนยันแล้ว**; read failure/invalid data BLOCK ไม่มี business fallback ใหม่สำหรับค่า invalid
+- **Read contract confirmed**: `StudentDataContext` อ่าน relation นี้แบบ read-only/no-tracking โดย filter SchoolID จาก authenticated context และ `nYear`/`nTerm` ของตาราง; validate เทอมของโรงเรียน/ปี, room ของโรงเรียน, caretaker ของโรงเรียนก่อนใช้ · ไม่มี INSERT/UPDATE/DELETE/SaveChanges ต่อ School DB จากโมดูล
+- DTO Rooms (ยืนยัน jtrp98 2026-10-11): `nCapacity:int|null` คงเดิม; `nCaretakerTeacherID`/`sCaretakerTeacherName` เดี่ยว → `lstCaretakers:[{nTeacherID:int,sTeacherName:string|null,isInPlan:bool}]` (ไม่มีผู้ดูแล = `[]`) · `sTeacherName` = ชื่อเมื่อ `TEmployees.cDel IS NULL` ไม่ขึ้นกับ `isInPlan`; ครูที่ถูกลบ/ชื่อว่าง = `null` (DES-013 §38.5a ข้อ 2 — SA ตัดสินตามที่ผู้ใช้มอบอำนาจ 2026-10-11; shape ไม่เปลี่ยน) · `isInPlan` = ผู้สอนในแผน/หลักสูตรของโรงเรียน ปี/เทอมเดียวกัน (OQ-45 ข) ตามนิยาม DES-013 BR-71 · `nTerm` บน School DB map กับ query `sTermID:string` ตรงตัว · successful absence/read failure/invalid external data ตาม DES-013 §38.3/§38.5 (ใช้กับทั้งสอง relation) ไม่ตีความ read failure ว่า absence
+- Evidence อ่านจริง: `sb-api-academic-timetable-ai/AITimeTableBackend/Helpers/StudentDataContext.cs:20` ใช้ `UseNpgsql`; `Models/TTerm.cs:16,25,32` ให้ nTerm string/SchoolID int/nYear int?; `Models/TEmployees.cs:13–14,24` ให้ sEmp int [Key]/SchoolID int?; แผน: `Models/TPlanCourseTeacher.cs:12–16,21` (PlanCourseId, sEmp int, IsActive bool?, SchoolID, cDel bool), `Models/TPlanCourse.cs:12–13,21–25` (PlanId, CourseStatus, IsActive, cDel bool), `Models/TPlan.cs:12–22` (ไม่มีปี/เทอม), `Models/TPlanTermSubLevel2.cs:11–15` (PlanId→nTermSubLevel2), `Models/TTermSubLevel2.cs:16` (nTerm string) · dump (D24) `school_db.sql:1106–1117` TClass, `:1626` TEmployees.sEmp INTEGER **inferred เท่านั้น ไม่ใช่ live-schema/length/FK confirmation** · Academic source `Tclass.cs:8–14`, `TimetableRepository.cs:621–630` (confirmed เฉพาะ source)
+- **Quality/operations (proposal):** PK สนับสนุน exact school/year/term query และอ่าน room rows แบบ batch ไม่ N+1; ปริมาณ/peak ไม่มีตัวเลขยืนยัน ต้องวัดก่อนเปิดใช้ · ไม่มี cache ข้ามหน่วย/no stale fallback; logs เก็บ school/year/term กับ read-state ไม่เผย PII ชื่อครู/JWT · external writer owner ดูแล retention/delete/SQL rollout; module ไม่เพิ่ม job/vendor/operational writer · School DB unavailable/invalid data เป็น visible fail-closed state ตาม DES-013 ไม่ clamp เป็น default
+- **read states/K1/`TClassSetting`/`TClassSettingCaretaker`/DTO `lstCaretakers`/SA-Q25 ปิดตามคำตอบจริง (gate #2 ส่วนรูปตารางปิด 2026-10-11)**; SA-Q5 runtime TClass, SA-Q10 Academic read path, module mapping schema (ก), DDL execution, security และ release ยังเปิด · backend-engineer เขียน SQL artifact ใหม่ (`class-setting-school-db.sql` ทั้งสอง relation) ตาม PM exact Write paths (ตารางลูกยืนยันแล้ว 2026-10-11); artifact review ไม่ใช่ permission execute/live-create; ไม่มีตาราง/คอลัมน์ใดถูกรันจาก amend นี้
+
+
+> **คำยืนยันจริงเพิ่มเติม jtrp98 2026-10-11 (รูป TRoomTermSetting ถูกแทนโดยคำสั่ง TClass/TClassSetting วันเดียวกัน; สัญญาอ่าน/K1 ยังมีผล):** ผู้ใช้ตรวจ concrete SQL `room-term-setting-school-db.sql:14–22` (six columns+PK/check ตรงรูปนี้; review14/QA17 เป็น static partial ไม่ใช่ runtime) แล้วตอบ **"ยืนยันตารางและสัญญาอ่านนี้ (แนะนำ)"** — ยืนยัน exact C1′ schema/DTO/read scopes/ownership และ read failure/invalid external data BLOCK ตาม DES-013 §38.3/38.5 · ตอบ **"ใช้ความจุ 1 พร้อมคำเตือน (แนะนำ)"** — successful absence ไม่มี row หรือ capacity NULL เท่านั้นใช้ K=1+RoomSettingMissing; ไม่ใช้เมื่ออ่านล้ม/ข้อมูล invalid · ไม่ยืนยัน live TRoom/Academic/module mapping schema (ก)/DDL execution/shared DB/migration/deploy/release/security
+
+> **คำยืนยันจริงเฉพาะ BE-013 / dev (jtrp98 2026-10-11):** ผู้ใช้ตอบ **"อนุมัติรูปนี้สำหรับ dev; ตั้งเพดานใหม่เมื่อเปิดใช้"** หลังเห็น (ข) `nMaxTeachingHoursPerDay/Week int NOT NULL DEFAULT 0`, keys รายคน; (ค) `jHomeroomRestrictedTeachers jsonb NULL = [{nTeacherID}]` (H1); คงคอลัมน์เดิมและหยุดอ่านหลัง paired cutover; (จ) M1 ไม่แปลง/ไม่มี backfill และผลเพดาน default 0 จนตั้งใหม่ · เป็น human schema/breaking approval ของ (ข)(ค)(จ) **เฉพาะ dev** จึงปิด SA-Q4/H1 สำหรับ dev; ไม่อนุมัติ (ก)(ง), §27.5; (ก2) มีคำยืนยันแยกด้านบนเฉพาะ schema/read, DDL execution/shared-environment migration/deploy หรือวัน cutover · SA-Q8 (BE-013 คู่ FE-025/DES-011) ยัง hold release แต่ไม่ขวาง dev หลัง PM ระบุ exact Write paths · ประวัติ archive.md:2717 คงเป็นประวัติที่ไม่ใช่ human approval
 
 **(ข) REQ-017 — `Tbl_Setting` + คอลัมน์เพดานหน่วยชั่วโมงเต็ม (Rev 6 — AC-041: จำนวนเต็มเท่านั้น)**
 
 - `nMaxTeachingHoursPerDay int NOT NULL DEFAULT 0`, `nMaxTeachingHoursPerWeek int NOT NULL DEFAULT 0` (0 = ไม่กำหนด) — Rev 5 เสนอหน่วยนาทีเพื่อรองรับเศษ; ไม่จำเป็นแล้ว เก็บตรงตามค่าที่ผู้ใช้กรอก ไม่ต้องแปลง/ปัด
 - jsonb `jSetMaxPeriodIndividually` แต่ละแถว + key `nMaxTeachingHoursPerDay`, `nMaxTeachingHoursPerWeek` (ไม่มี DDL)
-- คอลัมน์เดิม `nMaxTeachingPeriodPerDay`, `isApplyMaxPeriodToAllTeachers`, `isExceptMaxPeriodTeachers`, `sMaxPeriodExceptTeacherIDs` **คงไว้ ไม่ลบ แต่ไม่ถูกอ่านหลัง cutover** · ชื่อ/ชนิดสุดท้าย = SA-Q4
+- คอลัมน์เดิม `nMaxTeachingPeriodPerDay`, `isApplyMaxPeriodToAllTeachers`, `isExceptMaxPeriodTeachers`, `sMaxPeriodExceptTeacherIDs` **คงไว้ ไม่ลบ แต่ไม่ถูกอ่านหลัง cutover** · SA-Q4 ชื่อ/ชนิดนี้ยืนยันเฉพาะ dev โดย jtrp98 2026-10-11
 
 **(ค) REQ-018 — `Tbl_Setting` + `jHomeroomRestrictedTeachers jsonb NULL`**
 
@@ -155,7 +177,9 @@ erDiagram
 - ธง homeroom 7 คอลัมน์เดิม (`isUseAllHomeroomTeachers` … `sHomeroomExceptTeacherIDs`) คงไว้ ไม่อ่านหลัง cutover
 - `Tbl_TeacherClassAssignment` **ไม่แก้ ไม่ลบ** (AC-046a — dead data; การลบเป็นการตัดสินใจแยกที่ต้องมีคนอนุมัติ)
 
-**(ง) REQ-019 — ตารางใหม่ `Tbl_TimetableAcademicSync` (Rev 6 — บังคับ ไม่ใช่ทางเลือก)**
+**(ง) REQ-019 — ตารางใหม่ `Tbl_TimetableAcademicSync` (บังคับ; ยืนยัน schema jtrp98 2026-10-11)**
+
+> A+atomic T1 direction และ schema ยืนยันจริงโดย jtrp98 2026-10-11: "ยืนยันสัญญา T1 Atomic Replace (POST api/gateway/timetables/atomic-replace, Single DB Transaction พร้อม Revision check) และ schema Tbl_TimetableAcademicSync (บันทึก nStatus 1=Sent, 2=Rejected, 3=Failed)" ตาม DES-016 §41.4a; ไม่มีสถานะ Partial ใน atomic replace (T2 ตกไป); DDL execution ใน School DB ให้ผู้ใช้รันเอง
 
 | คอลัมน์ | ชนิด | ความหมาย |
 |---|---|---|
@@ -164,8 +188,8 @@ erDiagram
 | `nTimetableID` | int | ตารางต้นทาง (`Tbl_Timetable`) |
 | `nClassID` | int | ห้องเรียน = `nTermSubLevel2` ที่ส่ง |
 | `sTermID` | varchar | = `nTerm` ที่ส่ง (BR-46) |
-| `nStatus` | int | 1 Sent / 2 Rejected / 3 Failed / 4 Partial (BR-48, §41.4) |
-| `jScheduleIDs` | jsonb | `scheduleId` ที่ Service Academic คืนมาของชุดล่าสุดที่เขียนสำเร็จ (ใช้โดย BR-56 และการลู่เข้าของ T2) |
+| `nStatus` | int | 1 Sent / 2 Rejected / 3 Failed (BR-48, §41.4) |
+| `jScheduleIDs` | jsonb | `scheduleId` ที่ Service Academic คืนมาของชุดล่าสุดที่เขียนสำเร็จ (ใช้โดย BR-56) |
 | `jDetail` | jsonb | ผลรายแถว/ข้อความจาก Service Academic |
 | `dSentAt`, `nSentBy` | timestamp, int | ผู้ส่ง/เวลา (ค่าจาก client — §9) |
 | `CreatedBy/At`, `UpdatedBy/At` | | |
@@ -175,8 +199,8 @@ erDiagram
 
 **(จ) Migration / backfill (Rev 6)**
 
-- (ก)(ก2)(ค)(ง): ตาราง/คอลัมน์ใหม่แบบ nullable/default → ไม่มี backfill · DDL เป็น SQL มือ (ไม่มี EF Migrations — §27.4)
-- (ก)(ก2) กับ DES-009 (Rev 7): ถ้า `Tbl_SubjectRoom`/`Tbl_RoomSetting` ออกก่อน DES-009 แถวที่สร้างจะมี `sTermID` NULL (ทั้งปี) และถูก backfill ตาม §27.5 (จ) ข้อ 3 เป็น **เทอมแรกของปี** → เทอมอื่นของปีนั้นเริ่มโดยไม่มี mapping/ค่าห้อง (K = 1, ไม่มีผู้ดูแล) หลัง backfill — ผลที่ต้องแจ้งคนในรายงาน backfill (ขั้น 4) ไม่ใช่การคัดลอกให้อัตโนมัติ · ถ้าออกพร้อม/หลัง DES-009 ทุกแถวใหม่ต้องมี `sTermID` (BR-22) และไม่มี backfill
+- (ก)(ค)(ง): ตาราง/คอลัมน์ใหม่แบบ nullable/default → ไม่มี backfill · (ก2) C1′ School DB เป็น SQL artifact เท่านั้น ผู้ใช้รันเอง ไม่มี module migration/backfill · DDL execution ของทุกส่วนยังไม่อนุมัติจาก amend นี้
+- (ก) กับ DES-009: legacy Tbl_SubjectRoom.sTermID NULL เท่านั้นที่ใช้ §27.5 (จ); ถ้าออกพร้อม/หลัง DES-009 แถวใหม่ต้องมี sTermID · (ก2) TClassSetting/TClassSettingCaretaker ใหม่ไม่มี legacy NULL/year-wide row และไม่ถูก backfill/copy โดยโมดูล
 - (ข): **M1 — ไม่แปลง ไม่ backfill** (ยืนยันธุรกิจ — OQ-16 ข ปิด 2026-09-28): คอลัมน์ใหม่ default 0 = ไม่จำกัด จนกว่าผู้ใช้กรอกค่าใหม่เป็นชั่วโมง · ค่าเดิม `nMaxTeachingPeriodPerDay` ไม่ถูกแปลงและไม่ถูกอ่านหลัง cutover · M2/M3 ตกไป · ผลที่ต้องแจ้งคน: เพดานที่ทุกโรงเรียนตั้งไว้หมดผลทันทีที่ cutover — SA เสนอรายงานรายชื่อ (โรงเรียน, ปี) ที่เคยตั้งเพดานไว้เพื่อใช้สื่อสารผู้ใช้ก่อน deploy (เอกสารประกอบการสื่อสาร ไม่ใช่ขั้น migration)
 
 **27.7 Target data model ของ Rev 8 — `Data/schema: changed` · รอ schema confirmation จากคน**
@@ -201,6 +225,22 @@ erDiagram
 
 
 ## Change Log
+
+- 2026-10-11 — schema Tbl_SubjectRoom §27.6 (ก) (1 วิชา : 1 ห้อง, sRoomID varchar(10) แมป TClass.sClassID) และ schema Tbl_TimetableAcademicSync §27.6 (ง) (nStatus: 1=Sent, 2=Rejected, 3=Failed) ได้รับการยืนยันจาก jtrp98; DDL execution ยังคงให้ผู้ใช้รันเองตามข้อตกลงเดิม
+
+- 2026-10-11 — SA-Q5 ส่วน TClass model fields ยืนยันจาก model ที่ jtrp98 ส่ง: public.TClass, sClassID max10/key order0 + SchoolID int/key order1, sClass max250, sClassIP max15, cDel max1, nullable audit 4; ไม่ select sClassIP. SA-Q10 เลือก X2 + นับคาบไม่ถูกลบทั้งหมดรวม inactive (DES-013 §38.4). Module mapping schema (ก)/concrete X2 contract/runtime/security/DDL/deploy/release ยังไม่อนุมัติ; ไม่มี live DB check.
+
+- 2026-10-11 — (ก2) DTO `lstCaretakers[].sTeacherName` ค่าตาม DES-013 §38.5a ข้อ 2 (active โรงเรียนเดียวกัน→ชื่อ, ลบ/ว่าง→null) — SA ตัดสินตามที่ผู้ใช้มอบอำนาจ 2026-10-11 ไม่ใช่การอนุมัติของมนุษย์; shape/ตาราง/DDL ไม่เปลี่ยน; additive ไม่มีข้อความถูกแทน
+
+- 2026-10-11 — jtrp98 "ยืนยันทั้งตารางลูกและ DTO (Recommended)": (ก2) `TClassSettingCaretaker` + DTO `lstCaretakers` confirmed (gate #2 รูปปิด); ไม่รัน/ไม่อนุมัติ DDL execution; SA-Q5/SA-Q10/(ก)/security/release ยังเปิด; ส่วนที่แทน archive.md verbatim
+
+- 2026-10-11 — คำตอบ jtrp98 (req-016.md:22; OQ-43/44/45; SA-Q25): (ก2) `TClassSetting` ยืนยันรูป + audit 4 + nYear, เอา `sEmp` ออก; เสนอ `TClassSettingCaretaker` (PK 5 คอลัมน์, audit, ไม่มี FK) + DTO `lstCaretakers[{nTeacherID,sTeacherName,isInPlan}]` **รอ gate #2**; cDel active ยืนยัน; ไม่รัน DDL; ส่วนที่แทน archive.md verbatim
+
+- 2026-10-11 — jtrp98 ยืนยัน exact concrete C1′ SQL/read/ownership + read failure/invalid BLOCK และ successful absence/NULL K1+warning จริง; (ก2) gate ปิด ไม่ execute SQL/ปิด live TRoom/Academic/modulemapping/release/security; superseded proposal archive.md verbatim
+
+- 2026-10-11 — บันทึก jtrp98 คำตอบจริง C1′/read-only/SQL self-execute และ BE-013 schema+breaking (ข)(ค)(จ) dev only; C1′ exact table/read contract เป็น proposal; K=1/SA-Q5/SA-Q10 ยังเปิด; ส่วนที่ถูกแทนอยู่ archive.md verbatim ไม่มี code/DDL/deploy/Status writes
+
+- 2026-10-09 — แก้ approval provenance ของ §27.5/§27.6: archive.md:2717 ระบุไม่ได้รับคำตอบ AskUserQuestion แล้วใช้ข้อเสนอเอง จึงไม่ใช่ human schema/breaking confirmation; เก็บประวัติเดิม verbatim ไม่เปลี่ยน schema/API/migration/business rules, verdict BE-010 หรือสิทธิ์ทำ dev ที่ผู้ใช้ให้; งานที่ต้องยืนยันเจ้าของพักตาม Waiting on Human #4/#5
 
 - 2026-10-07 — Migrated to split layout
 

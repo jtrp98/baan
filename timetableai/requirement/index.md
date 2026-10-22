@@ -21,7 +21,7 @@
 | REQ-014 | ..REQ-019 — UI Redesign (Figma "AI Timetable to SB System" Phase 2) — **ยืนยันธุรกิจแล้ว 2026-09-23** | confirmed | — | `req-014.md` |
 | REQ-014 | บล็อกการ Generate เมื่อพบวิชาไม่มีครู/โควตา 0 (แก้ REQ-008) | confirmed | AC-016, AC-033, AC-034, AC-035, AC-046, AC-045 | `req-014.md` |
 | REQ-015 | วิชาคาบต่อเนื่อง (Class Continuity) เป็น hard constraint บังคับจริง (แก้ REQ-003(a), ปิด OQ-2 **บางส่วน — เฉพาะ Class Continuity**; ส่วน `nCourseIntensity` ของ OQ-2 ยังเปิด) | confirmed | AC-007, AC-019, AC-036, AC-037 | `req-015.md` |
-| REQ-016 | ห้องเรียนประจำวิชา (Subject Room) + กันห้องชนเวลาเดียวกัน — **ใหม่** | confirmed | AC-038, AC-039, AC-019, AC-040 | `req-016.md` |
+| REQ-016 | ห้องเรียนประจำวิชา (ทะเบียน `TClass`) + capacity/ครูผู้ดูแลรายปี/เทอมใน `TClassSetting` School DB อ่านอย่างเดียว (jtrp98 2026-10-11; OQ-43/44 ปิด — มี nYear, ผู้ดูแลหลายคน; OQ-45 ปิด — อย่างน้อย 1 ผู้ดูแลสอน, คง Link Subject) | confirmed | AC-038, AC-039, AC-019, AC-040 | `req-016.md` |
 | REQ-017 | เพดานการสอนของครู: หน่วยเป็นชั่วโมงจริง + เพดานรายสัปดาห์เป็น hard constraint (แก้ REQ-002) | confirmed | AC-041, AC-042, AC-003, AC-043 | `req-017.md` |
 | REQ-018 | ครูประจำชั้นสอนเฉพาะห้องที่รับผิดชอบ (Homeroom-restricted Teaching) — แก้ REQ-006 | confirmed | AC-044, AC-045, AC-046 | `req-018.md` |
 | REQ-019 | ส่งตารางสอนเข้าระบบตารางสอนหลักของ SB System (ปุ่ม "ใช้งานตารางสอน") — **ใหม่** | confirmed | AC-031, AC-049, AC-047, AC-048, AC-052, AC-053, AC-039 | `req-019.md` |
@@ -31,7 +31,15 @@
 
 ## Change Log
 
+- 2026-10-11 — REQ-016 ปิด OQ-45 (jtrp98): กติกาผู้ดูแลหลายคน + AC-038a; status/AC IDs คงเดิม.
+- 2026-10-11 — REQ-016 ปิด OQ-43/44 (มี nYear; ผู้ดูแลหลายคน ต้องเป็นครูในแผนและหลักสูตร), เปิด OQ-45; status/AC IDs คงเดิม.
+- 2026-10-11 — REQ-016 ทะเบียนห้อง `TRoom` → `TClass`, ที่เก็บค่าห้อง → `TClassSetting` (jtrp98); status/AC IDs คงเดิม; OQ-43/44 เปิด.
+
+- 2026-10-11 — REQ-015/016 normalize คำตอบเพิ่มเติม jtrp98: derived warning API, C1′ read/schema ส่ง SA และ K=1+warning; REQ statuses/AC IDs/scope คงเดิม.
+
 - 2026-10-07 — ตัด AC ซ้ำซ้อนใน REQ-021 ให้ตรงกับ req-021.md
 - 2026-10-07 — แปลงเป็น split layout (DES-014)
+
+- 2026-10-11 — amend REQ-013/REQ-016 ตาม jtrp98: C1′ read-only/ไม่ copy ค่าห้อง; คง confirmed และ REQ/AC IDs เดิม; ส่งต่อ SA amend contracts
 
 Back-links: `..\index.md`
