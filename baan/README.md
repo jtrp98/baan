@@ -1,12 +1,33 @@
-# 🏗️ นายช่าง — ผู้คุมทีม AI 11 role
+# 🏗️ BAAN — นายช่างผู้คุมทีม AI 11 ตำแหน่ง
 
-> แตกงาน เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์
+> แตกงานแต่ละตำแหน่งมีหน้าที่ชัด เปิด session ราย role ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์
+
+## BAAN คืออะไร
+
+เครื่องมือทำงาน software กับ AI หลายตัวพร้อมกันอย่างมีระเบียบ — แทนที่จะเปิด AI session เดียวให้ทำทุกอย่าง (วางแผน เขียนโค้ด เขียนเทส รีวิวความปลอดภัย) จนได้งานปนกันไม่มีคนตรวจ BAAN แบ่งงานเป็น **11 ตำแหน่งธีมไซต์งานก่อสร้าง** แต่ละตำแหน่งมีบทบาท เขตงาน และเขตห้ามแตะเป็นของตัวเอง แล้วเรียกใช้ผ่าน AI CLI ที่ติดตั้งไว้แล้วบนเครื่อง (claude / codex / agy) แบบ non-interactive (`claude -p` / `codex exec` / `agy --print`)
+
+หลักการสำคัญที่ฝังไว้ทุก role:
+
+- **แบ่งแยกหน้าที่กันข้อผิดพลาด** — คนเขียนโค้ดไม่ใช่คนตรวจโค้ด ผู้ออกแบบ schema ห้ามรัน SQL เอง
+- **ประตูมนุษย์** — สิ่งที่ต้องเป็นคนตัดสิน (เซ็น UX, รัน SQL, ตัดสินธุรกิจ) ทีมหยุดถามเสมอ ไม่ทำแทน
+- **จ่าย model ตามความยากงาน** — งานคิดหนักใช้ model แพง งานจำนวนมากใช้ model เบา ผ่านระบบ tier
+- **อ่านอย่างเดียวโดยดีฟอลต์** — ทุก session เริ่มแบบ read-only จะแก้ไฟล์ได้ต่อเมื่อสั่ง `--write` ชัดๆ
+
+คุณสมบัติ: **zero runtime dependency** (ต้องมีแค่ Node.js ≥ 18) · รัน local ทั้งหมด · รายงานของทุก run เก็บไว้ในเครื่อง (`reports/`)
+
+## เริ่มต้นใช้งาน
+
+ต้องมีก่อน: Node.js ≥ 18 และ AI CLI อย่างน้อยหนึ่งตัว (`claude` / `codex` / `agy`) ที่ล็อกอินใช้งานได้แล้ว (agy โหมดอ่านต้องติดตั้ง profile เพิ่มหนึ่งครั้ง — ดูหัวข้อ "ตัวรัน AI CLI")
+
+```bash
+git clone https://github.com/jtrp98/baan && cd baan/baan   # clone ไว้ตรงไหนก็ได้ เช่น C:\src\AICode\baan\baan
+npm link                            # ติดตั้งครั้งเดียว ใช้ได้จากทุกโปรเจกต์
+cd <โปรเจกต์ของคุณ>
+baan --init                         # สร้าง baan.config.json + ไฟล์นำทาง AI session ในโปรเจกต์นี้
+baan --list                         # ตรวจว่าเห็น knowledge/targets/roles/tiers ครบ
+```
 
 > ประวัติรุ่นและสิ่งที่เปลี่ยนแต่ละเวอร์ชัน: `RELEASE-NOTES.md`
-
-**นายช่าง คือบทบาทที่ AI session สวม** — session ที่สวม นายช่าง เป็นผู้คุมทั้ง 11 ตำแหน่ง และเปิด session ของแต่ละ role เองได้ (ผ่าน `claude -p` / `codex exec` / `agy --print` แบบ non-interactive — กลไกเดียวกับที่พิสูจน์ไปตอนแรก)
-
-ระบบนี้เป็น **local npm package** (clone ไว้ที่ไหนก็ได้บนเครื่อง — เช่น `C:\src\AICode\baan\baan`) — ติดตั้งครั้งเดียวด้วย `npm link` แล้วเรียกจากโปรเจกต์ไหนก็ได้ ไม่ต้อง copy code ไปทุกที่ ไม่รก
 
 ## สถาปัตยกรรม
 
@@ -22,7 +43,13 @@ AI session ใดก็ได้ (claude/codex/agy/ZCode/...)
 1. **โหมดหลัก** — AI session สวม นายช่าง แล้วคุมเอง (อ่าน `BAAN.md`)
 2. **โหมดอัตโนมัติ** — `baan --goal "..."` (gm → plan → execute เป็นสคริปต์ ตาม DAG)
 
-โครงสร้างข้อมูล (config ของ workspace อยู่**นอก package** ที่ `<ราก workspace>\baan.config.json` เช่น `C:\src\schoolbright\baan.config.json` — กัน update version ทับ config): **ที่เก็บเอกสาร** (`knowledge_roots` เช่น `C:\src\schoolbright\knowledge`) · **ที่เก็บ code** (`targets` เช่น `C:\src\schoolbright\target\*`) — ตัว baan เดินหา config ขึ้นจากไดเรกทอรีที่เรียกอัตโนมัติ (หรือ `--config <file>` / env `BAAN_CONFIG`) · ติดตั้ง workspace ด้วย `baan --init` · โหมดอัตโนมัติใช้ผ่าน `--target <ชื่อ>` · ตัวอย่างรูปแบบไฟล์: `baan.example.json`
+โครงสร้างข้อมูลของ workspace หนึ่งๆ (config อยู่**นอก package** เพื่อให้ update version ไม่ทับ config ของคุณ):
+
+- `<ราก workspace>\baan.config.json` — config ของ workspace นั้น (เช่น `C:\src\schoolbright\baan.config.json` · ตัวอย่างรูปแบบเต็ม: `baan.example.json`)
+- **ที่เก็บเอกสาร** — `knowledge_roots` เช่น `C:\src\schoolbright\knowledge` (requirement/design/review แยกโฟลเดอร์รายโปรเจกต์)
+- **ที่เก็บ code** — `targets` เช่น `C:\src\schoolbright\target\*` (repo ที่ทีมจะแตะ)
+
+ตัว baan เดินหา config ขึ้นจากไดเรกทอรีที่เรียกอัตโนมัติ (หรือระบุ `--config <file>` / env `BAAN_CONFIG`) · โหมดอัตโนมัติอ้าง target ผ่าน `--target <ชื่อ>`
 
 ```
 C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้วใช้ได้จากทุกที่)
@@ -39,6 +66,9 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
     run-store.mjs           ← checkpoint ราย task + manifest ของ run (run.json) + resume
     role-guard.mjs          ← ป้าย [baan-role: <ID>] + ประโยคข้อยกเว้น ใช้ร่วมใน prompt ของ role และ stub ของ --init
     role-session.mjs        ← แกนของ baan-role: parse args, runDir ไม่ชน, สถานะงาน + fallback ราย agent
+    init.mjs                ← ติดตั้งลง workspace (baan --init): สร้าง config + ไฟล์นำทาง AI session
+    timeout.mjs             ← คำนวณ/ตรวจ timeout ที่ใช้ร่วมทั้งสองคำสั่ง
+    knowledge-commit.mjs    ← auto commit ที่เก็บเอกสารหลังจบ run
   baan.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\baan.config.json)
   agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
   roles\                    ← 11 ตำแหน่งในทีม
@@ -87,7 +117,7 @@ baan-role --list              # ดูรายชื่อ agent + tier
 
 ### สัญญาของ `baan-role` (โหมดหลัก — ใช้กติกาเดียวกับโหมดอัตโนมัติ)
 
-- **cwd เริ่มต้น = ไดเรกทอรีที่เรียก** (เดิมคือโฟลเดอร์แม่ของ package ซึ่งทำให้ role อ่านผิด repo เมื่อลืม `--cwd`) · `--cwd` แบบ relative อิงจากที่เรียก
+- **cwd เริ่มต้น = ไดเรกทอรีที่เรียก** · `--cwd` แบบ relative อิงจากที่เรียก
 - **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
 - **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
@@ -118,7 +148,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 | `check` | ผู้ตรวจงานอิสระ | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task — ทำหน้าที่ศัตรูของโค้ด | t2 | — |
 | `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR ตามพื้นผิวจริง แล้วประกาศ blocker ตามความเสี่ยงจริง | t2 | `security` |
 
-หลักการแบ่งหน้าที่ที่ฝังไว้ใน role (สอดคล้อง convention ของโปรเจกต์ timetableai):
+หลักการแบ่งหน้าที่ที่ฝังไว้ใน role:
 - **วางแผนกับสั่งงานแยกกัน** — plan วางแผน, gm เป็นคนเรียกใช้ทีมตามแผน
 - **check แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) check เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
 - **Artifact ต้องเซ็นก่อนใช้** — int draft ของ `int` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
@@ -148,7 +178,7 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 # --dry-run ใช้กับทุก route ได้ (รวม --plan-file/--resume) — การ์ดห้ามเรียก provider อยู่ที่ execute จุดเดียว
 ```
 
-### สถานะงาน · checkpoint · resume (ตั้งแต่ v0.3.0)
+### สถานะงาน · checkpoint · resume
 
 - **สถานะงานแยกจาก exit code ของ CLI**: task จบด้วย `completed` เฉพาะเมื่อรันจบ + มีคำตอบ + output state ท้ายคำตอบ (CONVENTIONS §8) เป็น `DONE`/`PASS` (หรือไม่มี marker) — ถ้า role ตอบ `NEEDS_HUMAN` / `NEEDS_REQUIREMENT_CHANGE` / `NEEDS_DESIGN_CHANGE` / `FAIL` / `BLOCKED` ถือว่า**งานไม่สำเร็จแม้ exit code เป็น 0**
 - **dependency ผ่านเฉพาะงานที่ completed** — งานลูกของงานที่ล้มจะถูก mark `blocked` แล้วข้าม แต่งานอิสระที่ไม่ติด blocker ยังทำต่อจนจบ
@@ -161,9 +191,9 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 
 งานที่ผลิตเอกสารยาว (เช่น arch @ t1) อาจใช้เวลานาน — ทั้ง `baan` และ `baan-role` ใช้ timeout เริ่มต้น 1800 วินาทีต่อ AI CLI job (t0 ใช้ 3600 วินาที)
 
-ลำดับ timeout ของทั้งสองคำสั่ง รวม gm/plan, scheduler task และ fallback: **`--timeout` ที่ระบุเอง > tier `_timeoutSec` ใน `agents.json` > workspace `defaults.timeout_sec` > 1800 วินาที** ค่าที่เลือกใช้ต้องเป็นจำนวนเต็ม 1–86400; ค่าผิดจะ error ไม่เปลี่ยนเป็น default เงียบๆ ตัวอย่าง: `baan-role --agent codex --role arch --tier t1 --timeout 3600 --task "วิเคราะห์ระบบ"`
+**ลำดับ timeout** (ทั้งสองคำสั่ง รวมทุกขั้นและ fallback): `--timeout` ที่ระบุเอง > `_timeoutSec` ของ tier ใน `agents.json` > `defaults.timeout_sec` ใน workspace config > 1800 วินาที · ค่าต้องเป็นจำนวนเต็ม 1–86400 ค่าผิดจะ error ทันที ไม่เปลี่ยนเป็น default เงียบๆ เช่น `baan-role --agent codex --role arch --tier t1 --timeout 3600 --task "วิเคราะห์ระบบ"`
 
-`baan-role` อ่านเฉพาะ timeout จาก workspace config ผ่าน loader ร่วม: `BAAN_CONFIG` ชนะ discovery ซึ่งเดินขึ้นจาก `--cwd` หรือไดเรกทอรีที่เรียกเมื่อไม่ได้ส่ง `--cwd` (รองรับทั้ง `baan.config.json` และชื่อเก่า `mycelium/mycelium.json`) โดยไม่เปลี่ยน agent, cwd หรือโหมดสิทธิ์จาก workspace defaults ส่วน `baan` คง discovery จากไดเรกทอรีที่เรียก และรับ `--config` ตามเดิม การ resume ไม่คืน timeout จาก manifest ตามพฤติกรรมเดิม
+`baan-role` หา workspace config โดยเดินขึ้นจาก `--cwd` (หรือไดเรกทอรีที่เรียก) เพื่ออ่านเฉพาะ default timeout และราก workspace — ไม่เปลี่ยน agent/cwd/สิทธิ์จากที่สั่งไว้ · env `BAAN_CONFIG` ชนะการค้นหา · resume ไม่คืน timeout จาก run เดิม
 
 ## การเปลี่ยน model / effort (สำหรับแบ่ง tier)
 
@@ -194,16 +224,15 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 | t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / medium | gemini-3.8-flash-low |
 
 หมายเหตุ:
-- **ลำดับสลับตัวรันเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ --agent) เป็นตัวแรกเสมอ — ถ้าตัวปัจจุบันล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที ทั้งงานในแผนและขั้น gm/plan · **ความล้มเหลวด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint (`fallback`) และ summary · ค่าตั้งปัจจุบัน: t0–t3 = codex → agy → claude, t4–t5 = agy → codex → claude (claude ท้ายสุดทุก tier — โควตาแพงสุด เก็บไว้งานหนัก)
-- **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที (กันสงสัยว่าทำไมไม่ทำงาน)
-- **Argon เปิดตัวแล้ว (เติมครบ 2026-10-17)** — `agy models` มี `gemini-4-argon-low/medium/high` จึงเติม agy กลับที่ t0–t2 ได้ครบ · ข้อจำกัด: agy ไม่มี effort `max` ให้ ที่ t0 จึงใช้ argon-high เป็นเพดานสูงสุด · ชื่อ model ล่าสุดเช็คได้เสมอด้วย `agy models`
-- **t0 ยืด timeout อัตโนมัติเป็น 3600 วินาที/agent** (ปกติ 1800) เพราะงานหนักกินเวลานาน — override ได้ด้วย `--timeout` เสมอ โดยตั้งค่านี้ไว้ที่ `"_timeoutSec"` ใน tier ของ agents.json
-- effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ (ตามที่ UI เตือน) — ใช้เฉพาะ t0 จริงๆ
-- **t3–t5 จัดตาม Intelligence Index ให้สติปาร์ตี้ใกล้กันใน tier เดียว (2026-10-22)** — ก่อนหน้านี้ t3 ของ codex (sol/medium = 48) ฉลาดกว่าเพื่อนใน tier ถึง 7–8 คะแนนจนเผาโควตาเกินจำเป็น และ t4 ของ codex/agy ห่าง anchor ถึง ±4–6 คะแนน คู่ปัจจุบัน: t3 = 41/42/40 · t4 = 34/33/34 · t5 = 29/30/34 — เหตุผลหลักคือ fallback parity (codex ติดโควตาแล้วตกไป agy ที่ t3 เดิมหาย 8 คะแนนกลางแผน) · agy ใช้ flash-low ซ้ำทั้ง t4/t5 เพราะ Gemini มีขั้นระดับจริงแค่ 34/40/41/53 (แบบเดียวกับ argon-high ที่ซ้ำ t0/t1) · ยืนยันแล้ว: agy@t4 ผ่าน live smoke · codex รอโควตากลับ (27 ต.ค. 2026) — CLI รับ config และเริ่ม session ได้ปกติ แต่ยังตรวจพฤติกรรมจริงไม่ได้
-- agy ยังมี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่ออยากทำ tier bulk สำหรับงาน mass
-- แก้/เพิ่ม tier ได้ที่ส่วน `"tiers"` ใน `agents.json`
+- **สลับตัวรันอัตโนมัติเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ `--agent`) เป็นตัวแรกเสมอ — ถ้าล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที · **ล้มด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint และ summary
+- **t3–t5 จัดคู่ model ให้ความสามารถใกล้กันใน tier เดียว** — สลับตัวรันตอนติดโควตาแล้วคุณภาพไม่ตกหนัก · agy ใช้ flash-low ซ้ำทั้ง t4/t5 เพราะขั้นความสามารถของ Gemini มีให้เลือกแค่นั้น (เช่นเดียวกับ argon-high ที่ซ้ำ t0/t1 — agy ไม่มี effort `max`)
+- **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที
+- **t0 ยืด timeout อัตโนมัติเป็น 3600 วินาที/agent** (ปกติ 1800) เพราะงานหนักกินเวลานาน — override ด้วย `--timeout` ได้เสมอ (ตั้งที่ `"_timeoutSec"` ใน tier)
+- effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ — ใช้เฉพาะ t0 จริงๆ
+- agy มี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่อทำ tier สำหรับงานจำนวนมาก
+- แก้/เพิ่ม tier ได้ที่ส่วน `"tiers"` ใน `agents.json` · ชื่อ model ล่าสุดของแต่ละค่ายเช็คได้เสมอ (เช่น `agy models`)
 
-## หลักการทำงานของแต่ละตัว
+## ตัวรัน AI CLI: ความปลอดภัยและสิทธิ์
 
 | Agent | คำสั่งที่ baan-role ใช้ | รับ prompt ทาง | คำตอบอ่านจาก |
 |---|---|---|---|
@@ -213,63 +242,19 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
-  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent baan-readonly` (custom agent profile ระดับผู้ใช้ที่ตัด write/edit tools ออกจาก schema + `PreToolUse` guard hook ใน `~/.gemini/config/hooks.json` ที่บังคับ allowlist คำสั่งอ่านอย่างเดียวเฉพาะเซสชัน `baan-readonly` เพราะ `--mode plan` เดิมกันการเขียนไม่ได้) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
+  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent baan-readonly` (profile ระดับผู้ใช้ที่ตัดเครื่องมือเขียนออก + guard hook ยืนยันว่ารันได้แค่คำสั่งอ่าน) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
   - **agy ต้องติดตั้ง profile `baan-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
-  - **agy (jetski) กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม** จนได้คำตอบว่างเปล่า — พบจริง 2026-10-22 จาก arch ที่ cwd=target อ่าน `knowledge/` ไม่ได้ตอน fallback จาก codex (sandbox ของ smoke เดิมอยู่ใน %TEMP% ซึ่งเป็น safe area จึงตรวจไม่พบ) · นายช่าง จึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก `baan.config.json` เดินขึ้นจาก cwd — ไม่เจอ config = ไม่ส่ง) · โหมด `--write` ไม่ส่งเพราะ `--add-dir` ขยายขอบเขต *การเขียน* ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาใน task หรือรัน read แยกก่อน
+  - **agy ในโหมด headless อ่านไฟล์นอก cwd ไม่ได้** — นายช่างจึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก baan.config.json ที่เดินขึ้นจาก cwd) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนตามไปด้วย — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาไว้ใน task หรือรันโหมดอ่านแยกก่อน
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
 - **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox ปลอมเป็นรูป workspace จริง (มี `baan.config.json` ที่ราก + ไฟล์ลับนอก cwd) แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ใน cwd และนอก cwd (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
 - ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
 - เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
 
-## Change Log
+## สถานะการทดสอบ
 
-- 2026-10-22: แก้ agy อ่านไฟล์นอก workspace ไม่ได้ใน headless (ส่ง `--add-dir` ราก workspace เฉพาะโหมดอ่าน) + `smoke:live` ปลอม sandbox เป็นรูป workspace และตรวจอ่านนอก cwd
-- 2026-10-21: เพิ่ม timeout เริ่มต้นและอธิบาย priority, workspace discovery ของ role และ validation ที่ใช้ร่วมกัน
-
-## ผลการทดสอบ (2026-10-14)
-
-1. **อ่านไฟล์ข้าม CLI**: สั่งทั้ง 3 agent ให้อ่าน `demo-notes.md` แล้วตอบคำลับ — ตอบ `MANGO-77` ถูกต้องครบทุกตัว (claude ~7s, agy ~14s, codex ~35s) แสดงว่า agent รัน tool จริง (อ่านไฟล์ได้) ไม่ใช่แค่ตอบแชท
-2. **เปลี่ยน model/effort**: โจทย์ bat-and-ball รันด้วย `--tier low` และ `--tier high` (ชื่อสมัยแรก) — ผ่าน 3/3 ทั้งสอง tier โดยแต่ละตัวใช้ model/effort ตาม preset จริง (ตรวจแยกด้วย JSON metadata ของ claude และ header ของ codex ไปแล้ว)
-3. **tier ladder 5 ระดับ (t1–t5)**: ทดสอบครบทุก tier ผ่าน 15/15 (5 tier × 3 agent) — T1 ใช้ opus 5.5 high ได้จริงทั้ง claude (`--model opus`) และ agy (`claude-opus-5-5-high`)
-4. **codex เปลี่ยน model ได้**: รายชื่อจริงจาก `/model` ของ codex (gpt-6-astra, gpt-6.1-sol, gpt-6-luna ฯลฯ) — ทดสอบผ่าน CLI แล้วทั้ง astra และ luna ตอบกลับถูกต้อง และรันครบ 5 tier ด้วย model/effort ต่างกันทุกระดับ (5/5)
-5. **t0 overdrive**: claude `opus/max` + codex `gpt-6-astra/max` ใช้ได้จริง (codex header ยืนยัน `reasoning effort: max`) — ผ่าน 3/3 พร้อม timeout อัตโนมัติ 900s
-6. **role directive**: สั่ง `--role check` แล้ว agent ตอบในบทบาท check พร้อมอ้างหลักการ "เขียน test จาก spec ไม่ใช่จากโค้ด dev" จากไฟล์ role จริง — ยืนยันว่าบทบาทส่งถึง agent ครบ
-
-## ผลการทดสอบ release 0.4.0 (2026-10-16 — แยกโมดูลตาม AUDIT ข้อ 7)
-
-- **แยกไฟล์เป็น `bin/` + `src/`** ตามโครงสร้างที่ audit แนะนำ: entrypoint เหลือ parse args + ลำดับใหญ่ (195 บรรทัด/ไฟล์) ส่วนกลไกแยกเป็น config / runner / prompts / plan / scheduler / run-store (61–177 บรรทัด/ไฟล์) จากเดิมไฟล์เดียว 660+ บรรทัด
-- **runner ร่วมหนึ่งชุด** — baan กับ baan-role เรียก spawn/args/stdin/timeout จาก `src/runner.mjs` เดียวกัน ไม่ซ้ำสองแหล่งแล้ว
-- **comment เหลือเฉพาะ why** (เหตุผล/ข้อจำกัดที่โค้ดบอกเองไม่ได้) + ลบของไม่ใช้ (`PLANNER_TIERS_ROLES`, ตัวช่วย smoke ชั่วคราว)
-- tests เดิม 35 กรณีผ่านครบหลังย้าย (import ชี้ src โมดูลตรงตัว) + `npm link` ใหม่ + smoke `--plan-file --dry-run` ผ่าน bin ใหม่ + `npm pack` ยืนยัน bin/ และ src/ ติด package (25 ไฟล์)
-- หมายเหตุ: path ของ bin เปลี่ยน — ใคร link ไว้บนเครื่องอื่นต้อง `npm link` ใหม่หนึ่งครั้ง
-
-## ผลการทดสอบ release 0.8.0 (2026-10-17 — Argon ผ่าน agy)
-
-1. **Gemini 4 Argon ใช้งานจริงผ่าน agy**: โจทย์ smoke คลาสสิก (อ่าน `demo-notes.md` แล้วตอบคำลับ) — `t1 = gemini-4-argon-high` ตอบ `MANGO-77` ถูกต้องใน 25.6 วิ · `t2 = gemini-4-argon-medium` ถูกต้องใน 11.6 วิ — ผ่านทั้งคู่แปลว่า model รันจริงและใช้ tool อ่านไฟล์ได้ (ไม่ใช่แค่ตอบแชท) · รายงาน: `reports\2026-10-17-04-11-59-tier-t1-1agents` และ `reports\2026-10-17-04-12-32-tier-t2-1agents`
-2. **claude/codex ยังใช้ได้เต็มรูปแบบรอบนี้**: รันคู่กันที่ `t1` (opus/high + gpt-6-astra/high) — ตอบ `MANGO-77` ถูกทั้งคู่ (claude 11.6 วิ · codex 96.3 วิ) · โควตา claude ที่เคยใกล้หมด (10-14) กลับมาใช้ได้แล้ว · รายงาน: `reports\2026-10-17-04-14-42-tier-t1-2agents` — สรุป: **สาม agent ผ่าน smoke t1 ครบในวันเดียว (2026-10-17)**
-
-## ผลการทดสอบ release 0.3.0 (2026-10-16 — แก้ตาม AUDIT.md 2026-10-15)
-
-แก้ P1 ครบ 5 ข้อ + P2 สองข้อ พร้อม regression tests 35 กรณี (`npm test` — node:test ล้วน จำลอง provider ไม่ใช้โควตา):
-
-1. **แยกสถานะงานจาก exit code**: dependency ผ่านเฉพาะ task ที่ completed · role ตอบ `NEEDS_*`/`FAIL`/`BLOCKED` (แม้ exit 0) = งานล้ม → งานลูก `blocked` งานอิสระทำต่อ · exit 0 เมื่อทุก task completed เท่านั้น — ทดสอบกับรูปแบบคำตอบจริงจาก run `pipeline-2026-10-15-02-02-30` (bold marker, marker ที่มีข้อความต่อท้าย) ✓
-2. **checkpoint/resume**: `<id>.status.json` เขียนทันทีทีละงานแบบ atomic · resume ข้ามเฉพาะ completed ที่มีคำตอบจริง · timeout/needs_*/run เก่าก่อน v0.3 รันใหม่ · attempt สะสมข้ามรอบ ✓
-3. **resume คืนบริบท**: `run.json` manifest เก็บ resolved target/cwd/write/projectCtx แล้วคืนค่าตอน resume (explicit flag ชนะ, cwd ที่ถูกลบไปแล้ว = error ไม่ใช่เขียนผิดที่) ✓
-4. **dry-run ทุก route**: การ์ดห้ามเรียก provider ย้ายมาอยู่ใน execute จุดเดียว — `--plan-file <f> --dry-run` และ `--resume <dir> --dry-run` ผ่าน smoke test จริงทาง CLI (สร้างแค่ plan.json/run.json ไม่มี provider ถูกเรียก) ✓
-5. **plan validation กันหนี directory**: id pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` · types ของ tasks/dependsOn/humanGates · self-dep/cycle จับก่อน spawn ใดๆ · `--max-parallel`/`--timeout` ตรวจขอบเขต ✓
-6. **CONVENTIONS.md ติด package** (`npm pack` ยืนยัน) และทั้งสอง entrypoint หยุดชัดเจนเมื่ออ่านไม่ได้ · plan ได้กติกากลางครบเหมือน role อื่นแล้ว
-7. **context ส่งต่อ**: แนบสถานะ + path ฉบับเต็มเสมอ และแจ้งเมื่อถูกตัด
-
-ยังเหลือจาก audit (ไว้รอบถัดไป): แยก runner/prompts/config/run-store/scheduler เป็นโมดูล, task-level write scope ก่อนใช้ --write จริง, gate ผูกกับ task เป็น object มีหลักฐานอนุมัติ
-
-## ผลการทดสอบ release 0.2.0 (2026-10-15 — ทั้งหมดบน codex)
-
-1. **role ชุดใหม่ + CONVENTIONS ส่งถึงจริง**: smoke test `check` และ `backend-engineer` (t5) — ตอบครบทุกข้อ: เขต Owns/ห้ามแตะ `knowledge\`, stop-and-route (`NEEDS_*` พร้อมอ้างอิง), output states, check เป็นเจ้าของ unit test ✓
-2. **plan เคารพกติกาใหม่**: dry-run — plan ให้ 2 task ตามขนาดงาน (ไม่ใช้ทั้งทีม), tier ตรง FIXED_ROLE_TIER (spec=t2, inspect=t2), dependency ถูก, humanGates มีเนื้อหาจริง, จบ handoff ตามรูปแบบ ✓
-3. **โหมดอัตโนมัติจบครบ run แรก**: execute แผนเดียวกันจบ 2/2 task 2 wave exit 0 — output ทั้งสอบจบด้วย handoff รูปแบบ charter + **output state พร้อม Task/Reference/Reason** (`NEEDS_HUMAN`, `NEEDS_REQUIREMENT_CHANGE`) ตรงตาม CONVENTIONS §8 และ role ไม่ตัดสินธุรกิจแทนคน ✓ (รายงาน: `reports\pipeline-2026-10-15-02-02-30`)
-4. แก้บั๊กเครื่องสำอำรึก: ข้อความ console อ้าง path เก่า `ai-team/roles/` → `roles/`
-
-ยังค้างข้อเดียวก่อนใช้เต็มรูปแบบ: **โหมดหลัก (session สวมบท นายช่าง)** ยังไม่เคยรันกับ goal จริงบน target จริง — กลไกทุกชิ้นที่มันใช้พิสูจน์ครบแล้ว เริ่มใช้ได้ทันทีโดยให้ session อ่าน `BAAN.md` พร้อม goal จริง
+- **`npm test`** — regression ทั้งหมด (node:test ล้วน ไม่ยิง provider จริง ไม่ใช้โควตา) ต้องเขียวทุกครั้งก่อน commit
+- **`npm run smoke:live`** — ทดสอบตัวรันจริงทุกค่ายด้วยโควตาจริง: อ่านไฟล์ใน/นอก cwd, คำสั่งอ่านอย่างเดียว, โหมดอ่านกันเขียนจริง, `--write` เขียนได้ (ดูรายละเอียดหัวข้อ "ตัวรัน AI CLI")
+- ผลทดสอบย้อนหลังราย release: `RELEASE-NOTES.md`
 
 ## เพิ่ม/แก้ agent
 
@@ -283,6 +268,6 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 ## ไอเดียต่อยอด
 
-- **Pipeline อัตโนมัติ (นายช่าง) มีแล้ว** — ดูหัวข้อ "🏗️ นายช่าง" ด้านบน; ต่อยอดได้อีกเช่น เก็บผลลัพธ์เป็น artifact ตามโครงสร้าง knowledge base (requirement/ design/ check/ ฯลฯ)
+- เก็บผลลัพธ์ของแต่ละ task เป็น artifact ตามโครงสร้างที่เก็บเอกสาร (requirement/ design/ check/ ฯลฯ) อัตโนมัติ
 - ให้ นายช่าง เลือก agent ราย task ตามความเหมาะสม (เช่น งานเขียนโค้ดให้ตัวที่ถนัด) หรือรันซ้ำเมื่อคำตอบไม่ผ่านเงื่อนไข
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
