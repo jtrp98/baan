@@ -158,18 +158,18 @@
 
 ## Archived Rounds
 
-- [Phase 4 — R1 (2026-10-01, ❌ Failed FULL)](qa/phase-4.md)
-- [Phase 4 — R2 (2026-10-01, ❌ Failed FULL)](qa/phase-4.md)
-- [Phase 4 — R3 (2026-10-01, ⚠️ Partial FULL)](qa/phase-4.md)
-- [Phase 4 — R4 Final (2026-10-01, ✅ Verified FULL)](qa/phase-4.md)
-- [Phase 5 — R1 (2026-10-01, ⚠️ Partial FULL)](qa/phase-5.md)
-- [Phase 5 — R2 (2026-10-01, ❌ Failed TARGETED: FE-001)](qa/phase-5.md)
-- [Phase 5 — R3 (2026-10-01, ✅ Verified TARGETED: FE-001; archived 2026-10-02)](qa/phase-5.md)
-- [Phase 7 — R1 (2026-10-02, ✅ Verified TARGETED: FE-018; archived 2026-10-04)](qa/phase-7.md)
-- [Phase 7 — R6 (2026-10-04, ✅ Verified TARGETED: FE-019 รอบแก้ design Rev 20 §43.2b ข้อ 5; archived 2026-10-04)](qa/phase-7.md)
-- [Phase 5 — R4 (2026-10-04, ✅ Verified TARGETED: BE-008; archived 2026-10-04)](qa/phase-5.md) · RV-1, RV-4 (resolved R5) → `qa/phase-5.md`
-- [Phase 5 — R5 (2026-10-04, ✅ Verified TARGETED: BE-009; archived 2026-10-04)](qa/phase-5.md)
-- Open Issues ที่ปิดแล้ว (Phase 4: FIND-P4-01..07, HUMAN-P4-R4 · Phase 5: FIND-P5-01, FIND-P5-04, HUMAN-P5-R1, RV-2, RV-3, RV-5, RV-6, RV-8, RV-10) และ Change Log 2026-10-01..10-02 → ย้าย verbatim 2026-10-04 ไปท้าย [qa/phase-4.md](qa/phase-4.md), [qa/phase-5.md](qa/phase-5.md), [qa/phase-7.md](qa/phase-7.md)
+- [Phase 4 — R1 (2026-10-01, ❌ Failed FULL)](round-1.md)
+- [Phase 4 — R2 (2026-10-01, ❌ Failed FULL)](round-1.md)
+- [Phase 4 — R3 (2026-10-01, ⚠️ Partial FULL)](round-1.md)
+- [Phase 4 — R4 Final (2026-10-01, ✅ Verified FULL)](round-1.md)
+- [Phase 5 — R1 (2026-10-01, ⚠️ Partial FULL)](round-2.md)
+- [Phase 5 — R2 (2026-10-01, ❌ Failed TARGETED: FE-001)](round-2.md)
+- [Phase 5 — R3 (2026-10-01, ✅ Verified TARGETED: FE-001; archived 2026-10-02)](round-2.md)
+- [Phase 7 — R1 (2026-10-02, ✅ Verified TARGETED: FE-018; archived 2026-10-04)](round-3.md)
+- [Phase 7 — R6 (2026-10-04, ✅ Verified TARGETED: FE-019 รอบแก้ design Rev 20 §43.2b ข้อ 5; archived 2026-10-04)](round-3.md)
+- [Phase 5 — R4 (2026-10-04, ✅ Verified TARGETED: BE-008; archived 2026-10-04)](round-2.md) · RV-1, RV-4 (resolved R5) → `qa/phase-5.md`
+- [Phase 5 — R5 (2026-10-04, ✅ Verified TARGETED: BE-009; archived 2026-10-04)](round-2.md)
+- Open Issues ที่ปิดแล้ว (Phase 4: FIND-P4-01..07, HUMAN-P4-R4 · Phase 5: FIND-P5-01, FIND-P5-04, HUMAN-P5-R1, RV-2, RV-3, RV-5, RV-6, RV-8, RV-10) และ Change Log 2026-10-01..10-02 → ย้าย verbatim 2026-10-04 ไปท้าย [qa/phase-4.md](round-1.md), [qa/phase-5.md](round-2.md), [qa/phase-7.md](round-3.md)
 
 ## Change Log
 

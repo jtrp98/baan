@@ -4,7 +4,7 @@
 
 ## Verification Summary
 
-- **Phase / Round:** Phase 5 (Module G — DES-022 🔒 Security gate) · R1 · 2026-10-01 (วันที่ผู้เรียกระบุ) · Phase 4 R1–R4 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Phase / Round:** Phase 5 (Module G — DES-022 🔒 Security gate) · R1 · 2026-10-01 (วันที่ผู้เรียกระบุ) · Phase 4 R1–R4 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** FULL · ทุก task ในเฟส (BE-006, BE-007, FE-017, FE-010) + ตรวจ AC-063 ของ FE-001 ซ้ำตาม Sequencing Notes · STA run `run-mupjoyd7-8ab34689` — ไม่มี evidence package / `deterministic_gate` → ถือเป็น interactive · ไม่รัน git
 - **Deterministic sweep:** QA สั่ง `node .claude/scripts/static-analysis-gate.js` และ `sta context` — **ถูกปฏิเสธสิทธิ์ (ต้องขออนุมัติ)** · ผู้เรียกแจ้งว่า gate บน Knowledge repo PASS (caller-run, QA ไม่ได้รันซ้ำ) — gate นี้**ไม่ครอบ Target** จึงไม่นับเป็น sweep ของโค้ด Phase 5
 - **หลักฐานการรัน (caller-run ใน session นี้ · QA ไม่ได้รันซ้ำ):** [sb-api-academic-timetable-ai] `dotnet test AITimeTableBackend.Tests` 42/42 (QA นับจากซอร์ส: ResolverTests 15 = 9 Fact + Theory 6, FilterTests 10, IntegrationTests 17 = 42 ✓) · [sb-tech-upgrade-web-system] vitest ทั้ง suite 272/272 · `tsc --noEmit` exit 0 · eslint ไฟล์ Phase 5 exit 0 · `npm run build` exit 0 · lint ทั้ง repo 444 error เดิมนอก Phase 5 · backend deps NU1903/NU1904 เดิม → ของ `security`
@@ -79,7 +79,7 @@
 - → **frontend-engineer** (FE-010, Minor — FIND-P5-02): แก้ Case 13b/13c ให้เป็น "ครบ 5 + 401 ซ้ำ" 6 แถว (ค่าเดียวกัน / ค่าขัดกัน)
 - → **frontend-engineer** (Minor — FIND-P5-03): ป้องกัน `initAuth` เขียน token กลับหลัง `sb-session-expired` (ไม่ใช่งาน Phase 5)
 - → **devops / เจ้าของระบบ SB** (TP-D2, SA-Q14): บัญชี U0–U6 + ตรวจ `TMenu` ก่อนรัน S1 จริง
-- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](qa/phase-4.md) R4
+- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](round-1.md) R4
 - §21 (comment) ในไฟล์ที่รอบนี้แก้ — Minor, ไม่บล็อก: what-comment ที่ทวนโค้ด → ลบหรือเปลี่ยนเป็นเหตุผล · **backend-engineer**: `TimetableAuthorizationFilter.cs:134` `// 4. Endpoint Policy Lookup`, `:163` `// 5 & 6. Permission Resolution via Shared Resolver` (เลขขั้นค้างจากโครงเดิม) · `ResolverTests.cs:59` `// unrelated menu` · **frontend-engineer**: `useTimetableMenuPermissions.ts:70` `// Duplicate MenuID found` · `tests/lib/authHeaders.test.ts:124, 127, 130` (`// Verify …`) · `tests/hooks/useTimetableMenuPermissions.test.tsx:349, 356, 506, 516, 519, 525, 603` · comment ที่บอกเหตุผล (เก็บได้): `useTimetableMenuPermissions.ts:22, 26, 111, 198-199, 211-213`, `ResolverTests.cs:157`, `IntegrationTests.cs:18-19, 222` · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มี git diff จึงแยกบรรทัดใหม่/เดิมจากการอ่านเท่านั้น
 - §22 (ไฟล์ใหม่ตามแบบเพื่อนบ้าน): `Security/ITimetableMenuPermissionResolver.cs`, `Security/TimetableMenuPermissionResolver.cs` — ใช่ (แบบ `TimetableAuthorizationFilter.cs`) · `src/app/api/menu-permissions/get/route.ts` — ใช่ (แบบ `src/app/api/setting/get/route.ts`) · `src/hooks/useTimetableMenuPermissions.ts` — ใช่ (แบบ `useLocaleStorage.ts`) · `src/config/timetable-menu-permissions.ts` — ใช่ (typed const ตาม `src/config/README.md`) · test ใหม่ใต้ `tests/**` — ใช่ · `AITimeTableBackend.Tests/` — ไม่มีเพื่อนบ้าน (โปรเจกต์ test แรก)
 
@@ -98,7 +98,7 @@
 
 ## Verification Summary
 
-- **Phase / Round:** Phase 5 · **R2** (ตรวจ FE-001 ซ้ำหลังแก้ FIND-P5-01 + RV-5/RV-6) · 2026-10-01 (วันที่ผู้เรียกระบุ) · R1 อยู่ที่ [qa/phase-5.md](qa/phase-5.md) · Phase 4 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Phase / Round:** Phase 5 · **R2** (ตรวจ FE-001 ซ้ำหลังแก้ FIND-P5-01 + RV-5/RV-6) · 2026-10-01 (วันที่ผู้เรียกระบุ) · R1 อยู่ที่ [qa/phase-5.md](round-2.md) · Phase 4 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** **TARGETED**: FE-001 (AC-063, DES-018 §43.2) ใน Target sb-tech-upgrade-web-system เท่านั้น · BE-006/BE-007/FE-017/FE-010 ไม่ได้ตรวจซ้ำ ผลคงตาม R1 · STA run `run-mupmfag4-e95902df` ไม่มี evidence package / `deterministic_gate` จึงถือเป็น interactive · ไม่รัน git · ไม่มีสิทธิ์เขียน Target
 - **Deterministic sweep:** QA สั่ง `sta context` แล้ว**ถูกปฏิเสธสิทธิ์** (shell ยอมแค่คำสั่งอ่านอย่างง่าย) · gate ไม่ได้รันซ้ำ · ผู้เรียกแจ้งว่า `static-analysis-gate.js` ผ่าน (PASS) บน Knowledge repo แต่ gate นี้**ไม่ครอบ Target** จึงไม่นับเป็น sweep ของโค้ด FE-001
 - **หลักฐานการรันของรอบนี้ (ผู้เรียกรัน · QA ไม่ได้รันซ้ำ):** [sb-tech-upgrade-web-system] vitest ทั้ง suite 300/300 · `tsc --noEmit` exit 0 · `npm run build` exit 0 · eslint ไฟล์ที่แตะ 0 error / 9 warning (QA ไม่ได้ดู warning) · [sb-api-academic-timetable-ai] `dotnet test` 42/42 (backend ไม่ถูกแตะในรอบนี้)
@@ -110,7 +110,7 @@
 
 ## Verified File Manifest
 
-(R2 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ R1 อยู่ที่ [qa/phase-5.md](qa/phase-5.md))
+(R2 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ R1 อยู่ที่ [qa/phase-5.md](round-2.md))
 
 - sb-tech-upgrade-web-system:src/lib/authHeaders.ts (1-54) — ตรงกับ R1 ทุกบรรทัด
 - sb-tech-upgrade-web-system:src/components/modals/home/create-teaching-schedule/LinkSubjectsModal.tsx (150-219)
@@ -207,7 +207,7 @@
 - → **frontend-engineer** (FE-010, Minor — FIND-P5-02): แก้ Case 13b/13c ให้เป็น "ครบ 5 + 401 ซ้ำ" 6 แถว (ค่าเดียวกัน / ค่าขัดกัน)
 - → **frontend-engineer** (Minor — FIND-P5-03): ป้องกัน `initAuth` เขียน token กลับหลัง `sb-session-expired` (ไม่ใช่งาน Phase 5)
 - → **devops / เจ้าของระบบ SB** (TP-D2, SA-Q14): บัญชี U0–U6 + ตรวจ `TMenu` ก่อนรัน S1 จริง
-- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](qa/phase-4.md) R4
+- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](round-1.md) R4
 - §21 (comment) ในไฟล์ที่รอบนี้แก้ — Minor, ไม่บล็อก: what-comment ที่ทวนโค้ด → ลบหรือเปลี่ยนเป็นเหตุผล · **backend-engineer**: `TimetableAuthorizationFilter.cs:134` `// 4. Endpoint Policy Lookup`, `:163` `// 5 & 6. Permission Resolution via Shared Resolver` (เลขขั้นค้างจากโครงเดิม) · `ResolverTests.cs:59` `// unrelated menu` · **frontend-engineer**: `useTimetableMenuPermissions.ts:70` `// Duplicate MenuID found` · `tests/lib/authHeaders.test.ts:124, 127, 130` (`// Verify …`) · `tests/hooks/useTimetableMenuPermissions.test.tsx:349, 356, 506, 516, 519, 525, 603` · comment ที่บอกเหตุผล (เก็บได้): `useTimetableMenuPermissions.ts:22, 26, 111, 198-199, 211-213`, `ResolverTests.cs:157`, `IntegrationTests.cs:18-19, 222` · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มี git diff จึงแยกบรรทัดใหม่/เดิมจากการอ่านเท่านั้น
 - §21 (comment) ในไฟล์ที่ R2 แก้ (`LinkSubjectsModal.tsx:169-171`, `TimetableGrid.tsx:459-461`, `TeacherGroupsTab.tsx:68-69`, `manage-teaching-schedule/page.tsx:1131-1133`): ทุกจุดอธิบาย**เหตุผล** (401 ไม่ toast เพราะหน้า SessionExpired มาแทน, id ร่วมเพื่อไม่ให้ toast ซ้อนกัน, ทำไมยังเรียก `onReady`) ไม่ใช่ what-comment · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มีปัญหา · §22: R2 ไม่ได้เพิ่มไฟล์ใหม่ใต้ `src/` (เป็นการแก้ไฟล์เดิม) · test ที่เพิ่มอยู่ในไฟล์เดิม `tests/integration/timetable-session-expired.test.tsx`
 - (R1) §22 (ไฟล์ใหม่ตามแบบเพื่อนบ้าน): `Security/ITimetableMenuPermissionResolver.cs`, `Security/TimetableMenuPermissionResolver.cs` — ใช่ (แบบ `TimetableAuthorizationFilter.cs`) · `src/app/api/menu-permissions/get/route.ts` — ใช่ (แบบ `src/app/api/setting/get/route.ts`) · `src/hooks/useTimetableMenuPermissions.ts` — ใช่ (แบบ `useLocaleStorage.ts`) · `src/config/timetable-menu-permissions.ts` — ใช่ (typed const ตาม `src/config/README.md`) · test ใหม่ใต้ `tests/**` — ใช่ · `AITimeTableBackend.Tests/` — ไม่มีเพื่อนบ้าน (โปรเจกต์ test แรก)
@@ -227,7 +227,7 @@
 
 ## Verification Summary
 
-- **Phase / Round:** Phase 5 · **R3** (ตรวจ FE-001 ซ้ำหลังแก้ FIND-P5-04 · reviewer Round 4 ✅ Approved) · 2026-10-01 (วันที่ผู้เรียกระบุ) · R1 และ R2 อยู่ที่ [qa/phase-5.md](qa/phase-5.md) · Phase 4 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Phase / Round:** Phase 5 · **R3** (ตรวจ FE-001 ซ้ำหลังแก้ FIND-P5-04 · reviewer Round 4 ✅ Approved) · 2026-10-01 (วันที่ผู้เรียกระบุ) · R1 และ R2 อยู่ที่ [qa/phase-5.md](round-2.md) · Phase 4 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** **TARGETED**: FE-001 (AC-063, DES-018 §43.2) ใน Target sb-tech-upgrade-web-system + อ่าน backend sb-api-academic-timetable-ai เฉพาะ `Setting/Get` (อ่านอย่างเดียว เพื่อตัดสินว่ามี regression ที่โรงเรียนใหม่หรือไม่) · BE-006/BE-007/FE-017/FE-010 ไม่ได้ตรวจซ้ำ ผลคงตาม R1 · STA run `run-mupoc22l-9230c9ea` ไม่มี evidence package / `deterministic_gate` จึงถือเป็น interactive · ไม่รัน git · ไม่มีสิทธิ์เขียน Target
 - **Deterministic sweep:** `sta context` และ `$STA_CONTEXT_CMD` **ถูกปฏิเสธสิทธิ์** (ต้องขออนุมัติ) · `static-analysis-gate.js` และ `generate-status.js` QA ไม่ได้รัน · ผู้เรียกแจ้งว่า gate ผ่าน (PASS) บน Knowledge repo แต่ gate นี้**ไม่ครอบ Target** จึงไม่นับเป็น sweep ของโค้ด FE-001
 - **หลักฐานการรันของรอบนี้ (ผู้เรียกรัน · QA ไม่ได้รันซ้ำ):** [sb-tech-upgrade-web-system] vitest ทั้ง suite **313/313** · `tsc --noEmit` exit 0 · `npm run build` exit 0 · eslint ของ `src/lib/timetableRequestFailure.ts` + `tests/integration` ไม่มี error (lint ทั้ง repo มี error เดิมนอก Phase 5) · [sb-api-academic-timetable-ai] `dotnet test` 42/42 (backend ไม่ถูกแตะในการแก้นี้)
@@ -240,7 +240,7 @@
 
 ## Verified File Manifest
 
-(R3 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ R1/R2 อยู่ที่ [qa/phase-5.md](qa/phase-5.md))
+(R3 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ R1/R2 อยู่ที่ [qa/phase-5.md](round-2.md))
 
 - sb-tech-upgrade-web-system:src/lib/timetableRequestFailure.ts (1-35) — ไฟล์ใหม่
 - sb-tech-upgrade-web-system:src/lib/authHeaders.ts (1-54) — ตรงกับ R1/R2 ทุกบรรทัด
@@ -355,7 +355,7 @@
 - → **frontend-engineer** (FE-010, Minor — FIND-P5-02): แก้ Case 13b/13c ให้เป็น "ครบ 5 + 401 ซ้ำ" 6 แถว (ค่าเดียวกัน / ค่าขัดกัน)
 - → **frontend-engineer** (Minor — FIND-P5-03): ป้องกัน `initAuth` เขียน token กลับหลัง `sb-session-expired` (ไม่ใช่งาน Phase 5)
 - → **devops / เจ้าของระบบ SB** (TP-D2, SA-Q14): บัญชี U0–U6 + ตรวจ `TMenu` ก่อนรัน S1 จริง
-- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](qa/phase-4.md) R4
+- Phase 4 (คงจาก R4 — ยอมรับโดยคน ไม่บล็อก): lint/build frontend, oracle BR-81b 1–6 + RNG, สคริปต์แก้มือ FE-009, `locale` dependency FIND-P4-08, response 2 ภาษา BE-005 — รายละเอียดใน [qa/phase-4.md](round-1.md) R4
 - §21 (comment) ในไฟล์ที่รอบนี้แก้ — Minor, ไม่บล็อก: what-comment ที่ทวนโค้ด → ลบหรือเปลี่ยนเป็นเหตุผล · **backend-engineer**: `TimetableAuthorizationFilter.cs:134` `// 4. Endpoint Policy Lookup`, `:163` `// 5 & 6. Permission Resolution via Shared Resolver` (เลขขั้นค้างจากโครงเดิม) · `ResolverTests.cs:59` `// unrelated menu` · **frontend-engineer**: `useTimetableMenuPermissions.ts:70` `// Duplicate MenuID found` · `tests/lib/authHeaders.test.ts:124, 127, 130` (`// Verify …`) · `tests/hooks/useTimetableMenuPermissions.test.tsx:349, 356, 506, 516, 519, 525, 603` · comment ที่บอกเหตุผล (เก็บได้): `useTimetableMenuPermissions.ts:22, 26, 111, 198-199, 211-213`, `ResolverTests.cs:157`, `IntegrationTests.cs:18-19, 222` · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มี git diff จึงแยกบรรทัดใหม่/เดิมจากการอ่านเท่านั้น
 - §21 (comment) ในไฟล์ที่ R2 แก้ (`LinkSubjectsModal.tsx:169-171`, `TimetableGrid.tsx:459-461`, `TeacherGroupsTab.tsx:68-69`, `manage-teaching-schedule/page.tsx:1131-1133`): ทุกจุดอธิบาย**เหตุผล** (401 ไม่ toast เพราะหน้า SessionExpired มาแทน, id ร่วมเพื่อไม่ให้ toast ซ้อนกัน, ทำไมยังเรียก `onReady`) ไม่ใช่ what-comment · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มีปัญหา · §22: R2 ไม่ได้เพิ่มไฟล์ใหม่ใต้ `src/` (เป็นการแก้ไฟล์เดิม) · test ที่เพิ่มอยู่ในไฟล์เดิม `tests/integration/timetable-session-expired.test.tsx`
 - §21 (comment) ในไฟล์ที่ R3 แก้ — Minor, ไม่บล็อก, **frontend-engineer**: `use-timetable-generation.ts:95` "see the report for the open decision on failing closed" ชี้ไปยังรายงานของ engineer ที่ไม่อยู่ใน repo → เปลี่ยนเป็นเหตุผลในตัว (gate ยังเปิดใน `finally` โดยตั้งใจ รอ SA-P5-Q1) · `TeacherGroupsTab.tsx:526` `// Persist to server` เป็น what-comment (ไม่มี diff — อาจมีมาก่อน) · comment ใหม่อื่นบอก**เหตุผล** (เก็บได้): `timetableRequestFailure.ts:3-12, 14, 24-27`, `page.tsx:126-130, 155, 595`, `TeacherGroupsTab.tsx:73-74, 157-158, 500, 552-553, 798, 820-823`, `subject-settings/[year]/page.tsx:361, 433, 453` · ไม่พบ workaround ที่ขาดเหตุผล

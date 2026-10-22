@@ -88,7 +88,7 @@
 
 ## Verification Summary
 
-- **Round:** R2 (re-check ครั้งที่ 1 หลัง frontend-engineer แก้ FIND-P4-01..05) · R1 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Round:** R2 (re-check ครั้งที่ 1 หลัง frontend-engineer แก้ FIND-P4-01..05) · R1 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** FULL ตามที่ขอ — **ไม่มี evidence package / `deterministic_gate`** (เรียกผ่าน `sta execute`, interactive) · ใน session นี้ `node .claude/scripts/static-analysis-gate.js`, `dotnet build`, `npx tsc --noEmit`, `sta context` และ `generate-status.js` **ถูกปฏิเสธสิทธิ์ทั้งหมด** · ไม่รัน git (ข้อห้ามของบทบาท) → ผลทุกข้อมาจากการอ่านโค้ด
 - **Deterministic sweep:** unverified (ไม่ได้รัน) — ไม่นับเป็นผ่าน · จากการอ่าน: typecheck ของ frontend **จะไม่ผ่าน** (FIND-P4-07)
 - **หลักฐานที่ผู้เรียกส่งมา:** "`dotnet build` ผ่าน 0 errors" ของ BE-005 — เป็นข้อความของผู้เรียก ไม่มี log และ QA ไม่ได้รันเอง → บันทึกไว้ ไม่นับเป็นหลักฐานที่ตรวจได้
@@ -185,7 +185,7 @@
 
 ## Verification Summary
 
-- **Round:** R3 (re-check ครั้งที่ 2 หลังแก้ FIND-P4-07/08) · R1, R2 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Round:** R3 (re-check ครั้งที่ 2 หลังแก้ FIND-P4-07/08) · R1, R2 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** FULL ตามที่ขอ · ตรวจทุก task ในเฟส · เรียกในชื่อ STA run `run-mup836mh-a1180033` แต่ **ไม่มี evidence package / ฟิลด์ `deterministic_gate`** จึงถือเป็น interactive · QA ลองรัน `node .claude/scripts/static-analysis-gate.js`, `npx vitest run`, `sta context` และ `generate-status.js` เอง — **ถูกปฏิเสธสิทธิ์ทั้งหมด** · ไม่รัน git (ข้อห้ามของบทบาท)
 - **Deterministic sweep:** unverified — gate ไม่ได้รัน ไม่นับเป็นผ่าน
 - **หลักฐานการรันที่ผู้เรียกส่งมา (บันทึกตามที่รายงาน QA ไม่ได้รันซ้ำ):** [sb-tech-upgrade-web-system] `npm run type-check` (`tsc --noEmit`) 0 error exit 0 · `npx vitest run tests/app/timetable/` 4 ไฟล์ 29/29 ผ่าน (course-weight 10, shortfall-report 5, solver-intensity 7, intensity-summary 7) · [sb-api-academic-timetable-ai] `dotnet build` 0 error exit 0 · **ไม่มีรายงาน lint/build ของ frontend**
@@ -205,7 +205,7 @@
 - sb-tech-upgrade-web-system:tests/app/timetable/solver-intensity.test.ts (L1-80 + รายชื่อ `it`)
 - sb-tech-upgrade-web-system:tests/app/timetable/intensity-summary.test.ts (L120-210)
 - sb-tech-upgrade-web-system:tests/app/timetable/course-weight.test.ts (L10-44 + รายชื่อ `it`)
-- sb-tech-upgrade-web-system: ไฟล์อื่นของ Phase 4 — ตามรายการ R2 ใน [qa/phase-4.md](qa/phase-4.md) (ไม่มีรายงานว่าเปลี่ยนในรอบนี้)
+- sb-tech-upgrade-web-system: ไฟล์อื่นของ Phase 4 — ตามรายการ R2 ใน [qa/phase-4.md](round-1.md) (ไม่มีรายงานว่าเปลี่ยนในรอบนี้)
 
 ## Per-Task Results
 
@@ -265,7 +265,7 @@
 
 ## Verification Summary
 
-- **Round:** R4 (Final — บันทึกคำตัดสินของคน) · R1, R2, R3 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Round:** R4 (Final — บันทึกคำตัดสินของคน) · R1, R2, R3 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** FULL · ตรวจทุก task ในเฟส (BE-005, FE-007, FE-008, FE-009) · STA run `run-mup8cm1t-e0a29316` — **ไม่มี evidence package / ฟิลด์ `deterministic_gate`** จึงถือเป็น interactive · QA ลองรัน `sta context` และ `node .claude/scripts/static-analysis-gate.js` อีกครั้ง — **ถูกปฏิเสธสิทธิ์** · ไม่รัน git (ข้อห้ามของบทบาท)
 - **Deterministic sweep:** unverified — gate ไม่ได้รัน ไม่นับเป็นผ่าน (ระบุใน Unverified Behaviour)
 - **คำตัดสินของคน (R4):** ผู้ใช้ "ยอมรับผล Phase 4 ตามหลักฐานปัจจุบัน (tsc ผ่าน 0 error, vitest ผ่าน 29/29, dotnet build ผ่าน) และให้ QA บันทึก Verified (FULL) พร้อมรายการ Unverified Behaviour สำหรับตรวจสอบตอน Deploy" → ตามทางเลือก (1) ของ R3 · ผล ✅ ในรอบนี้คือ **การยอมรับของคนบนหลักฐานที่มี** ไม่ใช่ QA รับรองว่าข้อที่ขาดหลักฐานผ่าน
@@ -285,7 +285,7 @@
 - sb-tech-upgrade-web-system:tests/app/timetable/solver-intensity.test.ts (L1-80 + รายชื่อ `it`)
 - sb-tech-upgrade-web-system:tests/app/timetable/intensity-summary.test.ts (L120-210)
 - sb-tech-upgrade-web-system:tests/app/timetable/course-weight.test.ts (L10-44 + รายชื่อ `it`)
-- sb-tech-upgrade-web-system: ไฟล์อื่นของ Phase 4 — ตามรายการ R2 ใน [qa/phase-4.md](qa/phase-4.md) (ไม่มีรายงานว่าเปลี่ยนในรอบนี้)
+- sb-tech-upgrade-web-system: ไฟล์อื่นของ Phase 4 — ตามรายการ R2 ใน [qa/phase-4.md](round-1.md) (ไม่มีรายงานว่าเปลี่ยนในรอบนี้)
 
 ## Per-Task Results
 

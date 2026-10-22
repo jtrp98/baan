@@ -4,7 +4,7 @@
 
 ## Verification Summary
 
-- **Phase / Round:** Phase 7 · **R1** — FE-018 (AC-066, DES-018 §43.2b ข้อ 1) + ตรวจ AC-063 ของ FE-001 ซ้ำ (regression) · reviewer Round 6 ✅ Approved (RV-16/17/18 non-blocking) · 2026-10-02 (วันที่ผู้ใช้ให้ใน session นี้) · Phase 5 R1–R3 อยู่ที่ [qa/phase-5.md](qa/phase-5.md) · Phase 4 อยู่ที่ [qa/phase-4.md](qa/phase-4.md)
+- **Phase / Round:** Phase 7 · **R1** — FE-018 (AC-066, DES-018 §43.2b ข้อ 1) + ตรวจ AC-063 ของ FE-001 ซ้ำ (regression) · reviewer Round 6 ✅ Approved (RV-16/17/18 non-blocking) · 2026-10-02 (วันที่ผู้ใช้ให้ใน session นี้) · Phase 5 R1–R3 อยู่ที่ [qa/phase-5.md](round-2.md) · Phase 4 อยู่ที่ [qa/phase-4.md](round-1.md)
 - **Mode:** **TARGETED** — FE-018 + AC-063 regression ใน Target sb-tech-upgrade-web-system (อ่านโค้ดอย่างเดียว ไม่เขียน Target) · ไม่ได้ตรวจซ้ำ: FE-019 (`pending`), BE-006..BE-009, FE-017, FE-010 · STA run `run-muqp57eo-f5ec4421` — ไม่มี evidence package / `deterministic_gate` ใน packet จึงถือเป็น interactive · QA ลองรัน `sta context qa-engineer --module timetableai --phase 7` แล้ว**ถูกปฏิเสธสิทธิ์** (ต้องขออนุมัติ) · module/phase/task มาจาก packet ของผู้เรียก · ไม่รัน git
 - **Deterministic sweep (ผู้เรียกรัน · QA ไม่ได้รัน):** Knowledge root `node .claude/scripts/static-analysis-gate.js` → PASS (exit 0) — **ไม่ครอบ Target** จึงไม่นับเป็น sweep ของโค้ด FE-018
 - **หลักฐานการรันของรอบนี้ (ผู้เรียกรัน · QA ไม่ได้รันซ้ำ):** [sb-tech-upgrade-web-system] `npx vitest run` → 38 ไฟล์ **433/433** ผ่าน · `npx tsc --noEmit` exit 0 · eslint ของ 9 route file ที่แตะ + `src/lib/timetableRequestFailure.ts` + `tests/integration` + `tests/lib/timetableRequestFailure.test.ts` → **0 error**, 12 warning เดิม (unused vars, exhaustive-deps รวม `manage-teaching-schedule/page.tsx:1345` ขาด `locale` = FIND-P4-08) · `npm run build` exit 0
@@ -16,7 +16,7 @@
 
 ## Verified File Manifest
 
-(Phase 7 R1 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ Phase 5 อยู่ที่ [qa/phase-5.md](qa/phase-5.md))
+(Phase 7 R1 · QA อ่านเอง · ผลรันมาจากผู้เรียก · ไฟล์ของ Phase 5 อยู่ที่ [qa/phase-5.md](round-2.md))
 
 - sb-tech-upgrade-web-system:src/lib/timetableRequestFailure.ts (1-35) — `notifyRequestFailed` ข้าม 401 (:16), `readJsonOrNotify` (:29-35)
 - sb-tech-upgrade-web-system:src/lib/authHeaders.ts (1-54) — Do-not-modify, ตรงกับ Phase 5 R3
@@ -51,7 +51,7 @@
 - **RV-10** — ✅ Verified (resolved): จุดของ RV-10 ทั้งหมดไม่ toast เมื่อ 401 แล้ว (ดู AC-066) · SA-P5-Q1 ข้อ (1) ปิดด้วย FE-018
 - **RV-16 / RV-17 / RV-18** — ⚠️ Partial (open, non-blocking, frontend-engineer, QA อ่านยืนยัน — ช่องว่างหลักฐาน ไม่ใช่ defect)
 - **FIND-P4-08** (ส่วน `locale`) — ⚠️ Partial (open, Minor, ไม่ได้ตรวจซ้ำ — eslint ของผู้เรียกยังเตือนที่ `page.tsx:1345`) · **FIND-P5-02** — ⚠️ Partial (open, Minor, FE-010, ไม่ได้ตรวจซ้ำ) · **FIND-P5-03** — ⚠️ Partial (open, Minor, `AuthContext.tsx` race, ไม่ได้ตรวจซ้ำ — FE-018 ไม่แตะ)
-- **รายการคงตาม Phase 5 (ไม่ได้ตรวจซ้ำ):** FE-001 ✅ (AC-063 ตรวจซ้ำข้างบน — ยังผ่าน) · FE-017 ✅ · FE-010 ✅ · BE-006/BE-007 `verified` ตามคำตัดสินของคน (HUMAN-P5-R1) · ผลละเอียดอยู่ใน [qa/phase-5.md](qa/phase-5.md)
+- **รายการคงตาม Phase 5 (ไม่ได้ตรวจซ้ำ):** FE-001 ✅ (AC-063 ตรวจซ้ำข้างบน — ยังผ่าน) · FE-017 ✅ · FE-010 ✅ · BE-006/BE-007 `verified` ตามคำตัดสินของคน (HUMAN-P5-R1) · ผลละเอียดอยู่ใน [qa/phase-5.md](round-2.md)
 
 ## Contract Checks
 
@@ -59,7 +59,7 @@
 - §43.2b ข้อ 1 "ช่องทางเดียวของ 401" — ตรงทุกจุด (Per-Task Results) · ข้อยกเว้นเดียว BR-89 (opt-out ของ DES-022) ยังเป็นที่เดียว (`useTimetableMenuPermissions.ts:107`)
 - `Produces: none` — ไม่มีสัญญาใหม่/เปลี่ยน · ไม่มี copy ใหม่ (ข้อความในกิ่งที่เหลือเป็นข้อความเดิมทั้งหมด)
 - Data Model: QA อ่าน `design.md` `## Data Model` (§27.1–27.7) ทั้งหมดแล้ว — §27.7 ระบุ "DES-018 … **ไม่มี DDL**" และ §43.2b "ไม่มีพื้นผิว API/สิทธิ์/schema ใหม่" · FE-018 แตะเฉพาะโค้ด client ไม่มี model/schema ของ backend ถูกแตะ → ตรง · schema-contract checker ไม่ได้รัน (ไม่มี shell ที่อนุมัติ)
-- สัญญาของ Phase 5 (`MenuPermissions/Get`, body 401/403, MenuID ข้าม repo, `Setting/Get`) — ไม่ได้ตรวจซ้ำ ผลอยู่ใน [qa/phase-5.md](qa/phase-5.md) R1/R3
+- สัญญาของ Phase 5 (`MenuPermissions/Get`, body 401/403, MenuID ข้าม repo, `Setting/Get`) — ไม่ได้ตรวจซ้ำ ผลอยู่ใน [qa/phase-5.md](round-2.md) R1/R3
 
 ## Unverified Behaviour — Phase 7 R1 (คงไว้ใน `qa.md` ด้วยจนกว่า Phase 7 deploy)
 
@@ -79,7 +79,7 @@
 - **ไม่มี finding บล็อกในรอบนี้** · FE-018 ผ่าน AC-066 และไม่ทำให้ AC-063 ถดถอย
 - → **frontend-engineer** (FE-018 evidence gap, non-blocking — RV-16/RV-17/RV-18, ทำเฉพาะ test ไม่แก้ product): (RV-16) เพิ่ม `queryBy…(ข้อความสำเร็จ)` = null บนทุก 401 ที่มีหน้าจอสำเร็จ (`set-all`, `AddClassPeriodModal`, `CreateClassPeriodForm`, modal บันทึกของ `settings/[year]`) + เคสคุม 200 ที่ assert ว่าหน้าจอสำเร็จเปิดจริง + assert ปุ่ม Save ใช้ได้อีกหลัง 401 · (RV-17) เพิ่ม `it` 401/403/คุมของ `handleDetailSave` ผ่าน grid save ของ `LinkSubjectDetailModal` และแก้ header ของ `timetable-401-silent-subject-settings.test.tsx:13-14` · (RV-18) ให้ `expectSilent401` ตรวจว่าไม่มี `Alert variant="danger"` ด้วยตัวมันเอง (เช่น query container/พื้นที่ `saveError` ของหน้า) และแก้ doc comment :113-114 — การเพิ่ม `role` ให้ `Alert` เป็นการแก้ component นอก FE-018 · (เพิ่มเติม) ให้มี assert "ไม่มี toast" เมื่อ 401 ของ `TimetableGrid`/`LinkSubjectsModal` ภายใต้ stable-auth harness
 - → **system-analyst / frontend-engineer** (SA-P5-Q1 ข้อ (2)(3) = RV-11/RV-12): ตัดสินแล้วใน design Rev 18 (SA-Q19 = A, §43.2b ข้อ 4) → งานอยู่ที่ **FE-019** (`pending`) — ไม่ใช่ของรอบนี้
-- คงจากรอบก่อน (ไม่ได้ตรวจซ้ำ, รายละเอียดใน [qa/phase-5.md](qa/phase-5.md)): **frontend-engineer** RV-7, RV-13, RV-14, FIND-P5-02, FIND-P5-03 · **project-manager** RV-9, RV-15 · **backend-engineer** RV-1, RV-4 · **system-analyst** RV-2 · **devops / เจ้าของระบบ SB** TP-D2, SA-Q14 · Phase 4: FIND-P4-08 (`locale`) และรายการที่คนยอมรับใน R4
+- คงจากรอบก่อน (ไม่ได้ตรวจซ้ำ, รายละเอียดใน [qa/phase-5.md](round-2.md)): **frontend-engineer** RV-7, RV-13, RV-14, FIND-P5-02, FIND-P5-03 · **project-manager** RV-9, RV-15 · **backend-engineer** RV-1, RV-4 · **system-analyst** RV-2 · **devops / เจ้าของระบบ SB** TP-D2, SA-Q14 · Phase 4: FIND-P4-08 (`locale`) และรายการที่คนยอมรับใน R4
 - §21 (comment) ในไฟล์ที่รอบนี้แก้ — Minor, ไม่บล็อก, **frontend-engineer**: (ก) doc comment `TeacherGroupsTab.tsx:73-74` "any non-OK response (401 …) … rolls the group's teachers back **and notifies**" ล้าสมัยแล้ว (401 rollback เงียบตาม :80-85) → แก้ให้ตรง · (ข) `subject-settings/[year]/page.tsx:365` "a denied delete must stop the edit … and show the page's error Alert" และ `:439` "the page's existing error Alert shows it" อยู่เหนือบรรทัด `return` เงียบของ 401 (:366, :440) โดยตรง → อ่านแล้วขัดกัน ควรเติม "(non-401)" · comment `// FE-018 / AC-066: SessionExpired only …` ที่จุดอื่น ๆ บอก**เหตุผล** (ทำไมไม่มีข้อความ) — เก็บได้ · `TeacherGroupsTab.tsx:527` `// Persist to server` เป็น what-comment เดิม (คงจาก R3) · ไม่พบ workaround ที่ขาดเหตุผล · ไม่มี git diff จึงแยกบรรทัดใหม่/เดิมจากการอ่าน
 - §22 (ไฟล์ใหม่ของรอบนี้ตามแบบเพื่อนบ้าน — ตัดสินจากรายการของ reviewer + การอ่าน ไม่ใช่ diff): `tests/integration/timetable-401-silent{,-settings,-schedule,-subject-settings,-manage-timetable,-class-period}.test.tsx` — **ใช่** (แบบ `tests/integration/timetable-403-visible.test.tsx`: `describe`/`it` ภาษาอังกฤษ, mock `next/navigation`, stub `fetch` ระดับ global, `<Toaster/>`) · `tests/lib/timetableRequestFailure.test.ts` — **ใช่** (แบบ `tests/lib/authHeaders.test.ts`) · `tests/integration/_support/timetable-401-harness.tsx`, `_support/stable-auth.tsx` — **ใช่** (โฟลเดอร์ใหม่ ไม่มีเพื่อนบ้านในโฟลเดอร์ให้เทียบ · เพื่อนบ้านใกล้สุด `timetable-403-visible.test.tsx` ประกาศ harness ในไฟล์ — การแยกไฟล์ไม่ขัดแบบนั้น และ header :1-3 อธิบายว่าไม่ใช่ไฟล์ test)
 
