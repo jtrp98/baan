@@ -6,7 +6,7 @@
 
 **นายช่าง คือบทบาทที่ AI session สวม** — session ที่สวม นายช่าง เป็นผู้คุมทั้ง 11 ตำแหน่ง และเปิด session ของแต่ละ role เองได้ (ผ่าน `claude -p` / `codex exec` / `agy --print` แบบ non-interactive — กลไกเดียวกับที่พิสูจน์ไปตอนแรก)
 
-ระบบนี้เป็น **local npm package** (clone ไว้ที่ไหนก็ได้บนเครื่อง — เช่น `C:\src\AICode\project-ai\baan`) — ติดตั้งครั้งเดียวด้วย `npm link` แล้วเรียกจากโปรเจกต์ไหนก็ได้ ไม่ต้อง copy code ไปทุกที่ ไม่รก
+ระบบนี้เป็น **local npm package** (clone ไว้ที่ไหนก็ได้บนเครื่อง — เช่น `C:\src\AICode\baan\baan`) — ติดตั้งครั้งเดียวด้วย `npm link` แล้วเรียกจากโปรเจกต์ไหนก็ได้ ไม่ต้อง copy code ไปทุกที่ ไม่รก
 
 ## สถาปัตยกรรม
 
@@ -25,7 +25,7 @@ AI session ใดก็ได้ (claude/codex/agy/ZCode/...)
 โครงสร้างข้อมูล (config ของ workspace อยู่**นอก package** ที่ `<ราก workspace>\baan.config.json` เช่น `C:\src\schoolbright\baan.config.json` — กัน update version ทับ config): **ที่เก็บเอกสาร** (`knowledge_roots` เช่น `C:\src\schoolbright\knowledge`) · **ที่เก็บ code** (`targets` เช่น `C:\src\schoolbright\target\*`) — ตัว baan เดินหา config ขึ้นจากไดเรกทอรีที่เรียกอัตโนมัติ (หรือ `--config <file>` / env `BAAN_CONFIG`) · ติดตั้ง workspace ด้วย `baan --init` · โหมดอัตโนมัติใช้ผ่าน `--target <ชื่อ>` · ตัวอย่างรูปแบบไฟล์: `baan.example.json`
 
 ```
-C:\src\AICode\project-ai\baan\            ← ตัว package (npm link แล้วใช้ได้จากทุกที่)
+C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้วใช้ได้จากทุกที่)
   BAAN.md               ← charter: บทบาท นายช่าง สำหรับ AI session สวม
   bin\
     baan.mjs            ← entrypoint โหมดอัตโนมัติ (คำสั่ง baan) — parse args + ลำดับใหญ่ gm → plan → execute
@@ -53,7 +53,7 @@ C:\src\AICode\project-ai\baan\            ← ตัว package (npm link แล
 เปิด AI session ใดก็ได้ แล้วสั่ง:
 
 ```
-อ่าน C:\src\AICode\project-ai\baan\BAAN.md แล้วสวมบทบาท นายช่าง
+อ่าน C:\src\AICode\baan\baan\BAAN.md แล้วสวมบทบาท นายช่าง
 เป้าหมาย: <goal ของคุณ>   (โปรเจกต์: <path หรือชื่อ target>)
 ```
 

@@ -5,7 +5,7 @@
 > ชื่อเดิมของ project คือ MYCELIUM — เปลี่ยนเป็น BAAN + ธีมก่อสร้างเมื่อ 2026-10-22
 
 - ติดตั้งลง workspace (ครั้งเดียว): `cd <ราก workspace> && baan --init` — สร้าง CLAUDE.md/AGENTS.md ให้ AI session สวมบท นายช่าง เอง + config ของ workspace
-- สวมบท นายช่าง (ถ้าไม่ได้ init): `อ่าน C:\src\AICode\project-ai\baan\BAAN.md แล้วสวมบทบาทนายช่าง`
+- สวมบท นายช่าง (ถ้าไม่ได้ init): `อ่าน C:\src\AICode\baan\baan\BAAN.md แล้วสวมบทบาทนายช่าง`
 - เอกสารทั้งหมด: `baan\README.md` · ประวัติแต่ละรุ่น: `baan\RELEASE-NOTES.md`
 
 ## โมเดล branch / release
