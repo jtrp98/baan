@@ -13,11 +13,14 @@
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks 6 คอลัมน์ | พร้อม |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | พร้อม |
 | `test-plan\index.md` | สารบัญ test plan — ตาราง TP | พร้อม |
+| `uxui\index.md` | สารบัญ UX/UI — ตาราง UX-001..UX-014 + สถานะ sign-off | พร้อม |
 | `review\index.md` | สารบัญ review findings | พร้อม |
 | `qa\index.md` | สารบัญ QA findings | พร้อม |
 | `backlog.md` | งานที่ทำทีหลัง (append-only) | พร้อม |
 
 ## Change Log
+
+- 2026-10-22 — เพิ่มสารบัญหมวด uxui (`uxui\index.md` — ตาราง UX-001..UX-014 + README พร้อมสถานะ sign-off รายไฟล์ โดย `uxui-designer`) และเพิ่มแถว `uxui\index.md` ในตาราง Documents — การปรับโครงสร้างให้เข้ามาตรฐาน baan (นายช่างบันทึกแถว module index)
 
 - 2026-10-07 — แปลงเอกสารโมดูลเข้าโครงสร้าง split layout (DES-014)
 - 2026-09-21 — สร้าง `requirement.md` ฉบับแรก โดย normalize พฤติกรรม as-built จาก `design.md` (Rev 3) เป็น REQ-001..REQ-011 พร้อม AC-001..AC-025 · คำถามค้าง 7 ข้อจาก design.md §21 ย้ายมาเป็น OQ-1..OQ-7 ใน `## Open Questions` · ข้อเสนอ design.md §32.1 ไม่ถูกนำมาเป็น requirement ตามข้อห้ามของเอกสารต้นทาง · สถานะ `as-built baseline` — รอ interview เจ้าของผลิตภัณฑ์ก่อนปิด phase REQUIREMENT
