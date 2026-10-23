@@ -2,7 +2,7 @@
 
 - วันที่: 2026-10-21
 - คำสั่งผู้ใช้: "เรียก planner เลย"
-- บทบาท: Planner t2 ผ่าน MYCELIUM แบบ read-only
+- บทบาท: Planner t2 ผ่าน นายช่าง แบบ read-only
 - Code root: `C:/src/schoolbright/target/school-bot-v2`
 - Knowledge root: `C:/src/schoolbright/knowledge/school-bot`
 - สถานะ: Planner DONE; บันทึกร่างและตรวจแล้ว ดู [planning/index.md](index.md) พร้อมส่ง PM
@@ -38,7 +38,7 @@
 - หลักสูตร/ภารกิจ/ประเมิน/ความคืบหน้าจริง; Code/Block ตรวจอัตโนมัติ, Arm ครูตรวจ
 - Windows และ macOS ต้องควบคุมหุ่นจริง; Mac source transport ยังต้องพัฒนา ไม่ส่ง simulator แทน
 - API/engine bounds, native/sample separation, predicted/written/measured/stop-requested semantics คงตาม REQ; ต้องมีงานทดสอบจริงกับหุ่น/installer ภายหลังตามอุปกรณ์และเกณฑ์ที่คนยืนยัน
-- MYCELIUM timeout แก้แล้วและ tests 85/85 เป็นผลตัวรัน ไม่ใช่ผล QA SchoolBot ไม่มี implementation ของ SchoolBot ที่ถือ completed จากงานเอกสารนี้
+- นายช่าง timeout แก้แล้วและ tests 85/85 เป็นผลตัวรัน ไม่ใช่ผล QA SchoolBot ไม่มี implementation ของ SchoolBot ที่ถือ completed จากงานเอกสารนี้
 
 ## ลำดับและประตูที่ให้วางในแผน
 
@@ -59,3 +59,5 @@ UX sign-off ก่อน FE ที่พึ่ง flow; physical schema/breaking
 - 2026-10-21 — Planner จบ exit 0 / DONE ใน 681.9s; รับ 74 tasks / 8 phases / 17 gates ตรวจ IDs/DAG/tier/effort/first wave และ mapping 31 REQ/109 AC ผ่าน เก็บประเด็นส่ง PM ใน planning/review-001.md โดยไม่เปิด implementation
 - 2026-10-21 — เปิด Planner CLI จริง; แยกข้อกำหนด output เพื่อคุมขนาดโดยไม่เปลี่ยน prompt ที่ส่งไปแล้ว
 - 2026-10-21 — MYCELIUM สร้าง brief ตามคำสั่งผู้ใช้ให้เรียก Planner โดยรับ logical baseline ที่ยืนยันแล้วและคง scope ระบบเต็ม
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

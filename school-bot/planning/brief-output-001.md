@@ -4,7 +4,7 @@
 
 ## รูปแบบผลส่งมอบ
 
-ส่งข้อความ full artifacts ไม่เขียนไฟล์เอง ให้ MYCELIUM บันทึกนอก plan/ จน PM รับช่วง:
+ส่งข้อความ full artifacts ไม่เขียนไฟล์เอง ให้ นายช่าง บันทึกนอก plan/ จน PM รับช่วง:
 
 1. `=== FILE: planning/proposal-001.md ===` ... `=== END FILE ===` ภาษาไทย <=8KiB: ภาพรวม phases, sequencing/parallelism, critical path, first wave ที่เริ่มได้โดยไม่รอ gate, assumptions/effort bounds/ความเสี่ยง และ handoff PM
 2. `=== FILE: planning/tasks-001.json ===` ... `=== END FILE ===` valid JSON ไม่ใส่ markdown fence ภายใน; machine artifact ใช้งบมากกว่า markdown ได้ แต่รวม output ทั้งหมดเป้าหมาย <=40KiB
@@ -20,3 +20,5 @@ Markdown มี Rev1 และ Change Log วันที่2026-10-21; JSON ม
 ## Change Log
 
 - 2026-10-21 — MYCELIUM ย้ายข้อกำหนด output แบบ verbatim; Planner ได้รับเนื้อหาครบใน prompt เดิมแล้ว
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

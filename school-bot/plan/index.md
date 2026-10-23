@@ -27,7 +27,7 @@ SA-001 ต้องเสนอ disposition ของ DES-007 เทียบ RE
 
 ## Tasks
 
-Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน MYCELIUM เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
+Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
@@ -109,3 +109,5 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 ## Change Log
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

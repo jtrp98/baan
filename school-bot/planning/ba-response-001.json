@@ -311,7 +311,7 @@
     }
   ],
   "plan_reconciliation": {
-    "owner": "PM ผ่าน MYCELIUM",
+    "owner": "PM ผ่าน นายช่าง",
     "baseline": "Canonical plan และ tasks-001.json ยังเป็น 74 tasks / 31 REQ / 109 AC",
     "required": [
       "ปรับ scope/counts/REQ-AC associations หลังรับ amendment เป็น 34 REQ / 132 AC โดยคง task IDs และไม่ตั้งยอด task ใหม่เอง",

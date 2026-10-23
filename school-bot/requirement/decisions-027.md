@@ -10,7 +10,7 @@
 
 - ตาราง SchoolBot ทั้ง 33 ตารางอยู่ในฐานข้อมูล SchoolBot ที่ host `10.0.0.128` port `9499` ไม่ใช่ School DB (JabjaiSchoolSingleDB)
 - มตินี้แทนข้อความใน [decisions-011](decisions-011.md) และ data-model ที่ว่า "วางทุกตาราง SchoolBot ใน School DB / ไม่เพิ่ม DB ที่ห้า" — SchoolBot ใช้ DB ของตัวเองเพิ่มจาก 4 DB เดิม (Master, School, Logs, PGGradeDB) ซึ่งยังใช้อ่าน/เขียนตามมติเดิม
-- ไม่บันทึก credential ใดๆ ใน knowledge; MYCELIUM และทีมไม่ต่อ DB นี้เอง
+- ไม่บันทึก credential ใดๆ ใน knowledge; นายช่าง และทีมไม่ต่อ DB นี้เอง
 
 ## การตีความที่ยังไม่ยืนยัน (สมมติฐาน — ยังไม่ยืนยัน)
 
@@ -27,3 +27,5 @@
 ## Change Log
 
 - 2026-10-22 — MYCELIUM บันทึกคำสั่งผู้ใช้; แทน placement ใน decisions-011
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

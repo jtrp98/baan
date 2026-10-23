@@ -2,7 +2,7 @@
 
 ## ผล
 
-PM ส่งแผนครบ 74 tasks / 8 phases / 17 gates และรับทุก field ของ Planner ที่ไม่มี override อย่างชัดเจน MYCELIUM บันทึกจาก [adoption/render contract](pm-response-001.json) เท่านั้น ไม่มีการแต่ง canonical scope หรือใบงานแทน PM
+PM ส่งแผนครบ 74 tasks / 8 phases / 17 gates และรับทุก field ของ Planner ที่ไม่มี override อย่างชัดเจน นายช่าง บันทึกจาก [adoption/render contract](pm-response-001.json) เท่านั้น ไม่มีการแต่ง canonical scope หรือใบงานแทน PM
 
 - แผนหลัก: [index](../plan/index.md), [canonical tasks](../plan/tasks-001.json), [scope](../plan/scope-001.md), [gates](../plan/gates-001.md), [dispatch](../plan/dispatch-001.md)
 - สร้าง 74 ใบงานครบ 8 headings และ [backlog](../backlog.md); task ทั้งหมด pending ไม่มี QA verdict ของ SchoolBot
@@ -30,8 +30,10 @@ PM จบ NEEDS_HUMAN; CLI exit 1 ตาม semantics ของตัวรั�
 - Command: mycelium-role --agent codex --role pm --tier t2 --date 2026-10-21 --cwd C:/src/schoolbright/target/school-bot-v2 --task-file C:/src/schoolbright/knowledge/school-bot/task-004.md
 - Mode read-only, model gpt-6.1-sol/high, timeout 1800s, elapsed 654.1s
 - Report: C:/src/AICode/baan/baan/reports/2026-10-21-12-30-00-pm-tier-t2-1agents-5vaCrZ
-- Next recipient ตาม PM: MYCELIUM จัดคิว SA-001/BE-001/DBA-001 เมื่อสั่ง execution งานนี้ยังไม่ dispatch first-wave roles
+- Next recipient ตาม PM: นายช่าง จัดคิว SA-001/BE-001/DBA-001 เมื่อสั่ง execution งานนี้ยังไม่ dispatch first-wave roles
 
 ## Change Log
 
 - 2026-10-21 — MYCELIUM ตรวจ static artifacts หลังบันทึก output PM และเชื่อม knowledge สำหรับงานต่อ
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

@@ -3,7 +3,7 @@
 - วันที่งาน: 2026-10-22 (Asia/Bangkok ตามผู้ใช้)
 - คำสั่งผู้ใช้: งั้นเรียก ba เลย
 - งาน: ปรับ requirement/business rules/AC และ OQ ที่เกี่ยวกับคำตอบจริงให้พร้อมส่ง SA/BE/DBA ไม่ใช่ร่างระบบใหม่หรือเริ่ม implementation
-- เจ้าของเอกสาร BA; role read-only ส่ง output ให้ MYCELIUM บันทึก ไม่มีการเขียน code/design/plan/SQL/QA หรือเรียก role ต่อ
+- เจ้าของเอกสาร BA; role read-only ส่ง output ให้ นายช่าง บันทึก ไม่มีการเขียน code/design/plan/SQL/QA หรือเรียก role ต่อ
 - Dispatch แล้ว: mycelium-role ba/t2 แบบ read-only, gpt-6.1-sol/high, timeout1800s, exec session44464; report C:/src/AICode/baan/baan/reports/2026-10-22-01-03-31-ba-tier-t2-1agents-IWkZf4
 
 ## อ่านตาม path — index first
@@ -52,3 +52,5 @@ Knowledge root: C:/src/schoolbright/knowledge/school-bot
 
 - 2026-10-22 — BA DONE, exit0; บันทึก 34 REQ / 132 AC ตรวจ IDs/ยอด/ลิงก์/ขนาดผ่าน ดู [ผลและ handoff](ba-review-001.md); ไม่มีคำถามธุรกิจใหม่
 - 2026-10-22 — MYCELIUM เตรียม BA amendment ตามคำสั่งผู้ใช้ โดยใช้มติล่าสุดและรักษาownership
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

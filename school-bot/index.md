@@ -7,7 +7,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 174 AC — DRAFT; decisions-001..034 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..034 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | Rev3 — data-model/rules/DBML Rev3 (32 ตาราง) CONFIRMED; DES-001..012 PROPOSED |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks | 74 tasks pending (8 phases / 17 gates) |
@@ -18,11 +18,15 @@
 | `uxui` | สารบัญ/เอกสาร UX/UI | ยังไม่มีเอกสาร |
 | `security.md` | ผลตรวจความปลอดภัย | ยังไม่มีเอกสาร — จป. ยังไม่ได้รัน |
 | `backlog.md` | งานที่ทำทีหลัง (append-only) | ยังไม่มี BL entry |
-| `db\` | SQL DDL/rollback + review (`review-001..005.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน) |
+| `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
 | `planning\` | ข้อเสนอ planner เดิม + ใบงาน run/ประวัติเก่า (task*.md, history*.md) — convention เฉพาะโปรเจกต์ (อ่านอย่างเดียว) | ADOPTED_BY_PM |
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
+
+- 2026-10-23 — vault ตรวจ SQL static ตามมติ 032..034 ที่ db/review-006.md ส่ง NEEDS_DESIGN_CHANGE (mapping lock, policy/run, missing/partial apply, Submission context) ยังไม่มี physical SQL delta; arch/gm กำลังรับงานตาม task-013/014
+
+- 2026-10-23 — spec amend ตาม decisions-032..034 เป็น 44 REQ/180 AC; คง 3 PARTIAL/9 CLOSED และสถานะตรวจรับ ส่ง arch sync contract แล้ว gm reconcile แผนเดิม
 
 - 2026-10-23 — [decisions-034](requirement/decisions-034.md): สูตรรวมถ่วงน้ำหนักรายกิจกรรม น้ำหนักใหม่มีผลรอบใหม่ และครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด; ปิด OQ-014 เหลือ OQ-008/009/011 รอทีมเตรียมข้อเสนอ/หลักฐานให้ตรวจ
 
@@ -65,3 +69,5 @@
 - 2026-10-21 — บันทึก decisions-016 ปิด OQ-006; ผู้ใช้ตรวจรับภาพรวม ทีมเสนอรุ่นหุ่น/OS ให้ตรวจภายหลัง
 - 2026-10-21 — บันทึก decisions-015: ถังขยะ 30 วัน ทีมร่างหลักสูตรให้ตรวจ และกำหนด scope ครูรายชื่อนักเรียน
 - ประวัติก่อนหน้า: [ชุด 1](planning/history-001.md), [ชุด 2](planning/history-002.md)
+
+- 2026-10-23 — ปรับคำสั่งส่งต่อทั้งโมดูลจาก MYCELIUM เป็นนายช่าง (BAAN) ตามการเปลี่ยนชื่อระบบ (release 0.12.0): แก้ใบงาน/แผน/ส่วนสั่งงานในไฟล์ข้อมูล รวม 104 ไฟล์ — บรรทัดลงวันที่ใน Change Log/หมายเหตุประวัติ และโฟลเดอร์ archive ยังอ้าง MYCELIUM ตามประวัติ (หมายถึงผู้คุมคนเดิม)

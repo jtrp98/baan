@@ -13,4 +13,6 @@
 
 ## Change Log
 
+- 2026-10-23 — vault ส่ง NEEDS_DESIGN_CHANGE / CLI exit 0; บันทึก db/review-006.md และ planning/vault-response-001.json มี findings 10 ข้อ ยังไม่เสนอ physical delta ส่ง arch ปิดช่องว่างสัญญา
+
 - 2026-10-23 — นายช่างส่ง vault ตรวจ SQL เทียบมติแบบ read-only คู่กับ spec เพื่อให้ arch ได้หลักฐานก่อนปรับสัญญา

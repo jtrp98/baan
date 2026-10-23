@@ -1,9 +1,9 @@
-# SchoolBot — PK int4 / DBML / MYCELIUM timeout
+# SchoolBot — PK int4 / DBML / นายช่าง timeout
 
 - วันที่: 2026-10-21
 - ที่มา: [decisions-012.md](../requirement/decisions-012.md)
 - เป้าหมาย: ปรับแบบ PK/FK เป็น int4, ส่งไฟล์ DBML เปิดใน dbdiagram.io และแก้ timeout ที่ใช้งานจริง
-- ขอบเขต: แบบ/diagram และโค้ดตัวรัน MYCELIUM; ไม่แก้ implementation SchoolBot หรือรัน SQL
+- ขอบเขต: แบบ/diagram และโค้ดตัวรัน นายช่าง; ไม่แก้ implementation SchoolBot หรือรัน SQL
 - สถานะ: ส่ง DBML และ amend แบบตาม PK int4 แล้ว; timeout แก้และตรวจผ่าน ครบงานรอบนี้ ส่วน schema/placement ที่ยังเป็นข้อเสนอยังไม่อนุมัติให้รัน SQL หรือ implementation SchoolBot
 
 ## งานที่เปิดจริง
@@ -30,3 +30,5 @@ BE รอบแรกอ่าน Git metadata ของ parent ไม่ได�
 - 2026-10-21 — BE resume DONE: ใช้ timeout helper เดียว, default 1800s, t0 3600s, explicit override ชนะ; role อ่าน workspace config และ invalid values ถูกปฏิเสธ ผู้คุมรัน npm test แบบปกติซ้ำเพื่อยืนยันข้อจำกัด TEMP ที่ role พบ: 85/85 ผ่าน; diff --check ผ่าน และ cache ที่ tests สร้างถูกเก็บกวาดเฉพาะ path ที่ตรวจแล้ว
 - 2026-10-21 — ตรวจ installed npm junction ใช้ source ที่แก้จริง: role t1=1800, t0=3600, explicit=77 ตามค่าทดสอบ ไม่ bump version/commit/release ไม่แก้ SchoolBot source และไม่เชื่อม DB จริง
 - 2026-10-21 — MYCELIUM เปิดงานตามคำสั่งผู้ใช้และบันทึกหลักฐาน role; การอนุญาตแก้ตัวรันไม่ใช่คำสั่ง commit/release
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

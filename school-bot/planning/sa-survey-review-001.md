@@ -8,7 +8,7 @@ SA ส่ง DONE/exit 0 ใน 626.4s ผ่าน mycelium-role sa/t1, gpt-6-a
 
 - [Hardware survey](../design/hardware-survey-001.md): protocol/device filter/ข้อจำกัดและ matrix สำรวจจริง
 - [OS compatibility](../design/os-compatibility-001.md): source/installer/pinned dependencies, official evidence และ candidate แบบมีเงื่อนไข
-- MYCELIUM บันทึกสองไฟล์จาก [SA response](sa-survey-response-001.json) ตรงข้อความต้นฉบับ และ apply เฉพาะ index patch ของ SA ไม่แก้ plan หรืออ้าง QA verdict
+- นายช่าง บันทึกสองไฟล์จาก [SA response](sa-survey-response-001.json) ตรงข้อความต้นฉบับ และ apply เฉพาะ index patch ของ SA ไม่แก้ plan หรืออ้าง QA verdict
 - Report: C:/src/AICode/baan/baan/reports/2026-10-21-13-34-47-sa-tier-t1-1agents-HjWmXL
 
 ## การตรวจเพิ่มเติมของผู้คุม
@@ -30,3 +30,5 @@ SA ส่ง DONE/exit 0 ใน 626.4s ผ่าน mycelium-role sa/t1, gpt-6-a
 ## Change Log
 
 - 2026-10-21 — MYCELIUM บันทึกผล role และตรวจ references/config เพิ่มก่อนเสนอ candidate ให้ผู้ใช้ตรวจ
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

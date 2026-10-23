@@ -32,7 +32,7 @@ Source root C:/src/schoolbright/target/school-bot-v2:
 - engines/zide/scripts/ อนุญาต rg --files เฉพาะ build scripts ที่ root scripts เรียกโดยตรง แล้วอ่านไฟล์ที่เกี่ยว
 - app/*.go เฉพาะ OS/architecture/runtime packaging checks ที่ source ข้างต้นอ้าง อนุญาต rg ภายใน glob นี้เพื่อพบ callers; ห้ามดูไฟล์ผู้ใช้/credentials/ข้อมูลนักเรียน
 
-ไม่เปิด repo อื่นโดยไม่มี dependency ตรงที่พิสูจน์ได้ ไม่ต้องอ่าน UI/mockups หรือออกแบบหน้าจอ และไม่ต้องอ่าน MYCELIUM.md ตาม role exception
+ไม่เปิด repo อื่นโดยไม่มี dependency ตรงที่พิสูจน์ได้ ไม่ต้องอ่าน UI/mockups หรือออกแบบหน้าจอ และไม่ต้องอ่าน นายช่าง.md ตาม role exception
 
 ## ผลส่งมอบ
 
@@ -52,9 +52,11 @@ Source root C:/src/schoolbright/target/school-bot-v2:
 
 แต่ละไฟล์ Markdown ภาษาไทย <=10 KiB มี Change Log 2026-10-21 แยกข้อเท็จจริง/ข้อเสนอ/สิ่งที่ยังไม่ตรวจ ไม่สวมว่าได้ตรวจเครื่องหรือหุ่นจริง ยังไม่อนุมัติ min OS หรือ hardware model และไม่แก้สถานะใน plan
 
-MYCELIUM บันทึก output เชิงกลตาม ownership บทบาทนี้ไม่เขียนไฟล์เอง ไม่เรียก role ต่อ
+นายช่าง บันทึก output เชิงกลตาม ownership บทบาทนี้ไม่เขียนไฟล์เอง ไม่เรียก role ต่อ
 
 ## Change Log
 
 - 2026-10-21 — บันทึก SA survey สองไฟล์และผลตรวจ root; รอผู้ใช้ตรวจ candidate และหลักฐานอุปกรณ์จริงตาม gates
 - 2026-10-21 — MYCELIUM เตรียม SA survey ตามการมอบหมายผู้ใช้ใน decisions-016
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

@@ -218,7 +218,7 @@
         "REQ-032",
         "requirement/index"
       ],
-      "close_evidence": "QA-001..010 ส่ง verdict/evidence ครบ 109 AC ตาม TP matrix แยก automated/UI/source-built hardware/signed installer และระบุ RC hashes คนรับรอง hardware/install/performance ตามเกณฑ์จริง Critical หรือ fail ครั้งที่สามของ task เดิมต้องให้คนตัดสินก่อนเดินต่อ QA verdict เท่านั้นเป็นที่มาของ verified/blocked ผ่าน MYCELIUM"
+      "close_evidence": "QA-001..010 ส่ง verdict/evidence ครบ 109 AC ตาม TP matrix แยก automated/UI/source-built hardware/signed installer และระบุ RC hashes คนรับรอง hardware/install/performance ตามเกณฑ์จริง Critical หรือ fail ครั้งที่สามของ task เดิมต้องให้คนตัดสินก่อนเดินต่อ QA verdict เท่านั้นเป็นที่มาของ verified/blocked ผ่าน นายช่าง"
     },
     {
       "id": "G-RELEASE",

@@ -1,6 +1,6 @@
 # SchoolBot — PM output/render protocol
 
-## Output protocol — PM เป็นเจ้าของเนื้อหา MYCELIUM บันทึกเชิงกล
+## Output protocol — PM เป็นเจ้าของเนื้อหา นายช่าง บันทึกเชิงกล
 
 บทบาท read-only ไม่เขียนไฟล์ ให้ตอบ JSON object เดียวใน fenced json แล้ว handoff สั้น+state. เพื่อไม่ต้องพิมพ์ 74 ใบงานซ้ำ ให้ใช้ adoption/render contract นี้ (เป็นการรับเนื้อหาเดิมโดย PM ชัดเจน ไม่มอบให้ผู้คุมแต่งแผน):
 
@@ -40,3 +40,5 @@
 ## Change Log
 
 - 2026-10-21 — แยก protocol จาก task-004 หลัง PM ส่งผล รักษา brief เดิมและลดขนาดใบงาน
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

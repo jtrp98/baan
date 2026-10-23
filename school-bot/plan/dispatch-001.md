@@ -47,7 +47,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 
 ## Routing หลังส่งงาน
 
-ทุก role ส่ง MYCELIUM เท่านั้น ผู้คุมเลือกผู้รับจากงานที่ depends_on task นั้นพร้อมตรวจ gates ไม่ให้ role เรียกต่อกันเอง
+ทุก role ส่ง นายช่าง เท่านั้น ผู้คุมเลือกผู้รับจากงานที่ depends_on task นั้นพร้อมตรวจ gates ไม่ให้ role เรียกต่อกันเอง
 
 | กลุ่มผู้ส่ง | ผู้รับถัดไปและหลักฐาน |
 |---|---|
@@ -58,7 +58,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 | UX | มนุษย์ UX sign-off แล้ว FE ผ่านผู้คุม; ส่ง artifact revision และ flow/failure coverage |
 | TP | QA และผู้ทำ fixture ตาม dependencies ผ่านผู้คุม; ส่ง AC/platform/store/mode matrix และวิธีพิสูจน์ |
 | BE/FE | ผู้ทำ consumer ถัดไปและ QA ตาม task DAG ผ่านผู้คุม; ส่ง artifact/source changes/checks/ข้อจำกัด |
-| QA | MYCELIUM รับ verdict บันทึก index แล้วส่งผู้แก้หรือ PM; ห้าม PM ลง verified/blocked แทน |
+| QA | นายช่าง รับ verdict บันทึก index แล้วส่งผู้แก้หรือ PM; ห้าม PM ลง verified/blocked แทน |
 | SEC | ผู้แก้/มนุษย์รับความเสี่ยง/PM ผ่านผู้คุม; ส่ง findings, severity, RC hashes และ retest |
 | PM-001 | เจ้าของ release/shared environment/ผู้ตรวจรับผ่านผู้คุม; ส่ง full-scope evidence pack |
 | PM-002 | ผู้คุม/ผู้ใช้รับ receipts และ handover จริง; ไม่มีการ dispatch deployment จากบทบาท PM เอง |
@@ -72,3 +72,5 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 ## Change Log
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

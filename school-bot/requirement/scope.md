@@ -8,7 +8,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - เป้าหมายล่าสุดจากผู้ใช้: ทำระบบเต็มใช้งานจริงครบทุกส่วน ดู [มติระบบเต็ม](decisions-002.md)
 - โครงสร้างหลัก: Block / Arm / Code มีหน้าบทเรียนแยกจากพื้นที่สร้างงาน ดู [ผลตรวจโค้ด](../design/source-review-001.md) และ [มติ 3 โหมด](decisions-003.md)
 
-ตารางด้านล่างเป็นฐานโค้ดปัจจุบัน; ข้อจำกัด PoC เป็นช่องว่างที่ต้องพัฒนา ดู [มติระบบเต็ม](decisions-002.md) และ [มติผู้ใช้](decisions-001.md)
+ข้อจำกัดฐานเดิมเป็นช่องว่างที่ต้องพัฒนา ไม่ใช่เพดานขอบเขตเป้าหมาย
 
 แหล่งที่มา: `target/school-bot` และมติผู้ใช้ในแชต
 
@@ -31,26 +31,23 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - หลัง Login เลือกนำเข้าเอง คงต้นฉบับ/กันซ้ำ ไม่ auto-upload (REQ-041); ประวัติ Guest local เลือกย้ายได้ ต้องตรวจใหม่ Arm รอครู ไม่ถือ Guest เป็นตัวตนนักเรียน (REQ-042)
 - ทีมร่างเนื้อหา/ภารกิจ/เกณฑ์ครบสามโหมด ให้ผู้ใช้หรือผู้ที่ผู้ใช้ระบุอนุมัติ; ยังไม่มี inventory/criteria/rubric ที่อนุมัติจริง (REQ-037..039)
 - License บังคับ Guest/Login: ครั้งแรกออนไลน์ lease 3 วัน หนึ่ง Key/เครื่อง ผู้ดูแลย้ายทันที สิทธิ์เดิมคงถึงกำหนด (REQ-009/034/035)
-- API รวม Login ใน school-bot/web ใช้บัญชี/4 DB เดิม ไม่สร้าง SchoolBotUser; PK/FK ของ SchoolBot int4 และฟิลด์มาตรฐานครบ (REQ-033/036; decisions-010..013)
+- API รวม Login อยู่ school-bot/web ใช้บัญชี/4 DB เดิม; ตาราง SchoolBot อยู่ DB แยกตาม decisions-027 ไม่สร้าง SchoolBotUser ใช้ PK/FK int4/ฟิลด์มาตรฐาน (REQ-033/036)
 - OS: Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon ทั้งคู่ต้องใช้หุ่นจริง (decisions-019; REQ-031/032)
 
-รวม 34 REQ / 132 AC ใน [index](index.md); เพิ่ม REQ-040..042 เพื่อแบ่งหน้าที่และขนาด คง release ระบบเต็ม
+รวม 44 REQ / 180 AC ตาม [index](index.md); คง release ระบบเต็มและรหัสเดิม
 
-### สถานะปัจจุบันระดับโมดูล (ย้ายจาก Module Index — 2026-10-22)
+### มติล่าสุด — 2026-10-23
 
-- ตาราง SchoolBot อยู่ SchoolBot DB 10.0.0.128:9499 ตาม [decisions-027](decisions-027.md) (ไม่ใช่ School DB)
-- PK ของตาราง SchoolBot ใหม่เป็น `int4` ตาม [มติผู้ใช้](decisions-012.md); มี [DBML](../design/schoolbot.dbml) สำหรับ dbdiagram.io และปรับ timeout MYCELIUM แล้ว
-- API ทั้งหมดรวม Login อยู่ `target/school-bot/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](decisions-010.md), [มติ DB](decisions-011.md) และ [ผลตรวจบัญชีเดิม](../design/source-review-002.md)
-- Windows และ macOS ต้องควบคุมหุ่นจริงได้ทั้งคู่ ดู [มติ OS](decisions-008.md); ฝั่ง macOS ยังต้องพัฒนาจากโค้ดเดิม
-- เป้าหมาย OS ล่าสุด Windows11 25H2 x64 และ macOS15+ Intel/AppleSilicon ตาม [decisions-019](decisions-019.md) แทนข้อกำหนด Windows10 เดิม
-- Guest และ Login เก็บหลายโครงงานทุกโหมด; Code/Block ประเมินอัตโนมัติ Arm ให้ครูตรวจ ดู [มติผู้ประเมิน](decisions-009.md); Guest ใช้พื้นที่ร่วมและเลือกนำเข้างาน/ประวัติหลัง Login ตาม [มติ Guest](decisions-014.md)
-- Guest ลบเข้าถังขยะกู้ได้ 30 วัน; ทีมร่างหลักสูตรสามโหมดให้ผู้ใช้ตรวจ ครูดูแลเฉพาะรายชื่อนักเรียนที่ผู้ดูแลกำหนด ดู [มติชุด 2](decisions-015.md)
-- ต้องมี License ก่อนใช้แอปทั้ง Guest/Login; ตาราง `SchoolBotLicense` ใช้ PK `SchoolBotLicenseId` และฟิลด์มาตรฐาน ดู [มติ License/DB](decisions-004.md)
-- ครั้งแรกตรวจ License ออนไลน์ แล้วใช้สิทธิ์ในเครื่องได้ 3 วัน ครบกำหนดต้องตรวจ Key ว่ายัง Active ก่อนต่อสิทธิ์ ดู [มติออฟไลน์](decisions-005.md)
-- 1 Key ผูก 1 เครื่อง; ผู้ดูแลปลดก่อนย้าย Key เดิมได้ทันที เครื่องเดิมอาจใช้ออฟไลน์จนสิทธิ์เดิมหมด ดู [มติย้ายสิทธิ์](decisions-007.md)
-- BA amend แล้ว: 44 REQ / 174 AC ยังเป็น DRAFT (เพิ่ม REQ-043..052 หลักสูตร Level/ข้อสอบ/ส่งคะแนน) ดู [ผลตรวจเอกสาร](../planning/ba-review-001.md); คงรหัสเดิมครบ เพิ่ม REQ-040..042
-- หลักสูตรเปลี่ยนเป็นหลักสูตรกลางแบบ Level ต่อภาคเรียน ผูกชั้น/วิชาได้ ตาม [decisions-020](decisions-020.md); ยังไม่ amend REQ/DES
-- ส่งคะแนนเป็นช่องย่อยต่อกิจกรรม SchoolBot เขียนระบบเกรดเองผ่านหน้า mapping โดยไม่เปลี่ยนโครงสร้างเดิม ตาม [decisions-021](decisions-021.md)
+ผู้ยืนยัน: ผู้ใช้ในแชต ตาม decisions-032/033/034
+
+- ครูทดลอง local/เก็บโครงงาน Cloud ได้ แต่ห้าม submission/attempt Cloud (REQ-036/038/039)
+- กิจกรรมหนึ่งได้หลายช่องข้ามวิชา ช่องหนึ่งได้กิจกรรมเดียว; ใช้ช่องเดิม mapping ที่ส่งแล้วล็อก เปลี่ยนใช้ชุดใหม่ ไม่ย้าย/ล้างคะแนนเดิม (REQ-049)
+- export ต่อช่อง = earned/max × target max ปัด half-up; ไม่มีผลให้ข้าม คงเดิม ส่งภายหลังได้ (REQ-050/051)
+- รวมหลักสูตร = SUM((earned/max) × weight) น้ำหนักรวม 100% Quiz ไม่นับ = 0; เปลี่ยนเฉพาะ CourseRun ใหม่ (REQ-047)
+- ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด ส่วนจำนวนครั้ง/สุ่ม/เวลาเฉลยคงส่วนกลาง; คงซ่อมรายคน/คะแนนสูงสุดไม่มีเพดาน (REQ-046)
+- เลื่อน Level นับทุกคนใน roster งานขาด = 0 แยกจาก export (REQ-048)
+
+สถานะโมดูลเดิมเก็บที่ [ประวัติ](scope-history-20261023-011.md); ไม่ใช่หลักฐานผ่าน contract/QA/release
 
 ### หลักฐานฐานเดิม
 
@@ -71,8 +68,8 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - เอกสารระบุ Windows installer ยังไม่ลงนาม และ macOS ยังต้อง Developer ID/notarization
 - เป้าหมายขนาด 300 MB, startup 5 วินาที และ 30 FPS ยังไม่ใช่ผล benchmark หรือเกณฑ์ที่ธุรกิจอนุมัติ
 - Hardware, macOS และ installer verification ยังไม่พิสูจน์ในงานนี้
-- logical baseline ยืนยันแล้ว; [แผนหลัก](../plan/index.md) 74 งาน / 8 phases / 17 gates ทุกงาน pending ยังอ้าง 31/109 ให้ PM/TP ปรับ mapping ตาม AC ใหม่ 23 ข้อ; ยังไม่เริ่ม implementation SchoolBot
-- มี 12 ประเด็นคำถาม: 5 PARTIAL / 7 CLOSED (ไม่มี OPEN); OQ-006/007/010 ได้ข้อยุติธุรกิจแล้ว งาน contract ส่ง SA ส่วนเนื้อหา/หุ่น/ส่งมอบรอทีมเสนอให้ผู้ใช้ตรวจ
+- [แผนเดิม](../plan/index.md) 74 งาน/8 phases/17 gates รอ gm reconcile กับ 44 REQ/180 AC และ gate ตามหลักฐานจริง; งานเอกสารนี้ไม่เริ่ม implementation
+- 12 OQ: 3 PARTIAL/9 CLOSED ตาม index; OQ-008/009/011 รอทีมเตรียมข้อเสนอให้มนุษย์ตรวจ การปิด OQ ไม่รับรอง contract/implementation
 - หลักฐานเป็น working tree ณ 2026-10-21; source repository ยังไม่มี commit ให้อ้าง hash
 
 ### ช่องว่างของหลักฐาน
@@ -91,23 +88,8 @@ Windows 10 ออกจาก target ตามคำสั่งผู้ใช�
 
 ดู [Source References](source-references.md), decisions-014/015/016/019; OQ-007 ตอบนโยบายธุรกิจครบ ส่วน storage/migration contract ส่ง SA; OQ-008/009/011 และ gates ยังรอหลักฐานจริง
 
-Canonical plan/JSON 74 งานยังเป็น baseline 31/109 ให้ PM/TP reconcile mapping และยอดใหม่ ไม่แก้สถานะ task จากเอกสารนี้
+ให้ gm reconcile แผน/JSON 74 งานกับ REQ/AC ปัจจุบัน ไม่เปลี่ยนสถานะงานจากมติธุรกิจอย่างเดียว
 
 ## Change Log
-- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](decisions-031.md)
 
-- 2026-10-22 — ย้ายเนื้อหาสถานะปัจจุบันระดับโมดูลจาก `index.md` มาจัดเข้าหมวด Overview, Release Scope และ Constraints โดยคงถ้อยคำเดิม ไม่ตีความเพิ่ม และไม่ปิด OQ ใด
-- 2026-10-22 — amend ตามมติจริง แยกหลักฐานเดิม คงระบบเต็มและเกณฑ์ที่รออนุมัติ
-
-- 2026-10-21 — ชี้ขอบเขตข้อจำกัด SchoolBot ต้นทางให้แยกจาก User/DB เดิมของ Academic และบันทึกตำแหน่ง API ตามผู้ใช้
-
-- 2026-10-21 — สร้างจาก source repo ตามคำสั่งผู้ใช้ให้กลั่น requirement โดยไม่อนุมัติ release scope
-- 2026-10-21 — เพิ่มมติผู้ใช้ OQ-006..009; รายละเอียดใน decisions-001.md
-- 2026-10-21 — ผู้ใช้ยืนยันเป้าหมายระบบเต็มใช้งานจริง ดู decisions-002.md
-- 2026-10-21 — ตรวจโค้ดเพิ่ม แยกบทเรียนจาก Block/Arm/Code Labs
-- 2026-10-21 — เพิ่มมติบังคับ License และมาตรฐาน SchoolBot ดู decisions-004.md
-- 2026-10-21 — บันทึกสิทธิ์ออฟไลน์ 3 วันตามคำตอบผู้ใช้ ดู decisions-005.md
-- 2026-10-21 — ยืนยันผู้ดูแลย้ายทันทีและสิทธิ์ออฟไลน์เดิมตาม decisions-007.md
-- 2026-10-21 — ยืนยัน Windows/macOS ควบคุมหุ่นจริงตาม decisions-008.md
-
-- 2026-10-21 — ย้าย References ไป source-references.md โดยคงเนื้อหาเดิม; เป้าหมายหลายโครงงานและการประเมินตาม decisions-009.md
+- 2026-10-23 — amend ตาม decisions-032..034 รวม 44 REQ/180 AC; คง 3 PARTIAL/9 CLOSED ไม่เปลี่ยนผลตรวจรับ; แยกส่วนประวัติคุมขนาดที่ [scope-history-20261023-011.md](scope-history-20261023-011.md)

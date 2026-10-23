@@ -35,8 +35,10 @@
 - H4 schema ใหม่/แก้ (Session channel, StaffRole, CourseRun.PlanCourseIds ฯลฯ) → DBA
 - H5 env/route ใหม่ใน web-system และ network SchoolBot ↔ gateway → เจ้าของ repo/infra
 - endpoint `web-principal` → เจ้าของ sb-api-gateway
-- รายชื่อ staff_admin ตั้งต้น, release gates ของ DES-009, OQ-014 (สูตรรวม), OQ-016 (หลาย source ต่อช่อง/แก้ mapping หลังส่ง), ขอบเขตที่ครูปรับ policy ได้, test สุ่มลำดับตัวเลือกหรือไม่
+- รายชื่อ staff_admin ตั้งต้น, release gates ของ DES-009, test สุ่มลำดับตัวเลือกหรือไม่; OQ-014/016 และขอบเขตครูปรับ policy ตอบแล้วตาม decisions-032/033/034 ไม่ใช่ข้อค้าง
 
 ## Change Log
+
+- 2026-10-23 — เชื่อม decisions-032..034 ตัด OQ-014/016/ขอบเขตครูออกจากรายการรอ; gate อื่นคงเดิม
 
 - 2026-10-22 — MYCELIUM บันทึกคำตอบผู้ใช้ 8 ข้อ รวม risk acceptance H2

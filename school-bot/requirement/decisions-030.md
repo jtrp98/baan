@@ -11,7 +11,7 @@
 - ไม่มีคอลัมน์ `Version` ในตาราง SchoolBot ใดๆ (ถอนจาก SQL ทั้งหมด); `SchoolBotAuditEvent` ไม่เก็บ `PreviousVersion`/`NewVersion`
 - ยังต้องกันการแก้ทับกัน (lost update) ด้วยวิธีที่ไม่ต้องเพิ่มคอลัมน์
 
-## วิธีที่ MYCELIUM เลือกแทน (สมมติฐาน — ยังไม่ยืนยัน)
+## วิธีที่ นายช่าง เลือกแทน (สมมติฐาน — ยังไม่ยืนยัน)
 
 - ใช้ system column `xmin` ของ PostgreSQL เป็น concurrency token: ทุกแถวมีอยู่แล้วโดยไม่ต้องสร้างคอลัมน์ และเปลี่ยนเองทุกครั้งที่แถวถูก UPDATE
 - EF Core/Npgsql รองรับตรง (`UseXminAsConcurrencyToken` / `[Timestamp] uint xmin`); ระบบเกรดเดิม (score-record) ก็ใช้ `xmin` เป็น row version ตาม proto ที่ SA พบ ([source-review-005](../design/source-review-005.md))
@@ -23,7 +23,7 @@
 
 ผู้ใช้: "UpdateDate ใช้อันนี้สิ อุตส่ามีแล้ว"
 
-ยืนยัน: ใช้ `UpdateDate` เป็น concurrency token แทน xmin (ส่วน "วิธีที่ MYCELIUM เลือกแทน" ด้านบนถูกแทนด้วยข้อนี้ เก็บไว้เป็นประวัติ)
+ยืนยัน: ใช้ `UpdateDate` เป็น concurrency token แทน xmin (ส่วน "วิธีที่ นายช่าง เลือกแทน" ด้านบนถูกแทนด้วยข้อนี้ เก็บไว้เป็นประวัติ)
 
 - UPDATE ทุกครั้ง: `SET ..., "UpdateDate" = clock_timestamp() WHERE "Id" = @id AND "UpdateDate" = @expected` → 0 แถว = `412 VERSION_CONFLICT`
 - API ส่ง `ETag` เป็นค่า UpdateDate แบบ opaque string ที่ server สร้าง (ความละเอียด microsecond ของ timestamptz) และรับกลับทาง `If-Match`; client ห้าม parse เป็นวันที่ (เช่น JS Date ตัดเหลือ millisecond แล้วจะชนกันผิด)
@@ -39,3 +39,5 @@
 
 - 2026-10-22 — ผู้ใช้เลือก UpdateDate เป็น concurrency token แทน xmin
 - 2026-10-22 — MYCELIUM ถอน Version 20 จุดและ Previous/NewVersion ใน db/schoolbot_db.sql; Rev5 เดิมที่ db/archive/rev5/
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

@@ -2,7 +2,7 @@
 
 - วันที่: 2026-10-21
 - คำสั่งผู้ใช้: เรียก pm เลยครับ
-- ผู้คุม: MYCELIUM; เรียก PM จริงผ่าน mycelium-role แบบ read-only
+- ผู้คุม: นายช่าง; เรียก PM จริงผ่าน mycelium-role แบบ read-only
 - เป้าหมาย: PM รับ Planner เป็นเจ้าของ canonical plan/backlog และใบงานราย task ก่อนเริ่ม execution
 - Dispatch จบแล้ว: mycelium-role --agent codex --role pm --tier t2 แบบ read-only, model gpt-6.1-sol/high, timeout 1800s; elapsed 654.1s, state NEEDS_HUMAN/exit 1 เพราะ downstream gates ยังรอคน ไม่ใช่ timeout
 - Report directory: C:/src/AICode/baan/baan/reports/2026-10-21-12-30-00-pm-tier-t2-1agents-5vaCrZ
@@ -52,3 +52,5 @@ Logical model และ DBML ยืนยันแล้วตาม decisions-0
 
 - 2026-10-21 — PM รับ 74 tasks / 8 phases / 17 gates; MYCELIUM บันทึก canonical plan/74 ใบงาน/backlog แล้ว ตรวจ 31 REQ / 109 AC, DAG และ 988 links ผ่าน ดู [ผลตรวจ](pm-review-001.md) ยังไม่เปิด implementation roles
 - 2026-10-21 — MYCELIUM เตรียม PM dispatch ตามคำสั่งผู้ใช้ รับ Planner โดยไม่แต่ง canonical plan แทน PM
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

@@ -4,7 +4,7 @@
 
 ที่มา: SA (codex t1) 2026-10-22 รายงานเต็ม `C:/src/AICode/baan/baan/reports/2026-10-22-07-35-43-sa-tier-t1-1agents-6X8T00` ส่วนที่ 6–9 คัดลอกด้านล่างโดยไม่แก้เนื้อหา
 
-หมายเหตุ MYCELIUM: SA ร่างก่อน [decisions-022](../requirement/decisions-022.md) — หน้า admin อยู่ Next.js ใน school-bot-v2/web, หน้าครูอยู่ web-system; endpoint `/v2/admin/*` และ teacher endpoints ต้องออกแบบ auth ข้ามระบบเพิ่ม
+หมายเหตุ นายช่าง: SA ร่างก่อน [decisions-022](../requirement/decisions-022.md) — หน้า admin อยู่ Next.js ใน school-bot-v2/web, หน้าครูอยู่ web-system; endpoint `/v2/admin/*` และ teacher endpoints ต้องออกแบบ auth ข้ามระบบเพิ่ม
 
 ---
 
@@ -577,3 +577,5 @@ Ref: SchoolBotLevelProposal.SuccessorRunId > SchoolBotCourseRun.SchoolBotCourseR
 
 - 2026-10-22 — APPLIED เข้า baseline Rev4 / DBML Rev2 ตามมติอนุมัติ decisions-026
 - 2026-10-22 — MYCELIUM บันทึกข้อเสนอ SA โดยไม่ apply เข้า baseline
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ
