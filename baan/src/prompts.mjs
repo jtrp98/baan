@@ -86,7 +86,7 @@ ${matrix}
 ## Planning rules (important):
 1. Easy work = few tasks (maybe 1–2, or a single task) — pick only the roles that are needed, never the whole team.
 2. **Task tier is selectable only for roles = front / sys** (implementation work already designed by arch — pick within ${IMPLEMENT_TIER_RANGE} by real difficulty) — every other role uses its fixed tier from the list above.
-3. Tasks without dependencies (empty dependsOn) run in parallel — add a dependency only when genuinely required.
+3. Tasks without dependencies (empty dependsOn) run in parallel — add a dependency only when genuinely required. Two tasks writing to the same target repository must depend on each other unless they provably touch disjoint files/paths — sharing no contract is not the same as sharing no files.
 4. Every task works read-only (no file edits yet) — output is documents/text.
 5. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
 
