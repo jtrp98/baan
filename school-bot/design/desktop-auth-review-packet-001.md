@@ -1,4 +1,4 @@
-# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev3
+# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev4
 
 สถานะอยู่ที่ [index](index.md); อ่านคู่ [adapter](desktop-login-adapter-001.md). เป็น technical handoff ไม่ใช่ Light approval หรือคำถามนโยบาย035.
 
@@ -64,7 +64,14 @@ Public mapper ในอนาคตแปลง internal403จาก G web authe
 
 [คำถามเจ้าของ](../planning/desktop-login-owner-question-001.md) บันทึกว่าผู้ใช้ไม่เข้าใจและทีมรับ technical mappingกลับแล้ว ไม่ใช่ confirmation/approval และไม่ถาม columnซ้ำ. canonical_account_id ยังคือ TMasterDBUser.sID; คงข้อค้าง identity/device/session/H5เดิม ไม่เปิดมติ035หรือสร้าง human gateใหม่.
 
+## Override Rev4 — ใบงาน048
+
+[adapter Rev4](desktop-login-adapter-001.md) มี precedence เรื่อง cType/route. แทนข้อความ Rev3 ที่อาจอ่านว่าผู้ใช้ยังไม่ตอบ: ผู้ใช้ยืนยัน category แล้ว; ทีมตรวจ exact profile linkage ต่อให้ผู้ใช้ ไม่ถาม column/migration ซ้ำและไม่สร้าง human gate ใหม่.
+
+คง canonical_account_id=TMasterDBUser.sID; [036](../planning/desktop-login-mapping-evidence-001.json) ยังไม่พิสูจน์ Master.TUser↔TMasterDBUser↔profile. cType เลือกประเภท ไม่เลือก profile row หรือแก้สูตร NSystemId. G/sys รับตรวจ pre-auth lookup ตาม adapter; legacy/vault รวบรวม lineage/fixtures ที่มีอยู่ แยก tenant, keyต่างกัน, null/0/1/>1 และ cardinality พร้อม current salary/student history rule. ไม่อนุมาน equality/coalesce/FK จากเลขหรือชื่อเหมือนกัน. ข้อค้างนี้เป็น technical evidence เดิม ไม่ใช่คำถาม category ที่ยังไม่ได้คำตอบ; device/session/trusted terminal/H5คงเดิม.
+
 ## Change Log
+- 2026-10-24 — Rev4: category ตอบแล้ว; ส่งทีมตรวจ routing/linkage ต่อ คง canonical AccountId และ admission เดิม
 - 2026-10-24 — Rev3: ใบงาน047แยกขอบเขต035/037/public mapper และรับคำชี้แจง mapping; production prerequisites เดิม
 - 2026-10-23 — Rev2: ใบงาน037แทนข้อจำกัด component-with-caller ของ034โดยคงข้อความเดิมเป็นประวัติ; production prerequisites ไม่เปลี่ยน
 - 2026-10-23 — Rev1: ใบงาน034 แยก trust/mapping/device/persistence/transport gaps ตาม033และ B sourceจริง; ไม่มีschema deltaหรือการอนุมัติแก้ G

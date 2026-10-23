@@ -1,0 +1,54 @@
+{
+  "state": "DONE",
+  "summary": "เตรียม amendment Rev4 แบบ read-only; ตรวจ old anchors ทั้ง7จุดไม่ซ้ำ ผู้คุมต้อง archive ก่อน apply ยังไม่ได้เขียนไฟล์หรือรัน Login",
+  "evidence": [
+    "planning/desktop-login-owner-question-001.md:21 ยืนยัน category clarification; ผู้ใช้ไม่ได้ระบุตัวเลข",
+    "planning/desktop-login-evidence-001.json:175–204: CType='0' เข้า student; web lookup CType='1'; mobile JWT ไม่มี CType อ้าง G TusersRepository.cs:103, WebLoginService.cs:64, JwtTokenService.cs:80 ตาม033 ไม่ตรวจ source ซ้ำ",
+    "planning/desktop-login-mapping-evidence-001.json:15–56,80–114: account linkage ยัง unproven; student equality ไม่ใช่กฎสากล; employee key/active rules ต่างกัน",
+    "planning/desktop-login-wire-contract-response-001.json:3–38 และ adapter/packet Rev3: คง request bounds/error layer จาก047"
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/design/desktop-login-adapter-001.md",
+      "old": "# Desktop login adapter — Rev3",
+      "new": "# Desktop login adapter — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-login-adapter-001.md",
+      "old": "## Change Log",
+      "new": "## Override Rev4 — ใบงาน048: cType และการเลือก route\n\nมี precedence เฉพาะที่มา actor/category และการเลือก upstream เหนือข้อความเดิม; คง037/047และ admission เดิม. ผู้ใช้ยืนยันให้แยกนักเรียน/ครูด้วย cType แล้ว ตาม [คำชี้แจง](../planning/desktop-login-owner-question-001.md). ค่า CType=\"0\"→student และ \"1\"→employee มาจาก [033](../planning/desktop-login-evidence-001.json) identity_mapping ไม่ใช่ตัวเลขที่ผู้ใช้ระบุ.\n\nใช้ cType จากข้อมูล server ที่ผูกกับบัญชี/tenant ของ attempt ผ่าน trusted boundary; หลัง authentication ต้องตรวจความผูกพันนี้ก่อนยืนยัน actor และตรึงตลอด attempt. body/header cType, response user หรือ JWT ที่เพียง decode ไม่เป็น authority; mobile JWT ไม่มี CType ตาม033. null/unknown/กำกวมไม่ใช่ employee และห้ามออก session; unresolved mapping ใช้503 AUTH_NOT_CONFIGURED ตามเดิม. cType ไม่พิสูจน์ admin, active, tenant, device หรือ AccountId=ProfileId.\n\ncType ที่ได้หลัง authentication เลือก route ย้อนหลังไม่ได้. ก่อนส่ง password ต้องพิสูจน์ server lookup ที่เลือกบัญชีได้ไม่กำกวมและผูกผลกับบัญชีที่ authenticate จริง; ผลก่อน auth ใช้เลือกเส้นทางเท่านั้น ไม่เป็น admission. 033มี FindAuthUserDetail ที่ TusersRepository.cs:103 และ employee lookup ที่ WebLoginService.cs:64 แต่ยังไม่พิสูจน์ private routing seam สำหรับ B. ให้ G/sys ตรวจสองจุดนี้ต่อและคืน contract เรื่อง selector/cardinality/attempt binding โดยคง /login กับ /web/login ตามขอบเขตเดิม. ระหว่างยังไม่มีหลักฐาน ห้ามเดา route เพิ่ม public actor หรือส่ง password ลองหลาย route เพราะมี attempts/lock side effects; ไม่เลือก mobile fallback ให้ครู.\n\n## Change Log\n- 2026-10-24 — Rev4: รับ cType clarification; แยก category จาก pre-auth routing/profile linkage ไม่เปลี่ยน schema/public surface/admission"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev3",
+      "new": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "## Change Log",
+      "new": "## Override Rev4 — ใบงาน048\n\n[adapter Rev4](desktop-login-adapter-001.md) มี precedence เรื่อง cType/route. แทนข้อความ Rev3 ที่อาจอ่านว่าผู้ใช้ยังไม่ตอบ: ผู้ใช้ยืนยัน category แล้ว; ทีมตรวจ exact profile linkage ต่อให้ผู้ใช้ ไม่ถาม column/migration ซ้ำและไม่สร้าง human gate ใหม่.\n\nคง canonical_account_id=TMasterDBUser.sID; [036](../planning/desktop-login-mapping-evidence-001.json) ยังไม่พิสูจน์ Master.TUser↔TMasterDBUser↔profile. cType เลือกประเภท ไม่เลือก profile row หรือแก้สูตร NSystemId. G/sys รับตรวจ pre-auth lookup ตาม adapter; legacy/vault รวบรวม lineage/fixtures ที่มีอยู่ แยก tenant, keyต่างกัน, null/0/1/>1 และ cardinality พร้อม current salary/student history rule. ไม่อนุมาน equality/coalesce/FK จากเลขหรือชื่อเหมือนกัน. ข้อค้างนี้เป็น technical evidence เดิม ไม่ใช่คำถาม category ที่ยังไม่ได้คำตอบ; device/session/trusted terminal/H5คงเดิม.\n\n## Change Log\n- 2026-10-24 — Rev4: category ตอบแล้ว; ส่งทีมตรวจ routing/linkage ต่อ คง canonical AccountId และ admission เดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev3 — 047แก้ request bounds/public error layer จาก035; component037คงเดิม; full Login ready=false |",
+      "new": "| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev4 — 048รับ cType category; รอ pre-auth routing/linkage proof; คง037/047; full Login ready=false |"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev3 — รับ035เฉพาะ wire/bounds/error; identity/device/session/H5ยังค้างเดิม ไม่บล็อก decoder |",
+      "new": "| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev4 — category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน048: adapter/packet Rev4 override เฉพาะ cType/category/routing; คง44REQ/180AC/110pending/77TP NOT_RUN; 4032testsไม่ใช่ fullLogin acceptance"
+    }
+  ],
+  "next_role": "นายช่าง → sys (G/B); legacy/vault รับ linkage",
+  "next_action": "archive แล้ว apply7จุด; ส่ง sys ตรวจ FindAuthUserDetail กับ WebLoginService.LoginAsync ว่ามี server routing seam ที่เลือกบัญชีไม่กำกวมและผูกกับ authenticated account ได้หรือไม่ คืน exact contract/evidence ให้ arch ก่อนต่อ caller ไม่ลอง Login หรือเพิ่ม public actor",
+  "remaining_evidence": [
+    "pre-auth routing seam และการผูก server cType กับบัญชี/tenant ของ attempt",
+    "canonical account↔profile lineage/cardinality และ active directory ตาม036; ไม่ใช่ category clarification ที่ค้าง",
+    "device lifecycle, trusted terminal, continuation custody, durable session/audit และ H5 ตาม packet เดิม"
+  ]
+}

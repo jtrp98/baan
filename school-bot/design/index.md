@@ -159,8 +159,8 @@
 | ไฟล์ | ขอบเขต / สถานะปัจจุบัน |
 |---|---|
 | [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — พร้อม implement/test internal web decoder; ยังไม่มีผล implementation/check |
-| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev3 — 047แก้ request bounds/public error layer จาก035; component037คงเดิม; full Login ready=false |
-| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev3 — รับ035เฉพาะ wire/bounds/error; identity/device/session/H5ยังค้างเดิม ไม่บล็อก decoder |
+| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev4 — 048รับ cType category; รอ pre-auth routing/linkage proof; คง037/047; full Login ready=false |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev4 — category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |
 
 อ่าน037ก่อนข้อความ readiness ของ034 รวม planning/desktop-login-contract-response-001.json และ Gateway Login reuse Rev2. ไม่แก้ plan status, public contract, schema หรือ gate เดิม.
 
@@ -182,6 +182,7 @@
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
 ## Change Log
+- 2026-10-24 — ใบงาน048: adapter/packet Rev4 override เฉพาะ cType/category/routing; คง44REQ/180AC/110pending/77TP NOT_RUN; 4032testsไม่ใช่ fullLogin acceptance
 - 2026-10-24 — รับimplementation039/038/042และcheckเฉพาะscope; ไม่แก้สัญญาหรือschemaจากผลunit tests
 
 - 2026-10-24 — ใบงาน047: adapter/packet Rev3 มี precedence เฉพาะ request bounds และ future public error mapper; component037ไม่เปลี่ยน, full Login ready=false และ plan statusเดิม

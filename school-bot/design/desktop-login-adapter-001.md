@@ -1,4 +1,4 @@
-# Desktop login adapter — Rev3
+# Desktop login adapter — Rev4
 
 สถานะอยู่ที่ [index](index.md). สัญญานี้ครอบ outcome/admission ภายใน; ไม่สร้าง public endpoint หรือ schema. ใช้ร่วม [packet](desktop-auth-review-packet-001.md), DES-004 Rev9 และ DES-012 Rev7.
 
@@ -87,7 +87,16 @@ Wire facts: G code เป็น HTTP integer ไม่ใช่ semantic code; s
 
 ทั้งหมดเป็นสัญญาสำหรับ future public completion เท่านั้น ไม่เปิด endpoint/actor field จาก internal DTO; admission และ prerequisite เดิมคงอยู่.
 
+## Override Rev4 — ใบงาน048: cType และการเลือก route
+
+มี precedence เฉพาะที่มา actor/category และการเลือก upstream เหนือข้อความเดิม; คง037/047และ admission เดิม. ผู้ใช้ยืนยันให้แยกนักเรียน/ครูด้วย cType แล้ว ตาม [คำชี้แจง](../planning/desktop-login-owner-question-001.md). ค่า CType="0"→student และ "1"→employee มาจาก [033](../planning/desktop-login-evidence-001.json) identity_mapping ไม่ใช่ตัวเลขที่ผู้ใช้ระบุ.
+
+ใช้ cType จากข้อมูล server ที่ผูกกับบัญชี/tenant ของ attempt ผ่าน trusted boundary; หลัง authentication ต้องตรวจความผูกพันนี้ก่อนยืนยัน actor และตรึงตลอด attempt. body/header cType, response user หรือ JWT ที่เพียง decode ไม่เป็น authority; mobile JWT ไม่มี CType ตาม033. null/unknown/กำกวมไม่ใช่ employee และห้ามออก session; unresolved mapping ใช้503 AUTH_NOT_CONFIGURED ตามเดิม. cType ไม่พิสูจน์ admin, active, tenant, device หรือ AccountId=ProfileId.
+
+cType ที่ได้หลัง authentication เลือก route ย้อนหลังไม่ได้. ก่อนส่ง password ต้องพิสูจน์ server lookup ที่เลือกบัญชีได้ไม่กำกวมและผูกผลกับบัญชีที่ authenticate จริง; ผลก่อน auth ใช้เลือกเส้นทางเท่านั้น ไม่เป็น admission. 033มี FindAuthUserDetail ที่ TusersRepository.cs:103 และ employee lookup ที่ WebLoginService.cs:64 แต่ยังไม่พิสูจน์ private routing seam สำหรับ B. ให้ G/sys ตรวจสองจุดนี้ต่อและคืน contract เรื่อง selector/cardinality/attempt binding โดยคง /login กับ /web/login ตามขอบเขตเดิม. ระหว่างยังไม่มีหลักฐาน ห้ามเดา route เพิ่ม public actor หรือส่ง password ลองหลาย route เพราะมี attempts/lock side effects; ไม่เลือก mobile fallback ให้ครู.
+
 ## Change Log
+- 2026-10-24 — Rev4: รับ cType clarification; แยก category จาก pre-auth routing/profile linkage ไม่เปลี่ยน schema/public surface/admission
 - 2026-10-24 — Rev3: ใบงาน047รับ035 แก้ effective request bounds, wire/correlation และแยก public error mapper จาก decoder037; ไม่เปลี่ยน schema/public surface
 - 2026-10-23 — Rev2: ใบงาน037 อนุญาต internal web decoder ตามสัญญาแยก; คง full Login ready=false และประวัติ034
 - 2026-10-23 — Rev1: ใบงาน034 รับ033และตรวจ B; ตรึง internal outcome/bounds/failures แยกข้อค้าง public completion; ไม่มี source/SQL/tests/runtime

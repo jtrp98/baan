@@ -38,3 +38,11 @@ Loginเต็มยังไม่พร้อม: ต้องจับคู�
 
 - 2026-10-24 — บันทึกflow sys→arch→sys→checkและjpoเฉพาะscope พร้อมข้อจำกัดจริง; final knowledgecommitหลังบันทึกครบ
 - 2026-10-24 — ตรวจลิงก์ QA/security เพิ่ม11จุดที่ [validation002](auth-flow-validation-002.json); ตรวจ ownership/source/SQL/archive ตาม validation001 ครบแล้ว
+
+## คำชี้แจง cType — 2026-10-24
+
+ผู้ใช้ยืนยันใช้ cType แยกนักเรียน/ครูแล้ว; ค่า 0=student / 1=employee อ้าง source033. รับ [arch048](desktop-login-ctype-contract-response-001.json) เป็น adapter/packet Rev4 โดยเก็บต้นฉบับพร้อม [manifest](../design/archive/2026-10-24-before-ctype-clarification-001/manifest.json). ทีมตรวจการเลือก route ก่อนส่ง password และรหัสบัญชีที่เชื่อมโปรไฟล์ต่อ ไม่ถามผู้ใช้เรื่องประเภทซ้ำ. cType ต้องมาจาก trusted server และไม่เป็นสิทธิ์ admin หรือหลักฐานว่า AccountId=ProfileId.
+
+ขั้นเทคนิคถัดไป: sys ตรวจ FindAuthUserDetail/WebLoginService ว่ามี server routing seam ที่เลือกบัญชีไม่กำกวมและผูกกับ authenticated account ได้หรือไม่ ก่อนต่อ caller; ไม่ลอง credential หลาย route. ไม่มี code/SQL/runtime เพิ่มรอบนี้ คงผล4032testsเดิมและ fullLogin NOT_READY.
+
+- 2026-10-24 — Change Log: รับคำชี้แจง cType และสัญญา Rev4; ไม่เปลี่ยน REQ/AC/plan หรือปิด gate

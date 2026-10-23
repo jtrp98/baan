@@ -87,3 +87,5 @@
 - ประวัติก่อนหน้า: [ชุด 1](planning/history-001.md), [ชุด 2](planning/history-002.md)
 
 - 2026-10-23 — ปรับคำสั่งส่งต่อทั้งโมดูลจาก MYCELIUM เป็นนายช่าง (BAAN) ตามการเปลี่ยนชื่อระบบ (release 0.12.0): แก้ใบงาน/แผน/ส่วนสั่งงานในไฟล์ข้อมูล รวม 104 ไฟล์ — บรรทัดลงวันที่ใน Change Log/หมายเหตุประวัติ และโฟลเดอร์ archive ยังอ้าง MYCELIUM ตามประวัติ (หมายถึงผู้คุมคนเดิม)
+
+- 2026-10-24 — รับ cType category clarification แล้วใน [arch048](planning/desktop-login-ctype-contract-response-001.json); adapter/packet Rev4 แยก routing/profile linkage ที่ทีมต้องตรวจต่อ คง fullLogin NOT_READY

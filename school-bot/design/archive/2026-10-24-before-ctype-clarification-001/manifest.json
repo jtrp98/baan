@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-24",
+  "reason": "Before arch048 cType clarification amendment",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/desktop-login-adapter-001.md",
+      "archive": "desktop-login-adapter-001.md",
+      "sha256": "6b5ee6e77009f4a43459c13ae47be2756c4ff31a80203a5bcfd33b80a20a8b3f"
+    },
+    {
+      "source": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "archive": "desktop-auth-review-packet-001.md",
+      "sha256": "16c450dc7568d4a091d58774194d295bcbbaa4a941a069cd03f7fd37e714335f"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "index.md",
+      "sha256": "3233d26150668edae3dc62f002de330342296913b6104ce34ddcba01417379ec"
+    }
+  ]
+}
