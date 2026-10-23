@@ -1,4 +1,4 @@
-# Desktop login adapter — Rev1
+# Desktop login adapter — Rev2
 
 สถานะอยู่ที่ [index](index.md). สัญญานี้ครอบ outcome/admission ภายใน; ไม่สร้าง public endpoint หรือ schema. ใช้ร่วม [packet](desktop-auth-review-packet-001.md), DES-004 Rev9 และ DES-012 Rev7.
 
@@ -61,5 +61,12 @@ Input/wrong-stage/wrong-code →400 INVALID_INPUT; credentialผิด/บัญ
 
 Public /v2/auth/login ยังมี DTO เดิม; ห้ามเพิ่ม actor/step/flow_token หรือ continuation routes จาก DTO ภายในนี้เอง. ต้องมี attempt binding ที่ตรวจได้จริงกับ school/account/License/current binding/DeviceJkt, stage, expiry และ replay/cancellation ก่อนส่ง pending กลับ host. รอบนี้ไม่สร้าง store/ticket format ชดเชยโดยไม่มีฐานรองรับ. รายการที่ต้องรับต่ออยู่ใน packet.
 
+## Override Rev2 — component ตาม037
+
+[gateway-outcome-component-001.md](gateway-outcome-component-001.md) มี precedence เฉพาะ callable decoder, parser, normalized outcomes และ unit tests ภายใน เหนือข้อความ034ที่กำหนดให้มี production caller ก่อนเริ่ม component. อนุญาต web decoder ที่มี behavior ครบและเรียกทดสอบได้โดยตรง ไม่มี caller/endpoint สมมติ. Mobile ไม่อยู่ใน implementation รอบนี้; DTO request/effective bounds เดิมยังเป็นของ adapter ไม่เพิ่ม request validator ใน decoder.
+
+ไม่เปลี่ยน admission, session, public continuation หรือ production readiness. ประวัติ Rev1 ข้างบนคงไว้; ข้อกำหนด transport/header/retry ใช้เมื่อทำ transport จริง ไม่เป็น dependency ของ component.
+
 ## Change Log
+- 2026-10-23 — Rev2: ใบงาน037 อนุญาต internal web decoder ตามสัญญาแยก; คง full Login ready=false และประวัติ034
 - 2026-10-23 — Rev1: ใบงาน034 รับ033และตรวจ B; ตรึง internal outcome/bounds/failures แยกข้อค้าง public completion; ไม่มี source/SQL/tests/runtime

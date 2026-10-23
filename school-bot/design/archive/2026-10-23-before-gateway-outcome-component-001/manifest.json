@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-23",
+  "reason": "task-037 component contract; original bytes before amend",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/desktop-login-adapter-001.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-outcome-component-001/desktop-login-adapter-001.md",
+      "bytes": 10120,
+      "sha256": "cc323f3eba05c72f81ccf14795769aa4da26a964b9f6da5f629813b575123f18"
+    },
+    {
+      "source": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-outcome-component-001/desktop-auth-review-packet-001.md",
+      "bytes": 10092,
+      "sha256": "2787c4a98a482065eb16d544e82228978dd14107b45a20c1cd4fc881b5c62222"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-outcome-component-001/index.md",
+      "bytes": 22242,
+      "sha256": "28f7f10243c86340b422fa0a36c9e52ecf205476566ab1979fef22c092111e5f"
+    }
+  ]
+}

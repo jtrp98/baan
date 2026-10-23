@@ -1,4 +1,4 @@
-# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev1
+# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev2
 
 สถานะอยู่ที่ [index](index.md); อ่านคู่ [adapter](desktop-login-adapter-001.md). เป็น technical handoff ไม่ใช่ Light approval หรือคำถามนโยบาย035.
 
@@ -50,5 +50,12 @@ B Program.cs:43–44,84–118 ไม่มีauth use case/caller; ManagementSer
 
 Internal decoder/state reducer/error mappingทำและทดสอบได้เมื่อมี production callerในsliceเดียวกัน ไม่ต้องรอ H5deployment แต่ตอนนี้ callerดังกล่าวติด prerequisiteข้างบนที่เกินbackend-auth-adapterอย่างเดียว. ส่งให้sysจัดหลักฐานและขอบเขตprerequisiteก่อน ไม่ส่งคำถามhash/035กลับผู้ใช้.
 
+## Override Rev2 — แยก component ออกจาก production path
+
+ใบงาน037แทนเงื่อนไข Rev1 ที่ว่า internal decoder ต้องมี production caller ใน slice เดียวกัน: อนุญาต implement/test [web outcome decoder](gateway-outcome-component-001.md) ได้ทันที. ข้อสังเกตว่า B ยังไม่มี auth caller เป็นหลักฐานเดิม ไม่ใช่เหตุปิด component นี้. ไม่สร้าง caller ปลอม, 503-only route หรือ success stub.
+
+ข้อค้าง identity/device/session/transport ข้างบนยังบล็อก full production path ตาม034 แต่ไม่บล็อก decoder ที่ไม่มี admission หรือ side effects. ไม่ขอ human approval เพิ่มจากการแยกขอบเขตนี้.
+
 ## Change Log
+- 2026-10-23 — Rev2: ใบงาน037แทนข้อจำกัด component-with-caller ของ034โดยคงข้อความเดิมเป็นประวัติ; production prerequisites ไม่เปลี่ยน
 - 2026-10-23 — Rev1: ใบงาน034 แยก trust/mapping/device/persistence/transport gaps ตาม033และ B sourceจริง; ไม่มีschema deltaหรือการอนุมัติแก้ G

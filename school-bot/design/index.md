@@ -154,7 +154,17 @@
 | [learning-rules-032-034.md](learning-rules-032-034.md) | Rev1 — profile/run/freeze/สูตร/override; มติยืนยันแล้ว รอตรวจ implementation |
 | [grade-rules-032-034.md](grade-rules-032-034.md) | Rev1 — mapping/partial/skip/recovery; คง release gates |
 
-## Desktop authentication — ใบงาน034
+## Desktop authentication — ใบงาน037 มี precedence เฉพาะ component
+
+| ไฟล์ | ขอบเขต / สถานะปัจจุบัน |
+|---|---|
+| [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — พร้อม implement/test internal web decoder; ยังไม่มีผล implementation/check |
+| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev2 — อนุญาต component แยกจาก caller; full Login ready=false |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev2 — prerequisites บล็อก production path ตามเดิม ไม่บล็อก decoder |
+
+อ่าน037ก่อนข้อความ readiness ของ034 รวม planning/desktop-login-contract-response-001.json และ Gateway Login reuse Rev2. ไม่แก้ plan status, public contract, schema หรือ gate เดิม.
+
+## Desktop authentication — ใบงาน034 (ประวัติก่อน037)
 
 | ไฟล์ | ขอบเขต / สถานะ |
 |---|---|
@@ -168,6 +178,7 @@
 [gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev1 — PROPOSED: reuse W/G login ยืนยันจาก static evidence; Desktop adapter/identity และ H5 transport ยังรอหลักฐาน. อ่านร่วม override DES-004 Rev8, DES-012 Rev6 และ Gateway integration Rev2 ก่อน implement.
 
 ## Change Log
+- 2026-10-23 — ใบงาน037: เพิ่ม gateway-outcome-component Rev1; adapter/packet Rev2 อนุญาต internal web decoder โดยไม่มี production caller; full Login ready=false, ไม่มี source/SQL/runtime/check verdict ใหม่
 - 2026-10-23 — ใบงาน034: DES-004 Rev9/DES-012 Rev7/Login reuse Rev2 พร้อม Desktop adapter และ review packet; complete backend slice ยังไม่พร้อม ไม่มี source/SQL/runtime หรือ check verdict ใหม่
 - 2026-10-23 — ใบงาน032 รับ task031/Git metadata; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
 - 2026-10-23 — ใบงาน030: sync [decisions-035](../requirement/decisions-035.md) ปิดนโยบายแหล่ง is_admin (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม); คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
