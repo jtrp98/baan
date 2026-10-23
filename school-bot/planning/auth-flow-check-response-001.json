@@ -1,0 +1,92 @@
+{
+  "state": "BLOCKED",
+  "summary": "เพิ่ม adversarial tests 12 ไฟล์แล้ว แก้เฉพาะ tests/fixtures ไม่แตะ production โค้ด compile ผ่านครบ 5 projects แต่ testhost เชื่อมต่อไม่ได้ภายใน 90 วินาที จึงยังไม่มีผล PASS/FAIL จากการรัน tests และไม่ได้ retry หลังพบข้อจำกัดเดิม",
+  "scope_verdicts": [
+    {
+      "scope": "Gateway outcome component",
+      "verdict": "NOT_RUN",
+      "evidence": "เพิ่ม tests ตาม acceptance 8 หมวด เรียก Decode จริง; compile ผ่าน แต่ test execution ถูกยกเลิก"
+    },
+    {
+      "scope": "Logout local HTTP และ use case",
+      "verdict": "NOT_RUN",
+      "evidence": "ใช้ WebApplicationFactory ผ่าน production endpoint/use case และ replace ISessionLogoutStore ชัดเจน; ยังไม่มี actual test results"
+    },
+    {
+      "scope": "SEC040-001 local limiting regression",
+      "verdict": "NOT_RUN",
+      "evidence": "เพิ่ม source quota, spoofing, canonical base64url, held-store concurrency และ permit release tests; ยังยืนยัน runtime ไม่ได้"
+    },
+    {
+      "scope": "Logout repository static contract review",
+      "verdict": "FAIL",
+      "evidence": "ชื่อและชนิดคอลัมน์สอดคล้องกับ DDL แต่ Actor ที่เขียนเป็น JSON ไม่ตรงชนิด A ใน canonical contract"
+    },
+    {
+      "scope": "PostgreSQL integration, rollback และ atomicity",
+      "verdict": "NOT_RUN",
+      "evidence": "ไม่ได้เปิด DB socket หรือเรียก production store; fake ไม่พิสูจน์สถานะ session หรือ PostgreSQL transaction"
+    }
+  ],
+  "tests_added": [
+    "web/tests/SchoolBot.Tests/GatewayOutcomeFixtures.cs",
+    "web/tests/SchoolBot.Tests/GatewayOutcomeMatrixTests.cs",
+    "web/tests/SchoolBot.Tests/GatewayOutcomeFieldTests.cs",
+    "web/tests/SchoolBot.Tests/GatewayOutcomeHttpTests.cs",
+    "web/tests/SchoolBot.Tests/GatewayOutcomeJsonTests.cs",
+    "web/tests/SchoolBot.Tests/GatewayOutcomeBoundaryTests.cs",
+    "web/tests/SchoolBot.Tests/GatewaySecretTests.cs",
+    "web/tests/SchoolBot.Tests/LogoutApiFixture.cs",
+    "web/tests/SchoolBot.Tests/LogoutEndpointTests.cs",
+    "web/tests/SchoolBot.Tests/LogoutRateLimitTests.cs",
+    "web/tests/SchoolBot.Tests/LogoutConcurrencyTests.cs",
+    "web/tests/SchoolBot.Tests/LogoutConfigurationTests.cs"
+  ],
+  "checks": [
+    {
+      "command": "dotnet test SchoolBot.slnx --disable-build-servers -m:1 --no-restore",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 0,
+      "result": "ครั้งแรกพบ syntax error ใน collection initializer ของ test ใหม่ แก้แล้วก่อนรันครั้งถัดไป; ยังไม่ได้เริ่ม tests"
+    },
+    {
+      "command": "dotnet test SchoolBot.slnx --disable-build-servers -m:1 --no-restore",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 0,
+      "result": "Compile ผ่าน SchoolBot.Domain, Application, Infrastructure, Api และ Tests จากนั้น: vstest.console process failed to connect to testhost process after 90 seconds. Test Run Aborted. ตัวเลข 0 หมายถึงไม่มีผล tests ไม่ใช่ผ่าน"
+    },
+    {
+      "command": "ตรวจ source, scoped DDL และรูปแบบไฟล์ tests แบบ static",
+      "exit_code": 0,
+      "passed": 0,
+      "failed": 0,
+      "result": "ตรวจ Session 17 fields, AuditEvent 13 fields, audit INSERT 12 fields และ typed parameters token_hash:Varchar/request_id:Uuid; พบ Actor contract mismatch 1 จุด ทุกไฟล์ใหม่ต่ำกว่า 300 บรรทัด ไม่มี trailing whitespace หรือบรรทัดเกิน 120 ตัวอักษร"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CHECK041-001",
+      "file": "web/src/SchoolBot.Infrastructure/Persistence/PostgresSessionLogoutStore.cs",
+      "line": 44,
+      "repro": "Static: SELECT สำหรับ audit สร้าง Actor ด้วย json_build_object(...)::text ทุก channel",
+      "expected": "ตาม design/data-dictionary/contract-002.md Actor:A และ contract-001.md:19–24 เช่น desktop ที่ SchoolId=1, AccountId=10 และยังไม่ bind ต้องเป็น account:1:10:none",
+      "actual": "เขียน JSON object ของ school_id/channel/account_id/profile_kind/profile_id/legacy_admin_id แทนรูปแบบ A; เป็น logical contract mismatch ไม่ใช่ข้อผิดชนิด SQL และยังไม่ได้รัน DB",
+      "fix_owner": "sys"
+    }
+  ],
+  "limitations": [
+    "ยังไม่มี actual test results ของ tests ใหม่ ต้องรอ parent run นอก sandbox",
+    "การหมดอายุ window ตามเวลาจริงยังไม่ได้ทดสอบ; ไม่รอ window จริงหรือแก้ clock ภายใน limiter",
+    "ไม่อ้าง cross-pod capacity, Gateway wire parity, identity/session admission หรือ full Login",
+    "ไม่ให้ PASS แก่ BE-002/BE-006/BE-039, G-AUTH/H5, SQL runtime หรือ full security",
+    "คง 110 tasks pending, 77 TP cases NOT_RUN และ Important เดิม 6 ข้อ OPEN; ไม่ปิด SEC040-001",
+    "ไม่มีการแก้ knowledge, packages, production, Git state หรือ rebuild EXE/installer"
+  ],
+  "handoff": [
+    "ส่งนายช่างรัน dotnet test SchoolBot.slnx --disable-build-servers -m:1 --no-restore จาก web นอก sandbox และส่ง actual output ให้ check ตรวจ verdict ต่อ",
+    "ส่ง CHECK041-001 ให้ sys แก้ Actor ตาม canonical contract; หากต้องการเปลี่ยนรูปแบบให้ arch รับเรื่องก่อน",
+    "ไม่มี backlog suggestions หรือ security gate ใหม่ในรอบนี้"
+  ]
+}
