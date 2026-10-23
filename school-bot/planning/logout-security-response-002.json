@@ -1,0 +1,41 @@
+{
+  "state": "DONE",
+  "summary": "ตรวจ static fix042 แล้ว ไม่พบ bug concrete ในขอบเขต SEC040-001; กลไกแก้ผูก production path จริง แต่ยังไม่ปิด finding จน check041 พิสูจน์ runtime ครบ Important เดิมทั้ง 6 ข้อยัง OPEN",
+  "finding_disposition": {
+    "id": "SEC040-001",
+    "static": "REMEDIATED",
+    "runtime_required": [
+      "ใช้ production pipeline กับ fake store: canonical unknown Bearer ต่างค่าจาก peer เดิมต้องติด source quota ก่อนเรียก store; ทุก route variant ที่ router รับ รวม case/trailing slash ต้องใช้ quota เดียวกัน",
+      "เปลี่ยน X-Forwarded-For/X-Original-For, request ID, token และ body แล้ว partition ต้องไม่เปลี่ยน ทั้ง peer loopback และภายนอก; peer ต่างกันแยก quota, IPv4/mapped IPv6 รวมกัน และ missing peer ใช้ bucket ร่วม",
+      "ค้าง fake store ข้ามหลาย peer จนเต็ม concurrency cap: คำขอถัดไปต้องได้ 429 ทันทีและ store count ไม่เพิ่ม; ทั้งสอง limiter ต้องไม่มี queue",
+      "permit ต้องถือจน store task จบจริง แม้ request ถูก cancel; คืน permit หลัง success, storage failure, unexpected exception และ cancellation โดยไม่มี permit รั่ว",
+      "429 ต้องมี RATE_LIMITED, v2 envelope, UUID request_id ตรง response header และ no-store ทุก route variant; Retry-After มาจาก lease metadata ที่ใช้ได้เท่านั้น และ concurrency rejection ไม่มีเวลาที่แต่งขึ้น",
+      "token หาย/ผิดรูปแบบ/noncanonical/หลาย Authorization ยังคง 204 โดยไม่เข้า store แม้ quota เต็ม; logout ใช้ได้โดยไม่ต้อง authentication หรือ License",
+      "พิสูจน์ defaults 30/60วินาที/8, configured caps และ window renewal; ค่า 0/ติดลบ/ว่าง/noninteger/overflow ต้องทำให้ startup ล้มเหลว พร้อมตรวจ v1 regression",
+      "แนบผล check ของ source revision ที่ตรวจนี้ และยืนยัน error/cancellation responses กับ logs ไม่มี raw token, connection string หรือข้อมูลส่วนบุคคลเพิ่มจาก fix"
+    ],
+    "close_when": "เมื่อ check041 พิสูจน์ criteria ข้างต้นครบกับ source ที่ตรงกัน ให้ปิด SEC040-001 เฉพาะ scope การจำกัด logout ต่อ process ได้ โดยไม่ต้อง reopen human risk decision; หาก source เปลี่ยนหรือ tests พบข้อผิดพลาด ต้องตรวจส่วนที่เปลี่ยนซ้ำ"
+  },
+  "findings": [],
+  "checked": [
+    "อ่าน K/index.md → plan/index.md → design/index.md และรายงาน logout-security-response-001.json/logout-limiting-response-001.json; SEC040-001 อยู่ในรายงานเดิม ยังไม่พบ ID นี้ใน security.md",
+    "อ่าน B/AGENTS.md, README.md และ 5 ไฟล์ที่042แก้ครบ รวม LogoutRateLimiter.cs; ตามเฉพาะ V2Errors.cs/ApiErrors.cs เพื่อยืนยัน response",
+    "Program.cs:45-48,63-70,94 ลงทะเบียน singleton, บังคับสร้าง limiter ตอน startup และจับ socket peer ก่อน UseForwardedHeaders",
+    "LogoutRateLimiter.cs:31-43 ใช้ private Items key, normalize IPv4-mapped และ shared unknown; ไม่ใช้ header/body/token เลือก partition",
+    "LogoutEndpoint.cs:9-23 ผูก limiter ใน handler เดียวก่อน service/store ทุกคำขอ canonical; using leases ครอบ await จนจบ ส่วน invalid token ออกก่อน limiter",
+    "LogoutRateLimiter.cs:14-28 จำกัด fixed-window ต่อ source และ concurrency รวมต่อ process โดย QueueLimit=0; :64-70 configuration ผิด throw โดยไม่พิมพ์ค่า",
+    "LogoutRateLimiter.cs:45-55 คืน v2 429/no-store และตรวจ Retry-After จาก metadata; V2Errors.cs:7-19 สร้างหรือรับเฉพาะ UUID ที่ไม่ว่างและส่ง header ตรง envelope",
+    "LogoutService.cs:9-26 คง canonical validation และ SHA-256 ก่อนส่ง store; fix ไม่เพิ่มการบันทึก token/IP ลง log",
+    "web/README.md:44-62 ระบุ defaults, shared Gateway peer, restart และขอบเขต local per-process/pod ชัดเจน"
+  ],
+  "limitations": [
+    "เป็น static review เท่านั้น ไม่มี tests/build, SQL/DB, network/login หรือ runtime proof; ไม่อ่าน component039 และไม่ re-audit findings ทั้งระบบ",
+    "การปิด finding นี้ไม่รับรอง global cross-pod protection, deployment/H5 หรือ production SLA",
+    "ไม่เปลี่ยนข้อสรุป PDPA/GDPR, retention, dependency CVE/license หรือ human gates เดิม; ไม่มี risk acceptance ใหม่",
+    "ไม่ได้เขียน source/knowledge, เปลี่ยน Git state หรือ rebuild EXE/installer"
+  ],
+  "handoff": [
+    "ส่งนายช่างรับผล static และส่ง check041 ยืนยัน runtime criteria; รอบนี้ไม่มี Critical/Important ใหม่ที่ต้องถามมนุษย์",
+    "เมื่อหลักฐานครบ ให้บันทึก disposition แบบ append-only เฉพาะ SEC040-001 โดยคง Important6 OPEN และ full security/release gates เดิม"
+  ]
+}
