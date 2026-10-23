@@ -8,7 +8,7 @@ import path from "node:path";
 
 export function gitIn(root, args) {
   const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", windowsHide: true });
-  return { ok: r.status === 0, out: (r.stdout ?? "").trim(), err: (r.stderr ?? "").trim() };
+  return { ok: r.status === 0, out: r.stdout ?? "", err: (r.stderr ?? "").trim() };
 }
 
 // แกะ `git status --porcelain -z`: รายการคั่นด้วย NUL และ R/C มี path เดิมตามหลังอีกช่อง

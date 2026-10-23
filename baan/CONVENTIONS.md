@@ -6,6 +6,8 @@
 
 Read the index of the category you're pointed to first (`requirement\index.md`, `design\index.md`, `plan\index.md` etc.), then open **only the files the brief/task names by exact path** — no `ls` hunting, no reading across categories · grep within permitted files · **status lives in the index only**.
 
+When a named data model/index splits a contract across linked dictionaries or appendices, following those exact links for the assigned scope is allowed. This does not authorize directory hunting or unrelated categories.
+
 ## 2. Write only what you own
 
 Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
@@ -22,9 +24,13 @@ If the prompt has a **"วันที่ของงาน" (date of work)** he
 
 A number/fact with no source gets tagged `(สมมติฐาน — ยังไม่ยืนยัน)` until a human confirms · **the real thing beats memory** — if your recollection contradicts a file/the actual code, the file wins, and always verify the as-built code before citing it.
 
-## 6. No state-changing git
+## 6. Git boundaries and knowledge commits
 
-`status/log/diff/show` are readable — `commit/push/branch/merge/rebase/reset` always belong to the user.
+Source/target repositories: `status/log/diff/show` are readable; state-changing git belongs to the user unless explicitly authorized.
+
+**Configured knowledge exception:** the built-in `commitKnowledge` workflow and `baan --commit --config <workspace-config>` may stage/commit document changes only inside configured `knowledge_roots` that have their own Git repository. This exception is part of the requested knowledge auto-commit workflow; it does not authorize source/target commits, push, branch changes, history rewriting, or arbitrary git operations. Keep the existing per-module grouping and report failures.
+
+The controller must run the final knowledge commit **after saving all role outputs and its own knowledge edits**, including workflows where it writes the documents after a read-only role exits. A role-run completion hook cannot commit files that have not been written yet. Do not clear/replace `knowledge_roots` to bypass this workflow.
 
 ## 7. Never chain roles yourself
 
@@ -51,3 +57,17 @@ Approval/signing is a human act — an agent only records it (who/when) as the u
 ## 11. Language
 
 **Every answer and every document you produce is in Thai.** Technical terms, code, commands, and IDs stay in English — unless the target project's own convention says otherwise.
+
+## 12. Readable data documentation
+
+When data/schema documentation is in scope, a list of table names, field names/types, or shorthand alone is not a complete handoff. `arch` owns the readable canonical model: table purpose/row meaning, field meaning and rules, nested JSON/enums, and legacy table/field mappings with evidence. `vault` reconciles physical SQL and supplies deltas; `inspect`/`check` verify the scoped contract. Split large documents with exact linked paths and keep unknowns explicit. Clarifying wording does not itself require schema approval, new ACs, or database execution.
+Relational data-model work also includes a full, readable DBML artifact kept in sync by `arch`; add a focused legacy integration view when needed. `vault` reviews SQL parity, and `inspect`/`check` verify scoped coverage, parser evidence and physical/logical relationship distinctions. Link the artifacts and guide from the model/index. Diagram annotations and colors do not change schema approval or authorize database execution.
+
+
+## Change Log
+
+- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
+
+- 2026-10-23 — Permit configured knowledge commits and require the controller to commit after its final document writes.
+
+- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.
