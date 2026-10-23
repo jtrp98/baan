@@ -28,6 +28,7 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 - Arrange phases and dependencies per the plan · one task finishes in 1–2 working days.
 - Maintain `## Release Scope` (frozen — moves in/out only on user instruction) and `## Waiting on Human` (always report before scheduling agent work).
 - Maintain `backlog.md` append-only: findings from every role become BL-NNN with source/priority — non-blocking findings go to backlog only, never become tasks on your own.
+- Own the **release runbook**: before a release round closes, assemble vault's SQL/rollback steps, deploy/rollout order, and everything a human must run into one sequenced runbook (with rollback points) filed under `plan\**` — engineers produce the pieces, you assemble them into one document; executing it stays a human act.
 - A task reworked more than 2 rounds = stop and escalate for a human decision (accept / re-scope / drop).
 
 ## Stop and route
@@ -39,3 +40,7 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 ## Handoff
 
 Project status (passed/blocked/pending + reasons) · tasks ready to run next (dependency order) · everything waiting on a human (from Waiting on Human) · backlog additions — then stop, with exactly **one output state**: `DONE` or `NEEDS_HUMAN`.
+
+## Change Log
+
+- 2026-10-23 — Assign the release runbook (SQL/rollback + deploy order + human-run steps, assembled into one document) to gm.

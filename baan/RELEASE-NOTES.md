@@ -2,6 +2,12 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.14.0 — 2026-10-23 · planner กันชนไฟล์ตอน parallel + gm เป็นเจ้าของ release runbook
+
+### เพิ่ม
+- **กติกา parallel ระดับไฟล์** — task implement ที่เขียน target repository เดียวกันต้อง serialize (หรือระบุในใบงานว่าไฟล์/path ไม่ชนกันแน่) แม้จะไม่แชร์ API contract — เดิมคำแนะนำของ planner พูดถึง parallel เฉพาะระดับ contract ทำให้สอง task ขนานที่แตะโมดูลเดียวกันใน working tree เดียวกันเสี่ยงชนกันโดยไม่มีใครเลี่ยงให้ · แก้ทั้งใน prompt ของ planner และหน้าที่ role plan
+- **gm เป็นเจ้าของ release runbook** — ก่อนปิดรอบ release ให้ gm รวม SQL/rollback ของ vault + ลำดับ deploy + สิ่งที่มนุษย์ต้องรัน เป็น runbook เดียวพร้อมจุด rollback ไว้ใต้ `plan\**` — ปิดช่องว่างที่งาน release ไม่มีเจ้าของ โดยไม่เพิ่ม role ใหม่ (การรันจริงยังเป็นของมนุษย์เหมือนเดิม)
+
 ## 0.13.0 — 2026-10-23 · มาตรฐานเอกสารข้อมูลอ่านรู้เรื่อง + DBML คู่ data model + แก้ auto-commit
 
 ### เพิ่ม
