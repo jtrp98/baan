@@ -1,0 +1,66 @@
+[
+  {
+    "path": "web/README.md",
+    "sha256": "081efa6dd197b7c4a86233878e3d46eac0ce19d82375b8305f8e2f03f1d56778"
+  },
+  {
+    "path": "web/src/SchoolBot.Api/ApiErrors.cs",
+    "sha256": "a8fbe7c23ccea7eb2d86248bef3c565653a4df0359340af1ffd7ea179ac85901"
+  },
+  {
+    "path": "web/src/SchoolBot.Api/LogoutEndpoint.cs",
+    "sha256": "5418ee2f3a75a4dfdeb6bc405826d108302280e931bb433d645f32478f762aa1"
+  },
+  {
+    "path": "web/src/SchoolBot.Api/LogoutRateLimiter.cs",
+    "sha256": "2f5567ffe75146948b3490e66d96161f0a892280c4e6fe79dc6a731d12d87172"
+  },
+  {
+    "path": "web/src/SchoolBot.Api/Program.cs",
+    "sha256": "137263b382bc5113975635116d3c33c64d859b6d68fb96901636ae8b190c469a"
+  },
+  {
+    "path": "web/src/SchoolBot.Api/V2Errors.cs",
+    "sha256": "6a2db3ef0139b9fb00e934f346d76b33239569964bfc0f262f4226dd9e8a4d77"
+  },
+  {
+    "path": "web/src/SchoolBot.Application/Abstractions/ISessionLogoutStore.cs",
+    "sha256": "7e2d273a53b1004b5e05b2b13746b31345c7ebd1cd163dc05f0f2f8565d1748f"
+  },
+  {
+    "path": "web/src/SchoolBot.Application/AuthenticationUnavailableException.cs",
+    "sha256": "57a3bcb4b9ab7d4d5640a3f8c65449088abd6f08f6810370e9fdac096ed6b48c"
+  },
+  {
+    "path": "web/src/SchoolBot.Application/LogoutService.cs",
+    "sha256": "74b9c843b0dd0c770b53151aed3053186b83968f32ca1e4246e1e1d30258e860"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayFieldValidation.cs",
+    "sha256": "396f764e41c0be02326383f0710df2bc3cb56c293fe98190826273a4bfc1d8bc"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayJsonValidation.cs",
+    "sha256": "cb40fc0a566168b9808bb6a79f022730652a11882961410e92e3f2324b72f1cc"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayOutcome.cs",
+    "sha256": "32e4ed1af2eeb38368999dbf54a193b8fd8e46bc730e8a4f883f43a4e5a6c195"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayOutcomeDecoder.cs",
+    "sha256": "d16b5495242b4adefcb645b89b495a64659a84548a0ec7d4e530580e896a739d"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewaySecret.cs",
+    "sha256": "1e2d1d08313869b19be4f49a66dea88d6a4efcab4b063eaed975417d5eebd999"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/Persistence/PostgresSessionLogoutStore.cs",
+    "sha256": "327fe457256b57187474375e424679f394bc22d5946063c86524467116ca8023"
+  },
+  {
+    "path": "web/src/SchoolBot.Infrastructure/SchoolBot.Infrastructure.csproj",
+    "sha256": "5ace907cf45fef12206e938edc4753f466e11c23ac4906894e4270e5ae8db75b"
+  }
+]
