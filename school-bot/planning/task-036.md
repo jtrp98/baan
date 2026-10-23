@@ -1,5 +1,7 @@
 # ใบงาน036 — vault ตรวจ account mapping จาก source ที่มี ก่อนถามเจ้าของDB
 
+Exact knowledge root K=C:/src/schoolbright/knowledge/school-bot; index-first คือ C:/src/schoolbright/knowledge/school-bot/index.md → C:/src/schoolbright/knowledge/school-bot/plan/index.md → C:/src/schoolbright/knowledge/school-bot/design/index.md. ทุก planning/,design/ ที่อ้างด้านล่าง relative ต่อ K ไม่ใช่ knowledge/ เปล่า; moduleชื่อschool-bot ตามpathนี้
+
 วันที่2026-10-23 · vault/Codex t2 read-only · ต่อflowผู้ใช้หลังarch034 พบว่า G Master.TUser.SId ยังไม่พิสูจน์relationกับ canonical TMasterDBUser.sID ของ B. ตรวจแคบเพื่อปิดหลักฐานที่หาได้ในworkspace ไม่ออกschemaใหม่/ไม่ทำSQL
 
 อ่านindex-first module/plan/design และ planning/desktop-login-evidence-001.json เฉพาะidentity_mapping, design/desktop-auth-review-packet-001.md, design/data-dictionary/legacy-001.md, planning/legacy-auth-review-002.md/legacy-source-check-001.json. มติ035คงservergroup+superadminเดิม ไม่เลือกpolicyซ้ำ

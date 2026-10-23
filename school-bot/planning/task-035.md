@@ -1,5 +1,7 @@
 # ใบงาน035 — sys ปิด wire fixtures และ prerequisite ก่อน implement
 
+**Exact roots / retry correction:** K=C:/src/schoolbright/knowledge/school-bot; G=C:/src/schoolbright/target/sb-api-gateway; B=C:/src/schoolbright/target/school-bot. อ่าน C:/src/schoolbright/knowledge/school-bot/index.md → C:/src/schoolbright/knowledge/school-bot/plan/index.md → C:/src/schoolbright/knowledge/school-bot/design/index.md. ทุก path planning/,design/,plan/ ด้านล่าง relative ต่อ K ไม่ใช่ knowledge/ เปล่า. facts033=K/planning/desktop-login-evidence-001.json, facts034=K/planning/desktop-login-contract-response-001.json. ครบแล้ว ไม่ต้องค้น module ใหม่หรือส่ง path question กลับ. ผู้คุมแก้ความกำกวมของใบงานจาก attempt001 ที่ยังไม่ได้อ่านsource
+
 วันที่2026-10-23 · sys/Codex t3 read-only · ผู้ใช้สั่งตามflow; arch034ยัง ready=false ด้วย code prerequisitesจริง ไม่ใช่ขาดdeploymentอย่างเดียว. ต่อเฉพาะหลักฐานที่ทีมทำเองได้ ไม่ถามนโยบายใหม่ ไม่ฝืนสร้าง503-onlyroute/unuseddecoder
 
 อ่านindex-first module/plan/design แล้ว planning/desktop-login-evidence-001.json, desktop-login-contract-response-001.json, design/desktop-login-adapter-001.md และ desktop-auth-review-packet-001.md. ใช้ facts033/034 ไม่สำรวจLoginใหม่ทั้งหมด. อ่านG/B AGENTSและlocalskills/requiredreadingก่อนsourceตามกติกา ใช้graphifyfirstในG; no graphwrites/install/aiack/preflightในงานread. skillapi-engineer+api-documentation local contracts
@@ -14,3 +16,4 @@
 
 ## Change Log
 - 2026-10-23 — รับ034แล้วส่งsysปิดfixtures/ชี้task prerequisiteที่ลงงานต่อได้จริง ไม่ส่งblockerกว้างกลับคน
+- 2026-10-23 — retryแก้ exactroots/index paths ให้ครบ; attempt001เก็บไว้ตามจริง ไม่ถือว่าได้ตรวจsourceแล้ว
