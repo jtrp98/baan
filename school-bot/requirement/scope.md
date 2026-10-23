@@ -68,7 +68,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - เอกสารระบุ Windows installer ยังไม่ลงนาม และ macOS ยังต้อง Developer ID/notarization
 - เป้าหมายขนาด 300 MB, startup 5 วินาที และ 30 FPS ยังไม่ใช่ผล benchmark หรือเกณฑ์ที่ธุรกิจอนุมัติ
 - Hardware, macOS และ installer verification ยังไม่พิสูจน์ในงานนี้
-- [แผนเดิม](../plan/index.md) 74 งาน/8 phases/17 gates รอ gm reconcile กับ 44 REQ/180 AC และ gate ตามหลักฐานจริง; งานเอกสารนี้ไม่เริ่ม implementation
+- [แผนปัจจุบัน](../plan/index.md) gm reconcile แล้วเป็น 110 งาน/8 phases/17 gates ครอบคลุม 44 REQ/180 AC ตาม [gm-review-001](../planning/gm-review-001.md); ทุกงานยัง pending งานเอกสารนี้ไม่เริ่ม implementation
 - 12 OQ: 3 PARTIAL/9 CLOSED ตาม index; OQ-008/009/011 รอทีมเตรียมข้อเสนอให้มนุษย์ตรวจ การปิด OQ ไม่รับรอง contract/implementation
 - หลักฐานเป็น working tree ณ 2026-10-21; source repository ยังไม่มี commit ให้อ้าง hash
 
@@ -91,5 +91,7 @@ Windows 10 ออกจาก target ตามคำสั่งผู้ใช�
 ให้ gm reconcile แผน/JSON 74 งานกับ REQ/AC ปัจจุบัน ไม่เปลี่ยนสถานะงานจากมติธุรกิจอย่างเดียว
 
 ## Change Log
+
+- 2026-10-23 — นายช่างบันทึกสถานะแผนจาก output gm ที่ตรวจรับแล้วเป็น 110 งาน/180 AC; ไม่เปลี่ยนนโยบายหรือสถานะตรวจรับ requirement
 
 - 2026-10-23 — amend ตาม decisions-032..034 รวม 44 REQ/180 AC; คง 3 PARTIAL/9 CLOSED ไม่เปลี่ยนผลตรวจรับ; แยกส่วนประวัติคุมขนาดที่ [scope-history-20261023-011.md](scope-history-20261023-011.md)

@@ -3909,7 +3909,7 @@
     {
       "id": "SA-004",
       "owner": "arch",
-      "tier": "t2",
+      "tier": "t1",
       "phase": "P0",
       "depends_on": [
         "SA-001"

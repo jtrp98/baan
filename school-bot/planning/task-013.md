@@ -23,6 +23,8 @@ Amendไม่regenerate ทำ Rev/ChangeLog 2026-10-23 ให้ไฟล์�
 
 ## Change Log
 
+- 2026-10-23 — arch DONE บันทึก patches/สอง canonical rules และ archiveแล้ว; ผู้คุมตรวจ DBML parser/semanticผ่านและSQLhashเดิมตาม design/dbml-review-002.md
+
 - 2026-10-23 — นายช่างแนบหลักฐาน vault review-006/response-001 ให้ arch ตรวจตาม instruction อ่าน review ล่าสุดก่อนสรุป
 
 - 2026-10-23 — นายช่างรับ spec 44/180 และส่ง arch ปรับสัญญาโดยคงขอบเขต gate/SQL เดิม

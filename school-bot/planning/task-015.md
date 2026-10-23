@@ -22,4 +22,6 @@
 
 ## Change Log
 
+- 2026-10-23 — gm DONE/accept_recovered=true ยืนยัน SHA256 ตรง ไม่มีdeltaจำเป็น บันทึก gm-response-001.json และ applyร่างแล้ว; ส่งตรวจfixedmetadataอีกจุดในtask-016
+
 - 2026-10-23 — นายช่างกู้ร่างเจ้าของแผนและตรวจstatic แล้ว ส่ง gm ยืนยันแบบสั้นแทน regenerate หลัง timeout

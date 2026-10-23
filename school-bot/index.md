@@ -9,20 +9,22 @@
 |---|---|---|
 | `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..034 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
-| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | Rev3 — data-model/rules/DBML Rev3 (32 ตาราง) CONFIRMED; DES-001..012 PROPOSED |
-| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks | 74 tasks pending (8 phases / 17 gates) |
+| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev6/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED |
+| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/180 AC |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | `test-plan\index.md` | สารบัญ test plan | ยังไม่มีเอกสาร |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | `qa\index.md` | สารบัญ QA findings | ยังไม่มีเอกสาร |
 | `uxui` | สารบัญ/เอกสาร UX/UI | ยังไม่มีเอกสาร |
 | `security.md` | ผลตรวจความปลอดภัย | ยังไม่มีเอกสาร — จป. ยังไม่ได้รัน |
-| `backlog.md` | งานที่ทำทีหลัง (append-only) | ยังไม่มี BL entry |
+| `backlog.md` | งานที่ทำทีหลัง (append-only) | BL-001 แก้คำอธิบาย/ยอด constraints จาก vault advisory |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
-| `planning\` | ข้อเสนอ planner เดิม + ใบงาน run/ประวัติเก่า (task*.md, history*.md) — convention เฉพาะโปรเจกต์ (อ่านอย่างเดียว) | ADOPTED_BY_PM |
+| `planning\` | ผลส่งต่อมติ/ใบงาน run/ประวัติ planner เดิม — convention เฉพาะโปรเจกต์ | ล่าสุด handoff-001.md: spec/arch/gm บันทึกแล้ว, vault findings ส่งต่อ |
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
+
+- 2026-10-23 — ปิดรอบ [handoff-001](planning/handoff-001.md): spec44/180, arch sync/DBMLตรวจแล้ว และ gmรับแผน110งาน/17gates; ไม่มี source/SQL/runtime/release จากรอบนี้ ทุก taskยังpending คิวถัดไปที่ plan/queue-002.md
 
 - 2026-10-23 — vault ตรวจ SQL static ตามมติ 032..034 ที่ db/review-006.md ส่ง NEEDS_DESIGN_CHANGE (mapping lock, policy/run, missing/partial apply, Submission context) ยังไม่มี physical SQL delta; arch/gm กำลังรับงานตาม task-013/014
 

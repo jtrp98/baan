@@ -15,4 +15,6 @@
 
 ## Change Log
 
+- 2026-10-23 — gm DONE บันทึก gm-response-002.json และ applyแล้ว; SA-004tier=t1, BL-001append-only จำนวนงาน/AC/สถานะ/dependencies/gatesคงเดิม
+
 - 2026-10-23 — นายช่างตรวจ fixed role tiers หลัง gm รับร่าง พบ SA-004 จุดเดียว และส่ง advisory เก่าลง backlog โดยเจ้าของ

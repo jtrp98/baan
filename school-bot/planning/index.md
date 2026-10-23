@@ -59,3 +59,17 @@ PM รับแล้วผ่าน mycelium-role pm/t2 แบบ read-only; re
 - 2026-10-22 — ย้ายเอกสาร run/ประวัติเก่าจาก root ของโมดูลเข้าหมวดนี้ (task.md, task-002..008, task-history-001, history-001/002) พร้อมแก้ลิงก์ที่ชี้ path เดิม — การปรับโครงสร้างตามมาตรฐาน baan โดยนายช่าง
 - 2026-10-21 — บันทึก PM acceptance และชี้ไป canonical plan โดยรักษา Planner artifacts เดิม
 - 2026-10-21 — เก็บผล Planner พร้อมฉบับอ่านง่ายและการตรวจ ไม่เปิด implementation หรือสร้าง plan.md แทน PM
+
+## รอบส่งต่อมติ — 2026-10-23
+
+- [handoff-001.md](handoff-001.md) — ผล spec/vault/arch/gm และคิวถัดไป 44 REQ/180 AC/110 งาน
+- [spec-review-001.md](spec-review-001.md) / [spec-response-001.json](spec-response-001.json) — REQ/AC ตาม decisions-032..034
+- [arch-review-001.md](arch-review-001.md) / [arch-response-001.json](arch-response-001.json) — DES/JSON/invariants และผล DBML หลังบันทึก
+- [gm-review-001.md](gm-review-001.md) / [gm-response-001.json](gm-response-001.json) / [gm-response-002.json](gm-response-002.json) — เจ้าของแผนรับร่างและ correction
+- [vault-response-001.json](vault-response-001.json) — SQL static findings ส่ง arch; บันทึกหลักที่ ../db/review-006.md
+- [gm-recovery-001.json](gm-recovery-001.json) — ร่าง workproduct ที่กู้หลัง timeout และ gm ยืนยัน SHA256 ก่อนบันทึก
+- ใบงานต่อเนื่อง task-011.md..task-016.md เป็นประวัติ run นี้ ไม่ใช่การเปลี่ยนสถานะ task ใน canonical plan
+
+### Change Log รอบส่งต่อ
+
+- 2026-10-23 — นายช่างเชื่อมผลส่งต่อและคำรับรองเจ้าของแผนหลังบันทึกเอกสารครบ คง index/planner history เดิม

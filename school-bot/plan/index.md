@@ -109,6 +109,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 ## Change Log
 
 - 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม
+- 2026-10-23 — แก้ fixed metadata ของ SA-004 (`tasks-001.json` /tasks/107/tier) จาก t2 เป็น t1 ตามบทบาท arch; คง 110 tasks/180 AC, scope/dependencies/status/gates เดิม และบันทึก advisory V012-09 เป็น BL-001 ใน backlog โดยไม่เพิ่มงานในแผน
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 
