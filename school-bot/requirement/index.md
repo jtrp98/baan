@@ -1,6 +1,6 @@
 # Requirements — school-bot
 
-เอกสารกลั่นจาก repository `C:/src/schoolbright/target/school-bot-v2` ตามคำสั่งผู้ใช้ เพื่อทบทวนความต้องการ ไม่ใช่การอนุมัติ release scope หรือหลักฐานว่าระบบผ่าน QA
+เอกสารกลั่นจาก repository `C:/src/schoolbright/target/school-bot` ตามคำสั่งผู้ใช้ เพื่อทบทวนความต้องการ ไม่ใช่การอนุมัติ release scope หรือหลักฐานว่าระบบผ่าน QA
 
 ผู้ใช้ยืนยันระบบเต็มแล้ว ฐานเดิมถูกปรับและเติมเป็น 44 REQ รวม Guest/Cloud หลักสูตร Level ข้อสอบ และส่งคะแนน (REQ-043..052 ตาม decisions-020..022) ประเมินและติดตามผลตาม [มติล่าสุด](decisions-009.md); License/DB และการย้ายสิทธิ์ตาม decisions-004..007
 
@@ -95,7 +95,7 @@
 | [decisions-007.md](decisions-007.md) | ผู้ดูแลปลดเครื่องก่อนย้าย Key เดิมได้ทันที; เครื่องเดิมอาจใช้ออฟไลน์จนสิทธิ์เดิมหมด |
 | [decisions-008.md](decisions-008.md) | Windows และ macOS ต้องควบคุมหุ่นจริงได้ทั้งคู่ |
 | [decisions-009.md](decisions-009.md) | Guest/Login เก็บหลายโครงงานทุกโหมด; Code/Block ประเมินอัตโนมัติ Arm ให้ครูตรวจ |
-| [decisions-010.md](decisions-010.md) | API ทั้งหมดรวม Login อยู่ `school-bot-v2/web` และใช้บัญชีเดิม |
+| [decisions-010.md](decisions-010.md) | API ทั้งหมดรวม Login อยู่ `school-bot/web` และใช้บัญชีเดิม |
 | [decisions-011.md](decisions-011.md) | ใช้ DB เดิม 4 ตัวของ Academic (ส่วน placement ตาราง SchoolBot ปรับตาม decisions-027) |
 | [decisions-012.md](decisions-012.md) | PK ของตาราง SchoolBot ใหม่เป็น `int4` |
 | [decisions-013.md](decisions-013.md) | ยืนยัน DBML / logical data model เป็น baseline |
@@ -107,7 +107,7 @@
 | [decisions-019.md](decisions-019.md) | เป้าหมาย OS ล่าสุด Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon (ยุติสาขา Windows 10) |
 | [decisions-020.md](decisions-020.md) | หลักสูตรกลางแบบ Level ต่อภาคเรียน ผูกชั้น/วิชา เลื่อนทั้งห้องเมื่อครูยืนยัน; เปิด OQ-012 |
 | [decisions-021.md](decisions-021.md) | ส่งคะแนนเป็นช่องย่อยต่อกิจกรรม เขียนระบบเกรดเองผ่านหน้า mapping (ปิด OQ-012) |
-| [decisions-022.md](decisions-022.md) | admin เป็น Next.js ใน `school-bot-v2/web`, หน้าครูอยู่ใน `sb-tech-upgrade-web-system`, Desktop ใช้เรียนอย่างเดียว |
+| [decisions-022.md](decisions-022.md) | admin เป็น Next.js ใน `school-bot/web`, หน้าครูอยู่ใน `sb-tech-upgrade-web-system`, Desktop ใช้เรียนอย่างเดียว |
 | [decisions-023.md](decisions-023.md) | backend SchoolBot เขียนคะแนนเอง, ปัด half-up, นำเข้าทุกแถวเป็นร่าง, mapping เฉพาะ admin โรงเรียน (ปิด OQ-017; OQ-014/016 เป็น PARTIAL) |
 | [decisions-024.md](decisions-024.md) | เกณฑ์ผ่านราย Level (เริ่ม 70%) สิ้นเทอม, policy quiz/test ค่าเริ่มส่วนกลาง ครูปรับได้ (ปิด OQ-013/015) |
 | [decisions-025.md](decisions-025.md) | auth ทาง C, ยอมรับ token ไม่มี exp, admin โรงเรียน = IsAdmin, ต้องมี License, publish four-eyes, ปิด `/v1/admin`, สอบซ่อมใช้คะแนนสูงสุด, Desktop นักเรียน+ครู |
@@ -116,8 +116,10 @@
 | [decisions-028.md](decisions-028.md) | `CreateBy`/`UpdateBy` เป็น `int null` |
 | [decisions-029.md](decisions-029.md) | ไม่ GRANT/สร้าง role ใน School DB และ PGGradeDB ใช้บัญชี DB เดิม |
 | [decisions-030.md](decisions-030.md) | ถอนคอลัมน์ `Version` ทั้งหมด ใช้ `UpdateDate` เป็น concurrency token แทน |
+| [decisions-031.md](decisions-031.md) | repo เหลือ `school-bot` ตัวเดียว (`school-bot-v2` ไม่มีแล้ว) — พาธ `school-bot-v2` ในเอกสารเดิมให้อ่านเป็น `target/school-bot` |
 
 ## Change Log
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](decisions-031.md)
 
 - 2026-10-22 — เพิ่มสารบัญเอกสารขอบเขต (`scope.md`, `scope-baseline-001.md`, `source-references.md`) และทะเบียนมติผู้ใช้ (`decisions-001..030.md`) ให้ครอบคลุมทุกไฟล์ในหมวด `requirement\` โดยไม่เปลี่ยนรหัสหรือสถานะ REQ/AC
 - 2026-10-22 — เพิ่ม REQ-043..052 จำนวน 10 REQ/42 AC (BA) และ amend REQ-037/038 คง IDs/จำนวน AC เดิม; รวม 44 REQ/174 AC; MYCELIUM เพิ่ม BR ที่อยู่หน้าจอตาม decisions-022 ไม่เปลี่ยนจำนวน AC; ไม่ถือเป็นการอนุมัติ release

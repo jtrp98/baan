@@ -24,6 +24,9 @@
 
 ## Change Log
 
+- 2026-10-23 — ตรวจแก้ auto-commit knowledge: แก้ parser รับ stdout ที่ถูก trim และกติกา Git ที่ขัดกับฟีเจอร์ เพิ่ม final commit หลังนายช่างบันทึกเอกสาร ผลทดสอบ BAAN 96 ผ่าน; [หลักฐาน](planning/knowledge-commit-001.md)
+- 2026-10-23 — ขยาย [คู่มือ data model](design/data-model.md) Rev6: หน้าที่ 32 ตาราง/450 ฟิลด์ พร้อมตัวอย่าง, FK, JSON และแผนที่ตารางเก่า 27 รายการ; คง schema/SQL/สถานะตรวจรับเดิม ผลตรวจที่ [data-model-review-001](design/data-model-review-001.md)
+- 2026-10-23 — บันทึก [decisions-031](requirement/decisions-031.md): repo เหลือ `school-bot` ตัวเดียว (`school-bot-v2` ไม่มีแล้ว) — เอา target v2 ออกจาก `baan.config.json` และแก้พาธในเอกสารที่ยังใช้จริง (ไฟล์หลักฐาน/decisions เดิมคงตามประวัติ)
 - 2026-10-22 — ปรับโครงสร้าง `index.md` เป็นสารบัญล้วนตามมาตรฐาน baan และย้ายเนื้อหาสถานะปัจจุบันระดับโมดูลไป `requirement\scope.md` โดยคงถ้อยคำและ Change Log เดิมครบถ้วน
 - 2026-10-22 — SA (agy) NEEDS_HUMAN: sync เอกสารแบบให้ตรง SQL ปัจจุบัน (DBML Rev3 32 ตาราง ผ่าน parser, ชื่อตารางตรง SQL); เสนอแก้ LearnerId ที่ [db/proposal-learnerkind.md](db/proposal-learnerkind.md) รอผู้ใช้เลือก A/B
 - 2026-10-22 — บันทึก [decisions-030](requirement/decisions-030.md): ถอนคอลัมน์ Version ทั้งหมด (SQL 20 จุด, DBML, data-model) ใช้ UpdateDate เป็น concurrency token แทน (ผู้ใช้เลือก)

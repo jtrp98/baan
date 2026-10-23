@@ -34,3 +34,13 @@
 - 2026-10-21 — เก็บอีก 9 ไฟล์ก่อนแก้ PK int4 และตรวจ hash ก่อน apply
 
 - 2026-10-21 — MYCELIUM แยก archive ตามไฟล์เพื่อคุมขนาดและตรวจ hash ตรงต้นฉบับทั้ง 9 ไฟล์ก่อน apply patch SA
+
+## ก่อนเพิ่มคู่มืออ่านง่าย — 2026-10-23
+
+เก็บ data-model Rev5 แบบ byte-for-byte ก่อนปรับคำอธิบาย Rev6; baseline/SQL ไม่เปลี่ยน
+
+| ฉบับเดิม | Bytes | SHA-256 |
+|---|---:|---|
+| [data-model.md](archive/2026-10-23-before-readable-data-model/data-model.md) | 23815 | `c23ec3ab918a7176b571d559af581145f58bc592bfcd67c449e39e545c7170fd` |
+
+- 2026-10-23 — นายช่างบันทึกต้นฉบับและตรวจ hash ตามใบงาน 009

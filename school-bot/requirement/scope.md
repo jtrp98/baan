@@ -10,7 +10,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 
 ตารางด้านล่างเป็นฐานโค้ดปัจจุบัน; ข้อจำกัด PoC เป็นช่องว่างที่ต้องพัฒนา ดู [มติระบบเต็ม](decisions-002.md) และ [มติผู้ใช้](decisions-001.md)
 
-แหล่งที่มา: `target/school-bot-v2` และมติผู้ใช้ในแชต
+แหล่งที่มา: `target/school-bot` และมติผู้ใช้ในแชต
 
 ## Target Users
 
@@ -31,7 +31,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - หลัง Login เลือกนำเข้าเอง คงต้นฉบับ/กันซ้ำ ไม่ auto-upload (REQ-041); ประวัติ Guest local เลือกย้ายได้ ต้องตรวจใหม่ Arm รอครู ไม่ถือ Guest เป็นตัวตนนักเรียน (REQ-042)
 - ทีมร่างเนื้อหา/ภารกิจ/เกณฑ์ครบสามโหมด ให้ผู้ใช้หรือผู้ที่ผู้ใช้ระบุอนุมัติ; ยังไม่มี inventory/criteria/rubric ที่อนุมัติจริง (REQ-037..039)
 - License บังคับ Guest/Login: ครั้งแรกออนไลน์ lease 3 วัน หนึ่ง Key/เครื่อง ผู้ดูแลย้ายทันที สิทธิ์เดิมคงถึงกำหนด (REQ-009/034/035)
-- API รวม Login ใน school-bot-v2/web ใช้บัญชี/4 DB เดิม ไม่สร้าง SchoolBotUser; PK/FK ของ SchoolBot int4 และฟิลด์มาตรฐานครบ (REQ-033/036; decisions-010..013)
+- API รวม Login ใน school-bot/web ใช้บัญชี/4 DB เดิม ไม่สร้าง SchoolBotUser; PK/FK ของ SchoolBot int4 และฟิลด์มาตรฐานครบ (REQ-033/036; decisions-010..013)
 - OS: Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon ทั้งคู่ต้องใช้หุ่นจริง (decisions-019; REQ-031/032)
 
 รวม 34 REQ / 132 AC ใน [index](index.md); เพิ่ม REQ-040..042 เพื่อแบ่งหน้าที่และขนาด คง release ระบบเต็ม
@@ -40,7 +40,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 
 - ตาราง SchoolBot อยู่ SchoolBot DB 10.0.0.128:9499 ตาม [decisions-027](decisions-027.md) (ไม่ใช่ School DB)
 - PK ของตาราง SchoolBot ใหม่เป็น `int4` ตาม [มติผู้ใช้](decisions-012.md); มี [DBML](../design/schoolbot.dbml) สำหรับ dbdiagram.io และปรับ timeout MYCELIUM แล้ว
-- API ทั้งหมดรวม Login อยู่ `target/school-bot-v2/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](decisions-010.md), [มติ DB](decisions-011.md) และ [ผลตรวจบัญชีเดิม](../design/source-review-002.md)
+- API ทั้งหมดรวม Login อยู่ `target/school-bot/web`; แอปเรียก API และ backend ใช้ User/DB เดิมทั้ง 4 ตัว ดู [มติ API](decisions-010.md), [มติ DB](decisions-011.md) และ [ผลตรวจบัญชีเดิม](../design/source-review-002.md)
 - Windows และ macOS ต้องควบคุมหุ่นจริงได้ทั้งคู่ ดู [มติ OS](decisions-008.md); ฝั่ง macOS ยังต้องพัฒนาจากโค้ดเดิม
 - เป้าหมาย OS ล่าสุด Windows11 25H2 x64 และ macOS15+ Intel/AppleSilicon ตาม [decisions-019](decisions-019.md) แทนข้อกำหนด Windows10 เดิม
 - Guest และ Login เก็บหลายโครงงานทุกโหมด; Code/Block ประเมินอัตโนมัติ Arm ให้ครูตรวจ ดู [มติผู้ประเมิน](decisions-009.md); Guest ใช้พื้นที่ร่วมและเลือกนำเข้างาน/ประวัติหลัง Login ตาม [มติ Guest](decisions-014.md)
@@ -65,7 +65,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - OS write สำเร็จไม่ยืนยันว่าหุ่นเคลื่อนที่จบ หยุดจริง หรือเก็บชุดท่าถูกต้อง
 - การ cancel process ไม่หยุดชุดท่าที่บอร์ดกำลังเล่น ต้องขอ stop แยก และการสื่อสารขาดอาจส่งไม่ถึง
 - HOME/BOX/POSE0 ยังไม่มี calibrated preset สำหรับ native; native pause/resume และ firmware upgrade ไม่อยู่ในความสามารถปัจจุบัน
-- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป้าหมายให้ API ทั้งหมดอยู่ `school-bot-v2/web` และใช้ User/4 DB เดิมตาม [มติ DB](decisions-011.md)
+- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป้าหมายให้ API ทั้งหมดอยู่ `school-bot/web` และใช้ User/4 DB เดิมตาม [มติ DB](decisions-011.md)
 - เป้าหมาย License: ครั้งแรกออนไลน์ แล้วใช้สิทธิ์ในเครื่อง 3 วันตาม [มติ](decisions-005.md); โค้ดเดิมยังไม่บังคับ
 - ไม่มี update download/install, signature verification หรือ rollback
 - เอกสารระบุ Windows installer ยังไม่ลงนาม และ macOS ยังต้อง Developer ID/notarization
@@ -94,6 +94,7 @@ Windows 10 ออกจาก target ตามคำสั่งผู้ใช�
 Canonical plan/JSON 74 งานยังเป็น baseline 31/109 ให้ PM/TP reconcile mapping และยอดใหม่ ไม่แก้สถานะ task จากเอกสารนี้
 
 ## Change Log
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](decisions-031.md)
 
 - 2026-10-22 — ย้ายเนื้อหาสถานะปัจจุบันระดับโมดูลจาก `index.md` มาจัดเข้าหมวด Overview, Release Scope และ Constraints โดยคงถ้อยคำเดิม ไม่ตีความเพิ่ม และไม่ปิด OQ ใด
 - 2026-10-22 — amend ตามมติจริง แยกหลักฐานเดิม คงระบบเต็มและเกณฑ์ที่รออนุมัติ

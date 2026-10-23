@@ -57,7 +57,7 @@
    - ตารางทั้งหมดของ SchoolBot (33 ตาราง) สร้างในฐานข้อมูล **School DB** (`JabjaiSchoolSingleDB`) ภายใต้ schema `public` โดยใช้ชื่อตารางและคอลัมน์ตรงตาม `data-model.md` (quoted PascalCase เช่น `"SchoolBotLicense"`, `"SchoolBotLicenseId"`) เพื่อให้ตรงกับ convention ของตารางใหม่ใน `JabjaiSchoolSingleDBPostgreSQLDBContext` (เช่น `"PGTAcademicSetting"`, `"TPlanCourseSection"`) และไม่ต้องตั้ง `search_path` พิเศษ
 2. **Database Roles & Least Privilege**:
    - ออกแบบให้ใช้ role แยกกัน:
-     - `schoolbot_app` (NOLOGIN role หรือ group role สำหรับมอบสิทธิ์ให้ login user ของ backend `school-bot-v2/web`): ใน School DB มีสิทธิ์เฉพาะ `SELECT, INSERT, UPDATE` บนตาราง `"SchoolBot*"` และ `SELECT` บนตาราง legacy ใน School DB ที่ต้องใช้อ่านตรวจสิทธิ์ (`"TUser"`, `"TEmployees"`, `"TPlan"`, `"TPlanCourse"`, `"TPlanCourseTeacher"`, `"TPlanCourseTerm"`, `"TPlanTermSubLevel2"`, `"TPlane"`, `"TTerm"`, `"TTermSubLevel2"`, `"TStudentClassroomHistory"`, `"TPlanCourseStudent"`)
+     - `schoolbot_app` (NOLOGIN role หรือ group role สำหรับมอบสิทธิ์ให้ login user ของ backend `school-bot/web`): ใน School DB มีสิทธิ์เฉพาะ `SELECT, INSERT, UPDATE` บนตาราง `"SchoolBot*"` และ `SELECT` บนตาราง legacy ใน School DB ที่ต้องใช้อ่านตรวจสิทธิ์ (`"TUser"`, `"TEmployees"`, `"TPlan"`, `"TPlanCourse"`, `"TPlanCourseTeacher"`, `"TPlanCourseTerm"`, `"TPlanTermSubLevel2"`, `"TPlane"`, `"TTerm"`, `"TTermSubLevel2"`, `"TStudentClassroomHistory"`, `"TPlanCourseStudent"`)
      - **ไม่ให้สิทธิ์ `DELETE`, `TRUNCATE`, `ALTER`, `DROP`** แก่ `schoolbot_app` เพราะระบบใช้ soft-delete (`"IsDelete" = true`) และห้าม hard delete ประวัติ/ผลเรียน/receipt ตาม `data-contract-rules.md` (ส่วนการล้าง `ResultCipher` ที่หมดอายุใน `SchoolBotIdempotency` เป็น `UPDATE ... SET "ResultCipher" = NULL`)
 3. **Primary Key Generation & Capacity (`int4`)**:
    - ใช้ `integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE)` ตาม `decisions-012.md` และ `data-model.md` (ห้าม client ส่งค่า PK มาเอง และห้าม wrap/reuse เมื่อเต็ม)
@@ -312,4 +312,5 @@
 4. **อนุมัติ Gate `G-DB` และ Release Gates ของ `DES-009` ก่อนรัน `007_pggradedb_grants.sql`**: ห้ามเปิดสิทธิ์เขียนบน PGGradeDB ใน production จนกว่าผลการทดสอบ `G-PARITY`, `G-COEXIST`, `G-TARGET`, `G-AUTHZ` และ `G-DB` จะผ่านครบและได้รับการลงนามจากเจ้าของระบบเกรด
 
 ## Change Log
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 - 2026-10-22 — สร้างเอกสารรีวิว physical schema, ลำดับการรัน และเช็กลิสต์ตรวจสอบหลังรันสำหรับ SchoolBot ทั้ง 33 ตารางใน School DB และสิทธิ์ใน PGGradeDB

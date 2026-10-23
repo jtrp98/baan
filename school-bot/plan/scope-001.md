@@ -10,7 +10,7 @@
 - หลายโครงงานทุกโหมด ทั้ง Guest local และ Login DB/cloud รักษาความเป็นเจ้าของ ความคงทนและ failure semantics งานหนึ่งไม่แทนอีกงานโดยอัตโนมัติ
 - Windows/macOS ควบคุมหุ่นจริงทั้งคู่ตาม [decisions-008](../requirement/decisions-008.md) ต้องมี platform/transport/hardware evidence และ signed installer acceptance ตามเกณฑ์ที่มนุษย์กำหนด ไม่ส่ง Mac simulator แทน native
 - License บังคับทั้ง Guest/Login และสามโหมด ครั้งแรก online; signed offline lease ไม่เกินสามวันจาก online check สำเร็จล่าสุด เปิดแอปซ้ำไม่เริ่มนับใหม่ หนึ่ง Key ผูกเครื่องปัจจุบันหนึ่งเครื่อง ผู้ดูแลย้าย Key เดิมได้ทันที เครื่องเดิมอาจ offline ถึง lease เดิมหมดตาม decisions-004..007
-- API ทั้งหมดรวม Login อยู่ target/school-bot-v2/web แอปเรียก HTTPS ใช้บัญชีและ 4 DB เดิม ไม่สร้าง SchoolBotUser และไม่บังคับ Academic Login API/OIDC ตาม decisions-010/011 ไม่เพิ่ม DB ที่ห้าโดยพลการ
+- API ทั้งหมดรวม Login อยู่ target/school-bot/web แอปเรียก HTTPS ใช้บัญชีและ 4 DB เดิม ไม่สร้าง SchoolBotUser และไม่บังคับ Academic Login API/OIDC ตาม decisions-010/011 ไม่เพิ่ม DB ที่ห้าโดยพลการ
 - ตารางใหม่ prefix SchoolBot; PK/FK ที่อ้าง PK เป็น int4 และมี IsDelete/CreateBy/CreateDate/UpdateBy/UpdateDate/SchoolId ครบ UUID สำหรับ logical/local/request ที่ไม่ใช่ DB PK ยังใช้ได้ตาม decisions-012
 - รักษาภาษา th/en/zh offline, shell/window controls/close guards, sample/native boundary, trusted engine routing และ protocol/lifecycle ตาม REQ ที่เกี่ยวข้อง
 - รวม persistent License/release APIs, update metadata check, Windows/macOS distribution และการตรวจรับตาม REQ-027..035 API server deploy แยกจาก desktop installer
@@ -34,5 +34,6 @@ Release scope frozen ย้ายของเข้า/ออกได้เฉ�
 PM อ่าน knowledge ตาม allowlist และตรวจโครงสร้างแผน/AC mapping เท่านั้น ไม่ audit source ซ้ำ ไม่รัน build/tests/SQL/UI/hardware ไม่ rebuild EXE/installer ไม่อ้าง SchoolBot QA PASS หรือ implementation เสร็จ หลักฐาน as-built ที่ใช้คือ source-review-001/002 ซึ่งมีขอบเขตของรายงานเอง
 
 ## Change Log
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract

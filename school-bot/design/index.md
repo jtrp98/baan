@@ -34,7 +34,7 @@
 
 สถานะเอกสารอยู่ใน index นี้เท่านั้น
 
-พาธ source อ้างจาก `C:/src/schoolbright/target/school-bot-v2` ส่วน REQ/มติอยู่ที่ `C:/src/schoolbright/knowledge/school-bot/requirement`
+พาธ source อ้างจาก `C:/src/schoolbright/target/school-bot` ส่วน REQ/มติอยู่ที่ `C:/src/schoolbright/knowledge/school-bot/requirement`
 
 หลักฐานหลัก: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/SchoolBot.Api/Program.cs:43`, `engines/zide/src/transport.cpp:7`
 
@@ -110,7 +110,14 @@
 
 | ไฟล์ | เนื้อหา |
 |---|---|
-| [data-model.md](data-model.md) | Logical data model (Rev5 · CONFIRMED — sync ตรงกับ db/schoolbot_db.sql (32 ตาราง) บน SchoolBot DB (10.0.0.128:9499) ตาม decisions-027..030 และ db/review-005) |
+| [data-model.md](data-model.md) | คู่มือข้อมูล Rev6 — หน้าที่ตาราง/450 ฟิลด์ ตัวอย่าง และตารางเก่า; คง baseline Rev5 ตาม SQL 32 ตารางบน SchoolBot DB |
+| [data-dictionary/index.md](data-dictionary/index.md) | สารบัญ 32 ตาราง: ทุกฟิลด์ ชนิด/NULL หน้าที่ ตัวอย่าง และ FK จาก SQL |
+| [data-legacy-001.md](data-legacy-001.md) | ตารางเดิมที่ใช้ ฟิลด์เชื่อม ขอบเขตอ่าน/เขียน และหลักฐาน source |
+| [data-fields-001.md](data-fields-001.md) | วิธีอ่าน PK/FK/NULL/JSON และฟิลด์ร่วม |
+| [data-terms-001.md](data-terms-001.md) | แยกชื่อใกล้กัน: Mission/Activity, Submission/Attempt, Assessment และชุดส่งคะแนน |
+| [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
+| [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
+| [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
 | [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev5 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
 | [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy (Rev3 · CONFIRMED — อ้าง db/schoolbot_db.sql และ db/review-005.md (SchoolBot DB 10.0.0.128:9499, 32 ตาราง, ใช้บัญชี DB เดิมบน School DB/PGGradeDB)) |
 | [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev3 · PROPOSED) |
@@ -129,7 +136,13 @@
 | [quality-attributes.md](quality-attributes.md) | เกณฑ์คุณภาพและเกณฑ์พิสูจน์ (Rev1 · PROPOSED) |
 | [archive.md](archive.md) และโฟลเดอร์ `archive/` | Verbatim history (ฉบับก่อน amendment เก็บแบบ verbatim) |
 
+| [data-model-history-001.md](data-model-history-001.md) | Change Log เดิม Rev1–Rev5 |
+| [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
+| [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
+
 ## Change Log
+- 2026-10-23 — เพิ่มคู่มือ data model Rev6, dictionary 32 ตาราง/450 ฟิลด์, แผนที่ legacy พร้อมฟิลด์เชื่อม และภาคผนวกสัญญาเดิมตามผล arch ใบงาน 009; ไม่เปลี่ยน schema/สถานะตรวจรับ
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 - 2026-10-22 — แปลง index เข้าโครงมาตรฐาน baan + รับ source-review-001..005 เข้าหมวด design (ย้ายจาก root โดยนายช่าง)
 - 2026-10-21 — บันทึกการเลือก OS ของผู้ใช้ตาม decisions-019; เก็บ survey เดิมเป็นหลักฐาน ไม่แก้ข้อเท็จจริง source หรืออ้าง QA ผ่าน
 - 2026-10-21 — amend OS survey Rev2 และเพิ่ม Windows10 review ตาม decisions-017; ไม่ปิด G-DELIVERY/OQ-011

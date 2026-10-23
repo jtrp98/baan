@@ -37,7 +37,7 @@ Go Host: LicenseGate / Session / Projects / Robot lifecycle / Updates
 | Infrastructure | repositories ของ 4 DB เดิม, legacy credential/profile adapters, session store, signer และ grader; ไม่แก้ Academic generated entities |
 | Platform | Windows/Darwin transport และ credential adapters; ไม่แตก business rules ตาม OS |
 
-มติ decisions-010/011: API ทั้งหมดรวม Login อยู่ `C:/src/schoolbright/target/school-bot-v2/web` (C# API → Application → Domain; Infrastructure ผ่าน ports). Desktop เรียก HTTPS เท่านั้น ไม่อ่าน 4 DB โดยตรง ไม่พึ่ง Academic Login API/OIDC; ใช้ข้อมูลบัญชีเดิมผ่าน LegacyCredentials/LegacyDirectory ภายใน web ตาม DES-004
+มติ decisions-010/011: API ทั้งหมดรวม Login อยู่ `C:/src/schoolbright/target/school-bot/web` (C# API → Application → Domain; Infrastructure ผ่าน ports). Desktop เรียก HTTPS เท่านั้น ไม่อ่าน 4 DB โดยตรง ไม่พึ่ง Academic Login API/OIDC; ใช้ข้อมูลบัญชีเดิมผ่าน LegacyCredentials/LegacyDirectory ภายใน web ตาม DES-004
 
 Login ไม่ activate License; License ไม่สร้างบัญชีหรือสิทธิ์ครู Offline entitlement เปิด local runtime ได้ แต่ไม่ใช้แทน user token ของ Cloud
 
@@ -46,5 +46,6 @@ Sample อยู่ใน namespace และ execution path แยก ไม่
 ทางเลือก: คง modular monolith กับ engine เดิม; ปัดตก microservices และ engine ต่อหนึ่งหน้า เพราะเพิ่ม deployment/contract โดยไม่มีความต้องการรองรับ
 
 ## Change Log
+- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 - 2026-10-21 — Rev2: web เป็นเจ้าของ API/Login; 4 DB ผ่าน backend
 - 2026-10-21 — Rev1: กำหนดสาม product modes, routing และ integration boundaries
