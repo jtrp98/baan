@@ -6,7 +6,7 @@ Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 แล�
 
 ## Waiting on Human
 
-มติ Guest/Level/ข้อสอบ/สูตร/mapping/Learner A และแบบ H4 ตอบแล้ว; ค้าง SQL/runtime, credential fixtures, H5/infra/web-principal/staff_adminตั้งต้น, signed UX, เนื้อหา/criteria, หุ่น/ส่งมอบ และ export subconditions/QA/security/release ดู [หลักฐานค้าง](evidence-002.md) ไม่ถามมติเดิมซ้ำ ทีมต้องเตรียมartifactให้ตรวจ ก่อนfreezeรับผลtask-012/013ล่าสุดที่ผู้คุมบันทึกจริง
+มติ Guest/Level/ข้อสอบ/สูตร/mapping/Learner A, แบบ H4, พาธ legacy (`C:\src\sb-web-academic-dev-1`) และรูปแบบ SchoolBot เป็น 1 service ผ่าน `sb-api-gateway` ตอบแล้ว (ห้ามถามซ้ำ); ณ ตอนจัดทำ queue-003 ยังค้างผล arch task023 (ให้อ่าน `planning/handoff-002.md` ที่ผู้คุมจะบันทึกหลังรับงาน arch เป็นสถานะรับล่าสุด), หลักฐาน DB/legacy จากเจ้าของระบบ, SQL/runtime, H5 env/host/secret/web-principal/staff_admin ตั้งต้น, signed UX, เนื้อหา/criteria, หุ่น/ส่งมอบ และ export subconditions/QA/security/release ดู [หลักฐานค้าง](evidence-002.md) และ [คิวล่าสุด](queue-003.md) ทีมต้องเตรียม artifact ให้ครบก่อนถามคน
 
 ## Phases
 
@@ -110,6 +110,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 
 - 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม
 - 2026-10-23 — แก้ fixed metadata ของ SA-004 (`tasks-001.json` /tasks/107/tier) จาก t2 เป็น t1 ตามบทบาท arch; คง 110 tasks/180 AC, scope/dependencies/status/gates เดิม และบันทึก advisory V012-09 เป็น BL-001 ใน backlog โดยไม่เพิ่มงานในแผน
+- 2026-10-23 — รับหลักฐานรอบ task017..026 อัปเดต Waiting on Human ชี้ไปที่ queue-003.md และบันทึก BL-002..004 นอกขอบเขตโดยคง 110 tasks pending / 44 REQ / 180 AC / 17 gates เดิม
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 
