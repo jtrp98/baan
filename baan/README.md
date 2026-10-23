@@ -70,7 +70,7 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
     timeout.mjs             ← คำนวณ/ตรวจ timeout ที่ใช้ร่วมทั้งสองคำสั่ง
     knowledge-commit.mjs    ← auto commit ที่เก็บเอกสารหลังจบ run
   baan.example.json     ← template การตั้งค่า (config จริงอยู่นอก package ที่ <workspace>\baan.config.json)
-  agents.json               ← ตัวรัน (claude/codex/agy) + tier ladder t0–t5
+  agents.json               ← ตัวรัน (claude/codex/agy/opencode) + tier ladder t0–t5
   roles\                    ← 11 ตำแหน่งในทีม
   setup\agy\                ← profile baan-readonly ของ agy (agent.md + guard hook) — ติดตั้งครั้งเดียวต่อเครื่อง
   scripts\                  ← live-smoke.mjs (npm run smoke:live — ใช้โควตาจริง)
@@ -227,6 +227,7 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 | claude | `--model <alias>` เช่น `haiku`, `sonnet`, `opus` | `--effort <level>` | low, medium, high, xhigh, max |
 | codex | `-m <model>` (เฉพาะชื่อใน list ของ /model) | `-c model_reasoning_effort=<level>` | none, minimal, low, medium, high, xhigh, max |
 | agy | `--model <ชื่อจาก agy models>` | `--effort <level>` | low, medium, high, xhigh, max |
+| opencode | `-m <provider/model#variant>` เช่น `zai-coding-plan/glm-5.3#high` | ฝังในชื่อ model ผ่าน `#variant` | default, low, high, max |
 
 ข้อควรรู้ที่พิสูจน์แล้วจากการทดสอบจริง:
 
@@ -234,17 +235,18 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 - **codex**: header ของ `codex exec` พิมพ์ model/effort ที่ใช้จริงออกมาขณะรัน
 - **codex (บัญชี ChatGPT)**: สลับ model ได้เฉพาะชื่อที่อยู่ใน `/model` ของ codex เอง ได้แก่ `gpt-6.1-sol` (default), `gpt-6-astra` (frontier), `gpt-6-sol`, `gpt-6-luna` (fast/cheap), `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` — ชื่ออื่นเช่น `gpt-6.1-codex` หรือ `gpt-6.1` จะโดน API ปฏิเสธ (ตรวจรายชื่อล่าสุดได้จาก `/model` ใน codex interactive)
 - **agy**: เป็น multi-provider (gemini/claude/gpt-oss) — ชื่อ model ฝัง effort ไว้ในตัวเลย เช่น `gemini-3.8-flash-low`, `claude-opus-5-5-high` (ดูทั้งหมดด้วย `agy models`) และ**ต้องวาง `--model` ก่อน `--print`** เพราะ `--print` จะกลืน argument ถัดไปเป็น prompt (baan-role จัดการลำดับนี้ให้อยู่แล้ว)
+- **opencode**: รัน GLM ผ่าน **Z.AI Coding Plan (เหมาจ่าย cost 0 ต่อครั้ง)** — login ครั้งเดียวด้วย `opencode auth login` (เลือก Z.AI Coding Plan) · syntax variant `#low/#high/#max` มีตั้งแต่ **opencode 2.1.4** (ของเดิม 1.19.0 ส่ง effort ทาง CLI ไม่ได้) · ต้องมี opencode CLI ติดตั้ง (`npm i -g opencode-ai`)
 
 tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค่ายอื่นจัดตัวทัดเทียมตามระดับ, T0 = overdrive):
 
-| tier | เหมาะกับ | claude | codex | agy |
-|---|---|---|---|---|
-| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | gemini-4-argon-high |
-| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | gemini-4-argon-high |
-| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | gemini-4-argon-medium |
-| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / low | gemini-3.8-flash-medium |
-| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / high | gemini-3.8-flash-low |
-| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / medium | gemini-3.8-flash-low |
+| tier | เหมาะกับ | claude | codex | agy | opencode |
+|---|---|---|---|---|---|
+| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | gemini-4-argon-high | — |
+| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | gemini-4-argon-high | — |
+| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | gemini-4-argon-medium | glm-5.3 / max |
+| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / low | gemini-3.8-flash-medium | glm-5.3 / high |
+| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / high | gemini-3.8-flash-low | glm-5.3-flash / max |
+| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / medium | gemini-3.8-flash-low | glm-5.3-flash / high |
 
 หมายเหตุ:
 - **สลับตัวรันอัตโนมัติเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ `--agent`) เป็นตัวแรกเสมอ — ถ้าล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที · **ล้มด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint และ summary
@@ -262,10 +264,11 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 | claude | `claude -p --output-format text --allowedTools <ตามโหมด>` (write เพิ่ม `--permission-mode acceptEdits`) | stdin | stdout |
 | codex | `codex exec --skip-git-repo-check -s read-only -o <answer.txt> -` | stdin | ไฟล์ answer.txt (option `-o`) |
 | agy | `agy --add-dir <ราก workspace> --agent baan-readonly --print` (write: `--mode accept-edits --print`) | argument (spawn ตรง ไม่ผ่าน shell) | stdout |
+| opencode | `opencode run -m <provider/model#variant>` (write เพิ่ม `--auto`) | stdin | stdout |
 
 - ส่ง prompt ทาง **stdin** เมื่อทำได้ เพื่อเลี่ยงปัญหาการ quote อักขระพิเศษบน Windows
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
-  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent baan-readonly` (profile ระดับผู้ใช้ที่ตัดเครื่องมือเขียนออก + guard hook ยืนยันว่ารันได้แค่คำสั่งอ่าน) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ**
+  - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent baan-readonly` (profile ระดับผู้ใช้ที่ตัดเครื่องมือเขียนออก + guard hook ยืนยันว่ารันได้แค่คำสั่งอ่าน) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ** · opencode = ไม่ใส่ `--auto` ในโหมดอ่าน — non-interactive ที่ไม่มี `--auto` จะปฏิเสธการกระทำที่ต้องขออนุญาต (เช่น แก้ไฟล์) ให้เอง (โหมด write จึงต้องใส่ `--auto` เพราะไม่มีคนกดอนุมัติกลางทาง)
   - **agy ต้องติดตั้ง profile `baan-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
   - **agy ในโหมด headless อ่านไฟล์นอก cwd ไม่ได้** — นายช่างจึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก baan.config.json ที่เดินขึ้นจาก cwd) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนตามไปด้วย — งานเขียนที่ต้องอ่านไฟล์นอก cwd ให้ฝังเนื้อหาไว้ใน task หรือรันโหมดอ่านแยกก่อน
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด

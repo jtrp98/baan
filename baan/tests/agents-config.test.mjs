@@ -7,9 +7,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const cfg = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "agents.json"), "utf8"));
-const AGENTS = ["claude", "codex", "agy"];
+const AGENTS = ["claude", "codex", "agy", "opencode"];
 
-test("ทุก tier ประกาศครบทั้งสาม agent และรูปแบบถูกต้อง", () => {
+test("ทุก tier ประกาศครบทุก agent และรูปแบบถูกต้อง", () => {
   for (const [tier, conf] of Object.entries(cfg.tiers)) {
     for (const a of AGENTS) {
       assert.ok(a in conf, `tier ${tier} ต้องประกาศ ${a} ไว้เสมอ (ถ้ายังไม่มี model ให้ใส่ null)`);
@@ -91,6 +91,29 @@ test("claude: read-only อนุญาตเฉพาะ tool/คำสั่�
   const rw = tools(writeArgs);
   for (const t of ["Edit", "Write", "Bash", "PowerShell"]) assert.ok(rw.includes(t), `write ต้องมี ${t}`);
   assert.equal(writeArgs[writeArgs.indexOf("--permission-mode") + 1], "acceptEdits");
+});
+
+// opencode: variant ของ GLM ฝังใน model string ผ่าน `#` (เช่น glm-5.3#high) — ผ่านการทดสอบจริง 2026-10-23
+// (syntax `#variant` มีตั้งแต่ opencode 2.1.4 — ของเดิม 1.19.0 ส่งทาง CLI ไม่ได้เลย)
+test("opencode: ไม่มี effortArgs (effort อยู่ใน model string) · stdin · read-only = ไม่ใส่ --auto · write = --auto", () => {
+  const def = cfg.agents.opencode;
+  assert.equal(def.promptVia, "stdin", "prompt ต้องทาง stdin — prompt ของ role ยาวเกิน command-line limit ของ Windows");
+  assert.ok(!def.effortArgs, "effort ส่งผ่าน #variant ใน model อยู่แล้ว ห้ามมี effortArgs");
+  assert.ok(!def.readArgs.includes("--auto"), "read-mode ห้าม auto-approve: non-interactive ที่ไม่มี --auto จะปฏิเสธสิ่งที่ต้องขออนุญาต (กันเขียนไฟล์)");
+  assert.ok(def.writeArgs.includes("--auto"), "write-mode ต้อง --auto เพราะไม่มีคนกดอนุมัติกลางทาง");
+});
+
+// ผัง GLM ผ่าน Z.AI coding plan (cost 0): t2 = anchor ที่ผู้ใช้วัดจาก Intelligence Index (5.3 max ≈ sonnet high)
+// t0/t1 = null เพราะ GLM เพดานอยู่ t2 — null ทำให้ fallbackChainFor ข้าม opencode ไปค่ายอื่นของ tier นั้นเอง
+test("opencode: t2/t3 = glm-5.3 (max/high) · t4/t5 = glm-5.3-flash (max/high) · t0/t1 = null ตาม Intelligence Index", () => {
+  for (const tier of ["t0", "t1"]) assert.equal(cfg.tiers[tier].opencode, null, `${tier}: ไม่มี GLM ระดับทัดเทียม opus/astra`);
+  const expect = {
+    t2: "zai-coding-plan/glm-5.3#max",
+    t3: "zai-coding-plan/glm-5.3#high",
+    t4: "zai-coding-plan/glm-5.3-flash#max",
+    t5: "zai-coding-plan/glm-5.3-flash#high",
+  };
+  for (const [tier, model] of Object.entries(expect)) assert.equal(cfg.tiers[tier].opencode.model, model, `tier ${tier} ผัง GLM ผิด`);
 });
 
 // profile ของ agy ต้องมากับ package — readArgs อ้างชื่อ profile นี้ เครื่องที่ไม่มีจะล้มทุกงาน read-only
