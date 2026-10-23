@@ -69,3 +69,11 @@
 | [index.md](archive/2026-10-23-before-auth-evidence-001/index.md) | 18898 | `194f8d0c4870c6b9d709ba086f699adc0fa4e19b641145004dc22bdd1a44c3ef` |
 
 - 2026-10-23 — นายช่างตรวจสำเนา/hash ก่อน apply edits ของ arch
+
+## ก่อนจัด security disposition — 2026-10-23
+
+| ฉบับเดิม | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [auth-evidence-001.md Rev1](archive/2026-10-23-before-security-disposition-001/auth-evidence-001.md) | 11187 | `e6cc2ca3b5f708daebd903e028f37b0d9c55a9f6e188851fd7b932afdd7d513e` |
+
+- 2026-10-23 — เก็บ byte-for-byte ก่อน edits5จุดจากarchใบงาน021; [manifest](archive/2026-10-23-before-security-disposition-001/manifest.json)

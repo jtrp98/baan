@@ -136,7 +136,7 @@
 | [source-review-003.md](source-review-003.md) | หลักฐาน as-built จากการตรวจ source จริง: โครงสร้าง Course Plan จาก Google Sheet (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-004.md](source-review-004.md) | หลักฐาน as-built จากการตรวจ source จริง: ระบบเกรด SchoolBright บน PGGradeDB (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-005.md](source-review-005.md) | หลักฐาน as-built จากการตรวจ source จริง: writer คะแนนเดิม score-record (ย้ายมาจาก root วันที่ 2026-10-22) |
-| [auth-evidence-001.md](auth-evidence-001.md) | รับหลักฐาน BE-001: matrix ที่รับ/หักล้าง, policy ที่ยังไม่ยืนยัน, trust boundary, H5 checklist, TR-AUTH-01..07 (Rev1 · EVIDENCE — ไม่ใช่ verdict) |
+| [auth-evidence-001.md](auth-evidence-001.md) | รับหลักฐาน BE-001: matrix ที่รับ/หักล้าง, policy ที่ยังไม่ยืนยัน, trust boundary, H5 checklist, TR-AUTH-01..07 (Rev2 · EVIDENCE — ไม่ใช่ verdict) |
 | [modules.md](modules.md) | โครงสร้างโมดูลและขอบเขตระบบ (Rev2 · PROPOSED) |
 | [quality-attributes.md](quality-attributes.md) | เกณฑ์คุณภาพและเกณฑ์พิสูจน์ (Rev1 · PROPOSED) |
 | [archive.md](archive.md) และโฟลเดอร์ `archive/` | Verbatim history (ฉบับก่อน amendment เก็บแบบ verbatim) |

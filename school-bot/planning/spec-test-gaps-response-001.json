@@ -1,0 +1,144 @@
+{
+  "state": "DONE",
+  "summary": "GAP-01 และ GAP-02 จัดการแล้วด้วยการแก้ถ้อยคำใน REQ-025 และ REQ-027 ตามหลักฐานและมติเดิม ไม่เปลี่ยนจำนวนหรือ ID ของ REQ/AC (คง 44 REQ / 180 AC) และไม่เพิ่ม scope GAP-01: คง REQ-025 และหน่วย 'ตัวอักษร' ของ AC-025-03 เพราะ source ยืนยันแล้ว จึงแก้เฉพาะถ้อยคำให้บอกหน่วยของแต่ละจุดตรวจ แล้วส่ง arch ปรับ DES-003 ไม่ให้ขัดกับ REQ GAP-02: เปลี่ยน 'admin key' เป็นโมเดล staff session กับ StaffRole ตามมติ decisions-025 ข้อ 6 และ decisions-026 ส่วน GAP-05 และ GAP-09 ระบุ task กับ artifact ที่ต้องเตรียมต่อ ทั้งสองยังไม่เสร็จ (ไม่ถือว่า inventory/UX/hardware เสร็จ) GAP-03/04/06/07/08 เป็นของ arch ไม่ได้แก้ข้ามเจ้าของ รอบนี้ไม่มีการเขียนไฟล์ ไม่ได้แตะ source/git/SQL และไม่ได้เรียก role อื่น",
+  "dispositions": [
+    {
+      "gap": "GAP-01",
+      "basis": [
+        "target/school-bot/app/frontend/src/modes/coding-adventure/useCodeLab.ts:56 ใช้ `value.source.length > 16384` ซึ่งเป็น JavaScript String.length จึงนับเป็น UTF-16 code unit",
+        "target/school-bot/app/internal/engine/demo.go:66 ใช้ `len(source) > 16384` ซึ่งเป็น Go string จึงนับเป็น UTF-8 bytes",
+        "req-025 BR-025-03 แยกสองจุดตรวจนี้ไว้อยู่แล้ว (โหลดที่ UI = ตัวอักษร, รัน = bytes)",
+        "des-003.md:31 และ :89 เสนอ source ≤16384 UTF-8 bytes และให้ตรวจ bytes เพิ่มจาก UI เดิมที่นับ characters ซึ่งเป็นข้อเสนอของ arch ไม่ใช่มติผู้ใช้",
+        "grep ใน decisions และ requirement ไม่พบมติผู้ใช้เรื่องหน่วยของ 16384",
+        "AC-011-03 ใช้ 1 MiB ซึ่งเป็นหน่วย bytes อยู่แล้ว จึงไม่กำกวมและไม่แก้"
+      ],
+      "resolution": "คง REQ และไม่เปลี่ยนหน่วย AC-025-03 โดยเพิ่มข้อความระบุว่า 'ตัวอักษร' ที่จุดโหลดคือ UTF-16 code unit ตามหลักฐาน as-built และเพดาน bytes ตอนรันอยู่ใน BR-025-03 ไม่ใช่เกณฑ์ของ AC-025-03 ข้อเท็จจริงที่ตามมาจากสองจุดตรวจคือ ข้อความไทยหนึ่งตัวอักษรเป็น 3 UTF-8 bytes จึงอาจผ่านการโหลดแต่ถูกปฏิเสธตอนรันเมื่อเกิน 16384 bytes ไม่มีการระบุ codepoint หรือ grapheme เพราะไม่มีหลักฐาน ไม่ใช้ DES เป็น business approval และไม่เลือกหน่วยใหม่แทนผู้ใช้",
+      "remaining": "ถ้า arch หรือทีมต้องการให้การบันทึก/โหลดปฏิเสธตาม UTF-8 bytes (เข้มกว่า AC เดิม โดยเพดานจะเหลือประมาณ 5,461 ตัวอักษรไทย) จะเปลี่ยนพฤติกรรมที่ผู้ใช้เห็น ต้องส่งกลับมาให้ผู้ใช้ตัดสินก่อนแก้ REQ ห้ามแก้ DES แล้วให้ REQ ตามเอง จนกว่า arch sync DES-003 เสร็จ inspect ควรทดสอบ TP001-019 เฉพาะ ASCII และกรณีที่ตรงกับ BR-025-03"
+    },
+    {
+      "gap": "GAP-02",
+      "basis": [
+        "decisions-025 ข้อ 6 (H8): ผู้ใช้ตอบว่า \"ย้ายไป /v2/admin แล้วปิด v1\" และข้อกำหนดที่ยืนยันระบุ admin API ไป `/v2/admin` ที่ใช้ staff session แล้วปิด `/v1/admin` static bearer",
+        "decisions-026: ผู้ใช้อนุมัติ breaking change `/v1/admin` → `/v2/admin` เป็น baseline และให้ sync เข้า DES",
+        "des-004.md:59,84 และ des-012.md:61,64-68: `/v2/admin/*` ใช้ session channel `staff_admin` กับ SchoolBotStaffRole (ทั้งสองเป็นการออกแบบ ไม่ใช่มติธุรกิจ)",
+        "des-004.md:80: 503 AUTH_NOT_CONFIGURED เมื่อ compatibility ยังไม่พร้อม; ในส่วนที่อ่านพบไม่เจอรหัส 403 STAFF_ROLE_REQUIRED (พบเฉพาะ 403 CHANNEL_NOT_ALLOWED)",
+        "req-027.md:9 เป็นข้อเท็จจริง as-built ของ static bearer เดิม"
+      ],
+      "resolution": "ปรับ BR-027-01 และ AC-027-01..04 ให้ตรงมติเดิมโดยไม่เพิ่ม AC ใหม่ 'admin key' คือ static bearer เดิมที่ถูกแทนด้วย staff session บน `/v2/admin` ถ้อยคำเดิมคงไว้เป็นวงเล็บเพื่อให้ตามย้อนกลับได้ AC-027-01 ระบุ 503 เมื่อระบบยืนยันตัวตนพนักงานยังไม่ได้ตั้งค่า, 401 เมื่อไม่มีหรือไม่ถูกต้อง, 403 เมื่อไม่มี StaffRole ที่มีสิทธิ์ และ `/v1/admin` static bearer ใช้ไม่ได้ ส่วน AC-027-02..04 เพิ่มเงื่อนไขว่าผู้เรียกต้องเป็นผู้ที่มีสิทธิ์ตาม BR-027-01 ส่วนชื่อบทบาทที่ให้สิทธิ์ License ปล่อยให้ DES-004/DES-012 เป็นเจ้าของ ไม่นับเป็นมติธุรกิจ",
+      "remaining": "รายชื่อ staff_admin ตั้งต้นยังรอข้อมูลจากคนตาม decisions-025 ข้อ 'ยังรอ' ส่วนรหัส error 403 ของ StaffRole ในโค้ด (เช่น STAFF_ROLE_REQUIRED) ยังไม่พบใน DES-004 ที่อ่าน ให้ arch ยืนยันหรือเติมใน DES ส่วนคอลัมน์ expected ของ TP001-007 ให้ inspect ตรวจเทียบกับ BR-027-01 ใหม่"
+    },
+    {
+      "gap": "GAP-05",
+      "basis": [
+        "plan/BA-003.md: output คือ hardware acceptance pack; Acceptance ต้องระบุรุ่น/firmware/calibration/stop/disconnect/ผู้รับรอง/สิทธิ์ทดสอบ และห้ามสร้าง AC เอง",
+        "OQ-008 และ OQ-011 ยังเป็น PARTIAL ตาม index; decisions-019 กำหนด Windows 11 25H2 x64 กับ macOS 15+ Intel/Apple Silicon",
+        "tp-001.json GAP-05: ไม่มีรุ่นหุ่น/firmware/calibration/เกณฑ์ stop latency/ผู้รับรอง จึงไม่มี pass threshold ฝั่งกายภาพ"
+      ],
+      "resolution": "ไม่ถามคนเพื่อให้เดาเกณฑ์ และไม่เขียนเกณฑ์เองใน REQ ให้ BA-003 (ba) เตรียม hardware acceptance pack เป็นตาราง criterion/AC → วิธีตรวจ → expected/actual → evidence ครอบ AC-014-03, 019-03, 021-01, 021-03, 024-01, 024-02, 031-05, 032-02 พร้อมช่องให้คนกรอก: รุ่นหุ่น/firmware, calibration, platform matrix (Win11 25H2 / macOS Intel / Apple Silicon), เกณฑ์ stop latency, unplug, partial download, emergency-stop, ผู้รับรอง และสิทธิ์สั่งหุ่น ค่าตัวเลขที่ BA เสนอต้องติด (สมมติฐาน — ยังไม่ยืนยัน) และรอคนยืนยัน ส่วน polling/debounce ของ discovery (GAP-08) เป็นงาน SA-003 ของ arch",
+      "remaining": "ยังไม่มี artifact รอบนี้ รอ BA-003 และ SA-003 รวมถึงคนยืนยันรุ่น เกณฑ์ และคำสั่งอนุญาตทดสอบหุ่นก่อน QA-005/006/007 ที่ยังบล็อกตามเงื่อนไขนี้ ไม่ถือว่าทำ hardware เสร็จ และ case PF-HW ยังเป็นการเตรียมขั้นตอนอย่างเดียว"
+    },
+    {
+      "gap": "GAP-09",
+      "basis": [
+        "plan/BA-002.md: output คือ inventory/rubric decision pack; Acceptance ต้องมี inventory สามโหมดพร้อมที่มา, criteria/ดาว/scope และคู่ผ่าน-ไม่ผ่านให้คนยืนยัน",
+        "plan/BA-005.md และ BA-006.md: เป็นเนื้อหา Block/Code และ Arm/rubric ที่ depends BA-002 และต้องผ่าน gate G-LEARN",
+        "OQ-009 ยังเป็น PARTIAL; tp-001.json GAP-09 ระบุว่ายังไม่มี signed content inventory และผู้อนุมัติ revision"
+      ],
+      "resolution": "ไม่ถามคนให้เดาเนื้อหา และไม่เขียน criteria ลง REQ-037/038/044 ให้ BA-002 (ba) เตรียม inventory สามโหมดพร้อมที่มา, criteria/ดาว/scope, ตารางคู่ผ่าน-ไม่ผ่านต่อภารกิจ และช่องผู้อนุมัติแต่ละ revision เพื่อให้คนยืนยัน หลังจากนั้นจึงทำ BA-005 (Block/Code) และ BA-006 (Arm/rubric รวมที่มา calibration และ safety) ตามลำดับและผ่าน G-LEARN",
+      "remaining": "ยังไม่มี artifact รอบนี้ รอ BA-002 จนครบ แล้วรอคนยืนยัน criteria และผู้อนุมัติ revision ตอนนี้ cases ของ AC-037-05/06, AC-038-01, AC-044-03 ใช้ synthetic fixture ติดป้าย test-only ได้เท่านั้น ใช้เป็นการรับรองเนื้อหาไม่ได้ ไม่ถือว่า inventory/UX เสร็จ"
+    },
+    {
+      "gap": "GAP-03/04/06/07/08",
+      "basis": [
+        "tp-001.json ระบุ owner เป็น arch ทั้งห้ารายการ",
+        "GAP-03 เกี่ยวกับ DES-002/003/007 ที่ยังใช้ version แทน ETag(UpdateDate) ตาม decisions-030",
+        "GAP-04 เกี่ยวกับสัญญา Guest/ถังขยะ/import/history ใน DES-003",
+        "GAP-06 เกี่ยวกับนิยามรายชื่อที่ได้รับมอบหมาย",
+        "GAP-07 เกี่ยวกับ workflow อัปเดต ซึ่งต้องรอ SA-001 disposition ก่อนว่าจะเพิ่มหรือตัด",
+        "GAP-08 เกี่ยวกับความถี่ discovery"
+      ],
+      "resolution": "ไม่แก้ในรอบนี้ เพราะเป็นของ arch และไม่ข้ามเจ้าของ",
+      "remaining": "GAP-07: ถ้า SA-001 และผู้ใช้ตัดสินให้คง workflow Prepare/InstallPreparedUpdate จึงจะส่งกลับ spec เพื่อเพิ่ม AC ซึ่งเป็นการเปลี่ยนจำนวน AC ต้องผ่านผู้ใช้ตามนโยบาย ณ ตอนนั้น รอบนี้ไม่เพิ่ม AC"
+    }
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/requirement/req-025.md",
+      "old": "บรรทัด 35–63 บันทึก/เปิด schema 1 และจำกัด source ที่โหลด 16384 ตัวอักษร",
+      "new": "บรรทัด 35–63 บันทึก/เปิด schema 1 และจำกัด source ที่โหลด 16384 ตัวอักษร (บรรทัด 56 ใช้ `value.source.length` ของ JavaScript จึงนับเป็น UTF-16 code unit ไม่ใช่ UTF-8 bytes)"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-025.md",
+      "old": "การโหลดฝั่ง UI ตรวจ 16384 ตัวอักษรแยกต่างหาก",
+      "new": "การโหลดฝั่ง UI ตรวจ 16384 ตัวอักษร (UTF-16 code unit ตาม `String.length`) แยกต่างหาก — สองจุดตรวจใช้หน่วยต่างกันตามที่ source เป็นจริง ยังไม่มีมติผู้ใช้ให้รวมเป็นหน่วยเดียวหรือเปลี่ยนหน่วย; ข้อความหลายไบต์ (เช่น ไทย 1 ตัวอักษร = 3 UTF-8 bytes) อาจผ่านการโหลดแต่ถูกปฏิเสธตอนรันเมื่อเกิน 16384 bytes"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-025.md",
+      "old": "source ยาวเกิน 16384 ตัวอักษร แสดงข้อผิดพลาด",
+      "new": "source ยาวเกิน 16384 ตัวอักษร (หน่วยตาม BR-025-03) แสดงข้อผิดพลาด; เพดาน bytes ตอนรันอยู่ใน BR-025-03 ไม่ใช่เกณฑ์ของข้อนี้"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- `web/src/SchoolBot.Api/Program.cs:96` กัน admin ด้วย Bearer key ที่ตั้งไว้อย่างน้อย 32 ตัวอักษร",
+      "new": "- `web/src/SchoolBot.Api/Program.cs:96` กัน admin ด้วย Bearer key ที่ตั้งไว้อย่างน้อย 32 ตัวอักษร (as-built เดิมแบบ static bearer — ถูกแทนด้วย BR-027-01 ตาม decisions-025 ข้อ 6 และ decisions-026)"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- BR-027-01: ผู้เรียก admin API ต้องมี token ที่ถูกต้อง; ไม่ใช่ระบบบัญชีและสิทธิ์ผู้ใช้",
+      "new": "- BR-027-01: admin API ของ License อยู่ที่ `/v2/admin` ผู้เรียกต้องมี staff session (channel `staff_admin`) ของพนักงาน SchoolBright และมีบทบาท `SchoolBotStaffRole` ที่ active ซึ่งมีสิทธิ์จัดการ License; ปิด `/v1/admin` static bearer (admin key) ไม่ใช้เป็นทางเข้าอีก — ผู้ใช้ยืนยัน 2026-10-22 ([decisions-025](decisions-025.md) ข้อ 6, [decisions-026](decisions-026.md)); ชื่อบทบาทที่ให้สิทธิ์ License อยู่ที่ DES-004/DES-012 ไม่ใช่มติธุรกิจที่นี่ และรายชื่อ staff_admin ตั้งต้นยังรอข้อมูล"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- AC-027-01: ไม่ตั้ง admin key แล้วเรียก admin API ได้ 503; token หายหรือผิดได้ 401",
+      "new": "- AC-027-01: เมื่อระบบยืนยันตัวตนพนักงานที่ `/v2/admin` ยังไม่ถูกตั้งค่า (เดิมเรียก \"ไม่ตั้ง admin key\") เรียก admin API ได้ 503; ไม่มี staff session หรือ session/token ไม่ถูกต้อง (เดิมเรียก \"token หายหรือผิด\") ได้ 401; มี session แต่ไม่มีบทบาท StaffRole ที่ active ซึ่งมีสิทธิ์จัดการ License ได้ 403; เรียก `/v1/admin` ด้วย static bearer แล้วไม่สามารถสร้างหรือดูรายการ License ได้"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- AC-027-02: ข้อมูลถูกต้องได้ 201",
+      "new": "- AC-027-02: ผู้เรียกที่มี staff session และ StaffRole ที่มีสิทธิ์ ส่งข้อมูลถูกต้องได้ 201"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- AC-027-03: เรียกรายการหลังสร้างแล้วเห็น",
+      "new": "- AC-027-03: ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) เรียกรายการหลังสร้างแล้วเห็น"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/req-027.md",
+      "old": "- AC-027-04: สร้าง License แล้ว restart API",
+      "new": "- AC-027-04: ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) สร้าง License แล้ว restart API"
+    }
+  ],
+  "handoff": [
+    {
+      "role": "arch",
+      "task": "GAP-01: sync DES-003 บรรทัด 31 และ 89 ให้ไม่ขัดกับ REQ-025 BR-025-03/AC-025-03 ใหม่",
+      "action": "ระบุว่าจุดโหลดของ UI นับ UTF-16 code unit ตาม as-built และเพดาน 16384 UTF-8 bytes อยู่ที่ engine ตอนรัน ถ้าจะเสนอให้บันทึก/โหลดตรวจเป็น bytes ให้ติดป้ายเป็นข้อเสนอที่เปลี่ยนพฤติกรรมผู้ใช้ และส่งกลับ spec/นายช่างเพื่อขอผู้ใช้ตัดสิน ห้ามให้ DES เป็นตัวตัดสินหน่วย"
+    },
+    {
+      "role": "arch",
+      "task": "GAP-02: ตรวจ DES-002 บรรทัด 84 และ DES-004 ว่าตรงกับ AC-027-01 ใหม่",
+      "action": "ยืนยันหรือเพิ่มรหัส error ของกรณีมี session แต่ไม่มี StaffRole (ที่ไม่พบใน DES-004 ที่อ่าน) และปรับข้อความ 'ตาม AC-027-01' ให้ใช้โมเดล `/v2/admin` ด้วย staff_admin session"
+    },
+    {
+      "role": "arch",
+      "task": "GAP-03/04/06/07/08 (เดิมของ arch)",
+      "action": "ทำตาม required_evidence ใน tp-001.json: sync DES-002/003/007 ให้ตรง ETag(UpdateDate), ปรับสัญญา Guest/ถังขยะ/import/history, ระบุ authority ของรายชื่อที่ได้รับมอบหมาย, SA-001 disposition ของ workflow อัปเดต, และ polling/debounce ใน SA-003"
+    },
+    {
+      "role": "inspect",
+      "task": "หลังผู้คุม apply edits: ปรับ TP001-019 และ TP001-007 กับ traceability-001.json/tp-001.md",
+      "action": "(1) คัดลอกถ้อยคำ AC-025-03 และ AC-027-01..04 ใหม่ให้ตรง ID เดิม (2) TP001-019 คงเคส ASCII 16384/16385 ตัวอักษร และเพิ่มเคสหลายไบต์เฉพาะตามผล arch sync DES-003 ภายใต้ BR-025-03 (3) TP001-007 expected: 503 เมื่อยังไม่ตั้งค่า, 401, 403 เมื่อไม่มี StaffRole, `/v1/admin` ใช้ไม่ได้ (4) ปรับสถานะ GAP-01/02 เฉพาะหลังตรวจ ไม่ใช่ QA PASS และไม่นับ AC เพิ่ม"
+    },
+    {
+      "role": "ba",
+      "task": "BA-003 hardware acceptance pack (ตอบ GAP-05; อ้าง SA-003 สำหรับ GAP-08)",
+      "action": "จัดทำตาราง criterion/AC → วิธีตรวจ → expected/actual → evidence ครอบ AC-014-03/019-03/021-01/021-03/024-01/024-02/031-05/032-02 พร้อมช่องว่างให้คนกรอกรุ่นหุ่น/firmware/calibration/platform matrix/เกณฑ์ stop-unplug-partial download-emergency stop/ผู้รับรอง/สิทธิ์ทดสอบ ค่าที่เสนอติด (สมมติฐาน — ยังไม่ยืนยัน) ห้ามสร้างเกณฑ์เองและห้ามสั่งหุ่นจริงโดยไม่มีคำสั่งอนุญาต"
+    },
+    {
+      "role": "ba",
+      "task": "BA-002 inventory/rubric decision pack แล้ว BA-005 (Block/Code) และ BA-006 (Arm/rubric) หลังผ่าน G-LEARN (ตอบ GAP-09)",
+      "action": "BA-002 ทำ inventory สามโหมดพร้อมที่มา, criteria/ดาว/scope, ตารางคู่ผ่าน-ไม่ผ่าน และช่องผู้อนุมัติ revision ให้คนยืนยัน; ต่อด้วย BA-005 และ BA-006 ตามลำดับ synthetic fixture ของ TP ยังเป็น test-only ไม่ใช่การรับรองเนื้อหา"
+    }
+  ],
+  "questions": []
+}
