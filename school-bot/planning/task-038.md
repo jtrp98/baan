@@ -1,0 +1,18 @@
+# ใบงาน038 — sys implement logout/persistence subset ตาม DES เดิม
+
+วันที่2026-10-23 · sys/Codex t3 **write code roots only** · ผู้ใช้สั่งทำตามflow. ผล035ยืนยันส่วนBE-002+BE-006 code-firstได้จากสัญญาเดิม ไม่รันsharedSQL; 034ยังบล็อกfullLoginไม่ใช่logoutส่วนนี้. ไม่เปลี่ยนDAG/statusหรืออ้างDBA-003ปิดแล้ว
+
+Exact K=C:/src/schoolbright/knowledge/school-bot, B=C:/src/schoolbright/target/school-bot. อ่านK/index.md→K/plan/index.md→K/design/index.md แล้ว K/planning/desktop-login-wire-evidence-001.json เฉพาะprerequisites/next_work_item, K/design/des-004.md เฉพาะlogout/session/error, K/design/data-contract-rules.md, K/design/data-dictionary/table-005.md/table-006.md และ K/db/schoolbot_db.sql เฉพาะSchoolBotSession/SchoolBotAuditEvent (อ่านอย่างเดียวไม่execute). อ่านB/AGENTS.md/READMEและเอกสารAPIเดิมก่อนแก้
+
+Implement exact existing contract **POST /v2/auth/logout** ใน B/web เท่านั้น: opaque bearer→SHA256hash lookup→revokeปัจจุบัน+auditในSchoolBot DB transactionเดียว. ไม่ต้องLicense/If-Match/Idempotency/Gatewaylogin/device/introspection. missing/invalid/expired/alreadyrevoked tokenคืน204ตามDES; DB/unavailableไม่อ้างว่าสำเร็จคืน503ด้วยv2errorenvelope/request_id UUID/no-storeตามกฎกลาง. ไม่ออกsession/seed/mocksuccessหรือใช้InMemoryManagementStoreเป็นproductionpersistence. เก็บrawtokenเฉพาะmemory ไม่log/persist/echo; tokenไม่ออกในexception/ToString. ป้องกันheaderoversize/multi-Bearer/invalidencodingอย่างมีbounds ไม่นำJWTclaimsมาเป็นauthority. ใช้ identity/tenantจากrowที่lookupได้เท่านั้น ไม่รับschool/bodyidentity
+
+ใช้CleanArchitectureเดิม (Domain/Application/Infrastructure/Api), concretePostgreSQLrepositoryกับparameterizedSQLที่ตรงDDLเดิมและtransactionจริง. เพิ่มdependency DBproviderเฉพาะที่จำเป็น โดยใช้versionจากlocalexistingreference/cache/officialmetadata ไม่เดา. ไม่copycredentials/configvalues; configใช้env/secretreferenceชื่อที่บันทึกในREADMEเดิมด้วยplaceholderเท่านั้น ไม่อ่านsecrets/appsettingsค่าจริง และไม่เปิดconnectionไปDBจริง. Sessionschema/SQLไม่มีdelta; ถ้าต้องเปลี่ยนschemaหรือขาดsemanticcontractเหนือimplementationchoiceให้ส่งNEEDS_DESIGN_CHANGEพร้อมexactdelta ไม่แก้DDL/แต่งกฎแทนarch
+
+ขอบเขตไฟล์: B/web/srcตามหน้าที่ + B/web/README.md หรือREADMEเดิมที่เกี่ยว + csprojจำเป็น. อย่าแตะG/Go/UI/installer/hardware/release/gitstate/knowledgeหรือไฟล์ผู้ใช้ที่ไม่เกี่ยว. ทุกไฟล์Bเป็นpreexistinguntracked703(noHEAD) ห้ามclean/commit/reset/createbranch. ผู้คุมมี90code/docs hashesก่อนงานที่K/planning/desktop-login-files-before-001.json. ตรวจว่าผู้ใช้ไม่ได้แก้ไฟล์ร่วมก่อนเขียน ไม่ทับงานอื่น. Task037archกำลังออกcomponentdecoderอีกscope ไม่ต้องรอหรือแก้filecontractsของมัน
+
+Tests: sysทำbuild/existingchecksที่เกี่ยวจริง; ให้checkเป็นผู้เขียนadversarialtestsอิสระหลังงานนี้ ไม่ต้องเพิ่มtestsที่mirrorimplementation. รันจากB/web: dotnet test SchoolBot.slnx --disable-build-servers -m:1 ตามAGENTS. ถ้าprojectต้องrestoreให้ทำตามmanifest ไม่installSDK/เปลี่ยนframeworkเพื่อหลบerror; ถ้าsandbox/cacheขวางส่งexactcommand/errorให้ผู้คุมแก้ ไม่ถามผู้ใช้ก่อน. **ห้ามDBconnection/SQLexecutionแม้ใช้credentialที่พบ**, noHTTPupstreamcallsจึงไม่ต้องPostmansimulation; localin-processWebApplicationFactoryสำหรับcheckได้. ไม่รันbuildinstaller/fullverify/hardware. ไม่มีPASSหรือplanstatusจากsys
+
+คืนfencedJSON<=3500tokens {"state":"DONE|NEEDS_DESIGN_CHANGE|BLOCKED","summary":"...","files_changed":[],"behavior":"...","configuration":"names only","checks":[{"command":"...","exit_code":0,"result":"..."}],"contract_questions":[],"limitations":[],"handoff":[]}. DONE=codeพร้อมcheckเฉพาะlogoutsubset ไม่ใช่BE006/fullLogin/DBruntimeacceptance
+
+## Change Log
+- 2026-10-23 — นายช่างรับ035และdispatchlocalcode-first logoutsubsetตามDES004ที่มีแล้ว คงDBA003/G-AUTH/H5เป็นenablegates ไม่มีSQL/deploy
