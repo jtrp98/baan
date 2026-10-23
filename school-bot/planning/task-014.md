@@ -21,4 +21,6 @@ json_editsใช้replaceโดยdefaultต้องoldตรงจริง; 
 
 ## Change Log
 
+- 2026-10-23 — gm timeout1800sก่อนfinal ไม่มีverdictรับรอง; กู้prepared workproductเป็น planning/gm-recovery-001.json และpreviewในscratch ตรวจ110tasks/44REQ/180AC/DAGผ่านแต่ยังไม่apply ส่งgmยืนยัน task-015
+
 - 2026-10-23 — นายช่างส่ง gm รับผล spec 44/180 จัดแผนโครงการเดิมและgate ขณะ arch ปรับสัญญาคู่กัน

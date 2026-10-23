@@ -1,0 +1,3076 @@
+{
+  "state": "DONE",
+  "summary": "จัด exact patch แผนเดิม 74→110 งาน (แตก36งานของscopeเดิม ไม่เพิ่มfeature) 44REQ/180AC; คง8phases/17gates/74IDsและpendingทุกงาน ไม่มีcheck verdict/SQL/deploy; aliasบทบาทเดิมผ่านrole_aliases; coverage implementation+checkครบ180/DAGไม่วน; backlogไม่มีรายการใหม่; ผู้คุมบันทึกและตรวจซ้ำก่อนfinal knowledge commit",
+  "edits": [
+    {
+      "path": "knowledge/school-bot/plan/SA-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ SA-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/DBA-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ DBA-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/DBA-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ DBA-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/DBA-003.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ DBA-003 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BA-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BA-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BA-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BA-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BA-004.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BA-004 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/UX-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ UX-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/UX-004.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ UX-004 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/TP-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ TP-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/TP-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ TP-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/SEC-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ SEC-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-003.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-003 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-006.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-006 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-013.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-013 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/DBA-005.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ DBA-005 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-015.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-015 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-017.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-017 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-015.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ FE-015 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-016.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ FE-016 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-023.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ BE-023 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/SEC-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ SEC-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/PM-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ PM-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-001.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-002.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-002 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-003.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-003 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-004.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-004 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-005.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-005 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-006.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-006 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-007.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-007 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-008.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-008 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-009.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-009 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-010.md",
+      "old": "## Change Log",
+      "new": "> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ QA-010 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending\n\n## Change Log\n\n- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "Frozen ตามมติผู้ใช้: ระบบเต็ม 31 REQ / 109 AC ไม่ลดเป็น PoC/MVP ดู [ขอบเขตและ baseline](scope-001.md) เปลี่ยนเข้า/ออกได้เฉพาะคำสั่งผู้ใช้",
+      "new": "Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 และ decisions-014/015/016/019..034 ไม่เพิ่ม feature/ลดระบบเต็ม ดู [scope](scope-001.md); 74งานเดิม+36งานย่อย=110งาน คง8phases/17gates; เปลี่ยนscopeเฉพาะผู้ใช้"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "ยังไม่มีหลักฐานปิด gates ให้รายงานรายการนี้ก่อนคิว agent ทุกครั้ง: Guest/learning/robot/delivery โดย BA-001..004; physical schema/API/custody โดย SA/DBA/SEC; legacy compatibility โดย BE-001; UX โดย UX-001..004; QA/security/release โดยผู้ตรวจและเจ้าของจริง ดูผู้เตรียม ผู้ตัดสิน และหลักฐานทั้ง 17 gates ที่ [gates](gates-001.md) ผู้มีอำนาจที่ยังไม่ระบุชื่อให้ BA-004 เตรียมเสนอ ไม่แต่งชื่อหรือเซ็นแทน\n\nSA-001 ต้องเสนอ disposition ของ DES-007 เทียบ REQ-030 ก่อน freeze release/update contract; ส่วนอิสระเดินต่อได้ ไม่ถาม PK/API/DBML ซ้ำ",
+      "new": "มติ Guest/Level/ข้อสอบ/สูตร/mapping/Learner A และแบบ H4 ตอบแล้ว; ค้าง SQL/runtime, credential fixtures, H5/infra/web-principal/staff_adminตั้งต้น, signed UX, เนื้อหา/criteria, หุ่น/ส่งมอบ และ export subconditions/QA/security/release ดู [หลักฐานค้าง](evidence-002.md) ไม่ถามมติเดิมซ้ำ ทีมต้องเตรียมartifactให้ตรวจ ก่อนfreezeรับผลtask-012/013ล่าสุดที่ผู้คุมบันทึกจริง"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| P0 | ฐานและเตรียม gates | 13 | 23 |",
+      "new": "| P0 | ฐานและเตรียม gates | 15 | 27 |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| P1 | DB integration | 3 | 5 |",
+      "new": "| P1 | DB integration | 5 | 8 |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| P3 | Login/Projects | 13 | 24 |",
+      "new": "| P3 | Login/Projects | 16 | 30 |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| P5 | Learning | 13 | 25 |",
+      "new": "| P5 | Learning | 42 | 83 |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "*136 person-days",
+      "new": "*207 person-days"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "## Tasks",
+      "new": "## Tasks\n\nตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน pending ทั้งหมด; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001 | pending |",
+      "new": "| [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| [BE-015](BE-015.md) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006 | pending |",
+      "new": "| [BE-015](BE-015.md) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006, BE-027, BE-029 | pending |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| [BE-023](BE-023.md) | API deploy pack | be | P6 | BE-018, BE-017 | pending |",
+      "new": "| [BE-023](BE-023.md) | API deploy pack | be | P6 | BE-018, BE-017, BE-038, BE-039, FE-019, FE-020, FE-022, FE-024 | pending |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| [SEC-002](SEC-002.md) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023 | pending |",
+      "new": "| [SEC-002](SEC-002.md) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "| [PM-001](PM-001.md) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023 | pending |",
+      "new": "| [PM-001](PM-001.md) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n\n- 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/plan/scope-001.md",
+      "old": "มี 31 REQ / 109 AC ตาม [Requirements index](../requirement/index.md)",
+      "new": "มี 44 REQ/180 AC ตาม [Requirements index](../requirement/index.md) และ spec-review-001; ใช้มติ decisions-014/015/016/019..034 ที่ยืนยันแล้ว"
+    },
+    {
+      "path": "knowledge/school-bot/plan/scope-001.md",
+      "old": "- API ทั้งหมดรวม Login อยู่ target/school-bot/web แอปเรียก HTTPS ใช้บัญชีและ 4 DB เดิม ไม่สร้าง SchoolBotUser และไม่บังคับ Academic Login API/OIDC ตาม decisions-010/011 ไม่เพิ่ม DB ที่ห้าโดยพลการ",
+      "new": "- API อยู่ target/school-bot/web; SchoolBot DB แยกจาก4DBเดิมตาม027, 32ตาราง/450ฟิลด์; single FK+app tenant/recheck; audit int null/UpdateDateตาม028/030; ใช้บัญชีDBเดิม ไม่GRANT School/PGGradeDBตาม029\n- Guest shared/export/trash30วัน/explicit import project-historyแยก/กันซ้ำ/ตรวจใหม่ Arm pending ตาม014/015; ครูมีlocalและCloud project แต่ไม่มีCloud submission/attemptทุกทางตาม032\n- หลักสูตร Level/Activity/revision/four-eyes/Sheet draft/ข้อสอบ snapshot/ครูoverrideเวลา/ซ่อมสูงสุด/weights100% freezeต่อCourseRunใหม่/เลื่อนทั้งห้องเทอมหน้า ตาม020..025/034\n- Mapping admin/ช่องเดิม/sourceเดียว/activityหลายช่อง/กันช่องซ้ำข้ามชุด/ล็อกหลังส่ง; export earned/max*targetMax decimal half-up, missing skipคงเดิมแยกจริง0 ตาม032..034; export runtime subconditionsยังไม่ผ่าน\n- Admin Next.js ในschool-bot/web; เว็บครู/adminโรงเรียนในweb-system/school-bot; Desktopเรียน/ทดลองตาม022/023/031; pathย่อย/envต้องมีartifactตรวจ"
+    },
+    {
+      "path": "knowledge/school-bot/plan/scope-001.md",
+      "old": "136 person-days เป็นสมมติฐาน",
+      "new": "207 person-days/110งาน (74เดิม+36งานย่อย) เป็นสมมติฐาน"
+    },
+    {
+      "path": "knowledge/school-bot/plan/scope-001.md",
+      "old": "## Change Log",
+      "new": "Owner เดิมเป็น alias (รวม Handoff): sa→arch, ba→spec, be→sys, fe→front, dba→vault, tp→inspect, qa→check, sec→jpo, ux→int, pm→gm; ใช้ role_aliases ใน JSON ไม่ renumber\n\n## Change Log\n- 2026-10-23 — Rev2: reconcile44/180; แตก36งานscopeเดิม; ดู evidence-002/queue-002; pendingเดิม ไม่ใช่released"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-CORE | SA-001, DBA-002, BE-001, SEC-001 | เจ้าของ schema/API/security และผู้รัน test DB | core schema/API v2/host gating/custody review; test SQL/rollback/catalog/transaction receipts ก่อน DBA-003 และสาย DB/License ไม่รัน shared จาก gate นี้ |",
+      "new": "| G-CORE | arch/vault/sys/jpo | เจ้าของ schema/API/security และผู้รัน test DB | มติ/สิ่งค้างเฉพาะ G-CORE ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-AUTH | BE-001, SA | เจ้าของระบบเดิม/ผู้ตรวจ compatibility | source:line และ sanitized credential/profile/role/tenant fixtures ก่อน BE-006 ไม่ให้ธุรกิจเดา technical facts |",
+      "new": "| G-AUTH | sys/arch | เจ้าของระบบเดิม/ผู้ตรวจ compatibility | มติ/สิ่งค้างเฉพาะ G-AUTH ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-GUEST | BA-001, SA-001 | เจ้าของผลิตภัณฑ์/ผู้แทนผู้ใช้ | shared OS account/recovery/retention/import/history และ document v2/copy-only migration ที่ตัดสินจริง ก่อน UX-002/DBA-004/BE-009/SA-002 |",
+      "new": "| G-GUEST | spec/arch | เจ้าของผลิตภัณฑ์/ผู้แทนผู้ใช้ | มติ/สิ่งค้างเฉพาะ G-GUEST ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-LEARN | BA-002 | เจ้าของการเรียนรู้/ผลิตภัณฑ์ | inventory/criteria/rubric/ดาว/scope/คู่ผ่าน-ไม่ผ่าน ก่อน SA-002/UX-004/BA-005/006 |",
+      "new": "| G-LEARN | spec | เจ้าของการเรียนรู้/ผลิตภัณฑ์ | มติ/สิ่งค้างเฉพาะ G-LEARN ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-DELIVERY | BA-004, TP | เจ้าของส่งมอบ/signing/ผู้ตรวจรับ | min OS/network/performance/วิธีวัด/ช่องทางแจก/เครื่องแยก และสิทธิ์ installer tests ก่อน packaging/QA ที่พึ่งพา |",
+      "new": "| G-DELIVERY | spec/inspect | เจ้าของส่งมอบ/signing/ผู้ตรวจรับ | มติ/สิ่งค้างเฉพาะ G-DELIVERY ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-UX-LEARN | UX-004 | ผู้มีอำนาจ UX | หลัง G-LEARN sign-off Lessons/ผลจริง/Arm pending/error/teacher scope ก่อน FE-013 |",
+      "new": "| G-UX-LEARN | int (UX-004..007) | ผู้มีอำนาจ UX | มติ/สิ่งค้างเฉพาะ G-UX-LEARN ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-LEARN-DB | SA-002, DBA-005 | เจ้าของ schema และผู้รัน test DB | หลัง G-GUEST/G-LEARN review version/learner/reviewer/history/fallback; SQL/rollback/catalog receipts ที่ DBA ตรวจ ก่อน BE-015 |",
+      "new": "| G-LEARN-DB | arch/vault | เจ้าของ schema และผู้รัน test DB | มติ/สิ่งค้างเฉพาะ G-LEARN-DB ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-QA | QA-001..010, TP | ผู้รับรอง hardware/install/performance และผู้ตรวจรับ | verdict/evidence 109 AC แยกประเภทและ RC hashes; Critical/ตกครั้งสามส่งคนตัดสิน ก่อน release |",
+      "new": "| G-QA | check/inspect | ผู้รับรอง hardware/install/performance และผู้ตรวจรับ | มติ/สิ่งค้างเฉพาะ G-QA ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "| G-RELEASE | PM-001 | เจ้าของ release/shared environment/ผู้ตรวจรับ | หลัง G-SEC/G-QA อนุมัติ RC/environment/SQL/backup/rollback/deploy/publish อย่างเจาะจง ก่อน PM-002 ประสานคนรัน |",
+      "new": "| G-RELEASE | gm | เจ้าของ release/shared environment/ผู้ตรวจรับ | มติ/สิ่งค้างเฉพาะ G-RELEASE ตาม [evidence-002](evidence-002.md); ไม่มีหลักฐานปิด gate ในรอบนี้ |"
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "## Change Log",
+      "new": "ใช้ [evidence-002](evidence-002.md) Rev2 แยกมติที่ยืนยันแล้วจากหลักฐานค้าง; export G-PARITY/COEXIST/TARGET/AUTHZ/DB เป็น preconditions ย่อยใต้ G-LEARN-DB เฉพาะงานเขียนเกรด คง17gateIDs\n\n## Change Log\n\n- 2026-10-23 — Rev2: นโยบายตอบแล้วไม่ปิด SQL/UX/QA/security/release; ไม่ถามOQ014/016/Learner Aซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "9. TP-001 — 109-AC evidence matrix",
+      "new": "9. TP-001 — 180-AC evidence matrix (inspect)"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "4. BA-001 — Guest decision pack",
+      "new": "4. BA-001 — สรุปมติ Guest ที่ตอบแล้วส่ง contract (spec)"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "## First wave",
+      "new": "## First wave\n\nRev2 ใช้ [queue-002](queue-002.md) และrole_aliasesเป็นคิวปัจจุบันเมื่อข้อความเดิมขัดกัน; runนี้เฉพาะ evidence preparation ไม่ dispatch implementation/SQL/deploy"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "136 person-days และแต่ละ task 1–2 วันเป็นสมมติฐาน ไม่ใช่ deadline ไม่รวมรอคน/เครื่อง/credentials ถ้า inventory หรือ matrix เกินขนาดให้ PM แตกงานก่อนจ่ายโดยไม่ renumber/ลด scope การรับครั้งนี้ไม่เพิ่ม task",
+      "new": "207 person-days/110งานเป็นสมมติฐาน — ยังไม่ยืนยัน ไม่ใช่deadline; แตก36งานscopeเดิมเพื่อคุม1–2วัน ไม่ลดscope/renumber ไม่เพิ่มphase"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "ตรวจ static แล้ว 74 IDs ไม่ซ้ำ, 8 phases, 17 gates, REQ/AC associations ครบ 31/109 และ dependency ไม่มี cycle หลัง overrides First wave ยัง 12 งานพร้อมเตรียม ไม่มี SchoolBot build/test/QA/UI/hardware/SQL/release จากการตรวจแผนนี้",
+      "new": "Rev2:110 IDs/8phases/17gates, coverage180ACมีimplementationและcheck owner, DAGไม่วน/pendingทั้งหมด; staticแผนไม่ใช่ผลSchoolBot QA/SQL/implementation/release"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n\n- 2026-10-23 — Rev2: reconcile44/180และคิวqueue-002; ไม่ถามนโยบายเดิมซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "ทุก role ส่ง นายช่าง เท่านั้น ผู้คุมเลือกผู้รับจากงานที่ depends_on task นั้นพร้อมตรวจ gates ไม่ให้ role เรียกต่อกันเอง\n\n| กลุ่มผู้ส่ง | ผู้รับถัดไปและหลักฐาน |\n|---|---|\n| BA-001..004 | มนุษย์ตัดสินผ่านผู้คุม แล้ว SA/UX/DBA/TP ตามสาย; decision pack ต้องมีทางเลือก ผลกระทบ และผู้ตอบ |\n| BA-005/006 | BE-015/016/017 และ FE-013 ผ่านผู้คุม; ส่ง approved inventory/criteria/rubric/คู่ผ่าน-ไม่ผ่าน |\n| SA | DBA/SEC/BE และเจ้าของ contract ผ่านผู้คุม; ส่ง revision, consumer impact และข้อรอคน |\n| DBA | ผู้มีอำนาจ schema/ผู้รัน SQL และ BE ผ่านผู้คุม; ส่ง SQL/rollback หรือผลตรวจ human evidence ไม่รันเอง |\n| UX | มนุษย์ UX sign-off แล้ว FE ผ่านผู้คุม; ส่ง artifact revision และ flow/failure coverage |\n| TP | QA และผู้ทำ fixture ตาม dependencies ผ่านผู้คุม; ส่ง AC/platform/store/mode matrix และวิธีพิสูจน์ |\n| BE/FE | ผู้ทำ consumer ถัดไปและ QA ตาม task DAG ผ่านผู้คุม; ส่ง artifact/source changes/checks/ข้อจำกัด |\n| QA | นายช่าง รับ verdict บันทึก index แล้วส่งผู้แก้หรือ PM; ห้าม PM ลง verified/blocked แทน |\n| SEC | ผู้แก้/มนุษย์รับความเสี่ยง/PM ผ่านผู้คุม; ส่ง findings, severity, RC hashes และ retest |\n| PM-001 | เจ้าของ release/shared environment/ผู้ตรวจรับผ่านผู้คุม; ส่ง full-scope evidence pack |\n| PM-002 | ผู้คุม/ผู้ใช้รับ receipts และ handover จริง; ไม่มีการ dispatch deployment จากบทบาท PM เอง |",
+      "new": "ใช้ [routing ปัจจุบัน](queue-002.md) Rev2; ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases"
+    }
+  ],
+  "new_files": [
+    {
+      "path": "knowledge/school-bot/plan/BE-024.md",
+      "content": "# BE-024\n## Goal\nทำ Guest export/ถังขยะ 30 วัน\n## References\n[tasks-001.json](tasks-001.json): BE-024\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-025.md",
+      "content": "# BE-025\n## Goal\nทำ explicit project import กันซ้ำ\n## References\n[tasks-001.json](tasks-001.json): BE-025\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-026.md",
+      "content": "# BE-026\n## Goal\nทำ Guest local history และตรวจใหม่\n## References\n[tasks-001.json](tasks-001.json): BE-026\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-027.md",
+      "content": "# BE-027\n## Goal\nทำหลักสูตรกลาง revision/publish\n## References\n[tasks-001.json](tasks-001.json): BE-027\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-028.md",
+      "content": "# BE-028\n## Goal\nทำ Course Plan Sheet importer\n## References\n[tasks-001.json](tasks-001.json): BE-028\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-029.md",
+      "content": "# BE-029\n## Goal\nทำ CourseRun/Level/Activity รายห้อง\n## References\n[tasks-001.json](tasks-001.json): BE-029\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-030.md",
+      "content": "# BE-030\n## Goal\nทำคลังข้อสอบ revision/policy ส่วนกลาง\n## References\n[tasks-001.json](tasks-001.json): BE-030\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-031.md",
+      "content": "# BE-031\n## Goal\nทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ\n## References\n[tasks-001.json](tasks-001.json): BE-031\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-032.md",
+      "content": "# BE-032\n## Goal\nทำ teacher override และซ่อมรายคน\n## References\n[tasks-001.json](tasks-001.json): BE-032\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-033.md",
+      "content": "# BE-033\n## Goal\nทำ ScoringPolicy snapshot/สูตรรวม\n## References\n[tasks-001.json](tasks-001.json): BE-033\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-034.md",
+      "content": "# BE-034\n## Goal\nทำเสนอ/ยืนยันเลื่อน Level ทั้งห้อง\n## References\n[tasks-001.json](tasks-001.json): BE-034\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-035.md",
+      "content": "# BE-035\n## Goal\nทำ GradeSlot/ScoreMapping ช่องเดิม\n## References\n[tasks-001.json](tasks-001.json): BE-035\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-036.md",
+      "content": "# BE-036\n## Goal\nทำ preview snapshot/แปลงคะแนน\n## References\n[tasks-001.json](tasks-001.json): BE-036\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-037.md",
+      "content": "# BE-037\n## Goal\nทำ grade writer/ชน/CAS/receipt\n## References\n[tasks-001.json](tasks-001.json): BE-037\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-038.md",
+      "content": "# BE-038\n## Goal\nทำ export outbox/authz/replay/recovery\n## References\n[tasks-001.json](tasks-001.json): BE-038\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-039.md",
+      "content": "# BE-039\n## Goal\nทำ web-principal/BFF/session และ staff bootstrap\n## References\n[tasks-001.json](tasks-001.json): BE-039\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-017.md",
+      "content": "# FE-017\n## Goal\nเชื่อม Guest export/ถังขยะ\n## References\n[tasks-001.json](tasks-001.json): FE-017\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-018.md",
+      "content": "# FE-018\n## Goal\nเชื่อมเลือกนำเข้า project/history\n## References\n[tasks-001.json](tasks-001.json): FE-018\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-019.md",
+      "content": "# FE-019\n## Goal\nเชื่อม admin หลักสูตร/revision/นำเข้า\n## References\n[tasks-001.json](tasks-001.json): FE-019\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-020.md",
+      "content": "# FE-020\n## Goal\nเชื่อม admin คลังข้อสอบ/policy\n## References\n[tasks-001.json](tasks-001.json): FE-020\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-021.md",
+      "content": "# FE-021\n## Goal\nเชื่อมข้อสอบ Desktop/ผล attempt\n## References\n[tasks-001.json](tasks-001.json): FE-021\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-022.md",
+      "content": "# FE-022\n## Goal\nเชื่อมเว็บครู CourseRun/policy/เลื่อน Level\n## References\n[tasks-001.json](tasks-001.json): FE-022\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-023.md",
+      "content": "# FE-023\n## Goal\nเชื่อมเว็บ admin โรงเรียน mapping\n## References\n[tasks-001.json](tasks-001.json): FE-023\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/FE-024.md",
+      "content": "# FE-024\n## Goal\nเชื่อมเว็บครู preview/ชน/export status\n## References\n[tasks-001.json](tasks-001.json): FE-024\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-011.md",
+      "content": "# QA-011\n## Goal\nตรวจ Guest recovery/import/history\n## References\n[tasks-001.json](tasks-001.json): QA-011\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-012.md",
+      "content": "# QA-012\n## Goal\nตรวจ curriculum/revision/Sheet\n## References\n[tasks-001.json](tasks-001.json): QA-012\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-013.md",
+      "content": "# QA-013\n## Goal\nตรวจข้อสอบ/policy/ซ่อม\n## References\n[tasks-001.json](tasks-001.json): QA-013\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-014.md",
+      "content": "# QA-014\n## Goal\nตรวจสูตรรวมและเลื่อน Level\n## References\n[tasks-001.json](tasks-001.json): QA-014\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-015.md",
+      "content": "# QA-015\n## Goal\nตรวจ mapping/preview/คะแนนชน\n## References\n[tasks-001.json](tasks-001.json): QA-015\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/QA-016.md",
+      "content": "# QA-016\n## Goal\nตรวจ export authz/outbox/receipt recovery\n## References\n[tasks-001.json](tasks-001.json): QA-016\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/UX-005.md",
+      "content": "# UX-005\n## Goal\nเตรียม UX admin หลักสูตร/คลังข้อสอบ\n## References\n[tasks-001.json](tasks-001.json): UX-005\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/UX-006.md",
+      "content": "# UX-006\n## Goal\nเตรียม UX mapping/preview/ชน/export\n## References\n[tasks-001.json](tasks-001.json): UX-006\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/UX-007.md",
+      "content": "# UX-007\n## Goal\nเตรียม UX attempt/นโยบาย/เลื่อน Level\n## References\n[tasks-001.json](tasks-001.json): UX-007\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/SA-004.md",
+      "content": "# SA-004\n## Goal\nเตรียม export contract และ proof pack\n## References\n[tasks-001.json](tasks-001.json): SA-004\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/TP-003.md",
+      "content": "# TP-003\n## Goal\nเตรียม grade parity/coexist/crash fixtures\n## References\n[tasks-001.json](tasks-001.json): TP-003\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/DBA-007.md",
+      "content": "# DBA-007\n## Goal\nเตรียม cross-DB/export runtime evidence pack\n## References\n[tasks-001.json](tasks-001.json): DBA-007\n## Scope\nใช้ acceptance/req_ids/des_refs ของ JSON\n## Out of Scope\nเพิ่ม feature/รัน SQL/deploy\n## Expected Output\nใช้ outputs ของ JSON\n## Acceptance\nครบ ac_ids พร้อม evidence ให้ check ตรวจ\n## Dependencies\nใช้ depends_on/gate_ids/preconditions ของ JSON\n## Handoff\nส่งผู้คุมตาม dispatch-001\n## Change Log\n- 2026-10-23 — Rev2: แตก scope เดิมตาม spec-review-001; pending\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/extension/index.md",
+      "content": "# SchoolBot — Index งานย่อย Rev2\n\nเป็นส่วนต่อของ [plan/index](../index.md); คง pending ทุกงาน ไม่มี check verdict; แตก scope ที่ยืนยันแล้วเพื่อคุม1–2วัน ไม่เพิ่มfeature/phase; dependencies/gate preconditions ฉบับเต็มใช้ [JSON](../tasks-001.json)\n\n| Task | Name | Owner | Phase | Depends | Status |\n|---|---|---|---|---|---|\n| [BE-024](../BE-024.md) | ทำ Guest export/ถังขยะ 30 วัน | sys | P3 | BE-009 | pending |\n| [BE-025](../BE-025.md) | ทำ explicit project import กันซ้ำ | sys | P3 | BE-008, BE-009 | pending |\n| [BE-026](../BE-026.md) | ทำ Guest local history และตรวจใหม่ | sys | P5 | BE-025, BE-016, BE-017 | pending |\n| [BE-027](../BE-027.md) | ทำหลักสูตรกลาง revision/publish | sys | P5 | BE-002, DBA-005, BE-039 | pending |\n| [BE-028](../BE-028.md) | ทำ Course Plan Sheet importer | sys | P5 | BE-027 | pending |\n| [BE-029](../BE-029.md) | ทำ CourseRun/Level/Activity รายห้อง | sys | P5 | BE-027, BE-006 | pending |\n| [BE-030](../BE-030.md) | ทำคลังข้อสอบ revision/policy ส่วนกลาง | sys | P5 | BE-027 | pending |\n| [BE-031](../BE-031.md) | ทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ | sys | P5 | BE-030, BE-029 | pending |\n| [BE-032](../BE-032.md) | ทำ teacher override และซ่อมรายคน | sys | P5 | BE-031 | pending |\n| [BE-033](../BE-033.md) | ทำ ScoringPolicy snapshot/สูตรรวม | sys | P5 | BE-029, BE-031, BE-016 | pending |\n| [BE-034](../BE-034.md) | ทำเสนอ/ยืนยันเลื่อน Level ทั้งห้อง | sys | P5 | BE-033, BE-017 | pending |\n| [BE-035](../BE-035.md) | ทำ GradeSlot/ScoreMapping ช่องเดิม | sys | P5 | BE-029, BE-039, DBA-007, SA-004 | pending |\n| [BE-036](../BE-036.md) | ทำ preview snapshot/แปลงคะแนน | sys | P5 | BE-035, BE-033 | pending |\n| [BE-037](../BE-037.md) | ทำ grade writer/ชน/CAS/receipt | sys | P5 | BE-036, SA-004, DBA-007, TP-003 | pending |\n| [BE-038](../BE-038.md) | ทำ export outbox/authz/replay/recovery | sys | P5 | BE-037, BE-032 | pending |\n| [BE-039](../BE-039.md) | ทำ web-principal/BFF/session และ staff bootstrap | sys | P0 | BE-001, SA-001, SEC-001 | pending |\n| [FE-017](../FE-017.md) | เชื่อม Guest export/ถังขยะ | front | P3 | FE-003, BE-024, UX-002 | pending |\n| [FE-018](../FE-018.md) | เชื่อมเลือกนำเข้า project/history | front | P5 | FE-017, BE-025, BE-026, UX-002, UX-004 | pending |\n| [FE-019](../FE-019.md) | เชื่อม admin หลักสูตร/revision/นำเข้า | front | P5 | BE-027, BE-028, UX-005 | pending |\n| [FE-020](../FE-020.md) | เชื่อม admin คลังข้อสอบ/policy | front | P5 | BE-030, UX-005 | pending |\n| [FE-021](../FE-021.md) | เชื่อมข้อสอบ Desktop/ผล attempt | front | P5 | BE-031, FE-013, UX-007 | pending |\n| [FE-022](../FE-022.md) | เชื่อมเว็บครู CourseRun/policy/เลื่อน Level | front | P5 | BE-029, BE-032, BE-033, BE-034, UX-007 | pending |\n| [FE-023](../FE-023.md) | เชื่อมเว็บ admin โรงเรียน mapping | front | P5 | BE-035, UX-006 | pending |\n| [FE-024](../FE-024.md) | เชื่อมเว็บครู preview/ชน/export status | front | P5 | FE-023, BE-038, UX-006 | pending |\n| [QA-011](../QA-011.md) | ตรวจ Guest recovery/import/history | check | P5 | FE-018, TP-002 | pending |\n| [QA-012](../QA-012.md) | ตรวจ curriculum/revision/Sheet | check | P5 | FE-019, BE-029, TP-001 | pending |\n| [QA-013](../QA-013.md) | ตรวจข้อสอบ/policy/ซ่อม | check | P5 | FE-020, FE-021, FE-022, TP-002 | pending |\n| [QA-014](../QA-014.md) | ตรวจสูตรรวมและเลื่อน Level | check | P5 | FE-022, QA-013 | pending |\n| [QA-015](../QA-015.md) | ตรวจ mapping/preview/คะแนนชน | check | P5 | FE-024, TP-003, DBA-007 | pending |\n| [QA-016](../QA-016.md) | ตรวจ export authz/outbox/receipt recovery | check | P5 | QA-015, BE-038 | pending |\n| [UX-005](../UX-005.md) | เตรียม UX admin หลักสูตร/คลังข้อสอบ | int | P5 | BA-002, SA-002 | pending |\n| [UX-006](../UX-006.md) | เตรียม UX mapping/preview/ชน/export | int | P5 | SA-004, BA-001 | pending |\n| [UX-007](../UX-007.md) | เตรียม UX attempt/นโยบาย/เลื่อน Level | int | P5 | SA-002, BA-002 | pending |\n| [SA-004](../SA-004.md) | เตรียม export contract และ proof pack | arch | P0 | SA-001 | pending |\n| [TP-003](../TP-003.md) | เตรียม grade parity/coexist/crash fixtures | inspect | P1 | TP-001, SA-004 | pending |\n| [DBA-007](../DBA-007.md) | เตรียม cross-DB/export runtime evidence pack | vault | P1 | DBA-001, SA-004 | pending |\n\n## Change Log\n- 2026-10-23 — Rev2: เพิ่ม36งานย่อยของscopeเดิมตามspec-review-001; statusเปลี่ยนได้จากcheckผ่านผู้คุมเท่านั้น\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/evidence-002.md",
+      "content": "# SchoolBot — มติและหลักฐานค้าง Rev2\n\nวันที่2026-10-23 · refs: planning/spec-review-001.md, task-011.md, task-013.md; requirement/decisions-014/015/016/019..034.md; design/des-008..012.md; db/review-005.md\n\n## หลักฐานก่อนคิว\n\nยังไม่มีหลักฐานปิด gate/UX/SQL/QA/release ในรอบนี้ ทุก task pending. แบบ H4 ตาม025/026ได้รับอนุมัติแล้ว แต่ยังต้องตรวจผล arch task-013 และ vault task-012 ที่ผู้คุมบันทึกจริงก่อน freeze/implementation. Script review ไม่เท่ากับ runtime. ไม่ถาม OQ-014/016 หรือ Learner A ซ้ำ.\n\n| Gate | มติที่ยืนยันแล้ว | หลักฐานค้าง/ผู้เตรียม |\n|---|---|---|\n| G-CORE | 025/026 H4 แบบ; 027 placement; 028 audit; 029 DB account; 030 UpdateDate | arch SA-001/vault DBA-001/002/jpo SEC-001 รับ latest contract; มนุษย์รัน test SQL/rollback/catalog/concurrency ส่ง DBA-003 ตรวจ; ไม่อนุญาต shared migration |\n| G-AUTH | 025/026 ทางC/IsAdmin/Licenseเว็บ/no-exp risk acceptance; 032 Learner A | sys BE-001 source:line+sanitized lookup/hash/encoding/profile/role/tenant fixtures ไม่เดาcredential; BE-039เตรียมH5 route/BFF/web-principal/env/network/เจ้าของrepoและstaff_adminตั้งต้นให้คนระบุจากartifactก่อนส่วนที่พึ่งพา |\n| G-GUEST | 014/015 shared/export/trash30วัน/เลือกproject-history/เก็บต้นฉบับ/กันซ้ำ; 032 teacher ban | spec BA-001สรุปมติ; arch SA-001/002 storage/migration/provenance/dedup/failure contract; inspect fixtures; ไม่เปิดpolicyเดิมถามใหม่ |\n| G-LEARN | 015/020..025/032..034 เนื้อหาทีมร่าง/scopeครู/Level/สูตร/ข้อสอบ/ซ่อม | spec BA-002/005/006 inventory/criteria/rubricทั้งสามโหมด+คู่ผ่านไม่ผ่าน+หลักฐานผู้อนุมัติ revision ให้ผู้ใช้หรือผู้ที่ระบุพิจารณา; ยังไม่มีsigned inventory |\n| G-HW | 016ผู้ใช้ตรวจภาพรวม; 019 OS | spec BA-003+arch SA-003เสนอรุ่น/firmware/calibration/stop/disconnect/platform/testcasesให้คนกำหนดเกณฑ์และอนุญาตก่อนสั่งหุ่น |\n| G-DELIVERY | 016ผู้ตรวจภาพรวม; 019 Windows11 25H2 x64/macOS15+Intel/ARM | spec BA-004เสนอเครื่อง/signing/network/performance/วิธีวัด/ช่องทางแจก/installer casesให้คนตรวจ ไม่ถามOSซ้ำ; 300MB/5s/30FPSยังไม่ใช่SLA |\n| G-UX-ENTRY/PROJECT/LABS/LEARN | 016ผู้ใช้เป็นผู้อนุมัติ UX; 022/023/031ที่อยู่หน้าจอ | int UX-001..004ยังไม่มีsignedartifact; UX-005admin,006mapping/export,007exams/policy/promotionเพิ่มartifactในscopeเดิม; sign-offแยกconsumerก่อนfront ไม่รวมถามpermissionก่อนมีartifact |\n| G-PROJECT-DB | Guest policyตอบแล้ว | arch/vaultตรวจ project SQL/ownership/copy migration; test SQL/rollback/catalogจากคนก่อน BE-008 |\n| G-LEARN-DB | 025/026แบบ; 032ไม่เพิ่มLearnerKind; 033/034สูตร | SA-002/DBA-005 latest32ตาราง; singleFKต้องapp tenant/recheck; UpdateDate opaque ETag; ไม่มีTeacherGrantใหม่; runtimeSQL/rollback/catalogยังค้าง |\n| G-RELEASE-DB | 027..030ที่ตั้ง/บัญชี/audit/concurrency | SA-001 DES-007/REQ-030 dispositionยังต้องtraceก่อนfreezeupdate; DBA-006 SQL/rollback/runtime; jpo custody/trust |\n| G-ROBOT-CONTRACT | ไม่เท่ากับอนุญาตmotion | SA-003 payload/bounds/matching/timeout/cancel/drain-stop/compatibility artifact และคนreview |\n| G-SEC | 025ยอมรับเฉพาะno-exp token | SEC-002บนRCจริง; Critical/Importantทุกข้อแก้+retestหรือคนรับเป็นลายลักษณ์อักษร ไม่ขยายriskacceptanceเดิม |\n| G-QA | OQclosedไม่เท่ากับACผ่าน | QA-001..016/check ตามTP-001/003ครบ180AC แยกlogic/UI/SQLruntime/hardware/signedinstaller/RC hashes; Critical/ตกครั้ง3ส่งคน |\n| G-RELEASE | ไม่มีคำสั่งdeployในrunนี้ | gm PM-001รวมrunbook/RC/env/backup/rollback/ผู้รัน/ผู้ตรวจรับ หลังG-SEC/G-QAคนอนุมัติเจาะจง; PM-002เก็บreceiptsหลังเกิดจริง |\n\n## DES-009 — preconditions ย่อย ไม่เพิ่ม 17 gate IDs\n\nSA-004/TP-003/DBA-007เตรียม artifact ได้ทันทีเมื่อ dependenciesพร้อม; BE-035 mapping/BE-036 preview ไม่เขียนเกรด. BE-037/038 และ QA-015/016 ต้องมีหลักฐานครบก่อน grade write:\n- G-PARITY: fixturesกฎเดิม/derived totals/เกรดเทียบ100%; mockไม่ปิดเงื่อนไข\n- G-COEXIST: writer race/xmin CAS/lock/recheck ไม่อ้าง writerเดิมร่วมlockโดยไม่มีproof\n- G-TARGET: ScoreData JSON/identifier/detail row exactจากsanitizedfixtures ไม่เดาordinal/สร้างPgtassessment\n- G-AUTHZ: ครู/วิชา/ห้อง/เทอม/ล็อก/SubmitPeriod/overrideตรวจฝั่งserverและrecheckก่อนcommit/write\n- G-DB: คนระบุบัญชีDBเดิม/เจ้าของเกรดยอมให้ใช้/ผลtestว่าwriteกับINSERT durable receipt PgtgradeAuditLogได้ ไม่GRANT/เปลี่ยนschemaPGGradeDB\n\n## Scope งานที่ต้องคง\n\nBE-024 trash/export; BE-025 explicit importกันซ้ำ; BE-026 local history/regrade/Arm pending/teacher ban. BE-027 central revision/four-eyes;028 Sheetทุกแถวdraft Dเป็นป้าย/Oไม่ใช้/P–Xสื่อLessonเดิม;029CourseRun Level/Activity;030bank revision;031attempt snapshots/time/random;032ครูoverrideเฉพาะเวลา/ช่วงเปิดปิดและซ่อมรายคนสูงสุดไม่มีเพดาน.\nBE-033 weightsรวม100%, Quizไม่นับ0, freezeตอนเริ่มrun เปลี่ยนรอบใหม่ (79→81ตัวอย่างทดสอบ ไม่ใช่default);034เลื่อนทั้งห้องสิ้นเทอม rosterทุกคนmissing0 เฉลี่ยต้องสูงกว่าเกณฑ์ ครูยืนยันเทอมหน้า.\nBE-035หนึ่งsource100%ต่อช่อง,activityหลายช่องข้ามวิชา,ช่องเดิม/กันซ้ำข้ามชุด,immutableหลังส่งรวมretire/soft-delete/partial/pendingตามcontractล่าสุด;036earned/max*targetMax decimal half-up/missing skipคงเดิมแยกจริง0;037ชนต้องresolve/previewใหม่/CAS/owned-only merge/teacher overrideและผลพิเศษคงเดิม/receipt transactionเดียว;038outbox/replay/crash/partial/recheck/authz/auditสองฝั่ง.\n\n## Change Log\n- 2026-10-23 — Rev2: แยก approved decisions กับ evidence; ไม่ปิด gate ไม่เปลี่ยนstatus\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/queue-002.md",
+      "content": "# SchoolBot — คิว Rev2\n\nรายงาน Waiting on Human ที่ evidence-002.md ก่อนเสมอ; runนี้เอกสารเท่านั้น ไม่implement/deploy/SQL/hardware.\n\n## เริ่มเตรียมได้\n\n1. SA-001/arch รับผลtask-013ล่าสุด; BE-001/sys legacy fixtures; DBA-001/vault รับผลtask-012 parity. ไม่รอphaseทั้งก้อน ไม่รับรองผลที่ยังไม่บันทึก.\n2. TP-001/inspect จัด180AC matrix ใช้canonical owner/validation. SEC-001/jpo ทบทวนauth/channel/custody/H5 risk. BA-001/specสรุปGuestมติเดิม; BA-002/specเตรียมinventory/criteria; BA-003/004/specเสนอหุ่น/ส่งมอบให้ตรวจ.\n3. SA-004/arch หลังSA-001 → TP-003/inspectหลังTP-001 และ DBA-007/vaultหลังDBA-001 เตรียมexport proof/fixtures ไม่รันDB.\n4. UX-001/003/intเตรียมartifactได้; UX-002/004และUX-005..007ตามdependencies/G-GUEST/G-LEARNที่เกี่ยว ส่งผู้ใช้sign-offเมื่อartifactพร้อม.\n\n## คิว implementation ภายหลังอนุญาตและครบ evidence\n\nDBA-002→มนุษย์test SQL→DBA-003→BE-002; BE-039ตามG-AUTH/G-COREและH5 owner/route/env/network/staff_admin pack→BE-003→004→005→007เป็นสายDB/auth/License. ส่วนDesktop BE-006ตามdependencies/G-AUTH. ห้ามใช้policyapprovalข้ามruntimegate.\n\n| สาย | Implementation | validation |\n|---|---|---|\n| Guest | BE-024/025/026→FE-017/018 | QA-011 |\n| หลักสูตร/Sheet/Level | BE-027/028/029→FE-019 | QA-012 |\n| ข้อสอบ | BE-030/031/032→FE-020/021/022 | QA-013 |\n| สูตร/เลื่อนLevel | BE-033/034→FE-022 | QA-014 |\n| mapping/export | SA-004/TP-003/DBA-007→BE-035/036/037/038→FE-023/024 | QA-015/016 |\n\nตารางเป็นสายย่อ ใช้depends_on/gate_idsในJSONจริง. Frontทุกconsumerต้องsigned UXของตน; backendเขียนเกรดต้องexport subconditionsครบ; ไม่มีการสร้างfeatureใหม่. BE-023/SEC-002/PM-001ต้องรับงานใหม่ครบตามJSONก่อนrelease; PM-001รวมrunbookให้คนตรวจ PM-002เก็บreceiptsจริง.\n\n## Routing\n\nทุกrole→ผู้คุมเท่านั้น. arch→vault/sys/inspect/jpoตามcontract; spec→int/arch/เนื้อหาที่รอมนุษย์; vault→คนรันSQLและsysผ่านผู้คุม; int→ผู้ใช้sign-off→front; sys/front→check; check→ผู้คุมบันทึกverdict; jpo→ผู้แก้/คนรับความเสี่ยง; gm→คนอนุมัติrelease. ไม่chainrole.\nOwner alias: sa→arch,ba→spec,be→sys,fe→front,dba→vault,tp→inspect,qa→check,sec→jpo,ux→int,pm→gm. prefixIDsไม่renumber.\n\n207person-days/110งาน/แต่ละงาน1–2วันเป็นสมมติฐาน — ยังไม่ยืนยัน ไม่ใช่deadline ไม่รวมรอคน/เครื่อง; 36งานย่อยแตกscopeที่ผู้ใช้ยืนยันแล้วเพราะใส่รวมงาน2วันเดิมเกินขนาด. Reworkเกิน2รอบให้คนเลือกaccept/re-scope/drop. Non-blocking findingเข้าbacklogเท่านั้น รอบนี้ไม่มีBLใหม่.\n\n## Change Log\n- 2026-10-23 — Rev2: คิว44/180; คง8phases/17gates/pendingทั้งหมด\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/release-runbook-001.md",
+      "content": "# SchoolBot — โครง Release Runbook\n\nวันที่2026-10-23 · เจ้าของgm/PM-001 · เป็นโครงเตรียมหลักฐาน ยังไม่พร้อมใช้รันจริง ไม่มีSQL/deployapprovalจากrunนี้\n\n| ลำดับ | สิ่งที่ต้องพร้อม/ผู้เตรียม | จุดหยุดและrollback |\n|---|---|---|\n| 1 | check/jpoส่ง180AC/verdict,RC hashes,security retest/riskacceptance; gmตรวจG-QA/G-SEC | ขาดหลักฐานหยุด ไม่ประกาศreadiness |\n| 2 | vault DBA-002/004/005/006/007รวมrevision/hashของdb/schoolbot_db.sqlและschoolbot_db_rollback.sql,ผลtest/catalog/restore,backup target; sysระบุcompatibility/workerstop | ยังไม่มีhuman execution receipts; ห้ามกรอกผลสมมติ |\n| 3 | sys BE-023/039+เจ้าของinfraเตรียมroute/env/network/web-principal/secret refs,รายชื่อstaff_adminจากคน,rollout/health/rollback commandsจริง | H5/identityไม่พร้อมหยุด ไม่เปิดadminหรือexport |\n| 4 | gmรวมทุกคำสั่งจริงจากvault/sysพร้อมผู้รัน/environment/backup/rollbackpointsให้คนอนุมัติG-RELEASEเฉพาะRC | ยังไม่มีartifactครบ ห้ามขอpermissionรวม/คนต้องเห็นrunbookก่อน |\n| 5 | มนุษย์backupและหยุดwriter/workerตามแผนที่อนุมัติแล้ว จากนั้นรันSchoolBot DB SQLตามvault | catalog/constraintsไม่ตรงหยุด; ใช้rollback/restoreที่vaultตรวจพร้อมผลกระทบข้อมูล ห้ามรันdropกับข้อมูลจริงโดยเดา |\n| 6 | มนุษย์rolloutAPI/worker, gateway introspection/BFF/Next.js admin/web-systemตามcompatibility orderที่sysระบุ | health/auth/license/four-eyes/v1ปิดไม่ผ่าน rollbackapp/configตามsys; ตัดสินDBrestoreโดยคน |\n| 7 | คนยืนยันexport subconditionsครบก่อนเปิดgrade write; ไม่GRANT/เปลี่ยนschemaSchool/PGGradeDB | ปัญหาexportหยุดworker/กันwrite ตรวจdurable receipts/reconcile owned cells ไม่ล้างคะแนนครู |\n| 8 | คนpublishsignedDesktop/assetsตามRC/hashและapproveddelivery; smokeOS/hardwareตามสิทธิ์จริง | ถอนการแจก/ย้อนappตามsignedplan คงGuest/Clouddata ไม่ลบประวัติ |\n| 9 | PM-002รวบรวมdeployment/publication/SQL/smoke/ผู้ตรวจรับ receiptsที่เกิดจริง | ขาดreceiptหรือผู้ใช้ไม่ยอมรับยังไม่released |\n\nคำสั่งลำดับdeployย่อยและrollbackที่รันได้ต้องมาจากengineersก่อนปิดPM-001 ไม่แต่งคำสั่ง/ผู้รัน/วันอนุมัติแทนคน. SchoolBot DBแยก4DBlegacy; ใช้บัญชีเดิมSchool/PGGradeDB; sourceoftruthล่าสุดตามevidence-002.md/decisions-025..034. การประกอบrunbookไม่อนุญาตexecute.\n\n## Change Log\n- 2026-10-23 — ตั้งโครงrunbookตามหน้าที่gm; SQL/rollout/backup/restore/คนรันยังรอartifact\n"
+    },
+    {
+      "path": "knowledge/school-bot/plan/archive/dispatch-routing-20261021.md",
+      "content": "# Dispatch routing เดิม\n\nข้อความก่อน Rev2 เก็บเป็นประวัติ ใช้ queue-002.md สำหรับคิวปัจจุบัน\n\nทุก role ส่ง นายช่าง เท่านั้น ผู้คุมเลือกผู้รับจากงานที่ depends_on task นั้นพร้อมตรวจ gates ไม่ให้ role เรียกต่อกันเอง\n\n| กลุ่มผู้ส่ง | ผู้รับถัดไปและหลักฐาน |\n|---|---|\n| BA-001..004 | มนุษย์ตัดสินผ่านผู้คุม แล้ว SA/UX/DBA/TP ตามสาย; decision pack ต้องมีทางเลือก ผลกระทบ และผู้ตอบ |\n| BA-005/006 | BE-015/016/017 และ FE-013 ผ่านผู้คุม; ส่ง approved inventory/criteria/rubric/คู่ผ่าน-ไม่ผ่าน |\n| SA | DBA/SEC/BE และเจ้าของ contract ผ่านผู้คุม; ส่ง revision, consumer impact และข้อรอคน |\n| DBA | ผู้มีอำนาจ schema/ผู้รัน SQL และ BE ผ่านผู้คุม; ส่ง SQL/rollback หรือผลตรวจ human evidence ไม่รันเอง |\n| UX | มนุษย์ UX sign-off แล้ว FE ผ่านผู้คุม; ส่ง artifact revision และ flow/failure coverage |\n| TP | QA และผู้ทำ fixture ตาม dependencies ผ่านผู้คุม; ส่ง AC/platform/store/mode matrix และวิธีพิสูจน์ |\n| BE/FE | ผู้ทำ consumer ถัดไปและ QA ตาม task DAG ผ่านผู้คุม; ส่ง artifact/source changes/checks/ข้อจำกัด |\n| QA | นายช่าง รับ verdict บันทึก index แล้วส่งผู้แก้หรือ PM; ห้าม PM ลง verified/blocked แทน |\n| SEC | ผู้แก้/มนุษย์รับความเสี่ยง/PM ผ่านผู้คุม; ส่ง findings, severity, RC hashes และ retest |\n| PM-001 | เจ้าของ release/shared environment/ผู้ตรวจรับผ่านผู้คุม; ส่ง full-scope evidence pack |\n| PM-002 | ผู้คุม/ผู้ใช้รับ receipts และ handover จริง; ไม่มีการ dispatch deployment จากบทบาท PM เอง |\n\n## Change Log\n- 2026-10-23 — แยกประวัติจากdispatch-001.mdเพื่อคุมขนาด ไม่ลบหลักฐานเดิม\n"
+    }
+  ],
+  "json_edits": [
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/revision",
+      "old": 1,
+      "new": 2
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/work_date",
+      "old": "2026-10-21",
+      "new": "2026-10-23"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/role_aliases",
+      "new": {
+        "sa": "arch",
+        "ba": "spec",
+        "be": "sys",
+        "fe": "front",
+        "dba": "vault",
+        "tp": "inspect",
+        "qa": "check",
+        "sec": "jpo",
+        "ux": "int",
+        "pm": "gm"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/assumptions/0",
+      "old": "136 person-days เป็นสมมติฐาน ไม่ใช่ deadline; task1–2วัน ไม่รวมรอคน/อุปกรณ์/credentials",
+      "new": "207 person-days/110งานเป็นสมมติฐาน — ยังไม่ยืนยัน ไม่ใช่deadline; งาน1–2วัน ไม่รวมรอคน/เครื่อง/credentials; แตก36งานscopeเดิม ไม่เพิ่มphase/feature"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/adoption",
+      "old": "PM รับ planning/tasks-001.json revision 1 เป็น canonical plan จำนวน 74 tasks / 8 phases / 17 gates โดยรับทุก field ที่ไม่มี override ตามต้นฉบับ รวม REQ/AC associations เดิมครบ 31 REQ / 109 AC ไม่ renumber ไม่เพิ่ม task และไม่เปลี่ยน release scope ที่ผู้ใช้ยืนยัน ทุก task เริ่ม pending ทั้งใน index และ canonical task JSON; ค่า verified/blocked ต้องมาจาก QA verdict ผ่าน MYCELIUM เท่านั้น การรับแผนไม่ใช่อนุมัติ REQ ที่ยัง DRAFT หรือ DES ที่ยัง PROPOSED และไม่ใช่ implementation/release approval ข้อยกเว้นที่ยืนยันแล้วคือ logical baseline ตาม decisions-013 เท่านั้น ใช้ gates และ first_wave ในผลนี้แทนรายการระดับเดียวกันของข้อเสนอ ส่วน task_overrides ใช้ shallow merge โดยรักษา fields อื่นครบ ผลนี้เป็นเนื้อหาที่ PM ส่งให้บันทึกเชิงกล ยังไม่ได้เขียนไฟล์จริงในบทบาท read-only ให้สร้าง plan/tasks-001.json จาก source พร้อม overrides และ status pending; render plan/<id>.md หนึ่งไฟล์ต่อ task ด้วยชื่อ '# {id} — {goal}' และ task_template แปดหัวข้อ โดย task_sections แทนเฉพาะหัวข้อที่ระบุ ใช้เฉพาะ placeholders และกฎ renderer ที่ผู้ใช้กำหนด ห้ามเติมคำตัดสินผลิตภัณฑ์เอง ทุกใบงานเติม Change Log ด้วยข้อความตรงตัว '2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract' ไฟล์ใน files เป็นข้อความฉบับเต็มสำหรับการสร้างครั้งแรก หากพบไฟล์เดิมระหว่างบันทึกให้หยุดตรวจ diff และ amend พร้อม Change Log แทนการ overwrite; backlog เดิมต้อง append-only",
+      "new": "Rev2 วันที่2026-10-23 reconcile แผนเดิมตาม planning/spec-review-001 และ decisions-014/015/016/019..034: 44REQ/180AC, 110tasks/8phases/17gates; คง74IDsเดิมและทุกสถานะpending ไม่มีcheck verdict; เพิ่ม36งานย่อยของscopeที่ผู้ใช้ยืนยันแล้วเพื่อคุม1–2วัน ไม่เพิ่มfeature/phase; role aliasesใช้บทบาทปัจจุบัน; แบบH4/นโยบายที่ตอบแล้วไม่ใช่runtimeSQL/UX/QA/security/release approval; task-012/013 ต้องตรวจผลล่าสุดก่อนfreeze/implement"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/change_log",
+      "new": [
+        {
+          "date": "2026-10-23",
+          "revision": 2,
+          "refs": [
+            "planning/spec-review-001.md",
+            "planning/task-011.md",
+            "planning/task-013.md",
+            "requirement/decisions-032.md",
+            "requirement/decisions-033.md",
+            "requirement/decisions-034.md"
+          ],
+          "summary": "reconcile44/180; แตก36งานในscopeเดิม; คง17gates/8phases/74IDsเดิม/pendingทั้งหมด"
+        }
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/preconditions",
+      "new": {
+        "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น",
+        "owner_resolution": "Owner/คำเรียกroleเก่าในใบงานและdispatchใช้role_aliases; IDprefixคงเดิม",
+        "release": "DONEในresponseหมายถึงpatchแผนพร้อมบันทึก ไม่ใช่released; งานทั้งหมดpendingจนcheck verdict/ผู้คุมบันทึก"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/0/acceptance",
+      "old": "คง web/HTTPS/4 DB เดิม ไม่มี SchoolBotUser; แยกสิ่งยืนยันแล้วกับข้อเสนอ; trace update check/download/install ถึง REQ-030 และ decisions-002..013; เสนอ disposition ก่อน freeze implementation contract ไม่ตัด requirement หรือเพิ่ม release scope เอง; ถ้าเป็นทางเลือกธุรกิจ/schema/breaking ให้คนตัดสินและบันทึกหลักฐาน",
+      "new": "รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/0/outputs",
+      "old": [
+        "contract review pack แยก core/projects/release",
+        "ตารางเทียบ DES-007 PrepareUpdate/InstallPreparedUpdate กับ REQ-030/AC-030-01..03 และมติจริง พร้อม disposition/ผลกระทบ/ผู้ตัดสิน"
+      ],
+      "new": [
+        "contract review pack core/projects/release/auth พร้อม revision ล่าสุด",
+        "ตาราง DES-007/REQ-030 disposition และมติ/หลักฐานค้าง"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/2/acceptance",
+      "old": "เทียบ16ตาราง; pending/cross-DB/null/default/audit ระบุชัด",
+      "new": "เทียบ baseline 32 ตาราง/450 ฟิลด์กับ SQL/rollback และ DBML ล่าสุด; placement SchoolBot DB แยก4DBเดิม; audit int null/UpdateDate/single FK+app tenant; รับผล task-012 ไม่อ้าง runtime จาก script review"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/2/ac_ids",
+      "old": [
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04"
+      ],
+      "new": [
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/3/acceptance",
+      "old": "core SQL/rollback review ได้; int4/FK/audit ครบ; ยังไม่รัน shared",
+      "new": "เตรียมชุด core จาก SQL รวม SchoolBot DB/rollback ล่าสุด ไม่สร้างไฟล์ grants School/PGGradeDB; ใช้ PK/FK int4/audit int null/UpdateDate; แยก H4 แบบที่อนุมัติแล้วกับผล SQL/rollback/catalog ยังไม่มี"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/4/ac_ids",
+      "old": [],
+      "new": [
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/4/acceptance",
+      "old": "catalog/constraints/concurrency/rollback ตรงแบบ พร้อมหลักฐานผู้รัน",
+      "new": "ตรวจ human execution/catalog/rollback/constraints/concurrency receipts ตรง SQL revision/hash/environment จริง ไม่รัน SQL; script review และ logical approval ไม่ใช่ runtime evidence"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/5/acceptance",
+      "old": "แยกcontext/tenant; restartคงข้อมูล; Clean Architecture; secrets ผ่าน config",
+      "new": "แยก SchoolBot DB จาก4DB legacy; repositories/tenant recheck ข้าม connection; restartคงข้อมูล; UpdateDate opaque ETag/If-Match; secrets ผ่านconfig ไม่บันทึกknowledge"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/6/goal",
+      "old": "เตรียมคำตัดสิน Guest",
+      "new": "สรุปนโยบาย Guest ที่ยืนยันแล้วส่ง contract"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/6/outputs",
+      "old": [
+        "Guest decision pack"
+      ],
+      "new": [
+        "decision-to-AC pack REQ-040..042"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/6/acceptance",
+      "old": "ทางเลือกและผู้ตอบ shared-machine/recovery/import/history; ไม่ตัดสินแทน",
+      "new": "ใช้ decisions-014/015/032 ไม่ถาม policy เดิม; shared space/ถังขยะ30วัน/เลือก import/history/คงต้นฉบับ/กันซ้ำ/ตรวจใหม่/employee ban; storage/migration/runtime tests ยังค้าง"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/6/req_ids",
+      "old": [
+        "REQ-011",
+        "REQ-036",
+        "REQ-039"
+      ],
+      "new": [
+        "REQ-011",
+        "REQ-036",
+        "REQ-040",
+        "REQ-041",
+        "REQ-042"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/7/acceptance",
+      "old": "inventoryสามโหมดมีที่มา; criteria/ดาว/scope พร้อมคู่ผ่าน-ไม่ผ่านให้คนยืนยัน",
+      "new": "นโยบาย/teacher scope/Level/สูตร/ข้อสอบตอบแล้วตาม015/020..025/032..034; เตรียม inventory/criteria/rubric สามโหมดและคู่ผ่าน-ไม่ผ่านให้คนตรวจ; ไม่ถาม OQ-014/016 ซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/9/acceptance",
+      "old": "min OS/signing/performance/วิธีวัด/ผู้รับรองให้คนยืนยัน ไม่ถือเป้าเดิมเป็น SLA",
+      "new": "OS ยืนยันแล้ว Windows11 25H2 x64/macOS15+ Intel/ARM; เตรียมเครื่อง/signing/performance/วิธีวัด/ผู้รับรองและ delivery artifact; ผู้ใช้ตรวจภาพรวมตาม016 ไม่ถามOS/permissionรวมก่อนมีartifact"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/11/acceptance",
+      "old": "local/cloudสามโหมด; save failure/recovery/import ตามมติ พร้อม sign-off",
+      "new": "ใช้มติ Guest ที่ตอบแล้ว; prototype save/recovery/trash30วัน/export/import/history/provenance/failureสามโหมด; sign-off artifact revision ก่อน FE ที่พึ่งพา"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/11/req_ids",
+      "old": [
+        "REQ-011",
+        "REQ-017",
+        "REQ-036"
+      ],
+      "new": [
+        "REQ-011",
+        "REQ-017",
+        "REQ-036",
+        "REQ-040",
+        "REQ-041",
+        "REQ-042"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/13/acceptance",
+      "old": "LessonsแยกLabs; pending Arm/ผลจริง/scopeตรงมติ พร้อม sign-off",
+      "new": "artifact Lessons/results/progress ใน Desktop; review/teacher progress ใน web-system/school-bot ตาม022/023/031; employee local/cloud project ไม่มีcloud result; ลงนามจริงก่อน FE; admin/exams/export แยก UX-005..007"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/14/outputs",
+      "old": [
+        "109-AC/platform matrix"
+      ],
+      "new": [
+        "180-AC matrix พร้อม implementation/validation owner"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/14/acceptance",
+      "old": "109AC มีวิธี/fixture/หลักฐาน/ผู้ตรวจ; แยก bridge/hardware/installer",
+      "new": "ครบ AC จริง180ข้อจาก44REQ; อ้าง canonical task IDs/fixture/platform/store/mode/ผู้ตรวจและ evidence; แยก script review/runtime/hardware/installer; OQ closed ไม่ทำให้ ACผ่าน"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/15/acceptance",
+      "old": "late callback/drain/transport/DB failure/lease boundary จำลองได้ ไม่สั่งหุ่น",
+      "new": "late callback/drain/transport/DB/lease3วัน; เพิ่มclock30วัน/import lost response/tenant/teacher ban; export parity/crash แยกTP-003; sanitized ไม่ใช้ข้อมูลจริง"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/16/acceptance",
+      "old": "tenant/auth/lease/replay/device/key/update trust; ระบุข้อรอคน",
+      "new": "review tenant/auth/lease/replay/device/key/update trust รวม DES-012 channel/introspection/H5/bootstrap/four-eyes/v1ปิด; decisions025 รับเฉพาะtokenไม่มีexp ไม่ปิด findingsอื่น; Critical/Important ส่งคน"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/17/depends_on",
+      "old": [
+        "BE-002",
+        "SEC-001"
+      ],
+      "new": [
+        "BE-002",
+        "SEC-001",
+        "BE-039"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/17/acceptance",
+      "old": "tests:503/401/201/invalid/1device/restart; keyครั้งเดียว; listไม่รั่ว",
+      "new": "persistent /v2/admin License ใช้ staff session/four-eyes ตาม contractล่าสุด; /v1/admin ปิดตาม025; AC027 compatibility trace โดยarch/specก่อนเริ่ม ไม่ revive static bearer; 1device/restart/keyครั้งเดียว/listไม่รั่ว"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/20/acceptance",
+      "old": "credential fixtureตรง; tenant/profile/logout/expiryถูก; LoginแยกLicense",
+      "new": "credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/29/ac_ids",
+      "old": [],
+      "new": [
+        "AC-031-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/29/req_ids",
+      "old": [
+        "REQ-014",
+        "REQ-015",
+        "REQ-016",
+        "REQ-017",
+        "REQ-018",
+        "REQ-019",
+        "REQ-020"
+      ],
+      "new": [
+        "REQ-014",
+        "REQ-015",
+        "REQ-016",
+        "REQ-017",
+        "REQ-018",
+        "REQ-019",
+        "REQ-020",
+        "REQ-031"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/44/acceptance",
+      "old": "version/learner/reviewer/tenant/history/int4/audit/rollback reviewได้",
+      "new": "review learning subset ของ32ตารางรวม curriculum/Level/question/attempt/policy/mapping/outbox/promotion; SQLรวม/rollbackเดิม; ใช้UpdateDate/singleFK+tenant; LearnerAไม่เพิ่มLearnerKind; รับtask-012/013ก่อนfreeze; exportruntimepackแยกDBA-007"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/44/req_ids",
+      "old": [
+        "REQ-033",
+        "REQ-037",
+        "REQ-038",
+        "REQ-039"
+      ],
+      "new": [
+        "REQ-033",
+        "REQ-037",
+        "REQ-038",
+        "REQ-039",
+        "REQ-043",
+        "REQ-044",
+        "REQ-045",
+        "REQ-046",
+        "REQ-047",
+        "REQ-048",
+        "REQ-049",
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/44/des_refs",
+      "old": [
+        "DES-005"
+      ],
+      "new": [
+        "DES-005",
+        "DES-008",
+        "DES-009",
+        "DES-010",
+        "DES-011",
+        "DES-012"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/45/depends_on",
+      "old": [
+        "BE-008",
+        "DBA-005",
+        "BA-005",
+        "BA-006"
+      ],
+      "new": [
+        "BE-008",
+        "DBA-005",
+        "BA-005",
+        "BA-006",
+        "BE-027",
+        "BE-029"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/45/acceptance",
+      "old": "seedเนื้อหาจริงครบinventory/version; submitผูกงาน/ผู้เรียน; เปิด/ปิดไม่ผ่าน",
+      "new": "ใช้ published inventory/revision/Activityจริง; submissionผูกนักเรียน/งาน/mode; employeeห้ามทุกcloud submission path; เปิด/ปิดไม่ผ่าน; CRUD/import/CourseRun/ข้อสอบแยกBE-027..034"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/49/ac_ids",
+      "old": [
+        "AC-038-02",
+        "AC-038-03",
+        "AC-038-04",
+        "AC-039-01",
+        "AC-039-02",
+        "AC-039-03",
+        "AC-039-04"
+      ],
+      "new": [
+        "AC-038-02",
+        "AC-038-03",
+        "AC-038-04",
+        "AC-039-01",
+        "AC-039-02",
+        "AC-039-03",
+        "AC-039-04",
+        "AC-038-05",
+        "AC-039-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/49/acceptance",
+      "old": "Arm pendingจนauthorized review; auditผู้ตรวจ/งาน; restartคง; scopeไม่ข้ามผู้เรียน",
+      "new": "Arm pendingจนauthorized review; auditผู้ตรวจ/งาน; restartคง; teacherเฉพาะรายชื่อนักเรียนที่adminกำหนด รวมกันข้ามโรงเรียนแม้ห้องเดียว/รู้ID; ใช้legacy scope ไม่มีTeacherGrantใหม่"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/52/acceptance",
+      "old": "Armไม่ผ่านเอง; authorized reviewผูกผู้ตรวจ/งาน; unauthorizedปฏิเสธ",
+      "new": "หน้า review/teacher อยู่ web-system/school-bot ไม่อยู่Desktop; Arm pendingจนauthorized review; UX-004 signedartifact ครอบคลุมเส้นทาง/ข้อผิดพลาด; ห้ามครูตรวจนอกscope"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/53/acceptance",
+      "old": "restartคงผล; teacher scope; pendingแยกผ่าน; ไม่ปนscenario/บัญชี",
+      "new": "Desktopแสดงผลนักเรียน/ครูทดลองlocalแยกกัน; teacher progress อยู่ web-system/school-bot; restartคง/scope/pendingตรงข้อมูลจริง"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/60/depends_on",
+      "old": [
+        "BE-018",
+        "BE-017"
+      ],
+      "new": [
+        "BE-018",
+        "BE-017",
+        "BE-038",
+        "BE-039",
+        "FE-019",
+        "FE-020",
+        "FE-022",
+        "FE-024"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/60/acceptance",
+      "old": "HTTPS/secrets/4DB/backup/health/restoreพร้อมreview; ยังไม่deploy shared",
+      "new": "pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/71/depends_on",
+      "old": [
+        "QA-001",
+        "QA-004",
+        "BE-022",
+        "BE-023"
+      ],
+      "new": [
+        "QA-001",
+        "QA-004",
+        "BE-022",
+        "BE-023",
+        "QA-011",
+        "QA-012",
+        "QA-013",
+        "QA-014",
+        "QA-015",
+        "QA-016"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/71/acceptance",
+      "old": "RCตรวจauth/tenant/tamper/replay/key/IPC/artifact; Critical/Importantส่งคน",
+      "new": "RCจริงตรวจauth/channel/tenant/teacherCloudban/import/four-eyes/v1ปิด/mapping/outbox/receipt/key/IPC/artifact; Critical/Importantแก้และretestหรือคนรับความเสี่ยงเป็นลายลักษณ์อักษร; ไม่ขยายriskacceptance025"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/72/depends_on",
+      "old": [
+        "QA-010",
+        "SEC-002",
+        "BE-023"
+      ],
+      "new": [
+        "QA-010",
+        "SEC-002",
+        "BE-023",
+        "QA-011",
+        "QA-012",
+        "QA-013",
+        "QA-014",
+        "QA-015",
+        "QA-016"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/72/outputs",
+      "old": [
+        "full-scope release pack"
+      ],
+      "new": [
+        "full-scope release pack 44REQ/180AC",
+        "plan/release-runbook-001.md ลำดับ SQL/deploy/rollback/คนรัน"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/72/acceptance",
+      "old": "ครบ31REQ/109AC evidence; scopeเดิม; RC/SQL/rollback/signing/hardware/คู่มือพร้อม",
+      "new": "180ACมีcheck verdict/evidenceจริง; assemble vault SQL/rollback+sys rollout+H5/identity+backup/restore/RC/hash/ผู้รัน/จุดถอยในrunbookเดียว; ค้างartifactใดห้ามประกาศreadiness; คนอนุมัติและexecuteเท่านั้น"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/61/ac_ids",
+      "old": [],
+      "new": [
+        "AC-027-01",
+        "AC-027-02",
+        "AC-027-03",
+        "AC-027-04",
+        "AC-028-01",
+        "AC-028-02",
+        "AC-028-03",
+        "AC-028-04",
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05",
+        "AC-034-01",
+        "AC-034-02",
+        "AC-034-03",
+        "AC-034-04",
+        "AC-034-05",
+        "AC-034-06",
+        "AC-035-01",
+        "AC-035-02",
+        "AC-035-03",
+        "AC-035-04",
+        "AC-035-05",
+        "AC-009-01",
+        "AC-009-02",
+        "AC-036-02",
+        "AC-036-03",
+        "AC-036-04",
+        "AC-036-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/62/ac_ids",
+      "old": [],
+      "new": [
+        "AC-010-01",
+        "AC-010-02",
+        "AC-010-03",
+        "AC-011-01",
+        "AC-011-02",
+        "AC-011-03",
+        "AC-011-04",
+        "AC-012-01",
+        "AC-012-02",
+        "AC-012-03",
+        "AC-013-01",
+        "AC-013-02",
+        "AC-013-03",
+        "AC-009-03",
+        "AC-036-01"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/63/ac_ids",
+      "old": [],
+      "new": [
+        "AC-014-01",
+        "AC-014-02",
+        "AC-014-03",
+        "AC-015-01",
+        "AC-015-02",
+        "AC-015-03",
+        "AC-016-01",
+        "AC-016-02",
+        "AC-016-03",
+        "AC-017-01",
+        "AC-017-02",
+        "AC-017-03",
+        "AC-018-01",
+        "AC-018-02",
+        "AC-018-03",
+        "AC-019-01",
+        "AC-019-02",
+        "AC-019-03",
+        "AC-020-01",
+        "AC-020-02",
+        "AC-020-03",
+        "AC-021-01",
+        "AC-021-02",
+        "AC-021-03",
+        "AC-021-04",
+        "AC-022-01",
+        "AC-022-02",
+        "AC-022-03",
+        "AC-023-01",
+        "AC-023-02",
+        "AC-023-03",
+        "AC-024-01",
+        "AC-024-02",
+        "AC-024-03",
+        "AC-025-01",
+        "AC-025-02",
+        "AC-025-03",
+        "AC-026-01",
+        "AC-026-02",
+        "AC-026-03",
+        "AC-026-04"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/64/ac_ids",
+      "old": [],
+      "new": [
+        "AC-037-01",
+        "AC-037-02",
+        "AC-037-03",
+        "AC-037-04",
+        "AC-037-05",
+        "AC-037-06",
+        "AC-038-01",
+        "AC-038-02",
+        "AC-038-03",
+        "AC-038-04",
+        "AC-038-05",
+        "AC-039-01",
+        "AC-039-02",
+        "AC-039-03",
+        "AC-039-04",
+        "AC-039-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/65/ac_ids",
+      "old": [],
+      "new": [
+        "AC-031-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/66/ac_ids",
+      "old": [],
+      "new": [
+        "AC-032-02"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/67/ac_ids",
+      "old": [],
+      "new": [
+        "AC-032-02"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/68/ac_ids",
+      "old": [],
+      "new": [
+        "AC-031-01",
+        "AC-031-02",
+        "AC-031-03",
+        "AC-031-04",
+        "AC-031-05"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/69/ac_ids",
+      "old": [],
+      "new": [
+        "AC-032-01",
+        "AC-032-02",
+        "AC-032-03"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/tasks/70/ac_ids",
+      "old": [],
+      "new": [
+        "AC-029-01",
+        "AC-029-02",
+        "AC-029-03",
+        "AC-030-01",
+        "AC-030-02",
+        "AC-030-03"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/0/description",
+      "old": "มนุษย์ทบทวน core physical schema, API v2, License host authorization และ credential custody ก่อน implementation ที่พึ่งพา",
+      "new": "แบบ H4 อนุมัติแล้ว; คง runtime SQL/security/custody evidence ก่อนส่วนที่พึ่งพา"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/0/close_evidence",
+      "old": "SA-001/DBA-002 เตรียม contract/placement/constraints/SQL/rollback โดยใช้ BE-001 และ SEC-001 ประกอบ ผู้มีอำนาจ schema/API/security ที่ต้องระบุตัวจริงบันทึกคำอนุมัติและขอบเขต breaking/compatibility/custody จากนั้นมนุษย์ที่ได้รับอนุญาตรัน SQL/rollback บน test DB และส่งผลพร้อม catalog/constraints/transaction evidence ให้ DBA ตรวจ ไม่ขออนุมัติ logical DBML หรือ PK ซ้ำ และไม่ใช้ gate นี้อนุญาต shared migration",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-CORE ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/0/approved_decisions",
+      "new": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-027",
+        "decisions-028",
+        "decisions-029",
+        "decisions-030",
+        "decisions-032"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/1/description",
+      "old": "ทบทวนหลักฐาน legacy credential/profile/role/tenant compatibility ก่อนใช้ Login จริง",
+      "new": "credential compatibility และ DES-012 channel ยังต้องพิสูจน์"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/1/close_evidence",
+      "old": "BE-001 ส่ง source:line และ sanitized fixtures ของ lookup/hash/encoding/active flags/account-profile link/role/tenant ให้ SA และเจ้าของระบบเดิมตรวจยืนยัน compatibility พร้อมผู้ตรวจและวันที่จริง ข้อเท็จจริงที่ยังขาดต้องกลับไปหาหลักฐาน source ก่อน ไม่ส่งให้ธุรกิจเดา algorithm และไม่บังคับ Academic Login API/OIDC",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-AUTH ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/1/approved_decisions",
+      "new": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-032"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/2/description",
+      "old": "มนุษย์ตัดสินรายละเอียด Guest/shared-machine/recovery/import/history และทบทวน storage migration",
+      "new": "นโยบาย Guest ตอบครบ; รอ storage/migration contract และ tests"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/2/close_evidence",
+      "old": "BA-001 เตรียมทางเลือกและผลกระทบให้เจ้าของผลิตภัณฑ์/ผู้แทนผู้ใช้ตอบเรื่องการแยกและล้างข้อมูลบน OS account ร่วม, recovery/retention, explicit import และประวัติ Guest; SA-001 เตรียม document v2/revision/copy-only migration ให้คนทบทวนก่อนเปลี่ยน contract ไม่ auto-upload ไม่สมมติผูก Guest เป็นนักเรียน และไม่ถามหลายโครงงาน Local/Cloud ซ้ำ",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-GUEST ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/2/approved_decisions",
+      "new": [
+        "decisions-014",
+        "decisions-015",
+        "decisions-032"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/3/description",
+      "old": "มนุษย์ยืนยัน inventory หลักสูตร criteria/rubric ความหมายผลเรียน และ scope ครู",
+      "new": "นโยบายเรียนรู้ตอบแล้ว; รอ inventory/criteria/rubric ที่มี artifact"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/3/close_evidence",
+      "old": "BA-002 เตรียม inventory สามโหมดพร้อมที่มา ผู้รับผิดชอบเนื้อหา/เกณฑ์ ตัวอย่างผ่าน-ไม่ผ่าน ความหมายดาว/ความคืบหน้า และขอบเขตครู ให้เจ้าของการเรียนรู้และผลิตภัณฑ์ยืนยันรายประเด็น คง Code/Block auto grade และ Arm ครูตรวจ; เกณฑ์ต้องวัดได้ด้วย evaluator ที่มีแบบรองรับ หากวัดไม่ได้ให้ SA เสนอแก้ contract ก่อน publish",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-LEARN ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/3/approved_decisions",
+      "new": [
+        "decisions-015",
+        "decisions-020",
+        "decisions-023",
+        "decisions-024",
+        "decisions-025",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/5/description",
+      "old": "มนุษย์ยืนยันเกณฑ์ส่งมอบ ทรัพยากร และอนุญาต installer tests",
+      "new": "OS และผู้ตรวจภาพรวมยืนยันแล้ว; รอ delivery artifact/signing/tests"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/5/close_evidence",
+      "old": "BA-004 เตรียม min OS/network/performance พร้อมเครื่องและวิธีวัด signing owner/identities ช่องทางแจกจ่าย ผู้ตรวจรับ และแผนทดสอบติดตั้งบนเครื่องแยก ให้ผู้มีอำนาจจริงยืนยันและอนุญาต installer test cases ไม่ถือ 300 MB/5 วินาที/30 FPS เป็น SLA ที่อนุมัติแล้ว และไม่ใช้ gate นี้อนุญาต deploy/publish shared",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-DELIVERY ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/5/approved_decisions",
+      "new": [
+        "decisions-016",
+        "decisions-019"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/7/description",
+      "old": "มนุษย์ sign-off UX หลายโครงงาน Local/Cloud",
+      "new": "รอ signed artifact Guest/projects/import/history"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/7/close_evidence",
+      "old": "หลัง G-GUEST, UX-002 ส่ง flows ของสามโหมดทั้งสอง stores รวม save failure/conflict/recovery/import ตามมติจริง ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE-003",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-UX-PROJECT ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/7/approved_decisions",
+      "new": [
+        "decisions-014",
+        "decisions-015",
+        "decisions-016"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/9/description",
+      "old": "มนุษย์ sign-off UX Lessons/teacher/progress ตาม criteria และ scope ที่ยืนยัน",
+      "new": "รอ signed artifacts แยก Desktop/admin/เว็บครู"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/9/close_evidence",
+      "old": "หลัง G-LEARN, UX-004 ส่ง flows Lessons แยก Labs ผล automatic/Arm pending/error/history และ teacher permissions ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE-013",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-UX-LEARN ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/9/approved_decisions",
+      "new": [
+        "decisions-016",
+        "decisions-022",
+        "decisions-023",
+        "decisions-025",
+        "decisions-031",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/11/description",
+      "old": "มนุษย์อนุมัติ learning physical schema และให้หลักฐาน SQL ทดสอบ",
+      "new": "แบบ learning ตอบแล้ว; คง SQL/runtime และ export subconditions"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/11/close_evidence",
+      "old": "หลัง G-GUEST/G-LEARN, SA-002/DBA-005 ส่ง version/snapshot/learner/reviewer/tenant/history/constraints/rollback และข้อเสนอ TeacherGrant เฉพาะเมื่อจำเป็น ให้ผู้มีอำนาจอนุมัติ มนุษย์รัน test SQL/rollback ส่ง catalog/transaction evidence ให้ DBA ตรวจ ไม่สร้าง fallback grant โดยถือว่าอนุมัติแล้ว",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-LEARN-DB ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/11/approved_decisions",
+      "new": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-027",
+        "decisions-028",
+        "decisions-029",
+        "decisions-030",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/15/description",
+      "old": "QA/hardware/installer/performance acceptance ครบระบบเต็ม",
+      "new": "รอ check verdict/runtime/physical/signed installer ครบ 180 AC"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/15/close_evidence",
+      "old": "QA-001..010 ส่ง verdict/evidence ครบ 109 AC ตาม TP matrix แยก automated/UI/source-built hardware/signed installer และระบุ RC hashes คนรับรอง hardware/install/performance ตามเกณฑ์จริง Critical หรือ fail ครั้งที่สามของ task เดิมต้องให้คนตัดสินก่อนเดินต่อ QA verdict เท่านั้นเป็นที่มาของ verified/blocked ผ่าน นายช่าง",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-QA ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/15/approved_decisions",
+      "new": [
+        "decisions-016",
+        "decisions-019",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/16/description",
+      "old": "มนุษย์อนุมัติ shared SQL/deploy/publish และส่งมอบระบบเต็ม",
+      "new": "รอมนุษย์อนุมัติ runbook/RC/environment แล้วจึงคนรันจริง"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "pointer": "/gates/16/close_evidence",
+      "old": "หลัง G-SEC/G-QA, PM-001 รวบรวม full-scope pack ระบุ RC hashes/environment/SQL/backup/rollback/signing/ผู้รัน/ผู้ตรวจรับ ให้เจ้าของ release และ shared environment อนุมัติอย่างเจาะจงก่อนคนรันจริง PM-002 บันทึก receipts/smoke/คำยอมรับของผู้ตรวจรับหลังเกิดจริงเท่านั้น การรับแผนหรือ verified ไม่เท่ากับ released",
+      "new": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-RELEASE ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2"
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/gates/16/approved_decisions",
+      "new": [
+        "decisions-002",
+        "decisions-016",
+        "decisions-025",
+        "decisions-026",
+        "decisions-029"
+      ]
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-024",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P3",
+        "depends_on": [
+          "BE-009"
+        ],
+        "gate_ids": [
+          "G-GUEST"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ Guest export/ถังขยะ 30 วัน",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-003 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-040"
+        ],
+        "ac_ids": [
+          "AC-040-01",
+          "AC-040-02",
+          "AC-040-03",
+          "AC-040-04",
+          "AC-040-05",
+          "AC-040-06"
+        ],
+        "des_refs": [
+          "DES-003"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-025",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P3",
+        "depends_on": [
+          "BE-008",
+          "BE-009"
+        ],
+        "gate_ids": [
+          "G-GUEST",
+          "G-PROJECT-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ explicit project import กันซ้ำ",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-004 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-041"
+        ],
+        "ac_ids": [
+          "AC-041-01",
+          "AC-041-02",
+          "AC-041-03",
+          "AC-041-04",
+          "AC-041-05"
+        ],
+        "des_refs": [
+          "DES-003",
+          "DES-004"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-026",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-025",
+          "BE-016",
+          "BE-017"
+        ],
+        "gate_ids": [
+          "G-GUEST",
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ Guest local history และตรวจใหม่",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-004/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-042",
+          "REQ-036"
+        ],
+        "ac_ids": [
+          "AC-042-01",
+          "AC-042-02",
+          "AC-042-03",
+          "AC-042-04",
+          "AC-042-05",
+          "AC-042-06",
+          "AC-036-05"
+        ],
+        "des_refs": [
+          "DES-004",
+          "DES-005"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-027",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-002",
+          "DBA-005",
+          "BE-039"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-CORE"
+        ],
+        "effort_days": 2,
+        "goal": "ทำหลักสูตรกลาง revision/publish",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-044",
+          "REQ-043",
+          "REQ-037"
+        ],
+        "ac_ids": [
+          "AC-044-01",
+          "AC-044-02",
+          "AC-044-03",
+          "AC-044-04",
+          "AC-044-05",
+          "AC-043-01",
+          "AC-037-05",
+          "AC-037-06"
+        ],
+        "des_refs": [
+          "DES-005",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-028",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-027"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ Course Plan Sheet importer",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-045"
+        ],
+        "ac_ids": [
+          "AC-045-01",
+          "AC-045-02",
+          "AC-045-03",
+          "AC-045-04"
+        ],
+        "des_refs": [
+          "DES-005"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-029",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-027",
+          "BE-006"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ CourseRun/Level/Activity รายห้อง",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-043"
+        ],
+        "ac_ids": [
+          "AC-043-02",
+          "AC-043-03",
+          "AC-043-04"
+        ],
+        "des_refs": [
+          "DES-005",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-030",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-027"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-CORE"
+        ],
+        "effort_days": 2,
+        "goal": "ทำคลังข้อสอบ revision/policy ส่วนกลาง",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046"
+        ],
+        "ac_ids": [
+          "AC-046-01",
+          "AC-046-04"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-031",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-030",
+          "BE-029"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046",
+          "REQ-036"
+        ],
+        "ac_ids": [
+          "AC-046-02",
+          "AC-046-03",
+          "AC-036-05"
+        ],
+        "des_refs": [
+          "DES-010"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-032",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-031"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ teacher override และซ่อมรายคน",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046"
+        ],
+        "ac_ids": [
+          "AC-046-05",
+          "AC-046-06"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-033",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-029",
+          "BE-031",
+          "BE-016"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ ScoringPolicy snapshot/สูตรรวม",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-047"
+        ],
+        "ac_ids": [
+          "AC-047-01",
+          "AC-047-02",
+          "AC-047-03",
+          "AC-047-04",
+          "AC-047-05"
+        ],
+        "des_refs": [
+          "DES-010"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-034",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-033",
+          "BE-017"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ทำเสนอ/ยืนยันเลื่อน Level ทั้งห้อง",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-011 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-048"
+        ],
+        "ac_ids": [
+          "AC-048-01",
+          "AC-048-02",
+          "AC-048-03",
+          "AC-048-04"
+        ],
+        "des_refs": [
+          "DES-011"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-035",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-029",
+          "BE-039",
+          "DBA-007",
+          "SA-004"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ GradeSlot/ScoreMapping ช่องเดิม",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05"
+        ],
+        "des_refs": [
+          "DES-008",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-036",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-035",
+          "BE-033"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ preview snapshot/แปลงคะแนน",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-050",
+          "REQ-051"
+        ],
+        "ac_ids": [
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-05"
+        ],
+        "des_refs": [
+          "DES-009"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-037",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-036",
+          "SA-004",
+          "DBA-007",
+          "TP-003"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ grade writer/ชน/CAS/receipt",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-051",
+          "REQ-052"
+        ],
+        "ac_ids": [
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-052-05"
+        ],
+        "des_refs": [
+          "DES-009"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-038",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P5",
+        "depends_on": [
+          "BE-037",
+          "BE-032"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ export outbox/authz/replay/recovery",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-052",
+          "REQ-051"
+        ],
+        "ac_ids": [
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05",
+          "AC-051-05"
+        ],
+        "des_refs": [
+          "DES-009",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "BE-039",
+        "owner": "sys",
+        "tier": "t3",
+        "phase": "P0",
+        "depends_on": [
+          "BE-001",
+          "SA-001",
+          "SEC-001"
+        ],
+        "gate_ids": [
+          "G-AUTH",
+          "G-CORE"
+        ],
+        "effort_days": 2,
+        "goal": "ทำ web-principal/BFF/session และ staff bootstrap",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-043"
+        ],
+        "ac_ids": [
+          "AC-043-01"
+        ],
+        "des_refs": [
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-017",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P3",
+        "depends_on": [
+          "FE-003",
+          "BE-024",
+          "UX-002"
+        ],
+        "gate_ids": [
+          "G-UX-PROJECT"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อม Guest export/ถังขยะ",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-003 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-040"
+        ],
+        "ac_ids": [
+          "AC-040-01",
+          "AC-040-02",
+          "AC-040-03",
+          "AC-040-04",
+          "AC-040-05",
+          "AC-040-06"
+        ],
+        "des_refs": [
+          "DES-003"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-018",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-017",
+          "BE-025",
+          "BE-026",
+          "UX-002",
+          "UX-004"
+        ],
+        "gate_ids": [
+          "G-UX-PROJECT",
+          "G-UX-LEARN"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อมเลือกนำเข้า project/history",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-041",
+          "REQ-042"
+        ],
+        "ac_ids": [
+          "AC-041-01",
+          "AC-041-02",
+          "AC-041-03",
+          "AC-041-04",
+          "AC-041-05",
+          "AC-042-01",
+          "AC-042-02",
+          "AC-042-03",
+          "AC-042-04",
+          "AC-042-05",
+          "AC-042-06"
+        ],
+        "des_refs": [
+          "DES-003",
+          "DES-005"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-019",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BE-027",
+          "BE-028",
+          "UX-005"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN",
+          "G-CORE"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อม admin หลักสูตร/revision/นำเข้า",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-044",
+          "REQ-045",
+          "REQ-043"
+        ],
+        "ac_ids": [
+          "AC-044-01",
+          "AC-044-02",
+          "AC-044-03",
+          "AC-044-04",
+          "AC-044-05",
+          "AC-045-01",
+          "AC-045-02",
+          "AC-045-03",
+          "AC-045-04",
+          "AC-043-01"
+        ],
+        "des_refs": [
+          "DES-005",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-020",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BE-030",
+          "UX-005"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN",
+          "G-CORE"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อม admin คลังข้อสอบ/policy",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046"
+        ],
+        "ac_ids": [
+          "AC-046-01",
+          "AC-046-04"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-021",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BE-031",
+          "FE-013",
+          "UX-007"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อมข้อสอบ Desktop/ผล attempt",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046",
+          "REQ-036"
+        ],
+        "ac_ids": [
+          "AC-046-02",
+          "AC-046-03",
+          "AC-046-04",
+          "AC-036-05"
+        ],
+        "des_refs": [
+          "DES-010"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-022",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BE-029",
+          "BE-032",
+          "BE-033",
+          "BE-034",
+          "UX-007"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อมเว็บครู CourseRun/policy/เลื่อน Level",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-047",
+          "REQ-048",
+          "REQ-046",
+          "REQ-043"
+        ],
+        "ac_ids": [
+          "AC-047-01",
+          "AC-047-02",
+          "AC-047-03",
+          "AC-047-04",
+          "AC-047-05",
+          "AC-048-01",
+          "AC-048-02",
+          "AC-048-03",
+          "AC-048-04",
+          "AC-046-05",
+          "AC-046-06",
+          "AC-043-02",
+          "AC-043-03",
+          "AC-043-04"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-011",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-023",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BE-035",
+          "UX-006"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อมเว็บ admin โรงเรียน mapping",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05"
+        ],
+        "des_refs": [
+          "DES-008",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "FE-024",
+        "owner": "front",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-023",
+          "BE-038",
+          "UX-006"
+        ],
+        "gate_ids": [
+          "G-UX-LEARN",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "เชื่อมเว็บครู preview/ชน/export status",
+        "outputs": [
+          "implementation/tests"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-050",
+          "REQ-051",
+          "REQ-052"
+        ],
+        "ac_ids": [
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-051-05",
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05"
+        ],
+        "des_refs": [
+          "DES-009",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-011",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-018",
+          "TP-002"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "ตรวจ Guest recovery/import/history",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-040",
+          "REQ-041",
+          "REQ-042",
+          "REQ-036"
+        ],
+        "ac_ids": [
+          "AC-040-01",
+          "AC-040-02",
+          "AC-040-03",
+          "AC-040-04",
+          "AC-040-05",
+          "AC-040-06",
+          "AC-041-01",
+          "AC-041-02",
+          "AC-041-03",
+          "AC-041-04",
+          "AC-041-05",
+          "AC-042-01",
+          "AC-042-02",
+          "AC-042-03",
+          "AC-042-04",
+          "AC-042-05",
+          "AC-042-06",
+          "AC-036-05"
+        ],
+        "des_refs": [
+          "DES-003",
+          "DES-005"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-012",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-019",
+          "BE-029",
+          "TP-001"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "ตรวจ curriculum/revision/Sheet",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-043",
+          "REQ-044",
+          "REQ-045",
+          "REQ-037"
+        ],
+        "ac_ids": [
+          "AC-043-01",
+          "AC-043-02",
+          "AC-043-03",
+          "AC-043-04",
+          "AC-044-01",
+          "AC-044-02",
+          "AC-044-03",
+          "AC-044-04",
+          "AC-044-05",
+          "AC-045-01",
+          "AC-045-02",
+          "AC-045-03",
+          "AC-045-04",
+          "AC-037-05",
+          "AC-037-06"
+        ],
+        "des_refs": [
+          "DES-005",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-013",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-020",
+          "FE-021",
+          "FE-022",
+          "TP-002"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "ตรวจข้อสอบ/policy/ซ่อม",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046",
+          "REQ-036"
+        ],
+        "ac_ids": [
+          "AC-046-01",
+          "AC-046-02",
+          "AC-046-03",
+          "AC-046-04",
+          "AC-046-05",
+          "AC-046-06",
+          "AC-036-05"
+        ],
+        "des_refs": [
+          "DES-010"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-014",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-022",
+          "QA-013"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "ตรวจสูตรรวมและเลื่อน Level",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-047",
+          "REQ-048"
+        ],
+        "ac_ids": [
+          "AC-047-01",
+          "AC-047-02",
+          "AC-047-03",
+          "AC-047-04",
+          "AC-047-05",
+          "AC-048-01",
+          "AC-048-02",
+          "AC-048-03",
+          "AC-048-04"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-011"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-015",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "FE-024",
+          "TP-003",
+          "DBA-007"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB"
+        ],
+        "effort_days": 2,
+        "goal": "ตรวจ mapping/preview/คะแนนชน",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049",
+          "REQ-050",
+          "REQ-051"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05",
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-051-05"
+        ],
+        "des_refs": [
+          "DES-008",
+          "DES-009"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "QA-016",
+        "owner": "check",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "QA-015",
+          "BE-038"
+        ],
+        "gate_ids": [
+          "G-LEARN-DB",
+          "G-AUTH"
+        ],
+        "effort_days": 2,
+        "goal": "ตรวจ export authz/outbox/receipt recovery",
+        "outputs": [
+          "verdict/evidence"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-052",
+          "REQ-051"
+        ],
+        "ac_ids": [
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05",
+          "AC-051-05"
+        ],
+        "des_refs": [
+          "DES-009"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "UX-005",
+        "owner": "int",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "BA-002",
+          "SA-002"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "เตรียม UX admin หลักสูตร/คลังข้อสอบ",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-044",
+          "REQ-045",
+          "REQ-043",
+          "REQ-046"
+        ],
+        "ac_ids": [
+          "AC-044-01",
+          "AC-044-02",
+          "AC-044-03",
+          "AC-044-04",
+          "AC-044-05",
+          "AC-045-01",
+          "AC-045-02",
+          "AC-045-03",
+          "AC-045-04",
+          "AC-043-01",
+          "AC-046-01",
+          "AC-046-04"
+        ],
+        "des_refs": [
+          "DES-005",
+          "DES-010",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "UX-006",
+        "owner": "int",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "SA-004",
+          "BA-001"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "เตรียม UX mapping/preview/ชน/export",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049",
+          "REQ-050",
+          "REQ-051",
+          "REQ-052"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05",
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-051-05",
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05"
+        ],
+        "des_refs": [
+          "DES-008",
+          "DES-009",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "UX-007",
+        "owner": "int",
+        "tier": "t2",
+        "phase": "P5",
+        "depends_on": [
+          "SA-002",
+          "BA-002"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "เตรียม UX attempt/นโยบาย/เลื่อน Level",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-046",
+          "REQ-047",
+          "REQ-048"
+        ],
+        "ac_ids": [
+          "AC-046-01",
+          "AC-046-02",
+          "AC-046-03",
+          "AC-046-04",
+          "AC-046-05",
+          "AC-046-06",
+          "AC-047-01",
+          "AC-047-02",
+          "AC-047-03",
+          "AC-047-04",
+          "AC-047-05",
+          "AC-048-01",
+          "AC-048-02",
+          "AC-048-03",
+          "AC-048-04"
+        ],
+        "des_refs": [
+          "DES-010",
+          "DES-011",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "SA-004",
+        "owner": "arch",
+        "tier": "t2",
+        "phase": "P0",
+        "depends_on": [
+          "SA-001"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "เตรียม export contract และ proof pack",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049",
+          "REQ-050",
+          "REQ-051",
+          "REQ-052"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05",
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-051-05",
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05"
+        ],
+        "des_refs": [
+          "DES-008",
+          "DES-009",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "TP-003",
+        "owner": "inspect",
+        "tier": "t2",
+        "phase": "P1",
+        "depends_on": [
+          "TP-001",
+          "SA-004"
+        ],
+        "gate_ids": [],
+        "effort_days": 2,
+        "goal": "เตรียม grade parity/coexist/crash fixtures",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-049",
+          "REQ-050",
+          "REQ-051",
+          "REQ-052"
+        ],
+        "ac_ids": [
+          "AC-049-01",
+          "AC-049-02",
+          "AC-049-03",
+          "AC-049-04",
+          "AC-049-05",
+          "AC-050-01",
+          "AC-050-02",
+          "AC-050-03",
+          "AC-050-04",
+          "AC-051-01",
+          "AC-051-02",
+          "AC-051-03",
+          "AC-051-04",
+          "AC-051-05",
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05"
+        ],
+        "des_refs": [
+          "DES-009"
+        ],
+        "status": "pending"
+      }
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "op": "add",
+      "pointer": "/tasks/-",
+      "new": {
+        "id": "DBA-007",
+        "owner": "vault",
+        "tier": "t2",
+        "phase": "P1",
+        "depends_on": [
+          "DBA-001",
+          "SA-004"
+        ],
+        "gate_ids": [],
+        "effort_days": 1,
+        "goal": "เตรียม cross-DB/export runtime evidence pack",
+        "outputs": [
+          "artifact/evidence pack"
+        ],
+        "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+        "req_ids": [
+          "REQ-052",
+          "REQ-033"
+        ],
+        "ac_ids": [
+          "AC-052-01",
+          "AC-052-02",
+          "AC-052-03",
+          "AC-052-04",
+          "AC-052-05",
+          "AC-033-04",
+          "AC-033-05"
+        ],
+        "des_refs": [
+          "DES-009",
+          "DES-012"
+        ],
+        "status": "pending"
+      }
+    }
+  ],
+  "task_count": 110,
+  "gate_count": 17,
+  "req_count": 44,
+  "ac_count": 180,
+  "ready_next": [
+    {
+      "task": "SA-001",
+      "role": "arch",
+      "reason": "รับผลtask-013ที่ผู้คุมบันทึกจริง แยกapprovedpolicyกับcontract/evidenceก่อนfreeze"
+    },
+    {
+      "task": "DBA-001",
+      "role": "vault",
+      "reason": "รับผลtask-012/parityล่าสุด เตรียมSQL/catalog/rollback pack ไม่รันDB"
+    },
+    {
+      "task": "BE-001",
+      "role": "sys",
+      "reason": "เตรียมsanitizedcredential/profile/tenant fixtures ไม่implement/ไม่เดาข้อมูล"
+    },
+    {
+      "task": "TP-001",
+      "role": "inspect",
+      "reason": "จัด180AC owner/validation matrixได้ทันที"
+    },
+    {
+      "task": "SEC-001",
+      "role": "jpo",
+      "reason": "เตรียมauth/H5/channel/custodyreviewส่งผู้คุม"
+    },
+    {
+      "task": "BA-001/002/003/004",
+      "role": "spec",
+      "reason": "สรุปมติที่ตอบแล้วและเตรียมเนื้อหา/หุ่น/ส่งมอบให้มนุษย์ตรวจ"
+    },
+    {
+      "task": "SA-004→TP-003/DBA-007",
+      "role": "arch→inspect/vault",
+      "reason": "หลังdependenciesพร้อมเตรียมexport proof/fixtures ไม่ใช่คิวwritegrade"
+    }
+  ],
+  "waiting_on_human": [
+    "G-CORE/H4แบบอนุมัติแล้วแต่testSQL/rollback/catalog/runtime/security/custodyยังค้าง ให้vault/archเตรียมartifactก่อนเสนอคนรัน",
+    "G-AUTHcredentialcompatibility/fixturesยังไม่ยืนยัน; H5เจ้าของgateway/web-system/infra,web-principal/env/networkและรายชื่อstaff_adminตั้งต้นยังค้าง ต้องเสนอartifactเฉพาะก่อนถาม",
+    "UX-001..004ไม่มีsignedartifact; UX-005..007เตรียมหน้าจอscopeเดิมให้ผู้ใช้ตรวจตามconsumer",
+    "OQ-008/009/011รอทีมเสนอหุ่น/เนื้อหาcriteria/rubric/ส่งมอบ ไม่ถามมติOS/Guest/สูตร/mapping/LearnerAเดิม",
+    "DES-009 G-PARITY/COEXIST/TARGET/AUTHZ/DBยังค้าง; ไม่มีสิทธิ์เขียนเกรดจริง/QAsecurityrelease/deployจากrunนี้"
+  ],
+  "questions": []
+}
