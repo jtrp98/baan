@@ -1,6 +1,8 @@
 # ข้อเสนอแก้ปัญหา LearnerId ของครู (`sEmp`) ชนกับนักเรียน (`sId`) บน Desktop
 
-วันที่: 2026-10-22 · ผู้เสนอ: System Analyst (`sa`) · สถานะ: PROPOSED (รอผู้ใช้ตัดสิน)
+วันที่เสนอ: 2026-10-22 · ผู้เสนอ: System Analyst (`sa`) · ผู้ใช้เลือกทาง A เมื่อ 2026-10-23 ตาม [decisions-032](../requirement/decisions-032.md); เนื้อหาข้อเสนอเดิมด้านล่างเก็บเป็นประวัติ ไม่อนุมัติ SQL delta ทาง B
+
+บันทึกผลตัดสิน: ครูทดลอง local และเก็บโครงงาน Cloud ได้ แต่ไม่ส่งงานหรือสอบเก็บผลบน Cloud; ส่ง arch sync สัญญาที่เกี่ยว ไม่ใช่ผลตรวจ implementation
 อ้างอิง: [decisions-025.md](../requirement/decisions-025.md), [decisions-026.md](../requirement/decisions-026.md), [db/review-002.md](review-002.md), [db/schoolbot_db.sql](schoolbot_db.sql), [des-004.md](../design/des-004.md), [des-005.md](../design/des-005.md), [des-009.md](../design/des-009.md), [des-010.md](../design/des-010.md), [des-011.md](../design/des-011.md)
 
 ---
@@ -93,3 +95,7 @@ COMMIT;
 
 ## Change Log
 - 2026-10-22 — SA สร้างข้อเสนอเปรียบเทียบ 3 ทางเลือกสำหรับแก้ปัญหา `LearnerId` ครู/นักเรียนชนกัน พร้อม SQL delta สำหรับ DBA และประเด็นให้ผู้ใช้ตัดสิน
+
+## บันทึกมติภายหลัง
+
+- 2026-10-23 — ผู้ใช้เลือกทาง A ตาม decisions-032; คงข้อเสนอเดิมไว้เป็นประวัติและไม่ใช้ SQL delta ทาง B

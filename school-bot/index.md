@@ -24,6 +24,8 @@
 
 ## Change Log
 
+- 2026-10-23 — [decisions-032](requirement/decisions-032.md): ผู้ใช้เลือกผลครูแบบ local/โครงงาน Cloud, หนึ่งกิจกรรมได้หลายช่องแต่หนึ่งช่องได้หนึ่งกิจกรรม และล็อก mapping หลังส่ง; OQ-016 เหลือใช้ช่องเดิม/สร้างช่องใหม่ ส่ง spec/arch sync โดยไม่เปลี่ยนสถานะ implementation
+
 - 2026-10-23 — เพิ่ม [DBML อ่านภาพ](design/dbml-guide-001.md): แบบเต็ม 32 ตาราง/450 ฟิลด์/40 FK พร้อม notes ไทยและสี 10 กลุ่ม กับภาพเชื่อมตารางเก่า 24 ตาราง; schema ไม่เปลี่ยน
 
 - 2026-10-23 — ตรวจแก้ auto-commit knowledge: แก้ parser รับ stdout ที่ถูก trim และกติกา Git ที่ขัดกับฟีเจอร์ เพิ่ม final commit หลังนายช่างบันทึกเอกสาร ผลทดสอบ BAAN 96 ผ่าน; [หลักฐาน](planning/knowledge-commit-001.md)

@@ -118,7 +118,10 @@
 | [decisions-030.md](decisions-030.md) | ถอนคอลัมน์ `Version` ทั้งหมด ใช้ `UpdateDate` เป็น concurrency token แทน |
 | [decisions-031.md](decisions-031.md) | repo เหลือ `school-bot` ตัวเดียว (`school-bot-v2` ไม่มีแล้ว) — พาธ `school-bot-v2` ในเอกสารเดิมให้อ่านเป็น `target/school-bot` |
 
+| [decisions-032.md](decisions-032.md) | ครูทดลอง local/เก็บโครงงาน Cloud แต่ไม่ส่งงานหรือสอบบน Cloud; กิจกรรมหนึ่งได้หลายช่อง หนึ่งช่องได้กิจกรรมเดียว; ล็อก mapping หลังส่ง ใช้ชุดใหม่เมื่อเปลี่ยน |
+
 ## Change Log
+- 2026-10-23 — บันทึกมติผลครู/cardinality/ล็อก mapping ใน decisions-032; ส่ง spec/arch amend เอกสารที่เกี่ยว ไม่เปลี่ยนสถานะ REQ/งานตรวจรับ
 - 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](decisions-031.md)
 
 - 2026-10-22 — เพิ่มสารบัญเอกสารขอบเขต (`scope.md`, `scope-baseline-001.md`, `source-references.md`) และทะเบียนมติผู้ใช้ (`decisions-001..030.md`) ให้ครอบคลุมทุกไฟล์ในหมวด `requirement\` โดยไม่เปลี่ยนรหัสหรือสถานะ REQ/AC
