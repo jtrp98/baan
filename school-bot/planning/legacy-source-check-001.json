@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-23",
+  "source": "user-context-001.md",
+  "head": "a8c5dc62cabede11d279c919fe5c5c1de36e980a",
+  "verification": "controller: git rev-parse HEAD exit0 + git status --short -- cited paths exit0 with empty output; source read only",
+  "scope": "13 cited files only, not entire working tree",
+  "files": [
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/BypassAcademic.aspx.cs",
+      "sha256": "ec3c8f6f256c84d3ecdab595ce06d494014cfaf6502c7bdf8d4b459e11c44779"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/BypassSuperAdmin.aspx.cs",
+      "sha256": "b93d14d49135483b28a0afd50c9b3248b5be025d5d021ebdad74c6cc5749d047"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/Class/ComFunction.cs",
+      "sha256": "ae269abfd63a259d8eeda566967b26693377eb18c836300e12544d2cf9f6efe7"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/CommonLogic/BusinessLogic.cs",
+      "sha256": "39e7592dc812a083653a81d5271b5dd083adbaa32ee8ecba3294f4c126579cac"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/Controllers/CommonController.cs",
+      "sha256": "7c6cd879810569bf55cdd3a908699c6bbeda8bf414a359d0c58c2f70b5258f14"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/Default.aspx.cs",
+      "sha256": "05e7fc9b6c653a9714329ee6f67b72cf19e40fe856a6c04dd7f0dc1bb82746c9"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/Employees/EmpInfo.aspx.cs",
+      "sha256": "8edbebef65e39fc5f3364ab00b580bd03dbdc5ed4c5c775fd3146a04fd7cc3fe"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/Employees/ImportEmployeeData.aspx.cs",
+      "sha256": "4fd9362502dcef0f0da8c4abeecded60bdf8e4c38ed554865bc99622895444cc"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/PreRegister/preRegisterList.aspx.cs",
+      "sha256": "c273ae07eceb029b4f3735b086a534bd1721af4b09b847fa56f216bdc86b4f49"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/FingerprintPayment/bypassgarde.aspx.cs",
+      "sha256": "53207df03957f3597fb8080d3d0e7d82f7c4c8325ab520fa479f130a2286e09b"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/JabjaiMainClass/JWTToken.cs",
+      "sha256": "8be7d3186739ea4fb03c680c99b013fd7772d2d33db093282827d6e11070e905"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/PostgreSQL/PostgreSQL/MasterDB/TAdmin.cs",
+      "sha256": "bb76104bf8b53343fa35709fe8fedf67306c73c3cdff85bdb96ad54595dcbd3b"
+    },
+    {
+      "path": "C:/src/sb-web-academic-dev-1/jabjaiuniversity/PostgreSQLSingleDB/PostgreSQL/TUser.cs",
+      "sha256": "e9c3fa0cbb5603c985db20d0ca3b7b7db5c354494b01c5a1a7010f7ecd96bd58"
+    }
+  ]
+}
