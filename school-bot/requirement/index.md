@@ -117,12 +117,13 @@
 | [decisions-029.md](decisions-029.md) | ไม่ GRANT/สร้าง role ใน School DB และ PGGradeDB ใช้บัญชี DB เดิม |
 | [decisions-030.md](decisions-030.md) | ถอนคอลัมน์ `Version` ทั้งหมด ใช้ `UpdateDate` เป็น concurrency token แทน |
 | [decisions-031.md](decisions-031.md) | repo เหลือ `school-bot` ตัวเดียว (`school-bot-v2` ไม่มีแล้ว) — พาธ `school-bot-v2` ในเอกสารเดิมให้อ่านเป็น `target/school-bot` |
-
 | [decisions-032.md](decisions-032.md) | ครูทดลอง local/เก็บโครงงาน Cloud แต่ไม่ส่งงานหรือสอบบน Cloud; กิจกรรมหนึ่งได้หลายช่อง หนึ่งช่องได้กิจกรรมเดียว; ล็อก mapping หลังส่ง ใช้ชุดใหม่เมื่อเปลี่ยน |
-
 | [decisions-033.md](decisions-033.md) | ใช้เฉพาะช่องคะแนนเดิม แปลงตามสัดส่วนคะแนนเต็มแล้วปัด half-up ข้ามผลที่ยังไม่มีตอนส่งเกรด; ปิด OQ-016 |
+| [decisions-034.md](decisions-034.md) | สูตรรวมถ่วงน้ำหนักรายกิจกรรมรวม 100%; แก้น้ำหนักใช้รอบใหม่; ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด; ปิด OQ-014 |
 
 ## Change Log
+
+- 2026-10-23 — บันทึก decisions-034 และปิด OQ-014; ส่ง spec/arch sync โดยไม่เปลี่ยนจำนวน REQ/AC หรือสถานะตรวจรับ
 
 - 2026-10-23 — บันทึก decisions-033 และปิด OQ-016; ไม่เปลี่ยนจำนวน REQ/AC หรือสถานะงานตรวจรับ
 - 2026-10-23 — บันทึกมติผลครู/cardinality/ล็อก mapping ใน decisions-032; ส่ง spec/arch amend เอกสารที่เกี่ยว ไม่เปลี่ยนสถานะ REQ/งานตรวจรับ

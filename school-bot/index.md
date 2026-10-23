@@ -7,11 +7,11 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 174 AC — DRAFT; decisions-001..030 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 174 AC — DRAFT; decisions-001..034 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | Rev3 — data-model/rules/DBML Rev3 (32 ตาราง) CONFIRMED; DES-001..012 PROPOSED |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks | 74 tasks pending (8 phases / 17 gates) |
-| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 4 PARTIAL / 8 CLOSED |
+| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | `test-plan\index.md` | สารบัญ test plan | ยังไม่มีเอกสาร |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | `qa\index.md` | สารบัญ QA findings | ยังไม่มีเอกสาร |
@@ -23,6 +23,8 @@
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
+
+- 2026-10-23 — [decisions-034](requirement/decisions-034.md): สูตรรวมถ่วงน้ำหนักรายกิจกรรม น้ำหนักใหม่มีผลรอบใหม่ และครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด; ปิด OQ-014 เหลือ OQ-008/009/011 รอทีมเตรียมข้อเสนอ/หลักฐานให้ตรวจ
 
 - 2026-10-23 — [decisions-033](requirement/decisions-033.md): ใช้ช่องคะแนนเดิม แปลงตามสัดส่วนคะแนนเต็ม/half-up ข้ามผลที่ยังไม่มีตอนส่งเกรด; ปิด OQ-016 คง OQ-014 เฉพาะสูตรรวม/เปลี่ยนสัดส่วน ส่ง spec/arch sync ต่อ
 
