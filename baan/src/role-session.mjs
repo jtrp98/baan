@@ -74,7 +74,7 @@ export async function runRoleAgents({ cfg, opts, selected, attempt, onResult = (
     const { r, agent, trail } = await runWithFallback(
       chain,
       (a) => attempt(a, a === name),
-      (from, to) => log(`${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${opts.tier})`),
+      (from, to, reason) => log(`${from} ${reason === "missing" ? "ไม่ได้ติดตั้งบนเครื่อง" : "ติดโควตา/limit"} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${opts.tier})`),
     );
     const cls = classifyOutcome(r);
     const res = { ...r, requested: name, agent, fallback: trail, state: cls.state, marker: cls.marker, ok: cls.ok, cliOk: r.ok };
