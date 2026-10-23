@@ -1,0 +1,43 @@
+{
+  "state": "DONE",
+  "summary": "ตรวจ static ใบงาน040 เสร็จตามขอบเขต logout subset; SHA-256 ตรงรายงานครบ 10 ไฟล์ทั้งก่อนและหลังตรวจ พบ Medium ใหม่ 1 รายการ ไม่พบ Critical/Important ใหม่ใน subset นี้ ผลนี้ไม่ปิด full security gate และ Important เดิมทั้ง 6 ข้อยัง OPEN",
+  "findings": [
+    {
+      "id": "SEC040-001 (เสนอใหม่)",
+      "severity": "Medium",
+      "file": "web/src/SchoolBot.Api/LogoutEndpoint.cs",
+      "line": 9,
+      "issue": "POST /v2/auth/logout เป็น public endpoint ที่ไม่ผูก rate-limit policy และไม่มี global concurrency limit ใน Program.cs:48-61,86-87 ผู้เรียกไม่ต้องมี session จริง เพียงส่ง Bearer รูปแบบ canonical 43 ตัวก็เข้าสู่ PostgreSQL connection และ transaction ทุกครั้ง แม้ค้นหาไม่พบ session จึงส่งคำขอพร้อมกันเพื่อแย่ง connection pool และทรัพยากร DB ของ logout ได้; timeout 5 วินาทีจำกัดต่อคำขอ แต่ไม่จำกัดจำนวนคำขอ",
+      "fix": "เพิ่ม policy จำกัดตาม trusted source ให้ logout และจำกัดจำนวนงาน DB พร้อมกันก่อนเข้า repository โดยคงพฤติกรรม logout ที่ไม่ต้องผ่าน authentication/License; ให้ check ตรวจว่าเมื่อเกินขีดจำกัดได้ 429 หรือผลปฏิเสธที่กำหนดไว้โดยไม่เรียก store เพิ่ม",
+      "blocks": "ไม่เป็น human gate ระดับ Critical/Important; ส่งผู้คุมจัดลำดับแก้ตาม convention โดยไม่เปิดงานหรือรับความเสี่ยงแทนผู้ใช้"
+    }
+  ],
+  "checked": [
+    "อ่าน K/index.md → plan/index.md → design/index.md, security.md ส่วน auth/PII/token, รายงาน logout ทั้ง 3 ไฟล์, DES-004 ส่วน logout และ data-contract-rules.md; อ่าน B/AGENTS.md และ README.md ก่อน source",
+    "อ่านครบ 10 ไฟล์ตาม logout-source-hashes-001.json รวม abstraction, exception, service, PostgreSQL store, csproj, endpoint, V2Errors, ApiErrors, Program และ web/README.md; hash ตรง 10/10",
+    "LogoutEndpoint.cs:29-36 และ LogoutService.cs:17-26 รับ Authorization ค่าเดียว ความยาวแน่นอน ตรวจ scheme, alphabet และ unused bits ของ canonical base64url; header หลายค่า/รวมหลาย Bearer ไม่เข้าสู่ store",
+    "LogoutService.cs:11-14 ส่งเฉพาะ SHA-256 lowercase ของ token ไป store; ไม่มีการรับ tenant/actor จาก body หรือ header เพื่อเลือก session",
+    "LogoutEndpoint.cs:13-24 คืน 204 หลัง service สำเร็จ, แปลง storage failure เป็น 503 AUTH_UNAVAILABLE และใช้ข้อความคงที่โดยไม่ส่ง provider exception",
+    "V2Errors.cs:7-24 และ Program.cs:65-85 จัด UUID request_id, v2 error envelope และ no-store; token หายหรือผิดรูปแบบคืน 204 โดยไม่แตะ DB",
+    "PostgresSessionLogoutStore.cs:19-29 ไม่มี connection-string fallback; configuration ขาด/ผิดหรือเชื่อมต่อไม่ได้ไม่จำลอง revoke สำเร็จ ปิด parameter logging และ error detail",
+    "PostgresSessionLogoutStore.cs:30-54 ใช้ typed SQL parameters และ revoke+audit ใน transaction เดียว; Actor/SchoolId มาจาก session row และ audit ไม่เก็บ raw token",
+    "เงื่อนไข UPDATE กรอง revoked/expired/deleted; token ที่ไม่พบไม่สร้าง audit และรูปแบบ UPDATE RETURNING → INSERT ป้องกัน audit ซ้ำจาก concurrent revoke ที่ระดับ source โดยยังต้องยืนยันกับ PostgreSQL จริง",
+    "CancellationToken ส่งถึง open/begin/execute/commit และ client cancellation ถูกส่งต่อ; transaction ใช้ await using ส่วน provider/configuration failure ถูกแปลงเป็น exception ที่ไม่มีรายละเอียด secret",
+    "เทียบเฉพาะ DDL SchoolBotSession และ SchoolBotAuditEvent: ชื่อคอลัมน์ ชนิด hash/UUID, nullable actor fields และ unique TokenHash สอดคล้องกับ SQL ใน store",
+    "ระบุ PII ใน audit ได้แก่ AccountId, ProfileKind/ProfileId, LegacyAdminId และตัวเชื่อม Session/School; retention และมาตรการเข้าถึง/เข้ารหัสยังอยู่ภายใต้ SEC001-010 เดิม"
+  ],
+  "limitations": [
+    "เป็น static review เท่านั้น ไม่ได้รัน tests/build, SQL, DB connection, network หรือ login และไม่ได้อ่านค่า secret/env จริง",
+    "ไม่ได้อ่าน Authentication/* ที่ sys039 กำลังแก้ ไม่ขยายไป G/auth identity/H5 หรือ re-audit ระบบทั้งหมด",
+    "logout-build-check-001.json บันทึก existing suite ผ่าน 70 cases แต่ยังไม่ใช่ acceptance ของ logout behavior ใหม่",
+    "ยังไม่มี runtime evidence สำหรับ rollback เมื่อ audit ล้มเหลว, cancellation ระหว่าง commit, concurrent revoke และการ redaction ใน logs จริง",
+    "manifest ระบุ Npgsql 10.0.2; ไม่ได้ตรวจ advisory หรือ license metadata ภายนอก จึงไม่รับรองสถานะ CVE/license",
+    "ไม่ประกาศ PDPA/GDPR compliant หรือผิดกฎหมายจากหลักฐานนี้; retention และการตัดสินมาตรการคุ้มครอง PII ยังต้องได้ข้อยืนยันจากเจ้าของข้อมูล/DPO ตามประเด็นเดิม",
+    "ไม่มีการเขียน knowledge/source, Git mutation หรือ rebuild EXE/installer และไม่มี risk acceptance ใหม่"
+  ],
+  "handoff": [
+    "ส่งผู้คุมรับ SEC040-001 เพื่อจัดลำดับให้ sys แก้ โดยคง Important เดิมทั้ง 6 ข้อ OPEN",
+    "เมื่อ writer จบ ส่ง check ตรวจ adversarial Bearer, response/no-store/UUID, DB failure, rollback, cancellation และ concurrency อย่างอิสระ",
+    "ส่ง jpo re-audit source ที่แก้และหลักฐาน check เฉพาะ scope ต่อไป; ผลรอบนี้ไม่ใช่การอนุมัติ release"
+  ]
+}
