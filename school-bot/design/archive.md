@@ -44,3 +44,11 @@
 | [data-model.md](archive/2026-10-23-before-readable-data-model/data-model.md) | 23815 | `c23ec3ab918a7176b571d559af581145f58bc592bfcd67c449e39e545c7170fd` |
 
 - 2026-10-23 — นายช่างบันทึกต้นฉบับและตรวจ hash ตามใบงาน 009
+
+## ก่อนเพิ่ม DBML notes และกลุ่มสี — 2026-10-23
+
+| ฉบับเดิม | Bytes | SHA-256 |
+|---|---:|---|
+| [schoolbot.dbml Rev3](archive/2026-10-23-before-dbml-notes/schoolbot.dbml) | 45503 | `8ab66eb5002fefade1ca405ac2192ba2e41b239f7c93c784f69fcc633cfbd3eb` |
+
+- 2026-10-23 — เก็บ byte-for-byte ก่อนเพิ่มคำอธิบาย Rev4; schema/FK ไม่เปลี่ยน

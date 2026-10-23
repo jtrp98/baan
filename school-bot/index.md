@@ -24,6 +24,8 @@
 
 ## Change Log
 
+- 2026-10-23 — เพิ่ม [DBML อ่านภาพ](design/dbml-guide-001.md): แบบเต็ม 32 ตาราง/450 ฟิลด์/40 FK พร้อม notes ไทยและสี 10 กลุ่ม กับภาพเชื่อมตารางเก่า 24 ตาราง; schema ไม่เปลี่ยน
+
 - 2026-10-23 — ตรวจแก้ auto-commit knowledge: แก้ parser รับ stdout ที่ถูก trim และกติกา Git ที่ขัดกับฟีเจอร์ เพิ่ม final commit หลังนายช่างบันทึกเอกสาร ผลทดสอบ BAAN 96 ผ่าน; [หลักฐาน](planning/knowledge-commit-001.md)
 - 2026-10-23 — ขยาย [คู่มือ data model](design/data-model.md) Rev6: หน้าที่ 32 ตาราง/450 ฟิลด์ พร้อมตัวอย่าง, FK, JSON และแผนที่ตารางเก่า 27 รายการ; คง schema/SQL/สถานะตรวจรับเดิม ผลตรวจที่ [data-model-review-001](design/data-model-review-001.md)
 - 2026-10-23 — บันทึก [decisions-031](requirement/decisions-031.md): repo เหลือ `school-bot` ตัวเดียว (`school-bot-v2` ไม่มีแล้ว) — เอา target v2 ออกจาก `baan.config.json` และแก้พาธในเอกสารที่ยังใช้จริง (ไฟล์หลักฐาน/decisions เดิมคงตามประวัติ)

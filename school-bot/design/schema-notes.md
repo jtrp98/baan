@@ -1,4 +1,6 @@
-# หมายเหตุ schema — Rev3
+# หมายเหตุ schema — Rev4
+
+อ่าน [คู่มือ DBML](dbml-guide-001.md) สำหรับแบบเต็ม Rev4 และภาพ integration ที่เลือกเฉพาะจุดเชื่อมตารางเดิม; ชนิดของเส้นและจำนวนตารางในสองภาพต่างกันตามขอบเขตภาพ ไม่ได้เพิ่ม schema
 
 ## ขอบเขตและหลักฐาน
 
@@ -60,6 +62,8 @@
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-23 — Rev4: เพิ่ม DBML notes/กลุ่มสี และภาพ integration แยก; คง 32 ตาราง/450 ฟิลด์/40 FK และข้อจำกัดเดิม ตรวจเทียบ semantic model ก่อน/หลังแล้ว
 
 - 2026-10-22 — Rev3: sync ตาม `db/schoolbot_db.sql` (32 ตาราง, 40 FKs) และ `db/review-005.md` ภายใต้มติ decisions-027..030; อัปเดตที่ตั้งเป็น SchoolBot DB (10.0.0.128:9499), การใช้บัญชี DB เดิมบน School DB/PGGradeDB, การ re-check ข้าม DB ก่อน commit, การใช้ `UpdateDate` แทน `Version`, single-column FK + application tenant check และการถอน `SchoolBotTeacherGrant`/`ScoringPolicy.CurriculumId`/`ix_*`
 - 2026-10-22 — Rev2: sync ครบ 33 ตารางตามมติอนุมัติ decisions-026 และ physical design ใน db/review-001.md; อัปเดตกฎ global/tenant FK, deferred pointers, partial unique indexes และกฎ Session/Desktop/License ตาม decisions-025/026

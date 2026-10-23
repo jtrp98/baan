@@ -126,7 +126,10 @@
 | [windows10-compatibility-001.md](windows10-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ Windows 10 (Rev1 · HISTORICAL — ผู้ใช้ยุติ Windows10 target ตาม decisions-019) |
 | [amendment-proposal-001.md](amendment-proposal-001.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026) |
 | [amendment-proposal-002.md](amendment-proposal-002.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026 (แก้ 2 จุดตาม decisions-025)) |
-| [schoolbot.dbml](schoolbot.dbml) | DBML สำหรับ dbdiagram.io (Rev3 · CONFIRMED — sync ตรงกับ db/schoolbot_db.sql (32 ตาราง, 40 refs) บน SchoolBot DB; ผ่าน @dbml/core parser) |
+| [schoolbot.dbml](schoolbot.dbml) | DBML Rev4 — 32 ตาราง/450 ฟิลด์/40 FK; คำอธิบายไทยครบ กลุ่มสี 10 กลุ่ม; คง schema baseline เดิม |
+| [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพเชื่อม legacy: SchoolBot 10 + ตารางเดิม 14; FK จริง 4 / logical เส้นประ 12; ใช้อธิบาย ไม่ใช้สร้าง SQL |
+| [dbml-guide-001.md](dbml-guide-001.md) | วิธีอ่านกลุ่มสี เส้นทึบ/ประ และข้อจำกัดของภาพ |
+| [dbml-review-001.md](dbml-review-001.md) | ผลตรวจ parser/ความครบถ้วน/เทียบ contract ก่อนและหลัง |
 | [source-review-001.md](source-review-001.md) | หลักฐาน as-built จากการตรวจ source จริง: รายงาน as-built โหมด Block/Arm/Code และเส้นทางบทเรียน/สร้างงาน (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-002.md](source-review-002.md) | หลักฐาน as-built จากการตรวจ source จริง: บัญชี/profile และ EF context ใน academic (Rev2 · ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-003.md](source-review-003.md) | หลักฐาน as-built จากการตรวจ source จริง: โครงสร้าง Course Plan จาก Google Sheet (ย้ายมาจาก root วันที่ 2026-10-22) |
@@ -141,6 +144,7 @@
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
 
 ## Change Log
+- 2026-10-23 — DBML Rev4 เพิ่ม notes ทุกตาราง/450 ฟิลด์ กลุ่มสี 10 กลุ่ม และ integration 24 ตารางจากผล arch ใบงาน 010; schema/index/40 FK เดิมไม่เปลี่ยน
 - 2026-10-23 — เพิ่มคู่มือ data model Rev6, dictionary 32 ตาราง/450 ฟิลด์, แผนที่ legacy พร้อมฟิลด์เชื่อม และภาคผนวกสัญญาเดิมตามผล arch ใบงาน 009; ไม่เปลี่ยน schema/สถานะตรวจรับ
 - 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 - 2026-10-22 — แปลง index เข้าโครงมาตรฐาน baan + รับ source-review-001..005 เข้าหมวด design (ย้ายจาก root โดยนายช่าง)

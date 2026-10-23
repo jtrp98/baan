@@ -24,3 +24,5 @@ DBML documentation ปัจจุบันรองรับ table headercolor/
 ## Change Log
 
 - 2026-10-23 — นายช่างเปิดงาน DBML ตามคำขอผู้ใช้ ให้ arch ตรวจภาพ integration แบบ read-only
+
+- 2026-10-23 — arch DONE; นายช่างบันทึก schoolbot.dbml Rev4 และ schoolbot-integration.dbml พร้อมคู่มือ/ผลตรวจ parser; final knowledge commit หลังบันทึกเอกสารครบ

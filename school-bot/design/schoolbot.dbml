@@ -1,5 +1,6 @@
-// SchoolBot schema — Rev3
+// SchoolBot schema — Rev4: คำอธิบายไทยครบทุกตาราง/ฟิลด์ + กลุ่มสีตามงาน
 // Change Log:
+// - 2026-10-23 — Rev4: ขยาย Note จาก dictionary 32 ตาราง/450 ฟิลด์ เพิ่มตัวอย่างและกลุ่มสี; คง schema/index/40 FK ตาม SQL เดิม; ภาพ legacy แยกที่ schoolbot-integration.dbml.
 // - 2026-10-22 — Rev3: sync 100% with db/schoolbot_db.sql (Rev5 Slimmed, 32 tables, 40 refs) and db/review-005.md per decisions-027..030 (SchoolBot DB 10.0.0.128:9499, remove SchoolBotTeacherGrant/ScoringPolicy.CurriculumId/non-unique indexes/composite FK uniques, single-column FKs, UpdateDate concurrency).
 // - 2026-10-22 — Rev2.2: ถอน Version และ AuditEvent.Previous/NewVersion ตาม decisions-030 (ใช้ UpdateDate).
 // - 2026-10-22 — Rev2.1: CreateBy/UpdateBy เป็น int4 null (sEmp/sId, null=ระบบ) ตาม decisions-028.
@@ -8,7 +9,10 @@
 Project SchoolBot {
   database_type: 'PostgreSQL'
   Note: '''
-  Diagram artifact (Rev3) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
+  เริ่มดูตามกลุ่มสี 01–10; เปิด Note ของตาราง/ฟิลด์เพื่ออ่านหน้าที่ หนึ่งแถว ตัวอย่าง และกฎข้อมูลภาษาไทยครบ 450 ฟิลด์.
+  ภาพนี้มีเฉพาะ SchoolBot ใหม่ 32 ตารางและ FK จริง 40 เส้น; ดู schoolbot-integration.dbml สำหรับภาพตารางเดิมและ logical mappings.
+  SQL ยังเป็นร่างไม่ได้รัน; การยืนยันแบบไม่ใช่การยืนยันว่า deploy แล้ว.
+  Diagram artifact (Rev4) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
   คงไว้ในไฟล์เดียวเพื่อให้เปิดและวางใน dbdiagram.io ได้ครบทั้ง 32 ตารางทันที (ตารางสำรอง SchoolBotTeacherGrant ยังไม่สร้างตาม decisions-026).
   วางทุกตารางของ SchoolBot (32 ตาราง) ใน SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot, schema public) ตาม decisions-027 เพื่อรองรับ atomic transaction ระหว่าง domain, idempotency และ audit.
   Master, School, Logs และ PGGradeDB ต่อผ่าน connection แยกด้วยบัญชี DB เดิม (ไม่รัน GRANT/สร้าง role ใน School DB หรือ PGGradeDB ตาม decisions-029); การอ่านสิทธิ์ครู/roster/term จาก School DB ต้อง re-check ก่อน commit ใน SchoolBot DB.
@@ -168,95 +172,95 @@ Enum SchoolBotPlatform {
   "darwin-arm64"
 }
 
-Table SchoolBotLicense {
-  SchoolBotLicenseId int4 [pk, increment, not null]
-  SchoolName varchar(200) [not null]
-  KeyHash varchar(64) [not null, unique, note: 'UQ_SchoolBotLicense_KeyHash; SHA-256 hex 64 characters']
-  KeyHint varchar(32) [not null]
-  ExpiresAt timestamptz [not null]
-  RevokedAt timestamptz [null]
-  CurrentBindingId int4 [null]
-  BindingEpoch int4 [not null, note: 'Positive epoch; advance when binding changes']
-  AllowedNextJkt varchar(64) [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotLicense_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotLicense [headercolor: #2563EB] {
+  SchoolBotLicenseId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLicense (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  SchoolName varchar(200) [not null, note: 'ชื่อโรงเรียนที่บันทึกประกอบใบอนุญาต ไม่ใช่รหัสเชื่อมโรงเรียน; การเชื่อมใช้ SchoolId']
+  KeyHash varchar(64) [not null, unique, note: 'ค่า SHA-256 สำหรับตรวจ License Key โดยไม่เก็บ Key ฉบับอ่านได้; ห้ามซ้ำทั้งระบบ | ข้อกำหนดเดิม: UQ_SchoolBotLicense_KeyHash; SHA-256 hex 64 characters']
+  KeyHint varchar(32) [not null, note: 'ข้อความช่วยให้ผู้ดูแลแยกแยะ Key โดยไม่แสดง Key เต็ม']
+  ExpiresAt timestamptz [not null, note: 'เวลา UTC ที่ใบอนุญาตหมดอายุ; เมื่อถึงเวลานี้ใช้ต่อไม่ได้']
+  RevokedAt timestamptz [null, note: 'เวลา UTC ที่ถอนใบอนุญาตก่อนหมดอายุ; null หมายถึงยังไม่มีการถอน']
+  CurrentBindingId int4 [null, note: 'ชี้ SchoolBotLicenseBinding ที่ผูกอยู่ปัจจุบัน; null หมายถึงไม่มี binding ปัจจุบัน และไม่ได้แปลว่า License หมดอายุ']
+  BindingEpoch int4 [not null, note: 'เลขรุ่นของการผูกเครื่อง ใช้แยกสิทธิ์เครื่องก่อนและหลังย้ายเครื่อง; ไม่ใช่ row ID | ข้อกำหนดเดิม: Positive epoch; advance when binding changes']
+  AllowedNextJkt varchar(64) [null, note: 'ลายนิ้วมือ public key ของเครื่องที่ผู้ดูแลระบุให้ activate ครั้งถัดไป; null หมายถึงไม่ได้ระบุเครื่องถัดไปเฉพาะเจาะจง แต่ยังต้องตรวจประวัติเครื่องที่ถูกถอด']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotLicense_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (10.0.0.128:9499; DES-002, DES-004, DES-012). ใช้ตรวจสิทธิ์ทั้งช่อง desktop (ต้องมี active License + device binding) และช่อง school_web (ต้องมี active License ของโรงเรียนโดยไม่ต้องมี device binding ตาม decisions-025/026). FK_SchoolBotLicense_CurrentBinding เป็น DEFERRABLE INITIALLY DEFERRED.'
+  Note: 'หน้าที่: เก็บสิทธิ์ใช้งาน SchoolBot ของโรงเรียน รวมวันหมดอายุและเครื่องที่ผูกอยู่ | หนึ่งแถว: หนึ่งใบอนุญาตของหนึ่งโรงเรียน | ใช้เมื่อ: ผู้ดูแลออก/ถอนใบอนุญาต; Desktop activate/validate; เว็บโรงเรียนตรวจสิทธิ์ใช้งาน | ตัวอย่าง: สมมติ: โรงเรียน ก มีใบอนุญาตที่ยังใช้งานได้ และผูกกับคอมพิวเตอร์ห้องหุ่นยนต์ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-001.md | ข้อกำหนดเดิม: SchoolBot DB (10.0.0.128:9499; DES-002, DES-004, DES-012). ใช้ตรวจสิทธิ์ทั้งช่อง desktop (ต้องมี active License + device binding) และช่อง school_web (ต้องมี active License ของโรงเรียนโดยไม่ต้องมี device binding ตาม decisions-025/026). FK_SchoolBotLicense_CurrentBinding เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
 
-Table SchoolBotLicenseBinding {
-  SchoolBotLicenseBindingId int4 [pk, increment, not null]
-  LicenseId int4 [not null]
-  DeviceJkt varchar(64) [not null]
-  PublicJwk jsonb [not null, note: 'DES-002: public EC P-256 JWK only; no private key']
-  Epoch int4 [not null]
-  ActivatedAt timestamptz [not null]
-  DetachedAt timestamptz [null]
-  LastCheckedAt timestamptz [not null]
-  LastEntitlementExpiresAt timestamptz [not null, note: 'CK_SchoolBotLicenseBinding_LeaseWindow: <= LastCheckedAt + 259200s']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotLicenseBinding_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotLicenseBinding [headercolor: #2563EB] {
+  SchoolBotLicenseBindingId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLicenseBinding (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LicenseId int4 [not null, note: 'FK ไป SchoolBotLicense เจ้าของการผูกเครื่องนี้']
+  DeviceJkt varchar(64) [not null, note: 'ลายนิ้วมือ public key ของ installation; ใช้ตรวจ device proof ไม่ใช่เลขเครื่องทางกายภาพ']
+  PublicJwk jsonb [not null, note: 'JSON public key แบบ EC/P-256 สำหรับตรวจลายเซ็นเครื่อง มี kty, crv, x, y; ไม่เก็บ private key | ข้อกำหนดเดิม: DES-002: public EC P-256 JWK only; no private key']
+  Epoch int4 [not null, note: 'เลขรุ่นของ binding ภายใน License; คู่ LicenseId/Epoch ไม่ซ้ำ']
+  ActivatedAt timestamptz [not null, note: 'เวลา UTC ที่การผูกเครื่องนี้เริ่มมีผล']
+  DetachedAt timestamptz [null, note: 'เวลา UTC ที่ถอดเครื่องออก; null หมายถึงยังไม่ถูกถอด แต่ต้องตรวจ License และ current binding ร่วมด้วย']
+  LastCheckedAt timestamptz [not null, note: 'เวลา UTC ของการตรวจออนไลน์ล่าสุดที่ออกสิทธิ์ให้; replay คำขอเดิมไม่ถือเป็นการตรวจใหม่']
+  LastEntitlementExpiresAt timestamptz [not null, note: 'เวลา UTC ที่ entitlement ล่าสุดหมดอายุ; ไม่เกิน LastCheckedAt บวก 259200 วินาที หรือ 3 วัน และตามสัญญาต้องไม่เกิน License.ExpiresAt | ข้อกำหนดเดิม: CK_SchoolBotLicenseBinding_LeaseWindow: <= LastCheckedAt + 259200s']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotLicenseBinding_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (LicenseId, Epoch) [unique, name: 'UQ_SchoolBotLicenseBinding_LicenseId_Epoch']
     (LicenseId) [note: 'Partial unique index ux_schoolbot_license_binding_active WHERE DetachedAt IS NULL AND IsDelete = false in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-002). มี active binding ได้ไม่เกินหนึ่งต่อ License; LastEntitlementExpiresAt <= License.ExpiresAt และ <= LastCheckedAt + 259200 วินาที.'
+  Note: 'หน้าที่: เก็บประวัติการผูกใบอนุญาตกับ installation key และอายุสิทธิ์ออฟไลน์ที่ออกให้ | หนึ่งแถว: การผูก License กับ device key หนึ่งครั้งในหนึ่ง Epoch | ใช้เมื่อ: activate สร้าง binding; validate ต่ออายุ entitlement; unbind ปิด binding เดิม | ตัวอย่าง: สมมติ: ย้าย License จากเครื่องเก่าไปเครื่องใหม่ โดยเก็บ binding เก่าไว้เป็นประวัติ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-002.md | ข้อกำหนดเดิม: SchoolBot DB (DES-002). มี active binding ได้ไม่เกินหนึ่งต่อ License; LastEntitlementExpiresAt <= License.ExpiresAt และ <= LastCheckedAt + 259200 วินาที.'
 }
 
-Table SchoolBotRelease {
-  SchoolBotReleaseId int4 [pk, increment, not null]
-  VersionText varchar(32) [not null]
-  Channel SchoolBotChannel [not null]
-  Platform SchoolBotPlatform [not null]
-  Manifest varchar(16384) [not null, note: 'DES-007 signed JWS string']
-  ArtifactHash varchar(64) [not null]
-  Lifecycle SchoolBotReleaseState [not null]
-  PublishedAt timestamptz [null]
-  WithdrawnAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'CK_SchoolBotRelease_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+Table SchoolBotRelease [headercolor: #475569] {
+  SchoolBotReleaseId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotRelease (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  VersionText varchar(32) [not null, note: 'เลขรุ่นซอฟต์แวร์รูป x.y.z เช่น 2.1.0; ไม่ใช่ concurrency token']
+  Channel SchoolBotChannel [not null, note: 'ช่องแจกจ่าย stable สำหรับรุ่นปกติ หรือ beta สำหรับรุ่นทดลอง']
+  Platform SchoolBotPlatform [not null, note: 'ระบบและสถาปัตยกรรมที่ไฟล์รองรับ: windows-amd64, darwin-amd64 หรือ darwin-arm64']
+  Manifest varchar(16384) [not null, note: 'ข้อความ JWS ที่ลงนามแล้ว ระบุ release ID, URL, SHA-256, ขนาดเป็น bytes, ชนิด package, OS ขั้นต่ำ และข้อมูล engine ตาม DES-007 | ข้อกำหนดเดิม: DES-007 signed JWS string']
+  ArtifactHash varchar(64) [not null, note: 'SHA-256 ของไฟล์แจกจ่ายหลัง signing/notarization ใช้ตรวจว่าไฟล์ตรงกับรุ่นที่ประกาศ']
+  Lifecycle SchoolBotReleaseState [not null, note: 'draft=ร่าง, published=เผยแพร่ให้ใช้, withdrawn=ถอนจากการแจกจ่าย']
+  PublishedAt timestamptz [null, note: 'เวลา UTC ที่เผยแพร่; null เมื่อยังไม่มีเวลาเผยแพร่ และต้องมีค่าเมื่อ Lifecycle=published']
+  WithdrawnAt timestamptz [null, note: 'เวลา UTC ที่ถอนรุ่น; null เมื่อยังไม่มีการถอน ไม่ใช่หลักฐานว่าถอน binary ที่ติดตั้งไปแล้ว']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotRelease_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
 
   indexes {
     (VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_global WHERE SchoolId IS NULL in DDL']
     (SchoolId, VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_tenant WHERE SchoolId IS NOT NULL in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-007). รองรับทั้ง global catalog (SchoolId IS NULL) และ targeted release รายโรงเรียน.'
+  Note: 'หน้าที่: เก็บรายการรุ่นซอฟต์แวร์และ manifest ที่ลงนามสำหรับตรวจสอบไฟล์ติดตั้ง | หนึ่งแถว: หนึ่งเวอร์ชัน ต่อ channel ต่อ platform ใน catalog กลางหรือของโรงเรียนหนึ่ง | ใช้เมื่อ: ผู้เผยแพร่สร้าง/เผยแพร่/ถอนรุ่น; Desktop ตรวจอัปเดตและตรวจความน่าเชื่อถือก่อนติดตั้ง | ตัวอย่าง: สมมติ: รุ่น 2.1.0 ช่อง stable สำหรับ windows-amd64 | ขอบเขต: รองรับทั้งส่วนกลาง (SchoolId=NULL) และรายโรงเรียน (SchoolId>0) | คู่มือ: data-dictionary/table-003.md | ข้อกำหนดเดิม: SchoolBot DB (DES-007). รองรับทั้ง global catalog (SchoolId IS NULL) และ targeted release รายโรงเรียน.'
 }
 
-Table SchoolBotIdempotency {
-  SchoolBotIdempotencyId int4 [pk, increment, not null]
-  Principal varchar(512) [not null]
-  Operation varchar(200) [not null]
-  RequestKey uuid [not null]
-  RequestHash varchar(64) [not null]
-  NonceHash varchar(64) [null, note: 'Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
-  HttpStatus int4 [not null]
-  ResultCipher bytea [null]
-  ResultKeyId varchar(128) [null]
-  ResourceId int4 [null]
-  CompletedAt timestamptz [not null]
-  ReplayUntil timestamptz [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'CK_SchoolBotIdempotency_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+Table SchoolBotIdempotency [headercolor: #64748B] {
+  SchoolBotIdempotencyId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotIdempotency (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  Principal varchar(512) [not null, note: 'ตัวตนผู้เรียกแบบมีชนิดและขอบเขต เช่น account, web, staff, device หรือ service; ไม่ใช่เลขผู้ใช้เดี่ยว']
+  Operation varchar(200) [not null, note: 'ชื่อ operation ที่แยกขอบเขตคำสั่ง เช่น การสร้าง resource คนละประเภทต้องไม่ใช้ผลแทนกัน']
+  RequestKey uuid [not null, note: 'UUID จาก Idempotency-Key ใช้ระบุคำสั่งเดิมขณะ retry']
+  RequestHash varchar(64) [not null, note: 'SHA-256 ของ request ที่ทำ canonical แล้ว; Key เดิมแต่เนื้อหาต่างต้องเป็น conflict']
+  NonceHash varchar(64) [null, note: 'hash ของ nonce สำหรับกัน replay ของ device challenge; null เมื่อ operation ไม่ใช้ nonce | ข้อกำหนดเดิม: Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
+  HttpStatus int4 [not null, note: 'HTTP status ของผลที่บันทึกไว้สำหรับ replay ตามสัญญาช่วง 100–599']
+  ResultCipher bytea [null, note: 'response ที่เข้ารหัสเป็น bytes; null เมื่อไม่มี ciphertext ให้ replay รวมกรณีล้างหลังหมดอายุ']
+  ResultKeyId varchar(128) [null, note: 'ชื่ออ้างอิงกุญแจที่ใช้เข้ารหัส ResultCipher ไม่ใช่ตัวกุญแจ; null พร้อม ResultCipher']
+  ResourceId int4 [null, note: 'PK ของ SchoolBot resource หลักที่ operation สร้างหรือคืน; null เมื่อไม่มี resource ที่ระบุได้ โดยชนิดตารางต้องดู Operation']
+  CompletedAt timestamptz [not null, note: 'เวลา UTC ที่คำสั่งเสร็จและบันทึกผล']
+  ReplayUntil timestamptz [not null, note: 'เวลา UTC สิ้นสุดช่วง replay response ที่เข้ารหัส; สัญญากำหนด 24 ชั่วโมง หลังจากนั้นยังเก็บ tombstone กันทำซ้ำ']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotIdempotency_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
 
   indexes {
     (Principal, Operation, RequestKey) [note: 'Partial unique index ux_schoolbot_idempotency_global WHERE SchoolId IS NULL in DDL']
@@ -264,611 +268,611 @@ Table SchoolBotIdempotency {
     (NonceHash) [note: 'Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
   }
 
-  Note: 'SchoolBot DB. บันทึก idempotency ร่วม transaction เดียวกับ domain mutation ใน SchoolBot DB.'
+  Note: 'หน้าที่: จำผลคำสั่งเพื่อให้การส่งคำขอซ้ำไม่สร้างข้อมูลหรือทำธุรกรรมซ้ำ | หนึ่งแถว: ผลคำสั่งหนึ่งชุด ภายใต้โรงเรียน ผู้กระทำ Operation และ RequestKey เดียวกัน | ใช้เมื่อ: API mutation ตรวจคำขอซ้ำ บันทึกผลร่วมกับ domain transaction และคืนผล replay | ตัวอย่าง: สมมติ: บันทึกโครงงานสำเร็จแต่เครือข่ายขาด การ retry ด้วย RequestKey เดิมได้รับผลเดิม | ขอบเขต: รองรับทั้งส่วนกลาง (SchoolId=NULL) และรายโรงเรียน (SchoolId>0) | คู่มือ: data-dictionary/table-004.md | ข้อกำหนดเดิม: SchoolBot DB. บันทึก idempotency ร่วม transaction เดียวกับ domain mutation ใน SchoolBot DB.'
 }
 
-Table SchoolBotAuditEvent {
-  SchoolBotAuditEventId int4 [pk, increment, not null]
-  Actor varchar(512) [not null]
-  Event varchar(64) [not null]
-  EntityType varchar(64) [not null]
-  EntityId int4 [not null]
-  RequestId uuid [not null]
-  Reason varchar(1000) [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'CK_SchoolBotAuditEvent_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+Table SchoolBotAuditEvent [headercolor: #64748B] {
+  SchoolBotAuditEventId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotAuditEvent (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  Actor varchar(512) [not null, note: 'ตัวตนผู้กระทำแบบมีชนิดและโรงเรียน แยกนักเรียน พนักงาน legacy admin เครื่อง และระบบได้ชัดกว่า CreateBy']
+  Event varchar(64) [not null, note: 'ชื่อเหตุการณ์หรือ operation ตาม DES เพื่อบอกว่าเกิดการสร้าง ยืนยัน ถอน หรือเปลี่ยนสถานะใด']
+  EntityType varchar(64) [not null, note: 'ชื่อตาราง SchoolBot ที่เหตุการณ์อ้างถึง ใช้ตีความ EntityId']
+  EntityId int4 [not null, note: 'PK ของ resource ตาม EntityType; เป็น logical reference เพราะคอลัมน์เดียวอ้างได้หลายตาราง']
+  RequestId uuid [not null, note: 'UUID เชื่อมเหตุการณ์กับคำขอหรือกระบวนการเดียวกันสำหรับติดตามปัญหา']
+  Reason varchar(1000) [not null, note: 'เหตุผลหรือหลักฐานประกอบการกระทำ ไม่ใส่ password, Key, token, claims ทั้งก้อน หรือ source ของนักเรียน']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotAuditEvent_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
 
-  Note: 'SchoolBot DB. Append-only audit trail (ไม่มี PreviousVersion/NewVersion ตาม decisions-030).'
+  Note: 'หน้าที่: เก็บร่องรอยว่าใครทำอะไรกับข้อมูล SchoolBot เพื่อย้อนตรวจเหตุการณ์ | หนึ่งแถว: หนึ่งเหตุการณ์ของหนึ่ง resource; เป็นประวัติแบบ append-only | ใช้เมื่อ: API และ worker บันทึกเหตุการณ์ใน transaction ของ SchoolBot; ผู้มีสิทธิ์อ่านประวัติ | ตัวอย่าง: สมมติ: ครูยืนยันส่งคะแนนใบหนึ่ง และระบบบันทึกผู้ยืนยันกับ RequestId | ขอบเขต: รองรับทั้งส่วนกลาง (SchoolId=NULL) และรายโรงเรียน (SchoolId>0) | คู่มือ: data-dictionary/table-005.md | ข้อกำหนดเดิม: SchoolBot DB. Append-only audit trail (ไม่มี PreviousVersion/NewVersion ตาม decisions-030).'
 }
 
-Table SchoolBotSession {
-  SchoolBotSessionId int4 [pk, increment, not null]
-  Channel SchoolBotSessionChannel [not null, default: 'desktop', note: 'desktop|school_web|staff_admin']
-  AccountId int4 [null, note: 'Legacy Master TMasterDBUser.sID; NOT NULL when Channel = desktop']
-  TokenHash varchar(64) [not null, unique, note: 'UQ_SchoolBotSession_TokenHash; SHA-256 only']
-  ProfileKind SchoolBotProfileKind [null, note: 'student|employee; Desktop allows both student and employee for learning/trying only per decisions-025/026']
-  ProfileId int4 [null, note: 'Legacy student SId or employee SEmp selected by ProfileKind and SchoolId']
-  LegacyAdminId varchar(64) [null, note: 'Optional TAdmins.id from gateway web-principal when Channel = school_web']
-  DeviceJkt varchar(64) [null, note: 'NOT NULL iff Channel = desktop; NULL when school_web or staff_admin']
-  SourceTokenExpiresAt timestamptz [null, note: 'Optional exp of source web token when exchanged via DES-012']
-  ExpiresAt timestamptz [not null]
-  RevokedAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotSession_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotSession [headercolor: #7C3AED] {
+  SchoolBotSessionId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotSession (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  Channel SchoolBotSessionChannel [not null, default: 'desktop', note: 'desktop=เรียน/ทดลอง, school_web=งานโรงเรียน, staff_admin=งานส่วนกลาง; ใช้จำกัด endpoint ที่เรียกได้; ค่าเริ่มต้นใน SQL = \'desktop\' | ข้อกำหนดเดิม: desktop|school_web|staff_admin']
+  AccountId int4 [null, note: 'รหัสบัญชี TMasterDBUser.sID; Desktop ต้องมีค่า ส่วนช่องเว็บอาจ null; ห้ามถือว่าเท่ากับ TUser.sID หรือ TEmployees.sEmp | ข้อกำหนดเดิม: Legacy Master TMasterDBUser.sID; NOT NULL when Channel = desktop']
+  TokenHash varchar(64) [not null, unique, note: 'SHA-256 ของ opaque access token สำหรับค้นหา session; ไม่เก็บ raw token | ข้อกำหนดเดิม: UQ_SchoolBotSession_TokenHash; SHA-256 only']
+  ProfileKind SchoolBotProfileKind [null, note: 'student หรือ employee เพื่อเลือกชนิด profile; null พร้อม ProfileId ก่อน Desktop bind หรือกรณี legacy admin ที่ไม่มี employee profile | ข้อกำหนดเดิม: student|employee; Desktop allows both student and employee for learning/trying only per decisions-025/026']
+  ProfileId int4 [null, note: 'รหัส TUser.sID เมื่อ kind=student หรือ TEmployees.sEmp เมื่อ kind=employee ใช้ SchoolId ประกอบเสมอ; null พร้อม ProfileKind | ข้อกำหนดเดิม: Legacy student SId or employee SEmp selected by ProfileKind and SchoolId']
+  LegacyAdminId varchar(64) [null, note: 'รหัสผู้ดูแลเดิมจากตัวตนเว็บที่ตรวจแล้ว เมื่อใช้กรณี legacy admin; null เมื่อไม่มีรหัสนี้ ห้ามแปลงเป็น sEmp เอง | ข้อกำหนดเดิม: Optional TAdmins.id from gateway web-principal when Channel = school_web']
+  DeviceJkt varchar(64) [null, note: 'ลายนิ้วมือ device key ที่ผูก session Desktop; ต้องมีใน desktop และต้อง null ใน school_web/staff_admin | ข้อกำหนดเดิม: NOT NULL iff Channel = desktop; NULL when school_web or staff_admin']
+  SourceTokenExpiresAt timestamptz [null, note: 'เวลา UTC หมดอายุของ token เว็บต้นทาง; null เมื่อไม่มีเวลา exp จากต้นทางหรือช่องทางนั้นไม่ใช้ token เว็บ | ข้อกำหนดเดิม: Optional exp of source web token when exchanged via DES-012']
+  ExpiresAt timestamptz [not null, note: 'เวลา UTC ที่ session SchoolBot หมดอายุ แม้ token ต้นทางไม่มี exp ก็ยังต้องมีอายุ session นี้']
+  RevokedAt timestamptz [null, note: 'เวลา UTC ที่เพิกถอน session เช่น logout; null หมายถึงยังไม่มีการเพิกถอน แต่ session อาจหมดอายุแล้ว']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotSession_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-004 Rev5, DES-012 Rev2). ProfileKind/ProfileId ต้อง null พร้อมกันหรือ non-null พร้อมกัน. Channel=desktop ต้องมี DeviceJkt และ AccountId และ bind ได้ทั้ง student/employee (ใช้เรียน/ลองเท่านั้น). Channel=school_web ต้องมี License โรงเรียนที่ active และ DeviceJkt IS NULL. Channel=staff_admin ต้องมี StaffRole active และ DeviceJkt IS NULL.'
+  Note: 'หน้าที่: เก็บ session เข้าใช้งานที่หมดอายุและเพิกถอนได้ โดยใช้บัญชีเดิม; ไม่ใช่ SchoolBotUser | หนึ่งแถว: หนึ่ง session สำหรับช่องทางหนึ่งและโรงเรียนหนึ่ง | ใช้เมื่อ: Desktop login/bind profile; เว็บแลก token; API ตรวจ session; logout/revoke | ตัวอย่าง: สมมติ: บัญชี Master เลข 900 เลือก profile นักเรียนเลข 120 ของโรงเรียน ก; AccountId และ ProfileId มีหน้าที่คนละอย่าง | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-006.md | ข้อกำหนดเดิม: SchoolBot DB (DES-004 Rev5, DES-012 Rev2). ProfileKind/ProfileId ต้อง null พร้อมกันหรือ non-null พร้อมกัน. Channel=desktop ต้องมี DeviceJkt และ AccountId และ bind ได้ทั้ง student/employee (ใช้เรียน/ลองเท่านั้น). Channel=school_web ต้องมี License โรงเรียนที่ active และ DeviceJkt IS NULL. Channel=staff_admin ต้องมี StaffRole active และ DeviceJkt IS NULL.'
 }
 
-Table SchoolBotStaffRole {
-  SchoolBotStaffRoleId int4 [pk, increment, not null]
-  EmployeeId int4 [not null, note: 'Legacy employee SEmp within home SchoolId']
-  Role SchoolBotStaffRoleName [not null]
-  ValidFrom timestamptz [not null]
-  ValidUntil timestamptz [null]
-  Reason varchar(1000) [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'Home SchoolId (> 0) of the staff employee account']
+Table SchoolBotStaffRole [headercolor: #7C3AED] {
+  SchoolBotStaffRoleId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotStaffRole (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  EmployeeId int4 [not null, note: 'TEmployees.sEmp ของผู้รับสิทธิ์ ใช้ร่วมกับ SchoolId ต้นสังกัด ไม่ใช่ Master AccountId | ข้อกำหนดเดิม: Legacy employee SEmp within home SchoolId']
+  Role SchoolBotStaffRoleName [not null, note: 'content_author=สร้างเนื้อหา, content_approver=อนุมัติเนื้อหา, level_policy_admin=ตั้งเกณฑ์ Level, license_admin=จัดการ License, release_publisher=เผยแพร่ซอฟต์แวร์, dashboard_viewer=ดู dashboard, staff_admin=จัดการสิทธิ์ส่วนกลาง']
+  ValidFrom timestamptz [not null, note: 'เวลา UTC เริ่มใช้สิทธิ์บทบาทนี้']
+  ValidUntil timestamptz [null, note: 'เวลา UTC สิ้นสุดสิทธิ์ ต้องหลัง ValidFrom; null หมายถึงไม่ตั้งวันสิ้นสุด แต่ยังถอนได้']
+  Reason varchar(1000) [not null, note: 'เหตุผลการมอบบทบาท เพื่อให้ตรวจสอบการให้สิทธิ์ย้อนหลังได้']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Home SchoolId (> 0) of the staff employee account']
 
   indexes {
     (SchoolId, EmployeeId, Role) [note: 'Partial unique index ux_schoolbot_staff_role_live WHERE IsDelete = false in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-012 Rev2). สิทธิ์พนักงานส่วนกลางของ SchoolBright สำหรับเรียก /v2/admin/* (รวม four-eyes content_author vs content_approver).'
+  Note: 'หน้าที่: กำหนดสิทธิ์งานส่วนกลางให้พนักงาน SchoolBright เป็นรายบทบาท | หนึ่งแถว: สิทธิ์หนึ่งบทบาทของพนักงานหนึ่งคนในโรงเรียนต้นสังกัดหนึ่ง | ใช้เมื่อ: ผู้ดูแลมอบ/ถอนสิทธิ์; admin API ตรวจบทบาทและช่วงเวลาที่มีผล | ตัวอย่าง: สมมติ: พนักงานคนหนึ่งเป็น content_author แต่อีกคนเป็น content_approver | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-007.md | ข้อกำหนดเดิม: SchoolBot DB (DES-012 Rev2). สิทธิ์พนักงานส่วนกลางของ SchoolBright สำหรับเรียก /v2/admin/* (รวม four-eyes content_author vs content_approver).'
 }
 
-Table SchoolBotProject {
-  SchoolBotProjectId int4 [pk, increment, not null]
-  OwnerKind SchoolBotProfileKind [not null]
-  OwnerId int4 [not null, note: 'Polymorphic legacy profile (student SId or employee SEmp) within SchoolId']
-  Mode SchoolBotMode [not null]
-  Name varchar(200) [not null]
-  CurrentRevision int4 [not null, note: 'Positive revision number, not a revision row ID']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotProject_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotProject [headercolor: #0891B2] {
+  SchoolBotProjectId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotProject (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  OwnerKind SchoolBotProfileKind [not null, note: 'student หรือ employee เพื่อบอกว่ารหัส OwnerId อยู่ในทะเบียนใด; เปลี่ยนเจ้าของชนิดนี้ไม่ได้']
+  OwnerId int4 [not null, note: 'รหัส profile เจ้าของ: TUser.sID หรือ TEmployees.sEmp ตาม OwnerKind พร้อม SchoolId | ข้อกำหนดเดิม: Polymorphic legacy profile (student SId or employee SEmp) within SchoolId']
+  Mode SchoolBotMode [not null, note: 'block, arm หรือ code กำหนดชนิดเนื้อหาและเครื่องมือเปิดงาน; เปลี่ยนโหมดของโครงงานเดิมไม่ได้']
+  Name varchar(200) [not null, note: 'ชื่อที่ผู้ใช้เห็น ความยาวไม่เกิน 200 ตัวอักษร ไม่ใช้เป็น filesystem path']
+  CurrentRevision int4 [not null, note: 'เลขลำดับ Revision ปัจจุบันใน SchoolBotProjectRevision ของ Project นี้; ไม่ใช่ SchoolBotProjectRevisionId | ข้อกำหนดเดิม: Positive revision number, not a revision row ID']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotProject_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (SchoolBotProjectId, CurrentRevision) [note: 'Composite FK source for FK_SchoolBotProject_CurrentRevision (DEFERRABLE INITIALLY DEFERRED)']
   }
 
-  Note: 'SchoolBot DB (DES-003). OwnerKind/OwnerId/SchoolId และ Mode เปลี่ยนไม่ได้; FK_SchoolBotProject_CurrentRevision เป็น DEFERRABLE INITIALLY DEFERRED.'
+  Note: 'หน้าที่: เก็บตัวโครงงาน Cloud ชื่อ เจ้าของ โหมด และ pointer ไปฉบับปัจจุบัน | หนึ่งแถว: หนึ่งโครงงานของหนึ่ง profile โดยมี revision เนื้อหาได้หลายฉบับ | ใช้เมื่อ: สร้าง เปิด เปลี่ยนชื่อ บันทึก สำเนา และ soft delete โครงงาน | ตัวอย่าง: สมมติ: นักเรียนมีโครงงาน Block ชื่อ เดินไปถึงธง และบันทึกแล้ว 3 revision | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-008.md | ข้อกำหนดเดิม: SchoolBot DB (DES-003). OwnerKind/OwnerId/SchoolId และ Mode เปลี่ยนไม่ได้; FK_SchoolBotProject_CurrentRevision เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
 
-Table SchoolBotProjectRevision {
-  SchoolBotProjectRevisionId int4 [pk, increment, not null]
-  ProjectId int4 [not null]
-  Revision int4 [not null]
-  Content jsonb [not null, note: 'DES-003 ProjectContent tagged union']
-  ContentHash varchar(64) [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotProjectRevision_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotProjectRevision [headercolor: #0891B2] {
+  SchoolBotProjectRevisionId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotProjectRevision (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  ProjectId int4 [not null, note: 'FK ไป SchoolBotProject เจ้าของ snapshot']
+  Revision int4 [not null, note: 'เลขลำดับฉบับภายใน Project เริ่มจาก 1; คู่ ProjectId/Revision ไม่ซ้ำ']
+  Content jsonb [not null, note: 'JSON เนื้อหาตาม DES-003: code เก็บ source, block เก็บ stacks/blocks, arm เก็บ poses/order/groups และค่าการเล่น; duration ของ Arm เป็น milliseconds ไม่เก็บสถานะเชื่อมต่อเป็นผลจริงถาวร | ข้อกำหนดเดิม: DES-003 ProjectContent tagged union']
+  ContentHash varchar(64) [not null, note: 'SHA-256 ของเนื้อหา ใช้ระบุตรวจความตรงกันของ snapshot ไม่ใช่คะแนนหรือหลักฐานว่ารันผ่าน']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotProjectRevision_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (ProjectId, Revision) [unique, name: 'UQ_SchoolBotProjectRevision_ProjectId_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-003). Immutable revision snapshot.'
+  Note: 'หน้าที่: เก็บเนื้อหาโครงงานแต่ละฉบับแบบ immutable เพื่อเปิดย้อนหลังและส่งงานฉบับที่แน่นอน | หนึ่งแถว: หนึ่ง snapshot ของโครงงานหนึ่ง ณ เลข Revision หนึ่ง | ใช้เมื่อ: การบันทึกสร้าง revision ใหม่; เปิดงาน/ทำสำเนา/ตรวจงานอ่าน snapshot | ตัวอย่าง: สมมติ: งานที่ส่งอ้าง revision 3 แม้เจ้าของจะบันทึก revision 4 ภายหลัง | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-009.md | ข้อกำหนดเดิม: SchoolBot DB (DES-003). Immutable revision snapshot.'
 }
 
-Table SchoolBotLevel {
-  SchoolBotLevelId int4 [pk, increment, not null]
-  LevelKey uuid [not null, unique, note: 'UQ_SchoolBotLevel_LevelKey']
-  Code varchar(64) [not null, unique, note: 'UQ_SchoolBotLevel_Code']
-  Ordinal int4 [not null, unique, note: 'UQ_SchoolBotLevel_Ordinal']
-  Title jsonb [not null, note: 'Text localized object']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotLevel [headercolor: #059669] {
+  SchoolBotLevelId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLevel (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LevelKey uuid [not null, unique, note: 'UUID ถาวรของระดับ ใช้อ้างตัวตนเชิงเนื้อหาแยกจาก PK | ข้อกำหนดเดิม: UQ_SchoolBotLevel_LevelKey']
+  Code varchar(64) [not null, unique, note: 'รหัสระดับสำหรับสื่อสารและค้นหา เช่น BEGINNER; ไม่ซ้ำ | ข้อกำหนดเดิม: UQ_SchoolBotLevel_Code']
+  Ordinal int4 [not null, unique, note: 'ลำดับระดับตั้งแต่ 1 ใช้เรียงก่อนหลัง; ไม่ใช่เลขชั้น ป./ม. | ข้อกำหนดเดิม: UQ_SchoolBotLevel_Ordinal']
+  Title jsonb [not null, note: 'JSON ชื่อระดับหลายภาษาแบบ Text มี default_locale และข้อความ th/en/zh; ภาษาหลักต้องมีข้อความ | ข้อกำหนดเดิม: Text localized object']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
-  Note: 'SchoolBot DB (DES-005 Rev5, DES-011 Rev3). แกนระดับหลักสูตรกลาง Beginner -> Expert; SchoolId ต้องเป็น NULL เสมอ.'
+  Note: 'หน้าที่: กำหนดระดับหลักสูตรกลางและลำดับความก้าวหน้า ไม่ใช่ชั้นเรียนในทะเบียนนักเรียน | หนึ่งแถว: หนึ่งระดับหลักสูตรกลาง เช่น Beginner | ใช้เมื่อ: ส่วนกลางจัดระดับ; หลักสูตรอ้างระดับ; ระบบเสนอ Level ถัดไป | ตัวอย่าง: สมมติ: ห้อง ป.4 เรียน Level Beginner ได้โดยไม่ได้เปลี่ยนทะเบียนเป็นชั้นอื่น | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-010.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5, DES-011 Rev3). แกนระดับหลักสูตรกลาง Beginner -> Expert; SchoolId ต้องเป็น NULL เสมอ.'
 }
 
-Table SchoolBotLevelPromotionPolicy {
-  SchoolBotLevelPromotionPolicyId int4 [pk, increment, not null]
-  LevelId int4 [not null]
-  Revision int4 [not null]
-  Threshold numeric(9,6) [not null, note: '0..100; revision 1 defaults to 70.000000 per decisions-024']
-  Reason varchar(1000) [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotLevelPromotionPolicy [headercolor: #059669] {
+  SchoolBotLevelPromotionPolicyId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLevelPromotionPolicy (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LevelId int4 [not null, note: 'FK ไป SchoolBotLevel ที่ใช้เกณฑ์นี้']
+  Revision int4 [not null, note: 'เลขรุ่นเกณฑ์ภายใน Level; เปลี่ยนเกณฑ์สร้างแถวใหม่ ไม่ย้อนแก้ใบเสนอเก่า']
+  Threshold numeric(9,6) [not null, note: 'คะแนนเกณฑ์บนฐาน 0–100 เก็บ numeric(9,6); สัญญาใช้ average > threshold และเกณฑ์ revision แรกของ Level ใหม่เป็น 70 | ข้อกำหนดเดิม: 0..100; revision 1 defaults to 70.000000 per decisions-024']
+  Reason varchar(1000) [not null, note: 'เหตุผลที่กำหนดหรือเปลี่ยนเกณฑ์ เพื่ออธิบายว่าทำไมแต่ละรุ่นต่างกัน']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (LevelId, Revision) [unique, name: 'UQ_SchoolBotLevelPromotionPolicy_Level_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-011 Rev3). เกณฑ์คะแนนเฉลี่ยของห้องราย Level ที่ตั้งโดย level_policy_admin; immutable ต่อ revision.'
+  Note: 'หน้าที่: เก็บเกณฑ์ค่าเฉลี่ยสำหรับเสนอเลื่อน Level โดยเก็บประวัติการเปลี่ยนเกณฑ์ | หนึ่งแถว: เกณฑ์หนึ่ง revision สำหรับ Level หนึ่ง | ใช้เมื่อ: ส่วนกลางเพิ่ม revision เกณฑ์; LevelProposal อ่าน revision ที่ใช้ประเมิน | ตัวอย่าง: สมมติ: เกณฑ์ 70 หมายถึงค่าเฉลี่ย 70 ยังไม่ผ่าน แต่ค่าที่สูงกว่า 70 จึงเข้าเงื่อนไข | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-011.md | ข้อกำหนดเดิม: SchoolBot DB (DES-011 Rev3). เกณฑ์คะแนนเฉลี่ยของห้องราย Level ที่ตั้งโดย level_policy_admin; immutable ต่อ revision.'
 }
 
-Table SchoolBotCurriculum {
-  SchoolBotCurriculumId int4 [pk, increment, not null]
-  CurriculumKey uuid [not null, note: 'Logical key across revisions']
-  Revision int4 [not null]
-  LevelId int4 [not null]
-  Title jsonb [not null, note: 'Text localized object']
-  RecommendedGrades jsonb [not null, note: 'T16[] recommended grade codes; default guidance only']
-  Subjects jsonb [not null, note: 'CurriculumSubject[] {subject_key, code, title}']
-  SourceRef varchar(2048) [not null]
-  Lifecycle SchoolBotContentState [not null]
-  PublishedAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotCurriculum [headercolor: #059669] {
+  SchoolBotCurriculumId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotCurriculum (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CurriculumKey uuid [not null, note: 'UUID ของหลักสูตรที่คงเดิมข้าม revision | ข้อกำหนดเดิม: Logical key across revisions']
+  Revision int4 [not null, note: 'เลขฉบับหลักสูตร; คู่ CurriculumKey/Revision ไม่ซ้ำ และฉบับเผยแพร่แล้วไม่ย้อนแก้เนื้อหา']
+  LevelId int4 [not null, note: 'FK ไป SchoolBotLevel ของหลักสูตรฉบับนี้']
+  Title jsonb [not null, note: 'ชื่อหลักสูตรหลายภาษาแบบ Text ใช้แสดงรายการและหัวหลักสูตร | ข้อกำหนดเดิม: Text localized object']
+  RecommendedGrades jsonb [not null, note: 'JSON array ระดับชั้นที่แนะนำ เช่น ป.4; เป็นคำแนะนำ ไม่ใช่เงื่อนไขห้ามชั้นอื่นเรียน | ข้อกำหนดเดิม: T16[] recommended grade codes; default guidance only']
+  Subjects jsonb [not null, note: 'JSON รายวิชากลาง แต่ละรายการมี subject_key, code, title; ไม่ใช่รหัส TPlane ของโรงเรียน | ข้อกำหนดเดิม: CurriculumSubject[] {subject_key, code, title}']
+  SourceRef varchar(2048) [not null, note: 'แหล่งอ้างอิงเนื้อหา เช่น Course Plan หรือเอกสารต้นทาง เพื่อย้อนตรวจที่มา']
+  Lifecycle SchoolBotContentState [not null, note: 'draft=กำลังจัดทำ, published=อนุมัติให้เลือกใช้, retired=เลิกให้เลือกใช้ใหม่โดยยังเก็บประวัติ']
+  PublishedAt timestamptz [null, note: 'เวลา UTC เผยแพร่หลักสูตร; null เมื่อยังไม่มีการเผยแพร่ และต้องมีค่าเมื่อ published']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (CurriculumKey, Revision) [unique, name: 'UQ_SchoolBotCurriculum_Key_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-005 Rev5). เนื้อหากลางของ SchoolBright (SchoolId IS NULL); ถอน Mode ออกจาก Curriculum ไปไว้ที่ Activity ตาม decisions-026; publish ต้องผ่าน four-eyes.'
+  Note: 'หน้าที่: เก็บหลักสูตรกลางเป็นราย revision เพื่อให้แต่ละห้องเลือกใช้เนื้อหาฉบับแน่นอน | หนึ่งแถว: หนึ่ง revision ของหลักสูตรหนึ่งสำหรับ Level หนึ่ง | ใช้เมื่อ: ส่วนกลางสร้างร่าง/อนุมัติเผยแพร่; โรงเรียนเลือกเปิด CourseRun; ผู้เรียนอ่านบทเรียน | ตัวอย่าง: สมมติ: หลักสูตร Beginner revision 2 มีทั้งกิจกรรม Block, Arm และ Quiz | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-012.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). เนื้อหากลางของ SchoolBright (SchoolId IS NULL); ถอน Mode ออกจาก Curriculum ไปไว้ที่ Activity ตาม decisions-026; publish ต้องผ่าน four-eyes.'
 }
 
-Table SchoolBotLesson {
-  SchoolBotLessonId int4 [pk, increment, not null]
-  CurriculumId int4 [not null]
-  LessonKey uuid [not null, note: 'Stable logical lesson key across revisions']
-  Ordinal int4 [not null]
-  Title jsonb [not null]
-  Objective jsonb [not null]
-  Instructions jsonb [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotLesson [headercolor: #059669] {
+  SchoolBotLessonId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLesson (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CurriculumId int4 [not null, note: 'FK ไป SchoolBotCurriculum ฉบับที่บทเรียนนี้สังกัด']
+  LessonKey uuid [not null, note: 'UUID ของบทเรียนที่คงตัวตนข้าม revision ของหลักสูตร แม้ row ID เปลี่ยน | ข้อกำหนดเดิม: Stable logical lesson key across revisions']
+  Ordinal int4 [not null, note: 'ลำดับแสดงบทเรียนภายใน curriculum revision; เริ่มจาก 1 และไม่ซ้ำในฉบับเดียวกัน']
+  Title jsonb [not null, note: 'ชื่อบทเรียนหลายภาษาแบบ Text']
+  Objective jsonb [not null, note: 'ผลการเรียนรู้ที่บทนี้มุ่งให้ผู้เรียนทำได้ เป็น Text หลายภาษา']
+  Instructions jsonb [not null, note: 'คำอธิบายหรือแนวทางเรียนระดับบท เป็น Text หลายภาษา แยกจากโจทย์ภารกิจเฉพาะ']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (CurriculumId, LessonKey) [unique, name: 'UQ_SchoolBotLesson_Curriculum_LessonKey']
     (CurriculumId, Ordinal) [unique, name: 'UQ_SchoolBotLesson_Curriculum_Ordinal']
   }
 
-  Note: 'SchoolBot DB (DES-005 Rev5). บทเรียนในหลักสูตรกลาง; immutable หลัง parent curriculum publish.'
+  Note: 'หน้าที่: จัดเนื้อหาในหลักสูตรให้เป็นบทหรือหน่วยการเรียนที่มีกิจกรรมและภารกิจ | หนึ่งแถว: บทเรียนหนึ่งบทภายใน curriculum revision หนึ่ง | ใช้เมื่อ: ส่วนกลางจัดเนื้อหา; ผู้เรียนเปิดบทเรียน; mapping ใช้บทเรียนช่วยเลือกกลุ่มกิจกรรม | ตัวอย่าง: สมมติ: บทเรียน ลำดับคำสั่ง มีกิจกรรมอ่านคำแนะนำ ทำโครงงาน และทำ Quiz | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-013.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). บทเรียนในหลักสูตรกลาง; immutable หลัง parent curriculum publish.'
 }
 
-Table SchoolBotMission {
-  SchoolBotMissionId int4 [pk, increment, not null]
-  LessonId int4 [not null]
-  MissionKey uuid [not null]
-  Ordinal int4 [not null]
-  Title jsonb [not null]
-  Instructions jsonb [not null]
-  Method SchoolBotAssessmentMethod [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotMission [headercolor: #059669] {
+  SchoolBotMissionId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotMission (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LessonId int4 [not null, note: 'FK ไป SchoolBotLesson ที่ภารกิจอยู่']
+  MissionKey uuid [not null, note: 'UUID ถาวรของโจทย์ข้าม curriculum revision']
+  Ordinal int4 [not null, note: 'ลำดับภารกิจภายใน Lesson; ไม่ใช่ ActivityId หรือเลขช่องคะแนน']
+  Title jsonb [not null, note: 'ชื่อโจทย์หลายภาษาแบบ Text เพื่อให้ผู้เรียนรู้ว่าจะทำงานอะไร']
+  Instructions jsonb [not null, note: 'คำสั่งและข้อกำหนดของงานที่ต้องส่ง เป็น Text หลายภาษา']
+  Method SchoolBotAssessmentMethod [not null, note: 'automatic=ระบบตรวจงาน Block/Code, teacher=ครูตรวจงาน Arm; ต้องสอดคล้องกับ Mode ของ project Activity']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (LessonId, MissionKey) [unique, name: 'UQ_SchoolBotMission_Lesson_MissionKey']
     (LessonId, Ordinal) [unique, name: 'UQ_SchoolBotMission_Lesson_Ordinal']
   }
 
-  Note: 'SchoolBot DB (DES-005 Rev5). Project Activity อ้างถึง Mission ใน Lesson เดียวกัน; Method ต้องสอดคล้องกับ Activity.Mode.'
+  Note: 'หน้าที่: นิยามโจทย์โครงงานที่จะส่งให้ตรวจ พร้อมวิธีประเมิน | หนึ่งแถว: ภารกิจโครงงานหนึ่งภายใต้บทเรียน; project Activity อ้างภารกิจนี้ผ่าน Config | ใช้เมื่อ: จัดโจทย์และ Criteria; นักเรียนสร้าง Submission; ระบบหรือครูเลือกวิธีตรวจ | ตัวอย่าง: สมมติ: ภารกิจให้เขียน Block เดินขวา 3 ช่อง แล้วส่งโครงงานให้ตรวจ | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-014.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). Project Activity อ้างถึง Mission ใน Lesson เดียวกัน; Method ต้องสอดคล้องกับ Activity.Mode.'
 }
 
-Table SchoolBotCriteria {
-  SchoolBotCriteriaId int4 [pk, increment, not null]
-  MissionId int4 [not null]
-  Revision int4 [not null]
-  Rules jsonb [not null, note: 'DES-005 CriteriaRules automatic-v1 or teacher-v1']
-  SourceRef varchar(2048) [not null]
-  ApprovedBy varchar(512) [null]
-  ApprovedAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotCriteria [headercolor: #059669] {
+  SchoolBotCriteriaId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotCriteria (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  MissionId int4 [not null, note: 'FK ไป SchoolBotMission ที่เกณฑ์นี้ใช้ตรวจ; ต้องตรงกับ MissionId ของ Submission']
+  Revision int4 [not null, note: 'เลขฉบับเกณฑ์ภายใน Mission; ฉบับเผยแพร่หรือถูกใช้แล้วไม่ย้อนแก้']
+  Rules jsonb [not null, note: 'JSON เกณฑ์ตาม DES-005: automatic-v1 ใช้ combine all/any กับ trace_equals, steps_at_most, uses_op; teacher-v1 ใช้รายการ rubric; กติกานี้ยังไม่ใช่สูตรแปลงผ่านเป็นคะแนนเต็ม | ข้อกำหนดเดิม: DES-005 CriteriaRules automatic-v1 or teacher-v1']
+  SourceRef varchar(2048) [not null, note: 'เอกสารหรือหลักฐานต้นทางของกฎที่ใช้ตัดสินผลงาน']
+  ApprovedBy varchar(512) [null, note: 'ตัวตนผู้อนุมัติแบบ Actor; null พร้อม ApprovedAt เมื่อยังไม่มีการอนุมัติ']
+  ApprovedAt timestamptz [null, note: 'เวลา UTC อนุมัติเกณฑ์; null พร้อม ApprovedBy และต้องอนุมัติก่อน publish/use ตามสัญญา']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (MissionId, Revision) [unique, name: 'UQ_SchoolBotCriteria_Mission_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-005 Rev5). เกณฑ์ประเมินของ Mission กลาง; immutable เมื่อ publish หรือถูกใช้ส่งงาน.'
+  Note: 'หน้าที่: เก็บเกณฑ์ตรวจภารกิจเป็นราย revision พร้อมหลักฐานอนุมัติ | หนึ่งแถว: เกณฑ์ตรวจหนึ่งฉบับของ Mission หนึ่ง | ใช้เมื่อ: ส่วนกลางจัดทำ/อนุมัติเกณฑ์; Submission ตรึงเกณฑ์; evaluator หรือครูใช้ตรวจ | ตัวอย่าง: สมมติ: เกณฑ์กำหนดให้ trace ตรงกับคำสั่งที่คาดไว้ และใช้จำนวนก้าวไม่เกินกำหนด | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-015.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). เกณฑ์ประเมินของ Mission กลาง; immutable เมื่อ publish หรือถูกใช้ส่งงาน.'
 }
 
-Table SchoolBotActivity {
-  SchoolBotActivityId int4 [pk, increment, not null]
-  LessonId int4 [not null]
-  ActivityKey uuid [not null, note: 'Stable logical activity key across revisions']
-  Ordinal int4 [not null]
-  Title jsonb [not null]
-  Type SchoolBotActivityType [not null, note: 'instruction|project|quiz|test']
-  Mode SchoolBotMode [null, note: 'NOT NULL when Type = project; NULL when instruction|quiz|test']
-  Indicators jsonb [not null, note: 'Indicator[] {indicator_key, code, title}']
-  Config jsonb [not null, note: 'ActivityConfig: instruction-v1 | project-v1 | question-v1 (with default_policy: AssessmentPolicy)']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotActivity [headercolor: #059669] {
+  SchoolBotActivityId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotActivity (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LessonId int4 [not null, note: 'FK ไป SchoolBotLesson เจ้าของกิจกรรม']
+  ActivityKey uuid [not null, note: 'UUID ถาวรของกิจกรรมข้าม curriculum revision | ข้อกำหนดเดิม: Stable logical activity key across revisions']
+  Ordinal int4 [not null, note: 'ลำดับกิจกรรมภายใน Lesson; ไม่ซ้ำใน Lesson เดียวกัน']
+  Title jsonb [not null, note: 'ชื่อกิจกรรมหลายภาษาแบบ Text ใช้แสดงให้ผู้เรียนและครูเลือก']
+  Type SchoolBotActivityType [not null, note: 'instruction=อ่าน/ดูสื่อ, project=ทำและส่งโครงงาน, quiz=แบบฝึกทดสอบ, test=การสอบ | ข้อกำหนดเดิม: instruction|project|quiz|test']
+  Mode SchoolBotMode [null, note: 'block, arm หรือ code เฉพาะ Type=project; null สำหรับ instruction/quiz/test | ข้อกำหนดเดิม: NOT NULL when Type = project; NULL when instruction|quiz|test']
+  Indicators jsonb [not null, note: 'JSON รายตัวชี้วัดกลางของกิจกรรม มี indicator_key, code, title; ไม่ใช่ PGTAssessment | ข้อกำหนดเดิม: Indicator[] {indicator_key, code, title}']
+  Config jsonb [not null, note: 'JSON รายละเอียดตามชนิด: instruction-v1 เก็บคำแนะนำและสื่อ, project-v1 อ้าง mission_id, question-v1 อ้าง bank_id/question_keys/default_policy; policy มีจำนวนครั้ง วิธีเลือกคะแนน เวลาเป็นวินาที เวลาเปิดเฉลย และการสุ่ม | ข้อกำหนดเดิม: ActivityConfig: instruction-v1 | project-v1 | question-v1 (with default_policy: AssessmentPolicy)']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (LessonId, ActivityKey) [unique, name: 'UQ_SchoolBotActivity_Lesson_ActivityKey']
     (LessonId, Ordinal) [unique, name: 'UQ_SchoolBotActivity_Lesson_Ordinal']
   }
 
-  Note: 'SchoolBot DB (DES-005 Rev5, DES-010 Rev3). กิจกรรมรายคาบ/บทเรียนในหลักสูตรกลาง.'
+  Note: 'หน้าที่: นิยามหน่วยกิจกรรมที่ผู้เรียนพบในบทเรียน ทั้งการอ่าน โครงงาน Quiz และ Test | หนึ่งแถว: กิจกรรมหนึ่งรายการภายใต้ Lesson หนึ่ง; เฉพาะชนิด project จึงอ้าง Mission | ใช้เมื่อ: แสดงลำดับกิจกรรม; เปิดให้ห้องเรียนทำ; ติดตามผล; เลือกแหล่งคะแนนสำหรับ mapping | ตัวอย่าง: สมมติ: บทหนึ่งมี instruction ตามด้วย project แบบ Block และ quiz | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-016.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5, DES-010 Rev3). กิจกรรมรายคาบ/บทเรียนในหลักสูตรกลาง.'
 }
 
-Table SchoolBotQuestionBank {
-  SchoolBotQuestionBankId int4 [pk, increment, not null]
-  BankKey uuid [not null]
-  Revision int4 [not null]
-  Title jsonb [not null]
-  Questions jsonb [not null, note: 'Question[] (single_choice | boolean); contains protected correct_option_keys']
-  SourceRef varchar(2048) [not null]
-  Lifecycle SchoolBotContentState [not null]
-  PublishedAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+Table SchoolBotQuestionBank [headercolor: #059669] {
+  SchoolBotQuestionBankId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotQuestionBank (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  BankKey uuid [not null, note: 'UUID ของคลังข้อสอบที่คงเดิมข้าม revision']
+  Revision int4 [not null, note: 'เลขฉบับคลัง; เผยแพร่แล้วไม่ย้อนแก้ข้อสอบที่ Attempt เคยใช้']
+  Title jsonb [not null, note: 'ชื่อคลังข้อสอบหลายภาษาแบบ Text']
+  Questions jsonb [not null, note: 'JSON array ของข้อสอบ มี question_key, kind, prompt, options, correct_option_keys และ max_score; kind รองรับ single_choice/boolean, คะแนนเต็มเป็น DecimalString มากกว่า 0 และเฉลยไม่ส่งให้ผู้เรียนก่อนเวลาที่อนุญาต | ข้อกำหนดเดิม: Question[] (single_choice | boolean); contains protected correct_option_keys']
+  SourceRef varchar(2048) [not null, note: 'แหล่งอ้างอิงข้อสอบสำหรับตรวจที่มาและความถูกต้อง']
+  Lifecycle SchoolBotContentState [not null, note: 'draft=ร่าง, published=เผยแพร่ผ่านการอนุมัติ, retired=เลิกใช้ใหม่แต่คงประวัติ']
+  PublishedAt timestamptz [null, note: 'เวลา UTC เผยแพร่คลัง; null เมื่อยังไม่มีการเผยแพร่ และต้องมีค่าเมื่อ published']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
 
   indexes {
     (BankKey, Revision) [unique, name: 'UQ_SchoolBotQuestionBank_BankKey_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-010 Rev3). คลังข้อสอบกลางแบบ revision; publish ต้องผ่าน four-eyes; immutable หลัง publish.'
+  Note: 'หน้าที่: เก็บคลังข้อสอบกลางเป็นฉบับ เพื่อให้ Quiz/Test ใช้ข้อสอบและเฉลยที่ตรวจสอบย้อนหลังได้ | หนึ่งแถว: หนึ่ง revision ของคลังข้อสอบหนึ่งชุด | ใช้เมื่อ: ส่วนกลางสร้าง/อนุมัติคลัง; Activity เลือกข้อ; Attempt snapshot คัดลอกข้อที่ใช้จริง | ตัวอย่าง: สมมติ: คลัง ลำดับคำสั่ง revision 1 มีข้อเลือกตอบและข้อถูก/ผิด | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-017.md | ข้อกำหนดเดิม: SchoolBot DB (DES-010 Rev3). คลังข้อสอบกลางแบบ revision; publish ต้องผ่าน four-eyes; immutable หลัง publish.'
 }
 
-Table SchoolBotCourseRun {
-  SchoolBotCourseRunId int4 [pk, increment, not null]
-  CurriculumId int4 [not null]
-  ClassroomId int4 [not null, note: 'Legacy NTermSubLevel2 within SchoolId']
-  NYear int4 [not null]
-  NTerm varchar(64) [not null, note: 'Legacy TTerm.NTerm']
-  PlanCourseIds jsonb [not null, note: 'Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
-  CurrentPolicyId int4 [null]
-  PreviousRunId int4 [null]
-  EffectiveAt timestamptz [not null]
-  Lifecycle SchoolBotCourseRunState [not null, note: 'planned|active|closing|closed']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotCourseRun_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotCourseRun [headercolor: #D97706] {
+  SchoolBotCourseRunId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotCourseRun (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CurriculumId int4 [not null, note: 'FK ไป SchoolBotCurriculum ฉบับที่เลือกใช้; ไม่เปลี่ยนฉบับกลางทางของ run เดิม']
+  ClassroomId int4 [not null, note: 'รหัสห้อง TTermSubLevel2.nTermSubLevel2 ใช้ร่วมกับ SchoolId และบริบทปี/เทอม | ข้อกำหนดเดิม: Legacy NTermSubLevel2 within SchoolId']
+  NYear int4 [not null, note: 'รหัสปีจากระบบเดิม ใช้เชื่อม TYear.nYear และ TTerm.nYear; ไม่ใช่ numberYear ที่แสดง เช่น 2569 โดยอัตโนมัติ']
+  NTerm varchar(64) [not null, note: 'รหัสเทอมเดิมชนิดข้อความจาก TTerm.nTerm; ไม่ใช่การใส่เลข 1 หรือ 2 โดยไม่ resolve | ข้อกำหนดเดิม: Legacy TTerm.NTerm']
+  PlanCourseIds jsonb [not null, note: 'integer[] ของ TPlanCourse.PlanCourseId ที่ผูก run; ต้องมีอย่างน้อยหนึ่งรายการ ไม่มี null และตามสัญญาต้องไม่ซ้ำและตรงห้อง/เทอม | ข้อกำหนดเดิม: Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
+  CurrentPolicyId int4 [null, note: 'FK ไป SchoolBotScoringPolicy ฉบับปัจจุบันของ run นี้; null เมื่อยังไม่มี pointer ไป policy']
+  PreviousRunId int4 [null, note: 'FK ไป CourseRun ก่อนหน้าที่นำมาสู่ run นี้; null เมื่อไม่ใช่ successor']
+  EffectiveAt timestamptz [not null, note: 'เวลา UTC ที่การเปิดใช้ run นี้มีผล รวมกรณี run เทอมถัดไปจากการตัดสิน Level']
+  Lifecycle SchoolBotCourseRunState [not null, note: 'planned=เตรียมเปิด, active=กำลังใช้, closing=กำลังปิดเทอม, closed=ปิดแล้ว | ข้อกำหนดเดิม: planned|active|closing|closed']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotCourseRun_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (SchoolId, ClassroomId, NYear, NTerm) [note: 'Partial unique index ux_schoolbot_courserun_active_room WHERE Lifecycle IN (planned,active,closing) AND IsDelete = false in DDL']
     (PreviousRunId) [note: 'Partial unique index ux_schoolbot_courserun_one_successor WHERE PreviousRunId IS NOT NULL AND IsDelete = false in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-008 Rev3, DES-010 Rev3, DES-011 Rev3). การเปิดใช้หลักสูตรกลางกับห้อง/ปี/เทอมและชุดวิชา PlanCourseIds ของโรงเรียน; FK_SchoolBotCourseRun_CurrentPolicy เป็น DEFERRABLE INITIALLY DEFERRED.'
+  Note: 'หน้าที่: นำหลักสูตรกลางฉบับหนึ่งมาเปิดใช้จริงกับห้อง ปี และเทอมของโรงเรียน | หนึ่งแถว: การเปิดใช้ curriculum revision หนึ่งกับห้องหนึ่งในปี/เทอมหนึ่ง | ใช้เมื่อ: ผู้ดูแลโรงเรียนเปิด/ปิดหลักสูตร; ครูตั้งคะแนนและกิจกรรม; ตรวจ roster, mapping, export และการต่อ Level | ตัวอย่าง: สมมติ: ห้อง ป.4/1 ใช้ Beginner revision 2 ในเทอมที่เลือก และผูกวิชาวิทยาการคำนวณของห้องนั้น | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-018.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3, DES-010 Rev3, DES-011 Rev3). การเปิดใช้หลักสูตรกลางกับห้อง/ปี/เทอมและชุดวิชา PlanCourseIds ของโรงเรียน; FK_SchoolBotCourseRun_CurrentPolicy เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
 
-Table SchoolBotScoringPolicy {
-  SchoolBotScoringPolicyId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  Revision int4 [not null]
-  Policy jsonb [not null, note: 'DES-010 Rev3 ScoringPolicy {quiz_counts, activity_weights, formula_version}; immutable']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScoringPolicy_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScoringPolicy [headercolor: #D97706] {
+  SchoolBotScoringPolicyId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoringPolicy (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun; อ่าน CurriculumId ผ่าน run จึงไม่มีคอลัมน์ CurriculumId ซ้ำ']
+  Revision int4 [not null, note: 'เลขฉบับนโยบายภายใน run; การเปลี่ยนสร้างแถวใหม่เพื่อรักษาประวัติ']
+  Policy jsonb [not null, note: 'JSON มี quiz_counts, activity_weights และ formula_version; weight_bps เป็น basis points 0–10000 โดย 10000=100% และน้ำหนักรวม 10000; formula_version=null หมายถึงยังไม่มีสูตรรวมที่ยืนยันสำหรับการเลื่อน Level | ข้อกำหนดเดิม: DES-010 Rev3 ScoringPolicy {quiz_counts, activity_weights, formula_version}; immutable']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScoringPolicy_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (CourseRunId, Revision) [unique, name: 'UQ_SchoolBotScoringPolicy_CourseRun_Revision']
   }
 
-  Note: 'SchoolBot DB (DES-010 Rev3). นโยบายการนับคะแนน Quiz และน้ำหนักกิจกรรมราย CourseRun (ถอน CurriculumId ที่ซ้ำกับ CourseRun.CurriculumId ตาม db/review-005.md).'
+  Note: 'หน้าที่: เก็บนโยบายนับคะแนนและน้ำหนักกิจกรรมของห้องเป็นราย revision | หนึ่งแถว: หนึ่งฉบับนโยบายคะแนนของ CourseRun หนึ่ง | ใช้เมื่อ: ครูเพิ่ม policy ฉบับใหม่; การเลือกแหล่งคะแนนและการคำนวณ Level อ่าน policy ที่อ้างอิง | ตัวอย่าง: สมมติ: ห้องกำหนดไม่เอาคะแนน Quiz มารวม จึงให้น้ำหนัก Quiz เป็น 0 | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-019.md | ข้อกำหนดเดิม: SchoolBot DB (DES-010 Rev3). นโยบายการนับคะแนน Quiz และน้ำหนักกิจกรรมราย CourseRun (ถอน CurriculumId ที่ซ้ำกับ CourseRun.CurriculumId ตาม db/review-005.md).'
 }
 
-Table SchoolBotCourseRunActivity {
-  SchoolBotCourseRunActivityId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  ActivityId int4 [not null]
-  OpensAt timestamptz [null]
-  ClosesAt timestamptz [null]
-  PolicyOverride jsonb [null, note: 'Optional AssessmentPolicy override per classroom CourseRun']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotCourseRunActivity_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotCourseRunActivity [headercolor: #D97706] {
+  SchoolBotCourseRunActivityId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotCourseRunActivity (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ที่ใช้การตั้งค่านี้']
+  ActivityId int4 [not null, note: 'FK ไป SchoolBotActivity ซึ่งต้องอยู่ใน curriculum revision ของ run']
+  OpensAt timestamptz [null, note: 'เวลา UTC เริ่มเปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตเริ่มด้วยฟิลด์นี้ แต่ยังต้องตรวจเงื่อนไขอื่น']
+  ClosesAt timestamptz [null, note: 'เวลา UTC ปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตปิดด้วยฟิลด์นี้; หากมีทั้งคู่ต้องหลัง OpensAt']
+  PolicyOverride jsonb [null, note: 'JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010 | ข้อกำหนดเดิม: Optional AssessmentPolicy override per classroom CourseRun']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotCourseRunActivity_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (CourseRunId, ActivityId) [unique, name: 'UQ_SchoolBotCourseRunActivity_Run_Activity']
   }
 
-  Note: 'SchoolBot DB (DES-010 Rev3). การตั้งเวลาเปิด-ปิดและ override AssessmentPolicy รายห้องโดยครูรายวิชา; ClosesAt > OpensAt เมื่อมีทั้งคู่.'
+  Note: 'หน้าที่: ตั้งเวลาเปิดกิจกรรมและนโยบายเฉพาะห้อง โดยแยกจากเนื้อหากิจกรรมกลาง | หนึ่งแถว: การตั้งค่ากิจกรรมหนึ่งใน CourseRun หนึ่ง | ใช้เมื่อ: ครูตั้งเวลา/override; server ตรวจว่าผู้เรียนเริ่มหรือส่ง Attempt ได้หรือไม่ | ตัวอย่าง: สมมติ: Test กลางชุดเดียวกันเปิดให้ห้อง ป.4/1 ทำในช่วงเวลาที่ครูกำหนด | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-020.md | ข้อกำหนดเดิม: SchoolBot DB (DES-010 Rev3). การตั้งเวลาเปิด-ปิดและ override AssessmentPolicy รายห้องโดยครูรายวิชา; ClosesAt > OpensAt เมื่อมีทั้งคู่.'
 }
 
-Table SchoolBotSubmission {
-  SchoolBotSubmissionId int4 [pk, increment, not null]
-  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId (student only in current schema)']
-  MissionId int4 [not null]
-  CriteriaId int4 [not null]
-  ProjectRevisionId int4 [not null]
-  SubmittedAt timestamptz [not null]
-  State SchoolBotSubmissionState [not null]
-  CurrentAssessmentId int4 [null]
-  Evidence jsonb [null, note: 'DES-005 ArmEvidence']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotSubmission_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotSubmission [headercolor: #DC2626] {
+  SchoolBotSubmissionId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotSubmission (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  LearnerId int4 [not null, note: 'TUser.sID ของนักเรียนพร้อม SchoolId; schema ปัจจุบันไม่ใช้ sEmp ของครูแทน | ข้อกำหนดเดิม: Legacy student SId within SchoolId (student only in current schema)']
+  MissionId int4 [not null, note: 'FK ไป SchoolBotMission ที่ส่งงานตอบ']
+  CriteriaId int4 [not null, note: 'FK ไป SchoolBotCriteria ฉบับที่ใช้ตรวจ ต้องเป็นของ MissionId เดียวกัน']
+  ProjectRevisionId int4 [not null, note: 'FK ไป SchoolBotProjectRevision ที่ส่งจริง ต้องเป็นของนักเรียนคนนี้และโรงเรียนเดียวกัน ไม่ใช่ local UUID']
+  SubmittedAt timestamptz [not null, note: 'เวลา UTC ที่ server รับการส่งงานนี้']
+  State SchoolBotSubmissionState [not null, note: 'queued=รอระบบตรวจ, grading=กำลังตรวจ, awaiting_teacher=รอครู, evaluated=มีผลแล้ว, error=กระบวนการตรวจผิดพลาด ซึ่งไม่เท่ากับสอบไม่ผ่าน']
+  CurrentAssessmentId int4 [null, note: 'FK ไป SchoolBotAssessment ผลปัจจุบันของ Submission นี้; null เมื่อยังไม่มีผลที่ชี้ใช้งาน']
+  Evidence jsonb [null, note: 'JSON หลักฐานประกอบงาน Arm มี profile_hash, acceptance_ref และ note; null เมื่อไม่มีหลักฐานประกอบ ไม่ใช้ข้อมูลนี้ยืนยันว่าหุ่นเคลื่อนไหวสำเร็จโดยลำพัง | ข้อกำหนดเดิม: DES-005 ArmEvidence']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotSubmission_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-005 Rev5). อ้าง global Mission/Criteria และ ProjectRevision ด้วย single-column FK ชี้ PK; application ตรวจว่า CriteriaId อยู่ใน MissionId เดียวกัน และ ProjectRevision เป็นของนักเรียน (OwnerKind=student) ใน SchoolId เดียวกัน. FK_SchoolBotSubmission_CurrentAssessment เป็น DEFERRABLE INITIALLY DEFERRED.'
+  Note: 'หน้าที่: เก็บการส่งโครงงานฉบับแน่นอนให้ตรวจภารกิจ แยกจากการทำข้อสอบใน Attempt | หนึ่งแถว: นักเรียนหนึ่งคนส่ง ProjectRevision หนึ่งเพื่อ Mission และ Criteria ฉบับหนึ่ง | ใช้เมื่อ: นักเรียนส่งงาน; worker/ครูตรวจ; progress และ export อ่านผลประเมินปัจจุบัน | ตัวอย่าง: สมมติ: นักเรียนส่งโครงงาน Arm revision 3 ให้ครูตรวจ และสถานะเป็น awaiting_teacher | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-021.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). อ้าง global Mission/Criteria และ ProjectRevision ด้วย single-column FK ชี้ PK; application ตรวจว่า CriteriaId อยู่ใน MissionId เดียวกัน และ ProjectRevision เป็นของนักเรียน (OwnerKind=student) ใน SchoolId เดียวกัน. FK_SchoolBotSubmission_CurrentAssessment เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
 
-Table SchoolBotGradingJob {
-  SchoolBotGradingJobId int4 [pk, increment, not null]
-  SubmissionId int4 [not null, unique, note: 'UQ_SchoolBotGradingJob_SubmissionId']
-  State SchoolBotJobState [not null]
-  Attempts int4 [not null]
-  LeaseOwner varchar(128) [null]
-  LeaseUntil timestamptz [null]
-  NextAttemptAt timestamptz [not null]
-  LastErrorCode varchar(64) [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotGradingJob_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotGradingJob [headercolor: #DC2626] {
+  SchoolBotGradingJobId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotGradingJob (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  SubmissionId int4 [not null, unique, note: 'FK ไป SchoolBotSubmission ที่ต้องตรวจ; ไม่ซ้ำเพื่อไม่สร้างคิวซ้อนสำหรับการส่งเดียวกัน | ข้อกำหนดเดิม: UQ_SchoolBotGradingJob_SubmissionId']
+  State SchoolBotJobState [not null, note: 'queued=รอทำ, running=กำลังทำ, completed=งานคิวเสร็จ, failed=งานคิวล้มเหลว; completed ไม่ได้แปลว่า Outcome=passed']
+  Attempts int4 [not null, note: 'จำนวนครั้งที่ worker พยายามประมวลผล หน่วยเป็นครั้ง ไม่ใช่จำนวนครั้งที่นักเรียนส่งงาน']
+  LeaseOwner varchar(128) [null, note: 'รหัส worker ที่ถือสิทธิ์ทำงานชั่วคราว; null พร้อม LeaseUntil เมื่อไม่มี lease']
+  LeaseUntil timestamptz [null, note: 'เวลา UTC สิ้นสุด lease ของ worker; null พร้อม LeaseOwner']
+  NextAttemptAt timestamptz [not null, note: 'เวลา UTC เร็วที่สุดที่คิวนี้ถึงกำหนดให้ลองประมวลผล']
+  LastErrorCode varchar(64) [null, note: 'รหัสข้อผิดพลาดล่าสุดของงานคิว; null เมื่อไม่มีรหัสที่บันทึกไว้ ไม่ใช้แทนผลการเรียน']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotGradingJob_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-005 Rev5). คิวงานตรวจอัตโนมัติ 1 ต่อ Submission.'
+  Note: 'หน้าที่: จัดคิวตรวจโครงงานอัตโนมัติและติดตามการ retry ของ worker | หนึ่งแถว: งานคิวหนึ่งรายการต่อ Submission หนึ่ง โดย retry ใช้แถวเดิม | ใช้เมื่อ: การส่งงานสร้างคิว; worker claim lease ตรวจงาน และบันทึกผล/ข้อผิดพลาด | ตัวอย่าง: สมมติ: worker ตรวจ Block ขัดข้องชั่วคราว จึงเลื่อนเวลา retry โดยไม่สร้าง Submission ใหม่ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-022.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). คิวงานตรวจอัตโนมัติ 1 ต่อ Submission.'
 }
 
-Table SchoolBotAssessment {
-  SchoolBotAssessmentId int4 [pk, increment, not null]
-  SubmissionId int4 [not null]
-  Sequence int4 [not null, note: 'Allocated under SchoolBotSubmission row lock']
-  Method SchoolBotAssessmentMethod [not null]
-  Outcome SchoolBotOutcome [not null]
-  EarnedScore numeric(18,6) [null, note: 'Null together with MaxScore, or 0 <= EarnedScore <= MaxScore and MaxScore > 0']
-  MaxScore numeric(18,6) [null]
-  RuleResults jsonb [not null]
-  Feedback varchar(4000) [not null]
-  GraderVersion varchar(128) [null]
-  AssessorId int4 [null, note: 'Legacy employee SEmp within SchoolId']
-  SupersedesId int4 [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotAssessment_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotAssessment [headercolor: #DC2626] {
+  SchoolBotAssessmentId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotAssessment (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  SubmissionId int4 [not null, note: 'FK ไป SchoolBotSubmission ที่ผลนี้ประเมิน']
+  Sequence int4 [not null, note: 'ลำดับผลประเมินภายใน Submission; จัดสรรภายใต้ lock แถว Submission ไม่ใช่เลข Attempt | ข้อกำหนดเดิม: Allocated under SchoolBotSubmission row lock']
+  Method SchoolBotAssessmentMethod [not null, note: 'automatic=ระบบตรวจ, teacher=ครูตรวจ; ใช้กำหนดว่าจะระบุตัวตรวจใน GraderVersion หรือ AssessorId']
+  Outcome SchoolBotOutcome [not null, note: 'passed=ผ่านเกณฑ์, not_yet=ยังไม่ผ่าน; ไม่แปลงเป็นคะแนนเต็มหรือศูนย์เอง']
+  EarnedScore numeric(18,6) [null, note: 'คะแนนที่ได้ชนิด numeric(18,6); null พร้อม MaxScore เมื่อมีเฉพาะผลผ่าน/ยังไม่ผ่าน; เมื่อมีค่าต้องอยู่ระหว่าง 0 ถึง MaxScore | ข้อกำหนดเดิม: Null together with MaxScore, or 0 <= EarnedScore <= MaxScore and MaxScore > 0']
+  MaxScore numeric(18,6) [null, note: 'คะแนนเต็มชนิด numeric(18,6) ต้องมากกว่า 0 เมื่อมีคะแนน; null พร้อม EarnedScore และกรณีนี้ส่งเป็นคะแนนตัวเลขไม่ได้']
+  RuleResults jsonb [not null, note: 'JSON array ของ rule_id กับ matched ระบุว่าผ่านเงื่อนไขหรือ rubric รายข้อหรือไม่']
+  Feedback varchar(4000) [not null, note: 'คำอธิบายผลหรือข้อเสนอแนะต่อผู้เรียน ความยาวไม่เกิน 4000 ตัวอักษร']
+  GraderVersion varchar(128) [null, note: 'รุ่น evaluator ที่ใช้ตรวจเพื่อย้อนทำความเข้าใจผล; ต้องมีเมื่อ automatic และ null เมื่อ teacher']
+  AssessorId int4 [null, note: 'TEmployees.sEmp ของครูผู้ตรวจพร้อม SchoolId; ต้องมีเมื่อ teacher และ null เมื่อ automatic | ข้อกำหนดเดิม: Legacy employee SEmp within SchoolId']
+  SupersedesId int4 [null, note: 'FK ไป Assessment เดิมที่ผลใหม่นี้แทน ต้องเป็น Submission เดียวกัน; null เมื่อไม่ได้แทนผลเดิม']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotAssessment_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-005 Rev5). Immutable append-only assessment result; ล็อกแถว SchoolBotSubmission ก่อนสร้างเพื่อจัดสรร Sequence.'
+  Note: 'หน้าที่: เก็บผลตรวจโครงงานใน SchoolBot แบบมีประวัติ ไม่ใช่หัวช่องคะแนน PGTAssessment | หนึ่งแถว: ผลประเมินหนึ่งครั้งของ Submission หนึ่ง | ใช้เมื่อ: evaluator หรือครูสร้างผล; Submission ชี้ผลปัจจุบัน; progress/mapping/export อ่านผล | ตัวอย่าง: สมมติ: ครูตรวจงาน Arm ได้ 8 จาก 10 แล้วตรวจใหม่เป็นผลอีกแถวที่อ้างผลเดิม | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-023.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). Immutable append-only assessment result; ล็อกแถว SchoolBotSubmission ก่อนสร้างเพื่อจัดสรร Sequence.'
 }
 
-Table SchoolBotAttempt {
-  SchoolBotAttemptId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  ActivityId int4 [not null]
-  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId (student only in current schema)']
-  Sequence int4 [not null, note: 'Allocated under learner attempt lock']
-  State SchoolBotAttemptState [not null, note: 'started|submitted|expired|voided']
-  StartedAt timestamptz [not null]
-  DeadlineAt timestamptz [null]
-  SubmittedAt timestamptz [null]
-  Snapshot jsonb [not null, note: 'Immutable AttemptSnapshot; server-only']
-  Answers jsonb [not null, note: 'Answer[]']
-  EarnedScore numeric(18,6) [null]
-  MaxScore numeric(18,6) [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotAttempt_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotAttempt [headercolor: #DC2626] {
+  SchoolBotAttemptId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotAttempt (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ที่นักเรียนกำลังเรียน']
+  ActivityId int4 [not null, note: 'FK ไป SchoolBotActivity ชนิด quiz/test ในหลักสูตรของ run']
+  LearnerId int4 [not null, note: 'TUser.sID ของนักเรียนที่อยู่ใน roster พร้อม SchoolId; ไม่ใช่บัญชี Master หรือ sEmp | ข้อกำหนดเดิม: Legacy student SId within SchoolId (student only in current schema)']
+  Sequence int4 [not null, note: 'ลำดับครั้งที่ทำในชุด SchoolId/CourseRunId/ActivityId/LearnerId; ใช้ตรวจเพดานจำนวนครั้ง | ข้อกำหนดเดิม: Allocated under learner attempt lock']
+  State SchoolBotAttemptState [not null, note: 'started=กำลังทำ, submitted=ส่งแล้ว, expired=หมดเวลาที่อนุญาต, voided=ยกเลิกความใช้ได้ของครั้งนั้น | ข้อกำหนดเดิม: started|submitted|expired|voided']
+  StartedAt timestamptz [not null, note: 'เวลา UTC เริ่ม Attempt จาก server']
+  DeadlineAt timestamptz [null, note: 'เวลา UTC เส้นตายของ Attempt; null เมื่อไม่มีเส้นตายที่กำหนดไว้สำหรับครั้งนี้']
+  SubmittedAt timestamptz [null, note: 'เวลา UTC ส่งคำตอบ; null เมื่อยังไม่มีเวลาส่งที่บันทึก']
+  Snapshot jsonb [not null, note: 'JSON ตรึง bank_id/revision, curriculum_revision, policy_id, evaluator_version, คำถาม/เฉลย/คะแนนเต็ม และลำดับข้อ/ตัวเลือก; ข้อมูลเฉลยเป็น server-only และไม่เปลี่ยนตามการแก้คลังภายหลัง | ข้อกำหนดเดิม: Immutable AttemptSnapshot; server-only']
+  Answers jsonb [not null, note: 'JSON array ของ question_key และ selected_option_keys ที่ผู้เรียนเลือก ไม่รับคะแนนที่ client อ้าง | ข้อกำหนดเดิม: Answer[]']
+  EarnedScore numeric(18,6) [null, note: 'คะแนนที่ server ประเมินชนิด numeric(18,6); null เมื่อยังไม่มีคะแนน ไม่ตีความทุกกรณีเป็น 0']
+  MaxScore numeric(18,6) [not null, note: 'คะแนนเต็มของชุดข้อสอบใน Attempt ชนิด numeric(18,6) มากกว่า 0 และไม่เปลี่ยนตามคลังรุ่นใหม่']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotAttempt_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-010 Rev3). การทำข้อสอบ Quiz/Test ของนักเรียนพร้อม immutable snapshot.'
+  Note: 'หน้าที่: เก็บการเริ่มทำและส่งคำตอบ Quiz/Test แต่ละครั้ง พร้อมข้อสอบที่ตรึงไว้ | หนึ่งแถว: การทำกิจกรรมข้อสอบหนึ่งครั้งของนักเรียนหนึ่งคนใน CourseRun หนึ่ง | ใช้เมื่อ: เริ่มทำข้อสอบ บันทึกคำตอบ ส่งคำตอบ ตรวจคะแนน และเลือกผลตาม policy | ตัวอย่าง: สมมติ: นักเรียนเริ่ม Quiz ครั้งที่ 2 ได้ชุดคำถามตาม snapshot และส่งคำตอบได้ 4 จาก 5 | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-024.md | ข้อกำหนดเดิม: SchoolBot DB (DES-010 Rev3). การทำข้อสอบ Quiz/Test ของนักเรียนพร้อม immutable snapshot.'
 }
 
-Table SchoolBotRetakeGrant {
-  SchoolBotRetakeGrantId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  ActivityId int4 [not null]
-  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId']
-  Reason varchar(1000) [not null]
-  ConsumedAttemptId int4 [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotRetakeGrant_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotRetakeGrant [headercolor: #DC2626] {
+  SchoolBotRetakeGrantId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotRetakeGrant (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ที่สิทธิ์นี้มีผล']
+  ActivityId int4 [not null, note: 'FK ไป SchoolBotActivity ที่อนุญาตให้ทำเพิ่ม ไม่ใช้ข้ามกิจกรรม']
+  LearnerId int4 [not null, note: 'TUser.sID ของนักเรียนผู้รับสิทธิ์ พร้อม SchoolId | ข้อกำหนดเดิม: Legacy student SId within SchoolId']
+  Reason varchar(1000) [not null, note: 'เหตุผลที่ครูอนุญาตให้ทำเพิ่ม เพื่อย้อนตรวจการให้สิทธิ์']
+  ConsumedAttemptId int4 [null, note: 'FK ไป SchoolBotAttempt ที่ใช้สิทธิ์ใบนี้; null หมายถึงยังไม่ได้ผูกกับ Attempt ที่ใช้สิทธิ์']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotRetakeGrant_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-010 Rev3, decisions-025). สิทธิ์สอบซ่อมรายคนโดยครูรายวิชา; คะแนนสอบซ่อม Test ใช้คะแนนสูงสุดระหว่างครั้งจริงกับครั้งซ่อม ไม่มีเพดาน.'
+  Note: 'หน้าที่: ให้สิทธิ์สอบซ่อมหรือทำเพิ่มเป็นรายนักเรียน โดยติดตามว่าใช้สิทธิ์แล้วกับ Attempt ใด | หนึ่งแถว: สิทธิ์เพิ่มหนึ่ง Attempt สำหรับนักเรียน/กิจกรรม/run ที่ระบุ | ใช้เมื่อ: ครูรายวิชาออกสิทธิ์; เริ่ม Attempt ใช้สิทธิ์ภายใต้ lock | ตัวอย่าง: สมมติ: ครูให้สิทธิ์สอบซ่อม Test เพิ่ม 1 ครั้งแก่ผู้เรียนคนหนึ่ง | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-025.md | ข้อกำหนดเดิม: SchoolBot DB (DES-010 Rev3, decisions-025). สิทธิ์สอบซ่อมรายคนโดยครูรายวิชา; คะแนนสอบซ่อม Test ใช้คะแนนสูงสุดระหว่างครั้งจริงกับครั้งซ่อม ไม่มีเพดาน.'
 }
 
-Table SchoolBotGradeSlot {
-  SchoolBotGradeSlotId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  PlanCourseId int4 [not null]
-  CourseId int4 [not null]
-  NGradeId int4 [not null]
-  AssessmentId int4 [not null]
-  ScoreIdentifier varchar(128) [not null]
-  Category SchoolBotGradeCategory [not null]
-  TargetSnapshot jsonb [not null, note: 'DES-008 TargetSnapshot']
-  OwnershipReason varchar(1000) [not null]
-  RetiredAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotGradeSlot_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotGradeSlot [headercolor: #DB2777] {
+  SchoolBotGradeSlotId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotGradeSlot (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ที่ได้รับสิทธิ์ใช้ช่องนี้']
+  PlanCourseId int4 [not null, note: 'TPlanCourse.PlanCourseId ของวิชาในแผน ต้องอยู่ใน CourseRun.PlanCourseIds']
+  CourseId int4 [not null, note: 'รหัสรายวิชา TPlane.sPlaneID ที่ resolve จากแผน ไม่ใช่ PlanCourseId']
+  NGradeId int4 [not null, note: 'PGTGrade.nGradeId ของหัวใบคะแนนปลายทาง พร้อมบริบทโรงเรียน/เทอม/ห้อง/วิชา']
+  AssessmentId int4 [not null, note: 'PGTAssessment.AssessmentId ของหัวช่องคะแนนเดิม ไม่ใช่ SchoolBotAssessmentId']
+  ScoreIdentifier varchar(128) [not null, note: 'ตัวระบุช่องจริงใน JSON PGTGradeDetail.ScoreData ใช้คู่ AssessmentId; ห้ามสร้างจากเลข Ordinal หรือชื่อช่องเอง']
+  Category SchoolBotGradeCategory [not null, note: 'before_midterm=เก็บก่อนกลางภาค, after_midterm=เก็บหลังกลางภาค, midterm=กลางภาค, final=ปลายภาค']
+  TargetSnapshot jsonb [not null, note: 'JSON บริบทปลายทาง ณ ยืนยันช่อง: ปี เทอม ห้อง แผน วิชา หัวเกรด assessment identifier คะแนนเต็ม และ token/hash ของหัว/การตั้งค่า เพื่อจับการเปลี่ยนภายหลัง | ข้อกำหนดเดิม: DES-008 TargetSnapshot']
+  OwnershipReason varchar(1000) [not null, note: 'เหตุผลและหลักฐานประกอบที่ผู้ดูแลยืนยันว่าช่องนี้เป็นช่องเฉพาะ SchoolBot']
+  RetiredAt timestamptz [null, note: 'เวลา UTC ยุติ ownership; null หมายถึงยังถือครองอยู่ การตั้ง IsDelete อย่างเดียวไม่ทำให้ช่องว่างสำหรับเจ้าของใหม่']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotGradeSlot_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (SchoolId, NGradeId, AssessmentId, ScoreIdentifier) [note: 'Partial unique index ux_schoolbot_gradeslot_active_ownership WHERE RetiredAt IS NULL (without IsDelete filter) in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-008 Rev3). ช่องคะแนนย่อยใน PGGradeDB ที่ school_admin ยืนยันให้ SchoolBot ดูแล.'
+  Note: 'หน้าที่: บันทึกว่าช่องคะแนนเดิมใดได้รับการยืนยันให้ SchoolBot ดูแล โดยไม่ได้สร้างหัวช่องคะแนนเดิมขึ้นใหม่ | หนึ่งแถว: สิทธิ์ดูแลช่องปลายทางหนึ่งช่องที่ระบุด้วย SchoolId/NGradeId/AssessmentId/ScoreIdentifier | ใช้เมื่อ: ผู้ดูแลโรงเรียนยืนยัน ownership; mapping เลือกปลายทาง; preview/worker ตรวจสิทธิ์ช่องก่อนใช้ | ตัวอย่าง: สมมติ: ผู้ดูแลเลือกช่องคะแนนเก็บที่ว่างและยืนยันให้ใช้รับผลจากกิจกรรม SchoolBot | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-026.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3). ช่องคะแนนย่อยใน PGGradeDB ที่ school_admin ยืนยันให้ SchoolBot ดูแล.'
 }
 
-Table SchoolBotScoreMapping {
-  SchoolBotScoreMappingId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  GradeSlotId int4 [not null]
-  Sources jsonb [not null, note: 'MappingSource[]; weights sum to 10000']
-  RetiredAt timestamptz [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScoreMapping_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScoreMapping [headercolor: #DB2777] {
+  SchoolBotScoreMappingId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoreMapping (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun และต้องตรงกับ run ของ GradeSlot']
+  GradeSlotId int4 [not null, note: 'FK ไป SchoolBotGradeSlot ปลายทางที่มี ownership; active mapping ของ run/slot เดียวกันมีได้หนึ่งชุด']
+  Sources jsonb [not null, note: 'JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016 | ข้อกำหนดเดิม: MappingSource[]; weights sum to 10000']
+  RetiredAt timestamptz [null, note: 'เวลา UTC ยุติการใช้ mapping; null หมายถึงยังไม่ retire โดยประวัติ export เดิมคง snapshot เดิม']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScoreMapping_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (CourseRunId, GradeSlotId) [note: 'Partial unique index ux_schoolbot_scoremapping_active WHERE RetiredAt IS NULL AND IsDelete = false in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-008 Rev3). การผูก GradeSlot กับ Activity/Indicator โดย school_admin.'
+  Note: 'หน้าที่: กำหนดว่าจะนำคะแนนจากกิจกรรมใดไปใส่ GradeSlot ใด แยกจากการถือครองช่อง | หนึ่งแถว: ชุดแหล่งคะแนนหนึ่งชุดสำหรับ GradeSlot หนึ่งใน CourseRun หนึ่ง | ใช้เมื่อ: ผู้ดูแลสร้าง/แก้/retire mapping; ครูอ่านเพื่อ preview; server คำนวณคะแนนช่อง | ตัวอย่าง: สมมติ: ผล Test กิจกรรมหนึ่งถูกแมพเข้าช่องคะแนนปลายทางที่ผู้ดูแลเลือกไว้ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-027.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3). การผูก GradeSlot กับ Activity/Indicator โดย school_admin.'
 }
 
-Table SchoolBotScorePreview {
-  SchoolBotScorePreviewId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  Principal varchar(512) [not null]
-  SnapshotHash varchar(64) [not null]
-  ExpiresAt timestamptz [not null]
-  State SchoolBotPreviewState [not null]
-  SupersedesId int4 [null]
-  Context jsonb [not null, note: 'DES-009 PreviewContext']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScorePreview_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScorePreview [headercolor: #DB2777] {
+  SchoolBotScorePreviewId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScorePreview (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ของชุดคะแนน']
+  Principal varchar(512) [not null, note: 'ตัวตนครูผู้สร้าง preview แบบมีชนิดและโรงเรียน ใช้ผูกสิทธิ์กับ snapshot']
+  SnapshotHash varchar(64) [not null, note: 'SHA-256 ของ canonical snapshot ทั้งชุด ใช้ยืนยันว่าครูกำลังยืนยันข้อมูลชุดที่เห็น']
+  ExpiresAt timestamptz [not null, note: 'เวลา UTC หมดอายุ preview; DES-009 เสนอ bound 15 นาที ไม่ใช่ SLA ที่พิสูจน์จากระบบจริง']
+  State SchoolBotPreviewState [not null, note: 'open=รอยืนยัน, conflicted=มีความขัดแย้ง, confirmed=ยืนยันแล้ว, superseded=ถูกใบใหม่แทน, expired=หมดอายุ']
+  SupersedesId int4 [null, note: 'FK ไป preview เดิมที่ใบนี้แทน เช่น หลัง resolve; null เมื่อไม่ได้แทนใบเดิม']
+  Context jsonb [not null, note: 'JSON ของ mapping IDs/update_date, policy_id, roster นักเรียน, writer_version, calculator_version และเวลา authorization_checked_at เพื่อใช้ตรวจว่าบริบทเปลี่ยนก่อนยืนยันหรือไม่ | ข้อกำหนดเดิม: DES-009 PreviewContext']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScorePreview_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-009 Rev3). Snapshot ก่อนส่งคะแนนให้ครูรายวิชาตรวจสอบและยืนยัน.'
+  Note: 'หน้าที่: เก็บใบตรวจคะแนนเดิม→ใหม่และบริบทที่ตรึงไว้ก่อนครูยืนยัน | หนึ่งแถว: หนึ่งชุด preview ของ CourseRun ที่ผู้กระทำหนึ่งคนสร้าง | ใช้เมื่อ: สร้าง/อ่าน preview, resolve ความขัดแย้งเป็นใบใหม่ และ confirm เป็น Export | ตัวอย่าง: สมมติ: ครูตรวจคะแนนที่จะส่งให้นักเรียน 30 คน โดยยังไม่มีการเขียน PGGradeDB | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-028.md | ข้อกำหนดเดิม: SchoolBot DB (DES-009 Rev3). Snapshot ก่อนส่งคะแนนให้ครูรายวิชาตรวจสอบและยืนยัน.'
 }
 
-Table SchoolBotScorePreviewItem {
-  SchoolBotScorePreviewItemId int4 [pk, increment, not null]
-  ScorePreviewId int4 [not null]
-  LearnerId int4 [not null]
-  State SchoolBotPreviewItemState [not null, note: 'ready|conflict|blocked']
-  ReasonCodes jsonb [not null]
-  Snapshot jsonb [not null, note: 'DES-009 PreviewItemSnapshot (half-up integer rounding)']
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScorePreviewItem_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScorePreviewItem [headercolor: #DB2777] {
+  SchoolBotScorePreviewItemId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScorePreviewItem (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  ScorePreviewId int4 [not null, note: 'FK ไป SchoolBotScorePreview เจ้าของรายการ']
+  LearnerId int4 [not null, note: 'TUser.sID ของนักเรียนใน roster พร้อม SchoolId; คู่ ScorePreviewId/LearnerId ไม่ซ้ำ']
+  State SchoolBotPreviewItemState [not null, note: 'ready=พร้อมตามการตรวจ preview, conflict=ข้อมูลชนต้องตัดสินใจใหม่, blocked=ไม่ผ่านเงื่อนไขที่ห้ามเขียน | ข้อกำหนดเดิม: ready|conflict|blocked']
+  ReasonCodes jsonb [not null, note: 'JSON array รหัสเหตุที่ conflict/blocked เช่นข้อมูลปลายทางเปลี่ยนหรือผลยังไม่พร้อม; ไม่ใช้ข้อความแสดงผลเป็นตัวตัดสิน']
+  Snapshot jsonb [not null, note: 'JSON cells รายช่อง เก็บ mapping/slot, TargetSnapshot, grade_detail_id, row_token, old_score, last_exported_score, raw_target, new_score, source refs/hash, ผลพิเศษ และ fingerprints; old_score/last_exported_score=null หมายถึงไม่มีค่าที่บันทึก ไม่ใช่ 0; new_score เป็นจำนวนเต็มหลังปัด half-up; decision เป็น apply/keep_destination/replace_owned | ข้อกำหนดเดิม: DES-009 PreviewItemSnapshot (half-up integer rounding)']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScorePreviewItem_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (ScorePreviewId, LearnerId) [unique, name: 'UQ_SchoolBotScorePreviewItem_Preview_Learner']
   }
 
-  Note: 'SchoolBot DB (DES-009 Rev3). รายการ preview/ชน/บล็อกรายนักเรียน.'
+  Note: 'หน้าที่: เก็บรายละเอียด preview รายนักเรียน โดยหนึ่งคนอาจมีหลายช่องคะแนน | หนึ่งแถว: นักเรียนหนึ่งคนใน ScorePreview หนึ่งใบ | ใช้เมื่อ: หน้า preview แสดงผลรายคน; confirm สร้าง Outbox; worker อ่าน snapshot ที่ยืนยัน | ตัวอย่าง: สมมติ: นักเรียน ก มีสองช่องพร้อมส่ง ส่วนนักเรียน ข ถูก block เพราะมี override | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-029.md | ข้อกำหนดเดิม: SchoolBot DB (DES-009 Rev3). รายการ preview/ชน/บล็อกรายนักเรียน.'
 }
 
-Table SchoolBotScoreExport {
-  SchoolBotScoreExportId int4 [pk, increment, not null]
-  ScorePreviewId int4 [not null, unique, note: 'UQ_SchoolBotScoreExport_ScorePreviewId']
-  ConfirmedBy varchar(512) [not null]
-  ConfirmedAt timestamptz [not null]
-  State SchoolBotExportState [not null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScoreExport_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScoreExport [headercolor: #DB2777] {
+  SchoolBotScoreExportId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoreExport (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  ScorePreviewId int4 [not null, unique, note: 'FK ไป SchoolBotScorePreview ที่ยืนยัน; unique เพื่อไม่ให้ preview เดียวเกิด export ซ้ำ | ข้อกำหนดเดิม: UQ_SchoolBotScoreExport_ScorePreviewId']
+  ConfirmedBy varchar(512) [not null, note: 'ตัวตนครูผู้ยืนยันแบบ Actor ใช้ตรวจสิทธิ์ซ้ำตอน worker apply; ไม่ใช่ผู้ดูแลโรงเรียนโดยอัตโนมัติ']
+  ConfirmedAt timestamptz [not null, note: 'เวลา UTC ที่บันทึกการยืนยัน ไม่ใช่เวลาที่คะแนนทุกคนเขียนสำเร็จ']
+  State SchoolBotExportState [not null, note: 'queued=รอ, running=กำลังส่ง, paused_conflict=หยุดเพราะชน, reconciling=กำลังกระทบยอดผลที่ไม่แน่ชัด, completed=เสร็จ, completed_with_skips=เสร็จโดยมีข้าม, failed=งานล้มเหลว']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScoreExport_SchoolId_Pos: SchoolId > 0']
 
-  Note: 'SchoolBot DB (DES-009 Rev3). คำสั่งยืนยันการส่งคะแนนของครูรายวิชา (เปิดใช้หลังผ่าน release gates ทั้งห้า).'
+  Note: 'หน้าที่: บันทึกการยืนยันส่งคะแนนหนึ่งใบและสถานะรวมของงานส่งออก | หนึ่งแถว: ใบงานส่งออกหนึ่งใบจาก preview ที่ยืนยันแล้วหนึ่งใบ | ใช้เมื่อ: confirm สร้างใบงาน; worker ปรับสถานะรวม; ครูและผู้ดูแลติดตามผล | ตัวอย่าง: สมมติ: ครูกดยืนยัน preview แล้วได้ export สถานะ queued ก่อน worker เริ่มเขียน | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-030.md | ข้อกำหนดเดิม: SchoolBot DB (DES-009 Rev3). คำสั่งยืนยันการส่งคะแนนของครูรายวิชา (เปิดใช้หลังผ่าน release gates ทั้งห้า).'
 }
 
-Table SchoolBotScoreOutbox {
-  SchoolBotScoreOutboxId int4 [pk, increment, not null]
-  ScoreExportId int4 [not null]
-  ScorePreviewItemId int4 [not null]
-  OperationKey uuid [not null, unique, note: 'UQ_SchoolBotScoreOutbox_OperationKey']
-  PayloadHash varchar(64) [not null]
-  State SchoolBotOutboxState [not null]
-  Attempts int4 [not null]
-  LeaseOwner varchar(128) [null]
-  LeaseUntil timestamptz [null]
-  NextAttemptAt timestamptz [not null]
-  ReceiptId int8 [null, note: 'Logical ref to PGGradeDB PGTGradeAuditLog.GradeAuditLogId; no cross-DB FK']
-  ReceiptHash varchar(64) [null]
-  LastErrorCode varchar(64) [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotScoreOutbox_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotScoreOutbox [headercolor: #DB2777] {
+  SchoolBotScoreOutboxId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoreOutbox (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  ScoreExportId int4 [not null, note: 'FK ไป SchoolBotScoreExport เจ้าของงานส่งออก']
+  ScorePreviewItemId int4 [not null, note: 'FK ไป SchoolBotScorePreviewItem ของนักเรียนและ snapshot ที่จะส่ง; application ต้องตรวจว่าอยู่ใน preview ของ export เดียวกัน']
+  OperationKey uuid [not null, unique, note: 'UUID ไม่ซ้ำของการเขียนรายคน ใช้ตรวจ durable receipt และกัน replay ข้าม DB | ข้อกำหนดเดิม: UQ_SchoolBotScoreOutbox_OperationKey']
+  PayloadHash varchar(64) [not null, note: 'SHA-256 ของ payload ที่ยืนยัน ใช้ตรวจว่า OperationKey เดิมไม่ได้ถูกใช้กับข้อมูลคนละชุด']
+  State SchoolBotOutboxState [not null, note: 'queued=รอ, running=กำลังทำ, applied=ยืนยันว่าปลายทางรับแล้ว, skipped=ข้ามตามการตัดสิน, conflict=ข้อมูลชน, blocked=เงื่อนไขห้ามเขียน, unknown=ผลยังไม่แน่ชัดต้อง reconcile']
+  Attempts int4 [not null, note: 'จำนวนครั้งที่ worker พยายามดำเนินงาน หน่วยเป็นครั้ง ไม่ใช่จำนวนครั้งที่บวกคะแนน']
+  LeaseOwner varchar(128) [null, note: 'รหัส worker ที่ถือ lease; null พร้อม LeaseUntil เมื่อไม่มีผู้ถือ lease']
+  LeaseUntil timestamptz [null, note: 'เวลา UTC หมดอายุ lease เพื่อให้จัดการ worker ที่หยุดทำงานได้; null พร้อม LeaseOwner']
+  NextAttemptAt timestamptz [not null, note: 'เวลา UTC ที่งานนี้ถึงกำหนดให้ลองทำครั้งถัดไป']
+  ReceiptId int8 [null, note: 'logical reference ไป PGTGradeAuditLog.GradeAuditLogId ชนิด bigint/int8; API ส่งเป็น decimal string; null เมื่อยังไม่มี receipt ID ที่บันทึกยืนยัน | ข้อกำหนดเดิม: Logical ref to PGGradeDB PGTGradeAuditLog.GradeAuditLogId; no cross-DB FK']
+  ReceiptHash varchar(64) [null, note: 'hash สำหรับตรวจความตรงกันของ receipt ที่ใช้ยืนยันผล; null เมื่อยังไม่มี hash ที่บันทึก']
+  LastErrorCode varchar(64) [null, note: 'รหัสปัญหาล่าสุดของการส่งหรือกระทบยอด; null เมื่อไม่มีรหัสที่บันทึกไว้']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScoreOutbox_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (ScoreExportId, ScorePreviewItemId) [unique, name: 'UQ_SchoolBotScoreOutbox_Export_Item']
   }
 
-  Note: 'SchoolBot DB (DES-009 Rev3). Outbox รายนักเรียนสำหรับเขียน PGGradeDB แบบ idempotent คู่กับ xmin CAS ของตาราง PGGradeDB และ PGTGradeAuditLog receipt.'
+  Note: 'หน้าที่: เก็บงานเขียนคะแนนรายนักเรียนและหลักฐานปลายทาง เพื่อ retry/reconcile ข้ามฐานข้อมูลโดยไม่เขียนซ้ำ | หนึ่งแถว: งานของนักเรียนหนึ่งคนใน Export หนึ่งใบ อ้าง PreviewItem ที่ยืนยันแล้ว | ใช้เมื่อ: confirm สร้างงานรายคน; worker claim/apply/retry; reconciliation ตรวจ receipt | ตัวอย่าง: สมมติ: PGGradeDB commit คะแนนสำเร็จแต่ worker หยุดก่อนอัปเดต SchoolBot จึงอ่าน receipt เพื่อกระทบยอด | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-031.md | ข้อกำหนดเดิม: SchoolBot DB (DES-009 Rev3). Outbox รายนักเรียนสำหรับเขียน PGGradeDB แบบ idempotent คู่กับ xmin CAS ของตาราง PGGradeDB และ PGTGradeAuditLog receipt.'
 }
 
-Table SchoolBotLevelProposal {
-  SchoolBotLevelProposalId int4 [pk, increment, not null]
-  CourseRunId int4 [not null]
-  TargetCurriculumId int4 [not null]
-  SnapshotHash varchar(64) [not null]
-  Snapshot jsonb [not null, note: 'DES-011 Rev3 LevelSnapshot']
-  State SchoolBotLevelProposalState [not null, note: 'proposed|promoted|retained|max_level|stale']
-  DecisionBy varchar(512) [null]
-  DecisionAt timestamptz [null]
-  Reason varchar(1000) [null]
-  SuccessorRunId int4 [null]
-  IsDelete boolean [not null, default: false]
-  CreateBy int4 [null]
-  CreateDate timestamptz [not null]
-  UpdateBy int4 [null]
-  UpdateDate timestamptz [not null]
-  SchoolId int4 [not null, note: 'CK_SchoolBotLevelProposal_SchoolId_Pos: SchoolId > 0']
+Table SchoolBotLevelProposal [headercolor: #65A30D] {
+  SchoolBotLevelProposalId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotLevelProposal (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
+  CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun ต้นทางที่กำลังปิดหรือปิดแล้ว']
+  TargetCurriculumId int4 [not null, note: 'FK ไป curriculum revision ที่กำหนดเป็นปลายทางของข้อเสนอ อาจเป็นระดับเดิมในกรณีคงระดับ ไม่ใช่รหัสชั้นเรียนใหม่']
+  SnapshotHash varchar(64) [not null, note: 'SHA-256 ของข้อมูลข้อเสนอที่ตรึงไว้ ใช้ตรวจตอน confirm/decline']
+  Snapshot jsonb [not null, note: 'JSON เก็บ promotion policy/revision, scoring policy, formula_version, roster/คะแนนรวมรายคน/source_hash, average, threshold, gap, member_count, eligible และปี/เทอม/เวลาที่มีผล; missing_as_zero=true ใช้เฉพาะการประเมิน Level; total/average/gap ที่ null หมายถึงไม่มีค่าตาม snapshot ไม่ควรเดาสูตรเติม | ข้อกำหนดเดิม: DES-011 Rev3 LevelSnapshot']
+  State SchoolBotLevelProposalState [not null, note: 'proposed=รอครูยืนยัน, promoted=ยืนยันเลื่อน, retained=คงระดับ, max_level=ถึงระดับสูงสุด, stale=ข้อมูลเปลี่ยนต้องเสนอใหม่ | ข้อกำหนดเดิม: proposed|promoted|retained|max_level|stale']
+  DecisionBy varchar(512) [null, note: 'ตัวตนผู้ตัดสินเมื่อมีการบันทึกการตัดสิน; null พร้อม DecisionAt เมื่อยังไม่มีผู้ตัดสินที่บันทึก ห้ามแต่งชื่อผู้อนุมัติให้สถานะที่ระบบกำหนดเอง']
+  DecisionAt timestamptz [null, note: 'เวลา UTC ของการตัดสินที่บันทึก; null พร้อม DecisionBy']
+  Reason varchar(1000) [null, note: 'เหตุผลการตัดสิน เช่น ปฏิเสธการเลื่อน; null เมื่อยังไม่มีเหตุผลที่บันทึก ไม่ใช้ null แทนการอนุมัติ']
+  SuccessorRunId int4 [null, note: 'FK ไป CourseRun เทอมถัดไปที่สร้างจากผลนี้; null เมื่อยังไม่มี successor ที่ผูก และห้ามชี้ run ต้นทางเอง']
+  IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
+  CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
+  CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
+  UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
+  UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
+  SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotLevelProposal_SchoolId_Pos: SchoolId > 0']
 
   indexes {
     (CourseRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_confirmed_per_run WHERE State IN (promoted,retained,max_level) AND IsDelete = false in DDL']
     (SuccessorRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_successor_unique WHERE SuccessorRunId IS NOT NULL AND IsDelete = false in DDL']
   }
 
-  Note: 'SchoolBot DB (DES-011 Rev3). ข้อเสนอเลื่อน Level ทั้งห้องเมื่อสิ้นเทอมและการยืนยันของครู.'
+  Note: 'หน้าที่: เก็บผลเสนอและการตัดสิน Level ของทั้งห้องสำหรับเทอมถัดไป โดยไม่แก้ทะเบียนชั้นเรียนเดิม | หนึ่งแถว: ใบเสนอหนึ่งชุดจาก CourseRun หนึ่ง พร้อมคะแนนและ roster ณ ตอนประเมิน | ใช้เมื่อ: สิ้นเทอมสร้างข้อเสนอ; ครู confirm/decline; ระบบสร้าง successor CourseRun | ตัวอย่าง: สมมติ: ค่าเฉลี่ยห้องสูงกว่าเกณฑ์ ระบบเสนอหลักสูตร Level ถัดไปให้ครูยืนยันทั้งห้อง | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-032.md | ข้อกำหนดเดิม: SchoolBot DB (DES-011 Rev3). ข้อเสนอเลื่อน Level ทั้งห้องเมื่อสิ้นเทอมและการยืนยันของครู.'
 }
 
 // Section 001 & 002: Licensing & Projects (3 single-column FKs + 1 natural composite FK)
@@ -919,22 +923,24 @@ Ref FK_SchoolBotLevelProposal_CourseRun: SchoolBotLevelProposal.CourseRunId > Sc
 Ref FK_SchoolBotLevelProposal_TargetCurriculum: SchoolBotLevelProposal.TargetCurriculumId > SchoolBotCurriculum.SchoolBotCurriculumId [delete: no action, update: no action]
 Ref FK_SchoolBotLevelProposal_SuccessorRun: SchoolBotLevelProposal.SuccessorRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
 
-TableGroup Licensing {
+
+// กลุ่มเพื่อการอ่านภาพ ไม่เพิ่มตาราง/constraint ใน SQL
+TableGroup "01 License — สิทธิ์ใช้แอป" [color: #2563EB, note: 'ใบอนุญาตรายโรงเรียนและประวัติผูกเครื่อง'] {
   SchoolBotLicense
   SchoolBotLicenseBinding
 }
 
-TableGroup IdentityAndStaff {
+TableGroup "02 Identity — ผู้ใช้และสิทธิ์ส่วนกลาง" [color: #7C3AED, note: 'Session แยกช่องทางและ profile; ใช้บัญชีเดิม ไม่สร้าง SchoolBotUser'] {
   SchoolBotSession
   SchoolBotStaffRole
 }
 
-TableGroup Projects {
+TableGroup "03 Projects — แฟ้มงานและฉบับที่บันทึก" [color: #0891B2, note: 'Project เป็นแฟ้มงาน; Revision เป็นเนื้อหาที่บันทึกและส่งตรวจ'] {
   SchoolBotProject
   SchoolBotProjectRevision
 }
 
-TableGroup GlobalLearningContent {
+TableGroup "04 Content — หลักสูตรกลาง" [color: #059669, note: 'เนื้อหากลาง SchoolId=NULL; หลายโรงเรียนใช้ revision เดียวกันได้'] {
   SchoolBotLevel
   SchoolBotLevelPromotionPolicy
   SchoolBotCurriculum
@@ -945,19 +951,21 @@ TableGroup GlobalLearningContent {
   SchoolBotQuestionBank
 }
 
-TableGroup CourseRunsAndAssessments {
+TableGroup "05 Teaching — เปิดสอนรายห้อง" [color: #D97706, note: 'เลือกหลักสูตรให้ห้อง/ปี/เทอม และตั้งเวลา/นโยบายกิจกรรม'] {
   SchoolBotCourseRun
   SchoolBotScoringPolicy
   SchoolBotCourseRunActivity
+}
+
+TableGroup "06 Results — ส่งงาน ตรวจงาน และสอบ" [color: #DC2626, note: 'Submission คือส่งโครงงาน; Assessment คือผลตรวจ; Attempt คือทำ Quiz/Test'] {
   SchoolBotSubmission
   SchoolBotGradingJob
   SchoolBotAssessment
   SchoolBotAttempt
   SchoolBotRetakeGrant
-  SchoolBotLevelProposal
 }
 
-TableGroup GradeMappingAndExport {
+TableGroup "07 Grades — แมพ ตรวจ และส่งคะแนน" [color: #DB2777, note: 'Slot=ช่องปลายทาง; Mapping=ผลต้นทาง; Preview=ตรวจ; Export=ยืนยัน; Outbox=ติดตามส่ง'] {
   SchoolBotGradeSlot
   SchoolBotScoreMapping
   SchoolBotScorePreview
@@ -966,11 +974,23 @@ TableGroup GradeMappingAndExport {
   SchoolBotScoreOutbox
 }
 
-TableGroup Releases {
+TableGroup "08 Promotion — เลื่อน Level ทั้งห้อง" [color: #65A30D, note: 'เสนอ/ยืนยันระดับหลักสูตร ไม่ใช่เลื่อนชั้นในทะเบียนเดิม'] {
+  SchoolBotLevelProposal
+}
+
+TableGroup "09 Release — รุ่นแอป" [color: #475569, note: 'ข้อมูลแพ็กเกจและการเผยแพร่รุ่น Windows/macOS'] {
   SchoolBotRelease
 }
 
-TableGroup AtomicOperations {
+TableGroup "10 System — กันคำขอซ้ำและประวัติ" [color: #64748B, note: 'บันทึกใน transaction เดียวกับข้อมูล SchoolBot'] {
   SchoolBotIdempotency
   SchoolBotAuditEvent
+}
+
+Note ReadingOrder [color: #EFF6FF] {
+  '''
+  วิธีอ่าน: 04 เนื้อหากลาง → 05 เปิดสอน → 03/06 นักเรียนทำงาน/สอบ → 07 ตรวจและส่งคะแนน → 08 เสนอเลื่อน Level.
+  01/02 เป็นสิทธิ์เข้าใช้; 09/10 เป็นงานดูแลระบบ. สีเป็นตัวช่วยจัดกลุ่ม ไม่ใช่สถานะพร้อมใช้.
+  ไฟล์นี้คงเฉพาะ FK จริงในร่าง SQL; การเชื่อม legacy และข้อมูล JSON ดูภาพ integration/คู่มือข้อมูล.
+  '''
 }

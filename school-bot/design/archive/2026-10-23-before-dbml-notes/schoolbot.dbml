@@ -1,0 +1,976 @@
+// SchoolBot schema — Rev3
+// Change Log:
+// - 2026-10-22 — Rev3: sync 100% with db/schoolbot_db.sql (Rev5 Slimmed, 32 tables, 40 refs) and db/review-005.md per decisions-027..030 (SchoolBot DB 10.0.0.128:9499, remove SchoolBotTeacherGrant/ScoringPolicy.CurriculumId/non-unique indexes/composite FK uniques, single-column FKs, UpdateDate concurrency).
+// - 2026-10-22 — Rev2.2: ถอน Version และ AuditEvent.Previous/NewVersion ตาม decisions-030 (ใช้ UpdateDate).
+// - 2026-10-22 — Rev2.1: CreateBy/UpdateBy เป็น int4 null (sEmp/sId, null=ระบบ) ตาม decisions-028.
+// - 2026-10-22 — Rev2: sync confirmed logical baseline 33 tables per decisions-026 (amendment-proposal-001/002 + 2 fixes from decisions-025) and align with db/review-001.md.
+// - 2026-10-21 — Rev1: DBA handoff; PK int4; MYCELIUM validated dbml/dbmlv2.
+Project SchoolBot {
+  database_type: 'PostgreSQL'
+  Note: '''
+  Diagram artifact (Rev3) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
+  คงไว้ในไฟล์เดียวเพื่อให้เปิดและวางใน dbdiagram.io ได้ครบทั้ง 32 ตารางทันที (ตารางสำรอง SchoolBotTeacherGrant ยังไม่สร้างตาม decisions-026).
+  วางทุกตารางของ SchoolBot (32 ตาราง) ใน SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot, schema public) ตาม decisions-027 เพื่อรองรับ atomic transaction ระหว่าง domain, idempotency และ audit.
+  Master, School, Logs และ PGGradeDB ต่อผ่าน connection แยกด้วยบัญชี DB เดิม (ไม่รัน GRANT/สร้าง role ใน School DB หรือ PGGradeDB ตาม decisions-029); การอ่านสิทธิ์ครู/roster/term จาก School DB ต้อง re-check ก่อน commit ใน SchoolBot DB.
+  ไม่มี cross-database/polymorphic physical FK; FK ภายใน SchoolBot DB ใช้ single-column FK ชี้ PK คอลัมน์เดียว (ยกเว้น FK_SchoolBotProject_CurrentRevision ที่ชี้ (ProjectId, Revision)) และตรวจ SchoolId ตรงกันในชั้น application (db/review-005.md).
+  PK ทุกตารางเป็น server-generated int4 (GENERATED ALWAYS AS IDENTITY); ทุกตารางมี common columns 6 คอลัมน์: IsDelete, CreateBy, CreateDate, UpdateBy, UpdateDate, SchoolId.
+  ไม่มีคอลัมน์ Version — optimistic concurrency ใช้ UpdateDate ที่ server ตั้งด้วย clock_timestamp() เป็น opaque ETag/If-Match (decisions-030).
+  CreateBy/UpdateBy = int4 null: sEmp หรือ sId ของผู้ทำ, null = ระบบทำเอง (decisions-028).
+  ขอบเขต SchoolId:
+  1. Global เท่านั้น (SchoolId IS NULL — 8 ตาราง): SchoolBotLevel, SchoolBotLevelPromotionPolicy, SchoolBotCurriculum, SchoolBotLesson, SchoolBotMission, SchoolBotCriteria, SchoolBotActivity, SchoolBotQuestionBank.
+  2. Mixed Global/Tenant (SchoolId IS NULL หรือ > 0 — 3 ตาราง): SchoolBotRelease, SchoolBotIdempotency, SchoolBotAuditEvent.
+  3. Tenant เท่านั้น (SchoolId > 0 — 21 ตาราง): ตารางอื่นทั้งหมด.
+  '''
+}
+
+Enum SchoolBotProfileKind {
+  student
+  employee
+}
+
+Enum SchoolBotSessionChannel {
+  desktop
+  school_web
+  staff_admin
+}
+
+Enum SchoolBotStaffRoleName {
+  content_author
+  content_approver
+  level_policy_admin
+  license_admin
+  release_publisher
+  dashboard_viewer
+  staff_admin
+}
+
+Enum SchoolBotMode {
+  block
+  arm
+  code
+}
+
+Enum SchoolBotActivityType {
+  instruction
+  project
+  quiz
+  test
+}
+
+Enum SchoolBotAssessmentMethod {
+  automatic
+  teacher
+}
+
+Enum SchoolBotContentState {
+  draft
+  published
+  retired
+}
+
+Enum SchoolBotCourseRunState {
+  planned
+  active
+  closing
+  closed
+}
+
+Enum SchoolBotSubmissionState {
+  queued
+  grading
+  awaiting_teacher
+  evaluated
+  error
+}
+
+Enum SchoolBotJobState {
+  queued
+  running
+  completed
+  failed
+}
+
+Enum SchoolBotOutcome {
+  passed
+  not_yet
+}
+
+Enum SchoolBotAttemptState {
+  started
+  submitted
+  expired
+  voided
+}
+
+Enum SchoolBotGradeCategory {
+  before_midterm
+  after_midterm
+  midterm
+  final
+}
+
+Enum SchoolBotPreviewState {
+  open
+  conflicted
+  confirmed
+  superseded
+  expired
+}
+
+Enum SchoolBotPreviewItemState {
+  ready
+  conflict
+  blocked
+}
+
+Enum SchoolBotExportState {
+  queued
+  running
+  paused_conflict
+  reconciling
+  completed
+  completed_with_skips
+  failed
+}
+
+Enum SchoolBotOutboxState {
+  queued
+  running
+  applied
+  skipped
+  conflict
+  blocked
+  unknown
+}
+
+Enum SchoolBotLevelProposalState {
+  proposed
+  promoted
+  retained
+  max_level
+  stale
+}
+
+Enum SchoolBotReleaseState {
+  draft
+  published
+  withdrawn
+}
+
+Enum SchoolBotChannel {
+  stable
+  beta
+}
+
+Enum SchoolBotPlatform {
+  "windows-amd64"
+  "darwin-amd64"
+  "darwin-arm64"
+}
+
+Table SchoolBotLicense {
+  SchoolBotLicenseId int4 [pk, increment, not null]
+  SchoolName varchar(200) [not null]
+  KeyHash varchar(64) [not null, unique, note: 'UQ_SchoolBotLicense_KeyHash; SHA-256 hex 64 characters']
+  KeyHint varchar(32) [not null]
+  ExpiresAt timestamptz [not null]
+  RevokedAt timestamptz [null]
+  CurrentBindingId int4 [null]
+  BindingEpoch int4 [not null, note: 'Positive epoch; advance when binding changes']
+  AllowedNextJkt varchar(64) [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotLicense_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (10.0.0.128:9499; DES-002, DES-004, DES-012). ใช้ตรวจสิทธิ์ทั้งช่อง desktop (ต้องมี active License + device binding) และช่อง school_web (ต้องมี active License ของโรงเรียนโดยไม่ต้องมี device binding ตาม decisions-025/026). FK_SchoolBotLicense_CurrentBinding เป็น DEFERRABLE INITIALLY DEFERRED.'
+}
+
+Table SchoolBotLicenseBinding {
+  SchoolBotLicenseBindingId int4 [pk, increment, not null]
+  LicenseId int4 [not null]
+  DeviceJkt varchar(64) [not null]
+  PublicJwk jsonb [not null, note: 'DES-002: public EC P-256 JWK only; no private key']
+  Epoch int4 [not null]
+  ActivatedAt timestamptz [not null]
+  DetachedAt timestamptz [null]
+  LastCheckedAt timestamptz [not null]
+  LastEntitlementExpiresAt timestamptz [not null, note: 'CK_SchoolBotLicenseBinding_LeaseWindow: <= LastCheckedAt + 259200s']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotLicenseBinding_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (LicenseId, Epoch) [unique, name: 'UQ_SchoolBotLicenseBinding_LicenseId_Epoch']
+    (LicenseId) [note: 'Partial unique index ux_schoolbot_license_binding_active WHERE DetachedAt IS NULL AND IsDelete = false in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-002). มี active binding ได้ไม่เกินหนึ่งต่อ License; LastEntitlementExpiresAt <= License.ExpiresAt และ <= LastCheckedAt + 259200 วินาที.'
+}
+
+Table SchoolBotRelease {
+  SchoolBotReleaseId int4 [pk, increment, not null]
+  VersionText varchar(32) [not null]
+  Channel SchoolBotChannel [not null]
+  Platform SchoolBotPlatform [not null]
+  Manifest varchar(16384) [not null, note: 'DES-007 signed JWS string']
+  ArtifactHash varchar(64) [not null]
+  Lifecycle SchoolBotReleaseState [not null]
+  PublishedAt timestamptz [null]
+  WithdrawnAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'CK_SchoolBotRelease_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+
+  indexes {
+    (VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_global WHERE SchoolId IS NULL in DDL']
+    (SchoolId, VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_tenant WHERE SchoolId IS NOT NULL in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-007). รองรับทั้ง global catalog (SchoolId IS NULL) และ targeted release รายโรงเรียน.'
+}
+
+Table SchoolBotIdempotency {
+  SchoolBotIdempotencyId int4 [pk, increment, not null]
+  Principal varchar(512) [not null]
+  Operation varchar(200) [not null]
+  RequestKey uuid [not null]
+  RequestHash varchar(64) [not null]
+  NonceHash varchar(64) [null, note: 'Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
+  HttpStatus int4 [not null]
+  ResultCipher bytea [null]
+  ResultKeyId varchar(128) [null]
+  ResourceId int4 [null]
+  CompletedAt timestamptz [not null]
+  ReplayUntil timestamptz [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'CK_SchoolBotIdempotency_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+
+  indexes {
+    (Principal, Operation, RequestKey) [note: 'Partial unique index ux_schoolbot_idempotency_global WHERE SchoolId IS NULL in DDL']
+    (SchoolId, Principal, Operation, RequestKey) [note: 'Partial unique index ux_schoolbot_idempotency_tenant WHERE SchoolId IS NOT NULL in DDL']
+    (NonceHash) [note: 'Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
+  }
+
+  Note: 'SchoolBot DB. บันทึก idempotency ร่วม transaction เดียวกับ domain mutation ใน SchoolBot DB.'
+}
+
+Table SchoolBotAuditEvent {
+  SchoolBotAuditEventId int4 [pk, increment, not null]
+  Actor varchar(512) [not null]
+  Event varchar(64) [not null]
+  EntityType varchar(64) [not null]
+  EntityId int4 [not null]
+  RequestId uuid [not null]
+  Reason varchar(1000) [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'CK_SchoolBotAuditEvent_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
+
+  Note: 'SchoolBot DB. Append-only audit trail (ไม่มี PreviousVersion/NewVersion ตาม decisions-030).'
+}
+
+Table SchoolBotSession {
+  SchoolBotSessionId int4 [pk, increment, not null]
+  Channel SchoolBotSessionChannel [not null, default: 'desktop', note: 'desktop|school_web|staff_admin']
+  AccountId int4 [null, note: 'Legacy Master TMasterDBUser.sID; NOT NULL when Channel = desktop']
+  TokenHash varchar(64) [not null, unique, note: 'UQ_SchoolBotSession_TokenHash; SHA-256 only']
+  ProfileKind SchoolBotProfileKind [null, note: 'student|employee; Desktop allows both student and employee for learning/trying only per decisions-025/026']
+  ProfileId int4 [null, note: 'Legacy student SId or employee SEmp selected by ProfileKind and SchoolId']
+  LegacyAdminId varchar(64) [null, note: 'Optional TAdmins.id from gateway web-principal when Channel = school_web']
+  DeviceJkt varchar(64) [null, note: 'NOT NULL iff Channel = desktop; NULL when school_web or staff_admin']
+  SourceTokenExpiresAt timestamptz [null, note: 'Optional exp of source web token when exchanged via DES-012']
+  ExpiresAt timestamptz [not null]
+  RevokedAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotSession_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-004 Rev5, DES-012 Rev2). ProfileKind/ProfileId ต้อง null พร้อมกันหรือ non-null พร้อมกัน. Channel=desktop ต้องมี DeviceJkt และ AccountId และ bind ได้ทั้ง student/employee (ใช้เรียน/ลองเท่านั้น). Channel=school_web ต้องมี License โรงเรียนที่ active และ DeviceJkt IS NULL. Channel=staff_admin ต้องมี StaffRole active และ DeviceJkt IS NULL.'
+}
+
+Table SchoolBotStaffRole {
+  SchoolBotStaffRoleId int4 [pk, increment, not null]
+  EmployeeId int4 [not null, note: 'Legacy employee SEmp within home SchoolId']
+  Role SchoolBotStaffRoleName [not null]
+  ValidFrom timestamptz [not null]
+  ValidUntil timestamptz [null]
+  Reason varchar(1000) [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'Home SchoolId (> 0) of the staff employee account']
+
+  indexes {
+    (SchoolId, EmployeeId, Role) [note: 'Partial unique index ux_schoolbot_staff_role_live WHERE IsDelete = false in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-012 Rev2). สิทธิ์พนักงานส่วนกลางของ SchoolBright สำหรับเรียก /v2/admin/* (รวม four-eyes content_author vs content_approver).'
+}
+
+Table SchoolBotProject {
+  SchoolBotProjectId int4 [pk, increment, not null]
+  OwnerKind SchoolBotProfileKind [not null]
+  OwnerId int4 [not null, note: 'Polymorphic legacy profile (student SId or employee SEmp) within SchoolId']
+  Mode SchoolBotMode [not null]
+  Name varchar(200) [not null]
+  CurrentRevision int4 [not null, note: 'Positive revision number, not a revision row ID']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotProject_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (SchoolBotProjectId, CurrentRevision) [note: 'Composite FK source for FK_SchoolBotProject_CurrentRevision (DEFERRABLE INITIALLY DEFERRED)']
+  }
+
+  Note: 'SchoolBot DB (DES-003). OwnerKind/OwnerId/SchoolId และ Mode เปลี่ยนไม่ได้; FK_SchoolBotProject_CurrentRevision เป็น DEFERRABLE INITIALLY DEFERRED.'
+}
+
+Table SchoolBotProjectRevision {
+  SchoolBotProjectRevisionId int4 [pk, increment, not null]
+  ProjectId int4 [not null]
+  Revision int4 [not null]
+  Content jsonb [not null, note: 'DES-003 ProjectContent tagged union']
+  ContentHash varchar(64) [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotProjectRevision_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (ProjectId, Revision) [unique, name: 'UQ_SchoolBotProjectRevision_ProjectId_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-003). Immutable revision snapshot.'
+}
+
+Table SchoolBotLevel {
+  SchoolBotLevelId int4 [pk, increment, not null]
+  LevelKey uuid [not null, unique, note: 'UQ_SchoolBotLevel_LevelKey']
+  Code varchar(64) [not null, unique, note: 'UQ_SchoolBotLevel_Code']
+  Ordinal int4 [not null, unique, note: 'UQ_SchoolBotLevel_Ordinal']
+  Title jsonb [not null, note: 'Text localized object']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  Note: 'SchoolBot DB (DES-005 Rev5, DES-011 Rev3). แกนระดับหลักสูตรกลาง Beginner -> Expert; SchoolId ต้องเป็น NULL เสมอ.'
+}
+
+Table SchoolBotLevelPromotionPolicy {
+  SchoolBotLevelPromotionPolicyId int4 [pk, increment, not null]
+  LevelId int4 [not null]
+  Revision int4 [not null]
+  Threshold numeric(9,6) [not null, note: '0..100; revision 1 defaults to 70.000000 per decisions-024']
+  Reason varchar(1000) [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (LevelId, Revision) [unique, name: 'UQ_SchoolBotLevelPromotionPolicy_Level_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-011 Rev3). เกณฑ์คะแนนเฉลี่ยของห้องราย Level ที่ตั้งโดย level_policy_admin; immutable ต่อ revision.'
+}
+
+Table SchoolBotCurriculum {
+  SchoolBotCurriculumId int4 [pk, increment, not null]
+  CurriculumKey uuid [not null, note: 'Logical key across revisions']
+  Revision int4 [not null]
+  LevelId int4 [not null]
+  Title jsonb [not null, note: 'Text localized object']
+  RecommendedGrades jsonb [not null, note: 'T16[] recommended grade codes; default guidance only']
+  Subjects jsonb [not null, note: 'CurriculumSubject[] {subject_key, code, title}']
+  SourceRef varchar(2048) [not null]
+  Lifecycle SchoolBotContentState [not null]
+  PublishedAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (CurriculumKey, Revision) [unique, name: 'UQ_SchoolBotCurriculum_Key_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-005 Rev5). เนื้อหากลางของ SchoolBright (SchoolId IS NULL); ถอน Mode ออกจาก Curriculum ไปไว้ที่ Activity ตาม decisions-026; publish ต้องผ่าน four-eyes.'
+}
+
+Table SchoolBotLesson {
+  SchoolBotLessonId int4 [pk, increment, not null]
+  CurriculumId int4 [not null]
+  LessonKey uuid [not null, note: 'Stable logical lesson key across revisions']
+  Ordinal int4 [not null]
+  Title jsonb [not null]
+  Objective jsonb [not null]
+  Instructions jsonb [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (CurriculumId, LessonKey) [unique, name: 'UQ_SchoolBotLesson_Curriculum_LessonKey']
+    (CurriculumId, Ordinal) [unique, name: 'UQ_SchoolBotLesson_Curriculum_Ordinal']
+  }
+
+  Note: 'SchoolBot DB (DES-005 Rev5). บทเรียนในหลักสูตรกลาง; immutable หลัง parent curriculum publish.'
+}
+
+Table SchoolBotMission {
+  SchoolBotMissionId int4 [pk, increment, not null]
+  LessonId int4 [not null]
+  MissionKey uuid [not null]
+  Ordinal int4 [not null]
+  Title jsonb [not null]
+  Instructions jsonb [not null]
+  Method SchoolBotAssessmentMethod [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (LessonId, MissionKey) [unique, name: 'UQ_SchoolBotMission_Lesson_MissionKey']
+    (LessonId, Ordinal) [unique, name: 'UQ_SchoolBotMission_Lesson_Ordinal']
+  }
+
+  Note: 'SchoolBot DB (DES-005 Rev5). Project Activity อ้างถึง Mission ใน Lesson เดียวกัน; Method ต้องสอดคล้องกับ Activity.Mode.'
+}
+
+Table SchoolBotCriteria {
+  SchoolBotCriteriaId int4 [pk, increment, not null]
+  MissionId int4 [not null]
+  Revision int4 [not null]
+  Rules jsonb [not null, note: 'DES-005 CriteriaRules automatic-v1 or teacher-v1']
+  SourceRef varchar(2048) [not null]
+  ApprovedBy varchar(512) [null]
+  ApprovedAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (MissionId, Revision) [unique, name: 'UQ_SchoolBotCriteria_Mission_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-005 Rev5). เกณฑ์ประเมินของ Mission กลาง; immutable เมื่อ publish หรือถูกใช้ส่งงาน.'
+}
+
+Table SchoolBotActivity {
+  SchoolBotActivityId int4 [pk, increment, not null]
+  LessonId int4 [not null]
+  ActivityKey uuid [not null, note: 'Stable logical activity key across revisions']
+  Ordinal int4 [not null]
+  Title jsonb [not null]
+  Type SchoolBotActivityType [not null, note: 'instruction|project|quiz|test']
+  Mode SchoolBotMode [null, note: 'NOT NULL when Type = project; NULL when instruction|quiz|test']
+  Indicators jsonb [not null, note: 'Indicator[] {indicator_key, code, title}']
+  Config jsonb [not null, note: 'ActivityConfig: instruction-v1 | project-v1 | question-v1 (with default_policy: AssessmentPolicy)']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (LessonId, ActivityKey) [unique, name: 'UQ_SchoolBotActivity_Lesson_ActivityKey']
+    (LessonId, Ordinal) [unique, name: 'UQ_SchoolBotActivity_Lesson_Ordinal']
+  }
+
+  Note: 'SchoolBot DB (DES-005 Rev5, DES-010 Rev3). กิจกรรมรายคาบ/บทเรียนในหลักสูตรกลาง.'
+}
+
+Table SchoolBotQuestionBank {
+  SchoolBotQuestionBankId int4 [pk, increment, not null]
+  BankKey uuid [not null]
+  Revision int4 [not null]
+  Title jsonb [not null]
+  Questions jsonb [not null, note: 'Question[] (single_choice | boolean); contains protected correct_option_keys']
+  SourceRef varchar(2048) [not null]
+  Lifecycle SchoolBotContentState [not null]
+  PublishedAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [null, note: 'Global content only; CHECK (SchoolId IS NULL)']
+
+  indexes {
+    (BankKey, Revision) [unique, name: 'UQ_SchoolBotQuestionBank_BankKey_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-010 Rev3). คลังข้อสอบกลางแบบ revision; publish ต้องผ่าน four-eyes; immutable หลัง publish.'
+}
+
+Table SchoolBotCourseRun {
+  SchoolBotCourseRunId int4 [pk, increment, not null]
+  CurriculumId int4 [not null]
+  ClassroomId int4 [not null, note: 'Legacy NTermSubLevel2 within SchoolId']
+  NYear int4 [not null]
+  NTerm varchar(64) [not null, note: 'Legacy TTerm.NTerm']
+  PlanCourseIds jsonb [not null, note: 'Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
+  CurrentPolicyId int4 [null]
+  PreviousRunId int4 [null]
+  EffectiveAt timestamptz [not null]
+  Lifecycle SchoolBotCourseRunState [not null, note: 'planned|active|closing|closed']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotCourseRun_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (SchoolId, ClassroomId, NYear, NTerm) [note: 'Partial unique index ux_schoolbot_courserun_active_room WHERE Lifecycle IN (planned,active,closing) AND IsDelete = false in DDL']
+    (PreviousRunId) [note: 'Partial unique index ux_schoolbot_courserun_one_successor WHERE PreviousRunId IS NOT NULL AND IsDelete = false in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-008 Rev3, DES-010 Rev3, DES-011 Rev3). การเปิดใช้หลักสูตรกลางกับห้อง/ปี/เทอมและชุดวิชา PlanCourseIds ของโรงเรียน; FK_SchoolBotCourseRun_CurrentPolicy เป็น DEFERRABLE INITIALLY DEFERRED.'
+}
+
+Table SchoolBotScoringPolicy {
+  SchoolBotScoringPolicyId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  Revision int4 [not null]
+  Policy jsonb [not null, note: 'DES-010 Rev3 ScoringPolicy {quiz_counts, activity_weights, formula_version}; immutable']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScoringPolicy_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (CourseRunId, Revision) [unique, name: 'UQ_SchoolBotScoringPolicy_CourseRun_Revision']
+  }
+
+  Note: 'SchoolBot DB (DES-010 Rev3). นโยบายการนับคะแนน Quiz และน้ำหนักกิจกรรมราย CourseRun (ถอน CurriculumId ที่ซ้ำกับ CourseRun.CurriculumId ตาม db/review-005.md).'
+}
+
+Table SchoolBotCourseRunActivity {
+  SchoolBotCourseRunActivityId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  ActivityId int4 [not null]
+  OpensAt timestamptz [null]
+  ClosesAt timestamptz [null]
+  PolicyOverride jsonb [null, note: 'Optional AssessmentPolicy override per classroom CourseRun']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotCourseRunActivity_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (CourseRunId, ActivityId) [unique, name: 'UQ_SchoolBotCourseRunActivity_Run_Activity']
+  }
+
+  Note: 'SchoolBot DB (DES-010 Rev3). การตั้งเวลาเปิด-ปิดและ override AssessmentPolicy รายห้องโดยครูรายวิชา; ClosesAt > OpensAt เมื่อมีทั้งคู่.'
+}
+
+Table SchoolBotSubmission {
+  SchoolBotSubmissionId int4 [pk, increment, not null]
+  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId (student only in current schema)']
+  MissionId int4 [not null]
+  CriteriaId int4 [not null]
+  ProjectRevisionId int4 [not null]
+  SubmittedAt timestamptz [not null]
+  State SchoolBotSubmissionState [not null]
+  CurrentAssessmentId int4 [null]
+  Evidence jsonb [null, note: 'DES-005 ArmEvidence']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotSubmission_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-005 Rev5). อ้าง global Mission/Criteria และ ProjectRevision ด้วย single-column FK ชี้ PK; application ตรวจว่า CriteriaId อยู่ใน MissionId เดียวกัน และ ProjectRevision เป็นของนักเรียน (OwnerKind=student) ใน SchoolId เดียวกัน. FK_SchoolBotSubmission_CurrentAssessment เป็น DEFERRABLE INITIALLY DEFERRED.'
+}
+
+Table SchoolBotGradingJob {
+  SchoolBotGradingJobId int4 [pk, increment, not null]
+  SubmissionId int4 [not null, unique, note: 'UQ_SchoolBotGradingJob_SubmissionId']
+  State SchoolBotJobState [not null]
+  Attempts int4 [not null]
+  LeaseOwner varchar(128) [null]
+  LeaseUntil timestamptz [null]
+  NextAttemptAt timestamptz [not null]
+  LastErrorCode varchar(64) [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotGradingJob_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-005 Rev5). คิวงานตรวจอัตโนมัติ 1 ต่อ Submission.'
+}
+
+Table SchoolBotAssessment {
+  SchoolBotAssessmentId int4 [pk, increment, not null]
+  SubmissionId int4 [not null]
+  Sequence int4 [not null, note: 'Allocated under SchoolBotSubmission row lock']
+  Method SchoolBotAssessmentMethod [not null]
+  Outcome SchoolBotOutcome [not null]
+  EarnedScore numeric(18,6) [null, note: 'Null together with MaxScore, or 0 <= EarnedScore <= MaxScore and MaxScore > 0']
+  MaxScore numeric(18,6) [null]
+  RuleResults jsonb [not null]
+  Feedback varchar(4000) [not null]
+  GraderVersion varchar(128) [null]
+  AssessorId int4 [null, note: 'Legacy employee SEmp within SchoolId']
+  SupersedesId int4 [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotAssessment_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-005 Rev5). Immutable append-only assessment result; ล็อกแถว SchoolBotSubmission ก่อนสร้างเพื่อจัดสรร Sequence.'
+}
+
+Table SchoolBotAttempt {
+  SchoolBotAttemptId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  ActivityId int4 [not null]
+  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId (student only in current schema)']
+  Sequence int4 [not null, note: 'Allocated under learner attempt lock']
+  State SchoolBotAttemptState [not null, note: 'started|submitted|expired|voided']
+  StartedAt timestamptz [not null]
+  DeadlineAt timestamptz [null]
+  SubmittedAt timestamptz [null]
+  Snapshot jsonb [not null, note: 'Immutable AttemptSnapshot; server-only']
+  Answers jsonb [not null, note: 'Answer[]']
+  EarnedScore numeric(18,6) [null]
+  MaxScore numeric(18,6) [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotAttempt_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-010 Rev3). การทำข้อสอบ Quiz/Test ของนักเรียนพร้อม immutable snapshot.'
+}
+
+Table SchoolBotRetakeGrant {
+  SchoolBotRetakeGrantId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  ActivityId int4 [not null]
+  LearnerId int4 [not null, note: 'Legacy student SId within SchoolId']
+  Reason varchar(1000) [not null]
+  ConsumedAttemptId int4 [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotRetakeGrant_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-010 Rev3, decisions-025). สิทธิ์สอบซ่อมรายคนโดยครูรายวิชา; คะแนนสอบซ่อม Test ใช้คะแนนสูงสุดระหว่างครั้งจริงกับครั้งซ่อม ไม่มีเพดาน.'
+}
+
+Table SchoolBotGradeSlot {
+  SchoolBotGradeSlotId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  PlanCourseId int4 [not null]
+  CourseId int4 [not null]
+  NGradeId int4 [not null]
+  AssessmentId int4 [not null]
+  ScoreIdentifier varchar(128) [not null]
+  Category SchoolBotGradeCategory [not null]
+  TargetSnapshot jsonb [not null, note: 'DES-008 TargetSnapshot']
+  OwnershipReason varchar(1000) [not null]
+  RetiredAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotGradeSlot_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (SchoolId, NGradeId, AssessmentId, ScoreIdentifier) [note: 'Partial unique index ux_schoolbot_gradeslot_active_ownership WHERE RetiredAt IS NULL (without IsDelete filter) in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-008 Rev3). ช่องคะแนนย่อยใน PGGradeDB ที่ school_admin ยืนยันให้ SchoolBot ดูแล.'
+}
+
+Table SchoolBotScoreMapping {
+  SchoolBotScoreMappingId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  GradeSlotId int4 [not null]
+  Sources jsonb [not null, note: 'MappingSource[]; weights sum to 10000']
+  RetiredAt timestamptz [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScoreMapping_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (CourseRunId, GradeSlotId) [note: 'Partial unique index ux_schoolbot_scoremapping_active WHERE RetiredAt IS NULL AND IsDelete = false in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-008 Rev3). การผูก GradeSlot กับ Activity/Indicator โดย school_admin.'
+}
+
+Table SchoolBotScorePreview {
+  SchoolBotScorePreviewId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  Principal varchar(512) [not null]
+  SnapshotHash varchar(64) [not null]
+  ExpiresAt timestamptz [not null]
+  State SchoolBotPreviewState [not null]
+  SupersedesId int4 [null]
+  Context jsonb [not null, note: 'DES-009 PreviewContext']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScorePreview_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-009 Rev3). Snapshot ก่อนส่งคะแนนให้ครูรายวิชาตรวจสอบและยืนยัน.'
+}
+
+Table SchoolBotScorePreviewItem {
+  SchoolBotScorePreviewItemId int4 [pk, increment, not null]
+  ScorePreviewId int4 [not null]
+  LearnerId int4 [not null]
+  State SchoolBotPreviewItemState [not null, note: 'ready|conflict|blocked']
+  ReasonCodes jsonb [not null]
+  Snapshot jsonb [not null, note: 'DES-009 PreviewItemSnapshot (half-up integer rounding)']
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScorePreviewItem_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (ScorePreviewId, LearnerId) [unique, name: 'UQ_SchoolBotScorePreviewItem_Preview_Learner']
+  }
+
+  Note: 'SchoolBot DB (DES-009 Rev3). รายการ preview/ชน/บล็อกรายนักเรียน.'
+}
+
+Table SchoolBotScoreExport {
+  SchoolBotScoreExportId int4 [pk, increment, not null]
+  ScorePreviewId int4 [not null, unique, note: 'UQ_SchoolBotScoreExport_ScorePreviewId']
+  ConfirmedBy varchar(512) [not null]
+  ConfirmedAt timestamptz [not null]
+  State SchoolBotExportState [not null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScoreExport_SchoolId_Pos: SchoolId > 0']
+
+  Note: 'SchoolBot DB (DES-009 Rev3). คำสั่งยืนยันการส่งคะแนนของครูรายวิชา (เปิดใช้หลังผ่าน release gates ทั้งห้า).'
+}
+
+Table SchoolBotScoreOutbox {
+  SchoolBotScoreOutboxId int4 [pk, increment, not null]
+  ScoreExportId int4 [not null]
+  ScorePreviewItemId int4 [not null]
+  OperationKey uuid [not null, unique, note: 'UQ_SchoolBotScoreOutbox_OperationKey']
+  PayloadHash varchar(64) [not null]
+  State SchoolBotOutboxState [not null]
+  Attempts int4 [not null]
+  LeaseOwner varchar(128) [null]
+  LeaseUntil timestamptz [null]
+  NextAttemptAt timestamptz [not null]
+  ReceiptId int8 [null, note: 'Logical ref to PGGradeDB PGTGradeAuditLog.GradeAuditLogId; no cross-DB FK']
+  ReceiptHash varchar(64) [null]
+  LastErrorCode varchar(64) [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotScoreOutbox_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (ScoreExportId, ScorePreviewItemId) [unique, name: 'UQ_SchoolBotScoreOutbox_Export_Item']
+  }
+
+  Note: 'SchoolBot DB (DES-009 Rev3). Outbox รายนักเรียนสำหรับเขียน PGGradeDB แบบ idempotent คู่กับ xmin CAS ของตาราง PGGradeDB และ PGTGradeAuditLog receipt.'
+}
+
+Table SchoolBotLevelProposal {
+  SchoolBotLevelProposalId int4 [pk, increment, not null]
+  CourseRunId int4 [not null]
+  TargetCurriculumId int4 [not null]
+  SnapshotHash varchar(64) [not null]
+  Snapshot jsonb [not null, note: 'DES-011 Rev3 LevelSnapshot']
+  State SchoolBotLevelProposalState [not null, note: 'proposed|promoted|retained|max_level|stale']
+  DecisionBy varchar(512) [null]
+  DecisionAt timestamptz [null]
+  Reason varchar(1000) [null]
+  SuccessorRunId int4 [null]
+  IsDelete boolean [not null, default: false]
+  CreateBy int4 [null]
+  CreateDate timestamptz [not null]
+  UpdateBy int4 [null]
+  UpdateDate timestamptz [not null]
+  SchoolId int4 [not null, note: 'CK_SchoolBotLevelProposal_SchoolId_Pos: SchoolId > 0']
+
+  indexes {
+    (CourseRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_confirmed_per_run WHERE State IN (promoted,retained,max_level) AND IsDelete = false in DDL']
+    (SuccessorRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_successor_unique WHERE SuccessorRunId IS NOT NULL AND IsDelete = false in DDL']
+  }
+
+  Note: 'SchoolBot DB (DES-011 Rev3). ข้อเสนอเลื่อน Level ทั้งห้องเมื่อสิ้นเทอมและการยืนยันของครู.'
+}
+
+// Section 001 & 002: Licensing & Projects (3 single-column FKs + 1 natural composite FK)
+Ref FK_SchoolBotLicenseBinding_License: SchoolBotLicenseBinding.LicenseId > SchoolBotLicense.SchoolBotLicenseId [delete: no action, update: no action]
+Ref FK_SchoolBotLicense_CurrentBinding: SchoolBotLicense.CurrentBindingId > SchoolBotLicenseBinding.SchoolBotLicenseBindingId [delete: no action, update: no action]
+Ref FK_SchoolBotProjectRevision_Project: SchoolBotProjectRevision.ProjectId > SchoolBotProject.SchoolBotProjectId [delete: no action, update: no action]
+Ref FK_SchoolBotProject_CurrentRevision: SchoolBotProject.(SchoolBotProjectId, CurrentRevision) > SchoolBotProjectRevision.(ProjectId, Revision) [delete: no action, update: no action]
+
+// Section 003: Global Learning Content (6 single-column FKs)
+Ref FK_SchoolBotLevelPromotionPolicy_Level: SchoolBotLevelPromotionPolicy.LevelId > SchoolBotLevel.SchoolBotLevelId [delete: no action, update: no action]
+Ref FK_SchoolBotCurriculum_Level: SchoolBotCurriculum.LevelId > SchoolBotLevel.SchoolBotLevelId [delete: no action, update: no action]
+Ref FK_SchoolBotLesson_Curriculum: SchoolBotLesson.CurriculumId > SchoolBotCurriculum.SchoolBotCurriculumId [delete: no action, update: no action]
+Ref FK_SchoolBotMission_Lesson: SchoolBotMission.LessonId > SchoolBotLesson.SchoolBotLessonId [delete: no action, update: no action]
+Ref FK_SchoolBotCriteria_Mission: SchoolBotCriteria.MissionId > SchoolBotMission.SchoolBotMissionId [delete: no action, update: no action]
+Ref FK_SchoolBotActivity_Lesson: SchoolBotActivity.LessonId > SchoolBotLesson.SchoolBotLessonId [delete: no action, update: no action]
+
+// Section 004: CourseRuns, Policies, Submissions, Grading, Attempts & Retakes (18 single-column FKs)
+Ref FK_SchoolBotCourseRun_Curriculum: SchoolBotCourseRun.CurriculumId > SchoolBotCurriculum.SchoolBotCurriculumId [delete: no action, update: no action]
+Ref FK_SchoolBotCourseRun_PreviousRun: SchoolBotCourseRun.PreviousRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotScoringPolicy_CourseRun: SchoolBotScoringPolicy.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotCourseRun_CurrentPolicy: SchoolBotCourseRun.CurrentPolicyId > SchoolBotScoringPolicy.SchoolBotScoringPolicyId [delete: no action, update: no action]
+Ref FK_SchoolBotCourseRunActivity_CourseRun: SchoolBotCourseRunActivity.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotCourseRunActivity_Activity: SchoolBotCourseRunActivity.ActivityId > SchoolBotActivity.SchoolBotActivityId [delete: no action, update: no action]
+Ref FK_SchoolBotSubmission_Mission: SchoolBotSubmission.MissionId > SchoolBotMission.SchoolBotMissionId [delete: no action, update: no action]
+Ref FK_SchoolBotSubmission_Criteria: SchoolBotSubmission.CriteriaId > SchoolBotCriteria.SchoolBotCriteriaId [delete: no action, update: no action]
+Ref FK_SchoolBotSubmission_ProjectRevision: SchoolBotSubmission.ProjectRevisionId > SchoolBotProjectRevision.SchoolBotProjectRevisionId [delete: no action, update: no action]
+Ref FK_SchoolBotGradingJob_Submission: SchoolBotGradingJob.SubmissionId > SchoolBotSubmission.SchoolBotSubmissionId [delete: no action, update: no action]
+Ref FK_SchoolBotAssessment_Submission: SchoolBotAssessment.SubmissionId > SchoolBotSubmission.SchoolBotSubmissionId [delete: no action, update: no action]
+Ref FK_SchoolBotAssessment_Supersedes: SchoolBotAssessment.SupersedesId > SchoolBotAssessment.SchoolBotAssessmentId [delete: no action, update: no action]
+Ref FK_SchoolBotSubmission_CurrentAssessment: SchoolBotSubmission.CurrentAssessmentId > SchoolBotAssessment.SchoolBotAssessmentId [delete: no action, update: no action]
+Ref FK_SchoolBotAttempt_CourseRun: SchoolBotAttempt.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotAttempt_Activity: SchoolBotAttempt.ActivityId > SchoolBotActivity.SchoolBotActivityId [delete: no action, update: no action]
+Ref FK_SchoolBotRetakeGrant_CourseRun: SchoolBotRetakeGrant.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotRetakeGrant_Activity: SchoolBotRetakeGrant.ActivityId > SchoolBotActivity.SchoolBotActivityId [delete: no action, update: no action]
+Ref FK_SchoolBotRetakeGrant_ConsumedAttempt: SchoolBotRetakeGrant.ConsumedAttemptId > SchoolBotAttempt.SchoolBotAttemptId [delete: no action, update: no action]
+
+// Section 005 & 006: GradeSlots, ScoreMappings, Previews, Exports, Outbox & LevelProposals (12 single-column FKs)
+Ref FK_SchoolBotGradeSlot_CourseRun: SchoolBotGradeSlot.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotScoreMapping_CourseRun: SchoolBotScoreMapping.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotScoreMapping_GradeSlot: SchoolBotScoreMapping.GradeSlotId > SchoolBotGradeSlot.SchoolBotGradeSlotId [delete: no action, update: no action]
+Ref FK_SchoolBotScorePreview_CourseRun: SchoolBotScorePreview.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotScorePreview_Supersedes: SchoolBotScorePreview.SupersedesId > SchoolBotScorePreview.SchoolBotScorePreviewId [delete: no action, update: no action]
+Ref FK_SchoolBotScorePreviewItem_Preview: SchoolBotScorePreviewItem.ScorePreviewId > SchoolBotScorePreview.SchoolBotScorePreviewId [delete: no action, update: no action]
+Ref FK_SchoolBotScoreExport_Preview: SchoolBotScoreExport.ScorePreviewId > SchoolBotScorePreview.SchoolBotScorePreviewId [delete: no action, update: no action]
+Ref FK_SchoolBotScoreOutbox_Export: SchoolBotScoreOutbox.ScoreExportId > SchoolBotScoreExport.SchoolBotScoreExportId [delete: no action, update: no action]
+Ref FK_SchoolBotScoreOutbox_PreviewItem: SchoolBotScoreOutbox.ScorePreviewItemId > SchoolBotScorePreviewItem.SchoolBotScorePreviewItemId [delete: no action, update: no action]
+Ref FK_SchoolBotLevelProposal_CourseRun: SchoolBotLevelProposal.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+Ref FK_SchoolBotLevelProposal_TargetCurriculum: SchoolBotLevelProposal.TargetCurriculumId > SchoolBotCurriculum.SchoolBotCurriculumId [delete: no action, update: no action]
+Ref FK_SchoolBotLevelProposal_SuccessorRun: SchoolBotLevelProposal.SuccessorRunId > SchoolBotCourseRun.SchoolBotCourseRunId [delete: no action, update: no action]
+
+TableGroup Licensing {
+  SchoolBotLicense
+  SchoolBotLicenseBinding
+}
+
+TableGroup IdentityAndStaff {
+  SchoolBotSession
+  SchoolBotStaffRole
+}
+
+TableGroup Projects {
+  SchoolBotProject
+  SchoolBotProjectRevision
+}
+
+TableGroup GlobalLearningContent {
+  SchoolBotLevel
+  SchoolBotLevelPromotionPolicy
+  SchoolBotCurriculum
+  SchoolBotLesson
+  SchoolBotMission
+  SchoolBotCriteria
+  SchoolBotActivity
+  SchoolBotQuestionBank
+}
+
+TableGroup CourseRunsAndAssessments {
+  SchoolBotCourseRun
+  SchoolBotScoringPolicy
+  SchoolBotCourseRunActivity
+  SchoolBotSubmission
+  SchoolBotGradingJob
+  SchoolBotAssessment
+  SchoolBotAttempt
+  SchoolBotRetakeGrant
+  SchoolBotLevelProposal
+}
+
+TableGroup GradeMappingAndExport {
+  SchoolBotGradeSlot
+  SchoolBotScoreMapping
+  SchoolBotScorePreview
+  SchoolBotScorePreviewItem
+  SchoolBotScoreExport
+  SchoolBotScoreOutbox
+}
+
+TableGroup Releases {
+  SchoolBotRelease
+}
+
+TableGroup AtomicOperations {
+  SchoolBotIdempotency
+  SchoolBotAuditEvent
+}

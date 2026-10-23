@@ -7,7 +7,7 @@
 | อยากรู้อะไร | เปิดอ่าน |
 |---|---|
 | ตารางไหนทำอะไร | [รายชื่อ 32 ตาราง แยกตามงาน](data-dictionary/index.md) |
-| ตารางเชื่อมกันอย่างไร | [แผนภาพเนื้อหา → ผลเรียน → คะแนนเดิม](data-relations-001.md) |
+| ตารางเชื่อมกันอย่างไร | [แผนภาพขั้นตอน](data-relations-001.md) · [DBML แบบเต็ม/เชื่อมตารางเก่า](dbml-guide-001.md) |
 | ฟิลด์นี้เก็บอะไร ชนิดไหน ว่างได้หรือไม่ | กดชื่อตารางในรายชื่อด้านบน ทุกตารางมีคำอธิบายครบทุกฟิลด์ |
 | ใช้ตารางเก่าอะไร เชื่อมด้วยคอลัมน์ไหน | [แผนที่ข้อมูลเดิมของ SchoolBright](data-legacy-001.md) |
 | ฟิลด์ JSON เก็บโครงสร้างอะไร | [คำอธิบาย JSON พร้อมตัวอย่าง](data-json-001.md) และ [สัญญาชนิดข้อมูลเต็ม](data-dictionary/contract-index.md) |
@@ -65,6 +65,8 @@ schema ปัจจุบันให้ `LearnerId` ในผลเรียน
 อ่าน [data-contract-rules.md](data-contract-rules.md) ประกอบเสมอ: relations, uniqueness, invariants, error envelope, headers, pagination และขนาด payload คงตามสัญญาเดิม
 
 ## Change Log
+
+- 2026-10-23 — เชื่อม DBML Rev4 แบบเต็มและภาพ integration ผ่าน dbml-guide-001 โดยคง data-model Rev6/สัญญาเดิม
 
 - 2026-10-23 — Rev6: เพิ่มคำอธิบายหน้าที่/หนึ่งแถว/ตัวอย่าง/ผู้ใช้ข้อมูลและฟิลด์ครบ 32 ตาราง (450 ฟิลด์), แผนที่ตารางเดิมพร้อมหลักฐาน และแยกภาคผนวกสัญญา Rev5 ไว้ครบ; ไม่แก้ SQL/DBML/ข้อตกลงธุรกิจ; ฉบับก่อนปรับอ่านง่ายเก็บแบบ byte-for-byte ที่ [archive](archive/2026-10-23-before-readable-data-model/data-model.md)
 - ประวัติ Rev1–Rev5: [ประวัติ data model](data-model-history-001.md)
