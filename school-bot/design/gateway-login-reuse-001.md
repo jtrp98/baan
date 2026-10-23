@@ -1,4 +1,4 @@
-# Gateway Login reuse — Rev1
+# Gateway Login reuse — Rev2
 
 สถานะอยู่ที่ [index](index.md). ขอบเขต: auth seam เท่านั้น; ไม่มี schema delta.
 
@@ -35,5 +35,12 @@ Input bounds ต่างกัน: DES-004 username256/password1024; mobile100/
 
 G/sys ต้องให้ completion/continuation DTO, device lifecycle, token trust และ bounds mapping; legacy/vault ให้ TR-AUTH-02-rest/03..06 โดยเฉพาะ identity/tenant/status; G/Light+B ให้ H5 transport/private exposure/TLS/secret-owner และ opaque-token isolation; admin owner ให้ staff bootstrap/BFF/CSRF. ระหว่างนี้ fail closed เฉพาะส่วนที่หลักฐานขาด ไม่เปิดคำถาม035ใหม่.
 
+## Override Rev2 — ผลรับ033และขอบเขต034
+
+[desktop-login-adapter-001.md](desktop-login-adapter-001.md) มี precedence เหนือ candidate/readiness และ bounds เดิมเฉพาะ Desktop: เลือก teacher web continuation, student mobile ยังไม่มี Desktop completion ที่พิสูจน์ได้; ไม่ fallback หรือ fake IMEI. ไม่ต้องตรวจ password/hash ซ้ำใน B แต่ต้องตรวจ directory และ authorization ต่อ.
+
+ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md).
+
 ## Change Log
+- 2026-10-23 — Rev2: ใบงาน034 รับ033 กำหนด outcome/admission และรายงาน complete-slice gap โดยไม่เปลี่ยน schema/035
 - 2026-10-23 — Rev1: ใบงาน032 รับหลักฐาน031 เลือก reuse แบบมีเงื่อนไข; ไม่เขียน source/SQL ไม่ทดสอบหรือปิด gate

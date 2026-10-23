@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-23",
+  "reason": "task-034 Desktop Login contract; original bytes before amend",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/des-004.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-desktop-login-adapter-001/des-004.md",
+      "bytes": 22017,
+      "sha256": "c4ff6be8156e239d0ac9e3eae08812478e99e751769d8031383a250ffdace2e9"
+    },
+    {
+      "source": "knowledge/school-bot/design/des-012.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-desktop-login-adapter-001/des-012.md",
+      "bytes": 21012,
+      "sha256": "3b0ad02dc24a00e464ec37245bbb47acebd2c70723c6fff75e4648b6414e4740"
+    },
+    {
+      "source": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-desktop-login-adapter-001/gateway-login-reuse-001.md",
+      "bytes": 6325,
+      "sha256": "5c07defa1440b3979d1a27f5967b6c6a92268be9d3d084ebaa039c6b4b9b4fe4"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-desktop-login-adapter-001/index.md",
+      "bytes": 20987,
+      "sha256": "9bb7a13f991b24100d74e9c41590022025e0507f679b89dcc9ea87ce45214985"
+    }
+  ]
+}

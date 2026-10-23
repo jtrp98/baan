@@ -47,7 +47,7 @@
 | DES-001 | Desktop host และ IPC (Rev1) | PROPOSED — รอ breaking review | [des-001.md](des-001.md) |
 | DES-002 | License และ device binding (Rev2) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
 | DES-003 | หลายโครงงาน Local/Cloud (Rev3) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
-| DES-004 | Identity และ school authorization (Rev8) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
+| DES-004 | Identity และ school authorization (Rev9) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
 | DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
 | DES-006 | หุ่นจริง Windows/macOS (Rev1) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
 | DES-007 | Release และ trusted update (Rev2) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
@@ -55,7 +55,7 @@
 | DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
 | DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
 | DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
-| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev6) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
+| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev7) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
 
 ### REQ mapping
 
@@ -154,11 +154,21 @@
 | [learning-rules-032-034.md](learning-rules-032-034.md) | Rev1 — profile/run/freeze/สูตร/override; มติยืนยันแล้ว รอตรวจ implementation |
 | [grade-rules-032-034.md](grade-rules-032-034.md) | Rev1 — mapping/partial/skip/recovery; คง release gates |
 
+## Desktop authentication — ใบงาน034
+
+| ไฟล์ | ขอบเขต / สถานะ |
+|---|---|
+| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev1 — สัญญา outcome/continuation ภายใน; public completion และ complete implementation slice ยังขาด prerequisite ตาม packet |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev1 — trusted identity/device/transport evidence ให้เจ้าของรับต่อ; ไม่ใช่ Light approval |
+
+อ่าน override DES-004 Rev9/DES-012 Rev7/Gateway Login reuse Rev2 ก่อนข้อความเก่า. ข้อค้าง credential compatibility ของ DES-004 หมายถึง identity/directory proof ตาม packet; ไม่บังคับ B ทำ hash/verifier ซ้ำ. คง110tasks pending/77cases NOT_RUN/Important6 OPEN จน check มี verdict เฉพาะ scope.
+
 ## จุดอ่าน Login reuse
 
 [gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev1 — PROPOSED: reuse W/G login ยืนยันจาก static evidence; Desktop adapter/identity และ H5 transport ยังรอหลักฐาน. อ่านร่วม override DES-004 Rev8, DES-012 Rev6 และ Gateway integration Rev2 ก่อน implement.
 
 ## Change Log
+- 2026-10-23 — ใบงาน034: DES-004 Rev9/DES-012 Rev7/Login reuse Rev2 พร้อม Desktop adapter และ review packet; complete backend slice ยังไม่พร้อม ไม่มี source/SQL/runtime หรือ check verdict ใหม่
 - 2026-10-23 — ใบงาน032 รับ task031/Git metadata; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
 - 2026-10-23 — ใบงาน030: sync [decisions-035](../requirement/decisions-035.md) ปิดนโยบายแหล่ง is_admin (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม); คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
 - 2026-10-23 — ใบงาน029: DES-012 Rev5/auth-evidence Rev3 และ gateway-integration Rev1; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด gate
