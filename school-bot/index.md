@@ -7,7 +7,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..034 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..035 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev6/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/180 AC |
@@ -23,6 +23,8 @@
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
+
+- 2026-10-23 — [decisions-035](requirement/decisions-035.md): ผู้ใช้เลือกตรวจกลุ่มแอดมิน/ผู้บริหารฝั่งserverและคงsuperadminเดิม; ปิดเฉพาะคำถามแหล่งis_admin ส่งarch syncสัญญา ไม่ปิดG-AUTH/H5/QA/security
 
 - 2026-10-23 — รอบ002รับหลักฐานบัญชีเดิมจากพาธที่ผู้ใช้ให้ (ตรวจHEAD/hash13ไฟล์), 77cases/180AC, specแก้REQ025/027ตามมติเดิม, security15findingsOPEN และgmรับqueue003/BL002..004; คง110tasks pending ไม่มีruntime/SQL/sign-off/riskacceptanceใหม่ ผลรับGatewayและfinalcommitตามhandoff002
 
