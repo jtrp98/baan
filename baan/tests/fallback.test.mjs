@@ -1,11 +1,11 @@
-// Regression: ลำดับสลับตัวรัน (_fallback ต่อ tier) — สลับเฉพาะเมื่อติดโควตา/limit เท่านั้น
+// Regression: ลำดับสลับตัวรัน (_fallback ต่อ tier) — สลับเมื่อติดโควตา/limit หรือตัวรันไม่ได้ติดตั้งบนเครื่อง
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fallbackChainFor } from "../src/plan.mjs";
-import { execute, looksLikeLimitError } from "../src/scheduler.mjs";
+import { execute, looksLikeLimitError, looksLikeMissingCli, runWithFallback } from "../src/scheduler.mjs";
 
 const cfg = {
   agents: { codex: {}, agy: {}, claude: {} },
@@ -38,6 +38,38 @@ test("looksLikeLimitError: จับข้อความ limit ของทั�
 const okRun = (answer = "ผลลัพธ์\nDONE") => ({ ok: true, exitCode: 0, durationMs: 5, timedOut: false, answer, error: "", stdout: "", stderr: "" });
 const limitRun = () => ({ ok: false, exitCode: 1, durationMs: 5, timedOut: false, answer: "", error: "", stdout: "", stderr: "usage limit reached — resets in 3h" });
 const T = (id, tier, agent) => ({ id, role: "check", agent, tier, title: `งาน ${id}`, task: `ทำ ${id}`, dependsOn: [] });
+
+// ตัวรันไม่ได้ติดตั้ง = งานยังไม่ได้เริ่มรัน จึงสลับต่อได้เหมือนกรณีโควตา (0.15.1)
+// เคยไม่สลับ: เครื่องไม่มี opencode CLI → codex ติดโควตาแล้วล้มที่ command not found แทนที่จะไปต่อ agy
+test("looksLikeMissingCli: จับ ENOENT/command not found จาก error หรือ stderr ของ process แต่ไม่จับจากคำตอบ", () => {
+  const base = { ok: false, timedOut: false, answer: "", error: "", stderr: "" };
+  assert.equal(looksLikeMissingCli({ ...base, error: "spawn opencode ENOENT" }), true, "spawn ตรง (agy/opencode ที่ไม่ผ่าน shell)");
+  assert.equal(looksLikeMissingCli({ ...base, stderr: "'opencode' is not recognized as an internal or external command," }), true, "cmd.exe");
+  assert.equal(looksLikeMissingCli({ ...base, stderr: "sh: 1: opencode: command not found" }), true, "sh");
+  assert.equal(looksLikeMissingCli({ ...base, answer: "ตรวจพบ node foo.js ขึ้น command not found ตาม AC-2" }), false, "คำตอบของ role รายงานงานที่ตรวจ ไม่ใช่อาการของตัวรัน");
+  assert.equal(looksLikeMissingCli({ ...base, stderr: "connection refused" }), false, "error ทั่วไปไม่ใช่ของหาย");
+  assert.equal(looksLikeMissingCli({ ...base, error: "spawn x ENOENT", ok: true }), false, "ok อยู่แล้ว");
+  assert.equal(looksLikeMissingCli({ ...base, error: "spawn x ENOENT", timedOut: true }), false, "timeout ไม่ใช่ของหาย");
+});
+
+test("runWithFallback: ตัวรันที่ไม่ได้ติดตั้งถูกข้ามไปตัวถัดไป แต่ความล้มเหตุอื่นยังหยุดที่ตัวนั้น", async () => {
+  const seen = [];
+  const r1 = await runWithFallback(["codex", "opencode", "agy"], async (a) => {
+    seen.push(a);
+    return a === "codex" ? { ok: false, error: "spawn codex ENOENT", stderr: "", answer: "", timedOut: false } : okRun();
+  });
+  assert.equal(r1.agent, "opencode", "ข้ามตัวที่ไม่มีโปรแกรมไปตัวถัดไปจนได้ผล");
+  assert.deepEqual(r1.trail, ["codex→opencode"]);
+  assert.deepEqual(seen, ["codex", "opencode"], "ไม่ต้องรันตัวที่สามเพราะตัวที่สองสำเร็จแล้ว");
+
+  const seen2 = [];
+  const r2 = await runWithFallback(["codex", "agy"], async (a) => {
+    seen2.push(a);
+    return { ok: false, error: "connection refused", stderr: "", answer: "", timedOut: false };
+  });
+  assert.equal(r2.agent, "codex", "ล้มด้วยเหตุอื่น = หยุดตามเดิม ไม่ไล่สลับ");
+  assert.deepEqual(seen2, ["codex"]);
+});
 const mkOpts = (over = {}) => ({ cwd: tmpdir(), maxParallel: 3, dryRun: false, write: false, timeoutSec: 60, projectCtx: "", ...over });
 
 test("execute: ตัวแรกติดโควตา → สลับตัวถัดไปตาม _fallback งานสำเร็จ และบันทึกว่าสลับด้วยอะไร", async () => {

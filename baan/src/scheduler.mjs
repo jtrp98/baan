@@ -88,7 +88,18 @@ export function looksLikeLimitError(r) {
   return LIMIT_ERROR_PATTERNS.some((p) => hay.includes(p));
 }
 
-// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit
+// ตัวรันไม่ได้ติดตั้งบนเครื่อง (spawn ตรงล้ม ENOENT หรือ shell ตอบ command not found / not recognized) —
+// งานยังไม่ได้เริ่มรันจริงจึงสลับตัวถัดไปได้โดยไม่เสี่ยงเผาโควตาค่ายอื่นด้วยงานที่พัง (เหตุผลเดียวกับกรณีโควตา)
+// ดูเฉพาะ error/stderr ของ process ไม่รวมคำตอบ — role อย่าง check อาจรายงาน "command not found"
+// ของงานที่ตรวจ ซึ่งไม่ใช่อาการของตัวรันเอง
+const MISSING_CLI_PATTERNS = [/spawn \S+ enoent/i, /command not found/i, /is not recognized as/i];
+export function looksLikeMissingCli(r) {
+  if (r.ok || r.timedOut) return false;
+  const hay = `${r.error ?? ""}\n${r.stderr ?? ""}`;
+  return MISSING_CLI_PATTERNS.some((p) => p.test(hay));
+}
+
+// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit หรือไม่ได้ติดตั้งบนเครื่อง
 // ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ baan-role เพื่อให้กติกาการสลับเป็นชุดเดียว
 export async function runWithFallback(chain, attempt, onSwitch = () => {}) {
   const trail = [];
@@ -97,9 +108,10 @@ export async function runWithFallback(chain, attempt, onSwitch = () => {}) {
   for (let i = 0; i < chain.length; i++) {
     agent = chain[i];
     r = await attempt(agent);
-    if (r.ok || !looksLikeLimitError(r) || i + 1 >= chain.length) break;
+    const reason = looksLikeLimitError(r) ? "limit" : looksLikeMissingCli(r) ? "missing" : null;
+    if (r.ok || reason === null || i + 1 >= chain.length) break;
     trail.push(`${chain[i]}→${chain[i + 1]}`);
-    onSwitch(chain[i], chain[i + 1]);
+    onSwitch(chain[i], chain[i + 1], reason);
   }
   return { r, agent, trail };
 }
@@ -135,7 +147,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
         chain,
         (agent) => runTask(cfg, { ...opts, timeoutSec: resolveTimeout(opts, cfg.tiers?.[t.tier]) }, runDir, t, ctxBlocks, agent),
-        (from, to) => console.log(`  ${t.id}: ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
+        (from, to, reason) => console.log(`  ${t.id}: ${from} ${reason === "missing" ? "ไม่ได้ติดตั้งบนเครื่อง" : "ติดโควตา/limit"} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
       );
       t.agent = usedAgent;
       return { t, r, fallbackTrail };
