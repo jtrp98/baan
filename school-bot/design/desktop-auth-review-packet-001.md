@@ -1,4 +1,4 @@
-# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev2
+# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev3
 
 สถานะอยู่ที่ [index](index.md); อ่านคู่ [adapter](desktop-login-adapter-001.md). เป็น technical handoff ไม่ใช่ Light approval หรือคำถามนโยบาย035.
 
@@ -56,6 +56,15 @@ Internal decoder/state reducer/error mappingทำและทดสอบได
 
 ข้อค้าง identity/device/session/transport ข้างบนยังบล็อก full production path ตาม034 แต่ไม่บล็อก decoder ที่ไม่มี admission หรือ side effects. ไม่ขอ human approval เพิ่มจากการแยกขอบเขตนี้.
 
+## Override Rev3 — ใบงาน047
+
+[adapter Rev3](desktop-login-adapter-001.md) มี precedence เฉพาะ request bounds/wire facts/public error mapping เหนือข้อความเดิมใน packet. รับ contract_deltas/wire_fixtures จาก [035](../planning/desktop-login-wire-evidence-001.json) แล้ว จึงไม่ขอ fixtures ชุดเดิมหรือ reason แยก inactive/lockedจาก G ซ้ำ; trusted terminal validation ยังเป็นข้อค้างเดิม.
+
+Public mapper ในอนาคตแปลง internal403จาก G web authentication เป็น401 UNAUTHORIZEDแบบรวม โดยไม่เดาสาเหตุ; ไม่เปลี่ยน decoder037 หรือสร้าง component test failure จาก contractคนละlayer. Request validation/public mapper ยังไม่ implementจากการแก้เอกสารนี้.
+
+[คำถามเจ้าของ](../planning/desktop-login-owner-question-001.md) บันทึกว่าผู้ใช้ไม่เข้าใจและทีมรับ technical mappingกลับแล้ว ไม่ใช่ confirmation/approval และไม่ถาม columnซ้ำ. canonical_account_id ยังคือ TMasterDBUser.sID; คงข้อค้าง identity/device/session/H5เดิม ไม่เปิดมติ035หรือสร้าง human gateใหม่.
+
 ## Change Log
+- 2026-10-24 — Rev3: ใบงาน047แยกขอบเขต035/037/public mapper และรับคำชี้แจง mapping; production prerequisites เดิม
 - 2026-10-23 — Rev2: ใบงาน037แทนข้อจำกัด component-with-caller ของ034โดยคงข้อความเดิมเป็นประวัติ; production prerequisites ไม่เปลี่ยน
 - 2026-10-23 — Rev1: ใบงาน034 แยก trust/mapping/device/persistence/transport gaps ตาม033และ B sourceจริง; ไม่มีschema deltaหรือการอนุมัติแก้ G

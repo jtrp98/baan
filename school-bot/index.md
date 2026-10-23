@@ -14,7 +14,7 @@
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 77 cases/180 AC; join implementation/validation ครบ; actual ทุกเคส NOT_RUN, มี design gaps ค้าง |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
-| `qa\index.md` | สารบัญ QA findings | ยังไม่มีเอกสาร |
+| [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
 | `uxui` | สารบัญ/เอกสาร UX/UI | ยังไม่มีเอกสาร |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; mitigation reviewแล้ว ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
@@ -24,7 +24,12 @@
 
 เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
 
+เอกสารล่าสุด: [Authflow code/localcheck](planning/auth-flow-handoff-001.md) — logoutและinternaldecoderผ่านlocalcheck; fullLoginยังไม่พร้อม
+
 ## Change Log
+
+- 2026-10-24 — รับโค้ดและcheckจากCodex; 4032testsผ่านเฉพาะlocalscope คง110tasks pending/77TPcases NOT_RUN/Important6OPEN
+
 
 - 2026-10-23 — ตรวจ Login Gateway ที่มีอยู่แล้วและรับ DES-004 Rev8/DES-012 Rev6/Gateway Rev2; ใช้ Gateway authentication ผ่าน adapter คง opaque session และ035 ไม่ปิด gate
 

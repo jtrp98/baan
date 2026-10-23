@@ -1,4 +1,4 @@
-# Desktop login adapter — Rev2
+# Desktop login adapter — Rev3
 
 สถานะอยู่ที่ [index](index.md). สัญญานี้ครอบ outcome/admission ภายใน; ไม่สร้าง public endpoint หรือ schema. ใช้ร่วม [packet](desktop-auth-review-packet-001.md), DES-004 Rev9 และ DES-012 Rev7.
 
@@ -67,6 +67,27 @@ Public /v2/auth/login ยังมี DTO เดิม; ห้ามเพิ่
 
 ไม่เปลี่ยน admission, session, public continuation หรือ production readiness. ประวัติ Rev1 ข้างบนคงไว้; ข้อกำหนด transport/header/retry ใช้เมื่อทำ transport จริง ไม่เป็น dependency ของ component.
 
+## Override Rev3 — ใบงาน047: request bounds และ public error layer
+
+ส่วนนี้มี precedence เหนือข้อความ034/Rev2 เฉพาะ request construction และ future public completion; ไม่ override [component037](gateway-outcome-component-001.md). รับข้อเท็จจริงจาก [035](../planning/desktop-login-wire-evidence-001.json) ส่วน contract_deltas/wire_fixtures ไม่ตรวจ G ซ้ำ.
+
+- employee_login: ตรวจ raw username ยาวไม่เกิน100 UTF-16 code units ก่อน Trim แล้วต้องไม่ว่าง; เกินเพดานแม้ Trim แล้วสั้นให้400 INVALID_INPUT ก่อนเรียก G. password ไม่ Trim.
+- first_password: effective newPassword ต้องเป็น ASCII 0–9 เท่านั้น ยาว8..20; แทนข้อความ1..100ที่ไม่ใช่ effective policy. B ตรวจรูปแบบก่อนส่ง หากผิดคืน400 INVALID_INPUT; G ยังตรวจ changeToken และ policy เอง โดย source ตรวจ changeToken ก่อน policy. local validation ไม่ยืนยันว่า token ใช้ได้และไม่รับรองลำดับ error ของ G เมื่อผิดหลายเงื่อนไข. ไม่เลือก password policy ใหม่.
+- trustedDeviceToken ขาเข้า employee_login ถ้ามีค่า string ต้องยาวไม่เกิน2000 UTF-16 code units; เกินให้400 INVALID_INPUT ก่อนเรียก G ไม่ truncate หรือทิ้งเงียบ. ค่าที่ผ่านส่งโดยไม่แปลง; absent/null คงความหมายไม่มี token. G ทิ้งค่าที่เกิน2000เป็น null ตาม035. เพดาน16KiB UTF-8ยังเป็น parser/secret cap แยกต่างหาก ไม่ขยาย request limit และไม่ลด response-secret cap ของ037.
+
+หลักฐาน bounds: 035 อ้าง G/src/ApiGateway.API/Controllers/WebAuthController.cs:147,153 และ G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:137.
+
+Wire facts: G code เป็น HTTP integer ไม่ใช่ semantic code; string-code tolerance ของ037คงเดิม. Nullable DTO fields ของ upstream ไม่ได้บังคับ B ยอมรับ null ใน required authority fields; ใช้ admission/decoder rules ตามขอบเขตเดิม. keys ของแต่ละ branch ต่างกัน ไม่เติม flags/expiry จาก branch อื่น. G requestId เป็น string ไม่รับรอง UUID; B สร้าง correlation request_id UUID ของตนเอง ไม่ copy G requestId. G expiresAt ไม่ใช่ B session expiry. อ้าง035 contract_deltas และ wire_fixtures; G WebAuthController.cs:245–356, RequestContextMiddleware.cs:51.
+
+### การตัดสินใจเรื่อง error
+
+เลือก generic authentication-phase mapping สำหรับ future public mapper: เมื่อ caller รู้ว่าเป็น G web authentication operation และ decoder คืน Rejected(403,FORBIDDEN) ให้ outward401 UNAUTHORIZED โดยไม่ระบุ inactive/locked. G ใช้403ร่วมกันและไม่มี structured discriminator พอแยกสาเหตุ (035: WebAuthController.cs:234–344); ห้ามอ่าน message/messageTh เพื่อเดา. เป็นการปฏิเสธยืนยันตัวตนแบบรวมตามแนว401เดิม ไม่ใช่หลักฐานว่าบัญชี inactive. B License/device/tenant/channel authorization failures ยังคง403ตามเดิม; ห้าม remap403ทุกแหล่งแบบ global. Error อื่นคงเดิม รวม malformed/contradictory response →503 AUTH_UNAVAILABLE.
+
+ปัดการแยก inactive/locked เพราะหลักฐานไม่พอ และไม่ขอ G เพิ่ม reason เพื่อให้คืน generic authentication failure ได้. Decoder037ยังคืน Rejected(403,FORBIDDEN) เป็น internal outcome; public mapper เป็น layerถัดไปที่ยังไม่ implement. Fixture035ที่ส่งให้ arch ชี้ขาดเรื่อง inactive ใช้ข้อสรุปนี้เฉพาะ public layer ไม่เปลี่ยน expected outcome/tests ของ037. ไม่มี request validator หรือ UUID generator เพิ่มใน decoder.
+
+ทั้งหมดเป็นสัญญาสำหรับ future public completion เท่านั้น ไม่เปิด endpoint/actor field จาก internal DTO; admission และ prerequisite เดิมคงอยู่.
+
 ## Change Log
+- 2026-10-24 — Rev3: ใบงาน047รับ035 แก้ effective request bounds, wire/correlation และแยก public error mapper จาก decoder037; ไม่เปลี่ยน schema/public surface
 - 2026-10-23 — Rev2: ใบงาน037 อนุญาต internal web decoder ตามสัญญาแยก; คง full Login ready=false และประวัติ034
 - 2026-10-23 — Rev1: ใบงาน034 รับ033และตรวจ B; ตรึง internal outcome/bounds/failures แยกข้อค้าง public completion; ไม่มี source/SQL/tests/runtime

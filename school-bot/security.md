@@ -315,3 +315,9 @@ Minor · actual_defect · OPEN
 | SEC001-001 | ไม่ขัด fix ข้อ 1-6 ไม่ได้กำหนด MenuPermission และ endpoint นี้เป็น introspection ของ token ตัวเอง ไม่ได้เข้าข้อมูลตามเมนู MenuPermission ผูก TMenuPermission/Master DB และ fail closed (MenuPermission.cs:14-19) เห็นด้วยกับ arch แต่ policy ต้องไม่หลวม SmartScheme ส่ง Bearer ก่อน JabjaiWebKey (ApiServiceExtensions.cs:79-109) ถ้าใช้ default scheme/RequireAuthenticatedUser เฉยๆ Bearer ปกติ (Jwt:Secret) จะผ่านได้ handler ใช้ FirstOrDefault ของ JabjaiWebKey-* (JabjaiWebLegacyAuthHandler.cs:27-28) และ validator ไม่ปฏิเสธ purpose/aud จึงต้องปฏิเสธที่ endpoint/policy เอง ข้อเสนอ 'JabjaiWebKey-* มากกว่า 1 header → 401' ยืนยันเป็น optional ไม่ใช่ gate เพราะ claims ที่ตรวจแล้วเป็นแหล่งตัวตนเดียว (DES-012 §3 ข้อ 2) | เจ้าของ G ยืนยันแหล่ง is_admin/user_id (TR-AUTH-02/03) และสถานะ secret ถ้าเจ้าของ G ยืนยันว่าต้องใช้ MenuPermission ให้เป็น NEEDS_DESIGN_CHANGE DES-012 |
 
 - 2026-10-23 — appendตามjpoใบงาน025; Important6ยังOPEN, SEC001-009คงMedium; ไม่มีrisk acceptanceใหม่
+
+## Logoutsubset — SEC040-001
+
+2026-10-24: [jpo040](planning/logout-security-response-001.json) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](planning/logout-limiting-response-001.json) และ [jpo043](planning/logout-security-response-002.json) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน [QAround001](qa/round-001.md) และ [check](planning/auth-flow-check-response-002.json). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
+
+- 2026-10-24 — นายช่างบันทึกdispositionจากjpo+check; ไม่มีriskacceptanceใหม่

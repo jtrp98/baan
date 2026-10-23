@@ -159,8 +159,8 @@
 | ไฟล์ | ขอบเขต / สถานะปัจจุบัน |
 |---|---|
 | [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — พร้อม implement/test internal web decoder; ยังไม่มีผล implementation/check |
-| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev2 — อนุญาต component แยกจาก caller; full Login ready=false |
-| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev2 — prerequisites บล็อก production path ตามเดิม ไม่บล็อก decoder |
+| [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev3 — 047แก้ request bounds/public error layer จาก035; component037คงเดิม; full Login ready=false |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev3 — รับ035เฉพาะ wire/bounds/error; identity/device/session/H5ยังค้างเดิม ไม่บล็อก decoder |
 
 อ่าน037ก่อนข้อความ readiness ของ034 รวม planning/desktop-login-contract-response-001.json และ Gateway Login reuse Rev2. ไม่แก้ plan status, public contract, schema หรือ gate เดิม.
 
@@ -177,7 +177,14 @@
 
 [gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev1 — PROPOSED: reuse W/G login ยืนยันจาก static evidence; Desktop adapter/identity และ H5 transport ยังรอหลักฐาน. อ่านร่วม override DES-004 Rev8, DES-012 Rev6 และ Gateway integration Rev2 ก่อน implement.
 
+## หลักฐานลงโค้ดและตรวจรับล่าสุด
+
+[Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
+
 ## Change Log
+- 2026-10-24 — รับimplementation039/038/042และcheckเฉพาะscope; ไม่แก้สัญญาหรือschemaจากผลunit tests
+
+- 2026-10-24 — ใบงาน047: adapter/packet Rev3 มี precedence เฉพาะ request bounds และ future public error mapper; component037ไม่เปลี่ยน, full Login ready=false และ plan statusเดิม
 - 2026-10-23 — ใบงาน037: เพิ่ม gateway-outcome-component Rev1; adapter/packet Rev2 อนุญาต internal web decoder โดยไม่มี production caller; full Login ready=false, ไม่มี source/SQL/runtime/check verdict ใหม่
 - 2026-10-23 — ใบงาน034: DES-004 Rev9/DES-012 Rev7/Login reuse Rev2 พร้อม Desktop adapter และ review packet; complete backend slice ยังไม่พร้อม ไม่มี source/SQL/runtime หรือ check verdict ใหม่
 - 2026-10-23 — ใบงาน032 รับ task031/Git metadata; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5

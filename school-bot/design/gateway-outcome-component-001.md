@@ -41,7 +41,7 @@ Unknown presentation values รวม channels/missing/user รับ JSON value
 
 Secret ที่ต้องมีต้องเป็น string ไม่ว่าง ไม่มี Unicode whitespace/control; ไม่ trim/normalize. token/changeToken/trustedDeviceToken ไม่เกิน16,384 UTF-8 bytes หลัง unescape. challengeToken ใช้เพดานเดียวกันและไม่เกิน200 UTF-16 code units. ref/masked เป็น string1..512 UTF-16 code units ไม่มี control; ไม่ trim. resendAfterSeconds เป็น JSON integer lexical0..2147483647 ไม่รับ string/fraction/exponent.
 
-expiresAt เป็น stringรูปแบบ YYYY-MM-DDTHH:mm:ss[.1..7digits](Z|±HH:mm), ปี0001..9999, Gregorian date/time ถูกต้อง, seconds00..59, offsetไม่เกิน±14:00; ใช้ invariant culture, normalizeเป็น UTC DateTimeOffset. ปฏิเสธ timezoneหาย/epoch/null/dateผิด/leap second. ไม่เทียบเวลาปัจจุบัน ไม่ตัดสิน token lifetime หรือ authenticity; ค่าที่เป็นอดีตยัง decode ได้และต้องตรวจต่อที่ admission ภายหลัง.
+expiresAt เป็น stringรูปแบบ `YYYY-MM-DDTHH:mm:ss[.1..7digits](Z|±HH:mm)`, ปี0001..9999, Gregorian date/time ถูกต้อง, seconds00..59, offsetไม่เกิน±14:00; ใช้ invariant culture, normalizeเป็น UTC DateTimeOffset. ปฏิเสธ timezoneหาย/epoch/null/dateผิด/leap second. ไม่เทียบเวลาปัจจุบัน ไม่ตัดสิน token lifetime หรือ authenticity; ค่าที่เป็นอดีตยัง decode ได้และต้องตรวจต่อที่ admission ภายหลัง.
 
 ## Truth table ของ HTTP200
 
@@ -100,3 +100,5 @@ HTTP200 ใช้ตารางข้างบน. Statusอื่นไม่�
 
 ## Change Log
 - 2026-10-23 — Rev1: ใบงาน037ตรึง web decoder API/bounds/outcomes/errors/acceptance; ไม่มี schema, public endpoint หรือ production admission
+
+- 2026-10-24 — นายช่างจัดรูปแบบ literal วันที่เป็น code span เพื่อไม่ให้ Markdown ตีความเป็นลิงก์; ความหมายสัญญาเดิม

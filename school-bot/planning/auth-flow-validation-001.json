@@ -1,0 +1,193 @@
+{
+  "date": "2026-10-24",
+  "kind": "controller ownership/document validation; not runtime DB acceptance",
+  "requirements": 44,
+  "ac_count": 180,
+  "tasks": 110,
+  "task_status": "pending",
+  "cases": 77,
+  "tp_actual": "NOT_RUN",
+  "phases": 8,
+  "gates": 17,
+  "archive_files_verified": 11,
+  "local_links_checked": 220,
+  "sql_sha256": "2607a5177eafe53621619c21129ac7e2c7542e86a69ec86b0a1c94a8be8ee7a6",
+  "check_response": "auth-flow-check-response-002.json",
+  "check_scope": [
+    {
+      "scope": "Gateway outcome decoder local",
+      "verdict": "PASS",
+      "evidence": "TRX มี GatewayOutcome*/GatewaySecretTests ผ่าน 3874 cases; ตรวจ source/tests เทียบ acceptance ทั้ง 8 หมวด ครอบคลุม operation/stage/outcome, malformed input, bounds และ secret lifecycle"
+    },
+    {
+      "scope": "Logout API/usecase และ limiting local",
+      "verdict": "PASS",
+      "evidence": "Logout tests ผ่าน 88 cases ใช้ production Program/pipeline/endpoint/LogoutService/limiter โดยแทนเฉพาะ ISessionLogoutStore พร้อม middleware กำหนด peer สำหรับทดสอบ; ครบ security criteria 1–8"
+    },
+    {
+      "scope": "Repository Actor/DDL static",
+      "verdict": "PASS",
+      "evidence": "PostgresSessionLogoutStore.cs:44–63 ตรง canonical A และตัวอย่าง sys044 ครบ 6 กรณี; ตรวจ Session 17 fields, AuditEvent 13 fields และ INSERT 12 fields กับ DDL; token_hash:Varchar และ request_id:Uuid ตรงชนิด"
+    },
+    {
+      "scope": "PostgreSQL integration/atomic rollback",
+      "verdict": "NOT_RUN",
+      "evidence": "ไม่มี PostgreSQL execution; transaction/revoke/audit/invalid-row rollback ตรวจได้เฉพาะ source ไม่ยืนยันสถานะข้อมูลจริง"
+    }
+  ],
+  "production_files_preserved_after_check": 16,
+  "source_changes": [
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutWindowTests.cs",
+      "kind": "added",
+      "sha256": "2c648333219a308b691d16340e5495d8961ddac7202ec817de9c25e6a34a072c"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutRateLimitTests.cs",
+      "kind": "added",
+      "sha256": "3b62b846d322e1f6e413a26d2506947f270fbefa819e1241d4d581dc7d262337"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutEndpointTests.cs",
+      "kind": "added",
+      "sha256": "423fe21c6b1da6a01fa8b3edd4b285856b6e52df628488248685ba2d3c36b3a0"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutDefaultLimitTests.cs",
+      "kind": "added",
+      "sha256": "1801bf8ea2d446335f23237a8f48b1814d1fecd88af4accf69c0c6e50f19eb22"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutConfigurationTests.cs",
+      "kind": "added",
+      "sha256": "7b1da826b8abf7e12814e85ebdfd645ef78b544f04c77f702bdef701da3d1661"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutConcurrencyTests.cs",
+      "kind": "added",
+      "sha256": "06d8d8a60ec10579c48fcb0e56ff812a19a80fe5f12be1f9f1562cf451c32a8d"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/LogoutApiFixture.cs",
+      "kind": "added",
+      "sha256": "40aafb824321da4b5f2679aaa1f71cb14cd018c3c9551188e87ae5e3569c7382"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewaySecretTests.cs",
+      "kind": "added",
+      "sha256": "39a5cd6287ecd65565231350a357fefffdd7bce2c2583eb4b052a7625f458b8f"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeMatrixTests.cs",
+      "kind": "added",
+      "sha256": "0fd8b9885cb86bdeebd02d51720aa92b81e77d3285311377d9eb672e0a5ab05a"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeJsonTests.cs",
+      "kind": "added",
+      "sha256": "29ef396c2285e497ef478af0fd7bb44d5521480caaba923f3d3dac19c9053c87"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeHttpTests.cs",
+      "kind": "added",
+      "sha256": "2c53d90fe1460633878412c128419739bb108688af35083184ae873ce02e5667"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeFixtures.cs",
+      "kind": "added",
+      "sha256": "5f2ab2f9ec92e1623b8a2a4fc78061c4885a36c6c2f2e5321aff0dd43ccd13be"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeFieldTests.cs",
+      "kind": "added",
+      "sha256": "7e885b7640bdfb9d7027901d10ccab6817a62024858e3081f85fb081ac222cbc"
+    },
+    {
+      "path": "web/tests/SchoolBot.Tests/GatewayOutcomeBoundaryTests.cs",
+      "kind": "added",
+      "sha256": "b8cc19fa13838fa5088ad9881c9b53473db235a5b6361c0fcac417132a69a950"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/SchoolBot.Infrastructure.csproj",
+      "kind": "modified",
+      "sha256": "5ace907cf45fef12206e938edc4753f466e11c23ac4906894e4270e5ae8db75b"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Persistence/PostgresSessionLogoutStore.cs",
+      "kind": "added",
+      "sha256": "9c683ca815d4b906a297eee9e71e03c067ad5b84977f61a6f3978e11dd94859d"
+    },
+    {
+      "path": "web/README.md",
+      "kind": "modified",
+      "sha256": "081efa6dd197b7c4a86233878e3d46eac0ce19d82375b8305f8e2f03f1d56778"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewaySecret.cs",
+      "kind": "added",
+      "sha256": "1e2d1d08313869b19be4f49a66dea88d6a4efcab4b063eaed975417d5eebd999"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayOutcomeDecoder.cs",
+      "kind": "added",
+      "sha256": "d16b5495242b4adefcb645b89b495a64659a84548a0ec7d4e530580e896a739d"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayOutcome.cs",
+      "kind": "added",
+      "sha256": "32e4ed1af2eeb38368999dbf54a193b8fd8e46bc730e8a4f883f43a4e5a6c195"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayJsonValidation.cs",
+      "kind": "added",
+      "sha256": "cb40fc0a566168b9808bb6a79f022730652a11882961410e92e3f2324b72f1cc"
+    },
+    {
+      "path": "web/src/SchoolBot.Infrastructure/Authentication/GatewayFieldValidation.cs",
+      "kind": "added",
+      "sha256": "396f764e41c0be02326383f0710df2bc3cb56c293fe98190826273a4bfc1d8bc"
+    },
+    {
+      "path": "web/src/SchoolBot.Application/LogoutService.cs",
+      "kind": "added",
+      "sha256": "74b9c843b0dd0c770b53151aed3053186b83968f32ca1e4246e1e1d30258e860"
+    },
+    {
+      "path": "web/src/SchoolBot.Application/AuthenticationUnavailableException.cs",
+      "kind": "added",
+      "sha256": "57a3bcb4b9ab7d4d5640a3f8c65449088abd6f08f6810370e9fdac096ed6b48c"
+    },
+    {
+      "path": "web/src/SchoolBot.Api/V2Errors.cs",
+      "kind": "added",
+      "sha256": "6a2db3ef0139b9fb00e934f346d76b33239569964bfc0f262f4226dd9e8a4d77"
+    },
+    {
+      "path": "web/src/SchoolBot.Api/Program.cs",
+      "kind": "modified",
+      "sha256": "137263b382bc5113975635116d3c33c64d859b6d68fb96901636ae8b190c469a"
+    },
+    {
+      "path": "web/src/SchoolBot.Api/LogoutRateLimiter.cs",
+      "kind": "added",
+      "sha256": "2f5567ffe75146948b3490e66d96161f0a892280c4e6fe79dc6a731d12d87172"
+    },
+    {
+      "path": "web/src/SchoolBot.Api/LogoutEndpoint.cs",
+      "kind": "added",
+      "sha256": "5418ee2f3a75a4dfdeb6bc405826d108302280e931bb433d645f32478f762aa1"
+    },
+    {
+      "path": "web/src/SchoolBot.Api/ApiErrors.cs",
+      "kind": "modified",
+      "sha256": "a8fbe7c23ccea7eb2d86248bef3c565653a4df0359340af1ffd7ea179ac85901"
+    },
+    {
+      "path": "web/src/SchoolBot.Application/Abstractions/ISessionLogoutStore.cs",
+      "kind": "added",
+      "sha256": "7e2d273a53b1004b5e05b2b13746b31345c7ebd1cd163dc05f0f2f8565d1748f"
+    }
+  ],
+  "full_login": "NOT_READY",
+  "database": "NOT_CONNECTED"
+}

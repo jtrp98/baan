@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-24",
+  "kind": "supplement QA and appended security link validation",
+  "files": [
+    "qa/index.md",
+    "qa/round-001.md",
+    "security.md"
+  ],
+  "local_links_checked": 11,
+  "result": "all resolved",
+  "parent_validation": "auth-flow-validation-001.json"
+}

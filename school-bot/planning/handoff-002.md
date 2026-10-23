@@ -69,3 +69,9 @@ arch ใบงาน023: Claudeติดweeklylimit; AGY t1หมดเวลา
 ผู้ใช้สั่งใช้ Codex โดยตรงและให้ดู Login ที่มีอยู่ก่อน. [ผลรับล่าสุด](gateway-login-receipt-001.md) และ [แบบ reuse](../design/gateway-login-reuse-001.md) มีลำดับเหนือข้อบังคับสร้าง LegacyCredentials verifier และ HTTP relay เดิมที่ขัดกัน. ยืนยันมี Login เดิมจาก source; Desktop adapter/identity, private principal และ H5 transport ยังมี technical gaps. คง C/มติ035/110tasks pending/77cases NOT_RUN/Important6 OPEN. ไม่แก้ source/SQL หรือเรียก Login จริง
 
 - 2026-10-23 — รับ sys/arch ผ่าน Codex ตามคำสั่งล่าสุด; Runner เดิม Claude→AGY→Codex ไม่ใช้กับรอบ031/032นี้
+
+## Authflow code/localcheck — ต่อจาก031/032
+
+[ผลรอบนี้](auth-flow-handoff-001.md) มีลำดับสถานะเหนือข้อความเดิมเฉพาะcode/localtests: logout+localrate/concurrency และinternalwebdecoderเขียนแล้ว; checkPASSlocalscopeและactual4032cases. fullLogin/PG/H5/110task/77TPcase/gatesยังไม่ปิด. ผู้ใช้ไม่ต้องตอบชื่อตารางเองจากคำถามmappingที่ไม่เข้าใจ ทีมรับtechnicalissueกลับตามownerquestion001
+
+- 2026-10-24 — รับผลCodexตามflowและแก้SEC040-001; ปิดfindingเฉพาะlocalscope ไม่เปลี่ยนbaselineImportant6OPEN
