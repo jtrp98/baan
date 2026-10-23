@@ -11,7 +11,7 @@
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | Rev3 — data-model/rules/DBML Rev3 (32 ตาราง) CONFIRMED; DES-001..012 PROPOSED |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks | 74 tasks pending (8 phases / 17 gates) |
-| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 5 PARTIAL / 7 CLOSED |
+| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 4 PARTIAL / 8 CLOSED |
 | `test-plan\index.md` | สารบัญ test plan | ยังไม่มีเอกสาร |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | `qa\index.md` | สารบัญ QA findings | ยังไม่มีเอกสาร |
@@ -23,6 +23,8 @@
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 ## Change Log
+
+- 2026-10-23 — [decisions-033](requirement/decisions-033.md): ใช้ช่องคะแนนเดิม แปลงตามสัดส่วนคะแนนเต็ม/half-up ข้ามผลที่ยังไม่มีตอนส่งเกรด; ปิด OQ-016 คง OQ-014 เฉพาะสูตรรวม/เปลี่ยนสัดส่วน ส่ง spec/arch sync ต่อ
 
 - 2026-10-23 — [decisions-032](requirement/decisions-032.md): ผู้ใช้เลือกผลครูแบบ local/โครงงาน Cloud, หนึ่งกิจกรรมได้หลายช่องแต่หนึ่งช่องได้หนึ่งกิจกรรม และล็อก mapping หลังส่ง; OQ-016 เหลือใช้ช่องเดิม/สร้างช่องใหม่ ส่ง spec/arch sync โดยไม่เปลี่ยนสถานะ implementation
 
