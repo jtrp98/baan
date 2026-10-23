@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-23",
+  "source": "knowledge\\school-bot\\planning\\security-disposition-response-001.json",
+  "records": [
+    {
+      "path": "auth-evidence-001.md",
+      "bytes": 11187,
+      "sha256": "e6cc2ca3b5f708daebd903e028f37b0d9c55a9f6e188851fd7b932afdd7d513e"
+    }
+  ]
+}
