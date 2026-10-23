@@ -89,6 +89,19 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
 
 session นั้นจะกลายเป็นสมอง — รับ goal แตกงาน สั่ง `baan-role` เปิด session ของแต่ละ role ตาม tier ที่กำหนด ส่งต่อ context ระหว่าง role และรวบรวมประตูมนุษย์มาถามคุณตอนจบ
 
+## มาตรฐานเอกสารข้อมูล
+
+งาน data model ต้องอธิบายตารางทำอะไร หนึ่งแถวหมายถึงอะไร ทุกฟิลด์เก็บอะไร และใช้ข้อมูลเดิมผ่านคอลัมน์ไหน พร้อมตัวอย่างและหลักฐาน ไม่จบที่รายชื่อฟิลด์/ชนิดย่อ
+
+- `arch`: คู่มือภาพรวมและ dictionary ของตาราง/ฟิลด์ รวม JSON/enum, การเชื่อมตารางเก่า และขอบเขตอ่าน/เขียน
+- `vault`: เทียบแบบกับ SQL จริงและส่งรายละเอียด physical delta ให้เจ้าของแบบปรับคู่มือ
+- `inspect`/`check`: ตรวจความครบถ้วนในขอบเขตงาน แยก static documentation checks จากผลทดสอบระบบจริง
+- นายช่าง: บันทึกผลและเชื่อมไฟล์ที่แบ่งไว้ให้เปิดอ่านได้ ความหมายที่ยังไม่พิสูจน์ต้องระบุว่าไม่ยืนยัน
+
+งาน relational data model ต้องส่ง DBML แบบเต็มพร้อม Note ไทย/กลุ่มสี และภาพ integration ย่อเมื่อเชื่อมตารางเดิม โดยแยก FK จริงกับ logical mapping ชัดเจน ตรวจ parser และเทียบกับ SQL ก่อนส่ง พร้อมคู่มือเปิดอ่าน
+
+ข้อกำหนดละเอียดอยู่ใน `roles/arch.md` และ `CONVENTIONS.md`; กติกานี้ถูกแนบไปกับ prompt ของ role ผ่านกลไกเดิม
+
 ## วิธีใช้ (คำสั่งของ package — ใช้ได้จากทุกไดเรกทอรี)
 
 ```bash
@@ -124,6 +137,16 @@ baan-role --list              # ดูรายชื่อ agent + tier
 - **ป้าย `[baan-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท นายช่าง ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
 - **auto commit ที่เก็บเอกสารหลังจบ run** — knowledge root ไหนเป็น git repo (มี `.git`) จะถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` เช่น `school-bot: add db/review-001.md, index.md +2 more` · ไฟล์ที่ commit ไม่ทับของ module อื่นที่ staged ค้างไว้ · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังเมื่อไหร่แจ้งเตือนแล้วไปต่อ ไม่ลากผล run ไปตายด้วย · เรียกด้วยมือได้ด้วย `baan --commit` (โค้ดอยู่ที่ `src/knowledge-commit.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ gm/plan ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `baan` และ `baan-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
+
+### เมื่อเอกสาร knowledge ยังไม่ถูก commit
+
+hook ของ `baan`/`baan-role` ทำงานตอนคำสั่งนั้นจบเท่านั้น ถ้านายช่างรับ output จาก role แบบ read-only แล้วค่อยเขียนเอกสารเอง ต้องเรียกเก็บอีกรอบหลังบันทึกไฟล์ครบ:
+
+```powershell
+baan --commit --config C:/path/to/workspace/baan.config.json
+```
+
+ใช้ config จริงที่มี `knowledge_roots`; root ต้องมี Git repo ของตัวเองและมีสิทธิ์เขียน Git metadata รวมถึงตั้งชื่อ/อีเมลผู้ commit ไว้แล้ว ตรวจข้อความเตือนและ `git status` หลังรัน การ commit knowledge เป็นข้อยกเว้นที่อนุญาตในกติกากลาง; source/target และการ push ยังอยู่ภายใต้คำสั่งผู้ใช้
 
 # กำหนดบทบาท (role) — ตำแหน่งในทีม
 
@@ -271,3 +294,11 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - เก็บผลลัพธ์ของแต่ละ task เป็น artifact ตามโครงสร้างที่เก็บเอกสาร (requirement/ design/ check/ ฯลฯ) อัตโนมัติ
 - ให้ นายช่าง เลือก agent ราย task ตามความเหมาะสม (เช่น งานเขียนโค้ดให้ตัวที่ถนัด) หรือรันซ้ำเมื่อคำตอบไม่ผ่านเงื่อนไข
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
+
+## Change Log
+
+- 2026-10-23 — เพิ่ม DBML แบบเต็ม/ภาพ integration เป็นผลส่งมอบคู่ data model พร้อมบทบาทตรวจและหลักฐาน parser
+
+- 2026-10-23 — แก้ข้อขัดแย้ง auto-commit knowledge และเพิ่มขั้นปิดงานหลังนายช่างบันทึกเอกสารครบ
+
+- 2026-10-23 — เพิ่มมาตรฐานเอกสารข้อมูลและหน้าที่ arch/vault/inspect/check ให้ส่งต่อแบบอ่านเข้าใจและตรวจย้อนกลับได้

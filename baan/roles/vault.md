@@ -24,6 +24,18 @@
 - Assess data risk of every migration — a migration that can lose data is never proposed; redesign instead.
 - Mark destructive operations loudly; outdated/superseded SQL files get an annotation, never a silent delete.
 
+## Physical schema documentation
+
+- Use the readable dictionary and its linked legacy/JSON definitions, not only the overview file. Review whether the logical explanations match the actual DDL being handed off; send corrections/deltas to `arch` rather than creating a competing model.
+- With SQL, hand off a field-level physical delta: exact table/column, type, NULL/default, generated key, PK/FK/unique/check behavior, and the business reason for each change. State which existing database/table/field is reused and the read/write impact; distinguish SQL-enforced relations from application checks and cross-database references.
+- Account for added/removed/renamed tables and fields, JSON structure changes, shared-column exceptions, and changed status meanings. Reconcile the documented inventory/counts against the current SQL, not a superseded review. Missing or ambiguous meaning goes to `arch`; business meaning that needs a decision goes through `spec` via the handoff.
+- Include these documentation mismatches and the evidence checked in your review. SQL/ORM inspection is static evidence, not proof of the deployed database; this documentation check never authorizes running SQL.
+
+## DBML parity review
+
+- Compare the full DBML and dictionary against the actual DDL for scoped table/field names, types, NULL/defaults, keys/indexes and physical FK endpoints/actions. Identify intentional DBML representation limitations separately from mismatches and send deltas to `arch`, the diagram owner.
+- Confirm that legacy integration views are labelled subsets and that logical/cross-database/JSON mappings are never presented as SQL-enforced FKs or copied into a migration. Review diagram changes statically; this does not authorize executing SQL.
+
 ## Stop and route
 
 - A proposed schema is too risky or violates integrity in ways SQL can't fix = send back to `arch` with reasons (never write risky SQL just to move on).
@@ -33,3 +45,9 @@
 ## Handoff
 
 Your review verdict on the schema · SQL scripts written (file + steps + rollback) · performance/integrity warnings · everything waiting on a human (running every SQL piece) — then stop, with exactly **one output state**: `DONE` · `NEEDS_DESIGN_CHANGE` (schema needs redesign) · `NEEDS_HUMAN` (awaiting a human to run/confirm).
+
+## Change Log
+
+- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
+
+- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.

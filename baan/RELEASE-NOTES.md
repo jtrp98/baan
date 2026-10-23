@@ -2,6 +2,18 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.13.0 — 2026-10-23 · มาตรฐานเอกสารข้อมูลอ่านรู้เรื่อง + DBML คู่ data model + แก้ auto-commit
+
+### เพิ่ม
+- **กำหนด DBML เป็นผลส่งมอบคู่ relational data model** — แบบเต็มพร้อม Note ไทย/กลุ่มสี และภาพ integration ย่อเมื่อมีตารางเดิม พร้อมคู่มือสี/เส้นและข้อจำกัด · arch ดูแล artifact; vault เทียบ SQL; inspect/check ตรวจ parser/version/dialect และ physical/logical refs รวม structural comparison เมื่องานเปลี่ยนเฉพาะคำอธิบาย; นายช่างบันทึกก่อน final knowledge commit
+- **เพิ่มมาตรฐานคู่มือ data model** — หน้าที่ตาราง/หนึ่งแถว/ความหมายทุกฟิลด์/JSON/enum และตารางเก่าที่ใช้พร้อมคอลัมน์เชื่อมและหลักฐาน · กำหนดผู้รับผิดชอบให้ชัด: arch ดูแลคู่มือหลัก, vault เทียบ physical SQL, inspect/check ตรวจความครบถ้วนในขอบเขตงาน; นายช่างตรวจและบันทึกก่อนส่งต่อ
+- อนุญาตตามลิงก์ตรงจาก data-model/index ไปยังส่วนของสัญญาที่แยกไฟล์ และแยกการขยายคำอธิบายออกจากการเปลี่ยน schema/การตรวจ runtime
+- ปรับเอกสาร/บทบาทด้วยกลไกประกอบ prompt เดิม — คำสั่งและวิธีใช้กับผู้ใช้ไม่เปลี่ยน · tests 94 → 96 กรณี
+
+### แก้
+- **auto-commit knowledge อ่านชื่อ module/path ผิดเมื่อรายการแรกใน git status เป็น tracked file ที่แก้แต่ยังไม่ stage** — คง stdout ของ porcelain แบบ raw ไม่ตัด leading space พร้อม regression test กับ Git repo ชั่วคราว
+- แก้กติกา Git ที่ขัดกับฟีเจอร์: อนุญาตเฉพาะ configured knowledge commits และกำหนดให้นายช่างเรียก commit หลังบันทึก output/เอกสารของตัวเองครบ ไม่อาศัย hook ของ role ที่จบไปก่อนหน้านั้น
+
 ## 0.12.0 — 2026-10-22 · เปลี่ยนชื่อ MYCELIUM→BAAN + prompt อังกฤษทั้งระบบ + auto commit ที่เก็บเอกสาร
 
 ### ⚠ ต้องทำตอนอัปเกรด

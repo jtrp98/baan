@@ -105,6 +105,64 @@ test("commitKnowledgeRoot: ของที่ผู้ใช้ staged ไว้
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test("commitKnowledgeRoot: tracked file ที่แก้โดยไม่ stage เป็นรายการเดียว ต้อง commit module และ path ถูกต้อง", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "module"), { recursive: true });
+    writeFileSync(path.join(dir, "module", "file.md"), "# baseline\n", "utf8");
+    assert.equal(git(["add", "--", "module/file.md"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    writeFileSync(path.join(dir, "module", "file.md"), "# updated\n", "utf8");
+    const before = git(["status", "--porcelain", "-z"]);
+    assert.equal(before.status, 0);
+    assert.equal(before.stdout, " M module/file.md\0");
+
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.equal(res.repo, true);
+    assert.deepEqual(res.commits, ["module: update file.md"]);
+    assert.equal(git(["rev-list", "--count", "HEAD"]).stdout.trim(), "2");
+    assert.equal(git(["log", "-1", "--format=%s"]).stdout.trim(), "module: update file.md");
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD"]).stdout.trim(), "module/file.md");
+    assert.equal(git(["show", "HEAD:module/file.md"]).stdout, "# updated\n");
+    const after = git(["status", "--porcelain", "-z"]);
+    assert.equal(after.status, 0);
+    assert.equal(after.stdout, "", "ต้อง clean หลัง commit ไฟล์ที่ไม่ได้ stage");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: tracked path มีช่องว่างและเป็นรายการแรกที่ไม่ได้ stage ต้อง commit แยก module ถูกต้อง", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "module with space"), { recursive: true });
+    mkdirSync(path.join(dir, "z-module"), { recursive: true });
+    writeFileSync(path.join(dir, "module with space", "file with space.md"), "# baseline\n", "utf8");
+    writeFileSync(path.join(dir, "z-module", "other.md"), "# baseline\n", "utf8");
+    assert.equal(git(["add", "--", "module with space/file with space.md", "z-module/other.md"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    writeFileSync(path.join(dir, "module with space", "file with space.md"), "# updated first\n", "utf8");
+    writeFileSync(path.join(dir, "z-module", "other.md"), "# updated second\n", "utf8");
+    const before = git(["status", "--porcelain", "-z"]);
+    assert.equal(before.status, 0);
+    assert.equal(before.stdout, " M module with space/file with space.md\0 M z-module/other.md\0");
+
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.equal(res.repo, true);
+    assert.deepEqual(res.commits, ["module with space: update file with space.md", "z-module: update other.md"]);
+    assert.equal(git(["rev-list", "--count", "HEAD"]).stdout.trim(), "3");
+    assert.deepEqual(git(["log", "-2", "--format=%s"]).stdout.trim().split("\n"), [
+      "z-module: update other.md",
+      "module with space: update file with space.md",
+    ]);
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD~1"]).stdout.trim(), "module with space/file with space.md");
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD"]).stdout.trim(), "z-module/other.md");
+    assert.equal(git(["show", "HEAD:module with space/file with space.md"]).stdout, "# updated first\n");
+    assert.equal(git(["show", "HEAD:z-module/other.md"]).stdout, "# updated second\n");
+    const after = git(["status", "--porcelain", "-z"]);
+    assert.equal(after.status, 0);
+    assert.equal(after.stdout, "", "ต้อง clean หลัง commit ครบทั้งสอง module");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test("commitKnowledgeRoot: ไม่ใช่ git repo = ข้ามเงียบไม่ต้องพัง", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "baan-kcommit-nogit-"));
   try {

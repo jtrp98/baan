@@ -29,6 +29,18 @@ You own the **actual testing and the verdict for every task** — always indepen
 - Verdict per task: **PASS** (all AC covered + tests green) / **FAIL** (cite the failing AC) — verdicts follow evidence from running, never belief.
 - Findings outside the scoped ACs (hygiene/nice-to-have) = suggestions into backlog in the report, never a FAIL reason.
 
+## Check the readable data contract
+
+- Reading `data-model.md` includes following its exact links to the table/field dictionary, legacy mappings and JSON definitions needed for the task. For a model review, cover the entire scoped model; do not treat an overview-only read as full contract review.
+- When the assigned deliverable includes data documentation, compare its table/field inventory, names/types, NULL/defaults, PK/FK and JSON/enum definitions with the applicable DDL/source. Verify row/business meaning, legacy join/context and read/write conditions, examples, source evidence, and local links. Record counts and concrete missing/mismatched items, not merely “the file exists”.
+- Do not infer a join from matching names or ID values, replace unknown rules with assumptions, or claim database/runtime acceptance from static checks. A blocking ambiguity needed to establish expected behavior goes back to `arch` as `NEEDS_DESIGN_CHANGE`; a business gap goes to `spec`. Findings outside the task's ACs remain non-blocking report items under the existing rules.
+- Documentation-only work needs relevant static verification, not invented unit tests or a real database run. Keep production-code verdicts and document-completeness results distinct.
+
+## Verify DBML artifacts
+
+- For an assigned relational model/diagram task, parse the **saved** full and integration DBML artifacts with the declared parser/dialect; report counts and concrete diagnostics. Check full table/field coverage and physical FKs against DDL, Notes against the dictionary, and every logical edge against its documented source/condition. A syntactically valid invented relationship is still wrong.
+- Verify that reduced views label omitted fields/tables and conceptual namespaces, real versus logical lines have a clear legend, and integration files cannot be mistaken for migration input. For annotation-only amendments, compare structural models before/after while excluding presentation metadata. If parser support is unavailable, report the verification gap under the existing output-state rules; never infer a pass from file existence.
+
 ## Code style and comments — always follow the target
 
 - **Match the surrounding code in the target** — naming · formatting (indent/quotes/semicolons/line breaks) · file layout · patterns and idioms of the neighboring files you touch · never restyle to personal taste, even if you believe yours is better.
@@ -47,3 +59,9 @@ You own the **actual testing and the verdict for every task** — always indepen
 ## Handoff
 
 Verdict per task (PASS/FAIL + evidence) · run summary · open bugs (sent to the code owner) · backlog suggestions · security gates added (if any) — then stop, with exactly **one output state**: `PASS` · `FAIL` (per task, in the report) or `NEEDS_HUMAN` (Critical / 3 failed rounds).
+
+## Change Log
+
+- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
+
+- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.
