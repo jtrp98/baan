@@ -55,7 +55,7 @@
 | DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
 | DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
 | DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
-| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev5) | PROPOSED — topology ผ่าน gateway ยืนยันแล้ว; รอแหล่ง is_admin, implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
+| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev5) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
 
 ### REQ mapping
 
@@ -145,7 +145,7 @@
 | [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
 
-| [gateway-integration-001.md](gateway-integration-001.md) | Rev1 — override routing DES-012/auth-evidence; topology ยืนยันแล้ว ส่วน relay/private introspection ยังต้อง implement; รอคำตอบแหล่ง is_admin |
+| [gateway-integration-001.md](gateway-integration-001.md) | Rev1 — override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
 
 ## ภาคผนวก canonical
 
@@ -155,6 +155,7 @@
 | [grade-rules-032-034.md](grade-rules-032-034.md) | Rev1 — mapping/partial/skip/recovery; คง release gates |
 
 ## Change Log
+- 2026-10-23 — ใบงาน030: sync [decisions-035](../requirement/decisions-035.md) ปิดนโยบายแหล่ง is_admin (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม); คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
 - 2026-10-23 — ใบงาน029: DES-012 Rev5/auth-evidence Rev3 และ gateway-integration Rev1; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด gate
 - 2026-10-23 — เพิ่ม auth-evidence-001 (arch ใบงาน 020); DES-004 Rev7/DES-012 Rev4 แก้เฉพาะข้อเท็จจริง/ลิงก์ สัญญา/schema ไม่เปลี่ยน
 - 2026-10-23 — นายช่างบันทึก dbml-review-002: @dbml/core10.3.1/dbmlv2 ผ่านทั้งสองไฟล์ โครงสร้างและ SQL ไม่เปลี่ยน ปิดเฉพาะข้อค้าง parser ของ arch

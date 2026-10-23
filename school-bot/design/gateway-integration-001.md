@@ -74,5 +74,29 @@ Task: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ 
 
 ทางเลือกที่ไม่ใช้: direct B ขัด topology ผู้ใช้; แชร์ signing secret กับ B ขัดทาง C; generic proxy/gRPC rewrite เพิ่มงานเกินความจำเป็น ไม่มี schema change จึงไม่สร้าง DBML ในรอบนี้
 
+## Override ตามมติ decisions-035: แหล่งสิทธิ์ IsAdmin (มีลำดับเหนือจุดหยุดรอคำตอบด้านบน)
+
+ผู้ใช้ยืนยัน**ทาง A** ตาม [decisions-035](../requirement/decisions-035.md) ปิดคำถามนโยบายแหล่ง `is_admin` (C11 / ส่วนนโยบายของ TR-AUTH-02):
+
+1. **เกณฑ์ให้สิทธิ์ `is_admin=true` ฝั่ง server**:
+   - **แอดมินโรงเรียนปกติ**: ตรวจสมาชิกกลุ่มฝั่ง server ตามหลักฐาน legacy `FingerprintPayment/Default.aspx.cs:193–240` (`TGroupPermissionUser` ที่ `SchoolID==school_id`, `UserID==user_id` (`nSystemID`), `IsActive==true` join `TGroupPermissionMenu(Type=='W')` และ `TMenuPermission` ที่ `groupName=='แอดมิน/ผู้บริหาร' && isEditable==false` และมีแถวเมนูอย่างน้อย 1 แถว) ผูกกับตัวตนพนักงานที่ active (`WorkStatus ∉ {2,3}`) และโรงเรียน active (`TCompany`) ของ `school_id` ที่ตรวจจาก token แล้วเท่านั้น
+   - **Super admin เดิม**: คงสิทธิ์ตาม legacy `FingerprintPayment/bypassgarde.aspx.cs:55–75` และ `BypassAcademic.aspx.cs:43–63` (`user_id==0 && admin_id!=null` ที่ตรวจ `TAdmins` และโรงเรียน active แล้ว)
+2. **การตีความ JWT และ fail-closed**:
+   - JWT ของพนักงานปกติที่ส่ง `IsAdmin=0` ไม่ใช่เหตุปิดสิทธิ์กลุ่ม หากผลตรวจกลุ่มฝั่ง server ผ่าน
+   - ห้ามเชื่อ `is_admin`/`user_id`/`admin_id`/`school_id` จาก request body, header หรือ suffix ของ `JabjaiWebKey-*`
+   - เมื่อข้อมูล mapping (`TR-AUTH-03`), ตารางกลุ่มสิทธิ์ หรือ identity lookup ยังไม่พร้อม/เกิดความผิดพลาด ต้อง **fail closed** (`503 AUTH_NOT_CONFIGURED` / `503 AUTH_UNAVAILABLE`) ห้ามยกสิทธิ์จาก JWT claim ลอยๆ
+3. **ขอบเขตสิทธิ์และข้อจำกัด**:
+   - ได้เฉพาะสิทธิ์ `school_admin` ของ `school_id` นั้นบน `channel="school_web"` (ไม่กลายเป็น `staff_admin`, ไม่ให้สิทธิ์แอดมินแก่ครูทุกคนที่ไม่ใช่สมาชิกกลุ่ม, ไม่ข้ามโรงเรียน) และต้อง re-check ก่อน commit
+   - ไม่สร้างตาราง/GRANT/Role ใหม่ ไม่เพิ่ม AC และไม่สมมติชื่อคอลัมน์/DB placement/query นอกเหนือที่ source ยืนยัน
+   - แยก policy choice ที่ปิดแล้วออกจากสิ่งที่ยังค้าง: `TR-AUTH-02-rest` (ตัวตรวจ login `TAdmin`), `TR-AUTH-03..06`, การ implement ใน `G`/`B` และ H5 ยังไม่ปิด (G-AUTH ยังไม่ผ่าน)
+4. **Test scenarios สำหรับ `inspect`/`sys` รับต่อ (สถานะ NOT_RUN — ไม่อ้างรันผ่าน)**:
+   - **S1 (สมาชิกกลุ่ม)**: พนักงานในกลุ่ม `แอดมิน/ผู้บริหาร` ที่ active ของโรงเรียนตนเอง แม้ JWT ส่ง `IsAdmin=0` → ได้ `is_admin=true` (`school_admin` เฉพาะโรงเรียนนั้น)
+   - **S2 (ไม่เป็นสมาชิก)**: ครู/พนักงานปกติในโรงเรียนเดียวกันที่ไม่อยู่ในกลุ่ม → ได้ `is_admin=false` (ไม่ได้ `school_admin`)
+   - **S3 (ถูกถอนสิทธิ์/พ้นสภาพ)**: ผู้ใช้ที่ถูกถอนจากกลุ่ม (`IsActive=false` หรือไม่มีเมนู `Type='W'` ของกลุ่ม) หรือ `WorkStatus ∈ {2,3}` → ปฏิเสธ `school_admin` ทั้งตอนแลก session และตอน re-check ก่อน commit
+   - **S4 (ข้ามโรงเรียน)**: แอดมินกลุ่มของโรงเรียน A เรียกจัดการข้อมูลโรงเรียน B → ปฏิเสธ (`403`)
+   - **S5 (Super admin เดิม)**: token `user_id=0, admin_id!=null` ของโรงเรียนที่ active → คงได้ `is_admin=true` สำหรับ `school_web` ของโรงเรียนนั้น แต่แลก `staff_admin` ไม่ได้หากไม่มี `SchoolBotStaffRole`
+   - **S6 (Body/Header ปลอม หรือ mapping ไม่พร้อม)**: ส่ง body/header ปลอม (`is_admin=true`, `x-school-id`, suffix ไม่ตรง) หรือระบบกลุ่ม/mapping ยังไม่ตั้งค่า → ปฏิเสธ (`401`/`403`) หรือ fail closed (`503 AUTH_NOT_CONFIGURED`)
+
 ## Change Log
+- 2026-10-23 — ใบงาน030: append override ตาม [decisions-035](../requirement/decisions-035.md) ยืนยันทาง A (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม), กฎ fail-closed และ test scenarios S1–S6; คง H5/technical proof/gates เดิม
 - 2026-10-23 — Rev1: ใบงาน029 รับ topology ผู้ใช้/legacy evidence และตรวจ gateway routing/auth แบบ read-only; แยก implementation จาก unknown คง gates เดิม ไม่มี tests/network probe/deploy

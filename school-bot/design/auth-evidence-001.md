@@ -68,11 +68,14 @@ Implementation gaps (ทีมแก้ได้): IG1 ไม่มี web-princ
 
 [gateway-integration-001](gateway-integration-001.md) override routing/trust-boundary/H5 ใน §4–6: W/BFF→G→B และ B→private G; ไม่ตั้ง upstream ของ BFF ไป B โดยตรง ส่วน is_admin จาก claim เดิมยังห้ามเปลี่ยนเป็นกลุ่มสิทธิ์จนได้คำตอบมนุษย์
 
+**Override ตาม [decisions-035](../requirement/decisions-035.md) (มีลำดับเหนือ C11/§6/ข้อความรอคำตอบแหล่ง `is_admin` ด้านบน)**: ผู้ใช้ยืนยันทาง A ให้ตรวจสมาชิกกลุ่ม `แอดมิน/ผู้บริหาร` ฝั่ง server ตามเกณฑ์ `Default.aspx.cs:193–240` ผูกตัวตน/โรงเรียนที่ตรวจแล้ว และคง super admin เดิม (`bypassgarde.aspx.cs:55–75`); JWT ที่ส่ง `IsAdmin=0` ไม่ใช่เหตุตัดสิทธิ์กลุ่ม แต่ห้ามเชื่อ body/header assertion และต้อง fail closed (`503 AUTH_NOT_CONFIGURED`) ตราบที่ข้อมูลกลุ่ม/mapping (`TR-AUTH-03`) ยังไม่พร้อม ทั้งนี้มตินี้ปิดเฉพาะ policy choice `C11` (และส่วนนโยบายของ `TR-AUTH-02`) ส่วน `TR-AUTH-02-rest` (ตัวตรวจ login `TAdmin`), `TR-AUTH-03..06`, `C1–C10`, H5 และ implementation ยังคงค้าง รายละเอียดและ test scenarios S1–S6 อยู่ที่ [gateway-integration-001](gateway-integration-001.md)
+
 ## 7. ข้อความเดิมก่อนแก้ (verbatim)
 
 DES-012 Rev3: `user_id` = `TUser.NSystemId ?? SId` (คือ `TEmployees.sEmp`), `admin_id` = `TAdmins.id` (`WebLoginService.cs:206–217,272`) · ครูรายวิชา: `TplanCourseTeacher (SchoolId, PlanCourseId, SEmp)` `IsActive & !CDel` + `TEmployees` ไม่ถูกลบ (`A/.../TeacherRepository.cs:24–32,111–122`) + `TplanTermSubLevel2` (`PlanCourseRepository.cs:194–215`)
 
 ## Change Log
+- 2026-10-23 — ใบงาน030: บันทึก override ตาม [decisions-035](../requirement/decisions-035.md) ปิดเฉพาะนโยบาย C11/แหล่ง is_admin; คง C1–C10, TR-AUTH-02-rest..06 และ H5 เดิม
 - 2026-10-23 — Rev3: รับ legacy รอบ002/ผลตรวจ13ไฟล์ แยก session IsAdmin จาก JWT และชี้ routing addendum; ไม่เลือก compatibility policy หรือรับความเสี่ยง
 
 - 2026-10-23 — Rev2: (ใบงาน 021) §6 แทน 'gate 6' ด้วย G-CORE/G-RELEASE และ owner BE-039/BE-023; ระบุว่าชื่อ env ของ W เป็นข้อเสนอ; web-principal ใช้ policy ไม่ใช้ MenuPermission เฉพาะ; ผลพิสูจน์ §1-§5 ไม่เปลี่ยน

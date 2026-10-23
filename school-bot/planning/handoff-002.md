@@ -55,3 +55,11 @@ arch ใบงาน023: Claudeติดweeklylimit; AGY t1หมดเวลา
 [สถานะsourceก่อน/หลัง](source-status-check-002.json) ตรงกันทั้ง4repoที่เกี่ยว; [หลักฐานrunner](runner-results-002.json) บันทึกสาเหตุใช้Codexเป็นลำดับสุดท้าย. คำถามis_adminยังรอคำตอบ ณตรวจรอบนี้ ไม่มีการเลือกแทนคน
 
 - 2026-10-23 — บันทึกผลตรวจครบก่อนfinal knowledge commit; ใช้Gitcommitที่รายงานในข้อความปิดงานเพื่อตรวจrevision
+
+## ปิดคำถามแหล่งสิทธิ์ admin — decisions-035
+
+ผู้ใช้ตอบเลือกตรวจกลุ่มแอดมิน/ผู้บริหารฝั่งserverและคงsuperadminเดิมแล้ว. [มติ035](../requirement/decisions-035.md) และ [ผลรับarch](admin-source-receipt-001.md) มีลำดับสถานะเหนือข้อความ "รอคำตอบ" ก่อนหน้านี้ในhandoff/queue snapshot. AGY/arch syncสัญญา4ไฟล์แล้ว ไม่ถามทางเลือกA/Bนี้ซ้ำ
+
+คำถามนโยบายข้อนี้ปิด แต่ technicalproof TR-AUTH-02-rest/03..06, H5, implementationและgateตรวจรับอื่นยังค้าง. คิวต่อใช้queue003ร่วมกับมติ035; ไม่เปลี่ยนStatus110tasks/77casesNOT_RUN/Important6OPEN
+
+- 2026-10-23 — ผู้คุมรับมติ035และผลarchแบบread-only ตรวจเอกสารก่อนfinalknowledgecommitรอบนี้

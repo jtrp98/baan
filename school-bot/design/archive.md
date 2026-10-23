@@ -83,3 +83,9 @@
 เก็บ DES-012 Rev4, auth-evidence Rev2 และ design/index แบบbyte-for-byteก่อนapply11editsจากarchใบงาน029; [manifestพร้อมbytes/SHA256](archive/2026-10-23-before-gateway-integration-001/manifest.json). ไม่มีphysicalschema/SQL delta
 
 - 2026-10-23 — นายช่างเก็บฉบับเดิมและตรวจhashก่อนรับGateway addendum
+
+## ก่อน sync decisions-035 — 2026-10-23
+
+เก็บdesign/index, DES-012, Gateway integration และauth-evidenceแบบbyte-for-byteก่อนapply5editsจากarchใบงาน030ตามคำตอบผู้ใช้. [Manifestพร้อมbytes/SHA256](archive/2026-10-23-before-decisions-035/manifest.json); ไม่มีphysicalschema/SQL delta
+
+- 2026-10-23 — นายช่างรับpolicyแหล่งis_adminตามมติ035 ไม่ปิดruntime/securitygate
