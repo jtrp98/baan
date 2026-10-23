@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-23",
+  "records": [
+    {
+      "name": "tp-001.json",
+      "bytes": 96325,
+      "sha256": "0fd28590b702da76800ed8953413880a129a0d1a4fd79312d701154172520eac"
+    },
+    {
+      "name": "tp-001.md",
+      "bytes": 81080,
+      "sha256": "64db9bada68a321c2159adc78caa08845c05b3205140c6b03b47f98f5c5e6e8a"
+    },
+    {
+      "name": "traceability-001.json",
+      "bytes": 121107,
+      "sha256": "fea57ae41f70af86f71b0cd7c296b4e2ae5a2422fd0e5bbe021ac891085e2060"
+    },
+    {
+      "name": "traceability-001.md",
+      "bytes": 19840,
+      "sha256": "5a1aca987ac5870bbaff16c38e1b3b8ef5d28380231c18f2aee7f7e54dff84b5"
+    },
+    {
+      "name": "index.md",
+      "bytes": 815,
+      "sha256": "9c0022b348743517a12fd2fdb116519c77fff82600bd01635f6cac130d3e1e5e"
+    }
+  ]
+}

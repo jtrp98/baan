@@ -341,16 +341,17 @@
       "refs": [
         "DES-002",
         "DES-004",
-        "BR-027"
+        "DES-012",
+        "BR-027-01"
       ],
       "level": "integration",
       "profile_ids": [
         "PF-API",
         "PF-ADMIN"
       ],
-      "fixture": "admin auth ไม่ตั้ง/ตั้งแล้ว; token ขาด/ผิด/role ไม่พอ/token school_web; payload valid, ชื่อว่าง/whitespace, expires_at อดีต/=now, ฟิลด์ limit>1",
-      "action": "POST/GET /v2/admin/licenses และ /v1/admin; replay create",
-      "expected": "ไม่ configured→503; ขาด/ผิด→401; role ไม่พอ→403; valid→201+key เดียว 1 เครื่อง; ชื่อว่าง/หมดอายุ→4xx; สร้างหลายเครื่องไม่ได้; list ไม่มี key เต็ม/hash/device id มี activated_devices 0|1; replay คืน key เดิมเฉพาะ operation/admin เดิม; /v1/admin ปิด (ดู GAP-02)",
+      "fixture": "staff auth ของ /v2/admin ไม่ configured/configured; staff session (staff_admin) ขาด/ไม่ถูกต้อง/หมดอายุ; session ที่ไม่มี StaffRole active ที่มีสิทธิ์ License (role อื่น/ถูกถอน/valid_until หมด); token school_web/desktop; static bearer เดิมของ /v1/admin; ผู้เรียกมีสิทธิ์ + payload valid, ชื่อว่าง/whitespace, expires_at อดีต/=now, ฟิลด์ limit>1",
+      "action": "POST/GET /v2/admin/licenses ตามแต่ละ fixture; POST/GET /v1/admin ด้วย static bearer และด้วย staff session; replay create (DES-002 ยังเป็น /admin/licenses รอ arch sync)",
+      "expected": "staff auth ไม่ configured→503; ไม่มี/ไม่ถูกต้อง/หมดอายุ→401; มี session แต่ไม่มี StaffRole active ที่มีสิทธิ์ License→403; token channel ผิด→403 CHANNEL_NOT_ALLOWED (DES-004:61). assert เฉพาะ status+error envelope ห้าม assert code ของ 503/403(role) จน arch ผูกกับ /v2/admin/licenses (AUTH_NOT_CONFIGURED DES-004:80 และ STAFF_ROLE_REQUIRED ใน catalog ยังไม่ผูก). /v1/admin ด้วย static bearer สร้าง/ดูรายการไม่ได้ (ตรวจ DB rows ไม่เปลี่ยน ไม่ assert status ที่ AC ไม่ระบุ). ผู้เรียกมีสิทธิ์: valid→201+key เดียว 1 เครื่อง; ชื่อว่าง/หมดอายุ→4xx; สร้างหลายเครื่องไม่ได้; list ไม่มี key เต็ม/hash/device id มี activated_devices 0|1; replay คืน key เดิมเฉพาะ operation/admin เดิม (ดู GAP-02)",
       "evidence": "E-API",
       "actual": "NOT_RUN"
     },
@@ -371,7 +372,7 @@
       ],
       "fixture": "license+Cloud project ที่บันทึกสำเร็จ",
       "action": "restart ทุก instance; kill ระหว่าง commit; inject DB commit fail แล้ว restart",
-      "expected": "หลัง restart list/Login บัญชีเดิม/โครงงานเดิมครบ; commit fail ไม่รายงานสำเร็จและไม่มีแถวค้างครึ่ง",
+      "expected": "หลัง restart list (License สร้าง/เรียกผ่าน /v2/admin ด้วยผู้เรียกที่มีสิทธิ์ตาม BR-027-01; AC-027-04)/Login บัญชีเดิม/โครงงานเดิมครบ; commit fail ไม่รายงานสำเร็จและไม่มีแถวค้างครึ่ง",
       "evidence": "E-API",
       "actual": "NOT_RUN"
     },
@@ -597,9 +598,9 @@
         "PF-HOST",
         "PF-UNIT"
       ],
-      "fixture": "DSL ถูก; คำสั่งนอก DSL (import/eval/__import__/exec); source 16384 และ 16385 ตัวอักษร ASCII; schema ผิด",
-      "action": "รัน/บันทึก/โหลด",
-      "expected": "ได้รายการคำสั่ง/steps/ผลในฉาก ไม่มีคำสั่งไปหุ่น; นอก DSL→error ไม่รันเป็น Python; บันทึก/เปิด source เดิม; >16384→error, schema ผิด→error (หน่วย char vs byte ดู GAP-01)",
+      "fixture": "DSL ถูก; คำสั่งนอก DSL (import/eval/__import__/exec); ไฟล์ schema 1 เตรียมตรง (ไม่พึ่ง save ของ UI) แบบ DSL ถูก + บรรทัดคอมเมนต์ `#` (demo.go:72) ปรับ padding ให้ได้: (A) ASCII 16384/16385 units=bytes; (B) ไทย units≈5.5K ≤16384 แต่ bytes=16384 และ 16385; (C) ไทย units=16385; (D) emoji 8192 ตัว (16384 units, 32768 bytes) และ +1 ASCII (16385 units); schema ผิด. ตรวจ units=String.length, bytes=UTF-8 len ก่อนใช้",
+      "action": "(1) โหลดไฟล์ผ่าน UI load (useCodeLab.ts:56); (2) ส่ง source เดียวกันเข้า engine program.run (demo.go:66); (3) รัน DSL ถูก/นอก DSL; (4) บันทึกแล้วเปิด source เดิม; (5) โหลด schema ผิด",
+      "expected": "ได้รายการคำสั่ง/steps/ผลในฉาก ไม่มีคำสั่งไปหุ่น; นอก DSL→error ไม่รันเป็น Python; บันทึก/เปิด source เดิม; schema ผิด→error. AC-025-03 (โหลด UI นับ UTF-16 units): units 16384 โหลดได้, 16385→error ตัดที่ units ไม่ใช่ bytes (ครอบ A/C/D). BR-025-03 (รัน นับ UTF-8 bytes): A และ B ที่ bytes 16384 ผ่านด่านขนาด, bytes 16385 engine ปฏิเสธ; B ผ่านโหลด UI แต่ถูกปฏิเสธตอนรัน; emoji 8192 ผ่านโหลดแต่ engine ปฏิเสธ. ไม่ assert code/ข้อความ error ของ engine, ไม่ทดสอบ codepoint/grapheme, ไม่ใช้ DES-003:31,89 เป็น expected; เพดาน bytes ไม่ใช่เกณฑ์ AC-025-03",
       "evidence": "E-TRACE",
       "actual": "NOT_RUN"
     },
@@ -1868,7 +1869,11 @@
       ],
       "owner": "spec",
       "issue": "AC-025-03 ใช้หน่วย 'ตัวอักษร' (16384) แต่ DES-003 กำหนด source ≤16384 UTF-8 bytes (และระบุให้ตรวจ bytes เพิ่มจาก UI เดิมที่นับ characters) ข้อความไทย/multibyte ให้ผลต่างกัน ไม่รู้ว่าอะไรเป็นเกณฑ์",
-      "required_evidence": "spec/arch ยืนยันหน่วยเดียว (char หรือ byte) และผลของ multibyte; TP001-019 ทดสอบเฉพาะ ASCII จนกว่าจะชัด"
+      "required_evidence": "spec/arch ยืนยันหน่วยเดียว (char หรือ byte) และผลของ multibyte; TP001-019 ทดสอบเฉพาะ ASCII จนกว่าจะชัด",
+      "status": "requirement_clarified_design_sync_pending",
+      "resolution": "REQ-025 BR-025-03/AC-025-03 ระบุหน่วยแยกแล้ว (โหลด UI=UTF-16 units, รัน=UTF-8 bytes) TP001-019 แยก fixture/expected ตามนี้ และเพิ่ม multibyte ที่ยืนยันได้จาก REQ+as-built",
+      "remaining": "DES-003:31,89 ยังกำหนด UTF-8 bytes ขัดกับ REQ ต้อง arch sync ก่อนปิด; ไม่ปิด runtime ไม่ใช่ QA PASS; ถ้าจะให้บันทึก/โหลดตรวจ bytes ต้องให้ผู้ใช้ตัดสิน; owner เปลี่ยนจาก spec เป็น arch",
+      "resolution_owner": "arch"
     },
     {
       "id": "GAP-02",
@@ -1880,7 +1885,11 @@
       ],
       "owner": "spec",
       "issue": "AC-027-01 อ้าง 'admin key' ได้ 503/401 ตามโมเดล static bearer ที่ decisions-025 ปิด /v1/admin และย้ายไป /v2/admin ด้วย staff_admin session+SchoolBotStaffRole (DES-004: 503 AUTH_NOT_CONFIGURED, 401, 403 STAFF_ROLE_REQUIRED) ไม่มีข้อความ mapping ว่า AC ถือเป็นแบบใหม่",
-      "required_evidence": "spec ยืนยันว่า 'admin key' = staff_admin auth config และ amend ถ้อยคำ หรือยืนยันว่า TP001-007 คาดผลตาม DES-004"
+      "required_evidence": "spec ยืนยันว่า 'admin key' = staff_admin auth config และ amend ถ้อยคำ หรือยืนยันว่า TP001-007 คาดผลตาม DES-004",
+      "status": "requirement_clarified_case_aligned_design_sync_pending",
+      "resolution": "TP001-007 ตรง BR-027-01/AC-027-01..03 แล้ว (staff session /v2/admin, 503/401/403, ปิด /v1/admin static bearer); AC-027-04 อยู่ที่ TP001-008",
+      "remaining": "ข้อความ issue เดิมอ้างว่า DES-004 มี 403 STAFF_ROLE_REQUIRED แต่ DES-004:80 ไม่มี (มีเฉพาะ catalog กลาง data-contract-rules.md:51) ให้แก้ถ้อยคำ; arch ต้อง (1) ผูกรหัส 503/403 ของ /v2/admin/licenses และ role ที่มีสิทธิ์ License (DES-004:59 มี license_admin) (2) sync DES-002:27-30,84 จาก /admin/licenses เป็น /v2/admin; รายชื่อ staff_admin ตั้งต้นยังรอข้อมูล; case auth อื่นไม่แตะจนมี contract ใหม่",
+      "resolution_owner": "arch"
     },
     {
       "id": "GAP-03",
@@ -1986,5 +1995,13 @@
     "TP-002 (failure fixtures): ต้องการ harness fake clock/monotonic, late callback/drain, import lost response, tenant injection, 30-day clock ใช้กับ TP001-003/010/026/028/037",
     "check/QA: join task ผ่าน canonical JSON; รันตาม profile; ไม่ใช้ planner/runner tests แทน; แยก hardware/signed installer; เมื่อ prerequisite ยังไม่มีให้รายงาน blocked ไม่ปรับ expected เอง",
     "ไม่ได้แก้ plan/QA หรือไฟล์ใน knowledge (ตามใบงาน read-only) ผู้คุมบันทึก TP-001 deliverable เอง"
+  ],
+  "amendments": [
+    {
+      "date": "2026-10-23",
+      "source": "planning/inspect-amendment-response-001.json",
+      "summary": "ปรับ TP001-007 และ TP001-019 ตาม REQ-027/025 ที่บันทึกแล้ว (เสนอแก้ TP001-008 เพิ่ม 1 จุดให้ผู้คุมตัดสิน) จำนวนและ ID คงเดิม 44/180/77 ทุก actual=NOT_RUN ไม่มี PASS ไม่ปิด runtime. TP001-007 ใช้ staff session บน /v2/admin และ 503/401/403 ตาม BR-027-01 โดยปิด /v1/admin ไม่ยึด static key. รหัส error กรณีไม่มี role ไม่ assert: DES-004:80 ไม่มี STAFF_ROLE_REQUIRED, มีเฉพาะ catalog กลาง data-contract-rules.md:51 และ DES-005/010/011 แต่ไม่มีการผูกกับ /v2/admin/licenses. TP001-019 แยกจุดโหลด UI (UTF-16 units) ออกจากเพดาน runtime (UTF-8 bytes) และเพิ่ม multibyte ที่ยืนยันได้จาก BR-025-03 กับ as-built (demo.go:66,72; useCodeLab.ts:56). DES-003:31,89 ยังขัด (UTF-8 bytes) จึงไม่ใช้เป็น expected. DES-002:27-30 ยังใช้ path /admin/licenses (ไม่มี prefix /v2) ขัดกับ REQ รอ arch sync.",
+      "controller": "รับการปรับ TP001-008 ที่ inspect เสนอให้สอดคล้อง AC-027-04; ลบเฉพาะหมายเหตุเสนอของผู้เขียนจาก expected"
+    }
   ]
 }

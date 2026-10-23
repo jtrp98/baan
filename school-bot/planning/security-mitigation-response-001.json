@@ -1,0 +1,130 @@
+{
+  "state": "NEEDS_HUMAN",
+  "summary": "ตอบ 5 ข้อจาก DES-002/004/007/009/012, db/schoolbot_db.sql:142-167 และ source gateway (อ่านอย่างเดียว) ความเห็นนี้ไม่ใช่การปิด finding ทุก Important ยัง OPEN จนมี code จริงและ jpo re-audit ไม่มี risk acceptance แทนคน คำตอบ 'service เดียวผ่าน gateway' ยืนยันเฉพาะ routing ไม่ยืนยัน host/TLS/exposure/secret/instance จึงไม่ปิด SEC001-011/012 และไม่ปิด auth gap ใด รอผลอ่าน legacy ของ sys และ arch ปรับ topology ก่อนประเมิน SEC001-002 ใหม่ (gateway ซ่อน API ลด exposure ตรง แต่ไม่ลดความกว้างของ credential) ตัวเลข TTL/limit ทุกค่าเป็น (สมมติฐาน — ยังไม่ยืนยัน) CVE/กฎหมาย/ข้อกำหนด CA ยังไม่ได้ตรวจแหล่งทางการ",
+  "answers": [
+    {
+      "finding": "SEC001-002",
+      "question": "ถ้าไม่มีบัญชี DB ที่แคบกว่า รับหลักฐาน (a) write adapter เฉพาะ worker (b) worker แยก process/config (c) receipt+reconcile (d) cross-tenant tests ได้ไหม",
+      "judgment": "รับเป็นหลักฐานของการแก้บางส่วน ไม่ใช่ risk acceptance และไม่พอปิดทั้งข้อ (a)(d) พิสูจน์ตรรกะของแอป ไม่ใช่ขอบเขตความปลอดภัย (c) เป็น detective และเขียนด้วยบัญชีเดียวกับ writer (DES-009:134) process ที่ถูกยึดปลอม receipt ได้ มีแต่ (b) ที่ลด blast radius ของเส้นเขียนเกรด และนับก็ต่อเมื่อ process ของ public API ไม่ถือ credential PGGradeDB จริง แต่ preview/confirm ต้องอ่าน PGGradeDB (DES-009:58,131) จึงต้องให้การอ่านและเขียน PGGradeDB ผ่าน worker/adapter process ภายใน DES-009:31 ไม่บังคับ process เดียว ทำได้โดยไม่เปลี่ยนสัญญา ถ้าทำได้ ส่วนเขียนเกรดอาจลดเป็น Medium หลัง re-audit ส่วน School DB (บัญชีกว้าง อ่านข้ามโรงเรียน และอ่านข้อมูลบัญชี legacy ที่ login ต้องใช้ DES-004:20-24) ยังเป็น Important จนเจ้าของ DB มีบัญชีแคบกว่า หรือคนยอมรับเป็นลายลักษณ์อักษร ตอนนี้คง Important/OPEN",
+      "minimum_evidence": [
+        "MUST-1 รายชื่อ key ของ env/config/secret mount ของ public API (ไม่ส่งค่า) ต้องไม่มี credential PGGradeDB และ API start ได้โดยไม่มี secret นั้น",
+        "MUST-2 source: write adapter และ connection PGGradeDB ถูก register เฉพาะ composition root ของ worker/adapter และมี test ว่า DI ของ API entrypoint resolve ไม่ได้",
+        "MUST-3 ทางภายใน API→adapter ไม่เปิด public ยืนยันตัวตนระหว่าง process และไม่รับ SchoolId/ปลายทางจาก client",
+        "MUST-4 cross-tenant test ทุก endpoint, SchoolId มาจาก session เท่านั้น, ไม่มี raw SQL จาก input",
+        "MUST-5 credential matrix (process × ชื่อบัญชี × สิทธิ์ที่ต้องใช้จริง) ระบุความกว้างของบัญชี School DB ที่ API ถือ",
+        "MUST-6 login ไม่ cache/log password หรือ hash, SELECT เฉพาะคอลัมน์ที่จำเป็น, rate limit (DES-004:76)"
+      ],
+      "optional_hardening": [
+        "บัญชี read-only PGGradeDB สำหรับ preview",
+        "DB-side audit/alert",
+        "egress allowlist",
+        "แยก host/OS user ของ worker",
+        "hash chain ของ receipt"
+      ],
+      "human_decision_needed": "เจ้าของ DB+infra ตอบเป็นสถานะว่ามีบัญชี read-only/บัญชีที่แคบกว่าแล้วหรือไม่ และแยก process/unit ใน deploy จริงได้หรือไม่ ถ้าไม่ได้ ผู้มีอำนาจต้องตัดสินยอมรับ residual เป็นลายลักษณ์อักษร"
+    },
+    {
+      "finding": "SEC001-003",
+      "question": "host ตรวจ JWS+hash+OS signature อิสระอยู่แล้ว release_publisher รายบุคคล+audit+evidence_ref เพียงพอไหม หรือต้อง four-eyes",
+      "judgment": "เหตุผลของ arch มีช่อง: JWS+hash ไม่อิสระจากเส้นทาง publish เพราะ DES-007:37 ให้ trusted release signer ลงนาม manifest_input ที่ผู้ดูแลส่ง (url+sha256) ผู้ถือ release_publisher หรือ API ที่ถูกยึดจึงได้ manifest ลงนามถูกต้องของ artifact ใดก็ได้ และ DES-007:33 ขัดกับ :37 ว่าใครลงนาม ตัวตรวจที่อิสระจริงคือ OS publisher signature (DES-007:48) แต่สัญญายังไม่ระบุว่า host ต้อง pin ตัวตนผู้เผยแพร่ ลายเซ็นที่ถูกต้องของใครก็ได้ไม่พอ ถ้าครบ MUST-1..4 ผมลด four-eyes จาก must เป็น optional และ release_publisher รายบุคคล+audit+evidence_ref เป็น baseline พอ (four-eyes ที่มีความหมายอยู่ที่ CI protected environment ไม่ใช่ที่ API) decisions-025 H6 ครอบเฉพาะหลักสูตร/คลังข้อสอบ ถ้าจะขยายต้อง gate 1 นี่เป็นการปรับเงื่อนไขปิด ไม่ใช่การปิด คง Important/OPEN",
+      "minimum_evidence": [
+        "MUST-1 host pin ตัวตนผู้เผยแพร่ของ OS signature (Authenticode subject/thumbprint, Apple Team ID) ฝังเหมือน trust root; negative test: artifact ที่เซ็นถูกแต่โดยผู้อื่นต้องถูกปฏิเสธ",
+        "MUST-2 manifest ต้องลงนามใน CI protected env แล้ว API แค่ verify+เก็บ (แนะนำ ไม่มี online release signer) หรือ signer ปฏิเสธเมื่อ sha256+url ไม่ตรง entry ใน pipeline registry ที่ CI ลงทะเบียน; evidence_ref ต้อง resolve จาก registry; arch ต้องแก้ DES-007 :33 vs :37",
+        "MUST-3 origin allowlist, ไม่ตาม cross-origin redirect, ปฏิเสธ downgrade/manifest หมดอายุ/release ที่ withdraw (negative tests ตาม SEC001-003)",
+        "MUST-4 role release_publisher แยกจาก role อื่น, AuditEvent ผูก sEmp+release_id+evidence_ref ทั้ง publish และ withdraw",
+        "MUST-5 Authenticode/Developer ID+notarization ของ RC จริง (OQ-011)"
+      ],
+      "optional_hardening": [
+        "four-eyes ผ่าน CI protected env + required reviewer (ขยาย H6)",
+        "hardware token แยกสำหรับ manifest",
+        "transparency log ของ release"
+      ],
+      "human_decision_needed": "product owner (gate 1) ยืนยันว่าคงสัญญา 'release_publisher คนเดียว' หรือขยาย H6 ให้ครอบ release และระบุผู้ถือสิทธิ์ signing ของ OS cert"
+    },
+    {
+      "finding": "SEC001-006",
+      "question": "'KMS/signer แยก process + audit + lease ≤3 วัน + revoke kid' และ release key ใน CI protected env/hardware token โดยไม่มี dual control เพียงพอไหม",
+      "judgment": "entitlement: รับเป็น baseline ได้ ถ้า API ถูกยึดจะออก lease ปลอมอายุ ≤3 วันให้ device key ของผู้โจมตีได้ (กระทบสิทธิ์ใช้งาน ไม่ใช่ PII หรือโค้ดบนเครื่องนักเรียน) ครบ MUST แล้วส่วนนี้อาจต่ำกว่า Important หลัง re-audit แต่ห้ามเป็นไฟล์ key บน host/process ของ API และ signer ต้องบังคับ exp cap เอง release: CI protected env + required reviewer = dual control ในทางปฏิบัติ และเป็นแบบที่แนะนำ hardware token ที่คนเดียวถือ รับเป็น baseline ได้เฉพาะเมื่อ SEC001-003 MUST-1/2 ครบ เพราะคนเดียวยังเซ็น artifact อันตรายได้ (insider) ให้คนตัดสินว่ารับหรือไม่ jpo ไม่รับแทน HSM/dual control เป็น optional ส่วน release key คง Important จน custody ถูกระบุและ re-audit",
+      "minimum_evidence": [
+        "MUST-1 custody matrix (key × ผู้ถือ × ที่เก็บ × ใครสั่ง sign ได้ × rotation × revoke × backup) ไม่มีค่า key",
+        "MUST-2 entitlement signer แยก process/identity หรือ KMS sign-only ผูก identity ของ API; สแกน repo/payload/CI/log ไม่พบ private key",
+        "MUST-3 signer บังคับ exp≤min(now+259200,license_expires_at), typ/aud/kid, audit ทุกครั้งที่ sign, rate limit; test: exp>3 วันถูกปฏิเสธ",
+        "MUST-4 ซ้อม revoke kid + keyset root-signed rotation บน test (DES-002:61)",
+        "MUST-5 release/manifest signing อยู่นอก host API พร้อมบันทึกผู้เข้าถึง"
+      ],
+      "optional_hardening": [
+        "HSM",
+        "dual control",
+        "offline root",
+        "ตรวจการเข้ารหัส backup ของ key"
+      ],
+      "human_decision_needed": "เจ้าของ release/infra เลือก: KMS/signer ที่องค์กรมี, CI protected env หรือ token, ผู้ถือ root/token (ตอบเป็นสถานะ ไม่ส่งค่า)"
+    },
+    {
+      "finding": "SEC001-009",
+      "question": "ถ้าเลือก 'replay ไม่คืน key ให้ admin revoke แล้ว create ใหม่' จะปิด finding ได้ไหม",
+      "judgment": "ถ้า implement แล้ว re-audit ผ่านจะแก้ได้ เพราะไม่มี secret ใน idempotency แต่ไม่จำเป็นต้องเปลี่ยนสัญญา วิธีเรียบง่ายกว่าที่รักษา DES-002:51: กำหนดหน้าต่าง replay เฉพาะ operation create-license ให้สั้น (ข้อเสนอ ≤15 นาที) แทน 24 ชม. ทั่วไป (data-contract-rules:41) ใช้ envelope ผ่าน ResultKeyId ที่มีแล้ว ลบ ciphertext เมื่อหมด ReplayUntil และตรวจตอนอ่านด้วย หลังหน้าต่างให้ได้ IDEMPOTENCY_EXPIRED+resource_id แล้ว admin rotate DDL ร่าง db/schoolbot_db.sql:142-167 มี ResultCipher/ResultKeyId/ReplayUntil อยู่แล้วและไม่มี CHECK จำกัด ReplayUntil จึงไม่น่าต้องเปลี่ยน schema (vault ยืนยัน) ไม่เป็น breaking เพราะเข้มกว่าเดิมและ DES-002 ยัง PROPOSED หน้าต่างสั้นจำเป็นจริง เพราะ 24 ชม. คือเก็บ key ใช้งานได้นานเกินเหตุ (retry จริงเกิดในวินาที–นาที) เงื่อนไข 'ลบหลังอ่านครั้งแรก' ในข้อเสนอเดิมของผมเข้มเกินสัญญา เพราะถ้า response แรกหาย retry จะไม่ได้ key ให้ใช้ TTL + จำกัดจำนวน replay แทน คง Medium",
+      "minimum_evidence": [
+        "MUST-1 ReplayUntil ของ create-license ≤ TTL; test: now>ReplayUntil ได้ IDEMPOTENCY_EXPIRED แม้ purge job ยังไม่รัน",
+        "MUST-2 purge ตั้ง ResultCipher/ResultKeyId=NULL เมื่อหมด TTL; ข้อมูลตัวอย่างไม่มี cipher ค้างเกิน TTL",
+        "MUST-3 replay เฉพาะ Principal+Idempotency-Key+RequestHash เดิม และตรวจ authz/license ไม่ถูก revoke ก่อน replay",
+        "MUST-4 key ไม่อยู่ใน AuditEvent/log/error/list/ETag; Cache-Control no-store; ปิด body logging ของ endpoint นี้",
+        "MUST-5 envelope key อยู่นอก DB เดียวกับ ciphertext และ rotate ได้; backup residual ไม่เกิน TTL ระบุเป็นข้อจำกัด"
+      ],
+      "optional_hardening": [
+        "KMS แยก",
+        "จำกัดจำนวน replay",
+        "ภายหลังเปลี่ยนเป็นทาง A (key:null)",
+        "ไม่ replay key เลย"
+      ],
+      "human_decision_needed": "ไม่ต้องให้คนตัดสินด้านความปลอดภัยถ้าใช้แบบ tightening ให้ arch/SA-001 ระบุ TTL ใน DES-002/data-contract-rules ให้ชัด เจ้าของ schema/API ตัดสิน (gate 2) เฉพาะเมื่อจะเลือกทาง A"
+    },
+    {
+      "finding": "SEC001-001",
+      "question": "การใช้ policy authenticated scheme แทน [MenuPermission] ขัดกับ fix ของ jpo หรือไม่",
+      "judgment": "ไม่ขัด fix ข้อ 1-6 ไม่ได้กำหนด MenuPermission และ endpoint นี้เป็น introspection ของ token ตัวเอง ไม่ได้เข้าข้อมูลตามเมนู MenuPermission ผูก TMenuPermission/Master DB และ fail closed (MenuPermission.cs:14-19) เห็นด้วยกับ arch แต่ policy ต้องไม่หลวม SmartScheme ส่ง Bearer ก่อน JabjaiWebKey (ApiServiceExtensions.cs:79-109) ถ้าใช้ default scheme/RequireAuthenticatedUser เฉยๆ Bearer ปกติ (Jwt:Secret) จะผ่านได้ handler ใช้ FirstOrDefault ของ JabjaiWebKey-* (JabjaiWebLegacyAuthHandler.cs:27-28) และ validator ไม่ปฏิเสธ purpose/aud จึงต้องปฏิเสธที่ endpoint/policy เอง ข้อเสนอ 'JabjaiWebKey-* มากกว่า 1 header → 401' ยืนยันเป็น optional ไม่ใช่ gate เพราะ claims ที่ตรวจแล้วเป็นแหล่งตัวตนเดียว (DES-012 §3 ข้อ 2)",
+      "minimum_evidence": [
+        "MUST-1 endpoint ตรึง AuthenticationSchemes=JabjaiWebLegacy; test: Bearer/X-Api-Key/Basic → 401",
+        "MUST-2 token มี purpose หรือ aud → 401; ไม่มี school_id หรือไม่มีทั้ง user_id และ admin_id → 401; token เซ็นด้วย Jwt:Secret ไม่ผ่านเมื่อมี LegacyWebJwt:Secret แยก",
+        "MUST-3 is_admin มาจาก claim ที่ตรวจแล้ว ไม่อ่านจากชื่อ header/body",
+        "MUST-4 rate limit ตาม (school,user) โดย partition ไม่พึ่ง claim ที่ยังไม่ผ่านการตรวจ (กรณี auth ล้มเหลวใช้ IP), no-store, log ไม่มี token/claims/ชื่อ header (SEC001-013)",
+        "MUST-5 เจ้าของ G ตอบสถานะ LegacyWebJwt:Secret แยกหรือไม่ (SEC001-011)"
+      ],
+      "optional_hardening": [
+        "JabjaiWebKey-* มากกว่า 1 header → 401",
+        "จำกัดผู้เรียก endpoint ให้เฉพาะ service identity ของ SchoolBot (network/mTLS)"
+      ],
+      "human_decision_needed": "เจ้าของ G ยืนยันแหล่ง is_admin/user_id (TR-AUTH-02/03) และสถานะ secret ถ้าเจ้าของ G ยืนยันว่าต้องใช้ MenuPermission ให้เป็น NEEDS_DESIGN_CHANGE DES-012"
+    }
+  ],
+  "finding_status_changes": [],
+  "accepted_risk_changes": [],
+  "remaining_human_inputs": [
+    {
+      "topic": "SEC001-002 บัญชี DB และการแยก process",
+      "artifact_before_asking": "credential matrix (process × ชื่อบัญชี × read/write ที่ต้องใช้จริง) และรายการตาราง PGGradeDB/School DB ที่ preview กับ apply แตะ จัดทำโดย arch/sys ไม่มีค่า secret",
+      "owner": "เจ้าของ DB (G-DB) + infra"
+    },
+    {
+      "topic": "SEC001-003 four-eyes ของ release และเจ้าของ OS signing cert",
+      "artifact_before_asking": "DES-007 ที่ arch แก้ให้ชัด (ผู้ลงนาม manifest, pin ตัวตน publisher, registry เทียบ sha256) พร้อมตาราง 'ใครทำอะไรได้' ใน flow release",
+      "owner": "product owner (gate 1) + release owner (OQ-011)"
+    },
+    {
+      "topic": "SEC001-006 custody ของ entitlement/release/manifest key",
+      "artifact_before_asking": "custody matrix ร่างพร้อมรายการตัวเลือกที่องค์กรมีอยู่ (KMS/CI protected env/token) ไม่มีค่า key",
+      "owner": "release owner/infra (G-RELEASE-DB)"
+    },
+    {
+      "topic": "SEC001-001 สถานะ secret และแหล่ง is_admin ฝั่ง gateway",
+      "artifact_before_asking": "ผลอ่าน legacy ของ sys (ยังไม่ส่ง) และ auth-evidence-001 C11/TR-AUTH-02",
+      "owner": "เจ้าของ sb-api-gateway"
+    }
+  ],
+  "handoff": [
+    "ผู้คุม: append รายงานนี้ใน security.md และบันทึก JSON ต้นฉบับ ไม่เปลี่ยนสถานะ finding ใดๆ ถ้าจะบันทึกเงื่อนไขปิดใหม่ของ SEC001-003/009 ให้เป็นการแก้ช่องวิธีแก้ ไม่ใช่การแก้สถานะ",
+    "arch/SA-001: (1) แก้ DES-007 :33 vs :37 และเพิ่ม pin ตัวตน OS publisher (2) กำหนด TTL เฉพาะ create-license ใน DES-002:51/data-contract-rules:41 (3) vault ยืนยันว่าไม่มี DDL delta",
+    "ทุก Important ยัง OPEN: SEC001-001/002/003/004/005/006 ไม่มีการเติม PASS/DONE ให้ plan; SEC001-009 คง Medium",
+    "ยังไม่ได้ตรวจ: CVE/กฎหมายปัจจุบัน, host/TLS/exposure/secret, instance ที่ deploy จริง, ผลอ่าน legacy ของ sys ไม่มี sourcewrite/knowledgewrite/SQL/DB/network probe และไม่ได้อ่านค่า secret"
+  ]
+}

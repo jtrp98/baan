@@ -1,0 +1,4428 @@
+{
+  "date": "2026-10-23",
+  "source": "tp-001.json + plan/tasks-001.json revision2 + REQ source",
+  "case_count": 77,
+  "ac_count": 180,
+  "coverage": [
+    {
+      "id": "AC-009-01",
+      "expected": "เริ่มแอปโดยไม่เคยใส่ License แล้วเข้าใช้งาน Block Lab, Arm Lab และ Code Lab ไม่ได้ และมีทางให้กรอก License",
+      "requirement": "req-009.md",
+      "case_ids": [
+        "TP001-001",
+        "TP001-077"
+      ],
+      "implementation": [
+        {
+          "id": "FE-001",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-009-02",
+      "expected": "เลือก Guest หรือ Login โดยยังไม่มี License แล้วไม่สามารถข้ามข้อกำหนด License เพื่อเข้าใช้โหมดหลักได้",
+      "requirement": "req-009.md",
+      "case_ids": [
+        "TP001-001"
+      ],
+      "implementation": [
+        {
+          "id": "FE-001",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-009-03",
+      "expected": "ใน Desktop ผู้ใช้ย่อ สลับเต็มจอ และขอปิดหน้าต่างจากแอปได้",
+      "requirement": "req-009.md",
+      "case_ids": [
+        "TP001-011",
+        "TP001-077"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-010-01",
+      "expected": "ผู้ใช้เปลี่ยนไทย/อังกฤษ/จีนได้โดยไม่ต่อเครือข่าย และข้อความควบคุมที่แปลไว้เปลี่ยนตาม",
+      "requirement": "req-010.md",
+      "case_ids": [
+        "TP001-012",
+        "TP001-077"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-010-02",
+      "expected": "หลังเปลี่ยนภาษา งานที่ยังไม่บันทึก ลำดับบล็อก และข้อมูลที่ผู้ใช้ตั้งชื่อยังคงเดิม",
+      "requirement": "req-010.md",
+      "case_ids": [
+        "TP001-012"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-010-03",
+      "expected": "เมื่อ storage ใช้งานได้ เปิดแอปใหม่แล้วใช้ภาษาที่เลือกครั้งล่าสุด; ถ้าไม่มีค่าที่รองรับ เริ่มด้วยภาษาไทย",
+      "requirement": "req-010.md",
+      "case_ids": [
+        "TP001-012"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-011-01",
+      "expected": "บันทึกอย่างน้อยสองงานต่อโหมด Block/Arm/Code ทั้ง Guest และ Login แล้วเลือกเปิดแต่ละงานได้ครบและไม่ปะปนกัน",
+      "requirement": "req-011.md",
+      "case_ids": [
+        "TP001-015",
+        "TP001-016"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-011-02",
+      "expected": "บันทึกการแก้ไขงาน A แล้วเปิดใหม่ได้ค่าล่าสุดของ A โดยงาน B ในโหมดเดียวกันไม่เปลี่ยน",
+      "requirement": "req-011.md",
+      "case_ids": [
+        "TP001-015",
+        "TP001-016",
+        "TP001-077"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-011-03",
+      "expected": "เปิดไฟล์ JSON เสียหรือเกิน 1 MiB แล้วมีข้อผิดพลาด; ไม่แสดงว่าเปิดสำเร็จ",
+      "requirement": "req-011.md",
+      "case_ids": [
+        "TP001-017"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-011-04",
+      "expected": "เมื่อมีข้อมูลทั้งชื่อแอปเก่าและใหม่ การเริ่มแอปไม่ทับข้อมูลใหม่; เมื่อปลายทางยังไม่มี ข้อมูลเก่าที่ถูกต้องถูกคัดลอกและต้นฉบับยังอยู่",
+      "requirement": "req-011.md",
+      "case_ids": [
+        "TP001-017"
+      ],
+      "implementation": [
+        {
+          "id": "BE-009",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-012-01",
+      "expected": "เมื่ออยู่ระหว่างทำงานใน mode แล้วเลือก mode อื่น มีคำยืนยัน; เลือกยกเลิกแล้วอยู่ที่เดิม",
+      "requirement": "req-012.md",
+      "case_ids": [
+        "TP001-013"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-012-02",
+      "expected": "เมื่อเลือก Save แล้วออกและจำลอง storage ล้มเหลว หน้ายังไม่ออกและมีข้อความบันทึกล้มเหลว",
+      "requirement": "req-012.md",
+      "case_ids": [
+        "TP001-013"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-012-03",
+      "expected": "เมื่อจำลอง close guard ล้มเหลว หน้าต่างยังเปิดและแสดงเหตุผลให้ผู้ใช้เห็น",
+      "requirement": "req-012.md",
+      "case_ids": [
+        "TP001-013"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-013-01",
+      "expected": "เปิด browser โดยไม่มี `preview=1` และไม่มี bridge แล้วพบข้อผิดพลาด native bridge แทนผลสำเร็จจำลอง",
+      "requirement": "req-013.md",
+      "case_ids": [
+        "TP001-014"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-013-02",
+      "expected": "ใน preview บันทึกงานได้ใน browser แต่ activate และตรวจอัปเดตไม่เรียก API จริง",
+      "requirement": "req-013.md",
+      "case_ids": [
+        "TP001-014"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-013-03",
+      "expected": "ทดลอง LearnMap, Teacher restart/reset/console และ USB ตัวอย่างแล้วไม่มีคำสั่งไปอุปกรณ์ ไม่มีไฟล์ USB ที่ถูกคัดลอกจริง และไม่มีผลประเมินถาวร",
+      "requirement": "req-013.md",
+      "case_ids": [
+        "TP001-014"
+      ],
+      "implementation": [
+        {
+          "id": "FE-005",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-014-01",
+      "expected": "เปิด native ใหม่แล้วไม่แสดงว่าหุ่นเชื่อมต่ออยู่โดยอัตโนมัติ",
+      "requirement": "req-014.md",
+      "case_ids": [
+        "TP001-031"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-014-02",
+      "expected": "เมื่อไม่เลือกอุปกรณ์หรือไม่ยืนยันโปรไฟล์ การกดเชื่อมต่อไม่สำเร็จ",
+      "requirement": "req-014.md",
+      "case_ids": [
+        "TP001-031"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-014-03",
+      "expected": "ใช้ test device ที่ไม่ตอบ probe แล้วไม่เข้าสถานะ connected; เมื่อตอบถูกต้องจึงเชื่อมต่อ โดย trace ไม่มีคำสั่งเคลื่อนไหวระหว่างเชื่อมต่อ",
+      "requirement": "req-014.md",
+      "case_ids": [
+        "TP001-031",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-015-01",
+      "expected": "โปรไฟล์ที่มี ID ซ้ำ, servo ไม่ครบหก, PWM นอกช่วง หรือปลาย PWM เท่ากัน ถูกปฏิเสธก่อนเชื่อมต่อ",
+      "requirement": "req-015.md",
+      "case_ids": [
+        "TP001-032"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-015-02",
+      "expected": "โปรไฟล์ที่ถูกต้องและกำหนด PWM กลับทิศผ่านการตรวจรูปแบบได้",
+      "requirement": "req-015.md",
+      "case_ids": [
+        "TP001-032"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-015-03",
+      "expected": "เมื่อแก้ชื่อโปรไฟล์หรือค่า servo หลังยืนยัน ต้องยืนยันใหม่ก่อนเชื่อมต่อ",
+      "requirement": "req-015.md",
+      "case_ids": [
+        "TP001-032"
+      ],
+      "implementation": [
+        {
+          "id": "FE-008",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-016-01",
+      "expected": "เมื่อ disconnected หรือปลดแรงบิด การส่งท่าไม่สร้างคำสั่งเคลื่อนไหวและมีข้อความอธิบาย",
+      "requirement": "req-016.md",
+      "case_ids": [
+        "TP001-033"
+      ],
+      "implementation": [
+        {
+          "id": "FE-009",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-016-02",
+      "expected": "เมื่อจำลองการส่งล้มเหลว ภาพไม่เริ่มเคลื่อนไปตามท่าราวกับส่งสำเร็จ และมีข้อผิดพลาด",
+      "requirement": "req-016.md",
+      "case_ids": [
+        "TP001-033"
+      ],
+      "implementation": [
+        {
+          "id": "FE-009",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-016-03",
+      "expected": "ปรับข้อต่อถี่ผ่าน test bridge แล้ว trace มีคำสั่งทำงานครั้งละหนึ่งรายการ; หลังงานค้างจบ ค่าสุดท้ายตรงกับค่าล่าสุดที่ยอมรับ",
+      "requirement": "req-016.md",
+      "case_ids": [
+        "TP001-033"
+      ],
+      "implementation": [
+        {
+          "id": "FE-009",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-017-01",
+      "expected": "โหลดโครงงานถูกต้องที่มีสองท่าและกลุ่ม แล้วได้ชื่อ ค่า เวลา ลำดับ และสมาชิกกลุ่มเดิม",
+      "requirement": "req-017.md",
+      "case_ids": [
+        "TP001-018"
+      ],
+      "implementation": [
+        {
+          "id": "FE-004",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-017-02",
+      "expected": "โหลดโครงงานที่มี ID ท่าซ้ำหรือค่าท่านอกช่วงแล้วมีข้อผิดพลาด; กลุ่มที่อ้างท่าไม่มีอยู่ไม่ปรากฏเป็นกลุ่มใช้งาน",
+      "requirement": "req-017.md",
+      "case_ids": [
+        "TP001-018"
+      ],
+      "implementation": [
+        {
+          "id": "FE-004",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-017-03",
+      "expected": "บันทึกและเปิดใหม่แล้วไม่มีสถานะยืนยันว่าอัปโหลดตรงกับบอร์ดหรืออยู่ตรงท่าที่บันทึกโดยอัตโนมัติ",
+      "requirement": "req-017.md",
+      "case_ids": [
+        "TP001-018"
+      ],
+      "implementation": [
+        {
+          "id": "FE-004",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-018-01",
+      "expected": "ให้สองท่าและสองรอบผ่าน test bridge แล้วพบการส่งตามลำดับเดิมครบสี่ท่า",
+      "requirement": "req-018.md",
+      "case_ids": [
+        "TP001-034"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-018-02",
+      "expected": "เมื่อการส่งท่าแรกผิดพลาด ไม่มีการส่งท่าที่สองต่อ และผู้ใช้เห็นข้อผิดพลาด",
+      "requirement": "req-018.md",
+      "case_ids": [
+        "TP001-034"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-018-03",
+      "expected": "เมื่อส่งครบและเวลาครบ แอปแสดงจบการส่งลำดับ โดยไม่อ้างว่าได้รับการยืนยันการเคลื่อนที่จบจากหุ่น",
+      "requirement": "req-018.md",
+      "case_ids": [
+        "TP001-034"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-019-01",
+      "expected": "อัปโหลดห้าท่าผ่าน test bridge แล้วพบสองคำขอ ขนาดสี่และหนึ่งท่า ตามลำดับ",
+      "requirement": "req-019.md",
+      "case_ids": [
+        "TP001-035"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-019-02",
+      "expected": "ระหว่างรอคำตอบ progress ยังไม่เพิ่ม; เมื่อชุดแรกตอบสำเร็จจึงเพิ่มเป็นสี่",
+      "requirement": "req-019.md",
+      "case_ids": [
+        "TP001-035"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-019-03",
+      "expected": "เมื่อชุดแรกผิดพลาด ไม่มีชุดที่สอง และไม่มีผลยืนยันว่าข้อมูลครบหรือ verified บนบอร์ด",
+      "requirement": "req-019.md",
+      "case_ids": [
+        "TP001-035",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-020-01",
+      "expected": "เมื่อยังไม่มีชุดอัปโหลดใน session การเลือกเล่นจากบอร์ดไม่ส่งคำสั่งเริ่ม",
+      "requirement": "req-020.md",
+      "case_ids": [
+        "TP001-036"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-020-02",
+      "expected": "เมื่อเลือกวนไม่สิ้นสุด ระบบไม่ส่ง group.run และแจ้งให้ระบุจำนวนรอบ",
+      "requirement": "req-020.md",
+      "case_ids": [
+        "TP001-036"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-020-03",
+      "expected": "เมื่อ test bridge รับคำสั่งเริ่มสำเร็จ ระบบยังแสดงการเล่นบนบอร์ดแม้เลยเวลารวมของท่า จนมีการขอ stop หรือเกิดข้อผิดพลาด",
+      "requirement": "req-020.md",
+      "case_ids": [
+        "TP001-036"
+      ],
+      "implementation": [
+        {
+          "id": "FE-011",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-021-01",
+      "expected": "ระหว่างเล่นผ่าน test bridge เมื่อกดหยุด พบการยกเลิกและจบงานค้างก่อนคำขอ stop",
+      "requirement": "req-021.md",
+      "case_ids": [
+        "TP001-037",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-021-02",
+      "expected": "หลังหยุดแล้วปล่อยคำตอบเก่าหรือ timer ค้าง ไม่มีคำสั่งท่าถัดไปออกไป",
+      "requirement": "req-021.md",
+      "case_ids": [
+        "TP001-037"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-021-03",
+      "expected": "เมื่อส่ง stop ล้มเหลว ผู้ใช้เห็นข้อผิดพลาดและไม่มีข้อความยืนยันว่าหุ่นหยุดจริง",
+      "requirement": "req-021.md",
+      "case_ids": [
+        "TP001-037",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-021-04",
+      "expected": "เมื่อออกจาก native workspace ที่เชื่อมต่ออยู่ พบคำขอ stop แม้ไม่มีคำสั่งกำลังรอผล",
+      "requirement": "req-021.md",
+      "case_ids": [
+        "TP001-037"
+      ],
+      "implementation": [
+        {
+          "id": "FE-010",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-022-01",
+      "expected": "เมื่อ test device ตอบ PWM ที่ถูกต้องของ ID ที่ขอ ค่าในท่าเปลี่ยนตามการแปลงโปรไฟล์",
+      "requirement": "req-022.md",
+      "case_ids": [
+        "TP001-038"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-022-02",
+      "expected": "เมื่ออ่านครบหกข้อแล้วสร้างท่าใหม่ ท่านั้นมีค่าจากคำตอบทั้งหกข้อ",
+      "requirement": "req-022.md",
+      "case_ids": [
+        "TP001-038"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-022-03",
+      "expected": "เมื่อข้อใดข้อหนึ่งไม่ตอบ ตอบผิด ID หรือเกินช่วง ข้อมูลท่าเดิมไม่ถูกแทนด้วยผลอ่านบางส่วนและมีข้อผิดพลาด",
+      "requirement": "req-022.md",
+      "case_ids": [
+        "TP001-038"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-023-01",
+      "expected": "กดปลดและล็อกผ่าน test bridge แล้วพบคำสั่ง enabled=false และ enabled=true ตามลำดับ",
+      "requirement": "req-023.md",
+      "case_ids": [
+        "TP001-039"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-023-02",
+      "expected": "หลังปลดสำเร็จ การส่งท่า เล่น และอัปโหลดถูกกันไว้พร้อมข้อความให้ล็อกก่อน",
+      "requirement": "req-023.md",
+      "case_ids": [
+        "TP001-039"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-023-03",
+      "expected": "ขอ stop ขณะอยู่ในสถานะปลดแรงบิด แล้วพบคำขอ stop ก่อนคำขอล็อก; ถ้า stop ล้มเหลวไม่แสดงว่าล็อกสำเร็จ",
+      "requirement": "req-023.md",
+      "case_ids": [
+        "TP001-039"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-024-01",
+      "expected": "จำลองอุปกรณ์หายจาก discovery ขณะ idle แล้วสถานะเปลี่ยนเป็น lost และแสดงทางเชื่อมต่อใหม่ใน workspace",
+      "requirement": "req-024.md",
+      "case_ids": [
+        "TP001-040",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-024-02",
+      "expected": "จำลอง transport error ระหว่างส่งท่าแล้วเห็นข้อผิดพลาดและไม่มีการส่งท่าเดิมซ้ำเอง",
+      "requirement": "req-024.md",
+      "case_ids": [
+        "TP001-040",
+        "TP001-045"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-024-03",
+      "expected": "เชื่อมต่อใหม่หลัง lost แล้วไม่มีคำสั่งเคลื่อนไหวจนผู้ใช้สั่ง; ผล busy/cancelled เพียงอย่างเดียวไม่ทำให้เป็น lost",
+      "requirement": "req-024.md",
+      "case_ids": [
+        "TP001-040"
+      ],
+      "implementation": [
+        {
+          "id": "FE-012",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-025-01",
+      "expected": "รันชุด move_right, jump, move_left ที่ถูกต้องแล้วได้รายการคำสั่ง จำนวน steps และผลเล่นในฉาก โดยไม่มีคำสั่งไปหุ่น",
+      "requirement": "req-025.md",
+      "case_ids": [
+        "TP001-019"
+      ],
+      "implementation": [
+        {
+          "id": "FE-006",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-025-02",
+      "expected": "ส่งคำสั่งนอก DSL แล้วแสดงข้อผิดพลาด ไม่ดำเนินเป็น Python ทั่วไป",
+      "requirement": "req-025.md",
+      "case_ids": [
+        "TP001-019"
+      ],
+      "implementation": [
+        {
+          "id": "FE-006",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-025-03",
+      "expected": "บันทึกแล้วเปิด source เดิมได้; เมื่อโหลด schema ผิดหรือ source ยาวเกิน 16384 ตัวอักษร แสดงข้อผิดพลาด",
+      "requirement": "req-025.md",
+      "case_ids": [
+        "TP001-019"
+      ],
+      "implementation": [
+        {
+          "id": "FE-004",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-026-01",
+      "expected": "move_right(2) ตามด้วย repeat 2 ครั้งของ jump ให้ผลคำสั่ง move_right, jump, jump ตามลำดับ",
+      "requirement": "req-026.md",
+      "case_ids": [
+        "TP001-020"
+      ],
+      "implementation": [
+        {
+          "id": "FE-007",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-026-02",
+      "expected": "มีสองลำดับที่ไม่เชื่อมกันแล้วรันไม่ได้ และแจ้งให้เชื่อมเป็นลำดับเดียว",
+      "requirement": "req-026.md",
+      "case_ids": [
+        "TP001-020"
+      ],
+      "implementation": [
+        {
+          "id": "FE-007",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-026-03",
+      "expected": "โปรแกรมที่ขยายเป็นเกิน 64 commands หรือซ้อน repeat เกิน 8 ชั้น ถูกปฏิเสธโดยไม่แสดงผลรันสำเร็จ",
+      "requirement": "req-026.md",
+      "case_ids": [
+        "TP001-020"
+      ],
+      "implementation": [
+        {
+          "id": "FE-007",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-026-04",
+      "expected": "บันทึก workspace แล้วเปิดใหม่ ได้บล็อก ค่า และการเชื่อมต่อเดิม; ข้อมูล schema ผิดมีข้อผิดพลาด",
+      "requirement": "req-026.md",
+      "case_ids": [
+        "TP001-020"
+      ],
+      "implementation": [
+        {
+          "id": "FE-004",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-003",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-027-01",
+      "expected": "ไม่ตั้ง admin key แล้วเรียก admin API ได้ 503; token หายหรือผิดได้ 401",
+      "requirement": "req-027.md",
+      "case_ids": [
+        "TP001-007"
+      ],
+      "implementation": [
+        {
+          "id": "BE-003",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-027-02",
+      "expected": "ข้อมูลถูกต้องได้ 201 พร้อม Key สำหรับ 1 เครื่อง; ชื่อว่างหรือหมดอายุแล้วถูกปฏิเสธ และไม่สามารถสร้าง Key ที่ใช้ได้หลายเครื่อง",
+      "requirement": "req-027.md",
+      "case_ids": [
+        "TP001-007"
+      ],
+      "implementation": [
+        {
+          "id": "BE-003",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-027-03",
+      "expected": "เรียกรายการหลังสร้างแล้วเห็น metadata และจำนวน activated devices โดยไม่มี key เต็ม, hash หรือ device IDs",
+      "requirement": "req-027.md",
+      "case_ids": [
+        "TP001-007"
+      ],
+      "implementation": [
+        {
+          "id": "BE-003",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-027-04",
+      "expected": "สร้าง License แล้ว restart API ในสภาพแวดล้อมทดสอบ เมื่อเรียกรายการอีกครั้งยังพบ License เดิมและข้อมูลสถานะเดิม",
+      "requirement": "req-027.md",
+      "case_ids": [
+        "TP001-008"
+      ],
+      "implementation": [
+        {
+          "id": "BE-003",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-028-01",
+      "expected": "เปิดใช้ Key เดียวบนเครื่อง A ซ้ำได้; ขณะยังผูกกับ A การเปิดใช้บน B ถูกปฏิเสธด้วย DEVICE_LIMIT",
+      "requirement": "req-028.md",
+      "case_ids": [
+        "TP001-005"
+      ],
+      "implementation": [
+        {
+          "id": "BE-004",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-028-02",
+      "expected": "Validate device ที่ยังไม่ activate ได้ DEVICE_NOT_ACTIVATED; หลัง activate สำเร็จ validate ผ่าน",
+      "requirement": "req-028.md",
+      "case_ids": [
+        "TP001-005"
+      ],
+      "implementation": [
+        {
+          "id": "BE-004",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-028-03",
+      "expected": "หลัง revoke หรือถึงเวลาหมดอายุ ทั้ง activate และ validate ถูกปฏิเสธว่า license inactive",
+      "requirement": "req-028.md",
+      "case_ids": [
+        "TP001-006"
+      ],
+      "implementation": [
+        {
+          "id": "BE-004",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-028-04",
+      "expected": "เมื่อลองเปิดใช้ด้วย License ไม่ถูกต้องและไม่เคยมีสิทธิ์ที่ใช้ได้ แอปไม่ปลดล็อกโหมดหลัก และผู้ใช้สามารถกลับไปกรอก License ใหม่ได้",
+      "requirement": "req-028.md",
+      "case_ids": [
+        "TP001-002"
+      ],
+      "implementation": [
+        {
+          "id": "FE-001",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-029-01",
+      "expected": "สร้าง metadata ถูกต้องแล้ว published=false; สร้างคู่ version/channel/platform เดิมซ้ำได้ RELEASE_EXISTS",
+      "requirement": "req-029.md",
+      "case_ids": [
+        "TP001-046"
+      ],
+      "implementation": [
+        {
+          "id": "BE-018",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-029-02",
+      "expected": "Version ผิดรูปแบบ, platform ไม่รองรับ, URL ไม่ใช่ HTTPS, hash ผิด หรือ signature ว่าง ถูกปฏิเสธ",
+      "requirement": "req-029.md",
+      "case_ids": [
+        "TP001-046"
+      ],
+      "implementation": [
+        {
+          "id": "BE-018",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-029-03",
+      "expected": "Update check คืนเฉพาะ published release ใหม่สุดที่ channel/platform ตรงและ version สูงกว่า โดยไม่คืน draft หรือ version เท่ากัน",
+      "requirement": "req-029.md",
+      "case_ids": [
+        "TP001-047"
+      ],
+      "implementation": [
+        {
+          "id": "BE-018",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-030-01",
+      "expected": "เมื่อไม่มี published release ใหม่กว่า ผลตรวจมี available=false, release=null และ install_supported=false",
+      "requirement": "req-030.md",
+      "case_ids": [
+        "TP001-047"
+      ],
+      "implementation": [
+        {
+          "id": "BE-019",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-030-02",
+      "expected": "เมื่อมี release ที่เข้าเงื่อนไข ผู้ใช้เห็น metadata แต่ไม่มีไฟล์ถูกดาวน์โหลด ติดตั้ง หรือ execute จากการตรวจ",
+      "requirement": "req-030.md",
+      "case_ids": [
+        "TP001-048"
+      ],
+      "implementation": [
+        {
+          "id": "BE-019",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-030-03",
+      "expected": "เมื่อ API เข้าไม่ได้ การตรวจแสดงข้อผิดพลาดและผู้ใช้กลับไปใช้งาน local ต่อได้",
+      "requirement": "req-030.md",
+      "case_ids": [
+        "TP001-048"
+      ],
+      "implementation": [
+        {
+          "id": "BE-019",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-010",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-031-01",
+      "expected": "บน Windows 11 25H2 x64 บัญชีทดสอบสะอาดที่มี WebView2 ติดตั้ง MSI แล้วเปิดสาม mode และ engines ที่บรรจุมาได้โดยไม่ติดตั้งเครื่องมือพัฒนา",
+      "requirement": "req-031.md",
+      "case_ids": [
+        "TP001-049"
+      ],
+      "implementation": [
+        {
+          "id": "BE-020",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-008",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-031-02",
+      "expected": "เมื่อไม่มี WebView2 มีขั้นตอนขอให้ติดตั้ง; ยกเลิกแล้วไม่แสดงว่าแอปพร้อมใช้งานสำเร็จ",
+      "requirement": "req-031.md",
+      "case_ids": [
+        "TP001-049"
+      ],
+      "implementation": [
+        {
+          "id": "BE-020",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-008",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-031-03",
+      "expected": "ใน installation ทดสอบ ลบไฟล์ engine แล้ว repair คืนได้; uninstall เก็บ Projects และ Device ID เดิม",
+      "requirement": "req-031.md",
+      "case_ids": [
+        "TP001-050"
+      ],
+      "implementation": [
+        {
+          "id": "BE-020",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-008",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-031-04",
+      "expected": "แพ็กเกจเวอร์ชันใหม่อัปเกรด installation ทดสอบได้ และแพ็กเกจเก่ากว่าไม่ downgrade ทับ",
+      "requirement": "req-031.md",
+      "case_ids": [
+        "TP001-050"
+      ],
+      "implementation": [
+        {
+          "id": "BE-020",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-008",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-031-05",
+      "expected": "บน Windows 11 25H2 x64 กับหุ่นที่ผ่านการยืนยันรุ่นแล้ว เชื่อมต่อและส่งคำสั่งควบคุมผ่าน native transport ได้จริง ไม่ใช้ผลจำลองแทน",
+      "requirement": "req-031.md",
+      "case_ids": [
+        "TP001-041",
+        "TP001-042"
+      ],
+      "implementation": [
+        {
+          "id": "BE-013",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-005",
+          "role": "check"
+        },
+        {
+          "id": "QA-008",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-032-01",
+      "expected": "ติดตั้งแพ็กเกจเดียวบนเครื่องทดสอบ macOS 15+ ทั้ง Intel และ Apple Silicon แล้วเปิดแอปและงาน local ได้",
+      "requirement": "req-032.md",
+      "case_ids": [
+        "TP001-051"
+      ],
+      "implementation": [
+        {
+          "id": "BE-021",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-009",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-032-02",
+      "expected": "บน macOS 15+ ทั้ง Intel และ Apple Silicon กับหุ่นรุ่นที่ผ่านการยืนยันแล้ว เชื่อมต่อและส่งคำสั่งควบคุมหุ่นผ่าน native transport ได้จริง โดยไม่ใช้ผลจำลองแทนการส่งคำสั่ง",
+      "requirement": "req-032.md",
+      "case_ids": [
+        "TP001-043",
+        "TP001-044"
+      ],
+      "implementation": [
+        {
+          "id": "BE-021",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-006",
+          "role": "check"
+        },
+        {
+          "id": "QA-007",
+          "role": "check"
+        },
+        {
+          "id": "QA-009",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-032-03",
+      "expected": "ถอนแอปจาก Applications แล้วข้อมูลโครงงานใน Application Support ยังคงอยู่",
+      "requirement": "req-032.md",
+      "case_ids": [
+        "TP001-051"
+      ],
+      "implementation": [
+        {
+          "id": "BE-021",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-009",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-033-01",
+      "expected": "ตรวจหลักฐาน catalog ของ DB ที่ระบบทดสอบใช้งานแล้วพบชื่อตาราง License เป็น `SchoolBotLicense` ตรงตามตัวพิมพ์",
+      "requirement": "req-033.md",
+      "case_ids": [
+        "TP001-052",
+        "TP001-053"
+      ],
+      "implementation": [
+        {
+          "id": "DBA-001",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-003",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-033-02",
+      "expected": "ตรวจ catalog ของ DB เดียวกันแล้วพบ `SchoolBotLicenseId` เป็น Primary Key ชนิด `int4`",
+      "requirement": "req-033.md",
+      "case_ids": [
+        "TP001-052",
+        "TP001-053"
+      ],
+      "implementation": [
+        {
+          "id": "DBA-001",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-003",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-033-03",
+      "expected": "ตรวจ catalog ของ DB เดียวกันแล้วพบฟิลด์มาตรฐานครบทั้งหกชื่อ โดยไม่เปลี่ยนชื่อเป็นรูปแบบอื่น",
+      "requirement": "req-033.md",
+      "case_ids": [
+        "TP001-052",
+        "TP001-053"
+      ],
+      "implementation": [
+        {
+          "id": "DBA-001",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-003",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-033-04",
+      "expected": "ตรวจ catalog ของ DB ที่ระบบทดสอบใช้งานแล้วทุกตารางข้อมูลของผลิตภัณฑ์ใช้ prefix `SchoolBot` และมีฟิลด์มาตรฐานทั้งหก",
+      "requirement": "req-033.md",
+      "case_ids": [
+        "TP001-052",
+        "TP001-053"
+      ],
+      "implementation": [
+        {
+          "id": "DBA-001",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-003",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-033-05",
+      "expected": "จาก catalog เดียวกัน PK ของตาราง SchoolBot ใหม่และ FK ที่อ้าง PK เหล่านั้นเป็น int4 ตรงกันทุกคู่",
+      "requirement": "req-033.md",
+      "case_ids": [
+        "TP001-052",
+        "TP001-053"
+      ],
+      "implementation": [
+        {
+          "id": "DBA-001",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-003",
+          "role": "vault"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-01",
+      "expected": "ครั้งแรกไม่มีอินเทอร์เน็ต เข้าโหมดหลักไม่ได้แม้กรอก Key แล้ว",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-002"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-02",
+      "expected": "ตรวจออนไลน์ได้ Active แล้วเข้าใช้งานได้และมีสิทธิ์ในเครื่อง",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-004"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-03",
+      "expected": "ออฟไลน์ภายใน 3 วันจากตรวจสำเร็จล่าสุดใช้งานได้; เปิดซ้ำไม่เลื่อนวันสิ้นสุด",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-003"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-04",
+      "expected": "ครบ 3 วันและติดต่อเซิร์ฟเวอร์ไม่ได้ เข้าโหมดหลักไม่ได้และแจ้งให้ต่ออินเทอร์เน็ต",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-003"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-05",
+      "expected": "ตรวจ Key เดิมออนไลน์ได้ Active อีกครั้ง แล้วต่อสิทธิ์ 3 วันจากการตรวจครั้งใหม่",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-004"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-034-06",
+      "expected": "ได้ผล Key ไม่ Active แล้วไม่ต่อสิทธิ์หรือใช้ค่าเดิมข้ามผลปฏิเสธเพื่อปลดล็อก",
+      "requirement": "req-034.md",
+      "case_ids": [
+        "TP001-004"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-035-01",
+      "expected": "ผู้ไม่มีสิทธิ์ผู้ดูแลขอปลดเครื่องแล้วถูกปฏิเสธ และการผูกเครื่องไม่เปลี่ยน",
+      "requirement": "req-035.md",
+      "case_ids": [
+        "TP001-009"
+      ],
+      "implementation": [
+        {
+          "id": "BE-005",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-035-02",
+      "expected": "ผู้ดูแลปลด A แล้ว B เปิดใช้ Key เดิมได้ทันที แม้ A ยังมีสิทธิ์ออฟไลน์เหลือ โดยไม่สร้าง License ใหม่",
+      "requirement": "req-035.md",
+      "case_ids": [
+        "TP001-009"
+      ],
+      "implementation": [
+        {
+          "id": "BE-005",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-035-03",
+      "expected": "B ต้องเปิดใช้ Key ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ออฟไลน์ของ A แทน",
+      "requirement": "req-035.md",
+      "case_ids": [
+        "TP001-009"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-035-04",
+      "expected": "หลัง Key ผูกกับ B แล้ว A ตรวจออนไลน์ไม่ผ่านและไม่ได้สิทธิ์ออฟไลน์รอบใหม่",
+      "requirement": "req-035.md",
+      "case_ids": [
+        "TP001-009"
+      ],
+      "implementation": [
+        {
+          "id": "BE-005",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-035-05",
+      "expected": "A ที่ออฟไลน์ยังใช้ได้ก่อนสิทธิ์เดิมหมด แต่ครบกำหนดแล้วเข้าโหมดหลักไม่ได้; การย้ายไม่เลื่อนกำหนดเดิม",
+      "requirement": "req-035.md",
+      "case_ids": [
+        "TP001-010"
+      ],
+      "implementation": [
+        {
+          "id": "BE-007",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-036-01",
+      "expected": "Guest ที่มี License บันทึกและเปิดหลายงานทั้งสามโหมดในเครื่องได้โดยไม่ต้อง Login",
+      "requirement": "req-036.md",
+      "case_ids": [
+        "TP001-021"
+      ],
+      "implementation": [
+        {
+          "id": "BE-009",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-002",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-036-02",
+      "expected": "นักเรียนและครู Login ด้วยบัญชีเดิมและ License แล้วบันทึก/เปิดโครงงาน Cloud ของตนได้",
+      "requirement": "req-036.md",
+      "case_ids": [
+        "TP001-022",
+        "TP001-023"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-036-03",
+      "expected": "Restart บริการแล้ว Login บัญชีเดิมยังเรียกโครงงานที่บันทึกสำเร็จได้",
+      "requirement": "req-036.md",
+      "case_ids": [
+        "TP001-008"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-036-04",
+      "expected": "บันทึก Cloud ไม่สำเร็จแล้วแจ้งความล้มเหลว ไม่แสดงว่า Cloud บันทึกสำเร็จหรือผูกงานกับบัญชีอื่น",
+      "requirement": "req-036.md",
+      "case_ids": [
+        "TP001-022"
+      ],
+      "implementation": [
+        {
+          "id": "BE-008",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-036-05",
+      "expected": "ครูทดลองภารกิจ/ข้อสอบ local และเก็บโครงงาน Cloud ได้ แต่ส่ง submission/attempt ไป Cloud ทั้งทางตรงและนำเข้าประวัติไม่ได้; ไม่เกิดผลเรียนหรือคะแนน Cloud ของครู",
+      "requirement": "req-036.md",
+      "case_ids": [
+        "TP001-024"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "BE-031",
+          "role": "sys"
+        },
+        {
+          "id": "FE-021",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-001",
+          "role": "check"
+        },
+        {
+          "id": "QA-011",
+          "role": "check"
+        },
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-01",
+      "expected": "เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง Mode ได้ แม้อยู่ใน Course/Lesson เดียวกัน",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-054"
+      ],
+      "implementation": [
+        {
+          "id": "FE-013",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-02",
+      "expected": "เปิด Lesson แล้วเห็นเป้าหมาย คำแนะนำ และรายการ Activity ตรงกับบทเรียนที่เลือก",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-054"
+      ],
+      "implementation": [
+        {
+          "id": "BE-015",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-03",
+      "expected": "งานและผลภารกิจอ้าง Activity, Mode, Lesson และ revision ที่เรียนถูกต้อง ไม่ปะปนข้ามโหมดหรือฉบับ",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-054"
+      ],
+      "implementation": [
+        {
+          "id": "BE-015",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-04",
+      "expected": "เพียงเปิดหรือกดปิดบทเรียนไม่สร้างผลผ่านจริงโดยไม่มีการประเมินตาม REQ-038",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-055"
+      ],
+      "implementation": [
+        {
+          "id": "BE-015",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-05",
+      "expected": "เมื่อยังไม่มีหลักฐานอนุมัติเนื้อหาและเกณฑ์ บทเรียนนั้นไม่ถูกเสนอเป็นบทเรียนจริงที่อนุมัติแล้ว",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-055"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        },
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-037-06",
+      "expected": "กิจกรรมภารกิจจริงทุกโหมดอ้างกลับไปยังเนื้อหา ภารกิจ เกณฑ์ และหลักฐานผู้อนุมัติ revision ที่ใช้ได้",
+      "requirement": "req-037.md",
+      "case_ids": [
+        "TP001-055"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        },
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-038-01",
+      "expected": "Code/Block ที่มีเกณฑ์ภารกิจกำหนดแล้วได้รับผลอัตโนมัติตรงกับตัวอย่างผ่านและไม่ผ่านของเกณฑ์นั้น",
+      "requirement": "req-038.md",
+      "case_ids": [
+        "TP001-056"
+      ],
+      "implementation": [
+        {
+          "id": "BE-016",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-038-02",
+      "expected": "ส่งภารกิจ Arm แล้วไม่กลายเป็นผ่านเองก่อนมีผลตรวจจากครู",
+      "requirement": "req-038.md",
+      "case_ids": [
+        "TP001-057"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-038-03",
+      "expected": "ครูที่มีสิทธิ์บันทึกผล Arm แล้วเรียกดูผลที่บันทึก พร้อมผู้ตรวจและงานที่ตรวจได้",
+      "requirement": "req-038.md",
+      "case_ids": [
+        "TP001-057"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-038-04",
+      "expected": "ผล Cloud อ้างนักเรียน Activity/Mode/revision และงานถูกต้อง ไม่ปนผลครู/ดาวตัวอย่าง",
+      "requirement": "req-038.md",
+      "case_ids": [
+        "TP001-057"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-038-05",
+      "expected": "ครูตรวจ Arm ของนักเรียนนอกรายชื่อที่ได้รับมอบหมายหรือข้ามโรงเรียนไม่ได้ แม้อยู่ห้องเดียวกันหรือรู้รหัสงาน; ผลเดิมไม่เปลี่ยน",
+      "requirement": "req-038.md",
+      "case_ids": [
+        "TP001-058"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-039-01",
+      "expected": "นักเรียน Login ทำภารกิจและได้ผลแล้ว เปิดครั้งถัดไปยังเห็นผล/ความคืบหน้าของตน; ไม่ปนผลทดลองครู",
+      "requirement": "req-039.md",
+      "case_ids": [
+        "TP001-059"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-039-02",
+      "expected": "ครูที่มีสิทธิ์เห็นสถานะและผลตรงกับประวัติจริงของผู้เรียนที่รับผิดชอบ",
+      "requirement": "req-039.md",
+      "case_ids": [
+        "TP001-059"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-039-03",
+      "expected": "ภารกิจ Arm ที่ยังไม่ตรวจแสดงแยกจากภารกิจที่ครูยืนยันผลแล้ว",
+      "requirement": "req-039.md",
+      "case_ids": [
+        "TP001-059"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-039-04",
+      "expected": "ผล Block/Arm/Code ของผู้เรียนไม่ปะปนกับบัญชีอื่นหรือค่าจาก scenario",
+      "requirement": "req-039.md",
+      "case_ids": [
+        "TP001-059"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-039-05",
+      "expected": "ครูขอดูรายชื่อหรือผลนักเรียนนอกที่ได้รับมอบหมาย รวมข้ามโรงเรียนแล้วไม่เห็นข้อมูลนั้น แม้อยู่ห้องเดียวกันหรือทราบรหัสนักเรียน",
+      "requirement": "req-039.md",
+      "case_ids": [
+        "TP001-058"
+      ],
+      "implementation": [
+        {
+          "id": "BE-017",
+          "role": "sys"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-004",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-01",
+      "expected": "ผู้ใช้สองคนใช้ Guest ใน OS account เดียวกัน เปิดงานที่อีกคนบันทึกไว้ได้ทั้ง Block/Arm/Code โดยไม่ขอ PIN แยก",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-025"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-02",
+      "expected": "จบใช้งานและเปิดใหม่ รวมเมื่อผ่าน 30 วัน งานที่ไม่เคยสั่งลบยังเปิดได้",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-025"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-03",
+      "expected": "ส่งออกงานแต่ละโหมดแล้วได้ไฟล์ที่เปิดกลับได้เนื้อหาเดิม และต้นฉบับ Guest ยังอยู่",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-025"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-04",
+      "expected": "สั่งลบงานแล้วงานออกจากรายการปกติและอยู่ในถังขยะ ไม่แสดงว่าลบถาวรแล้ว",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-026"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-05",
+      "expected": "กู้คืนงานก่อนครบ 30 วันนับจากสั่งลบ แล้วเปิดได้โหมด/เนื้อหาเดิม",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-026"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-040-06",
+      "expected": "เปิดระบบโดยมีงานในถังขยะครบ 30 วันแล้ว งานนั้นถูกลบถาวรอัตโนมัติและกู้ไม่ได้ งานปกติยังอยู่",
+      "requirement": "req-040.md",
+      "case_ids": [
+        "TP001-026"
+      ],
+      "implementation": [
+        {
+          "id": "BE-024",
+          "role": "sys"
+        },
+        {
+          "id": "FE-017",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-041-01",
+      "expected": "มีงาน Guest หลายงานแล้ว Login โดยไม่สั่งนำเข้า ไม่เกิดงานเหล่านั้นในบัญชี",
+      "requirement": "req-041.md",
+      "case_ids": [
+        "TP001-027"
+      ],
+      "implementation": [
+        {
+          "id": "BE-025",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-041-02",
+      "expected": "เลือกงาน A แล้วนำเข้า บัญชีเปิด A ได้โหมดและเนื้อหาตรงต้นทาง; งาน B ที่ไม่เลือกไม่ถูกนำเข้า",
+      "requirement": "req-041.md",
+      "case_ids": [
+        "TP001-027"
+      ],
+      "implementation": [
+        {
+          "id": "BE-025",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-041-03",
+      "expected": "หลังนำเข้าแต่ละโหมดสำเร็จ เปิดต้นฉบับใน Guest ได้เนื้อหาเดิม งานอื่นทั้งสองพื้นที่ไม่ถูกทับ",
+      "requirement": "req-041.md",
+      "case_ids": [
+        "TP001-027"
+      ],
+      "implementation": [
+        {
+          "id": "BE-025",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-041-04",
+      "expected": "นำเข้างานเดิมซ้ำในบัญชีเดิม รวม retry หลังคำตอบสูญหาย/เปิดแอปใหม่ ไม่เกิดสำเนา Cloud เพิ่มจากคำสั่งเดิม",
+      "requirement": "req-041.md",
+      "case_ids": [
+        "TP001-028"
+      ],
+      "implementation": [
+        {
+          "id": "BE-025",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-041-05",
+      "expected": "เมื่อบันทึกนำเข้าล้มเหลว ไม่แสดงว่างานนั้นสำเร็จ ต้นฉบับยังเปิดได้ และงานไม่ถูกผูกบัญชีอื่น",
+      "requirement": "req-041.md",
+      "case_ids": [
+        "TP001-028"
+      ],
+      "implementation": [
+        {
+          "id": "BE-025",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-01",
+      "expected": "Guest ทำภารกิจแล้วเปิดแอปใหม่ ยังเรียกประวัติและความคืบหน้า local ของภารกิจนั้นได้",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-029"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-02",
+      "expected": "Login หรือนำเข้าเฉพาะโครงงาน ไม่สร้างผลจากประวัติ Guest ในบัญชีจนเลือกย้ายประวัติ",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-029"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-03",
+      "expected": "เลือกย้ายประวัติ A เท่านั้น แล้วมีเฉพาะ A เข้ากระบวนการตรวจใหม่ในบัญชีปัจจุบัน ไม่ย้าย B ที่ไม่เลือก",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-029"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-04",
+      "expected": "เปลี่ยน client ให้รายงานผ่าน แต่ชิ้นงาน Code/Block ไม่ผ่านเกณฑ์ ตรวจใหม่แล้วไม่ให้ผ่านตามค่าที่ client ส่ง",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-030"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-05",
+      "expected": "ย้ายประวัติ Arm แล้วแสดงรอครูตรวจ ไม่นับผ่านก่อนครูที่มีสิทธิ์บันทึกผล; ตรวจใหม่ล้มเหลวก็ไม่ผ่านเอง",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-030"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-042-06",
+      "expected": "เปิดประวัติที่ย้ายแล้วแยกผล Guest กับผลตรวจใหม่ได้ อ้างภารกิจ/งานถูกต้อง และไม่แสดง Guest ว่าเป็นตัวตนผู้เรียนที่ยืนยันแล้ว",
+      "requirement": "req-042.md",
+      "case_ids": [
+        "TP001-030"
+      ],
+      "implementation": [
+        {
+          "id": "BE-026",
+          "role": "sys"
+        },
+        {
+          "id": "FE-018",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-011",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-043-01",
+      "expected": "ส่วนกลางสร้าง/แก้หลักสูตรได้; บัญชีโรงเรียนเลือกใช้ได้แต่แก้เนื้อหากลางไม่ได้",
+      "requirement": "req-043.md",
+      "case_ids": [
+        "TP001-060"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "BE-039",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-043-02",
+      "expected": "เปิด Course แล้วเห็น Level ระดับชั้นเริ่มต้น วิชาที่ผูก และ Lesson/Activity ของมัน",
+      "requirement": "req-043.md",
+      "case_ids": [
+        "TP001-060"
+      ],
+      "implementation": [
+        {
+          "id": "BE-029",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-043-03",
+      "expected": "ห้องใช้ Level ต่างจากค่าเริ่มต้นของระดับชั้นได้ โดยยังอ้าง Level ที่เลือก",
+      "requirement": "req-043.md",
+      "case_ids": [
+        "TP001-060"
+      ],
+      "implementation": [
+        {
+          "id": "BE-029",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-043-04",
+      "expected": "Lesson เดียวเปิด Activity ครบชนิดใน BR-043-03 และภารกิจสาม Mode ได้ โดยแต่ละภารกิจใช้ Mode ของตน",
+      "requirement": "req-043.md",
+      "case_ids": [
+        "TP001-060"
+      ],
+      "implementation": [
+        {
+          "id": "BE-029",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-044-01",
+      "expected": "สลับลำดับ Lesson ผ่านข้อมูลแล้วลำดับเปลี่ยน รหัสและการอ้างผลเดิมคงเดิม โดยไม่แก้โค้ด",
+      "requirement": "req-044.md",
+      "case_ids": [
+        "TP001-061"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-044-02",
+      "expected": "แก้เนื้อหาฉบับร่างแล้วเปิดดูเนื้อหาใหม่ได้โดยไม่แก้โค้ด",
+      "requirement": "req-044.md",
+      "case_ids": [
+        "TP001-061"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-044-03",
+      "expected": "revision ที่ไม่มีหลักฐานอนุมัติเผยแพร่ไม่ได้; ฉบับเผยแพร่ตรวจผู้อนุมัติและที่มาได้",
+      "requirement": "req-044.md",
+      "case_ids": [
+        "TP001-061"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-044-04",
+      "expected": "เมื่อ publish revision ใหม่ ผู้เรียนเดิมยังเปิดฉบับเดิมและดูผลเดิมได้",
+      "requirement": "req-044.md",
+      "case_ids": [
+        "TP001-061"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-044-05",
+      "expected": "ขอแก้ฉบับ publish แล้วฉบับเดิมไม่เปลี่ยน; เนื้อหาที่แก้อยู่ใน revision ใหม่",
+      "requirement": "req-044.md",
+      "case_ids": [
+        "TP001-061"
+      ],
+      "implementation": [
+        {
+          "id": "BE-027",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-045-01",
+      "expected": "นำเข้าแถว D=TRUE แล้วเห็นเป็น draft พร้อมที่มาและความหมายว่าอนุมัติจากต้นทาง; ยังไม่เผยแพร่เอง",
+      "requirement": "req-045.md",
+      "case_ids": [
+        "TP001-062"
+      ],
+      "implementation": [
+        {
+          "id": "BE-028",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-045-02",
+      "expected": "เปลี่ยนเฉพาะ O ในข้อมูลทดสอบแล้วข้อมูลหลักสูตรที่นำเข้าไม่เปลี่ยน",
+      "requirement": "req-045.md",
+      "case_ids": [
+        "TP001-062"
+      ],
+      "implementation": [
+        {
+          "id": "BE-028",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-045-03",
+      "expected": "แถวที่มีสื่อทั้งสองชุดแสดงสื่อครบภายใต้ Lesson เดิม โดยไม่เกิด Course/Level ใหม่จาก P–X",
+      "requirement": "req-045.md",
+      "case_ids": [
+        "TP001-062"
+      ],
+      "implementation": [
+        {
+          "id": "BE-028",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-045-04",
+      "expected": "นำเข้าแถวที่เลข C ไม่ตรง Unit ในชื่อแผนแล้วแสดงรหัส Lesson แยกจากทั้งสองค่า; สลับลำดับแล้วรหัสเดิมคงเดิม",
+      "requirement": "req-045.md",
+      "case_ids": [
+        "TP001-062"
+      ],
+      "implementation": [
+        {
+          "id": "BE-028",
+          "role": "sys"
+        },
+        {
+          "id": "FE-019",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-012",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-01",
+      "expected": "เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-063"
+      ],
+      "implementation": [
+        {
+          "id": "BE-030",
+          "role": "sys"
+        },
+        {
+          "id": "FE-020",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-02",
+      "expected": "Quiz/Test ที่ไม่ปรับค่าใช้ BR-046-05; เมื่อใช้ policy ที่กำหนด ระบบจำกัดครั้ง/เวลาและเปิดเฉลยตรงค่า",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-063"
+      ],
+      "implementation": [
+        {
+          "id": "BE-031",
+          "role": "sys"
+        },
+        {
+          "id": "FE-021",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-03",
+      "expected": "รายการที่กำหนดสุ่มข้อ แสดงประวัติชุดและลำดับข้อที่ผู้เรียนได้รับจริงได้",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-064"
+      ],
+      "implementation": [
+        {
+          "id": "BE-031",
+          "role": "sys"
+        },
+        {
+          "id": "FE-021",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-04",
+      "expected": "แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot และเกณฑ์เดิม ผลเดิมไม่เปลี่ยน",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-064"
+      ],
+      "implementation": [
+        {
+          "id": "BE-030",
+          "role": "sys"
+        },
+        {
+          "id": "FE-020",
+          "role": "front"
+        },
+        {
+          "id": "FE-021",
+          "role": "front"
+        },
+        {
+          "id": "UX-005",
+          "role": "int"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-05",
+      "expected": "ครูแก้เวลาสอบ/ช่วงเปิด–ปิดได้; แก้จำนวนครั้ง/สุ่ม/เวลาเฉลยหรือข้อ/เฉลยไม่ได้ ค่าเดิมคงอยู่",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-063"
+      ],
+      "implementation": [
+        {
+          "id": "BE-032",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-046-06",
+      "expected": "เปิดซ่อมให้ A แล้ว B ไม่ได้สิทธิ์; A ได้ 6/10 ซ่อม 9/10 ใช้ 9/10 ไม่มีเพดานลด; ซ่อมต่ำกว่าเดิมคงค่าสูงสุด",
+      "requirement": "req-046.md",
+      "case_ids": [
+        "TP001-065"
+      ],
+      "implementation": [
+        {
+          "id": "BE-032",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-013",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-047-01",
+      "expected": "ครูตั้ง A ให้นับ Quiz และ B ไม่นับ แล้วเห็นค่ารายหลักสูตร; แต่ละชุดน้ำหนักบันทึกใช้ได้เมื่อรวม 100% เท่านั้น",
+      "requirement": "req-047.md",
+      "case_ids": [
+        "TP001-066"
+      ],
+      "implementation": [
+        {
+          "id": "BE-033",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-047-02",
+      "expected": "Quiz ของ B มีผลให้ดูและน้ำหนัก 0; เปลี่ยนคะแนน Quiz อย่างเดียวแล้วคะแนนรวม B ไม่เปลี่ยน",
+      "requirement": "req-047.md",
+      "case_ids": [
+        "TP001-066"
+      ],
+      "implementation": [
+        {
+          "id": "BE-033",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-047-03",
+      "expected": "ครูกำหนดสัดส่วน A แล้วเรียกดูสัดส่วนที่บันทึกได้ โดยไม่เปลี่ยน B",
+      "requirement": "req-047.md",
+      "case_ids": [
+        "TP001-066"
+      ],
+      "implementation": [
+        {
+          "id": "BE-033",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-047-04",
+      "expected": "กิจกรรม 8/10 น้ำหนัก 20%, Quiz 6/10 น้ำหนัก 30%, Test 18/20 น้ำหนัก 50% ได้รวม 79/100 และแสดงส่วน 16+18+45 (ตัวเลขทดสอบจากสูตร ไม่ใช่ค่าเริ่ม)",
+      "requirement": "req-047.md",
+      "case_ids": [
+        "TP001-067"
+      ],
+      "implementation": [
+        {
+          "id": "BE-033",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-047-05",
+      "expected": "เปลี่ยนน้ำหนักจาก 20/30/50 เป็น 30/20/50 แล้ว CourseRun เดิมยังได้ 79/100 ด้วยค่าเดิม; CourseRun ใหม่ใช้ค่าใหม่ได้ 81/100 เมื่อคะแนนเท่ากัน",
+      "requirement": "req-047.md",
+      "case_ids": [
+        "TP001-067"
+      ],
+      "implementation": [
+        {
+          "id": "BE-033",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-048-01",
+      "expected": "สิ้นเทอม roster 2 คนได้คะแนนรวม 80 และ 0 เพราะขาดทุกงาน ระบบแสดงเฉลี่ย 40 ไม่เสนอเลื่อนที่เกณฑ์ 70; ถ้าเฉลี่ยสูงกว่าเกณฑ์จึงเสนอพร้อมค่าเฉลี่ย/เกณฑ์",
+      "requirement": "req-048.md",
+      "case_ids": [
+        "TP001-068"
+      ],
+      "implementation": [
+        {
+          "id": "BE-034",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-048-02",
+      "expected": "ก่อนครูยืนยัน Level ของห้องและนักเรียนทุกคนยังไม่เปลี่ยน",
+      "requirement": "req-048.md",
+      "case_ids": [
+        "TP001-068"
+      ],
+      "implementation": [
+        {
+          "id": "BE-034",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-048-03",
+      "expected": "ครูยืนยันข้อเสนอสิ้นเทอมแล้ว เทอมปัจจุบันไม่เปลี่ยน; เทอมถัดไปทั้งห้องเริ่ม Level ใหม่เดียวกัน ไม่เลือกบางคน",
+      "requirement": "req-048.md",
+      "case_ids": [
+        "TP001-068"
+      ],
+      "implementation": [
+        {
+          "id": "BE-034",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-048-04",
+      "expected": "เฉลี่ยเท่ากับหรือต่ำกว่าเกณฑ์ไม่เสนอเลื่อน เทอมถัดไปอยู่ Level เดิมและแสดงส่วนที่ขาด (เท่ากันแสดง 0)",
+      "requirement": "req-048.md",
+      "case_ids": [
+        "TP001-068"
+      ],
+      "implementation": [
+        {
+          "id": "BE-034",
+          "role": "sys"
+        },
+        {
+          "id": "FE-022",
+          "role": "front"
+        },
+        {
+          "id": "UX-007",
+          "role": "int"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-014",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-049-01",
+      "expected": "admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม; สร้างช่องใหม่ไม่ได้ ครูสร้าง/แก้ mapping ไม่ได้",
+      "requirement": "req-049.md",
+      "case_ids": [
+        "TP001-069"
+      ],
+      "implementation": [
+        {
+          "id": "BE-035",
+          "role": "sys"
+        },
+        {
+          "id": "FE-023",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-049-02",
+      "expected": "กิจกรรม A แมพช่องวิชา X และ Y ได้; แมพ B ซ้ำช่องใดของ A ในบริบทเดียวกันถูกปฏิเสธ ทั้งแก้ชุดเดิมและสร้างชุดใหม่",
+      "requirement": "req-049.md",
+      "case_ids": [
+        "TP001-070"
+      ],
+      "implementation": [
+        {
+          "id": "BE-035",
+          "role": "sys"
+        },
+        {
+          "id": "FE-023",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-049-03",
+      "expected": "สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ",
+      "requirement": "req-049.md",
+      "case_ids": [
+        "TP001-069"
+      ],
+      "implementation": [
+        {
+          "id": "BE-035",
+          "role": "sys"
+        },
+        {
+          "id": "FE-023",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-049-04",
+      "expected": "Preview ตรงคู่กิจกรรม–ช่องที่แมพ ไม่เพิ่มช่อง/เดาหมวดเอง",
+      "requirement": "req-049.md",
+      "case_ids": [
+        "TP001-069"
+      ],
+      "implementation": [
+        {
+          "id": "BE-035",
+          "role": "sys"
+        },
+        {
+          "id": "FE-023",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-049-05",
+      "expected": "mapping ที่ส่งแล้วแก้คู่เดิมไม่ได้; เปลี่ยนใช้ชุดใหม่ คู่/คะแนนที่ส่งแล้วคงเดิม และยังห้ามช่องซ้ำ",
+      "requirement": "req-049.md",
+      "case_ids": [
+        "TP001-070"
+      ],
+      "implementation": [
+        {
+          "id": "BE-035",
+          "role": "sys"
+        },
+        {
+          "id": "FE-023",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-050-01",
+      "expected": "preview ตรวจค่าเดิม/ใหม่และปลายทางตาม BR-050-02/03 ได้; คนไม่มีผลแสดงข้าม ไม่เสนอ 0 ทับค่าเดิม",
+      "requirement": "req-050.md",
+      "case_ids": [
+        "TP001-071"
+      ],
+      "implementation": [
+        {
+          "id": "BE-036",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-050-02",
+      "expected": "ก่อนยืนยันหรือเมื่อออกจาก preview โดยไม่ยืนยัน คะแนนปลายทางไม่เปลี่ยน",
+      "requirement": "req-050.md",
+      "case_ids": [
+        "TP001-072"
+      ],
+      "implementation": [
+        {
+          "id": "BE-036",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-050-03",
+      "expected": "กิจกรรม 8/10 ไปช่องเต็ม 20 ได้ 16; 3/4 ไปช่องเต็ม 10 ได้ 8 (7.5 half-up); ช่องเต็ม 12 ได้ 9 โดยแต่ละช่องคำนวณจากต้นทาง และค่าที่ส่งตรง preview",
+      "requirement": "req-050.md",
+      "case_ids": [
+        "TP001-071"
+      ],
+      "implementation": [
+        {
+          "id": "BE-036",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-050-04",
+      "expected": "เปลี่ยนคะแนนต้นทางหรือ mapping หลัง preview แล้วส่งค่าใหม่ด้วยการยืนยัน preview เก่าไม่ได้",
+      "requirement": "req-050.md",
+      "case_ids": [
+        "TP001-071"
+      ],
+      "implementation": [
+        {
+          "id": "BE-036",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-051-01",
+      "expected": "ครูแก้ช่อง SchoolBot หลังส่งรอบก่อนแล้วส่งอีกครั้ง ระบบหยุดและแสดงรายการชนก่อนเปลี่ยนคะแนน",
+      "requirement": "req-051.md",
+      "case_ids": [
+        "TP001-072"
+      ],
+      "implementation": [
+        {
+          "id": "BE-037",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-051-02",
+      "expected": "เลือกทับนักเรียน A และคงค่า B แล้วยืนยันอีกครั้ง A ได้ค่าที่เสนอ B คงค่าครู",
+      "requirement": "req-051.md",
+      "case_ids": [
+        "TP001-072"
+      ],
+      "implementation": [
+        {
+          "id": "BE-037",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-051-03",
+      "expected": "แก้ปลายทางหลัง preview หรือหลังเลือกแก้ชนแล้ว ระบบหยุดให้ตรวจใหม่ ไม่เขียนทับค่าล่าสุดเงียบ",
+      "requirement": "req-051.md",
+      "case_ids": [
+        "TP001-072"
+      ],
+      "implementation": [
+        {
+          "id": "BE-037",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-051-04",
+      "expected": "ส่งคะแนนในข้อมูลที่มีช่องครู override และผลพิเศษแล้วค่าคุ้มครองคงเดิม ไม่มีการแทนด้วยศูนย์",
+      "requirement": "req-051.md",
+      "case_ids": [
+        "TP001-073"
+      ],
+      "implementation": [
+        {
+          "id": "BE-037",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-051-05",
+      "expected": "A ยังไม่มีผลกิจกรรมแต่ช่องเดิมมี 5 ส่งแล้วคง 5 และแสดงข้าม; เมื่อมีผลจึงส่งภายหลังตาม REQ-050/052 ได้; คนที่มีผลจริง 0 ไม่ถูกข้ามเพราะคะแนนเป็น 0",
+      "requirement": "req-051.md",
+      "case_ids": [
+        "TP001-073"
+      ],
+      "implementation": [
+        {
+          "id": "BE-036",
+          "role": "sys"
+        },
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-015",
+          "role": "check"
+        },
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-052-01",
+      "expected": "ครูไม่มีสิทธิ์วิชา/ห้อง ข้ามโรงเรียน/เทอม หรือปลายทางล็อก ส่งแล้วถูกปฏิเสธและคะแนนไม่เปลี่ยน",
+      "requirement": "req-052.md",
+      "case_ids": [
+        "TP001-074"
+      ],
+      "implementation": [
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-052-02",
+      "expected": "สิทธิ์/ล็อกเปลี่ยนหลัง preview แล้วการยืนยันเดิมเขียนคะแนนไม่ได้",
+      "requirement": "req-052.md",
+      "case_ids": [
+        "TP001-074"
+      ],
+      "implementation": [
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-052-03",
+      "expected": "ส่งรายการเดิมซ้ำรวมกรณีไม่ทราบผลครั้งก่อน คะแนนไม่บวกซ้ำและไม่เกิดผลซ้ำ",
+      "requirement": "req-052.md",
+      "case_ids": [
+        "TP001-075"
+      ],
+      "implementation": [
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-052-04",
+      "expected": "เมื่อส่งสำเร็จบางรายการ ระบบแสดงผลจริงแยกรายการ; ส่งต่อส่วนค้างไม่ทำให้ส่วนสำเร็จซ้ำ",
+      "requirement": "req-052.md",
+      "case_ids": [
+        "TP001-075"
+      ],
+      "implementation": [
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    },
+    {
+      "id": "AC-052-05",
+      "expected": "ตรวจรายการส่งแล้วพบ audit ครบ BR-052-03; ผลรวม/เกรดตรงตัวอย่างกฎเดิมและช่องอื่นคงเดิม",
+      "requirement": "req-052.md",
+      "case_ids": [
+        "TP001-076"
+      ],
+      "implementation": [
+        {
+          "id": "BE-037",
+          "role": "sys"
+        },
+        {
+          "id": "BE-038",
+          "role": "sys"
+        },
+        {
+          "id": "FE-024",
+          "role": "front"
+        },
+        {
+          "id": "UX-006",
+          "role": "int"
+        },
+        {
+          "id": "SA-004",
+          "role": "arch"
+        },
+        {
+          "id": "DBA-007",
+          "role": "vault"
+        }
+      ],
+      "validation": [
+        {
+          "id": "QA-016",
+          "role": "check"
+        }
+      ],
+      "actual": "NOT_RUN"
+    }
+  ]
+}
