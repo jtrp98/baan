@@ -57,3 +57,15 @@
 | [schoolbot.dbml Rev3](archive/2026-10-23-before-dbml-notes/schoolbot.dbml) | 45503 | `8ab66eb5002fefade1ca405ac2192ba2e41b239f7c93c784f69fcc633cfbd3eb` |
 
 - 2026-10-23 — เก็บ byte-for-byte ก่อนเพิ่มคำอธิบาย Rev4; schema/FK ไม่เปลี่ยน
+
+## ก่อนรับ auth evidence — 2026-10-23
+
+สำเนา byte-for-byte ก่อนแก้ข้อเท็จจริงตาม arch ใบงาน020; สัญญา/schema เดิม
+
+| ฉบับเดิม | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [des-012.md](archive/2026-10-23-before-auth-evidence-001/des-012.md) | 12988 | `c8d23be9839c4d0d23d7dd48878b948c416f3644a8ea68af1ce496bafa4d4aeb` |
+| [des-004.md](archive/2026-10-23-before-auth-evidence-001/des-004.md) | 20066 | `4ae285412982496db9d9b30cec928375280a0f1968af3e3ed87b50ff10468354` |
+| [index.md](archive/2026-10-23-before-auth-evidence-001/index.md) | 18898 | `194f8d0c4870c6b9d709ba086f699adc0fa4e19b641145004dc22bdd1a44c3ef` |
+
+- 2026-10-23 — นายช่างตรวจสำเนา/hash ก่อน apply edits ของ arch
