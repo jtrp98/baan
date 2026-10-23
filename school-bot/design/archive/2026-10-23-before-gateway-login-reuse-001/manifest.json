@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-23",
+  "reason": "task-032 gateway Login reuse override; verbatim before amend",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/des-004.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-login-reuse-001/des-004.md",
+      "bytes": 20770,
+      "sha256": "bd4b1ce80bc1ff4120dc2f778f484daa1586c22b7d1d9c8fa6f5f691a6e90e8a"
+    },
+    {
+      "source": "knowledge/school-bot/design/des-012.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-login-reuse-001/des-012.md",
+      "bytes": 19937,
+      "sha256": "63b13fff4d2f8c62e9ff1eaf43d29f74101f6be7c9d5da9dd1f55b6a7325da79"
+    },
+    {
+      "source": "knowledge/school-bot/design/gateway-integration-001.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-login-reuse-001/gateway-integration-001.md",
+      "bytes": 18623,
+      "sha256": "2712bf532db3687261060c96b8b13c02f004bed58b66f7152d288f37e9ff4739"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "knowledge/school-bot/design/archive/2026-10-23-before-gateway-login-reuse-001/index.md",
+      "bytes": 20419,
+      "sha256": "315c6609404447ea7925ea6bbdb0bb1252c90d6e52e1336ca0a2dc56302b46a1"
+    }
+  ]
+}

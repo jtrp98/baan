@@ -1,4 +1,4 @@
-# Gateway integration — Rev1
+# Gateway integration — Rev2
 
 วันที่2026-10-23 · ใบงาน029 · สถานะอยู่ที่ [index](index.md)
 
@@ -97,6 +97,11 @@ Task: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ 
    - **S5 (Super admin เดิม)**: token `user_id=0, admin_id!=null` ของโรงเรียนที่ active → คงได้ `is_admin=true` สำหรับ `school_web` ของโรงเรียนนั้น แต่แลก `staff_admin` ไม่ได้หากไม่มี `SchoolBotStaffRole`
    - **S6 (Body/Header ปลอม หรือ mapping ไม่พร้อม)**: ส่ง body/header ปลอม (`is_admin=true`, `x-school-id`, suffix ไม่ตรง) หรือระบบกลุ่ม/mapping ยังไม่ตั้งค่า → ปฏิเสธ (`401`/`403`) หรือ fail closed (`503 AUTH_NOT_CONFIGURED`)
 
+## Override Rev2 — H5 transport ต้อง owner review
+
+มีลำดับเหนือข้อเสนอ HTTP adapter/HttpClient และการปัด gRPC ด้านบน: `G/AGENTS.md:29` กำหนด REST→gRPC ไป service; `:35,37` กำหนด tenant จาก JWT และ Light review ส่วน hosting/auth pipeline. ข้อเสนอ relay opaque Bearer เดิมจึงมี owner-review gap ทั้ง transport/tenant boundary. คง topology ผ่าน G และ private introspection แยกจาก public service-route; ให้ G/Light กับ B ระบุวิธีที่สอดคล้องมาตรฐานหรือข้อยกเว้นที่ได้รับอนุมัติก่อน implement. ไม่สร้าง proxy/framework/proto หรือเลือก transport ใหม่ในงานนี้. Login เดิมและ local DI ports ไม่พิสูจน์ว่า SchoolBot route พร้อม ดู [reuse](gateway-login-reuse-001.md).
+
 ## Change Log
+- 2026-10-23 — Rev2: ใบงาน032 ระบุข้อขัดกัน HTTP relay กับกฎ G; คง035/C/H5 และไม่อนุมัติข้อยกเว้นแทน owner
 - 2026-10-23 — ใบงาน030: append override ตาม [decisions-035](../requirement/decisions-035.md) ยืนยันทาง A (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม), กฎ fail-closed และ test scenarios S1–S6; คง H5/technical proof/gates เดิม
 - 2026-10-23 — Rev1: ใบงาน029 รับ topology ผู้ใช้/legacy evidence และตรวจ gateway routing/auth แบบ read-only; แยก implementation จาก unknown คง gates เดิม ไม่มี tests/network probe/deploy

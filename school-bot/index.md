@@ -22,7 +22,12 @@
 | [planning/handoff-002.md](planning/handoff-002.md) | ผลส่งต่อหลักฐาน/ใบงาน run/ประวัติ planner เดิม — convention เฉพาะโปรเจกต์ | authต้นฉบับ/TP/spec/security/gmบันทึกแล้ว; สถานะรับGatewayและfinalvalidationอ่านในhandoff002 |
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
+เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
+
 ## Change Log
+
+- 2026-10-23 — ตรวจ Login Gateway ที่มีอยู่แล้วและรับ DES-004 Rev8/DES-012 Rev6/Gateway Rev2; ใช้ Gateway authentication ผ่าน adapter คง opaque session และ035 ไม่ปิด gate
+
 
 - 2026-10-23 — [decisions-035](requirement/decisions-035.md): ผู้ใช้เลือกตรวจกลุ่มแอดมิน/ผู้บริหารฝั่งserverและคงsuperadminเดิม; ปิดเฉพาะคำถามแหล่งis_admin ส่งarch syncสัญญา ไม่ปิดG-AUTH/H5/QA/security
 

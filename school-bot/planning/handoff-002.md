@@ -63,3 +63,9 @@ arch ใบงาน023: Claudeติดweeklylimit; AGY t1หมดเวลา
 คำถามนโยบายข้อนี้ปิด แต่ technicalproof TR-AUTH-02-rest/03..06, H5, implementationและgateตรวจรับอื่นยังค้าง. คิวต่อใช้queue003ร่วมกับมติ035; ไม่เปลี่ยนStatus110tasks/77casesNOT_RUN/Important6OPEN
 
 - 2026-10-23 — ผู้คุมรับมติ035และผลarchแบบread-only ตรวจเอกสารก่อนfinalknowledgecommitรอบนี้
+
+## รับ Login Gateway เดิม — ใบงาน031/032
+
+ผู้ใช้สั่งใช้ Codex โดยตรงและให้ดู Login ที่มีอยู่ก่อน. [ผลรับล่าสุด](gateway-login-receipt-001.md) และ [แบบ reuse](../design/gateway-login-reuse-001.md) มีลำดับเหนือข้อบังคับสร้าง LegacyCredentials verifier และ HTTP relay เดิมที่ขัดกัน. ยืนยันมี Login เดิมจาก source; Desktop adapter/identity, private principal และ H5 transport ยังมี technical gaps. คง C/มติ035/110tasks pending/77cases NOT_RUN/Important6 OPEN. ไม่แก้ source/SQL หรือเรียก Login จริง
+
+- 2026-10-23 — รับ sys/arch ผ่าน Codex ตามคำสั่งล่าสุด; Runner เดิม Claude→AGY→Codex ไม่ใช้กับรอบ031/032นี้
