@@ -47,15 +47,15 @@
 | DES-001 | Desktop host และ IPC (Rev1) | PROPOSED — รอ breaking review | [des-001.md](des-001.md) |
 | DES-002 | License และ device binding (Rev2) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
 | DES-003 | หลายโครงงาน Local/Cloud (Rev3) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
-| DES-004 | Identity และ school authorization (Rev5) | PROPOSED — sync decisions-027..030 และ db/review-005; รอหลักฐาน credential compatibility และการตัดสิน db/proposal-learnerkind.md | [des-004.md](des-004.md) |
-| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev5) | PROPOSED — sync decisions-027..030 และ db/review-005; รอเกณฑ์ numeric rubric/evaluator และการตัดสิน db/proposal-learnerkind.md | [des-005.md](des-005.md) |
+| DES-004 | Identity และ school authorization (Rev6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility | [des-004.md](des-004.md) |
+| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
 | DES-006 | หุ่นจริง Windows/macOS (Rev1) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
 | DES-007 | Release และ trusted update (Rev2) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
-| DES-008 | Mapping หลักสูตรกับช่องคะแนน SchoolBright (Rev3) | PROPOSED — sync decisions-027..030 และ db/review-005; รอ OQ-016 และ H5/web-principal | [des-008.md](des-008.md) |
-| DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev3) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
-| DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev3) | PROPOSED — sync decisions-025..030 และ db/review-005; รอ OQ-014 สูตรรวม, กรอบครูปรับ policy และการตัดสิน db/proposal-learnerkind.md | [des-010.md](des-010.md) |
-| DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev3) | PROPOSED — sync decisions-027..030 และ db/review-005; รอ OQ-014 สูตรรวม และตรวจแหล่ง roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
-| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev2) | PROPOSED — sync decisions-025..030 และ db/review-005; รอ H5 env/network และ endpoint web-principal ใน gateway | [des-012.md](des-012.md) |
+| DES-008 | Mapping หลักสูตรกับช่องคะแนน SchoolBright (Rev4) | PROPOSED — OQ-016 ตอบแล้ว; คง H5/web-principal | [des-008.md](des-008.md) |
+| DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
+| DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
+| DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
+| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev3) | PROPOSED — sync decisions-025..030 และ db/review-005; รอ H5 env/network และ endpoint web-principal ใน gateway | [des-012.md](des-012.md) |
 
 ### REQ mapping
 
@@ -110,7 +110,7 @@
 
 | ไฟล์ | เนื้อหา |
 |---|---|
-| [data-model.md](data-model.md) | คู่มือข้อมูล Rev6 — หน้าที่ตาราง/450 ฟิลด์ ตัวอย่าง และตารางเก่า; คง baseline Rev5 ตาม SQL 32 ตารางบน SchoolBot DB |
+| [data-model.md](data-model.md) | คู่มือข้อมูล Rev7 — หน้าที่ตาราง/450 ฟิลด์ ตัวอย่าง และตารางเก่า; คง baseline Rev5 ตาม SQL 32 ตารางบน SchoolBot DB |
 | [data-dictionary/index.md](data-dictionary/index.md) | สารบัญ 32 ตาราง: ทุกฟิลด์ ชนิด/NULL หน้าที่ ตัวอย่าง และ FK จาก SQL |
 | [data-legacy-001.md](data-legacy-001.md) | ตารางเดิมที่ใช้ ฟิลด์เชื่อม ขอบเขตอ่าน/เขียน และหลักฐาน source |
 | [data-fields-001.md](data-fields-001.md) | วิธีอ่าน PK/FK/NULL/JSON และฟิลด์ร่วม |
@@ -118,18 +118,19 @@
 | [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
-| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev5 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
+| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev6 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
 | [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy (Rev3 · CONFIRMED — อ้าง db/schoolbot_db.sql และ db/review-005.md (SchoolBot DB 10.0.0.128:9499, 32 ตาราง, ใช้บัญชี DB เดิมบน School DB/PGGradeDB)) |
-| [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev3 · PROPOSED) |
+| [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev4 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |
 | [os-compatibility-001.md](os-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ OS (Rev2 · EVIDENCE — target ถูกแทนโดย decisions-019; runtime proof ยังรอ) |
 | [windows10-compatibility-001.md](windows10-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ Windows 10 (Rev1 · HISTORICAL — ผู้ใช้ยุติ Windows10 target ตาม decisions-019) |
 | [amendment-proposal-001.md](amendment-proposal-001.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026) |
 | [amendment-proposal-002.md](amendment-proposal-002.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026 (แก้ 2 จุดตาม decisions-025)) |
-| [schoolbot.dbml](schoolbot.dbml) | DBML Rev4 — 32 ตาราง/450 ฟิลด์/40 FK; คำอธิบายไทยครบ กลุ่มสี 10 กลุ่ม; คง schema baseline เดิม |
-| [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพเชื่อม legacy: SchoolBot 10 + ตารางเดิม 14; FK จริง 4 / logical เส้นประ 12; ใช้อธิบาย ไม่ใช้สร้าง SQL |
+| [schoolbot.dbml](schoolbot.dbml) | DBML Rev5 — Notes032..034; ผู้คุมตรวจ parser/semantic ผ่านตาม dbml-review-002; 32 ตาราง/450 ฟิลด์/40 FK; คง schema baseline เดิม |
+| [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพเชื่อม legacy Rev2 (Notes; parser/semantic ผ่าน): SchoolBot 10 + ตารางเดิม 14; FK จริง 4 / logical เส้นประ 12; ใช้อธิบาย ไม่ใช้สร้าง SQL |
 | [dbml-guide-001.md](dbml-guide-001.md) | วิธีอ่านกลุ่มสี เส้นทึบ/ประ และข้อจำกัดของภาพ |
 | [dbml-review-001.md](dbml-review-001.md) | ผลตรวจ parser/ความครบถ้วน/เทียบ contract ก่อนและหลัง |
+| [dbml-review-002.md](dbml-review-002.md) | ผู้คุมตรวจ parser/semantic หลัง sync032..034; structural model/SQL เดิม |
 | [source-review-001.md](source-review-001.md) | หลักฐาน as-built จากการตรวจ source จริง: รายงาน as-built โหมด Block/Arm/Code และเส้นทางบทเรียน/สร้างงาน (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-002.md](source-review-002.md) | หลักฐาน as-built จากการตรวจ source จริง: บัญชี/profile และ EF context ใน academic (Rev2 · ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-003.md](source-review-003.md) | หลักฐาน as-built จากการตรวจ source จริง: โครงสร้าง Course Plan จาก Google Sheet (ย้ายมาจาก root วันที่ 2026-10-22) |
@@ -143,7 +144,16 @@
 | [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
 
+## ภาคผนวก canonical
+
+| ไฟล์ | เนื้อหา / สถานะ |
+|---|---|
+| [learning-rules-032-034.md](learning-rules-032-034.md) | Rev1 — profile/run/freeze/สูตร/override; มติยืนยันแล้ว รอตรวจ implementation |
+| [grade-rules-032-034.md](grade-rules-032-034.md) | Rev1 — mapping/partial/skip/recovery; คง release gates |
+
 ## Change Log
+- 2026-10-23 — นายช่างบันทึก dbml-review-002: @dbml/core10.3.1/dbmlv2 ผ่านทั้งสองไฟล์ โครงสร้างและ SQL ไม่เปลี่ยน ปิดเฉพาะข้อค้าง parser ของ arch
+- 2026-10-23 — Rev4: sync44REQ/180AC และ review-006; ไม่เปิด gate SQL/QA/release
 - 2026-10-23 — DBML Rev4 เพิ่ม notes ทุกตาราง/450 ฟิลด์ กลุ่มสี 10 กลุ่ม และ integration 24 ตารางจากผล arch ใบงาน 010; schema/index/40 FK เดิมไม่เปลี่ยน
 - 2026-10-23 — เพิ่มคู่มือ data model Rev6, dictionary 32 ตาราง/450 ฟิลด์, แผนที่ legacy พร้อมฟิลด์เชื่อม และภาคผนวกสัญญาเดิมตามผล arch ใบงาน 009; ไม่เปลี่ยน schema/สถานะตรวจรับ
 - 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)

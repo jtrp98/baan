@@ -24,7 +24,7 @@
 | `NYear` | `integer` | ไม่ได้ | รหัสปีจากระบบเดิม ใช้เชื่อม TYear.nYear และ TTerm.nYear; ไม่ใช่ numberYear ที่แสดง เช่น 2569 โดยอัตโนมัติ |
 | `NTerm` | `varchar(64)` | ไม่ได้ | รหัสเทอมเดิมชนิดข้อความจาก TTerm.nTerm; ไม่ใช่การใส่เลข 1 หรือ 2 โดยไม่ resolve |
 | `PlanCourseIds` | `integer[]` | ไม่ได้ | integer[] ของ TPlanCourse.PlanCourseId ที่ผูก run; ต้องมีอย่างน้อยหนึ่งรายการ ไม่มี null และตามสัญญาต้องไม่ซ้ำและตรงห้อง/เทอม |
-| `CurrentPolicyId` | `integer` | ได้ | FK ไป SchoolBotScoringPolicy ฉบับปัจจุบันของ run นี้; null เมื่อยังไม่มี pointer ไป policy |
+| `CurrentPolicyId` | `integer` | ได้ | FK ไป SchoolBotScoringPolicy ของ run; null เฉพาะ planned ไม่พร้อมเปิด; freeze เมื่อ active ตาม [กฎผลเรียน](../learning-rules-032-034.md) |
 | `PreviousRunId` | `integer` | ได้ | FK ไป CourseRun ก่อนหน้าที่นำมาสู่ run นี้; null เมื่อไม่ใช่ successor |
 | `EffectiveAt` | `timestamptz` | ไม่ได้ | เวลา UTC ที่การเปิดใช้ run นี้มีผล รวมกรณี run เทอมถัดไปจากการตัดสิน Level |
 | `Lifecycle` | `varchar(16)` | ไม่ได้ | planned=เตรียมเปิด, active=กำลังใช้, closing=กำลังปิดเทอม, closed=ปิดแล้ว |
@@ -59,5 +59,6 @@
 
 
 ## Change Log
+- 2026-10-23 — Rev2: อธิบาย freeze; physicalเดิม
 
 - 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

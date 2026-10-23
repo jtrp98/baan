@@ -1,0 +1,457 @@
+{
+  "state": "DONE",
+  "summary": "ส่ง exact patches แบบ read-only ตาม decisions-032..034 และ review-006; คง 32 ตาราง/450 ฟิลด์ ไม่มี SQL/code delta ไม่รับรอง runtime/release",
+  "edits": [
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "n — Rev5",
+      "new": "n — Rev6"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎผลเรียน](learning-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev6: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-005.md",
+      "old": "น — Rev5",
+      "new": "น — Rev6"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-005.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎผลเรียน](learning-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev6: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "t — Rev3",
+      "new": "t — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎคะแนน](grade-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev4: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-009.md",
+      "old": "t — Rev3",
+      "new": "t — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-009.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎคะแนน](grade-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev4: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": "น — Rev3",
+      "new": "น — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎผลเรียน](learning-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev4: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-011.md",
+      "old": "ง — Rev3",
+      "new": "ง — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-011.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎผลเรียน](learning-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev4: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "I — Rev2",
+      "new": "I — Rev3"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "## Change Log",
+      "new": "อ่าน canonical [กฎผลเรียน](learning-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev3: sync032..034/review-006; schemaเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "ดูข้อเสนอทางเลือกใน [db/proposal-learnerkind.md](../db/proposal-learnerkind",
+      "new": "ทาง A ยืนยันแล้วตาม [decisions-032](../requirement/decisions-032.md); ห้ามผล Cloud ของ employee รวม Guest import ตาม [กฎผลเรียน](learning-rules-032-034"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-005.md",
+      "old": "ดูข้อเสนอทางเลือกใน [db/proposal-learnerkind.md](../db/proposal-learnerkind",
+      "new": "ทาง A ยืนยันแล้วตาม [decisions-032](../requirement/decisions-032.md); ห้ามผล Cloud ของ employee รวม Guest import ตาม [กฎผลเรียน](learning-rules-032-034"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-009.md",
+      "old": "ดูข้อเสนอทางเลือกใน [db/proposal-learnerkind.md](../db/proposal-learnerkind",
+      "new": "ทาง A ยืนยันแล้วตาม [decisions-032](../requirement/decisions-032.md); ห้ามผล Cloud ของ employee รวม Guest import ตาม [กฎผลเรียน](learning-rules-032-034"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "ข้อเสนอ SA (รอ OQ-016 — การรวมหลายกิจกรรมลงช่องเดียว):\ncontract รองรับหลาย source ที่ผลรวม weight_bps = 10000 แต่จนกว่า OQ-016 มีมติ server รับได้ 1 source ต่อ mapping (weight_bps = 10000) และตอบ 409 MAPPING_MULTI_SOURCE_NOT_ENABLE",
+      "new": "Sources ต้องมีหนึ่งรายการเท่านั้น และ weight_bps=10000 อย่างถาวรตาม decisions-032; หลาย source คืน 409 MAPPING_SOURCE_COUNT_INVALID น้ำหนักผิดคืน 400 MAPPING_WEIGHT_INVALI"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "ต้องรอ writer contract/DBA review (DES-009)",
+      "new": "ทำผ่านระบบเกรดเท่านั้น ตาม decisions-033"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "ข้อเสนอ SA (รอ OQ-016 — การแก้ mapping หลังส่ง): mapping ที่ใช้งานแล้วเปลี่ยนได้เฉพาะอนาคต ประวัติ export เก็บ snapshot เดิม การแก้/retire mapping ทำให้ preview ที่ยังไม่ยืนยันหมดความใช้",
+      "new": "mapping/slot ที่ confirm ส่งแล้ว immutable รวม soft-delete/retire; pending/partial และชุดใหม่ใช้ [กฎล็อกประวัติ](grade-rules-032-034.md); ก่อน confirm การแก้ที่อนุญาตทำให้ preview เก่าใช้ไม่"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "MAPPING_MULTI_SOURCE_NOT_ENABLED\n4",
+      "new": "MAPPING_SOURCE_COUNT_INVALID, MAPPING_LOCKED, EXPORT_IN_PROGRESS\n4"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "เปิดหลาย source ต่อช่องก่อน OQ-016",
+      "new": "หลาย source ต่อช่องอย่างถาวรตาม decisions-032"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-008.md",
+      "old": "ก่อน OQ-016 → 409",
+      "new": "→ 409 MAPPING_SOURCE_COUNT_INVALID"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-009.md",
+      "old": "Σ(weight_bps/10000 × earned/max)\nraw_target = normalized",
+      "new": "earned/max ของ source เดียว\nraw_target = earned/max"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-009.md",
+      "old": "หลังรวมน้ำหนัก ไม่ปัดราย source (ก่อน OQ-016 มี source เดียว ตาม DES-008)",
+      "new": "จาก source เดียวตาม decisions-032/033; ทุกช่องคำนวณจาก earned/max เดิม ไม่ใช้ผลปัดของอีกช่อง"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": " รายห้อง",
+      "new": " รายคน"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": "ขอบเขตที่ครูปรับได้ยังไม่มีมติ (decisions-024): server ตรวจเฉพาะชนิด/ช่วงข้อมูล (`ClosesAt > OpensAt`, `reveal=after_close` ต้องมี `closes_at`",
+      "new": "ครูเปลี่ยนเฉพาะ time_limit_seconds และ opens_at/closes_at; field อื่นต้องเท่าค่าส่วนกลาง มิฉะนั้น 403 POLICY_OVERRIDE_NOT_ALLOWED; ตรวจ window ตาม [กฎผลเรียน](learning-rules-032-034.md"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": "สูตรคะแนนรวม 0–100 รอ OQ-014 (`formula_version` ยังไม่ยืนยัน → `409 SCORING_FORMULA_NOT_CONFIRMED` สำหรับ DES-011)",
+      "new": "ใช้ weighted-normalized-v1 และ freeze CurrentPolicyId เมื่อเริ่ม CourseRun ตาม [กฎผลเรียน](learning-rules-032-034.md); NULL คือร่างเปิดรอบไม่ได้ ไม่ใช่รอมติ"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-010.md",
+      "old": ", SCORING_FORMULA_NOT_CONFIRME",
+      "new": ", SCORING_POLICY_FROZEN, SCORING_WEIGHT_INVALI"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-011.md",
+      "old": "คะแนนรวมรายคน รอ OQ-014 (DES-010 `formula_version`); ก่อนอนุมัติ endpoint ตอบ `409 SCORING_FORMULA_NOT_CONFIRMED`",
+      "new": "รวมยืนยันแล้วตาม decisions-034 ใช้ policy ที่ freeze ตาม [กฎผลเรียน](learning-rules-032-034.md); ขาด policy ที่ใช้ได้คืน 409 POLICY_NOT_CONFIGURED"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-011.md",
+      "old": ", SCORING_FORMULA_NOT_CONFIRM",
+      "new": ", POLICY_NOT_CONFIGUR"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "จำกัดเฉพาะ `P=student` ตาม [db/proposal-learnerkind.md](../db/proposal-learnerkind.md)",
+      "new": "และนำเข้าประวัติ จำกัดเฉพาะ `P=student` ตาม decisions-032; employee เก็บ project Cloud ได้"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "ม — Rev5",
+      "new": "ม — Rev6"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "ants",
+      "new": "ants\n\nCanonical เพิ่มเติม: [ผลเรียน/policy](learning-rules-032-034.md), [mapping/export](grade-rules-032-034.md); เป็น application invariants เพิ่มจาก SQL ด้านล่าง โดย unique active ไม่เท่ากับล็อกประวัติ"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": " Log",
+      "new": " Log\n- 2026-10-23 — Rev6: sync032..034/review-006; SQL เดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-model.md",
+      "old": "(Rev6",
+      "new": "(Rev7"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-model.md",
+      "old": "schema ปัจจุบันให้ `LearnerId` ในผลเรียนเป็นนักเรียน ส่วนความสามารถให้ครูทดลองส่งงาน/ข้อสอบขึ้น Cloud ยังรอเลือกแนวทางที่ [ข้อเสนอ LearnerKind](../db/proposal-learnerkind.md)",
+      "new": "ทาง A ยืนยันแล้วตาม032: ครูทดลอง local/เก็บ Project Cloud แต่ห้าม Submission/Attempt Cloud รวม import"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-model.md",
+      "old": "Change Log",
+      "new": "ภาคผนวก canonical\n\n[ผลเรียน/policy](learning-rules-032-034.md) และ [mapping/export](grade-rules-032-034.md) ครอบ dictionary/JSON/DBML โดยไม่เพิ่ม physical fields/FK\n\n## Change Log\n- 2026-10-23 — Rev7: sync032..034; คง32ตาราง/450ฟิลด์"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-json-001.md",
+      "old": "รุ่นสูตรคะแนนรวม; ส่วนที่ยังรอมติธุรกิจไม่ได้ถือว่ามีสูตรพร้อมใช้แล้ว",
+      "new": "weighted-normalized-v1 ตาม034; NULL ใช้เฉพาะร่างก่อนเปิดรอบ"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-json-001.md",
+      "old": "Change Log",
+      "new": "นิยามเพิ่มเติม\n\n[ผลเรียน](learning-rules-032-034.md) นิยาม effective_policy/windows และ audit ผูก run; [คะแนน](grade-rules-032-034.md) นิยาม Sources หนึ่งรายการ, skipped_cells และ lock จาก snapshot\n\n## Change Log\n- 2026-10-23 — Rev2: sync032..034; SQL เดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/index.md",
+      "old": "## Change Log",
+      "new": "Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev2: sync032..034; physicalเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/contract-index.md",
+      "old": "## Change Log",
+      "new": "Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md)\n\n## Change Log\n- 2026-10-23 — Rev2: sync032..034; physicalเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/contract-003.md",
+      "old": "## Change Log",
+      "new": "Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md) รวม JSON effective_policy/windows/skipped_cells\n\n## Change Log\n- 2026-10-23 — Rev2: sync032..034; physicalเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-019.md",
+      "old": "formula_version=null หมายถึงยังไม่มีสูตรรวมที่ยืนยันสำหรับการเลื่อน Level ",
+      "new": "formula_version=weighted-normalized-v1; null คือร่างก่อนเปิด; น้ำหนักใหม่หลังเริ่มใช้ run ใหม่ "
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-019.md",
+      "old": "formula_version=null หมายถึงยังไม่มีสูตรรวมที่ยืนยันสำหรับการเลื่อน Level\n",
+      "new": "formula_version=weighted-normalized-v1; null คือร่างก่อนเปิด; น้ำหนักใหม่หลังเริ่มใช้ run ใหม่\n"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-019.md",
+      "old": "og",
+      "new": "og\n- 2026-10-23 — Rev2: sync032..034 ตาม [กฎผลเรียน](../learning-rules-032-034.md)"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-020.md",
+      "old": "ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010 ",
+      "new": "ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลาง "
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-020.md",
+      "old": "ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010\n",
+      "new": "ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลาง\n"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-020.md",
+      "old": "og",
+      "new": "og\n- 2026-10-23 — Rev2: sync034 ตาม [กฎผลเรียน](../learning-rules-032-034.md)"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-027.md",
+      "old": "สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016 ",
+      "new": "หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้วห้ามแก้/retire/soft-delete "
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-027.md",
+      "old": "สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016\n",
+      "new": "หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้วห้ามแก้/retire/soft-delete\n"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-027.md",
+      "old": "og",
+      "new": "og\n- 2026-10-23 — Rev2: sync032/033 ตาม [กฎคะแนน](../grade-rules-032-034.md)"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-018.md",
+      "old": "ฉบับปัจจุบันของ run นี้; null เมื่อยังไม่มี pointer ไป policy",
+      "new": "ของ run; null เฉพาะ planned ไม่พร้อมเปิด; freeze เมื่อ active ตาม [กฎผลเรียน](../learning-rules-032-034.md)"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/table-018.md",
+      "old": "Log",
+      "new": "Log\n- 2026-10-23 — Rev2: อธิบาย freeze; physicalเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": "4: คำอธิบายไทยครบทุกตาราง/ฟิลด์ + กลุ่มสีตามงาน\n// Change Log:",
+      "new": "5: sync032..034 เฉพาะ Notes\n// Change Log:\n// - 2026-10-23 — Rev5: physical structure เดิม; ผู้คุมตรวจ parser/semantic หลังบันทึก"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": "Diagram artifact (Rev4",
+      "new": "กฎ032..034: learning-rules-032-034.md และ grade-rules-032-034.md นิยาม profile/import, freeze, mapping lock และ JSON skipped_cells; เป็นกฎแอป ไม่ใช่ SQL constraint ใหม่.\n  Diagram artifact (Rev5"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": "null หมายถึงยังไม่มีสูตรรวมที่ยืนยันสำหรับการเลื่อน Level",
+      "new": "weighted-normalized-v1; null คือร่างก่อนเปิด; freeze ตาม learning-rules-032-034.md"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": "ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010",
+      "new": "ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลางตาม learning-rules-032-034.md"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": "สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016",
+      "new": "หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้ว immutable ตาม grade-rules-032-034.md"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot.dbml",
+      "old": " ฉบับปัจจุบันของ run นี้; null เมื่อยังไม่มี pointer ไป policy",
+      "new": "; null เฉพาะร่างก่อนเปิด; freeze เมื่อ active"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot-integration.dbml",
+      "old": "v1",
+      "new": "v2\n// Change Log: 2026-10-23 — Notes เท่านั้น structure เดิม; ผู้คุมตรวจ parser หลังบันทึก"
+    },
+    {
+      "path": "knowledge/school-bot/design/schoolbot-integration.dbml",
+      "old": "  AccountId ไ",
+      "new": "  กฎ032..034: employee มี Project Cloud แต่ไม่มีผล Cloud รวม import; ช่องเดิมเท่านั้นและ ownership ที่ confirm แล้วคงประวัติรวม partial/pending. อ่าน grade-rules-032-034.md และ learning-rules-032-034.md; ไม่เพิ่ม field/ref.\n  AccountId ไ"
+    },
+    {
+      "path": "knowledge/school-bot/design/dbml-guide-001.md",
+      "old": "Change Log",
+      "new": "Amendment 032..034\n\nFull Rev5/integration Rev2 เปลี่ยน Notes เท่านั้น; [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) เป็นกฎแอป รอบนี้ require.resolve('@dbml/core') ไม่พบ module จึงไม่อ้าง parser pass ใหม่ ผู้คุมตรวจ @dbml/core10.3.1/dbmlv2 และ semantic ก่อน/หลัง: type/NULL/default/PK/index/enum/FK/actions; คง32/450/40FK และ24/112/4FK+12logical\n\n## Change Log\n- 2026-10-23 — Rev2: ระบุขอบเขต Notes/validation"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "น — Rev3",
+      "new": "น — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": ", OQ-007 | ผู้ใช้ร่วม OS account แยก/ล้างข้อมูลอย่างไร? อนุญาต encrypted recovery และ explicit Guest import หรือไม่? ไม่ auto-upload",
+      "new": " | นโยบายตอบแล้ว; ตาม032 ห้ามนำเข้าผลครู Cloud แต่เก็บโครงงานได้ ตรวจ implementation ต่อ"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "อนุมัติ logical entities/relations/uniqueness/audit และข้อเสนอ SchoolId=null เฉพาะ global release/operations หรือให้ใช้ ownership model อื่น?",
+      "new": "baseline ตาม026..030; รอบนี้ใช้32ตารางเดิม ไม่มี delta ใหม่ การรัน SQL ยังต้องมนุษย์"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "schema — DES-004 | SchoolId/legacy IDs เป็น int; ขอทบทวน Session และ placement ตารางใหม่ใน School DB, physical keys/FKs/tenant routing; DBA ทำต่อหลังมนุษย์อนุมัติ",
+      "new": "integration — DES-004/012 | placement เป็น SchoolBot DB ตาม027; ยังต้องพิสูจน์ credentials/account-profile/roster และ H5 ไม่ถามทาง A/placement ซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "Change Log",
+      "new": "มติรอบนี้\n\nOQ-014/016/ทาง A ตอบครบตาม032..034; ใช้ [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) คง H5 และ G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB งานเนื้อหา/hardware/ส่งมอบรอทีมเตรียมหลักฐาน ไม่ถามนโยบายเดิม\n\n## Change Log\n- 2026-10-23 — Rev4: syncมติ แยก technical proof"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "5) | PROPOSED — sync decisions-027..030 และ db/review-005; รอหลักฐาน credential compatibility และการตัดสิน db/proposal-learnerkind.md",
+      "new": "6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "5) | PROPOSED — sync decisions-027..030 และ db/review-005; รอเกณฑ์ numeric rubric/evaluator และการตัดสิน db/proposal-learnerkind.md",
+      "new": "6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "3) | PROPOSED — sync decisions-027..030 และ db/review-005; รอ OQ-016 และ",
+      "new": "4) | PROPOSED — OQ-016 ตอบแล้ว; คง"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "บ SchoolBright (Rev3",
+      "new": "บ SchoolBright (Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "3) | PROPOSED — sync decisions-025..030 และ db/review-005; รอ OQ-014 สูตรรวม, กรอบครูปรับ policy และการตัดสิน db/proposal-learnerkind.md",
+      "new": "4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "3) | PROPOSED — sync decisions-027..030 และ db/review-005; รอ OQ-014 สูตรรวม และตรวจแหล่ง",
+      "new": "4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "I (Rev2",
+      "new": "I (Rev3"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "ล Rev6",
+      "new": "ล Rev7"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "ล (Rev5",
+      "new": "ล (Rev6"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "์ (Rev3",
+      "new": "์ (Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "4 —",
+      "new": "5 — Notes032..034 รอตรวจ parser;"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "ม legacy",
+      "new": "ม legacy Rev2 (Notes; รอตรวจ parser)"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "# Change Log",
+      "new": "# ภาคผนวก canonical\n\n| ไฟล์ | เนื้อหา / สถานะ |\n|---|---|\n| [learning-rules-032-034.md](learning-rules-032-034.md) | Rev1 — profile/run/freeze/สูตร/override; มติยืนยันแล้ว รอตรวจ implementation |\n| [grade-rules-032-034.md](grade-rules-032-034.md) | Rev1 — mapping/partial/skip/recovery; คง release gates |\n\n## Change Log\n- 2026-10-23 — Rev4: sync44REQ/180AC และ review-006; ไม่เปิด gate SQL/QA/release"
+    },
+    {
+      "path": "knowledge/school-bot/design/archive.md",
+      "old": "Change Log",
+      "new": "ก่อน sync032..034 — 2026-10-23\n\nผู้คุมเก็บทุกไฟล์เดิมใน edits ใบงาน013 แบบ byte-for-byte ที่ archive/2026-10-23-before-decisions-032-034/<relative-path จาก design/> รวม index.md/archive.md ก่อนแก้; new_files ไม่มีฉบับก่อนหน้า ตรวจ bytes/SHA-256 ตรงต้นฉบับ ไม่ regenerate สำเนา\n\n## Change Log\n- 2026-10-23 — Rev4: เพิ่ม archive ใบงาน013; ผู้คุมบันทึกหลักฐานหลังสำเนาจริง"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "ใครอนุมัติเนื้อหา/criteria และแต่ละ mission ใช้เกณฑ์ใด? ไม่มีสูตรคะแนน/ดาวที่ agent กำหนดแทน",
+      "new": "ทีมเตรียมเนื้อหา/numeric rubric ให้ผู้ใช้ตรวจตาม015/016; สูตรรวมตอบแล้วตาม034 ไม่กำหนดเกณฑ์ภารกิจแทน"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "ผู้ตรวจรับ, OS ขั้นต่ำ, signing owner และ performance measurement ยังต้องระบุ ไม่บล็อกการทบทวนแบบส่วนอื่น",
+      "new": "ผู้ใช้ตรวจรับตาม016; OSตาม019; ทีมเตรียม signing/delivery/performance evidence ไม่ถามนโยบายซ้ำ"
+    }
+  ],
+  "new_files": [
+    {
+      "path": "knowledge/school-bot/design/learning-rules-032-034.md",
+      "content": "# กฎผลเรียน/policy — Rev1\n\nCanonical ของ DES-004/005/010/011/012 และ dictionary ตาม032..034; หลักฐานแบบคือ ../db/schoolbot_db.sql:572–858 และ ../db/review-006.md ไม่ใช่ runtime\n\n## ตัวตนและรอบเรียน\nemployee ทดลอง local/เก็บ Project Cloud ได้ แต่ห้ามผล Cloud รวม Submission/Attempt, direct API, Guest import, retry/worker: 403 PROFILE_NOT_ALLOWED ก่อนสร้างผล/job; import ที่มีประวัติผลปฏิเสธทั้งคำขอ โครงงานนำเข้าแยกได้ ครู school_web ตรวจงานนักเรียนได้ตามสิทธิ์เดิม ตรวจ session/profile/SchoolId/Project.OwnerKind=student/OwnerId/roster ก่อน commit ไม่เชื่อ ID จาก client\n\nSubmission ไม่มี CourseRunId: รับงานโดย resolve active run เดียวจาก school/roster/ห้อง/เทอม/curriculum ของ mission และ EffectiveAt<=SubmittedAt ล็อก CourseRun แล้ว commit submission/job/idempotency กับ AuditEvent เดิม: Event=Submission.Accepted, EntityType=SchoolBotSubmission, EntityId=PK, Actor=นักเรียน, Reason เป็น JSON text {\"course_run_id\":K} ใน varchar(1000); K=รหัสจริง ไม่เพิ่ม FK ไม่พบ/กำกวมคืน409 COURSE_RUN_NOT_RESOLVED\n\nเลือก project result เฉพาะหลักฐาน run/learner/mission/revision ตรง เลือก submission ล่าสุดตาม SubmittedAt,PK แล้ว CurrentAssessmentId ไม่ fallback ผลเก่าเมื่อยังไม่ตรวจ การตรวจใหม่คง run เดิม ผลไร้หลักฐาน run เป็น SOURCE_SCOPE_UNPROVEN และ block export/proposal ไม่เดาจากเวลา/sId เก็บ audit ตลอดอายุผล Attempt ใช้ CourseRunId จริงและ submitted results ตาม selection; Test รวมซ่อมใช้ best ไม่มีเพดานลดคะแนน\n\n## สูตรและ freeze\nPolicy คง {quiz_counts,activity_weights:[{activity_id,weight_bps}],formula_version}; activity ให้คะแนนต้องครบ/ไม่ซ้ำ/อยู่ curriculum ของ run น้ำหนัก int0..10000 รวม10000=100%; instruction ไม่เป็น source; quiz_counts=false ให้ quiz น้ำหนัก0\nweighted-normalized-v1: total=SUM((earned/max)*weight_bps/100) สเกล0..100 เทียบเท่า normalized0..100*weight_bps/10000; decimal, max>0, 0<=earned<=max ไม่ปัดรายส่วน ตัวอย่างสมมติ 8/10*20+6/10*30+18/20*50=79; น้ำหนัก30/20/50ได้81 ไม่มีน้ำหนักเริ่มที่กำหนดแทนผู้ใช้\n\npolicy revision/pointer แก้ได้เฉพาะ planned ที่ไม่เคยเริ่ม ภายใต้ CourseRun lock+If-Match ตรวจ same-run/tenant/weights เริ่มรอบ=planned→active transaction ตรึง CurrentPolicyId พร้อม audit/idempotency บันทึก Event=CourseRun.Started, EntityType=SchoolBotCourseRun, EntityId=PK, Reason={\"policy_id\":K,\"policy_hash\":H}; H=SHA-256 canonical Policy ต้องพร้อมก่อนเริ่ม Lifecycle ไป active→closing→closed ห้ามย้อน planned/ลบหลบ freeze\nหลังเริ่มห้ามแก้ quiz_counts/weights/formula/pointer หรือลบ policy ที่อ้าง:409 SCORING_POLICY_FROZEN น้ำหนักใหม่ใช้ run ใหม่ planned ตาม unique ห้อง/เทอม/successor เดิม ไม่ปิดรอบเพื่อย้อนคิดผล NULL สูตรคือร่างเปิดไม่ได้:409 POLICY_NOT_CONFIGURED; weights ผิด409 SCORING_WEIGHT_INVALID\n\n## ข้อสอบและ Level\nPolicyOverride คง AssessmentPolicy เต็ม object หรือ null ครูเปลี่ยนเฉพาะ time_limit_seconds field อื่นต้องเท่าค่าส่วนกลาง มิฉะนั้น403 POLICY_OVERRIDE_NOT_ALLOWED ไม่บันทึกบางส่วน null กลับ default; Test ต้องมีเวลา ครูปรับ OpensAt/ClosesAt ตาม window validation เดิม\nAttemptSnapshot ใน JSON เดิมเพิ่ม effective_policy:AssessmentPolicy, opens_at:UTC ISO8601|null, closes_at:UTC ISO8601|null โดย server ตอนเริ่ม; policy_id เดิมคือ ScoringPolicy ไม่แทน effective_policy; override ใหม่ไม่เปลี่ยน attempt/deadline/เฉลยเดิม\nRetakeGrant หนึ่งใบเพิ่มหนึ่งครั้งเฉพาะคน/activity/run ล็อก CourseRun ก่อนนับ Sequence/เพดาน/consume และ commit พร้อม attempt/audit/idempotency; retry ไม่กิน grant ซ้ำ\nLevel ใช้ทุกคนใน roster งานขาด/ไม่มีผล=0 quiz ไม่นับน้ำหนัก0 ไม่ renormalize; average=SUM(total)/member_count เทียบ strict> ก่อนปัด; roster ว่าง409 ROSTER_EMPTY ไม่สร้าง successor; snapshot/recheck ตาม DES-011; export ใช้ skip แยกต่างหาก\n\nSQL คุม FK/UQ/state/bounds; profile/JSON/freeze/weights/run-binding เป็น application invariants Recheck สิทธิ์/License/roster ข้าม DB ก่อน commit ไม่อ้าง atomic ข้ามฐาน ปัดตก LearnerKind B, ผูกผลด้วยเวลา/sId อย่างเดียว, policy ย้อนหลัง และ flag/counter ใหม่\n\n## Change Log\n- 2026-10-23 — Rev1: sync032..034/review-006; physical เดิม\n"
+    },
+    {
+      "path": "knowledge/school-bot/design/grade-rules-032-034.md",
+      "content": "# กฎ mapping/export — Rev1\n\nCanonical ของ DES-008/009/dictionary ตาม032/033; อ่าน [ผลเรียน](learning-rules-032-034.md) และ ../db/review-006.md; SQL=../db/schoolbot_db.sql\n\n## ช่องและล็อก\nSources ยาว1ถาวร: {activity_id:PK,indicator_key:UUID|null,weight_bps:10000}; null ไม่เจาะตัวชี้วัด หนึ่ง activity หลายช่องได้ หนึ่งช่องกิจกรรมเดียว คีย์ช่อง=(SchoolId,NGradeId,AssessmentId,ScoreIdentifier) ตรวจ NYear/NTerm/ClassroomId/PlanCourseId/CourseId จริง ห้าม alias ด้วย identifier/run ใหม่ ScoreIdentifier resolve จาก ScoreData ไม่เดาจาก NameIdentifier/MaxScoreIdentifier/ordinal ช่องใหม่สร้างผ่านระบบเกรดก่อนเท่านั้น\n\nทุก mutation slot/mapping และ confirm ใช้ transaction-scoped advisory lock คีย์ช่อง canonical เรียงเหมือนกันทุก writer แล้วล็อก CourseRun/GradeSlot/Mapping ตาม PK ตรวจ If-Match/สิทธิ์และอ่านประวัติซ้ำหลัง lock แม้ยังไม่มี slot ต้องกัน create race ข้าม process\nSQL:911–941 คุม active เท่านั้น แอปตรวจประวัติทุก run รวม IsDelete/RetiredAt ก่อน confirm แก้ได้และ invalidate preview จุดล็อกถาวร=confirm commit Export/Outbox/confirmed Preview ก่อน worker เขียน ครอบทุก mapping ใน Context.mapping_versions รวม pending/partial/failed/unknown/skipped ไม่เพิ่ม flag\nหลังล็อกห้ามแก้ Sources/CourseRunId/GradeSlotId/ตัวตนปลายทาง รวม retire/soft-delete/hard-delete เพื่อเปิดช่องเดิม:409 MAPPING_LOCKED เก็บ mapping/slot/snapshots/outbox/receipt/audit linkage\nชุดใหม่ใช้ mapping ใหม่กับช่องอื่นไม่ถูกจอง หรือบริบทใหม่ที่ resolve เป็นคนละช่องจริง ไม่ใช่ PK/run ใหม่ทับช่องล็อก แม้ source เดิมให้ใช้ mapping เดิมส่งเพิ่ม ไม่ย้าย/ล้างคะแนน คะแนนเต็มปลายทางเปลี่ยนต้อง preview/recheck ใหม่ ไม่เปลี่ยนคู่\n\n## สูตรและ skip\nCellPreview เพิ่ม sources:SourceResultRef[] ตาม [นิยามเดิม](data-dictionary/contract-003.md) เพื่อแสดง earned/max ต้นทางคู่กับ target_max/raw_target/new_score; server สร้างจาก authoritative results ไม่รับคะแนนจาก client\nraw_target=earned/max*target_max decimal ปัด integer half-up ครั้งเดียวต่อช่องจากต้นทาง เช่น3/4ไปเต็ม10=7.5→8 เต็ม12=9 max ปลายทางต้อง parse ได้และ>0 ผิด/กำกวม409 TARGET_NOT_READY ไม่เดา0/clamp/แปลง passed\nไม่มีผล/ยังไม่ตรวจ/error ข้ามรายช่อง คงค่าเดิม ผลจริง0ยังพร้อมส่ง PreviewItemSnapshot/View เพิ่ม skipped_cells:[{mapping_id:K,grade_slot_id:K,reason_code:SOURCE_RESULT_MISSING|SOURCE_RESULT_UNGRADED|SOURCE_RESULT_ERROR,old_score:T128|null}]; server สร้าง []เมื่อไม่มีข้าม null คือไม่มีค่าเดิม cells เดิมเก็บเฉพาะผลตัวเลข คงชนิด raw_target/new_score; SOURCE_SCOPE_UNPROVEN เป็น blocked แยกจาก missing\nState เดิม ready/conflict/blocked: missing อย่างเดียว ready พร้อม ReasonCodes แม้ cells=[] UI แสดงข้าม apply เฉพาะ cells; ทั้งคนข้ามให้ Outbox skipped/LastErrorCode=SOURCE_RESULT_MISSING รายละเอียดใน snapshot ไม่เขียน PG/สร้าง receipt ปลอม Export มีข้ามให้ completed_with_skips เมื่อไม่มี pending/conflict/blocked ค้าง\n\n## Recheck และ partial\nhash ครอบ skipped_cells; missing กลายเป็นมีผลหรือ source/mapping/policy/roster/target/สิทธิ์เปลี่ยนก่อน confirm:409 PREVIEW_STALE ต้อง preview ใหม่ Worker recheck source/policy/mapping/สิทธิ์/License/locks ก่อน apply ไม่เติมผลใหม่ลงช่องที่ยืนยันให้ข้าม\nconfirm commit export/outbox/idempotency/audit ใน SchoolBot DB เดียว ตรวจ Export→Preview ตรง PreviewItem.ScorePreviewId และ SchoolId ทุกคู่ FK เดี่ยวไม่รับประกัน ข้าม DB ไม่อ้าง distributed transaction\n\npending/running/unknown ซ้อนช่อง+learner:409 EXPORT_IN_PROGRESS; reconcile ก่อน operation ใหม่ retry ใช้ OperationKey/PayloadHash เดิม payload ต่าง409 IDEMPOTENCY_CONFLICT สำเร็จอ่าน receipt ไม่เขียนซ้ำ key ใหม่ไม่ข้ามงานค้าง\npartial คง applied และหยุดที่ยังไม่เริ่ม resolve/preview ใหม่ส่งเฉพาะส่วนค้าง: ล็อก outbox เก่า ไม่มี lease ทำงาน/receipt ไม่ทราบ; unknown ต้อง reconcile เมื่อพิสูจน์ว่ายังไม่ apply จึง mark เก่า blocked/LastErrorCode=SUPERSEDED_BY_PREVIEW และ audit อ้าง preview ใหม่ก่อน confirm ใหม่ worker ห้าม claim เก่า นี่คือชุดส่งใหม่ ไม่ใช่ mapping ใหม่\nPG transaction บันทึกคะแนน+PgtgradeAuditLog receipt พร้อมกัน ผูก OperationKey/PayloadHash/context/learner/cells ที่เขียน/before-after hashes/calculator version/ผู้ยืนยัน ReceiptId/Hash ใน Outbox ใช้ reconcile หลัง crash รูป JSON/ขนาด receipt ยังต้องพิสูจน์ G-TARGET/G-DB unknown ไม่ใช่ failed ห้ามส่งใหม่ทันที\n\nSQL:879–1059 เดิม cardinality/history/immutable/skip/สิทธิ์เป็นกฎแอป คง G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB ปัดตกหลาย source/flag table/ปลดล็อก partial/ลบหลบ ownership/missing=0\n\n## Change Log\n- 2026-10-23 — Rev1: sync032/033/review-006; physical เดิม\n"
+    }
+  ],
+  "schema_changes": [],
+  "as_built": [
+    "target/school-bot/web/src/SchoolBot.Api/Program.cs:43,84–120 ใช้ memory store และ v1 license/release/static admin; ไม่พบ v2 learning/export ในไฟล์นี้",
+    "target/school-bot/web/src/SchoolBot.Application/ManagementService.cs:10–14,45–65 ใช้ process lock ไม่ใช่ durable transaction",
+    "target/school-bot/web/src/SchoolBot.Infrastructure/Persistence/InMemoryManagementStore.cs:10–13,22–25 เก็บ dictionary ใน memory",
+    "target/school-bot/app/desktopservice.go:98–105,109–123 เรียก engine/update/activate ไม่พิสูจน์ Cloud learner guard",
+    "target/sb-tech-upgrade-academic/src/ServiceAcademic.Application/Features/GradeCalculation/Services/Implementations/GradeService.cs:296–313 จับคู่ AssessmentId/parse คะแนนเต็มเป็น int; entity Pgtassessment.cs:14–18 ไม่มี ScoreIdentifier จึงยังต้องพิสูจน์ target fixtures"
+  ],
+  "remaining_gates": [
+    "คง H5, credential/profile/roster/rubric proof และ G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB; ไม่มีคำถามนโยบายหรือ schema delta ใหม่",
+    "DBML parser รอบนี้ยังไม่ตรวจผ่าน: require.resolve('@dbml/core') ไม่พบ module; ผู้คุมตรวจหลังบันทึก"
+  ],
+  "handoff_gm": [
+    "ตรวจ old ทุก patch ตรงหนึ่งตำแหน่งและลำดับ apply ในหน่วยความจำแล้ว; archive byte เดิมและรักษา newline ก่อนบันทึก; reconcile44REQ/180AC ไม่ถือว่า release",
+    "coverage คง dictionary32/450 และ legacy mappings; เพิ่ม canonical JSON/invariants เฉพาะขอบเขต ส่ง inspect/check พิสูจน์ race/partial/crash และ0เทียบ missing"
+  ],
+  "handoff_vault": [
+    "รับ review-006: ตรวจ audit ผูก run/freeze/history lock/skipped_cells บน schema เดิม ไม่เพิ่ม SQL/index/flag",
+    "ผู้คุมตรวจ @dbml/core10.3.1/dbmlv2 และ semantic ก่อน/หลัง: full32/450/40FK; integration24/112/4FK+12logical; type/NULL/default/key/index/enum/FK/actions ต้องเดิม การแก้ DBML เป็น Notes เท่านั้น",
+    "คง receipt/writer parity; rollback ลบข้อมูล SchoolBot ไม่ย้อนเกรดที่ส่งแล้ว ไม่รัน SQL ในงานนี้"
+  ]
+}

@@ -1,4 +1,4 @@
-# SchoolBot — ตารางและข้อมูลของระบบ (Rev6)
+# SchoolBot — ตารางและข้อมูลของระบบ (Rev7)
 
 เอกสารนี้อธิบายแบบข้อมูลเป้าหมายของ SchoolBot ตาม SQL ปัจจุบัน **32 ตาราง / 450 ฟิลด์ / 40 ความสัมพันธ์** เพื่อให้รู้ว่าตารางไหนเก็บอะไรและใช้ข้อมูลเก่าจากที่ไหน การมีแบบและ SQL ไม่ได้หมายความว่าระบบเชื่อมฐานข้อมูลจริงแล้ว
 
@@ -58,13 +58,18 @@
 
 ## ประเด็นที่ยังไม่ควรตีความเอง
 
-schema ปัจจุบันให้ `LearnerId` ในผลเรียนเป็นนักเรียน ส่วนความสามารถให้ครูทดลองส่งงาน/ข้อสอบขึ้น Cloud ยังรอเลือกแนวทางที่ [ข้อเสนอ LearnerKind](../db/proposal-learnerkind.md) ข้อมูลบัญชี→profile และ writer คะแนนเดิมยังมีหลักฐานที่ต้องตรวจต่อ คู่มือนี้ระบุช่องว่างนั้นไว้โดยไม่สมมติว่าเชื่อมสำเร็จแล้ว
+ทาง A ยืนยันแล้วตาม032: ครูทดลอง local/เก็บ Project Cloud แต่ห้าม Submission/Attempt Cloud รวม import ข้อมูลบัญชี→profile และ writer คะแนนเดิมยังมีหลักฐานที่ต้องตรวจต่อ คู่มือนี้ระบุช่องว่างนั้นไว้โดยไม่สมมติว่าเชื่อมสำเร็จแล้ว
 
 ## กฎข้อมูลและ HTTP contract ร่วม
 
 อ่าน [data-contract-rules.md](data-contract-rules.md) ประกอบเสมอ: relations, uniqueness, invariants, error envelope, headers, pagination และขนาด payload คงตามสัญญาเดิม
 
+## ภาคผนวก canonical
+
+[ผลเรียน/policy](learning-rules-032-034.md) และ [mapping/export](grade-rules-032-034.md) ครอบ dictionary/JSON/DBML โดยไม่เพิ่ม physical fields/FK
+
 ## Change Log
+- 2026-10-23 — Rev7: sync032..034; คง32ตาราง/450ฟิลด์
 
 - 2026-10-23 — เชื่อม DBML Rev4 แบบเต็มและภาพ integration ผ่าน dbml-guide-001 โดยคง data-model Rev6/สัญญาเดิม
 

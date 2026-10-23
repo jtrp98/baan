@@ -1,8 +1,10 @@
-# กฎข้อมูลและ HTTP contract ร่วม — Rev5
+# กฎข้อมูลและ HTTP contract ร่วม — Rev6
 
 แยกจาก logical data contract ของ SA เพื่อคุมขนาดเอกสาร ชนิด `K`, `I`, `U`, `N`, `Tn` และตารางอ้าง [data-model.md](data-model.md) (Rev5 — ตรงกับ [db/schoolbot_db.sql](../db/schoolbot_db.sql) และ [db/review-005.md](../db/review-005.md) ตามมติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md))
 
 ## Relations / uniqueness / invariants
+
+Canonical เพิ่มเติม: [ผลเรียน/policy](learning-rules-032-034.md), [mapping/export](grade-rules-032-034.md); เป็น application invariants เพิ่มจาก SQL ด้านล่าง โดย unique active ไม่เท่ากับล็อกประวัติ
 
 | กลุ่ม | กฎ |
 |---|---|
@@ -70,6 +72,7 @@ List: `limit` 1–100 ค่าเริ่ม 50, `cursor` opaque; คืน `{
 Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องแก้ทั้ง proxy/API/host ให้ตรงกัน ไม่ยก limit ของ engine ตาม HTTP.
 
 ## Change Log
+- 2026-10-23 — Rev6: sync032..034/review-006; SQL เดิม
 - 2026-10-22 — Rev5: sync ตาม `db/schoolbot_db.sql` (32 ตาราง), `db/review-005.md` และมติ decisions-027..030; ปรับ placement เป็น SchoolBot DB (10.0.0.128:9499) คู่กับการอ่าน School DB/PGGradeDB ด้วยบัญชี DB เดิมและ re-check ก่อน commit; เปลี่ยน optimistic concurrency จาก `Version` เป็น `UpdateDate` (`clock_timestamp()`, opaque `ETag`/`If-Match`); ปรับกฎ single-column FK + application tenant check และตัด `UQ_SchoolBotAssessment_Submission_Sequence` / `UQ_SchoolBotAttempt_Learner_Seq` / `ScoringPolicy.CurriculumId`
 - 2026-10-22 — Rev4: sync ตามมติอนุมัติ decisions-026 (รวม amendment-proposal-001/002 และแก้ 2 จุดตาม decisions-025: school_web ต้องมี License active ของโรงเรียน, Desktop bind ได้ทั้ง student และ employee); เพิ่มกฎ global/tenant uniqueness, CourseRun/Attempt/Retake/GradeSlot/Mapping/Preview/Export/Outbox/LevelProposal, กฎ Origin/Channel และการปิด /v1/admin
 - 2026-10-21 — Rev3: แยก resource K จาก request/idempotency U

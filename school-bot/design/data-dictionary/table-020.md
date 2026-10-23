@@ -23,7 +23,7 @@
 | `ActivityId` | `integer` | ไม่ได้ | FK ไป SchoolBotActivity ซึ่งต้องอยู่ใน curriculum revision ของ run |
 | `OpensAt` | `timestamptz` | ได้ | เวลา UTC เริ่มเปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตเริ่มด้วยฟิลด์นี้ แต่ยังต้องตรวจเงื่อนไขอื่น |
 | `ClosesAt` | `timestamptz` | ได้ | เวลา UTC ปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตปิดด้วยฟิลด์นี้; หากมีทั้งคู่ต้องหลัง OpensAt |
-| `PolicyOverride` | `jsonb` | ได้ | JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010 |
+| `PolicyOverride` | `jsonb` | ได้ | JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลาง |
 | `IsDelete` | `boolean` | ไม่ได้ | ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false |
 | `CreateBy` | `integer` | ได้ | รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ |
 | `CreateDate` | `timestamptz` | ไม่ได้ | วันเวลาสร้างรายการตามเวลา UTC จาก server |
@@ -44,7 +44,7 @@
 
 JSON เป็นข้อมูลหลายฟิลด์ซ้อนกัน ต้องตรวจตามโครงสร้างที่กำหนด:
 
-- `PolicyOverride`: AssessmentPolicy; JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010
+- `PolicyOverride`: AssessmentPolicy; JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลาง
 
 อ่าน [คำอธิบาย JSON พร้อมตัวอย่าง](../data-json-001.md) แล้วดูรูปแบบฟิลด์ย่อยและ enum ที่ [สัญญาชนิดข้อมูล/JSON](contract-index.md)
 
@@ -54,5 +54,6 @@ JSON เป็นข้อมูลหลายฟิลด์ซ้อนกั
 
 
 ## Change Log
+- 2026-10-23 — Rev2: sync034 ตาม [กฎผลเรียน](../learning-rules-032-034.md)
 
 - 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

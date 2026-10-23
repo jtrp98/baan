@@ -1,5 +1,6 @@
-// SchoolBot schema — Rev4: คำอธิบายไทยครบทุกตาราง/ฟิลด์ + กลุ่มสีตามงาน
+// SchoolBot schema — Rev5: sync032..034 เฉพาะ Notes
 // Change Log:
+// - 2026-10-23 — Rev5: physical structure เดิม; ผู้คุมตรวจ parser/semantic หลังบันทึก
 // - 2026-10-23 — Rev4: ขยาย Note จาก dictionary 32 ตาราง/450 ฟิลด์ เพิ่มตัวอย่างและกลุ่มสี; คง schema/index/40 FK ตาม SQL เดิม; ภาพ legacy แยกที่ schoolbot-integration.dbml.
 // - 2026-10-22 — Rev3: sync 100% with db/schoolbot_db.sql (Rev5 Slimmed, 32 tables, 40 refs) and db/review-005.md per decisions-027..030 (SchoolBot DB 10.0.0.128:9499, remove SchoolBotTeacherGrant/ScoringPolicy.CurriculumId/non-unique indexes/composite FK uniques, single-column FKs, UpdateDate concurrency).
 // - 2026-10-22 — Rev2.2: ถอน Version และ AuditEvent.Previous/NewVersion ตาม decisions-030 (ใช้ UpdateDate).
@@ -12,7 +13,8 @@ Project SchoolBot {
   เริ่มดูตามกลุ่มสี 01–10; เปิด Note ของตาราง/ฟิลด์เพื่ออ่านหน้าที่ หนึ่งแถว ตัวอย่าง และกฎข้อมูลภาษาไทยครบ 450 ฟิลด์.
   ภาพนี้มีเฉพาะ SchoolBot ใหม่ 32 ตารางและ FK จริง 40 เส้น; ดู schoolbot-integration.dbml สำหรับภาพตารางเดิมและ logical mappings.
   SQL ยังเป็นร่างไม่ได้รัน; การยืนยันแบบไม่ใช่การยืนยันว่า deploy แล้ว.
-  Diagram artifact (Rev4) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
+  กฎ032..034: learning-rules-032-034.md และ grade-rules-032-034.md นิยาม profile/import, freeze, mapping lock และ JSON skipped_cells; เป็นกฎแอป ไม่ใช่ SQL constraint ใหม่.
+  Diagram artifact (Rev5) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
   คงไว้ในไฟล์เดียวเพื่อให้เปิดและวางใน dbdiagram.io ได้ครบทั้ง 32 ตารางทันที (ตารางสำรอง SchoolBotTeacherGrant ยังไม่สร้างตาม decisions-026).
   วางทุกตารางของ SchoolBot (32 ตาราง) ใน SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot, schema public) ตาม decisions-027 เพื่อรองรับ atomic transaction ระหว่าง domain, idempotency และ audit.
   Master, School, Logs และ PGGradeDB ต่อผ่าน connection แยกด้วยบัญชี DB เดิม (ไม่รัน GRANT/สร้าง role ใน School DB หรือ PGGradeDB ตาม decisions-029); การอ่านสิทธิ์ครู/roster/term จาก School DB ต้อง re-check ก่อน commit ใน SchoolBot DB.
@@ -557,7 +559,7 @@ Table SchoolBotCourseRun [headercolor: #D97706] {
   NYear int4 [not null, note: 'รหัสปีจากระบบเดิม ใช้เชื่อม TYear.nYear และ TTerm.nYear; ไม่ใช่ numberYear ที่แสดง เช่น 2569 โดยอัตโนมัติ']
   NTerm varchar(64) [not null, note: 'รหัสเทอมเดิมชนิดข้อความจาก TTerm.nTerm; ไม่ใช่การใส่เลข 1 หรือ 2 โดยไม่ resolve | ข้อกำหนดเดิม: Legacy TTerm.NTerm']
   PlanCourseIds jsonb [not null, note: 'integer[] ของ TPlanCourse.PlanCourseId ที่ผูก run; ต้องมีอย่างน้อยหนึ่งรายการ ไม่มี null และตามสัญญาต้องไม่ซ้ำและตรงห้อง/เทอม | ข้อกำหนดเดิม: Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
-  CurrentPolicyId int4 [null, note: 'FK ไป SchoolBotScoringPolicy ฉบับปัจจุบันของ run นี้; null เมื่อยังไม่มี pointer ไป policy']
+  CurrentPolicyId int4 [null, note: 'FK ไป SchoolBotScoringPolicy; null เฉพาะร่างก่อนเปิด; freeze เมื่อ active']
   PreviousRunId int4 [null, note: 'FK ไป CourseRun ก่อนหน้าที่นำมาสู่ run นี้; null เมื่อไม่ใช่ successor']
   EffectiveAt timestamptz [not null, note: 'เวลา UTC ที่การเปิดใช้ run นี้มีผล รวมกรณี run เทอมถัดไปจากการตัดสิน Level']
   Lifecycle SchoolBotCourseRunState [not null, note: 'planned=เตรียมเปิด, active=กำลังใช้, closing=กำลังปิดเทอม, closed=ปิดแล้ว | ข้อกำหนดเดิม: planned|active|closing|closed']
@@ -580,7 +582,7 @@ Table SchoolBotScoringPolicy [headercolor: #D97706] {
   SchoolBotScoringPolicyId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoringPolicy (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
   CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun; อ่าน CurriculumId ผ่าน run จึงไม่มีคอลัมน์ CurriculumId ซ้ำ']
   Revision int4 [not null, note: 'เลขฉบับนโยบายภายใน run; การเปลี่ยนสร้างแถวใหม่เพื่อรักษาประวัติ']
-  Policy jsonb [not null, note: 'JSON มี quiz_counts, activity_weights และ formula_version; weight_bps เป็น basis points 0–10000 โดย 10000=100% และน้ำหนักรวม 10000; formula_version=null หมายถึงยังไม่มีสูตรรวมที่ยืนยันสำหรับการเลื่อน Level | ข้อกำหนดเดิม: DES-010 Rev3 ScoringPolicy {quiz_counts, activity_weights, formula_version}; immutable']
+  Policy jsonb [not null, note: 'JSON มี quiz_counts, activity_weights และ formula_version; weight_bps เป็น basis points 0–10000 โดย 10000=100% และน้ำหนักรวม 10000; formula_version=weighted-normalized-v1; null คือร่างก่อนเปิด; freeze ตาม learning-rules-032-034.md | ข้อกำหนดเดิม: DES-010 Rev3 ScoringPolicy {quiz_counts, activity_weights, formula_version}; immutable']
   IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
   CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
   CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
@@ -601,7 +603,7 @@ Table SchoolBotCourseRunActivity [headercolor: #D97706] {
   ActivityId int4 [not null, note: 'FK ไป SchoolBotActivity ซึ่งต้องอยู่ใน curriculum revision ของ run']
   OpensAt timestamptz [null, note: 'เวลา UTC เริ่มเปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตเริ่มด้วยฟิลด์นี้ แต่ยังต้องตรวจเงื่อนไขอื่น']
   ClosesAt timestamptz [null, note: 'เวลา UTC ปิดกิจกรรม; null หมายถึงไม่กำหนดขอบเขตปิดด้วยฟิลด์นี้; หากมีทั้งคู่ต้องหลัง OpensAt']
-  PolicyOverride jsonb [null, note: 'JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ขอบเขตที่ครูมีสิทธิ์ปรับยังรอมติตาม DES-010 | ข้อกำหนดเดิม: Optional AssessmentPolicy override per classroom CourseRun']
+  PolicyOverride jsonb [null, note: 'JSON AssessmentPolicy ของห้องที่ใช้แทนค่าตั้งต้น; null หมายถึงใช้ default_policy ของ Activity; ครูเปลี่ยนเฉพาะ time_limit_seconds; field อื่นตรงส่วนกลางตาม learning-rules-032-034.md | ข้อกำหนดเดิม: Optional AssessmentPolicy override per classroom CourseRun']
   IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
   CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']
   CreateDate timestamptz [not null, note: 'วันเวลาสร้างรายการตามเวลา UTC จาก server']
@@ -749,7 +751,7 @@ Table SchoolBotScoreMapping [headercolor: #DB2777] {
   SchoolBotScoreMappingId int4 [pk, increment, not null, note: 'รหัสแถวของ SchoolBotScoreMapping (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity']
   CourseRunId int4 [not null, note: 'FK ไป SchoolBotCourseRun และต้องตรงกับ run ของ GradeSlot']
   GradeSlotId int4 [not null, note: 'FK ไป SchoolBotGradeSlot ปลายทางที่มี ownership; active mapping ของ run/slot เดียวกันมีได้หนึ่งชุด']
-  Sources jsonb [not null, note: 'JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016 | ข้อกำหนดเดิม: MappingSource[]; weights sum to 10000']
+  Sources jsonb [not null, note: 'JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้ว immutable ตาม grade-rules-032-034.md | ข้อกำหนดเดิม: MappingSource[]; weights sum to 10000']
   RetiredAt timestamptz [null, note: 'เวลา UTC ยุติการใช้ mapping; null หมายถึงยังไม่ retire โดยประวัติ export เดิมคง snapshot เดิม']
   IsDelete boolean [not null, default: false, note: 'ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false']
   CreateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ']

@@ -21,7 +21,7 @@
 | `SchoolBotScoreMappingId` | `integer` | ไม่ได้ | รหัสแถวของ SchoolBotScoreMapping (PK); ฐานข้อมูลสร้างให้ ไม่รับรหัสจาก client; เป็น Primary Key ของตารางนี้; สร้างอัตโนมัติแบบ identity |
 | `CourseRunId` | `integer` | ไม่ได้ | FK ไป SchoolBotCourseRun และต้องตรงกับ run ของ GradeSlot |
 | `GradeSlotId` | `integer` | ไม่ได้ | FK ไป SchoolBotGradeSlot ปลายทางที่มี ownership; active mapping ของ run/slot เดียวกันมีได้หนึ่งชุด |
-| `Sources` | `jsonb` | ไม่ได้ | JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016 |
+| `Sources` | `jsonb` | ไม่ได้ | JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้วห้ามแก้/retire/soft-delete |
 | `RetiredAt` | `timestamptz` | ได้ | เวลา UTC ยุติการใช้ mapping; null หมายถึงยังไม่ retire โดยประวัติ export เดิมคง snapshot เดิม |
 | `IsDelete` | `boolean` | ไม่ได้ | ระบุว่าแถวถูกลบแบบเก็บประวัติหรือไม่; false = ยังใช้, true = ซ่อนจากการอ่านตามปกติ ไม่ใช่การลบข้อมูลถาวร; ค่าเริ่มต้นใน SQL = false |
 | `CreateBy` | `integer` | ได้ | รหัสนักเรียน sId หรือบุคลากร sEmp ผู้สร้างรายการ; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ เลขอย่างเดียวไม่บอกชนิดคน ให้ดู Actor ใน AuditEvent ประกอบ |
@@ -43,7 +43,7 @@
 
 JSON เป็นข้อมูลหลายฟิลด์ซ้อนกัน ต้องตรวจตามโครงสร้างที่กำหนด:
 
-- `Sources`: MappingSource[]; JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; สัญญาปัจจุบันรับเพียงหนึ่ง source น้ำหนัก 10000 จนกว่ามีมติ OQ-016
+- `Sources`: MappingSource[]; JSON array ของ activity_id, indicator_key และ weight_bps; indicator_key=null เมื่อไม่ระบุรายตัวชี้วัด, 10000 basis points=100%; หนึ่ง source น้ำหนัก10000ถาวร; confirm แล้วห้ามแก้/retire/soft-delete
 
 อ่าน [คำอธิบาย JSON พร้อมตัวอย่าง](../data-json-001.md) แล้วดูรูปแบบฟิลด์ย่อยและ enum ที่ [สัญญาชนิดข้อมูล/JSON](contract-index.md)
 
@@ -53,5 +53,6 @@ JSON เป็นข้อมูลหลายฟิลด์ซ้อนกั
 
 
 ## Change Log
+- 2026-10-23 — Rev2: sync032/033 ตาม [กฎคะแนน](../grade-rules-032-034.md)
 
 - 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

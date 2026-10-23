@@ -30,7 +30,12 @@
 | [des-007.md](archive/2026-10-21-before-int4/des-007.md) | 6914 | `f4b249b4fbabf0219a35c977bb0ea3bc4cff6bab4a5fa67e5518fb0e4cc1642c` |
 | [risks.md](archive/2026-10-21-before-int4/risks.md) | 7133 | `c1205ae1fc82083cef6a4f04ab4752ffd77b5bc3b49c6a672e20e0c3c335cd22` |
 
+## ก่อน sync032..034 — 2026-10-23
+
+ผู้คุมเก็บทุกไฟล์เดิมใน edits ใบงาน013 แบบ byte-for-byte ที่ archive/2026-10-23-before-decisions-032-034/<relative-path จาก design/> รวม index.md/archive.md ก่อนแก้; new_files ไม่มีฉบับก่อนหน้า ตรวจ bytes/SHA-256 ตรงต้นฉบับ ไม่ regenerate สำเนา
+
 ## Change Log
+- 2026-10-23 — Rev4: เพิ่ม archive ใบงาน013; ผู้คุมบันทึกหลักฐานหลังสำเนาจริง
 - 2026-10-21 — เก็บอีก 9 ไฟล์ก่อนแก้ PK int4 และตรวจ hash ก่อน apply
 
 - 2026-10-21 — MYCELIUM แยก archive ตามไฟล์เพื่อคุมขนาดและตรวจ hash ตรงต้นฉบับทั้ง 9 ไฟล์ก่อน apply patch SA

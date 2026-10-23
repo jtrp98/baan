@@ -1,4 +1,5 @@
-// SchoolBot integration — Rev1
+// SchoolBot integration — Rev2
+// Change Log: 2026-10-23 — Notes เท่านั้น structure เดิม; ผู้คุมตรวจ parser หลังบันทึก
 // Change Log: 2026-10-23 — ภาพย่อจุดเชื่อมข้อมูลเดิม; ไม่ใช่ DDL และไม่เพิ่ม FK ข้าม DB
 Project SchoolBotIntegration {
   database_type: 'PostgreSQL'
@@ -8,6 +9,7 @@ Project SchoolBotIntegration {
   เส้นทึบ FK_* = FK จริงในร่าง SQL ของ SchoolBot; เส้นประสีส้ม LOGICAL_* = การเทียบรหัส/ตรวจเงื่อนไขเท่านั้น ไม่ใช่ physical FK.
   LegacyMaster/LegacySchool/LegacyGrade เป็น namespace ของภาพเพื่อแยกฐานข้อมูล ไม่ใช่ชื่อ schema ที่ใช้ deploy.
   ห้ามนำไฟล์ภาพ integration นี้ไปสร้าง SQL/migration. แบบครบ 32 ตาราง/450 ฟิลด์/40 FK อยู่ที่ schoolbot.dbml.
+  กฎ032..034: employee มี Project Cloud แต่ไม่มีผล Cloud รวม import; ช่องเดิมเท่านั้นและ ownership ที่ confirm แล้วคงประวัติรวม partial/pending. อ่าน grade-rules-032-034.md และ learning-rules-032-034.md; ไม่เพิ่ม field/ref.
   AccountId ไม่เท่ากับรหัสนักเรียน/ครู; ไม่วาด account-profile join ที่ยังพิสูจน์ไม่ได้.
   '''
 }

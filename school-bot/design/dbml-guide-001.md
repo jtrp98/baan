@@ -58,6 +58,11 @@ Note ของตารางมีหน้าที่ “หนึ่งแ�
 
 อ่านเพิ่มเติม: [คู่มือข้อมูล](data-model.md) · [ตารางเดิมและฟิลด์เชื่อม](data-legacy-001.md) · [ผลตรวจ DBML](dbml-review-001.md)
 
+## Amendment 032..034
+
+Full Rev5/integration Rev2 เปลี่ยน Notes เท่านั้น; [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) เป็นกฎแอป รอบนี้ require.resolve('@dbml/core') ไม่พบ module จึงไม่อ้าง parser pass ใหม่ ผู้คุมตรวจ @dbml/core10.3.1/dbmlv2 และ semantic ก่อน/หลัง: type/NULL/default/PK/index/enum/FK/actions; คง32/450/40FK และ24/112/4FK+12logical
+
 ## Change Log
+- 2026-10-23 — Rev2: ระบุขอบเขต Notes/validation
 
 - 2026-10-23 — นายช่างบันทึกคู่มืออ่าน DBML แบบเต็มและภาพเชื่อมระบบเดิมจากข้อเสนอ arch ใบงาน 010

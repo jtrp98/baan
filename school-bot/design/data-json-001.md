@@ -68,7 +68,7 @@
 | `quiz_counts` | ให้นับ Quiz เป็นคะแนนหรือไม่; false บังคับน้ำหนัก Quiz เป็น 0 |
 | `activity_weights[].activity_id` | รหัส SchoolBotActivity ที่มีน้ำหนักในนโยบายคะแนนรวม |
 | `activity_weights[].weight_bps` | น้ำหนักเป็นจำนวนเต็ม: 10000 = 100%, 2500 = 25% ไม่ใช่ 2500 คะแนน |
-| `formula_version` | รุ่นสูตรคะแนนรวม; ส่วนที่ยังรอมติธุรกิจไม่ได้ถือว่ามีสูตรพร้อมใช้แล้ว |
+| `formula_version` | weighted-normalized-v1 ตาม034; NULL ใช้เฉพาะร่างก่อนเปิดรอบ |
 | `Sources[].activity_id` | รหัสกิจกรรมต้นทางของ mapping ช่องนี้ |
 | `Sources[].indicator_key` | UUID ตัวชี้วัดที่เลือก; NULL เมื่อไม่แยกตัวชี้วัด |
 | `Sources[].weight_bps` | น้ำหนักของแหล่งผลนั้นใน mapping; 10000 = 100% |
@@ -87,6 +87,11 @@
 
 ดูทุกฟิลด์ย่อยและกฎที่ [สัญญาชนิดข้อมูล/JSON](data-dictionary/contract-index.md), [ข้อสอบ](des-010.md), [การส่งคะแนน](des-009.md) และ [เลื่อน Level](des-011.md)
 
+## นิยามเพิ่มเติม
+
+[ผลเรียน](learning-rules-032-034.md) นิยาม effective_policy/windows และ audit ผูก run; [คะแนน](grade-rules-032-034.md) นิยาม Sources หนึ่งรายการ, skipped_cells และ lock จาก snapshot
+
 ## Change Log
+- 2026-10-23 — Rev2: sync032..034; SQL เดิม
 
 - 2026-10-23 — นายช่างขยายคำอธิบาย JSON จาก data-model Rev5 และ DES-005/009/010/011 ตามคำติผู้ใช้ โดยคงรูปแบบข้อมูลเดิม
