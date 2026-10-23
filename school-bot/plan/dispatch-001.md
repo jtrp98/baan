@@ -6,17 +6,19 @@
 
 ## First wave
 
+Rev2 ใช้ [queue-002](queue-002.md) และrole_aliasesเป็นคิวปัจจุบันเมื่อข้อความเดิมขัดกัน; runนี้เฉพาะ evidence preparation ไม่ dispatch implementation/SQL/deploy
+
 12 งานต่อไปนี้ไม่มี task dependency หรือ gate precondition จึงพร้อมสำหรับการเตรียมงานตามบทบาท ยังไม่ได้ dispatch จากการรับแผนนี้
 
 1. SA-001 — contracts และ update disposition
 2. BE-001 — legacy auth source evidence
 3. DBA-001 — physical mapping review
-4. BA-001 — Guest decision pack
+4. BA-001 — สรุปมติ Guest ที่ตอบแล้วส่ง contract (spec)
 5. BA-002 — learning criteria/scope pack
 6. SEC-001 — trust/security review
 7. BA-003 — hardware acceptance pack
 8. BA-004 — delivery/decision-owner pack
-9. TP-001 — 109-AC evidence matrix
+9. TP-001 — 180-AC evidence matrix (inspect)
 10. SA-003 — Host/robot contract review
 11. UX-001 — entry/shell flows
 12. UX-003 — Lab flows
@@ -47,29 +49,17 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 
 ## Routing หลังส่งงาน
 
-ทุก role ส่ง นายช่าง เท่านั้น ผู้คุมเลือกผู้รับจากงานที่ depends_on task นั้นพร้อมตรวจ gates ไม่ให้ role เรียกต่อกันเอง
-
-| กลุ่มผู้ส่ง | ผู้รับถัดไปและหลักฐาน |
-|---|---|
-| BA-001..004 | มนุษย์ตัดสินผ่านผู้คุม แล้ว SA/UX/DBA/TP ตามสาย; decision pack ต้องมีทางเลือก ผลกระทบ และผู้ตอบ |
-| BA-005/006 | BE-015/016/017 และ FE-013 ผ่านผู้คุม; ส่ง approved inventory/criteria/rubric/คู่ผ่าน-ไม่ผ่าน |
-| SA | DBA/SEC/BE และเจ้าของ contract ผ่านผู้คุม; ส่ง revision, consumer impact และข้อรอคน |
-| DBA | ผู้มีอำนาจ schema/ผู้รัน SQL และ BE ผ่านผู้คุม; ส่ง SQL/rollback หรือผลตรวจ human evidence ไม่รันเอง |
-| UX | มนุษย์ UX sign-off แล้ว FE ผ่านผู้คุม; ส่ง artifact revision และ flow/failure coverage |
-| TP | QA และผู้ทำ fixture ตาม dependencies ผ่านผู้คุม; ส่ง AC/platform/store/mode matrix และวิธีพิสูจน์ |
-| BE/FE | ผู้ทำ consumer ถัดไปและ QA ตาม task DAG ผ่านผู้คุม; ส่ง artifact/source changes/checks/ข้อจำกัด |
-| QA | นายช่าง รับ verdict บันทึก index แล้วส่งผู้แก้หรือ PM; ห้าม PM ลง verified/blocked แทน |
-| SEC | ผู้แก้/มนุษย์รับความเสี่ยง/PM ผ่านผู้คุม; ส่ง findings, severity, RC hashes และ retest |
-| PM-001 | เจ้าของ release/shared environment/ผู้ตรวจรับผ่านผู้คุม; ส่ง full-scope evidence pack |
-| PM-002 | ผู้คุม/ผู้ใช้รับ receipts และ handover จริง; ไม่มีการ dispatch deployment จากบทบาท PM เอง |
+ใช้ [routing ปัจจุบัน](queue-002.md) Rev2; ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases
 
 ## Effort และข้อจำกัด
 
-136 person-days และแต่ละ task 1–2 วันเป็นสมมติฐาน ไม่ใช่ deadline ไม่รวมรอคน/เครื่อง/credentials ถ้า inventory หรือ matrix เกินขนาดให้ PM แตกงานก่อนจ่ายโดยไม่ renumber/ลด scope การรับครั้งนี้ไม่เพิ่ม task
+207 person-days/110งานเป็นสมมติฐาน — ยังไม่ยืนยัน ไม่ใช่deadline; แตก36งานscopeเดิมเพื่อคุม1–2วัน ไม่ลดscope/renumber ไม่เพิ่มphase
 
-ตรวจ static แล้ว 74 IDs ไม่ซ้ำ, 8 phases, 17 gates, REQ/AC associations ครบ 31/109 และ dependency ไม่มี cycle หลัง overrides First wave ยัง 12 งานพร้อมเตรียม ไม่มี SchoolBot build/test/QA/UI/hardware/SQL/release จากการตรวจแผนนี้
+Rev2:110 IDs/8phases/17gates, coverage180ACมีimplementationและcheck owner, DAGไม่วน/pendingทั้งหมด; staticแผนไม่ใช่ผลSchoolBot QA/SQL/implementation/release
 
 ## Change Log
+
+- 2026-10-23 — Rev2: reconcile44/180และคิวqueue-002; ไม่ถามนโยบายเดิมซ้ำ
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 

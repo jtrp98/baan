@@ -2,30 +2,30 @@
 
 ## Release Scope
 
-Frozen ตามมติผู้ใช้: ระบบเต็ม 31 REQ / 109 AC ไม่ลดเป็น PoC/MVP ดู [ขอบเขตและ baseline](scope-001.md) เปลี่ยนเข้า/ออกได้เฉพาะคำสั่งผู้ใช้
+Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 และ decisions-014/015/016/019..034 ไม่เพิ่ม feature/ลดระบบเต็ม ดู [scope](scope-001.md); 74งานเดิม+36งานย่อย=110งาน คง8phases/17gates; เปลี่ยนscopeเฉพาะผู้ใช้
 
 ## Waiting on Human
 
-ยังไม่มีหลักฐานปิด gates ให้รายงานรายการนี้ก่อนคิว agent ทุกครั้ง: Guest/learning/robot/delivery โดย BA-001..004; physical schema/API/custody โดย SA/DBA/SEC; legacy compatibility โดย BE-001; UX โดย UX-001..004; QA/security/release โดยผู้ตรวจและเจ้าของจริง ดูผู้เตรียม ผู้ตัดสิน และหลักฐานทั้ง 17 gates ที่ [gates](gates-001.md) ผู้มีอำนาจที่ยังไม่ระบุชื่อให้ BA-004 เตรียมเสนอ ไม่แต่งชื่อหรือเซ็นแทน
-
-SA-001 ต้องเสนอ disposition ของ DES-007 เทียบ REQ-030 ก่อน freeze release/update contract; ส่วนอิสระเดินต่อได้ ไม่ถาม PK/API/DBML ซ้ำ
+มติ Guest/Level/ข้อสอบ/สูตร/mapping/Learner A และแบบ H4 ตอบแล้ว; ค้าง SQL/runtime, credential fixtures, H5/infra/web-principal/staff_adminตั้งต้น, signed UX, เนื้อหา/criteria, หุ่น/ส่งมอบ และ export subconditions/QA/security/release ดู [หลักฐานค้าง](evidence-002.md) ไม่ถามมติเดิมซ้ำ ทีมต้องเตรียมartifactให้ตรวจ ก่อนfreezeรับผลtask-012/013ล่าสุดที่ผู้คุมบันทึกจริง
 
 ## Phases
 
 | Phase | ขอบเขต | Tasks | Effort* |
 |---|---|---:|---:|
-| P0 | ฐานและเตรียม gates | 13 | 23 |
-| P1 | DB integration | 3 | 5 |
+| P0 | ฐานและเตรียม gates | 15 | 27 |
+| P1 | DB integration | 5 | 8 |
 | P2 | License | 5 | 9 |
-| P3 | Login/Projects | 13 | 24 |
+| P3 | Login/Projects | 16 | 30 |
 | P4 | Labs/native | 14 | 27 |
-| P5 | Learning | 13 | 25 |
+| P5 | Learning | 42 | 83 |
 | P6 | Packages/acceptance | 11 | 21 |
 | P7 | ส่งมอบ | 2 | 2 |
 
-*136 person-days (สมมติฐาน — ยังไม่ยืนยัน) ไม่ใช่ deadline; phase ไม่ใช่ barrier ใช้ [DAG/คิว](dispatch-001.md)
+*207 person-days (สมมติฐาน — ยังไม่ยืนยัน) ไม่ใช่ deadline; phase ไม่ใช่ barrier ใช้ [DAG/คิว](dispatch-001.md)
 
 ## Tasks
+
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน pending ทั้งหมด; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -48,7 +48,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [TP-001](TP-001.md) | AC matrix | tp | P0 | — | pending |
 | [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | pending |
 | [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | pending |
-| [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001 | pending |
+| [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
 | [BE-004](BE-004.md) | Signed lease | be | P2 | BE-003 | pending |
 | [BE-005](BE-005.md) | Key transfer | be | P2 | BE-004 | pending |
 | [BE-006](BE-006.md) | Login/session | be | P3 | BE-007, BE-001 | pending |
@@ -76,7 +76,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [FE-012](FE-012.md) | Servo/lost | fe | P4 | FE-010 | pending |
 | [SA-002](SA-002.md) | Learning contracts | sa | P5 | BA-001, BA-002, BE-001 | pending |
 | [DBA-005](DBA-005.md) | Learning DDL | dba | P5 | SA-002, DBA-001 | pending |
-| [BE-015](BE-015.md) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006 | pending |
+| [BE-015](BE-015.md) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006, BE-027, BE-029 | pending |
 | [BA-005](BA-005.md) | Block/Code content | ba | P5 | BA-002 | pending |
 | [BA-006](BA-006.md) | Arm content | ba | P5 | BA-002 | pending |
 | [BE-016](BE-016.md) | Auto grading | be | P5 | BE-015, BA-005 | pending |
@@ -91,7 +91,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [BE-020](BE-020.md) | Windows MSI | be | P6 | FE-005, FE-016, FE-012, BE-019 | pending |
 | [BE-021](BE-021.md) | macOS PKG | be | P6 | FE-005, FE-016, FE-012, BE-011, BE-012, BE-019 | pending |
 | [BE-022](BE-022.md) | Signing/assets | be | P6 | BE-020, BE-021, SEC-001 | pending |
-| [BE-023](BE-023.md) | API deploy pack | be | P6 | BE-018, BE-017 | pending |
+| [BE-023](BE-023.md) | API deploy pack | be | P6 | BE-018, BE-017, BE-038, BE-039, FE-019, FE-020, FE-022, FE-024 | pending |
 | [QA-001](QA-001.md) | License QA | qa | P3 | BE-005, BE-006, BE-007, FE-001, FE-002, TP-002 | pending |
 | [QA-002](QA-002.md) | Projects QA | qa | P4 | FE-005, QA-001 | pending |
 | [QA-003](QA-003.md) | Labs QA | qa | P4 | FE-006, FE-007, FE-011, FE-012, BE-011, BE-012, TP-002 | pending |
@@ -102,11 +102,13 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [QA-008](QA-008.md) | Windows install QA | qa | P6 | BE-022, QA-004, QA-005 | pending |
 | [QA-009](QA-009.md) | macOS install QA | qa | P6 | BE-022, QA-004, QA-006, QA-007 | pending |
 | [QA-010](QA-010.md) | Update/assets QA | qa | P6 | QA-008, QA-009, BE-019 | pending |
-| [SEC-002](SEC-002.md) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023 | pending |
-| [PM-001](PM-001.md) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023 | pending |
+| [SEC-002](SEC-002.md) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
+| [PM-001](PM-001.md) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+
+- 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม
 
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 

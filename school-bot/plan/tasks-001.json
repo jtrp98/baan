@@ -1,6 +1,6 @@
 {
-  "revision": 1,
-  "work_date": "2026-10-21",
+  "revision": 2,
+  "work_date": "2026-10-23",
   "kind": "pm_canonical_plan",
   "phases": [
     {
@@ -39,7 +39,7 @@
   "gates": [
     {
       "id": "G-CORE",
-      "description": "มนุษย์ทบทวน core physical schema, API v2, License host authorization และ credential custody ก่อน implementation ที่พึ่งพา",
+      "description": "แบบ H4 อนุมัติแล้ว; คง runtime SQL/security/custody evidence ก่อนส่วนที่พึ่งพา",
       "refs": [
         "DES-001",
         "DES-002",
@@ -49,22 +49,36 @@
         "decisions-011",
         "decisions-013"
       ],
-      "close_evidence": "SA-001/DBA-002 เตรียม contract/placement/constraints/SQL/rollback โดยใช้ BE-001 และ SEC-001 ประกอบ ผู้มีอำนาจ schema/API/security ที่ต้องระบุตัวจริงบันทึกคำอนุมัติและขอบเขต breaking/compatibility/custody จากนั้นมนุษย์ที่ได้รับอนุญาตรัน SQL/rollback บน test DB และส่งผลพร้อม catalog/constraints/transaction evidence ให้ DBA ตรวจ ไม่ขออนุมัติ logical DBML หรือ PK ซ้ำ และไม่ใช้ gate นี้อนุญาต shared migration"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-CORE ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-027",
+        "decisions-028",
+        "decisions-029",
+        "decisions-030",
+        "decisions-032"
+      ]
     },
     {
       "id": "G-AUTH",
-      "description": "ทบทวนหลักฐาน legacy credential/profile/role/tenant compatibility ก่อนใช้ Login จริง",
+      "description": "credential compatibility และ DES-012 channel ยังต้องพิสูจน์",
       "refs": [
         "DES-004",
         "decisions-010",
         "decisions-011",
         "source-review-002"
       ],
-      "close_evidence": "BE-001 ส่ง source:line และ sanitized fixtures ของ lookup/hash/encoding/active flags/account-profile link/role/tenant ให้ SA และเจ้าของระบบเดิมตรวจยืนยัน compatibility พร้อมผู้ตรวจและวันที่จริง ข้อเท็จจริงที่ยังขาดต้องกลับไปหาหลักฐาน source ก่อน ไม่ส่งให้ธุรกิจเดา algorithm และไม่บังคับ Academic Login API/OIDC"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-AUTH ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-032"
+      ]
     },
     {
       "id": "G-GUEST",
-      "description": "มนุษย์ตัดสินรายละเอียด Guest/shared-machine/recovery/import/history และทบทวน storage migration",
+      "description": "นโยบาย Guest ตอบครบ; รอ storage/migration contract และ tests",
       "refs": [
         "OQ-007",
         "DES-003",
@@ -73,11 +87,16 @@
         "REQ-036",
         "REQ-039"
       ],
-      "close_evidence": "BA-001 เตรียมทางเลือกและผลกระทบให้เจ้าของผลิตภัณฑ์/ผู้แทนผู้ใช้ตอบเรื่องการแยกและล้างข้อมูลบน OS account ร่วม, recovery/retention, explicit import และประวัติ Guest; SA-001 เตรียม document v2/revision/copy-only migration ให้คนทบทวนก่อนเปลี่ยน contract ไม่ auto-upload ไม่สมมติผูก Guest เป็นนักเรียน และไม่ถามหลายโครงงาน Local/Cloud ซ้ำ"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-GUEST ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-014",
+        "decisions-015",
+        "decisions-032"
+      ]
     },
     {
       "id": "G-LEARN",
-      "description": "มนุษย์ยืนยัน inventory หลักสูตร criteria/rubric ความหมายผลเรียน และ scope ครู",
+      "description": "นโยบายเรียนรู้ตอบแล้ว; รอ inventory/criteria/rubric ที่มี artifact",
       "refs": [
         "OQ-009",
         "DES-005",
@@ -85,7 +104,17 @@
         "REQ-038",
         "REQ-039"
       ],
-      "close_evidence": "BA-002 เตรียม inventory สามโหมดพร้อมที่มา ผู้รับผิดชอบเนื้อหา/เกณฑ์ ตัวอย่างผ่าน-ไม่ผ่าน ความหมายดาว/ความคืบหน้า และขอบเขตครู ให้เจ้าของการเรียนรู้และผลิตภัณฑ์ยืนยันรายประเด็น คง Code/Block auto grade และ Arm ครูตรวจ; เกณฑ์ต้องวัดได้ด้วย evaluator ที่มีแบบรองรับ หากวัดไม่ได้ให้ SA เสนอแก้ contract ก่อน publish"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-LEARN ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-015",
+        "decisions-020",
+        "decisions-023",
+        "decisions-024",
+        "decisions-025",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
     },
     {
       "id": "G-HW",
@@ -101,7 +130,7 @@
     },
     {
       "id": "G-DELIVERY",
-      "description": "มนุษย์ยืนยันเกณฑ์ส่งมอบ ทรัพยากร และอนุญาต installer tests",
+      "description": "OS และผู้ตรวจภาพรวมยืนยันแล้ว; รอ delivery artifact/signing/tests",
       "refs": [
         "OQ-006",
         "OQ-011",
@@ -109,7 +138,11 @@
         "REQ-031",
         "REQ-032"
       ],
-      "close_evidence": "BA-004 เตรียม min OS/network/performance พร้อมเครื่องและวิธีวัด signing owner/identities ช่องทางแจกจ่าย ผู้ตรวจรับ และแผนทดสอบติดตั้งบนเครื่องแยก ให้ผู้มีอำนาจจริงยืนยันและอนุญาต installer test cases ไม่ถือ 300 MB/5 วินาที/30 FPS เป็น SLA ที่อนุมัติแล้ว และไม่ใช้ gate นี้อนุญาต deploy/publish shared"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-DELIVERY ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-016",
+        "decisions-019"
+      ]
     },
     {
       "id": "G-UX-ENTRY",
@@ -124,13 +157,18 @@
     },
     {
       "id": "G-UX-PROJECT",
-      "description": "มนุษย์ sign-off UX หลายโครงงาน Local/Cloud",
+      "description": "รอ signed artifact Guest/projects/import/history",
       "refs": [
         "REQ-011",
         "REQ-036",
         "DES-003"
       ],
-      "close_evidence": "หลัง G-GUEST, UX-002 ส่ง flows ของสามโหมดทั้งสอง stores รวม save failure/conflict/recovery/import ตามมติจริง ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE-003"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-UX-PROJECT ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-014",
+        "decisions-015",
+        "decisions-016"
+      ]
     },
     {
       "id": "G-UX-LABS",
@@ -146,14 +184,24 @@
     },
     {
       "id": "G-UX-LEARN",
-      "description": "มนุษย์ sign-off UX Lessons/teacher/progress ตาม criteria และ scope ที่ยืนยัน",
+      "description": "รอ signed artifacts แยก Desktop/admin/เว็บครู",
       "refs": [
         "REQ-037",
         "REQ-038",
         "REQ-039",
         "DES-005"
       ],
-      "close_evidence": "หลัง G-LEARN, UX-004 ส่ง flows Lessons แยก Labs ผล automatic/Arm pending/error/history และ teacher permissions ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE-013"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-UX-LEARN ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-016",
+        "decisions-022",
+        "decisions-023",
+        "decisions-025",
+        "decisions-031",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
     },
     {
       "id": "G-PROJECT-DB",
@@ -166,7 +214,7 @@
     },
     {
       "id": "G-LEARN-DB",
-      "description": "มนุษย์อนุมัติ learning physical schema และให้หลักฐาน SQL ทดสอบ",
+      "description": "แบบ learning ตอบแล้ว; คง SQL/runtime และ export subconditions",
       "refs": [
         "DES-005",
         "REQ-033",
@@ -174,7 +222,18 @@
         "REQ-038",
         "REQ-039"
       ],
-      "close_evidence": "หลัง G-GUEST/G-LEARN, SA-002/DBA-005 ส่ง version/snapshot/learner/reviewer/tenant/history/constraints/rollback และข้อเสนอ TeacherGrant เฉพาะเมื่อจำเป็น ให้ผู้มีอำนาจอนุมัติ มนุษย์รัน test SQL/rollback ส่ง catalog/transaction evidence ให้ DBA ตรวจ ไม่สร้าง fallback grant โดยถือว่าอนุมัติแล้ว"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-LEARN-DB ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-025",
+        "decisions-026",
+        "decisions-027",
+        "decisions-028",
+        "decisions-029",
+        "decisions-030",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
     },
     {
       "id": "G-RELEASE-DB",
@@ -210,7 +269,7 @@
     },
     {
       "id": "G-QA",
-      "description": "QA/hardware/installer/performance acceptance ครบระบบเต็ม",
+      "description": "รอ check verdict/runtime/physical/signed installer ครบ 180 AC",
       "refs": [
         "OQ-008",
         "OQ-011",
@@ -218,17 +277,31 @@
         "REQ-032",
         "requirement/index"
       ],
-      "close_evidence": "QA-001..010 ส่ง verdict/evidence ครบ 109 AC ตาม TP matrix แยก automated/UI/source-built hardware/signed installer และระบุ RC hashes คนรับรอง hardware/install/performance ตามเกณฑ์จริง Critical หรือ fail ครั้งที่สามของ task เดิมต้องให้คนตัดสินก่อนเดินต่อ QA verdict เท่านั้นเป็นที่มาของ verified/blocked ผ่าน นายช่าง"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-QA ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-016",
+        "decisions-019",
+        "decisions-032",
+        "decisions-033",
+        "decisions-034"
+      ]
     },
     {
       "id": "G-RELEASE",
-      "description": "มนุษย์อนุมัติ shared SQL/deploy/publish และส่งมอบระบบเต็ม",
+      "description": "รอมนุษย์อนุมัติ runbook/RC/environment แล้วจึงคนรันจริง",
       "refs": [
         "decisions-002",
         "decisions-013",
         "DES-007"
       ],
-      "close_evidence": "หลัง G-SEC/G-QA, PM-001 รวบรวม full-scope pack ระบุ RC hashes/environment/SQL/backup/rollback/signing/ผู้รัน/ผู้ตรวจรับ ให้เจ้าของ release และ shared environment อนุมัติอย่างเจาะจงก่อนคนรันจริง PM-002 บันทึก receipts/smoke/คำยอมรับของผู้ตรวจรับหลังเกิดจริงเท่านั้น การรับแผนหรือ verified ไม่เท่ากับ released"
+      "close_evidence": "ใช้หลักฐานค้าง/มติที่ยืนยันแล้วของ G-RELEASE ใน plan/evidence-002.md ร่วมกับ gates-001.md; ไม่มีการปิด gate ใน Rev2",
+      "approved_decisions": [
+        "decisions-002",
+        "decisions-016",
+        "decisions-025",
+        "decisions-026",
+        "decisions-029"
+      ]
     }
   ],
   "tasks": [
@@ -242,10 +315,10 @@
       "effort_days": 2,
       "goal": "จัด contracts/backend boundaries และเสนอ disposition ของ update workflow",
       "outputs": [
-        "contract review pack แยก core/projects/release",
-        "ตารางเทียบ DES-007 PrepareUpdate/InstallPreparedUpdate กับ REQ-030/AC-030-01..03 และมติจริง พร้อม disposition/ผลกระทบ/ผู้ตัดสิน"
+        "contract review pack core/projects/release/auth พร้อม revision ล่าสุด",
+        "ตาราง DES-007/REQ-030 disposition และมติ/หลักฐานค้าง"
       ],
-      "acceptance": "คง web/HTTPS/4 DB เดิม ไม่มี SchoolBotUser; แยกสิ่งยืนยันแล้วกับข้อเสนอ; trace update check/download/install ถึง REQ-030 และ decisions-002..013; เสนอ disposition ก่อน freeze implementation contract ไม่ตัด requirement หรือเพิ่ม release scope เอง; ถ้าเป็นทางเลือกธุรกิจ/schema/breaking ให้คนตัดสินและบันทึกหลักฐาน",
+      "acceptance": "รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ",
       "req_ids": [
         "REQ-027",
         "REQ-029",
@@ -298,7 +371,7 @@
       "outputs": [
         "physical mapping review"
       ],
-      "acceptance": "เทียบ16ตาราง; pending/cross-DB/null/default/audit ระบุชัด",
+      "acceptance": "เทียบ baseline 32 ตาราง/450 ฟิลด์กับ SQL/rollback และ DBML ล่าสุด; placement SchoolBot DB แยก4DBเดิม; audit int null/UpdateDate/single FK+app tenant; รับผล task-012 ไม่อ้าง runtime จาก script review",
       "req_ids": [
         "REQ-033"
       ],
@@ -306,7 +379,8 @@
         "AC-033-01",
         "AC-033-02",
         "AC-033-03",
-        "AC-033-04"
+        "AC-033-04",
+        "AC-033-05"
       ],
       "des_refs": [
         "DES-002",
@@ -333,7 +407,7 @@
       "outputs": [
         "core SQL/rollback/runbook"
       ],
-      "acceptance": "core SQL/rollback review ได้; int4/FK/audit ครบ; ยังไม่รัน shared",
+      "acceptance": "เตรียมชุด core จาก SQL รวม SchoolBot DB/rollback ล่าสุด ไม่สร้างไฟล์ grants School/PGGradeDB; ใช้ PK/FK int4/audit int null/UpdateDate; แยก H4 แบบที่อนุมัติแล้วกับผล SQL/rollback/catalog ยังไม่มี",
       "req_ids": [
         "REQ-027",
         "REQ-028",
@@ -364,11 +438,17 @@
       "outputs": [
         "catalog/rollback evidence"
       ],
-      "acceptance": "catalog/constraints/concurrency/rollback ตรงแบบ พร้อมหลักฐานผู้รัน",
+      "acceptance": "ตรวจ human execution/catalog/rollback/constraints/concurrency receipts ตรง SQL revision/hash/environment จริง ไม่รัน SQL; script review และ logical approval ไม่ใช่ runtime evidence",
       "req_ids": [
         "REQ-033"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05"
+      ],
       "des_refs": [
         "DES-002",
         "DES-004"
@@ -389,7 +469,7 @@
       "outputs": [
         "repositories/config"
       ],
-      "acceptance": "แยกcontext/tenant; restartคงข้อมูล; Clean Architecture; secrets ผ่าน config",
+      "acceptance": "แยก SchoolBot DB จาก4DB legacy; repositories/tenant recheck ข้าม connection; restartคงข้อมูล; UpdateDate opaque ETag/If-Match; secrets ผ่านconfig ไม่บันทึกknowledge",
       "req_ids": [
         "REQ-027",
         "REQ-033",
@@ -409,15 +489,17 @@
       "depends_on": [],
       "gate_ids": [],
       "effort_days": 1,
-      "goal": "เตรียมคำตัดสิน Guest",
+      "goal": "สรุปนโยบาย Guest ที่ยืนยันแล้วส่ง contract",
       "outputs": [
-        "Guest decision pack"
+        "decision-to-AC pack REQ-040..042"
       ],
-      "acceptance": "ทางเลือกและผู้ตอบ shared-machine/recovery/import/history; ไม่ตัดสินแทน",
+      "acceptance": "ใช้ decisions-014/015/032 ไม่ถาม policy เดิม; shared space/ถังขยะ30วัน/เลือก import/history/คงต้นฉบับ/กันซ้ำ/ตรวจใหม่/employee ban; storage/migration/runtime tests ยังค้าง",
       "req_ids": [
         "REQ-011",
         "REQ-036",
-        "REQ-039"
+        "REQ-040",
+        "REQ-041",
+        "REQ-042"
       ],
       "ac_ids": [],
       "des_refs": [
@@ -437,7 +519,7 @@
       "outputs": [
         "inventory/rubric decision pack"
       ],
-      "acceptance": "inventoryสามโหมดมีที่มา; criteria/ดาว/scope พร้อมคู่ผ่าน-ไม่ผ่านให้คนยืนยัน",
+      "acceptance": "นโยบาย/teacher scope/Level/สูตร/ข้อสอบตอบแล้วตาม015/020..025/032..034; เตรียม inventory/criteria/rubric สามโหมดและคู่ผ่าน-ไม่ผ่านให้คนตรวจ; ไม่ถาม OQ-014/016 ซ้ำ",
       "req_ids": [
         "REQ-037",
         "REQ-038",
@@ -486,7 +568,7 @@
       "outputs": [
         "delivery acceptance pack"
       ],
-      "acceptance": "min OS/signing/performance/วิธีวัด/ผู้รับรองให้คนยืนยัน ไม่ถือเป้าเดิมเป็น SLA",
+      "acceptance": "OS ยืนยันแล้ว Windows11 25H2 x64/macOS15+ Intel/ARM; เตรียมเครื่อง/signing/performance/วิธีวัด/ผู้รับรองและ delivery artifact; ผู้ใช้ตรวจภาพรวมตาม016 ไม่ถามOS/permissionรวมก่อนมีartifact",
       "req_ids": [
         "REQ-009",
         "REQ-030",
@@ -541,11 +623,14 @@
       "outputs": [
         "project flows"
       ],
-      "acceptance": "local/cloudสามโหมด; save failure/recovery/import ตามมติ พร้อม sign-off",
+      "acceptance": "ใช้มติ Guest ที่ตอบแล้ว; prototype save/recovery/trash30วัน/export/import/history/provenance/failureสามโหมด; sign-off artifact revision ก่อน FE ที่พึ่งพา",
       "req_ids": [
         "REQ-011",
         "REQ-017",
-        "REQ-036"
+        "REQ-036",
+        "REQ-040",
+        "REQ-041",
+        "REQ-042"
       ],
       "ac_ids": [],
       "des_refs": [
@@ -603,7 +688,7 @@
       "outputs": [
         "learning flows"
       ],
-      "acceptance": "LessonsแยกLabs; pending Arm/ผลจริง/scopeตรงมติ พร้อม sign-off",
+      "acceptance": "artifact Lessons/results/progress ใน Desktop; review/teacher progress ใน web-system/school-bot ตาม022/023/031; employee local/cloud project ไม่มีcloud result; ลงนามจริงก่อน FE; admin/exams/export แยก UX-005..007",
       "req_ids": [
         "REQ-037",
         "REQ-038",
@@ -625,9 +710,9 @@
       "effort_days": 2,
       "goal": "จัด traceability/test matrix",
       "outputs": [
-        "109-AC/platform matrix"
+        "180-AC matrix พร้อม implementation/validation owner"
       ],
-      "acceptance": "109AC มีวิธี/fixture/หลักฐาน/ผู้ตรวจ; แยก bridge/hardware/installer",
+      "acceptance": "ครบ AC จริง180ข้อจาก44REQ; อ้าง canonical task IDs/fixture/platform/store/mode/ผู้ตรวจและ evidence; แยก script review/runtime/hardware/installer; OQ closed ไม่ทำให้ ACผ่าน",
       "req_ids": [
         "REQ-009",
         "REQ-032",
@@ -659,7 +744,7 @@
       "outputs": [
         "bridge/API/clock fixtures"
       ],
-      "acceptance": "late callback/drain/transport/DB failure/lease boundary จำลองได้ ไม่สั่งหุ่น",
+      "acceptance": "late callback/drain/transport/DB/lease3วัน; เพิ่มclock30วัน/import lost response/tenant/teacher ban; export parity/crash แยกTP-003; sanitized ไม่ใช้ข้อมูลจริง",
       "req_ids": [
         "REQ-013",
         "REQ-021",
@@ -685,7 +770,7 @@
       "outputs": [
         "security review pack"
       ],
-      "acceptance": "tenant/auth/lease/replay/device/key/update trust; ระบุข้อรอคน",
+      "acceptance": "review tenant/auth/lease/replay/device/key/update trust รวม DES-012 channel/introspection/H5/bootstrap/four-eyes/v1ปิด; decisions025 รับเฉพาะtokenไม่มีexp ไม่ปิด findingsอื่น; Critical/Important ส่งคน",
       "req_ids": [
         "REQ-027",
         "REQ-028",
@@ -711,7 +796,8 @@
       "phase": "P2",
       "depends_on": [
         "BE-002",
-        "SEC-001"
+        "SEC-001",
+        "BE-039"
       ],
       "gate_ids": [],
       "effort_days": 2,
@@ -719,7 +805,7 @@
       "outputs": [
         "admin API/tests"
       ],
-      "acceptance": "tests:503/401/201/invalid/1device/restart; keyครั้งเดียว; listไม่รั่ว",
+      "acceptance": "persistent /v2/admin License ใช้ staff session/four-eyes ตาม contractล่าสุด; /v1/admin ปิดตาม025; AC027 compatibility trace โดยarch/specก่อนเริ่ม ไม่ revive static bearer; 1device/restart/keyครั้งเดียว/listไม่รั่ว",
       "req_ids": [
         "REQ-027"
       ],
@@ -808,7 +894,7 @@
       "outputs": [
         "auth API/tests"
       ],
-      "acceptance": "credential fixtureตรง; tenant/profile/logout/expiryถูก; LoginแยกLicense",
+      "acceptance": "credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence",
       "req_ids": [
         "REQ-036"
       ],
@@ -1083,9 +1169,12 @@
         "REQ-017",
         "REQ-018",
         "REQ-019",
-        "REQ-020"
+        "REQ-020",
+        "REQ-031"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-031-05"
+      ],
       "des_refs": [
         "DES-006"
       ],
@@ -1558,16 +1647,31 @@
       "outputs": [
         "learning SQL/review"
       ],
-      "acceptance": "version/learner/reviewer/tenant/history/int4/audit/rollback reviewได้",
+      "acceptance": "review learning subset ของ32ตารางรวม curriculum/Level/question/attempt/policy/mapping/outbox/promotion; SQLรวม/rollbackเดิม; ใช้UpdateDate/singleFK+tenant; LearnerAไม่เพิ่มLearnerKind; รับtask-012/013ก่อนfreeze; exportruntimepackแยกDBA-007",
       "req_ids": [
         "REQ-033",
         "REQ-037",
         "REQ-038",
-        "REQ-039"
+        "REQ-039",
+        "REQ-043",
+        "REQ-044",
+        "REQ-045",
+        "REQ-046",
+        "REQ-047",
+        "REQ-048",
+        "REQ-049",
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
       ],
       "ac_ids": [],
       "des_refs": [
-        "DES-005"
+        "DES-005",
+        "DES-008",
+        "DES-009",
+        "DES-010",
+        "DES-011",
+        "DES-012"
       ],
       "status": "pending"
     },
@@ -1580,7 +1684,9 @@
         "BE-008",
         "DBA-005",
         "BA-005",
-        "BA-006"
+        "BA-006",
+        "BE-027",
+        "BE-029"
       ],
       "gate_ids": [
         "G-LEARN-DB"
@@ -1590,7 +1696,7 @@
       "outputs": [
         "learning API/tests"
       ],
-      "acceptance": "seedเนื้อหาจริงครบinventory/version; submitผูกงาน/ผู้เรียน; เปิด/ปิดไม่ผ่าน",
+      "acceptance": "ใช้ published inventory/revision/Activityจริง; submissionผูกนักเรียน/งาน/mode; employeeห้ามทุกcloud submission path; เปิด/ปิดไม่ผ่าน; CRUD/import/CourseRun/ข้อสอบแยกBE-027..034",
       "req_ids": [
         "REQ-037",
         "REQ-038"
@@ -1701,7 +1807,7 @@
       "outputs": [
         "teacher/progress API/tests"
       ],
-      "acceptance": "Arm pendingจนauthorized review; auditผู้ตรวจ/งาน; restartคง; scopeไม่ข้ามผู้เรียน",
+      "acceptance": "Arm pendingจนauthorized review; auditผู้ตรวจ/งาน; restartคง; teacherเฉพาะรายชื่อนักเรียนที่adminกำหนด รวมกันข้ามโรงเรียนแม้ห้องเดียว/รู้ID; ใช้legacy scope ไม่มีTeacherGrantใหม่",
       "req_ids": [
         "REQ-038",
         "REQ-039"
@@ -1713,7 +1819,9 @@
         "AC-039-01",
         "AC-039-02",
         "AC-039-03",
-        "AC-039-04"
+        "AC-039-04",
+        "AC-038-05",
+        "AC-039-05"
       ],
       "des_refs": [
         "DES-005"
@@ -1795,7 +1903,7 @@
       "outputs": [
         "teacher review UI"
       ],
-      "acceptance": "Armไม่ผ่านเอง; authorized reviewผูกผู้ตรวจ/งาน; unauthorizedปฏิเสธ",
+      "acceptance": "หน้า review/teacher อยู่ web-system/school-bot ไม่อยู่Desktop; Arm pendingจนauthorized review; UX-004 signedartifact ครอบคลุมเส้นทาง/ข้อผิดพลาด; ห้ามครูตรวจนอกscope",
       "req_ids": [
         "REQ-038"
       ],
@@ -1820,7 +1928,7 @@
       "outputs": [
         "progress UI"
       ],
-      "acceptance": "restartคงผล; teacher scope; pendingแยกผ่าน; ไม่ปนscenario/บัญชี",
+      "acceptance": "Desktopแสดงผลนักเรียน/ครูทดลองlocalแยกกัน; teacher progress อยู่ web-system/school-bot; restartคง/scope/pendingตรงข้อมูลจริง",
       "req_ids": [
         "REQ-039"
       ],
@@ -2026,7 +2134,13 @@
       "phase": "P6",
       "depends_on": [
         "BE-018",
-        "BE-017"
+        "BE-017",
+        "BE-038",
+        "BE-039",
+        "FE-019",
+        "FE-020",
+        "FE-022",
+        "FE-024"
       ],
       "gate_ids": [],
       "effort_days": 1,
@@ -2034,7 +2148,7 @@
       "outputs": [
         "deployment/rollback pack"
       ],
-      "acceptance": "HTTPS/secrets/4DB/backup/health/restoreพร้อมreview; ยังไม่deploy shared",
+      "acceptance": "pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy",
       "req_ids": [
         "REQ-027",
         "REQ-036",
@@ -2067,7 +2181,38 @@
       ],
       "acceptance": "ผลรายAC: restart/race/3วัน/denial/A→B/legacy/tenant",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-027-01",
+        "AC-027-02",
+        "AC-027-03",
+        "AC-027-04",
+        "AC-028-01",
+        "AC-028-02",
+        "AC-028-03",
+        "AC-028-04",
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05",
+        "AC-034-01",
+        "AC-034-02",
+        "AC-034-03",
+        "AC-034-04",
+        "AC-034-05",
+        "AC-034-06",
+        "AC-035-01",
+        "AC-035-02",
+        "AC-035-03",
+        "AC-035-04",
+        "AC-035-05",
+        "AC-009-01",
+        "AC-009-02",
+        "AC-036-02",
+        "AC-036-03",
+        "AC-036-04",
+        "AC-036-05"
+      ],
       "des_refs": [
         "DES-002",
         "DES-004"
@@ -2091,7 +2236,23 @@
       ],
       "acceptance": "matrix:2งานทุกโหมด/บัญชี; migrate/failure/close/3ภาษา/preview",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-010-01",
+        "AC-010-02",
+        "AC-010-03",
+        "AC-011-01",
+        "AC-011-02",
+        "AC-011-03",
+        "AC-011-04",
+        "AC-012-01",
+        "AC-012-02",
+        "AC-012-03",
+        "AC-013-01",
+        "AC-013-02",
+        "AC-013-03",
+        "AC-009-03",
+        "AC-036-01"
+      ],
       "des_refs": [
         "DES-001",
         "DES-003"
@@ -2120,7 +2281,49 @@
       ],
       "acceptance": "dry-run bounds/stale/drain/stop/read/torque/lost; ไม่อ้างhardware proof",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-014-01",
+        "AC-014-02",
+        "AC-014-03",
+        "AC-015-01",
+        "AC-015-02",
+        "AC-015-03",
+        "AC-016-01",
+        "AC-016-02",
+        "AC-016-03",
+        "AC-017-01",
+        "AC-017-02",
+        "AC-017-03",
+        "AC-018-01",
+        "AC-018-02",
+        "AC-018-03",
+        "AC-019-01",
+        "AC-019-02",
+        "AC-019-03",
+        "AC-020-01",
+        "AC-020-02",
+        "AC-020-03",
+        "AC-021-01",
+        "AC-021-02",
+        "AC-021-03",
+        "AC-021-04",
+        "AC-022-01",
+        "AC-022-02",
+        "AC-022-03",
+        "AC-023-01",
+        "AC-023-02",
+        "AC-023-03",
+        "AC-024-01",
+        "AC-024-02",
+        "AC-024-03",
+        "AC-025-01",
+        "AC-025-02",
+        "AC-025-03",
+        "AC-026-01",
+        "AC-026-02",
+        "AC-026-03",
+        "AC-026-04"
+      ],
       "des_refs": [
         "DES-001",
         "DES-006"
@@ -2144,7 +2347,24 @@
       ],
       "acceptance": "ครบinventory; criteriaผ่าน-ไม่ผ่าน/Arm pending/scope/restart/cross-account",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-037-01",
+        "AC-037-02",
+        "AC-037-03",
+        "AC-037-04",
+        "AC-037-05",
+        "AC-037-06",
+        "AC-038-01",
+        "AC-038-02",
+        "AC-038-03",
+        "AC-038-04",
+        "AC-038-05",
+        "AC-039-01",
+        "AC-039-02",
+        "AC-039-03",
+        "AC-039-04",
+        "AC-039-05"
+      ],
       "des_refs": [
         "DES-005"
       ],
@@ -2172,7 +2392,9 @@
       ],
       "acceptance": "source buildล่าสุด: รุ่นที่อนุญาต: calibration/stop latency/disconnect/servo/board; คนรับรอง",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-031-05"
+      ],
       "des_refs": [
         "DES-006"
       ],
@@ -2197,7 +2419,9 @@
       ],
       "acceptance": "source buildล่าสุด: Intel native HID/Serialตามรุ่น: calibration/stop/disconnect/servo/board; คนรับรอง",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-032-02"
+      ],
       "des_refs": [
         "DES-006"
       ],
@@ -2222,7 +2446,9 @@
       ],
       "acceptance": "source buildล่าสุด: Apple Silicon nativeตามmatrix Windows; มีค่าจริงและคนรับรอง",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-032-02"
+      ],
       "des_refs": [
         "DES-006"
       ],
@@ -2248,7 +2474,13 @@
       ],
       "acceptance": "clean:WebView2มี/ไม่มี/cancel; 3โหมด; repair/uninstallคงProjects/DeviceID; upgradeกันdowngrade; nativeหุ่นจริงจากsigned MSI",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-031-01",
+        "AC-031-02",
+        "AC-031-03",
+        "AC-031-04",
+        "AC-031-05"
+      ],
       "des_refs": [
         "DES-007"
       ],
@@ -2275,7 +2507,11 @@
       ],
       "acceptance": "signed PKGเดียว:local/engines/หุ่นจริง2arch; ถอนคงdata; notarization",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-032-01",
+        "AC-032-02",
+        "AC-032-03"
+      ],
       "des_refs": [
         "DES-006",
         "DES-007"
@@ -2302,7 +2538,14 @@
       ],
       "acceptance": "signed RC benchmarkตามเกณฑ์; updateไม่install; hash/signature/payload/notices",
       "req_ids": [],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-029-01",
+        "AC-029-02",
+        "AC-029-03",
+        "AC-030-01",
+        "AC-030-02",
+        "AC-030-03"
+      ],
       "des_refs": [
         "DES-007"
       ],
@@ -2317,7 +2560,13 @@
         "QA-001",
         "QA-004",
         "BE-022",
-        "BE-023"
+        "BE-023",
+        "QA-011",
+        "QA-012",
+        "QA-013",
+        "QA-014",
+        "QA-015",
+        "QA-016"
       ],
       "gate_ids": [],
       "effort_days": 2,
@@ -2325,7 +2574,7 @@
       "outputs": [
         "findings/retest evidence"
       ],
-      "acceptance": "RCตรวจauth/tenant/tamper/replay/key/IPC/artifact; Critical/Importantส่งคน",
+      "acceptance": "RCจริงตรวจauth/channel/tenant/teacherCloudban/import/four-eyes/v1ปิด/mapping/outbox/receipt/key/IPC/artifact; Critical/Importantแก้และretestหรือคนรับความเสี่ยงเป็นลายลักษณ์อักษร; ไม่ขยายriskacceptance025",
       "req_ids": [
         "REQ-027",
         "REQ-028",
@@ -2354,15 +2603,22 @@
       "depends_on": [
         "QA-010",
         "SEC-002",
-        "BE-023"
+        "BE-023",
+        "QA-011",
+        "QA-012",
+        "QA-013",
+        "QA-014",
+        "QA-015",
+        "QA-016"
       ],
       "gate_ids": [],
       "effort_days": 1,
       "goal": "รวบรวม release readiness",
       "outputs": [
-        "full-scope release pack"
+        "full-scope release pack 44REQ/180AC",
+        "plan/release-runbook-001.md ลำดับ SQL/deploy/rollback/คนรัน"
       ],
-      "acceptance": "ครบ31REQ/109AC evidence; scopeเดิม; RC/SQL/rollback/signing/hardware/คู่มือพร้อม",
+      "acceptance": "180ACมีcheck verdict/evidenceจริง; assemble vault SQL/rollback+sys rollout+H5/identity+backup/restore/RC/hash/ผู้รัน/จุดถอยในrunbookเดียว; ค้างartifactใดห้ามประกาศreadiness; คนอนุมัติและexecuteเท่านั้น",
       "req_ids": [],
       "ac_ids": [],
       "des_refs": [],
@@ -2392,6 +2648,1395 @@
       "ac_ids": [],
       "des_refs": [],
       "status": "pending"
+    },
+    {
+      "id": "BE-024",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P3",
+      "depends_on": [
+        "BE-009"
+      ],
+      "gate_ids": [
+        "G-GUEST"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ Guest export/ถังขยะ 30 วัน",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-003 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-040"
+      ],
+      "ac_ids": [
+        "AC-040-01",
+        "AC-040-02",
+        "AC-040-03",
+        "AC-040-04",
+        "AC-040-05",
+        "AC-040-06"
+      ],
+      "des_refs": [
+        "DES-003"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-025",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P3",
+      "depends_on": [
+        "BE-008",
+        "BE-009"
+      ],
+      "gate_ids": [
+        "G-GUEST",
+        "G-PROJECT-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ explicit project import กันซ้ำ",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-004 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-041"
+      ],
+      "ac_ids": [
+        "AC-041-01",
+        "AC-041-02",
+        "AC-041-03",
+        "AC-041-04",
+        "AC-041-05"
+      ],
+      "des_refs": [
+        "DES-003",
+        "DES-004"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-026",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-025",
+        "BE-016",
+        "BE-017"
+      ],
+      "gate_ids": [
+        "G-GUEST",
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ Guest local history และตรวจใหม่",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-004/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-042",
+        "REQ-036"
+      ],
+      "ac_ids": [
+        "AC-042-01",
+        "AC-042-02",
+        "AC-042-03",
+        "AC-042-04",
+        "AC-042-05",
+        "AC-042-06",
+        "AC-036-05"
+      ],
+      "des_refs": [
+        "DES-004",
+        "DES-005"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-027",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-002",
+        "DBA-005",
+        "BE-039"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-CORE"
+      ],
+      "effort_days": 2,
+      "goal": "ทำหลักสูตรกลาง revision/publish",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-044",
+        "REQ-043",
+        "REQ-037"
+      ],
+      "ac_ids": [
+        "AC-044-01",
+        "AC-044-02",
+        "AC-044-03",
+        "AC-044-04",
+        "AC-044-05",
+        "AC-043-01",
+        "AC-037-05",
+        "AC-037-06"
+      ],
+      "des_refs": [
+        "DES-005",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-028",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-027"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ Course Plan Sheet importer",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-045"
+      ],
+      "ac_ids": [
+        "AC-045-01",
+        "AC-045-02",
+        "AC-045-03",
+        "AC-045-04"
+      ],
+      "des_refs": [
+        "DES-005"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-029",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-027",
+        "BE-006"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ CourseRun/Level/Activity รายห้อง",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-043"
+      ],
+      "ac_ids": [
+        "AC-043-02",
+        "AC-043-03",
+        "AC-043-04"
+      ],
+      "des_refs": [
+        "DES-005",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-030",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-027"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-CORE"
+      ],
+      "effort_days": 2,
+      "goal": "ทำคลังข้อสอบ revision/policy ส่วนกลาง",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046"
+      ],
+      "ac_ids": [
+        "AC-046-01",
+        "AC-046-04"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-031",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-030",
+        "BE-029"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046",
+        "REQ-036"
+      ],
+      "ac_ids": [
+        "AC-046-02",
+        "AC-046-03",
+        "AC-036-05"
+      ],
+      "des_refs": [
+        "DES-010"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-032",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-031"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ teacher override และซ่อมรายคน",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046"
+      ],
+      "ac_ids": [
+        "AC-046-05",
+        "AC-046-06"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-033",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-029",
+        "BE-031",
+        "BE-016"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ ScoringPolicy snapshot/สูตรรวม",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-047"
+      ],
+      "ac_ids": [
+        "AC-047-01",
+        "AC-047-02",
+        "AC-047-03",
+        "AC-047-04",
+        "AC-047-05"
+      ],
+      "des_refs": [
+        "DES-010"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-034",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-033",
+        "BE-017"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ทำเสนอ/ยืนยันเลื่อน Level ทั้งห้อง",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-011 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-048"
+      ],
+      "ac_ids": [
+        "AC-048-01",
+        "AC-048-02",
+        "AC-048-03",
+        "AC-048-04"
+      ],
+      "des_refs": [
+        "DES-011"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-035",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-029",
+        "BE-039",
+        "DBA-007",
+        "SA-004"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ GradeSlot/ScoreMapping ช่องเดิม",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05"
+      ],
+      "des_refs": [
+        "DES-008",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-036",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-035",
+        "BE-033"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ preview snapshot/แปลงคะแนน",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-050",
+        "REQ-051"
+      ],
+      "ac_ids": [
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-05"
+      ],
+      "des_refs": [
+        "DES-009"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-037",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-036",
+        "SA-004",
+        "DBA-007",
+        "TP-003"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ grade writer/ชน/CAS/receipt",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-051",
+        "REQ-052"
+      ],
+      "ac_ids": [
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-052-05"
+      ],
+      "des_refs": [
+        "DES-009"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-038",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P5",
+      "depends_on": [
+        "BE-037",
+        "BE-032"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ export outbox/authz/replay/recovery",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-052",
+        "REQ-051"
+      ],
+      "ac_ids": [
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05",
+        "AC-051-05"
+      ],
+      "des_refs": [
+        "DES-009",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "BE-039",
+      "owner": "sys",
+      "tier": "t3",
+      "phase": "P0",
+      "depends_on": [
+        "BE-001",
+        "SA-001",
+        "SEC-001"
+      ],
+      "gate_ids": [
+        "G-AUTH",
+        "G-CORE"
+      ],
+      "effort_days": 2,
+      "goal": "ทำ web-principal/BFF/session และ staff bootstrap",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-043"
+      ],
+      "ac_ids": [
+        "AC-043-01"
+      ],
+      "des_refs": [
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-017",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P3",
+      "depends_on": [
+        "FE-003",
+        "BE-024",
+        "UX-002"
+      ],
+      "gate_ids": [
+        "G-UX-PROJECT"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อม Guest export/ถังขยะ",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-003 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-040"
+      ],
+      "ac_ids": [
+        "AC-040-01",
+        "AC-040-02",
+        "AC-040-03",
+        "AC-040-04",
+        "AC-040-05",
+        "AC-040-06"
+      ],
+      "des_refs": [
+        "DES-003"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-018",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-017",
+        "BE-025",
+        "BE-026",
+        "UX-002",
+        "UX-004"
+      ],
+      "gate_ids": [
+        "G-UX-PROJECT",
+        "G-UX-LEARN"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อมเลือกนำเข้า project/history",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-041",
+        "REQ-042"
+      ],
+      "ac_ids": [
+        "AC-041-01",
+        "AC-041-02",
+        "AC-041-03",
+        "AC-041-04",
+        "AC-041-05",
+        "AC-042-01",
+        "AC-042-02",
+        "AC-042-03",
+        "AC-042-04",
+        "AC-042-05",
+        "AC-042-06"
+      ],
+      "des_refs": [
+        "DES-003",
+        "DES-005"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-019",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BE-027",
+        "BE-028",
+        "UX-005"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN",
+        "G-CORE"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อม admin หลักสูตร/revision/นำเข้า",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-044",
+        "REQ-045",
+        "REQ-043"
+      ],
+      "ac_ids": [
+        "AC-044-01",
+        "AC-044-02",
+        "AC-044-03",
+        "AC-044-04",
+        "AC-044-05",
+        "AC-045-01",
+        "AC-045-02",
+        "AC-045-03",
+        "AC-045-04",
+        "AC-043-01"
+      ],
+      "des_refs": [
+        "DES-005",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-020",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BE-030",
+        "UX-005"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN",
+        "G-CORE"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อม admin คลังข้อสอบ/policy",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046"
+      ],
+      "ac_ids": [
+        "AC-046-01",
+        "AC-046-04"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-021",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BE-031",
+        "FE-013",
+        "UX-007"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อมข้อสอบ Desktop/ผล attempt",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046",
+        "REQ-036"
+      ],
+      "ac_ids": [
+        "AC-046-02",
+        "AC-046-03",
+        "AC-046-04",
+        "AC-036-05"
+      ],
+      "des_refs": [
+        "DES-010"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-022",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BE-029",
+        "BE-032",
+        "BE-033",
+        "BE-034",
+        "UX-007"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อมเว็บครู CourseRun/policy/เลื่อน Level",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-047",
+        "REQ-048",
+        "REQ-046",
+        "REQ-043"
+      ],
+      "ac_ids": [
+        "AC-047-01",
+        "AC-047-02",
+        "AC-047-03",
+        "AC-047-04",
+        "AC-047-05",
+        "AC-048-01",
+        "AC-048-02",
+        "AC-048-03",
+        "AC-048-04",
+        "AC-046-05",
+        "AC-046-06",
+        "AC-043-02",
+        "AC-043-03",
+        "AC-043-04"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-011",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-023",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BE-035",
+        "UX-006"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อมเว็บ admin โรงเรียน mapping",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05"
+      ],
+      "des_refs": [
+        "DES-008",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "FE-024",
+      "owner": "front",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-023",
+        "BE-038",
+        "UX-006"
+      ],
+      "gate_ids": [
+        "G-UX-LEARN",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "เชื่อมเว็บครู preview/ชน/export status",
+      "outputs": [
+        "implementation/tests"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
+      ],
+      "ac_ids": [
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-051-05",
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05"
+      ],
+      "des_refs": [
+        "DES-009",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-011",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-018",
+        "TP-002"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "ตรวจ Guest recovery/import/history",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-003/DES-005 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-040",
+        "REQ-041",
+        "REQ-042",
+        "REQ-036"
+      ],
+      "ac_ids": [
+        "AC-040-01",
+        "AC-040-02",
+        "AC-040-03",
+        "AC-040-04",
+        "AC-040-05",
+        "AC-040-06",
+        "AC-041-01",
+        "AC-041-02",
+        "AC-041-03",
+        "AC-041-04",
+        "AC-041-05",
+        "AC-042-01",
+        "AC-042-02",
+        "AC-042-03",
+        "AC-042-04",
+        "AC-042-05",
+        "AC-042-06",
+        "AC-036-05"
+      ],
+      "des_refs": [
+        "DES-003",
+        "DES-005"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-012",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-019",
+        "BE-029",
+        "TP-001"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "ตรวจ curriculum/revision/Sheet",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-043",
+        "REQ-044",
+        "REQ-045",
+        "REQ-037"
+      ],
+      "ac_ids": [
+        "AC-043-01",
+        "AC-043-02",
+        "AC-043-03",
+        "AC-043-04",
+        "AC-044-01",
+        "AC-044-02",
+        "AC-044-03",
+        "AC-044-04",
+        "AC-044-05",
+        "AC-045-01",
+        "AC-045-02",
+        "AC-045-03",
+        "AC-045-04",
+        "AC-037-05",
+        "AC-037-06"
+      ],
+      "des_refs": [
+        "DES-005",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-013",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-020",
+        "FE-021",
+        "FE-022",
+        "TP-002"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "ตรวจข้อสอบ/policy/ซ่อม",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046",
+        "REQ-036"
+      ],
+      "ac_ids": [
+        "AC-046-01",
+        "AC-046-02",
+        "AC-046-03",
+        "AC-046-04",
+        "AC-046-05",
+        "AC-046-06",
+        "AC-036-05"
+      ],
+      "des_refs": [
+        "DES-010"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-014",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-022",
+        "QA-013"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "ตรวจสูตรรวมและเลื่อน Level",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-047",
+        "REQ-048"
+      ],
+      "ac_ids": [
+        "AC-047-01",
+        "AC-047-02",
+        "AC-047-03",
+        "AC-047-04",
+        "AC-047-05",
+        "AC-048-01",
+        "AC-048-02",
+        "AC-048-03",
+        "AC-048-04"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-011"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-015",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "FE-024",
+        "TP-003",
+        "DBA-007"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB"
+      ],
+      "effort_days": 2,
+      "goal": "ตรวจ mapping/preview/คะแนนชน",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049",
+        "REQ-050",
+        "REQ-051"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05",
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-051-05"
+      ],
+      "des_refs": [
+        "DES-008",
+        "DES-009"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "QA-016",
+      "owner": "check",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "QA-015",
+        "BE-038"
+      ],
+      "gate_ids": [
+        "G-LEARN-DB",
+        "G-AUTH"
+      ],
+      "effort_days": 2,
+      "goal": "ตรวจ export authz/outbox/receipt recovery",
+      "outputs": [
+        "verdict/evidence"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-052",
+        "REQ-051"
+      ],
+      "ac_ids": [
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05",
+        "AC-051-05"
+      ],
+      "des_refs": [
+        "DES-009"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "UX-005",
+      "owner": "int",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "BA-002",
+        "SA-002"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "เตรียม UX admin หลักสูตร/คลังข้อสอบ",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-005/DES-010/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-044",
+        "REQ-045",
+        "REQ-043",
+        "REQ-046"
+      ],
+      "ac_ids": [
+        "AC-044-01",
+        "AC-044-02",
+        "AC-044-03",
+        "AC-044-04",
+        "AC-044-05",
+        "AC-045-01",
+        "AC-045-02",
+        "AC-045-03",
+        "AC-045-04",
+        "AC-043-01",
+        "AC-046-01",
+        "AC-046-04"
+      ],
+      "des_refs": [
+        "DES-005",
+        "DES-010",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "UX-006",
+      "owner": "int",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "SA-004",
+        "BA-001"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "เตรียม UX mapping/preview/ชน/export",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049",
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05",
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-051-05",
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05"
+      ],
+      "des_refs": [
+        "DES-008",
+        "DES-009",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "UX-007",
+      "owner": "int",
+      "tier": "t2",
+      "phase": "P5",
+      "depends_on": [
+        "SA-002",
+        "BA-002"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "เตรียม UX attempt/นโยบาย/เลื่อน Level",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-010/DES-011/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-046",
+        "REQ-047",
+        "REQ-048"
+      ],
+      "ac_ids": [
+        "AC-046-01",
+        "AC-046-02",
+        "AC-046-03",
+        "AC-046-04",
+        "AC-046-05",
+        "AC-046-06",
+        "AC-047-01",
+        "AC-047-02",
+        "AC-047-03",
+        "AC-047-04",
+        "AC-047-05",
+        "AC-048-01",
+        "AC-048-02",
+        "AC-048-03",
+        "AC-048-04"
+      ],
+      "des_refs": [
+        "DES-010",
+        "DES-011",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "SA-004",
+      "owner": "arch",
+      "tier": "t2",
+      "phase": "P0",
+      "depends_on": [
+        "SA-001"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "เตรียม export contract และ proof pack",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-008/DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049",
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05",
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-051-05",
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05"
+      ],
+      "des_refs": [
+        "DES-008",
+        "DES-009",
+        "DES-012"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "TP-003",
+      "owner": "inspect",
+      "tier": "t2",
+      "phase": "P1",
+      "depends_on": [
+        "TP-001",
+        "SA-004"
+      ],
+      "gate_ids": [],
+      "effort_days": 2,
+      "goal": "เตรียม grade parity/coexist/crash fixtures",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-049",
+        "REQ-050",
+        "REQ-051",
+        "REQ-052"
+      ],
+      "ac_ids": [
+        "AC-049-01",
+        "AC-049-02",
+        "AC-049-03",
+        "AC-049-04",
+        "AC-049-05",
+        "AC-050-01",
+        "AC-050-02",
+        "AC-050-03",
+        "AC-050-04",
+        "AC-051-01",
+        "AC-051-02",
+        "AC-051-03",
+        "AC-051-04",
+        "AC-051-05",
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05"
+      ],
+      "des_refs": [
+        "DES-009"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "DBA-007",
+      "owner": "vault",
+      "tier": "t2",
+      "phase": "P1",
+      "depends_on": [
+        "DBA-001",
+        "SA-004"
+      ],
+      "gate_ids": [],
+      "effort_days": 1,
+      "goal": "เตรียม cross-DB/export runtime evidence pack",
+      "outputs": [
+        "artifact/evidence pack"
+      ],
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-009/DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "req_ids": [
+        "REQ-052",
+        "REQ-033"
+      ],
+      "ac_ids": [
+        "AC-052-01",
+        "AC-052-02",
+        "AC-052-03",
+        "AC-052-04",
+        "AC-052-05",
+        "AC-033-04",
+        "AC-033-05"
+      ],
+      "des_refs": [
+        "DES-009",
+        "DES-012"
+      ],
+      "status": "pending"
     }
   ],
   "first_wave": [
@@ -2409,11 +4054,43 @@
     "UX-003"
   ],
   "assumptions": [
-    "136 person-days เป็นสมมติฐาน ไม่ใช่ deadline; task1–2วัน ไม่รวมรอคน/อุปกรณ์/credentials",
+    "207 person-days/110งานเป็นสมมติฐาน — ยังไม่ยืนยัน ไม่ใช่deadline; งาน1–2วัน ไม่รวมรอคน/เครื่อง/credentials; แตก36งานscopeเดิม ไม่เพิ่มphase/feature",
     "inventoryหลักสูตร/เครื่องทดสอบสมมติพอดีtask; เกิน2วัน PM แตกเพิ่มก่อนมอบ ไม่ลดscope/renumber",
     "REQยังDRAFT/DESยังPROPOSED ยกเว้นlogical baseline; ไม่มี SchoolBot implementation completed",
     "ผู้ลงมืออ่านREADME/as-built; ใช้skills/components/i18n/checks/release scriptsตามAGENTS; แก้ซ้ำสูงสุด2รอบแล้วให้คนตัดสิน",
     "gateเป็นpreconditionจากคน ไม่ใช่roleCLI; SQL/rollbackreviewก่อนคนรัน; PMรับข้อเสนอก่อนสร้างplan"
   ],
-  "adoption": "PM รับ planning/tasks-001.json revision 1 เป็น canonical plan จำนวน 74 tasks / 8 phases / 17 gates โดยรับทุก field ที่ไม่มี override ตามต้นฉบับ รวม REQ/AC associations เดิมครบ 31 REQ / 109 AC ไม่ renumber ไม่เพิ่ม task และไม่เปลี่ยน release scope ที่ผู้ใช้ยืนยัน ทุก task เริ่ม pending ทั้งใน index และ canonical task JSON; ค่า verified/blocked ต้องมาจาก QA verdict ผ่าน MYCELIUM เท่านั้น การรับแผนไม่ใช่อนุมัติ REQ ที่ยัง DRAFT หรือ DES ที่ยัง PROPOSED และไม่ใช่ implementation/release approval ข้อยกเว้นที่ยืนยันแล้วคือ logical baseline ตาม decisions-013 เท่านั้น ใช้ gates และ first_wave ในผลนี้แทนรายการระดับเดียวกันของข้อเสนอ ส่วน task_overrides ใช้ shallow merge โดยรักษา fields อื่นครบ ผลนี้เป็นเนื้อหาที่ PM ส่งให้บันทึกเชิงกล ยังไม่ได้เขียนไฟล์จริงในบทบาท read-only ให้สร้าง plan/tasks-001.json จาก source พร้อม overrides และ status pending; render plan/<id>.md หนึ่งไฟล์ต่อ task ด้วยชื่อ '# {id} — {goal}' และ task_template แปดหัวข้อ โดย task_sections แทนเฉพาะหัวข้อที่ระบุ ใช้เฉพาะ placeholders และกฎ renderer ที่ผู้ใช้กำหนด ห้ามเติมคำตัดสินผลิตภัณฑ์เอง ทุกใบงานเติม Change Log ด้วยข้อความตรงตัว '2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract' ไฟล์ใน files เป็นข้อความฉบับเต็มสำหรับการสร้างครั้งแรก หากพบไฟล์เดิมระหว่างบันทึกให้หยุดตรวจ diff และ amend พร้อม Change Log แทนการ overwrite; backlog เดิมต้อง append-only"
+  "adoption": "Rev2 วันที่2026-10-23 reconcile แผนเดิมตาม planning/spec-review-001 และ decisions-014/015/016/019..034: 44REQ/180AC, 110tasks/8phases/17gates; คง74IDsเดิมและทุกสถานะpending ไม่มีcheck verdict; เพิ่ม36งานย่อยของscopeที่ผู้ใช้ยืนยันแล้วเพื่อคุม1–2วัน ไม่เพิ่มfeature/phase; role aliasesใช้บทบาทปัจจุบัน; แบบH4/นโยบายที่ตอบแล้วไม่ใช่runtimeSQL/UX/QA/security/release approval; task-012/013 ต้องตรวจผลล่าสุดก่อนfreeze/implement",
+  "role_aliases": {
+    "sa": "arch",
+    "ba": "spec",
+    "be": "sys",
+    "fe": "front",
+    "dba": "vault",
+    "tp": "inspect",
+    "qa": "check",
+    "sec": "jpo",
+    "ux": "int",
+    "pm": "gm"
+  },
+  "change_log": [
+    {
+      "date": "2026-10-23",
+      "revision": 2,
+      "refs": [
+        "planning/spec-review-001.md",
+        "planning/task-011.md",
+        "planning/task-013.md",
+        "requirement/decisions-032.md",
+        "requirement/decisions-033.md",
+        "requirement/decisions-034.md"
+      ],
+      "summary": "reconcile44/180; แตก36งานในscopeเดิม; คง17gates/8phases/74IDsเดิม/pendingทั้งหมด"
+    }
+  ],
+  "preconditions": {
+    "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น",
+    "owner_resolution": "Owner/คำเรียกroleเก่าในใบงานและdispatchใช้role_aliases; IDprefixคงเดิม",
+    "release": "DONEในresponseหมายถึงpatchแผนพร้อมบันทึก ไม่ใช่released; งานทั้งหมดpendingจนcheck verdict/ผู้คุมบันทึก"
+  }
 }
