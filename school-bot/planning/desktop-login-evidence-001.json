@@ -1,0 +1,380 @@
+{
+  "state": "DONE",
+  "summary": "ใบงาน033 ตรวจ static evidence ครบตามสามช่องทาง พบส่วนที่ลงโค้ดได้หลัง arch ยืนยันคือ core จำแนกผล authentication และตรวจ admission แบบ fail closed โดยไม่ออก session ส่วน Desktop login ที่ใช้งานสำเร็จครบวงจรยังขาด device/continuation/identity contract และ persistence จริง โดยเฉพาะ G ใช้ Master.TUser แต่ AccountId ในแบบอ้าง TMasterDBUser จึงห้ามเทียบ SId ตรงกันเอง ไม่ต้องเลือกหรือทำ password hash ซ้ำ คง C/opaque session/License/Channel/DeviceJkt/มติ035/fresh authorization ทั้งหมด",
+  "graph_trace": {
+    "skill": "G/.claude/skills/graphify/SKILL.md และ references/query.md; ตรวจ find-skills policy และใช้ postman:api-engineer เทียบ local contract",
+    "aliases": "G=C:/src/schoolbright/target/sb-api-gateway; B=C:/src/schoolbright/target/school-bot; K=C:/src/schoolbright/knowledge/school-bot",
+    "expanded_tokens": [
+      "auth",
+      "login",
+      "web",
+      "token",
+      "device",
+      "verification",
+      "student",
+      "employee",
+      "user",
+      "two",
+      "factor",
+      "contact"
+    ],
+    "cli": "graphify query พร้อม --budget 2200 เรียกไม่ได้: interpreter ของ uv ถูกระบบปฏิเสธการเข้าถึง ไม่ติดตั้งหรือซ่อมเครื่องมือ",
+    "fallback": "อ่าน graph.json เข้า memory ด้วย PowerShell; BFS depth3 จาก 3 seeds ที่จัดอันดับด้วย token overlap แล้ว DFS depth6 จาก AuthService/WebLoginService/WebTwoFactorService/TusersRepository; ไม่เขียน .vocab/result/graph",
+    "paths": [
+      "AuthService:L11 → LoginAsync:L99 → IEmployeesRepository.FindEmployeeByEmpIdAndSchoolIdAsync:L12 → EmployeesRepository:L20",
+      "WebLoginService:L28 → LoginAsync:L55 → WebLoginResult:L89 → WebLoginStatus:L56",
+      "WebTwoFactorService:L51 → BeginAsync:L75 → TrustedDeviceTokens.IsValid:L27 และ RedisWebLoginChallengeStore.CreateAsync:L20",
+      "TusersRepository:L13 → FindUserByIdAndSchoolIdAsync:L36 และ GetStudentClassroomDetailsAsync:L184"
+    ],
+    "limitations": "graph มี source_location เก่าบางจุด เช่น WebLoginChallenge:L55 แต่ source ปัจจุบัน:L64; หลักฐานด้านล่างใช้เลขบรรทัดที่อ่านจาก source จริง ไม่ถือ graph edge เป็นหลักฐาน runtime หรือ FK"
+  },
+  "student_flow": [
+    {
+      "finding": "POST /api/auth/login มีจริง รับ {user,password,schoolId,imei}; bounds user100/password20/imei50, schoolId1..99999; IMEI ไม่บังคับ แต่ไม่มี IMEI จะไม่ผ่าน device verification",
+      "evidence": [
+        "G/src/ApiGateway.API/Controllers/AuthController.cs:35",
+        "G/src/ApiGateway.Application/DTOs/Commons/Auth/Requests/LoginRequest.cs:5",
+        "G/src/ApiGateway.Application/DTOs/Commons/Auth/Requests/Validators/LoginRequestValidator.cs:10"
+      ]
+    },
+    {
+      "finding": "หลัง password ถูก ค้น TB_FCM ด้วย UserId=SId, SchoolId=NCompany, Imei และ active/not deleted; verified เฉพาะ FdVerifyStatus==2 จึงคืน token AccessLevel='1'; กรณีอื่นคืน temporaryToken AccessLevel='0'. forceResetPassword=!UseEncryptPassword เป็นเงื่อนไขแยก จึงอาจมี full token แต่ยังต้อง reset ห้ามออก SchoolBot session",
+      "evidence": [
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:177",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:196",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:207",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:300",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TB_FCMRepository.cs:58"
+      ]
+    },
+    {
+      "finding": "terminal candidate ต้อง token ไม่ว่าง, temporaryToken ว่าง, isDeviceVerified=true, forceResetPassword=false และ trusted token validation ผ่านพร้อม active directory ของ B; HTTP200/statusCode='200'/desc ใช้ตัดสินความสำเร็จไม่ได้ Login มีการเขียน attempts/lock/token claim จึงห้าม retry อัตโนมัติ",
+      "evidence": [
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:162",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:173",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:312",
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:118",
+        "K/design/gateway-login-reuse-001.md:21"
+      ]
+    },
+    {
+      "finding": "ไม่พบ active implementation ของ mobile verify/reset/approval ในเส้นที่ตรวจ: ServiceMobile/AuthController และ DeviceController เป็น comment ทั้งไฟล์ รวม verification/v3, change-password, password/change และ tokens/refresh. TB_FCMRepository มี lookup และแก้ IP แต่ไม่มี transition อนุมัติสถานะ ดังนั้นพิสูจน์ได้เพียงสถานะ2=verified; ไม่กำหนดความหมายสถานะอื่นหรืออ้าง lifecycle ครบ",
+      "evidence": [
+        "G/src/ApiGateway.API/Controllers/ServiceMobile/AuthController.cs:1",
+        "G/src/ApiGateway.API/Controllers/ServiceMobile/AuthController.cs:123",
+        "G/src/ApiGateway.API/Controllers/ServiceMobile/AuthController.cs:212",
+        "G/src/ApiGateway.API/Controllers/ServiceMobile/AuthController.cs:303",
+        "G/src/ApiGateway.API/Controllers/ServiceMobile/DeviceController.cs:1",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TB_FCMRepository.cs:67"
+      ]
+    },
+    {
+      "finding": "full/temporary token ที่ AuthService เรียกมีอายุ5นาทีเท่ากันจาก default argument; มี issuer/audience/nbf/exp/jti และ AccessLevel ต่างกัน ไม่มี refresh route ที่ใช้งานจริงในหลักฐานนี้ ห้ามนำ comment refresh มาเป็น dependency",
+      "evidence": [
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:199",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:204",
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:54",
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:80",
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:101"
+      ]
+    },
+    {
+      "finding": "B มีเพียง installation ID สุ่ม16bytes เป็น hex32 เก็บไฟล์ device-id ใช้ License v1; ไม่ใช่ hardware IMEI และไม่ใช่ DeviceJkt ไม่มีหลักฐาน mobile ownership/approval ที่รับ ID นี้ จึง reuse mobile password pipeline ได้แบบมีเงื่อนไข แต่เส้น device completion สำหรับ Desktop ยังขาดอย่างหลีกเลี่ยงไม่ได้",
+      "evidence": [
+        "B/app/desktopservice.go:70",
+        "B/app/desktopservice.go:118",
+        "B/app/desktopstorage.go:37",
+        "K/design/des-004.md:64"
+      ]
+    }
+  ],
+  "teacher_flow": [
+    {
+      "finding": "candidate หลักคือ POST /api/auth/web/login รับ schoolId,username,password,lang?,trustedDeviceToken?; username100/password100 ไม่ trim password; username ถูก Trim ใน service. /first-password รับ changeToken,newPassword,lang; change token เป็น timed DataProtection purpose web-login.first-password.v1 อายุ10นาที ผูก SId/NCompany/username ตรวจ IsFirstLogin ก่อนแก้ password และไป AfterPasswordAsync ต่อ",
+      "evidence": [
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:15",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:143",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:39",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:58",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:118",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:137"
+      ]
+    },
+    {
+      "finding": "wire envelope={code,message,messageTh,results,requestId}. HTTP200 มี4ผล: results.requirePasswordChange=true+changeToken; results.next='two-factor'+challengeToken/expiresAt/channels; next='contact'+challengeToken/expiresAt/missing; terminal results.token/expiresAt/user/requirePasswordChange=false/trustedDeviceToken?. Caller ต้องจำแนกผลและปฏิเสธ contradictory/malformed result ไม่ใช้ HTTP200=success",
+      "evidence": [
+        "G/src/ApiGateway.Application/Auth/WebLogin.cs:56",
+        "G/src/ApiGateway.Application/Auth/WebLogin.cs:89",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:265",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:302",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:348"
+      ]
+    },
+    {
+      "finding": "continuation: POST two-factor/send={challengeToken,channel:sms|email}; verify={challengeToken,code,trustDevice}; contact/send={challengeToken,type:phone|email,value}; contact/verify เพิ่ม code/trustDevice. Token<=200/code<=20/value<=100; send200={ref,masked,expiresAt,resendAfterSeconds}. Verify อาจเปลี่ยนเป็น contact อีก ต้องวนจน terminal จริง",
+      "evidence": [
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:35",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:168",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:191",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:212",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:245"
+      ]
+    },
+    {
+      "finding": "challenge สุ่ม32bytes base64url เก็บ server state ผูก SId,EmployeeKey,SchoolId,username,pwdStamp,stage,channels,target/ref; contact verify ต้องตรง type/value/channel ที่ส่ง OTP. Defaults OTP6หลัก/300วินาที/resend60วินาที/3ส่งต่อ scope/5 attempts; stage900วินาที absolute1800วินาที ต่ออายุเมื่อผ่านขั้นเท่านั้น Scope เป็น stage+missing.Count จึงมีงบใหม่เมื่อ contact ที่ขาดลดลง; claim ใช้ atomic Take กัน replay/parallel success",
+      "evidence": [
+        "G/src/ApiGateway.Application/Auth/WebTwoFactor.cs:30",
+        "G/src/ApiGateway.Application/Auth/WebTwoFactor.cs:64",
+        "G/src/ApiGateway.Application/Auth/WebTwoFactor.cs:83",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:157",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:245",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:288",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:300"
+      ]
+    },
+    {
+      "finding": "defaults send limiter: target+account5/ชั่วโมงและ10/วัน, target200/วัน, account10/วัน; sensitive10/60วินาที/IP, auth-flow60/60วินาที/IP. เป็น defaults ไม่ใช่ deployed config. wrong-stage/input400; wrong-code400พร้อม attemptsLeft; expired-code400; expired/consumed challenge401; attempts exhausted401; resend/send-limit429; delivery502; not-configured503. resend-too-soon คืน retryAfterSeconds ใน results ไม่ควรสมมติว่าทุก429มี Retry-After header",
+      "evidence": [
+        "G/src/ApiGateway.Application/Auth/WebTwoFactor.cs:43",
+        "G/src/ApiGateway.API/RateLimiting/SbRateLimitOptions.cs:58",
+        "G/src/ApiGateway.API/RateLimiting/SbRateLimitOptions.cs:65",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:245",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:285"
+      ]
+    },
+    {
+      "finding": "trustedDeviceToken เป็น DataProtection purpose web-login.trusted-device.v1 ผูก SId/SchoolId/pwdStamp/expiry default30วัน ใช้ข้าม OTP หลัง password ถูกเท่านั้น ไม่ใช่ session token และไม่ข้าม contact ที่ยังจำเป็น กรณีไม่มี contact แล้วเพิ่ม contact เป็น2FAครั้งแรกจะไม่ออก trusted token แม้ส่ง trustDevice=true",
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Authentication/TrustedDeviceTokens.cs:15",
+        "G/src/ApiGateway.Infrastructure/Authentication/TrustedDeviceTokens.cs:27",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:88",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:185"
+      ]
+    },
+    {
+      "finding": "terminal web JWT HS256 อายุ12ชั่วโมง ไม่มี purpose/aud/iss ใน session ปกติ; handoff ใช้ keyเดียวกันแต่ purpose=legacy-handoff/aud=sb-web-system/iss=sb-api-gateway อายุ90วินาที clamp30..300. GetWebSessionPrincipal ตรวจ signature/lifetime เมื่อมีexp แต่ไม่บังคับexp/issuer/audience และไม่ปฏิเสธ purpose; จึงไม่ใช่ SchoolBot trusted admission สำเร็จในตัว ต้องคง private introspection C พร้อมปฏิเสธ purpose/aud ตาม DES-012",
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Authentication/LegacyWebTokenFactory.cs:15",
+        "G/src/ApiGateway.Infrastructure/Authentication/LegacyWebTokenFactory.cs:49",
+        "G/src/ApiGateway.Infrastructure/Authentication/LegacyWebTokenFactory.cs:67",
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:184",
+        "K/design/des-012.md:37"
+      ]
+    },
+    {
+      "finding": "reuse web challenge services/wire flow ได้หลัง arch กำหนด Desktop continuation; ห้าม fallback mobile. B ที่ตรวจไม่มี browser launch/callback/auth-code redemption/PKCE/state binding หรือ token handback seam. System browser ทำได้เป็นทางเลือกออกแบบใหม่ ไม่ใช่เพียงเปิด URL แล้วรับ token; ต้องกำหนด callback trust และ License/DeviceJkt binding ก่อน",
+      "evidence": [
+        "B/app/desktopservice.go:31",
+        "B/app/desktopservice.go:109",
+        "B/app/frontend/src/core/client.ts:13",
+        "K/design/des-004.md:36",
+        "K/design/gateway-login-reuse-001.md:19"
+      ]
+    }
+  ],
+  "identity_mapping": [
+    {
+      "actor": "Desktop student",
+      "keys": "mobile JWT: Name/Email/Sid/PostalCode/AccessLevel/Expiration/jti และ iss/aud/nbf/exp; Sid=Master.TUser.SId, PostalCode=NCompany. CType/NSystemId ไม่ได้อยู่ใน token",
+      "proven": "FindAuthUserDetail กรอง NCompany+username+CDel!='1' เรียง SId ล่าสุด; CType='0' เข้า student branch; School.TUser lookup ใช้ SId==Master.SId และ SchoolId==NCompany เป็น code equality",
+      "gap": "แบบ AccountId อ้าง TMasterDBUser.sID แต่ G EF map Master.TUser ไม่ใช่ TMasterDBUser; ยังไม่มี relation/actual data proof ระหว่างสองบัญชี และ Master.SId→School student. student lookup ไม่กรอง CDel; history by term ไม่กรอง SId/SchoolId และ null ข้าม inactive check ตาม BL-002. ต้องกำหนด active predicate แบบ scoped/fail closed ไม่ลอก query",
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Common/Authentication/JwtTokenService.cs:80",
+        "G/src/ApiGateway.Infrastructure/Common/Databases/JabjaiMasterSingleDBPostgreSQLDbContext.cs:2816",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TusersRepository.cs:103",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TusersRepository.cs:36",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TstudentClassroomHistoriesRepository.cs:35",
+        "G/src/ApiGateway.Application/Services/Implementations/AuthService.cs:254",
+        "K/design/data-dictionary/legacy-001.md:9",
+        "K/backlog.md:25"
+      ]
+    },
+    {
+      "actor": "Desktop teacher",
+      "keys": "web JWT: user_id/admin_id/entities/user_name/user_name_en/user_type/SchoolDBConnectionString/NCompany/IsAdmin/HostURL/AuthKey/AuthValue/lang/iat/exp; user_id=NSystemId??SId, admin_id=null, user_type='1', IsAdmin=0",
+      "proven": "web lookup CType='1', NCompany ตรง, CDel=null. WorkStatus ก่อน challenge ใช้ SEmp=SId ไม่มี tenant; 2FA EmployeeKey ใช้ NSystemId>1 มิฉะนั้น SId พร้อม SchoolId; terminal token ใช้ NSystemId??SId. mobile employee lookup ใช้ NSystemId+SchoolId+CDel='0'",
+      "gap": "สามกฎ key ไม่เท่ากันเมื่อ NSystemId<=1/แตกจากSId; ห้ามกำหนด AccountId/profile จาก tokenเอง ยังขาด inverse mapping แบบไม่กำกวม, tenant-qualified current salary selection และเงื่อนไข missing employee/salary. 2FA recheck ยังยอมผ่านเมื่อไม่พบ employee และ salary FirstOrDefault ไม่เรียง จึงไม่รับเป็น active proof ของ B",
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:64",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:206",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebLoginService.cs:272",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:330",
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:379",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/EmployeesRepository.cs:20",
+        "G/src/ApiGateway.Infrastructure/Authentication/LegacyWebTokenFactory.cs:49"
+      ]
+    },
+    {
+      "actor": "tenant/FK/server exchange",
+      "keys": "Master.TUser PK=SId; School.TUser PK=(SchoolId,SId); TEmployees PK=(SchoolId,SEmp); TEmpSalary PK=(SchoolId,SEmp,Id)",
+      "proven": "เป็น declared EF keys; student classroom join มี equality (SId,SchoolId). ไม่พบ declared FK ที่พิสูจน์ Master account→School profile ใน entity blocks ที่ตรวจ และไม่มี cross-DB data verification",
+      "gap": "035 ยุติ policy แล้ว: ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่งserverและคงsuperadmin ไม่เชื่อ IsAdmin=0/1 เป็น authority เดี่ยว. ยังต้อง mapping/active school/employee และ fresh group lookup; ห้ามลอก BL-002/004. ใช้ trusted Gateway outcome แล้วปลด dependency password/hash compatibility ของ B ได้ แต่ไม่ปลด directory/authorization",
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Common/Databases/JabjaiSchoolSingleDBPostgreSQLDbContext.cs:2447",
+        "G/src/ApiGateway.Infrastructure/Common/Databases/JabjaiSchoolSingleDBPostgreSQLDbContext.cs:2580",
+        "G/src/ApiGateway.Infrastructure/Common/Databases/JabjaiSchoolSingleDBPostgreSQLDbContext.cs:6747",
+        "G/src/ApiGateway.Infrastructure/Repositories/Databases/TusersRepository.cs:191",
+        "K/design/des-012.md:85",
+        "K/requirement/decisions-035.md:15"
+      ]
+    }
+  ],
+  "implementation_slices": [
+    {
+      "name": "Gateway outcome decoder และ admission policy core",
+      "ready": "conditional",
+      "files": [
+        "B/web/src/SchoolBot.Application/Authentication/GatewayAuthenticationOutcome.cs (เสนอเพิ่ม)",
+        "B/web/src/SchoolBot.Application/Authentication/DesktopAuthenticationAdmission.cs (เสนอเพิ่ม)",
+        "B/web/src/SchoolBot.Infrastructure/Authentication/GatewayLoginResponseDecoder.cs (เสนอเพิ่ม)",
+        "B/web/tests/SchoolBot.Tests/GatewayAuthenticationOutcomeTests.cs (ให้ check เขียน)"
+      ],
+      "behavior": "slice ที่แนะนำ: bounded JSON decoder จำแนก terminal/password-change/2FA/contact/temporary/reset/errors และ pure admission policy ปฏิเสธ incomplete/untrusted/cross-tenant/unknown mapping โดยไม่มี network/persistence/session issuance. เป็น logic จริงที่ adapter ต้องใช้ ไม่สร้าง success stub หรือ credentials verifier",
+      "prerequisites": [
+        "arch ยืนยัน internal outcome contract และ malformed/contradictory/upstream error mapping; DTO ใหม่เป็นข้อเสนอ ไม่ใช่สัญญาที่ sys เพิ่มเอง",
+        "ยืนยัน validation ของ /v2 กับ upstream bounds โดยไม่ truncate/normalize password",
+        "แยก terminal candidate จาก trusted authenticated identity; decoder ห้าม validate ด้วยการ decode JWT อย่างเดียว",
+        "ไม่ต้องรอ H5 deployment เพื่อ implement/test core นี้ แต่ยังไม่ register เป็น public login สำเร็จ"
+      ],
+      "tests": [
+        "HTTP200+temporaryToken/forceReset/requirePasswordChange/next แต่มี tokenปน ต้องไม่ผ่าน",
+        "missing/null/wrong types/duplicate keys/oversized/truncated JSON และ unknown discriminant ต้อง fail closed",
+        "upstream body code ขัด HTTP status; HTML502/429; ห้ามส่ง raw upstream details/secret",
+        "identity จากคนละschool, AccessLevel0, expired/unvalidated token, unknown AccountId/profile ต้องปฏิเสธ",
+        "สำเร็จจริงครบ field จำแนกเป็น candidate เท่านั้น ไม่มี session/persistence side effect"
+      ],
+      "evidence": [
+        "B/web/src/SchoolBot.Application/ManagementService.cs:12",
+        "B/web/tests/SchoolBot.Tests/ApiHelpers.cs:12",
+        "G/src/ApiGateway.API/Controllers/WebAuthController.cs:265",
+        "K/design/gateway-login-reuse-001.md:21"
+      ]
+    },
+    {
+      "name": "Desktop student login ครบวงจร",
+      "ready": "no",
+      "files": [
+        "B/web/src/SchoolBot.Api/Program.cs",
+        "B/web/src/SchoolBot.Application/Authentication/ (ต้องเพิ่ม use case)",
+        "B/web/src/SchoolBot.Infrastructure/Authentication/ (ต้องเพิ่ม adapter/directory)",
+        "B/app/desktopservice.go",
+        "B/app/frontend/src/core/client.ts"
+      ],
+      "behavior": "Gateway full authentication→trusted identity→active directory→License/device proof→opaque unbound session5นาที→bind profile; ไม่มี slice success ที่ครบได้ด้วย source ปัจจุบัน",
+      "prerequisites": [
+        "owner ให้ active mobile verification/reset/approval contract และ Desktop device compatibility หรือ arch ออกแบบ student entrypoint ใหม่โดยใช้ authentication เดิม",
+        "ยืนยัน Master.TUser↔TMasterDBUser↔School student mapping",
+        "session/license binding/device key/audit transaction persistence จริง; ห้ามใช้ InMemoryManagementStore เป็น production session",
+        "transport review ก่อน enable ผ่าน G"
+      ],
+      "tests": [
+        "verified IMEI ของคนอื่น/โรงเรียนอื่น, missing device, pending approval, reset-required",
+        "inactive/null/foreign history, duplicate identity, revoked License, wrong DeviceJkt",
+        "concurrent bind/revoke, stale authorizationก่อนcommit, session expiry"
+      ],
+      "evidence": [
+        "B/web/src/SchoolBot.Infrastructure/Persistence/InMemoryManagementStore.cs:8",
+        "B/app/desktopservice.go:70",
+        "K/design/des-004.md:64",
+        "K/design/des-004.md:72"
+      ]
+    },
+    {
+      "name": "Desktop teacher continuation และ browser completion",
+      "ready": "conditional",
+      "files": [
+        "B/web/src/SchoolBot.Application/Authentication/ (เสนอ continuation core)",
+        "B/web/src/SchoolBot.Infrastructure/Authentication/ (เสนอ web-flow adapter)",
+        "B/app/desktopservice.go",
+        "B/app/desktopservice_test.go"
+      ],
+      "behavior": "reuse challenge wire flow ได้หลัง arch เลือก continuation surface; browser completion ต้องออกแบบ callback/redemption ใหม่ ไม่มี seam ที่นำมาใช้ได้ทันที ไม่มี mobile fallback",
+      "prerequisites": [
+        "amend /v2/auth/login ที่ปัจจุบันมีเพียงschool_id/username/password ให้รองรับ continuation โดย arch ระบุ field/endpoints เอง",
+        "trusted terminal validation และ reverse employee/account mapping",
+        "แยก core state transition ซึ่งทดสอบได้ก่อน H5 ออกจาก browser callback/OS credential store/session persistence ที่ยังขาด"
+      ],
+      "tests": [
+        "ผิดstage/ผิดtarget/replay/resend/parallel completion/expired challenge",
+        "contact หลัง2FAต้องไม่ออกsessionก่อนครบ",
+        "callbackต่างstate/account/school/device และ late callbackหลังlogoutต้องปฏิเสธ",
+        "password/terminal tokenไม่หลุด renderer/log/disk"
+      ],
+      "evidence": [
+        "G/src/ApiGateway.Infrastructure/Authentication/WebTwoFactorService.cs:133",
+        "B/app/desktopservice.go:125",
+        "B/app/desktopservice_test.go:132",
+        "K/design/des-004.md:76"
+      ]
+    },
+    {
+      "name": "server exchange C และ session expiry policy",
+      "ready": "conditional",
+      "files": [
+        "B/web/src/SchoolBot.Application/Authentication/ (เสนอ pure exchange eligibility/expiry)",
+        "B/web/src/SchoolBot.Api/Program.cs (ต่อ endpoint ภายหลัง)",
+        "B/web/src/SchoolBot.Api/ApiErrors.cs (ต่อ v2 error contract ภายหลัง)"
+      ],
+      "behavior": "core คำนวณ min(source expiry, school_web30นาที/staff_admin8ชั่วโมง) และตรวจ Channel/License/StaffRole/DeviceJkt จาก trusted inputs ทดสอบได้ก่อน runtime; public exchange success ยังเปิดไม่ได้",
+      "prerequisites": [
+        "arch ยืนยัน core inputs; คงไม่มีexpได้เฉพาะข้อยกเว้น025",
+        "private web-principal +035 mapping/fresh lookup ยังต้อง implement/review",
+        "H5 transport/private exposure/TLS/ownerและopaque token isolation ก่อนenable",
+        "real session+audit transaction; v2 error envelopeมีrequest_id/details ต่างจาก v1 ปัจจุบัน"
+      ],
+      "tests": [
+        "purpose/aud handoffปะปน, expired source, null expiryข้อยกเว้น",
+        "school_webไม่มีLicense, staff_adminไม่มีStaffRole, DeviceJktผิดchannel",
+        "introspection timeout→AUTH_UNAVAILABLE; unconfigured→AUTH_NOT_CONFIGURED; ห้าม fallbackแชร์signing secret"
+      ],
+      "evidence": [
+        "K/design/des-012.md:37",
+        "K/design/des-012.md:47",
+        "K/design/des-012.md:76",
+        "B/web/src/SchoolBot.Api/ApiErrors.cs:18",
+        "K/design/data-contract-rules.md:46"
+      ]
+    }
+  ],
+  "contract_questions_for_arch": [
+    "DES-004: ยืนยัน slice outcome decoder/admission core ก่อน เพื่อให้ลงโค้ดจริงได้โดยยังไม่ออกsession; กำหนด malformed/contradictory outcome และ bounds/error mapping",
+    "DES-004/data-model: AccountId จะ resolve จาก G Master.TUser.SId ไป TMasterDBUser.sID อย่างไร? sourceไม่พิสูจน์ equality; ต้องกำหนด mapping จากหลักฐานownerโดยไม่เพิ่มmapping DBเอง",
+    "DES-004/012: ยุติความต่าง EmployeeKey(NSystemId>1)/terminal user_id(NSystemId??SId)/WorkStatus(SId) และกำหนด tenant/current-salary/missing-row predicates",
+    "DES-004: student ใช้ mobile candidateต่อได้เฉพาะมีDesktop device lifecycleที่เจ้าของรองรับ; หากไม่มี ให้archระบุ entrypointใหม่ที่reuseauthentication ไม่ fake IMEI",
+    "DES-004/012: เลือก continuation API หรือ browser completion พร้อม callback/redemption binding; ปัจจุบัน /v2/auth/login ไม่รองรับchallenge ห้ามsysเพิ่มwireเอง"
+  ],
+  "remaining_external_evidence": [
+    {
+      "channel": "desktop student",
+      "static_ready": "request/terminal classification/tokenTTL/device lookup และ defensive core",
+      "before_enable": "active verify/reset/approval, Desktop device acceptance, account/student data relation, active predicate, realLicense/DeviceJkt/session persistence และ transport review"
+    },
+    {
+      "channel": "desktop teacher",
+      "static_ready": "web login/first-password/2FA/contact wireและstate/TTL/limits เพียงพอทำdecoderและcontinuation coreหลังarchยืนยัน",
+      "before_enable": "employee/account mappingและcurrentWorkStatus, trusted completion, Desktop continuation/browser contract, OS token custody, persistence และ deployed config/runtime"
+    },
+    {
+      "channel": "server exchange",
+      "static_ready": "C/035/channel/expiry/License/StaffRole admission policy ทดสอบเป็นcoreได้",
+      "before_enable": "private introspection, tenant/group lookup, session/audit transaction, H5 owner reviewและnetwork/TLS/isolation; ไม่เลือกHTTPrelayหรือgRPCเอง"
+    },
+    "G graph comments อ้างข้อมูล sentinel จริง แต่รอบนี้ไม่อ่านDBและไม่มีowner artifactยืนยัน จึงรับเป็นsource rationale ไม่ใช่actual data proof",
+    "legacy path FingerprintPayment/Default.aspx.cs ที่เอกสารอ้างไม่มีที่ตำแหน่งที่ลอง ไม่ค้นขยายทั้งrepo; 035ถือเป็นมติเดิม ไม่เปิดpolicyใหม่"
+  ],
+  "checks": [
+    "อ่าน index-first และเอกสารที่ใบงานระบุ รวม linked data dictionaries เฉพาะidentity/session; ตรวจ BL-002/004",
+    "อ่าน G/B AGENTS/CLAUDE/README, required handbook และ graphify/find-skills/API engineer; ไม่รัน ai-ack/preflight/reflect/save-result ที่เขียนไฟล์",
+    "B ใช้ Minimal API ไม่พบ auth controller/application/infra adapter; Program.cs:84..117 มีเฉพาะv1License/Release; Infrastructure store มีเฉพาะLicense/Release dictionaries",
+    "test seams จริง: B/web/tests/SchoolBot.Tests/ApiHelpers.cs:18 WebApplicationFactoryและFakeClock; ApiTransportTests.cs:19 peer injection; B/app/desktopservice_test.go:26 httptestและ:154 error-response cases",
+    "คำสั่งรอบimplement: จากB/web: dotnet test SchoolBot.slnx --disable-build-servers -m:1; จากB/app: go test ./... และ go vet ./... ตาม B/AGENTS.md:93..95; frontendเปลี่ยนจึงใช้npm run typecheck/build ตาม:91; รอบนี้ไม่รัน",
+    "G git rev-parse HEAD ถูกpermission denied; รับ baseline9a03c9428a47150aa960e61ca91eedad6d0196afจากใบงาน ไม่ถามผู้ใช้และไม่อ้างตรวจHEADซ้ำสำเร็จ",
+    "ไม่มีcode/knowledge write, gitmutation, install, rebuildgraph, network/login/DB/SQL/tests/build/hardware/role chaining; ไม่อ่านsecrets/env/credential values; B preexisting untrackedไม่ถือเป็นงานนี้"
+  ],
+  "handoff": [
+    "ส่งนายช่าง→arch รับข้อสรุปใบงาน033และตอบcontract5จุดด้านบนก่อนให้sysลงโค้ด; ไม่ต้องรอH5เพื่อทำcoreที่ไม่ผูกtransport",
+    "หลังarchยืนยัน ให้sysทำslice outcome decoder/admissionก่อน; checkเป็นผู้เขียนและรันadversarial tests ไม่สร้างmock successหรือpersistence/verifierซ้ำ",
+    "ส่วนDesktopsuccess/serverexchangeยังไม่พร้อมenable ตามreadiness table; คงG-AUTH/H5/QA/security gatesและ035เดิม",
+    "DONEหมายถึงการตรวจหลักฐานและส่งข้อสรุปรอบนี้ครบ ไม่ใช่implementationเสร็จ/check verdict/releaseหรือsecurity re-audit"
+  ]
+}
