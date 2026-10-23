@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-23",
+  "kind": "controller-document-validation",
+  "requirements": 44,
+  "ac_count": 180,
+  "cases": 77,
+  "actual": "NOT_RUN",
+  "implementation_and_validation_join": 180,
+  "tasks": 110,
+  "task_status": "pending",
+  "gates": 17,
+  "phases": 8,
+  "live_local_links": 2785,
+  "link_scope_exclusions": [
+    "archive/**",
+    "db/review-003.md",
+    "db/review-004.md"
+  ],
+  "archive_files_verified": 14,
+  "security": {
+    "Important": 6,
+    "Medium": 6,
+    "Minor": 3,
+    "status": "OPEN"
+  },
+  "sql_sha256": "2607a5177eafe53621619c21129ac7e2c7542e86a69ec86b0a1c94a8be8ee7a6",
+  "limitations": [
+    "No source behavior changes or runtime tests",
+    "No SQL/DB execution",
+    "No hardware, installer, deployment or risk acceptance",
+    "Static data coverage is not QA verdict"
+  ]
+}

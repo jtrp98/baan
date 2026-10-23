@@ -1,0 +1,26 @@
+[
+  {
+    "path": "target/school-bot",
+    "baseline_status_entries": 703,
+    "current_status_entries": 703,
+    "status_matches_baseline": true
+  },
+  {
+    "path": "target/sb-api-gateway",
+    "baseline_status_entries": 0,
+    "current_status_entries": 0,
+    "status_matches_baseline": true
+  },
+  {
+    "path": "target/sb-tech-upgrade-academic",
+    "baseline_status_entries": 0,
+    "current_status_entries": 0,
+    "status_matches_baseline": true
+  },
+  {
+    "path": "target/sb-tech-upgrade-web-system",
+    "baseline_status_entries": 0,
+    "current_status_entries": 0,
+    "status_matches_baseline": true
+  }
+]

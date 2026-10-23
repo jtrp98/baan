@@ -1,0 +1,86 @@
+{
+  "state": "NEEDS_HUMAN",
+  "summary": "เตรียม amendment แบบ read-only: SchoolBot เป็น 1 service ผ่าน gateway สำหรับ browser/BFF/Desktop โดยคง auth ทาง C และมติ025/026 ไม่มี source/schema/SQL เปลี่ยน เหลือคำถามเดียวเรื่องแหล่ง is_admin ซึ่ง server session กับ JWT ให้ความหมายต่างกัน",
+  "edits": [
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev4",
+      "new": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev5"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "| A | web-system → gateway → SchoolBot | ปัดตก (gateway ไม่มี HTTP forwarder) |",
+      "new": "| A | web-system → gateway → SchoolBot | ข้อสรุปเรื่อง routing เดิมถูกแทนโดย [gateway-integration-001](gateway-integration-001.md): ผู้ใช้ยืนยันให้ผ่าน gateway; HTTP forwarder ยังต้อง implement ส่วน auth ยังคงทาง C |"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "## ทางเลือกที่ยืนยัน (ตามมติ decisions-025 และ decisions-026)",
+      "new": "## ขอบเขต amendment Rev5\n\n[gateway-integration-001](gateway-integration-001.md) เป็น addendum ที่มีลำดับเหนือข้อความ routing เดิมในไฟล์นี้และ auth-evidence-001: browser ผ่าน BFF → G → B, Desktop → G → B; B → private G web-principal แยกจาก public service-route ข้อเท็จจริงว่า gateway ยังไม่มี HTTP forwarder หมายถึง implementation needed ไม่ใช่เหตุปัด topology ผู้ใช้ ไม่เปลี่ยน C, Channel, License, อายุ session หรือสิทธิ์ตาม025/026 แหล่ง is_admin ยังรอคำตอบตาม addendum; ห้ามสร้างสิทธิ์กลุ่มโรงเรียนจาก JWT ที่ส่ง IsAdmin=0\n\n## ทางเลือกที่ยืนยัน (ตามมติ decisions-025 และ decisions-026)"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-23 — Rev5: ใบงาน029 แยก topology ผ่าน gateway จาก auth C; เพิ่ม addendum routing/H5 และข้อแตกต่าง IsAdmin จากหลักฐาน sys รอบ002; ไม่เปลี่ยน schema หรือปิด gate"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "# Auth evidence 001 — รับหลักฐาน BE-001 — Rev2",
+      "new": "# Auth evidence 001 — รับหลักฐาน BE-001 — Rev3"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "## 7. ข้อความเดิมก่อนแก้ (verbatim)",
+      "new": "## หลักฐานเพิ่มเติม Rev3 — มีลำดับเหนือข้อความเดิมที่ขัดกัน\n\nรับ [legacy-auth-review-002](../planning/legacy-auth-review-002.md) และ [legacy-source-check-001](../planning/legacy-source-check-001.json) เป็น upstream evidence: ผู้คุมตรวจ HEAD/hash/status ครบ13ไฟล์แล้ว ไม่ต้องขอ WORKTREE-STATUS ซ้ำ; arch ไม่ได้อ่าน legacy นอก workspace ซ้ำ\n\n- M1/C5: legacy trim เฉพาะคอลัมน์ ไม่ trim input ต่างจาก port\n- M4/M5/C1–C4: legacy format วันเกิดด้วย culture ของ thread จึงห้ามสรุปว่า pattern เดิมให้สตริงเดิมเสมอ; v2/OrdinalIgnoreCase/mobile yyyyMMdd ไม่ปรากฏใน login ต้นฉบับนี้\n- C7/C8: lock counter/IsFirstLogin เป็นส่วนเพิ่มของ port ไม่ใช่พฤติกรรมที่ต้นฉบับยืนยัน\n- M8/C10: legacy ใช้ nSystemID เป็นตัวตนสิทธิ์ แต่ WorkStatus ใช้ sID; ไม่มี fallback nSystemID??sID แบบ port ความสัมพันธ์ข้อมูลจริงยังไม่พิสูจน์\n- M10/C11: Default.aspx.cs:193–240 สร้าง IsAdmin จากกลุ่มแอดมิน/ผู้บริหารใน server session; bypassgarde.aspx.cs:55–75 ไม่ส่งค่านั้น แต่ให้ IsAdmin=1 เฉพาะ user_id=0 และ admin_id!=null จึงใช้แทนกันไม่ได้\n- TR-AUTH-01 และ WORKTREE-STATUS ได้หลักฐาน source แล้ว; TR-AUTH-02 ได้ผู้ผลิต session/JWT แต่ยังขาดตัวตรวจ login TAdmin และข้อยุติแหล่งสิทธิ์; TR-AUTH-03/04/05 ยังขาดข้อมูลจริง; TR-AUTH-06 ไม่มีเส้น login นักเรียนใน source ชุดนี้ ไม่มีผล runtime\n\n[gateway-integration-001](gateway-integration-001.md) override routing/trust-boundary/H5 ใน §4–6: W/BFF→G→B และ B→private G; ไม่ตั้ง upstream ของ BFF ไป B โดยตรง ส่วน is_admin จาก claim เดิมยังห้ามเปลี่ยนเป็นกลุ่มสิทธิ์จนได้คำตอบมนุษย์\n\n## 7. ข้อความเดิมก่อนแก้ (verbatim)"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-23 — Rev3: รับ legacy รอบ002/ผลตรวจ13ไฟล์ แยก session IsAdmin จาก JWT และชี้ routing addendum; ไม่เลือก compatibility policy หรือรับความเสี่ยง"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev4) | PROPOSED — sync decisions-025..030 และ db/review-005; รอ H5 env/network และ endpoint web-principal ใน gateway | [des-012.md](des-012.md) |",
+      "new": "| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev5) | PROPOSED — topology ผ่าน gateway ยืนยันแล้ว; รอแหล่ง is_admin, implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "TR-AUTH-01..07 (Rev2 · EVIDENCE — ไม่ใช่ verdict)",
+      "new": "TR-AUTH-01..07 + legacy รอบ002 (Rev3 · EVIDENCE — ไม่ใช่ verdict)"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## ภาคผนวก canonical",
+      "new": "| [gateway-integration-001.md](gateway-integration-001.md) | Rev1 — override routing DES-012/auth-evidence; topology ยืนยันแล้ว ส่วน relay/private introspection ยังต้อง implement; รอคำตอบแหล่ง is_admin |\n\n## ภาคผนวก canonical"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-23 — ใบงาน029: DES-012 Rev5/auth-evidence Rev3 และ gateway-integration Rev1; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด gate"
+    }
+  ],
+  "new_files": [
+    {
+      "path": "knowledge/school-bot/design/gateway-integration-001.md",
+      "content": "# Gateway integration — Rev1\n\nวันที่2026-10-23 · ใบงาน029 · สถานะอยู่ที่ [index](index.md)\n\n## ขอบเขตและลำดับอ้างอิง\n\nเอกสารนี้ override เฉพาะ routing/trust-boundary/H5 ของ [DES-012](des-012.md) และ [auth-evidence](auth-evidence-001.md) ตาม [คำตอบผู้ใช้](../planning/user-context-001.md) ไม่แทนสัญญา auth C, Channel, License หรือมติ025/026 และไม่ยืนยันว่ามี deployment แล้ว\n\n## หลักฐาน as-built\n\nพาธ G = `C:/src/schoolbright/target/sb-api-gateway` อ่าน AGENTS/CLAUDE ก่อนตรวจ source; ไม่อ่าน config/env/secret\n\n- `G/src/ApiGateway.API/Program.cs:59–72,118–130`: ลงทะเบียน controller; authentication → user logging → control plane → authorization → rate limit → controllers\n- `G/src/ApiGateway.API/Extensions/ApiServiceExtensions.cs:68–123`: SmartScheme เลือก Bearer ก่อน JabjaiWebKey; :293–296 และ `Helpers/ApiPrefixConvention.cs:13–22` เติม `/api` ให้ controller\n- `G/src/ApiGateway.Infrastructure/Extensions/InfrastructureServiceExtensions.cs:549–614`: client เดิมเป็น gRPC พร้อม metadata/deadline/retry; ไม่ใช่ HTTP relay\n- `G/src/ApiGateway.Infrastructure/Common/Authentication/JabjaiWebLegacyAuthHandler.cs:27–53`: เลือก header แรกและ log ชื่อ header; `JwtTokenService.cs:41–45,184–220`: secret มี fallback, ไม่บังคับ exp/iss/aud, Sid รวม admin_id/user_id\n- `G/src/ApiGateway.API/ControlPlane/ControlPlaneEnforcementMiddleware.cs:29–49,56–76`: revocation ใช้ principal; maintenance ใช้ route/service และมี error envelope ของ gateway\n\nค้น routing/auth ใน API/Infrastructure source แล้วไม่พบ SchoolBot route, web-principal หรือ HTTP forwarder; ขอบเขตนี้ไม่ใช่การพิสูจน์ทุก proxy ภายนอกหรือ instance ที่ deploy ข้อเท็จจริงเดิมว่าไม่มี HTTP forwarder จึงคงไว้เป็น implementation needed\n\n## Topology และ route ที่ต้องเพิ่ม\n\n```text\nbrowser web-system → same-origin W BFF → G public service-route → B\nbrowser admin web → same-origin admin BFF → G public service-route → B\nDesktop host → G public service-route → B\nB exchange → G private web-principal → response กลับ B\n```\n\nB คือ SchoolBot service เดียว เส้น introspection เป็นคนละ route/listener exposure กับ public relay ไม่วิ่งวนผ่าน BFF หรือ SchoolBot relay\n\nข้อเสนอ route: `G /api/school-bot/service/v2/<path>` ส่งไป `B /v2/<path>` ด้วย method/path allowlist จากสัญญาที่มีอยู่; ตัวอย่าง POST `auth/web-sessions`, POST `auth/login` และ resource หลัง login เส้น private คง `GET /api/school-bot/auth/web-principal` ตาม DES-012 §2 ห้าม public ingress/BFF relay เปิดถึงเส้นนี้ ห้าม catch-all รวม `/api/school-bot/*`, `/v1/admin`, health/control หรือ URL ปลายทางจาก client\n\nW ใช้ upstream gateway เดิมและเพิ่ม route mapping SchoolBot; admin BFF ใช้ gateway เช่นกัน Desktop base URL ต้องรวม public service prefix ไม่มี direct public B fallback ชื่อ host/instance ยังไม่ทราบ\n\n## วิธี implement เล็กสุดและ trust\n\nต่อยอด ASP.NET hosting, controller/route convention, rate limit และ logging เดิมด้วย HTTP adapter เฉพาะ SchoolBot ใช้ HttpClient ที่มีในแพลตฟอร์ม ไม่เพิ่ม proxy framework/dependency และไม่แปลง SchoolBot เป็น gRPC เพียงเพื่อ routing\n\nแยก public relay pipeline ก่อน legacy UseAuthentication/UserEnricher: SchoolBot Bearer ต้องไม่เข้า SmartScheme/JWT validator ไม่สร้าง legacy principal จาก opaque token; ไม่ใช้ AllowAnonymous อย่างเดียวแล้วปล่อย global authentication อ่าน Bearer ต่อ ต้องคง security headers, request limits, rate limit และ maintenance ของ route โดย authz/session/revocation/Channel/tenant ตรวจที่ B จริง นี่ไม่ใช่การ bypass auth ของ B และไม่กระทบ scheme ของ route legacy อื่น การแก้ Program/ส่วนล็อกต้องผ่าน Light/CODEOWNERS review\n\n- Exchange ส่งเฉพาะ legacy credential ที่จำเป็นไป B แล้ว B ส่งไป private G; resource หลังแลกส่งเฉพาะ SchoolBot Bearer ไม่พก legacy credential ต่อ\n- BFF เป็นทางส่ง ไม่ผลิตสิทธิ์ admin BFF อ่าน `__Host-sb-admin` ใน session ของตน แปลงเป็น Bearer ฝั่ง server ไม่ส่ง Cookie ไป G/B; mutation คง Origin/CSRF validation ก่อนใช้ cookie\n- strip identity/tenant headers จาก client รวม x-school-id/x-user-id, forwarding headers และ hop-by-hop headers; สร้าง forwarding metadata เฉพาะ trusted proxy ไม่ใช้ header suffix/body เป็น SchoolId หรือสิทธิ์ SchoolId ของ resource มาจาก SchoolBot session; ตอน exchange มาจากผล introspection ที่ตรวจแล้ว\n- request/response ใช้ header allowlist ตาม endpoint เช่น Content-Type, Accept, Authorization, Origin, ETag/If-Match, Idempotency-Key, Retry-After, request-id; ไม่ส่ง Cookie/Set-Cookie, secret หรือ connection string เกินจำเป็น ไม่ log token/body/ชื่อ JabjaiWebKey ที่มีตัวตน\n- upstream origin/port/path ตั้งฝั่ง server แบบ allowlist ไม่รับ Host/URL override; ตรวจ normalized path ป้องกัน traversal; ปิด auto-redirect/auto-cookie และไม่ retry mutation อัตโนมัติ กำหนด bounded timeout/body size/cancellation ตาม endpoint\n- ใช้ TLS และตรวจ certificate สำหรับเส้นข้าม host; infra ต้องระบุ termination/เครือข่ายภายในจริงก่อนเปิดเส้นทาง ห้ามถือว่า HTTP default ใน source พิสูจน์ TLS แล้ว B upstream ต้องไม่ชี้กลับ G/BFF; introspection URL ต้องชี้เฉพาะ private G route\n\nPrivate web-principal ใช้ scheme JabjaiWebLegacy ที่ตรึงไว้และ authenticated policy ไม่ใช้ MenuPermission เฉพาะเมนู; ปฏิเสธ purpose/aud, missing school หรือไม่มีทั้ง user/admin ตาม security-mitigation-001 ใช้ raw user_id/admin_id ไม่ใช้ Sid รวม ค่า expires_at=null ยังคงอนุญาตตามมติเดิม คง no-store/rate limit; identity ที่ยังไม่ผ่านตรวจใช้ IP partition การจำกัด network/service identity ต้องแยกจาก credential ของผู้ใช้\n\nผล B ส่งกลับ status/body ตามสัญญาเดิม; transport failure ก่อนถึง B ใช้ gateway error envelope เดิมแบบ sanitized: upstream ติดต่อไม่ได้ 502, timeout 504, maintenance 503 ไม่รายงาน mutation ว่าสำเร็จ ส่วน exchange: introspection invalid token 401; unavailable/timeout 503 AUTH_UNAVAILABLE; แหล่ง identity/mapping ยังไม่พร้อม 503 AUTH_NOT_CONFIGURED; ไม่มี License 403 LICENSE_REQUIRED ตาม DES-012 ไม่เพิ่ม fallback ยกระดับสิทธิ์\n\n## IsAdmin: ข้อเท็จจริงและจุดหยุด\n\nรับหลักฐาน sys ที่ [legacy-auth-review-002](../planning/legacy-auth-review-002.md) พร้อม [HEAD/hash13ไฟล์](../planning/legacy-source-check-001.json) ไม่อ่าน source นอก workspace ซ้ำ\n\nLegacy `FingerprintPayment/Default.aspx.cs:193–240` คำนวณ IsAdmin ใน server session จากสมาชิกกลุ่มแอดมิน/ผู้บริหารที่ active ผูก SchoolID/UserID และกลุ่ม Type=W/isEditable=false พร้อมแถวเมนู แต่ `FingerprintPayment/bypassgarde.aspx.cs:55–75` ให้ JWT IsAdmin=1 เฉพาะ user_id=0/admin_id!=null; แอดมินโรงเรียนปกติได้0\n\nดังนั้น introspection ที่อ่าน claim อย่างเดียวจะไม่ให้ school_admin แก่สมาชิกกลุ่มดังกล่าว G/B มองไม่เห็น server session โดยอัตโนมัติ ห้ามแก้ด้วย body/header is_admin หรือถือ token ที่มีลายเซ็นว่าเก็บสิทธิ์ครบแล้ว\n\nTask: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ security-mitigation-001 SEC001-001; Reason: การเปลี่ยนจาก claim เป็นการคำนวณกลุ่มมีผลต่อผู้ได้รับสิทธิ์ จึงหยุดเฉพาะส่วนนี้รอคำตอบมนุษย์ ตัวเลือก A ตรวจ IsAdmin ตามกลุ่มฝั่ง server โดยคง superadmin เดิม; B คง JWT-only ซึ่งกลุ่มแอดมินโรงเรียนปกติจะไม่ได้สิทธิ์นี้ ห้าม implement A ก่อนอนุมัติและพิสูจน์ mapping ที่เกี่ยวข้อง\n\n## เจ้าของและหลักฐานก่อนเปิดใช้\n\n| เจ้าของ | สิ่งที่เตรียม | สถานะหลักฐาน |\n|---|---|---|\n| G/Light | relay isolation, private endpoint, route/rate-limit/log review | ยังไม่มี implementation ที่ตรวจพบ |\n| W/admin BFF | gateway mapping, credential filtering, Origin/CSRF | ต้องจัดทำ |\n| B/sys | exchange/session/Channel/License/revocation; bootstrap staff_admin ตามเดิม | ยังไม่มี runtime proof |\n| infra/G/B | env matrix: gateway public/private origin, B upstream, TLS/allowlist, service access, secret แยกหรือ fallback; ระบุชื่อ key/owner/status ไม่ส่งค่า | host/env/instance ยังไม่ยืนยัน |\n| legacy/vault | TR-AUTH-02 login TAdmin; 03 mapping; 04 collation; 05 hash/culture; 06 student login | ยังขาดตามรายงาน sys |\n\nชื่อ env ใหม่ให้เจ้าของแต่ละ process กำหนด; W ใช้ GATEWAY_API_URL ตามหลักฐานเดิม ไม่ตั้ง SCHOOL_BOT_API_URL ไป B ตรงโดยอัตโนมัติ\n\nทางเลือกที่ไม่ใช้: direct B ขัด topology ผู้ใช้; แชร์ signing secret กับ B ขัดทาง C; generic proxy/gRPC rewrite เพิ่มงานเกินความจำเป็น ไม่มี schema change จึงไม่สร้าง DBML ในรอบนี้\n\n## Change Log\n- 2026-10-23 — Rev1: ใบงาน029 รับ topology ผู้ใช้/legacy evidence และตรวจ gateway routing/auth แบบ read-only; แยก implementation จาก unknown คง gates เดิม ไม่มี tests/network probe/deploy\n"
+    }
+  ],
+  "human_question": {
+    "question": "ให้ web-principal ใช้ IsAdmin จากกลุ่มแอดมินโรงเรียนฝั่ง server หรือคงเฉพาะ claim ใน JWT?",
+    "options": [
+      "A: ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server โดยคง superadmin เดิม; ต้อง implement แหล่งสิทธิ์และพิสูจน์ mapping",
+      "B: คง JWT-only; สมาชิกกลุ่มแอดมินโรงเรียนปกติที่ JWT เป็น0 จะไม่ได้ school_admin"
+    ],
+    "recommendation": "A เพื่อรักษาความหมายแอดมินโรงเรียนในระบบเดิม โดยไม่เชื่อ claim จาก body/header",
+    "basis": "DES-012 §2/§4 และมติ025 H3 ระบุ IsAdmin แต่หลักฐาน sys พบ server session กับ JWT ต่างกัน; CONVENTIONS §9 ข้อ1 กำหนดให้มนุษย์ตัดสินผลต่อสิทธิ์"
+  },
+  "remaining_evidence": [
+    "แหล่ง is_admin รอคำตอบ; employee mapping/ข้อมูลจริงและ legacy login ที่ขาดคงตาม TR-AUTH-02..06 ไม่ถาม routing/source path ซ้ำ",
+    "H5: owner/env/TLS/allowlist/private exposure/staff bootstrap และ implementation/runtime proof ยังไม่ครบ",
+    "ไม่ได้รัน tests, SQL, DB, login, network probe หรือ git mutation; 110 tasks pending, 77 cases NOT_RUN, Important6 OPEN"
+  ],
+  "handoff": [
+    "นายช่าง archive ฉบับเดิมก่อน apply exact edits และบันทึก addendum; final knowledge commit หลังบันทึกครบ",
+    "ส่งคำถาม is_admin ให้มนุษย์; หลังคำตอบส่ง sys/G/W/B เตรียม implementation และให้ jpo ตรวจตาม gates เดิม ไม่ถือว่าผลนี้ผ่านตรวจรับหรือรับความเสี่ยง",
+    "DES004/Guest/units/ETag/updater/hardware/retention คงคิว queue003 ไม่รวมงานนี้"
+  ]
+}

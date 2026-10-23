@@ -77,3 +77,9 @@
 | [auth-evidence-001.md Rev1](archive/2026-10-23-before-security-disposition-001/auth-evidence-001.md) | 11187 | `e6cc2ca3b5f708daebd903e028f37b0d9c55a9f6e188851fd7b932afdd7d513e` |
 
 - 2026-10-23 — เก็บ byte-for-byte ก่อน edits5จุดจากarchใบงาน021; [manifest](archive/2026-10-23-before-security-disposition-001/manifest.json)
+
+## ก่อนรับ Gateway integration — 2026-10-23
+
+เก็บ DES-012 Rev4, auth-evidence Rev2 และ design/index แบบbyte-for-byteก่อนapply11editsจากarchใบงาน029; [manifestพร้อมbytes/SHA256](archive/2026-10-23-before-gateway-integration-001/manifest.json). ไม่มีphysicalschema/SQL delta
+
+- 2026-10-23 — นายช่างเก็บฉบับเดิมและตรวจhashก่อนรับGateway addendum

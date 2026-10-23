@@ -35,3 +35,23 @@ Claude → AGY → Codexสุดท้าย; `--no-fallback` แล้วผ�
 ## Change Log
 
 - 2026-10-23 — นายช่างบันทึกผลที่รับแล้วและสถานะรอarchอย่างชัดเจน ก่อนappendผลรับสุดท้ายและfinal knowledge commit
+
+## ผลรับ Gateway ล่าสุด — 2026-10-23
+
+arch ใบงาน023: Claudeติดweeklylimit; AGY t1หมดเวลา1200วินาทีโดยไม่มีคำตอบ ผู้คุมจึงใช้Codexเป็นตัวเลือกสุดท้ายใน[ใบงาน029](task-029.md). ผลNEEDS_HUMANบันทึกที่[gateway-response-001](gateway-response-001.json); ผู้คุมapply11editsและเก็บฉบับก่อนแก้พร้อมhashแล้ว
+
+[Gateway integration Rev1](../design/gateway-integration-001.md) มีลำดับเหนือroutingเดิมในDES-012 Rev5/auth-evidence Rev3: browser/BFF→gateway→SchoolBot; Desktop→gateway→SchoolBot; introspectionแยกprivategatewayroute. ยังไม่มีHTTPrelay/web-principalที่ตรวจพบในsource จึงเป็นimplementationneeded ไม่ใช่routeverifiedหรือdeploymentproof. ไม่เปลี่ยนauthทางC/License/Channel/schema
+
+ส่งคำถามมนุษย์1ข้อผ่านrequest_user_input_async: แหล่งis_adminจะตรวจกลุ่มแอดมินโรงเรียนฝั่งserverโดยคงsuperadmin หรือยึดJWTอย่างเดียวที่แอดมินโรงเรียนปกติได้0. แนะนำแบบกลุ่มเพื่อรักษาสิทธิ์เดิม แต่ยังไม่เลือกแทนคนหรือimplementส่วนนี้. ข้อเท็จจริงDBmapping/H5/TR-AUTH-02..06และImportant6ยังค้าง; รูปแบบgatewayและพาธlegacyผู้ใช้ตอบแล้วไม่ถามซ้ำ
+
+ส่วนRunnerด้านบนเป็นสถานะก่อนfallbackสุดท้าย: รอบนี้ใช้Claudeก่อน, AGYถัดมา, Codexเฉพาะarch recoveryเมื่อสองตัวแรกไปต่อไม่ได้. ไม่ใช้Codexเป็นdefaultก่อนAGY
+
+- 2026-10-23 — รับแบบGatewayแล้ว ส่งคำถามเฉพาะสิทธิ์admin; finalvalidation/knowledgecommitทำหลังบันทึกครบ
+
+## ตรวจเอกสารก่อนปิดรอบ
+
+[ผลตรวจผู้คุม](validation-002.json): 44REQ/180AC/77cases, join180ACครบ, 110tasks pending/17gates/8phases; actualทุกเคสNOT_RUN. ตรวจลิงก์เอกสารliveโดยแยกarchiveและreview003/004ที่อ้างSQLเก่าตามประวัติ; ตรวจhasharchiveตามmanifest14ไฟล์ และSQLยังSHA256เดิม. ไม่ใช่runtime/DB/QA acceptance
+
+[สถานะsourceก่อน/หลัง](source-status-check-002.json) ตรงกันทั้ง4repoที่เกี่ยว; [หลักฐานrunner](runner-results-002.json) บันทึกสาเหตุใช้Codexเป็นลำดับสุดท้าย. คำถามis_adminยังรอคำตอบ ณตรวจรอบนี้ ไม่มีการเลือกแทนคน
+
+- 2026-10-23 — บันทึกผลตรวจครบก่อนfinal knowledge commit; ใช้Gitcommitที่รายงานในข้อความปิดงานเพื่อตรวจrevision

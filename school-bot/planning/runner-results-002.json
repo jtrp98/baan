@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-23",
+  "policy": "Claude -> AGY -> Codex last; controller uses --no-fallback",
+  "delivered_by_claude": ["sys/task017", "inspect/task018 retry after tool reset", "jpo/task019 retry after tool reset", "arch/task020", "arch/task021", "sys/task022", "spec/task024", "jpo/task025", "inspect/task026"],
+  "delivered_by_agy": ["gm/task027", "gm/task028"],
+  "gateway_recovery": [
+    {"task": "task023", "agent": "claude", "result": "failed", "reason": "weekly limit", "report": "C:/src/AICode/baan/baan/reports/2026-10-23-05-20-54-arch-tier-t1-1agents-Po5MY0"},
+    {"task": "task023", "agent": "agy", "result": "timeout", "seconds": 1200, "answer_received": false, "report": "C:/src/AICode/baan/baan/reports/2026-10-23-05-26-46-arch-tier-t1-1agents-aQeiRc"},
+    {"task": "task029", "agent": "codex", "result": "NEEDS_HUMAN", "artifact_received": true, "artifact": "gateway-response-001.json", "report": "C:/src/AICode/baan/baan/reports/2026-10-23-05-48-12-arch-tier-t1-1agents-XTMeKe"}
+  ],
+  "scope": "role artifacts only; no implementation, QA PASS, SQL, deployment or risk acceptance",
+  "source_git_mutations": false,
+  "knowledge_commit": "baan --commit after all controller saves"
+}

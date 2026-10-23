@@ -1,4 +1,4 @@
-# Auth evidence 001 — รับหลักฐาน BE-001 — Rev2
+# Auth evidence 001 — รับหลักฐาน BE-001 — Rev3
 
 สถานะ: EVIDENCE ไม่ใช่ verdict ของ BE-001/SA-001/G-AUTH และไม่ใช่ผล SEC-001 · ที่มา: [legacy-auth-response-001.json](../planning/legacy-auth-response-001.json) (sys) + arch ตรวจ source:line ซ้ำ · ไม่อ่าน secrets/env ไม่เชื่อม DB ไม่รัน · พาธย่อ `G`=sb-api-gateway `A`=sb-tech-upgrade-academic `W`=sb-tech-upgrade-web-system `B`=school-bot
 
@@ -55,11 +55,25 @@ Implementation gaps (ทีมแก้ได้): IG1 ไม่มี web-princ
 - **คนต้องระบุ**: host/TLS ของ B, เส้นทางเครือข่าย W→B และ B→G (internal หรือ public), allow-list ของ Origin (W, admin web), เจ้าของ repo/ผู้ review แต่ละฝั่ง; agent ไม่ใส่ค่า host/secret แทน
 - **staff bootstrap**: คนระบุ NCompany/บัญชีที่ใช้เป็น staff_admin คนแรก (ไม่ต้องส่งให้ agent) และเส้นทาง login ที่ออก token ให้บัญชีนั้น; ต้องได้คำตอบ TR-AUTH-03 ก่อน (key คือ `(school_id,user_id)`); แถวแรกของ `SchoolBotStaffRole` (ต้องใช้วิธีนี้เพราะ `POST /v2/admin/staff-roles` ต้องมี staff_admin อยู่ก่อน) ให้ sys เตรียมขั้นตอนใน BE-039/BE-023 โดยใช้ค่าจริงจากคนและไม่บันทึกค่าใน knowledge ถ้าเป็นคำสั่ง SQL ให้ vault ตรวจ ใส่ `reason`/`valid_until`/AuditEvent; การรันบน test DB เป็นหลักฐานของ G-CORE (คนรัน, DBA-003 ตรวจ receipt) ส่วนบน shared/production ต้องให้คนรันภายใต้ G-RELEASE ตาม [release-runbook-001](../plan/release-runbook-001.md) ข้อ 3-6 (CONVENTIONS §9 ข้อ6); re-audit โดยคนที่สองผ่าน `GET /v2/admin/staff-roles` และบันทึกว่าใครทำเมื่อไรตามที่คนแจ้ง
 
+## หลักฐานเพิ่มเติม Rev3 — มีลำดับเหนือข้อความเดิมที่ขัดกัน
+
+รับ [legacy-auth-review-002](../planning/legacy-auth-review-002.md) และ [legacy-source-check-001](../planning/legacy-source-check-001.json) เป็น upstream evidence: ผู้คุมตรวจ HEAD/hash/status ครบ13ไฟล์แล้ว ไม่ต้องขอ WORKTREE-STATUS ซ้ำ; arch ไม่ได้อ่าน legacy นอก workspace ซ้ำ
+
+- M1/C5: legacy trim เฉพาะคอลัมน์ ไม่ trim input ต่างจาก port
+- M4/M5/C1–C4: legacy format วันเกิดด้วย culture ของ thread จึงห้ามสรุปว่า pattern เดิมให้สตริงเดิมเสมอ; v2/OrdinalIgnoreCase/mobile yyyyMMdd ไม่ปรากฏใน login ต้นฉบับนี้
+- C7/C8: lock counter/IsFirstLogin เป็นส่วนเพิ่มของ port ไม่ใช่พฤติกรรมที่ต้นฉบับยืนยัน
+- M8/C10: legacy ใช้ nSystemID เป็นตัวตนสิทธิ์ แต่ WorkStatus ใช้ sID; ไม่มี fallback nSystemID??sID แบบ port ความสัมพันธ์ข้อมูลจริงยังไม่พิสูจน์
+- M10/C11: Default.aspx.cs:193–240 สร้าง IsAdmin จากกลุ่มแอดมิน/ผู้บริหารใน server session; bypassgarde.aspx.cs:55–75 ไม่ส่งค่านั้น แต่ให้ IsAdmin=1 เฉพาะ user_id=0 และ admin_id!=null จึงใช้แทนกันไม่ได้
+- TR-AUTH-01 และ WORKTREE-STATUS ได้หลักฐาน source แล้ว; TR-AUTH-02 ได้ผู้ผลิต session/JWT แต่ยังขาดตัวตรวจ login TAdmin และข้อยุติแหล่งสิทธิ์; TR-AUTH-03/04/05 ยังขาดข้อมูลจริง; TR-AUTH-06 ไม่มีเส้น login นักเรียนใน source ชุดนี้ ไม่มีผล runtime
+
+[gateway-integration-001](gateway-integration-001.md) override routing/trust-boundary/H5 ใน §4–6: W/BFF→G→B และ B→private G; ไม่ตั้ง upstream ของ BFF ไป B โดยตรง ส่วน is_admin จาก claim เดิมยังห้ามเปลี่ยนเป็นกลุ่มสิทธิ์จนได้คำตอบมนุษย์
+
 ## 7. ข้อความเดิมก่อนแก้ (verbatim)
 
 DES-012 Rev3: `user_id` = `TUser.NSystemId ?? SId` (คือ `TEmployees.sEmp`), `admin_id` = `TAdmins.id` (`WebLoginService.cs:206–217,272`) · ครูรายวิชา: `TplanCourseTeacher (SchoolId, PlanCourseId, SEmp)` `IsActive & !CDel` + `TEmployees` ไม่ถูกลบ (`A/.../TeacherRepository.cs:24–32,111–122`) + `TplanTermSubLevel2` (`PlanCourseRepository.cs:194–215`)
 
 ## Change Log
+- 2026-10-23 — Rev3: รับ legacy รอบ002/ผลตรวจ13ไฟล์ แยก session IsAdmin จาก JWT และชี้ routing addendum; ไม่เลือก compatibility policy หรือรับความเสี่ยง
 
 - 2026-10-23 — Rev2: (ใบงาน 021) §6 แทน 'gate 6' ด้วย G-CORE/G-RELEASE และ owner BE-039/BE-023; ระบุว่าชื่อ env ของ W เป็นข้อเสนอ; web-principal ใช้ policy ไม่ใช้ MenuPermission เฉพาะ; ผลพิสูจน์ §1-§5 ไม่เปลี่ยน
 - 2026-10-23 — Rev1: arch รับ/ตรวจหลักฐาน BE-001 จาก sys (ใบงาน 020); ไม่มี verdict/SQL/runtime
