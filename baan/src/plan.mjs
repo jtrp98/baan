@@ -22,7 +22,8 @@ export const FIXED_ROLE_TIER = {
 export const IMPLEMENT_TIER_RANGE = "t2–t5";
 
 // ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
-export const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
+// opencode (Z.AI coding plan เหมาจ่าย) อยู่ก่อน agy/claude ที่กินโควตารายเรียก
+export const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
 
 // ลำดับตัวรันจริงของงานหนึ่งงาน: agent ที่เลือกมาเป็นตัวแรกเสมอ แล้วไล่ตาม _fallback ของ tier
 // (ข้าม agent ที่ไม่รู้จักหรือเป็น null ใน tier นั้น) — ใช้ทั้งตอน validate แผน (เลือกตัวแรกที่ใช้ได้)
