@@ -2,9 +2,13 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## ยังไม่ออกเวอร์ชัน — 2026-10-23
+## 0.15.0 — 2026-10-23 · เพิ่มตัวรันที่สี่ opencode — GLM ผ่าน Z.AI Coding Plan (cost 0)
 
-- **เพิ่มตัวรันที่สี่: opencode (GLM ผ่าน Z.AI Coding Plan — เหมาจ่าย cost 0 ต่อครั้ง)** — tier: t2=`glm-5.3#max` · t3=`glm-5.3#high` · t4=`glm-5.3-flash#max` · t5=`glm-5.3-flash#high` (จัดตาม Intelligence Index ที่ผู้ใช้วัด: 5.3 max ≈ sonnet high) · t0/t1 = null (GLM เพดาน t2 — fallback ข้ามไปค่ายอื่นอัตโนมัติ) · ลำดับ `_fallback` ทุก tier เป็น codex→opencode→agy→claude · effort ฝังใน model string ผ่าน `#variant` (ต้องใช้ opencode ≥ 2.1.4 — ทดสอบจริง: รันได้ ตอบถูก #max คิดนานกว่า #low) · read-only = ไม่ใส่ `--auto` (non-interactive ปฏิเสธการกระที่ต้องขออนุญาตเอง) · write = `--auto` · ต้อง `opencode auth login` เลือก Z.AI Coding Plan ก่อนใช้ · tests 96 → 98
+### ⚠ ต้องทำตอนอัปเกรด (รู้ไว้)
+- **opencode เข้าลำดับ fallback ทุก tier (`codex→opencode→agy→claude`)** — เครื่องที่ไม่มี opencode CLI: เมื่อ codex ติดโควตา ระบบจะสลับไป opencode แล้วล้มด้วย "command not found" แทนที่จะไปต่อที่ agy (spawn ล้มไม่ใช่ limit error จึงไม่สลับต่อ) · **ถ้าใช้ GLM:** ติดตั้ง `npm i -g opencode-ai` + `opencode auth login` (เลือก Z.AI Coding Plan) ครั้งเดียวต่อเครื่อง · **ถ้าไม่ใช้ GLM:** ถือ `agents.json` เดิมของตัวเองต่อ หรือลบ opencode ออกจาก `_fallback` ใน agents.json ของ workspace
+
+### เพิ่ม
+- **ตัวรันที่สี่: opencode (GLM ผ่าน Z.AI Coding Plan — เหมาจ่าย cost 0 ต่อครั้ง)** — tier: t2=`glm-5.3#max` · t3=`glm-5.3#high` · t4=`glm-5.3-flash#max` · t5=`glm-5.3-flash#high` (จัดตาม Intelligence Index ที่ผู้ใช้วัด: 5.3 max ≈ sonnet high) · t0/t1 = null (GLM เพดาน t2 — fallback ข้ามไปค่ายอื่นอัตโนมัติ) · ลำดับ `_fallback` ทุก tier เป็น codex→opencode→agy→claude · effort ฝังใน model string ผ่าน `#variant` (ต้องใช้ opencode ≥ 2.1.4 — ทดสอบจริง: รันได้ ตอบถูก #max คิดนานกว่า #low) · read-only = ไม่ใส่ `--auto` (non-interactive ปฏิเสธการกระทำที่ต้องขออนุญาตเอง) · write = `--auto` · ต้อง `opencode auth login` เลือก Z.AI Coding Plan ก่อนใช้ · smoke จริงผ่านครบ: t2 glm-5.3#max อ่าน knowledge จริงจบ DONE ตรง marker / t4 flash#max อ่าน / t5 flash#high เขียนไฟล์จริง · tests 96 → 98
 
 ## 0.14.0 — 2026-10-23 · planner กันชนไฟล์ตอน parallel + gm เป็นเจ้าของ release runbook
 
