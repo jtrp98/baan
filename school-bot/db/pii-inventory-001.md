@@ -52,14 +52,16 @@
 | SchoolBotScoreOutbox | ScorePreviewItemId | integer | pseudonymous — **เด็ก** ทางอ้อม | 1 แถว = คะแนนนักเรียน 1 คนใน PGGradeDB |
 | SchoolBotLevelProposal | DecisionBy | varchar(512) | quasi-identifier | ผู้ตัดสินเลื่อน Level |
 | SchoolBotLevelProposal | Reason | varchar(1000) | free-text อาจซ้อน PII | |
-| SchoolBotLevelProposal | Snapshot | jsonb | **เด็ก** | `LevelSnapshot.roster[]` มี `learner_id`+`total` รายคน + average/threshold ผูกผู้เรียนทั้งห้อง (contract-003:46 — เพิ่มตาม jpo 060f) |
+| SchoolBotLevelProposal | Snapshot | jsonb | **เด็ก** | `LevelSnapshot.roster[]` มี `learner_id`+`total` รายคน + average/threshold ผูกผู้เรียนทั้งห้อง (contract-003:49 — เพิ่มตาม jpo 060f; แก้เลขบรรทัดตาม check 060f) |
 | SchoolBotScorePreview | Context | jsonb | **เด็ก** (ทางอ้อม→ตรง) | `PreviewContext.roster:I[]` คือรายชื่อนักเรียนรายห้อง (contract-003:46 — เพิ่มตาม jpo 060f) |
 | SchoolBotLevelPromotionPolicy | Reason | varchar(1000) NOT NULL | free-text อาจซ้อน PII | (SQL:379 — ตกจากฉบับแรก เพิ่มตาม jpo 060f) |
 | SchoolBotGradeSlot | OwnershipReason | varchar(1000) NOT NULL | free-text อาจซ้อน PII | (SQL:889 — ตกจากฉบับแรก เพิ่มตาม jpo 060f) |
 | SchoolBotSubmission | Evidence (jsonb ช่อง `note`) | jsonb | free-text — บริบท**เด็ก** | `ArmEvidence.note:T4000` คือหมายเหตุผู้ส่งงาน (contract-003 — เพิ่มตาม jpo 060f) |
-| SchoolBotAssessment | RuleResults/Outcome/EarnedScore/MaxScore (ผ่าน jsonb ผลตรวจ) | — | ข้อมูลผลประเมินผูกผู้เรียน | คะแนน/เวลา/สถานะที่ผูกบุคคล — จัดเป็น PII เชิงบริบทแม้ไม่ระบุตัวตนโดยตรง (เพิ่มตาม jpo 060f) |
+| SchoolBotAssessment | Outcome | varchar(16) NOT NULL | ผลประเมินผูกผู้เรียน — บริบท**เด็ก** | คอลัมน์จริงตาม SQL:747 (แยกจาก RuleResults ตาม check 060f) |
+| SchoolBotAssessment | EarnedScore / MaxScore | numeric(18,6) NULL | คะแนนรายบุคคล — บริบท**เด็ก** | SQL:748–749 |
+| SchoolBotAssessment | RuleResults | jsonb NOT NULL | ผล rule การประเมินผูกผู้เรียน | SQL:750 (เดิมรวมเป็น "ผ่าน jsonb" ผิดแหล่ง — แก้ตาม check 060f) |
 
-ตารางที่ไม่มีคอลัมน์ PII เฉพาะตัว (นอกจาก CreateBy/UpdateBy ร่วม): SchoolBotLicense, SchoolBotLicenseBinding, SchoolBotRelease, SchoolBotLevel, SchoolBotLevelPromotionPolicy, SchoolBotCurriculum, SchoolBotLesson, SchoolBotMission, SchoolBotActivity, SchoolBotQuestionBank, SchoolBotCourseRun, SchoolBotScoringPolicy, SchoolBotCourseRunActivity, SchoolBotGradingJob, SchoolBotGradeSlot, SchoolBotScoreMapping
+ตารางที่ไม่มีคอลัมน์ PII เฉพาะตัว (นอกจาก CreateBy/UpdateBy ร่วม): SchoolBotLicense, SchoolBotLicenseBinding, SchoolBotRelease, SchoolBotLevel, SchoolBotCurriculum, SchoolBotLesson, SchoolBotMission, SchoolBotActivity, SchoolBotQuestionBank, SchoolBotCourseRun, SchoolBotScoringPolicy, SchoolBotCourseRunActivity, SchoolBotGradingJob, SchoolBotGradeSlot, SchoolBotScoreMapping (แก้ตาม check 060f: ถอน SchoolBotLevelPromotionPolicy และ SchoolBotGradeSlot ออกจากรายการนี้เพราะมี Reason/OwnershipReason เป็น free-text ที่จำแนกไว้ §3 แล้ว)
 
 ไม่ใช่ PII บุคคล (ระบุกันเข้าใจผิด — ไม่นับใน inventory): `SchoolId`/`SchoolName` (องค์กร), `License.KeyHash/KeyHint/AllowedNextJkt` (credential องค์กร), `DeviceJkt`/`PublicJwk` (อุปกรณ์), `NonceHash/RequestHash/RequestKey/ContentHash/SnapshotHash/PayloadHash/ArtifactHash` (ค่า crypto), `LeaseOwner` (worker instance), `GraderVersion`
 
@@ -90,7 +92,7 @@
 - F3 ข้อมูลเด็กอย่างน้อย 13 ตาราง (§4) — พิจารณาข้อกำหนดผู้เยาว์ของ PDPA (มาตรา 20/24 เรื่องความยินยอม/ผู้ใช้อำนาจปกครอง) — ประเด็นให้ jpo และเจ้าของข้อมูลตัดสิน; การเป็นนักเรียนไม่ได้พิสูจน์อายุ และไม่บังคับ consent ทุกกิจกรรมโดยอัตโนมัติ — ต้องผูกฐานประมวลผลกับวัตถุประสงค์ก่อน
 - F4 free-text 8 คอลัมน์ + jsonb serializer (AuditEvent.Reason, StaffRole.Reason, Project.Name, Assessment.Feedback, RetakeGrant.Reason, LevelProposal.Reason, LevelPromotionPolicy.Reason, GradeSlot.OwnershipReason, Evidence.note) เสี่ยงซ้อน PII โดยไม่ตั้งใจ — ต้องมีแนวทางการเขียน/ตรวจฝั่ง application (เพิ่ม 3 รายการตาม jpo 060f)
 - F5 TokenHash (credential-derived ของบุคคล) และ ResultCipher (secret ของทุก operation) — คุม log/backup/ETag ตาม SEC001-009 MUST-4/5
-- F6 โครงสร้างภายใน jsonb ไม่ถูกบังคับที่ DDL — PII ฝังใน JSON ต้องคุมที่ serializer/DTO · รายการที่ต้องลงเพิ่ม: PreviewContext(Context), LevelSnapshot(LevelProposal.Snapshot), ArmEvidence.note, Assessment ผลตรวจ (RuleResults/Outcome/EarnedScore/MaxScore — คะแนน/เวลา/สถานะผูกผู้เรียน ไม่จำกัดเฉพาะคอลัมน์ระบุตัวตน)
+- F6 โครงสร้างภายใน jsonb ไม่ถูกบังคับที่ DDL — PII ฝังใน JSON ต้องคุมที่ serializer/DTO · รายการที่ต้องลงเพิ่ม: PreviewContext(Context), LevelSnapshot(LevelProposal.Snapshot), ArmEvidence.note, Assessment.RuleResults (jsonb) และคอลัมน์ผลประเมิน Outcome/EarnedScore/MaxScore (แยกชนิดจริงตาม SQL:747–750 แล้วใน §3 — คะแนน/สถานะผูกผู้เรียน ไม่จำกัดเฉพาะคอลัมน์ระบุตัวตน)
 - F7 retention: กลไกหมดอายุที่มี = Idempotency.ReplayUntil, ScorePreview.ExpiresAt และ Session.ExpiresAt (SQL:226 — เพิ่มตาม jpo 060f) — **expiry ไม่ใช่หลักฐานว่าลบข้อมูลแล้ว** และ IsDelete ไม่ใช่การทำลายข้อมูล; Attempt.Answers/Evidence/ScorePreviewItem.Snapshot ของเด็กไม่มีนโยบายเก็บ/ลบ — เจ้าของข้อมูล/กฎหมายต้องรับรองระยะเก็บ/จุดเริ่มนับ/วิธีลบ/ข้อยกเว้น/backup ตามมาตรา 23/37 (jpo เสนอและตรวจ ไม่กำหนดแทน)
 - F8 สรุป jpo 060f: inventory นี้รับเป็นหลักฐานตั้งต้นได้ แต่ SEC001-010 ยังปิดไม่ได้ — ต้องเติมขอบเขต legacy/local files/logs พร้อมนโยบาย masking/encryption/access และเส้นทางลบ/ส่งออกข้อมูลรายคน
 
@@ -98,3 +100,4 @@
 
 - 2026-10-24 — สร้างครั้งแรก (ใบงาน060c): inventory รายคอลัมน์จาก DDL จริง + flag ส่งต่อ jpo — รันโดย นายช่าง solo (subagent role vault); นายช่างยืนยันพาธ SEC001-010 = security.md:188 แล้ว
 - 2026-10-24 — แก้ตามผลตรวจ jpo ใบงาน060f (สวมบท vault โดยนายช่าง solo ตรง): สรุป direct identifier, DeviceJkt/ResultCipher จำแนกใหม่, ข้อมูลเด็ก 9→13 ตาราง, free-text เพิ่ม 3, jsonb เพิ่มรายการผลประเมิน, F7 เพิ่ม Session.ExpiresAt + expiry≠deletion, AccountId NULL; ยังไม่ปิด SEC001-010
+- 2026-10-24 — แก้ตามผลตรวจ check ใบงาน060f (สวมบท vault โดยนายช่าง solo ตรง): แยก Outcome/EarnedScore/MaxScore เป็นคอลัมน์จริงตาม SQL:747–750 (varchar/numeric), ถอน LevelPromotionPolicy/GradeSlot จากรายการ "ไม่มี PII เฉพาะตัว", แก้อ้างอิง LevelSnapshot เป็น contract-003:49

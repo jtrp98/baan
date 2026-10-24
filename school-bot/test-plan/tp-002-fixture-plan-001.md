@@ -15,7 +15,7 @@
 | id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
 | --- | --- | --- | --- |
 | FX-01a | wall clock แช่และย้อน + monotonic เดินต่อ + anchor {server UTC ล่าสุด, wall, max effective} | License offline 3 วัน · TP001-003/004/010 · AC-034-03/04, AC-035-05 | exp=min(checked_at+259200,license_exp); ขอบ exp−1s/exp/exp+1s; ย้อน→CLOCK_UNTRUSTED ต้อง online; monotonic ไม่ลด high-water; เปิดซ้ำไม่เลื่อน exp; replay คืน exp เดิมไม่ใช่ online check ใหม่ |
-| FX-01b | server-side fake clock ขับ ReplayUntil | create-license TTL replay · TP001-007 · AC-027-02/03 | CompletedAt+899s คืน key เดิม (ตรวจสิทธิ์+license ไม่ revoke); +900s→409 IDEMPOTENCY_EXPIRED+details.resource_id แม้ purge ยังไม่รัน; retry ไม่ต่อ TTL; ResultCipher+ResultKeyId ล้างคู่กัน tombstone คง |
+| FX-01b | server-side fake clock ขับ ReplayUntil (fixture ตั้ง TTL=900 วินาทีชัดเจน — สมมติฐาน) | create-license TTL replay · TP001-007 · AC-027-02/03 | ทดสอบที่ `ReplayUntil−1s` คืน key เดิม (ตรวจสิทธิ์+license ไม่ revoke); ที่/หลัง `ReplayUntil`→409 IDEMPOTENCY_EXPIRED+details.resource_id แม้ purge ยังไม่รัน (สัญญากำหนดเพียง ReplayUntil≤CompletedAt+900s จึงทดสอบรอบ ReplayUntil ไม่ใช่ offset จาก CompletedAt — แก้ตาม check 060f); retry ไม่ต่อ TTL; ResultCipher+ResultKeyId ล้างคู่กัน tombstone คง |
 | FX-01c | fake clock พ้น window 24 ชม. ของ idempotency ทั่วไป | import/recheck replay · TP001-028/030/078 · AC-041-04, AC-042-05 | พ้น window→409 IDEMPOTENCY_EXPIRED+resource_id; Host GET ยืนยันไม่ POST ใหม่; snapshot freeze ไม่อ่านเนื้อหาที่แก้ภายหลัง |
 
 วิธี: inject clock interface (wall กับ monotonic แยกคู่ + จุด persist anchor) ที่ host/API ใช้ — ห้ามเปลี่ยนเวลาเครื่องจริง; เก็บ log เวลาทุกการอ่านค่าเป็น E-TRACE
@@ -70,3 +70,4 @@
 
 ## Change Log
 - 2026-10-24 — Rev1: สร้างแผน failure/race fixtures ตามใบงาน060e (fake clock/monotonic, trash 30 วัน/rollback/ปิดแอป, late callback/drain-stop, lost response/receipt/tombstone, cross-tenant GAP-06); docs-only ไม่มีการรัน
+- 2026-10-24 — แก้ตาม check 060f (นายช่างสวมบท inspect): FX-01b ปรับเป็น fixture TTL=900s และทดสอบรอบ ReplayUntil (ไม่ใช่ offset จาก CompletedAt)

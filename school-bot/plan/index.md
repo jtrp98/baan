@@ -6,6 +6,8 @@ Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 แล�
 
 ## Waiting on Human
 
+Precedence 2026-10-24 (ใบงาน060 โหมด solo): รอบ060 ปิดคิวเตรียมเอกสาร §3 ของ [queue-003 ฉบับปรับ059](queue-003.md) ครบ (arch GAP sync + packs + DB docs + TP 79 cases + UX drafts + ตรวจข้ามโมเดล jpo/check — ดู [task-060](../planning/task-060.md)) ประตูมนุษย์ที่พร้อมถามแล้วเพิ่มเติมจากฐานด้านล่าง: (1) GAP-07 update workflow คง Prepare/Install พร้อม spec ร่าง AC หรือเลือก check-only ([update-disposition-001](../design/update-disposition-001.md)) (2) คำถาม spec Q1–Q6 ของ [packs 4 ชุด](../requirement/index.md) (3) จุดเซ็น UX Q1–Q13 ([uxui/index](../uxui/index.md)) (4) คำขอหลักฐาน EV-01..06 รอส่งเจ้าของ Master DB ([db-safe-evidence-001](../db/db-safe-evidence-001.md)). คงทั้งหมด: 110 tasks pending, ไม่มี code/SQL/runtime ใหม่, gates เดิมทั้งหมดยังไม่ปิด.
+
 Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับปรับ059](queue-003.md), [H5 questionnaire 7 หัวข้อ](../planning/h5-questionnaire-001.md), [gRPC contract Rev1 §7/open items](../design/gateway-grpc-contract-001.md#7-review-packet-และการตัดสินใจ) และ [evidence-002](evidence-002.md) ก่อนข้อความฐานด้านล่าง. คิวเตรียมเอกสาร 055/056→057→058 ทำครบ; contract ยัง PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session และ mapper, เจ้าของ/มนุษย์ตอบ H5 และหลักฐาน selector/cardinality/linkage/continuation กับ runtime; fullLogin NOT_READY. gRPC/035/cType ตอบแล้ว ไม่ถามซ้ำ. รอบนี้ docs-only ใช้ Codex ตามผู้ใช้; task023/runner เก่าเป็นประวัติ ไม่ใช่คิวปัจจุบัน.
 
 ข้อความฐาน ณ 2026-10-23 (อ่าน precedence ด้านบนก่อน):
@@ -111,6 +113,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+- 2026-10-24 — ใบงาน060 (นายช่างสวมบท gm ในโหมด solo): เพิ่ม precedence รอบ060 — ปิดคิวเอกสาร §3 ครบ + ประตูมนุษย์พร้อมถาม 4 กลุ่มใหม่ (GAP-07/spec Q1–Q6/UX Q1–Q13/EV-01..06); คง Status/Release Scope/dependencies/gates ทั้งหมด
 - 2026-10-24 — ใบงาน059: ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items; คงข้อความฐาน/Status/dependencies/gates/Release Scope.
 - 2026-10-24 — ใบงาน051: ชี้คิว051/หลักฐานล่าสุด; คง Status/Release Scope.
 

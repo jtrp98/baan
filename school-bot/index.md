@@ -9,14 +9,14 @@
 |---|---|---|
 | `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..035 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
-| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev7/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED |
+| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev8/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED; รอบ060a ปิด GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา (ดู §060a) |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/180 AC |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 77 cases/180 AC; join implementation/validation ครบ; actual ทุกเคส NOT_RUN, มี design gaps ค้าง |
+| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 79 cases/180 AC (Amendment002 sync GAP+SEC รอบ060) + TP-002 fixture plan FX-01..05; actual ทุกเคส NOT_RUN; GAP-07 ยังไม่มี coverage |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | ร่างแรก int-001 Entry / int-002 Labs — รอเซ็นทุกส่วน |
-| [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; mitigation reviewแล้ว ยังไม่มี re-audit runtime |
+| [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; รอบ060 ฝัง mitigation SEC001-003/009 ระดับแบบ + jpo ตรวจรับ (security-gap-sync-review-001); ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
 | [planning/handoff-002.md](planning/handoff-002.md) | ผลส่งต่อหลักฐาน/ใบงาน run/ประวัติ planner เดิม — convention เฉพาะโปรเจกต์ | authต้นฉบับ/TP/spec/security/gmบันทึกแล้ว; สถานะรับGatewayและfinalvalidationอ่านในhandoff002 |
@@ -32,7 +32,11 @@
 
 เอกสารที่เกี่ยวข้องรอบล่าสุด: [ผลตรวจและรายการแก้ทั้งหมด](planning/transport-docs-review-001.md) — แบบระบบ/คู่มือ/แผน/ทดสอบ/ข้อกำหนด/security ตรวจและปรับตาม owner; รอบนี้เอกสารเท่านั้น ยังไม่ implement.
 
+เอกสารล่าสุด: [ใบงาน060 โหมด solo](planning/task-060.md) — ปิด GAP design รอบ060a + packs/DB docs/TP/UX + jpo/check ตรวจข้ามโมเดล (ผล check รอบ 1 FAIL → แก้ครบ ตาม [check-060-docs-review-001](planning/check-060-docs-review-001.md)); ประตูมนุษย์ใหม่: GAP-07 disposition, spec Q1–Q6, UX Q1–Q13, EV-01..06.
+
 ## Change Log
+
+- 2026-10-24 — ใบงาน060 (โหมด solo): ปิดคิวเตรียมเอกสาร queue-003 §3 ครบ — arch ผ่าน runner ภายนอก codex t1 (GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา + BL-001 + SA-004 ชุดเกณฑ์ + arch-fix Rev2 ตาม jpo) · spec/int/inspect/vault เป็น subagent โดยนายช่างบันทึก (packs 4 ชุดครอบ GAP-05/09, uxui int-001/002 รอเซ็น Q1–Q13, TP 79 cases + TP-002 fixtures, db review-007/pii-inventory/db-safe-evidence + BL-001) · jpo และ check ตรวจข้ามโมเดลผ่าน baan-role (jpo NEEDS_HUMAN ตาม gates เดิม; check รอบ 1 FAIL 4 จุด → เจ้าของไฟล์แก้ครบ) · คง 110 tasks pending/44 REQ/180 AC/17 gates ไม่มี code/SQL/runtime; ประตูมนุษย์ใหม่: GAP-07 disposition (update-disposition-001), spec Q1–Q6 (packs), UX Q1–Q13, EV-01..06 (ส่งเจ้าของ Master DB)
 
 - 2026-10-24 — รอบ transport contract (ใบงาน055–059): sys055/056 หลักฐาน routing/linkage ([001](planning/routing-linkage-evidence-001.json)/[002](planning/routing-linkage-evidence-002.json)) สรุปว่าไม่มี pre-auth cType selector ที่พิสูจน์แล้ว (fullLogin คง NOT_READY), arch057 สร้าง [gateway-grpc-contract-001](design/gateway-grpc-contract-001.md) Rev1 PROPOSED + Gateway Rev4 pointer (เก็บฉบับก่อนแก้พร้อม SHA256 ที่ design/archive/2026-10-24-before-grpc-contract-001), sys058 [H5 questionnaire](planning/h5-questionnaire-001.md) 7 หัวข้อ, gm059 sync คิว/แผน; คง 110 tasks pending/77 TP NOT_RUN/Important6 OPEN ไม่มี code/SQL/runtime ใหม่; ประตูค้าง: G/Light รับรองข้อยกเว้น opaque-session + error mapper, เจ้าของ/มนุษย์ตอบ H5, selector/cardinality/linkage พิสูจน์ต่อ
 

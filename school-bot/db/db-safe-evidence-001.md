@@ -47,7 +47,7 @@
 
 - เหตุผล: ต้องยืนยันสัดส่วนรูปแบบ hash (SHA-1 hex ยาว 40 อักษร / prefix 'v2:' / อื่น) เพื่อเลือก verifier อ้างอิงของ Desktop login (C1–C3) โดยไม่ต้องเห็น hash จริง
 - สิ่งที่ขอ (count รวมเท่านั้น): **ป้ายประเภทคงที่ที่คำนวณภายใน DB** เช่น `SHA1_HEX_40`, `V2_FORMAT`, `NULL_OR_EMPTY`, `OTHER` — ความยาวใช้ช่วงที่กำหนดล่วงหน้า (เช่น `LEN_40`, `LEN_OTHER`) ไม่ใช่ค่ารายแถว
-- ตัวอย่างรูปแบบ: `SELECT CASE WHEN PasswordHash IS NULL OR PasswordHash='' THEN 'NULL_OR_EMPTY' WHEN PasswordHash LIKE 'v2:%' THEN 'V2_FORMAT' WHEN length(PasswordHash)=40 THEN 'SHA1_HEX_40' ELSE 'OTHER' END AS kind, count(*) FROM ... GROUP BY 1;`
+- ตัวอย่างรูปแบบ: `SELECT CASE WHEN PasswordHash IS NULL OR PasswordHash='' THEN 'NULL_OR_EMPTY' WHEN PasswordHash LIKE 'v2:%' THEN 'V2_FORMAT' WHEN PasswordHash ~ '^[0-9a-fA-F]{40}$' THEN 'SHA1_HEX_40' ELSE 'OTHER' END AS kind, count(*) FROM ... GROUP BY 1;` (ตรวจรูปแบบ hex ครบ 40 ตัวอักษรด้วย — length=40 อย่างเดียวยังแยก SHA-1 hex ไม่ถูกต้อง ตามข้อสังเกต check 060f)
 - รูปแบบผลลัพธ์ที่ยอมรับ: ตาราง (kind, count) — กลุ่ม < 5 รวมเป็น "other"
 - **ห้ามส่ง prefix/suffix จริงของ hash ไม่ว่าส่วนใด** (แก้ตาม jpo 060f: `left(PasswordHash,3)` เดิมเปิดเผยส่วนของ credential จริง แม้แสดงเป็นกลุ่ม ≥5)
 
