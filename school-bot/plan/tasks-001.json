@@ -318,7 +318,7 @@
         "contract review pack core/projects/release/auth พร้อม revision ล่าสุด",
         "ตาราง DES-007/REQ-030 disposition และมติ/หลักฐานค้าง"
       ],
-      "acceptance": "รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ",
+      "acceptance": "รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; จัด RPC/HTTP mapping/auth-tenant trust ก่อน implementation",
       "req_ids": [
         "REQ-027",
         "REQ-029",
@@ -894,7 +894,7 @@
       "outputs": [
         "auth API/tests"
       ],
-      "acceptance": "credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence",
+      "acceptance": "credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; HTTP Login เดิมของ G แยกขอบเขต; cTypeตอบแล้ว ทีมพิสูจน์routing/linkage",
       "req_ids": [
         "REQ-036"
       ],
@@ -2148,7 +2148,7 @@
       "outputs": [
         "deployment/rollback pack"
       ],
-      "acceptance": "pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy",
+      "acceptance": "pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; pack G HTTP→RPC/B gRPC พร้อมcompatibility/health/rollback; รอLight/H5",
       "req_ids": [
         "REQ-027",
         "REQ-036",
@@ -3185,7 +3185,7 @@
       "outputs": [
         "implementation/tests"
       ],
-      "acceptance": "พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check",
+      "acceptance": "พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; แยก private introspection; 035ตอบแล้ว; รอtrust/tenant/Light/H5 proof",
       "req_ids": [
         "REQ-043"
       ],
@@ -4075,6 +4075,12 @@
   },
   "change_log": [
     {
+      "date": "2026-10-24",
+      "revision": 2,
+      "refs": ["design/gateway-integration-001.md", "planning/auth-flow-handoff-001.md", "plan/queue-003.md"],
+      "summary": "051: precedence transport/Codex/docs-only; sync SA-001/BE-006/BE-023/BE-039 คู่md; คงscope/IDs/status/dependencies/gates/effort"
+    },
+    {
       "date": "2026-10-23",
       "revision": 2,
       "refs": [
@@ -4089,7 +4095,7 @@
     }
   ],
   "preconditions": {
-    "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น",
+    "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
     "owner_resolution": "Owner/คำเรียกroleเก่าในใบงานและdispatchใช้role_aliases; IDprefixคงเดิม",
     "release": "DONEในresponseหมายถึงpatchแผนพร้อมบันทึก ไม่ใช่released; งานทั้งหมดpendingจนcheck verdict/ผู้คุมบันทึก"
   }

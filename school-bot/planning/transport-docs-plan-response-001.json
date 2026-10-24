@@ -1,0 +1,214 @@
+{
+  "state": "DONE",
+  "summary": "เตรียม27 exact replacements ใน13ไฟล์ ยังไม่apply; amend queue-003เดิม ไม่สร้างคิวใหม่. ตรวจ anchor ไม่ซ้ำและ JSON หลังแทนข้อความ parseได้; อ้าง as-built จากarch049/receipt ไม่ตรวจsourceซ้ำ.",
+  "coverage": [
+    {
+      "paths": [
+        "knowledge/school-bot/index.md",
+        "knowledge/school-bot/design/index.md",
+        "knowledge/school-bot/design/gateway-integration-001.md",
+        "knowledge/school-bot/planning/auth-flow-handoff-001.md",
+        "knowledge/school-bot/planning/gateway-grpc-doc-amendment-response-001.json"
+      ],
+      "action": "consistent",
+      "reason": "อ่านindexตามลำดับแล้ว; Gateway Rev3/receipt แยกHTTP Login/local logoutจากgRPC integrationถูกต้อง"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/index.md",
+        "knowledge/school-bot/plan/queue-003.md",
+        "knowledge/school-bot/plan/dispatch-001.md",
+        "knowledge/school-bot/plan/evidence-002.md",
+        "knowledge/school-bot/plan/gates-001.md",
+        "knowledge/school-bot/plan/scope-001.md",
+        "knowledge/school-bot/plan/release-runbook-001.md"
+      ],
+      "action": "amend",
+      "reason": "เพิ่มprecedence051/Codex/docs-only; แยกมติที่ตอบแล้วกับหลักฐานค้าง และชี้คิวล่าสุด"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/tasks-001.json",
+        "knowledge/school-bot/plan/SA-001.md",
+        "knowledge/school-bot/plan/BE-006.md",
+        "knowledge/school-bot/plan/BE-023.md",
+        "knowledge/school-bot/plan/BE-039.md"
+      ],
+      "action": "amend",
+      "reason": "ตรวจข้อความเกี่ยวข้องในJSON110รายการ; sync Acceptance คู่mdตามschemaเดิม โดยไม่เปลี่ยนโครงงาน"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/extension/index.md",
+        "knowledge/school-bot/plan/BE-001.md",
+        "knowledge/school-bot/plan/BE-002.md",
+        "knowledge/school-bot/plan/FE-002.md",
+        "knowledge/school-bot/plan/SEC-001.md",
+        "knowledge/school-bot/plan/QA-001.md",
+        "knowledge/school-bot/plan/PM-001.md"
+      ],
+      "action": "consistent",
+      "reason": "ไม่มีคำสั่งHTTP relay/direct public B; ใช้latest contract/preconditionsส่วนกลาง ไม่แก้เนื้อหานอกtransport"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/queue-002.md"
+      ],
+      "action": "historical_preserve",
+      "reason": "คงคิวและmetadataเดิม; dispatch/indexชี้queue-003ฉบับ051"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/backlog.md"
+      ],
+      "action": "amend",
+      "reason": "appendคำชี้แจง035/transportเท่านั้น คงBL-001..004 ไม่เพิ่มBLหรือtask"
+    }
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "## Waiting on Human",
+      "new": "## Waiting on Human\n\nPrecedence 2026-10-24: ใช้ [queue-003 ฉบับ051](queue-003.md) และ [evidence-002](evidence-002.md) ก่อนข้อความฐานด้านล่าง: gRPC/035/cType ตอบแล้ว; รอ contract/mapping/trust/Light/H5 และหลักฐาน runtime. รอบนี้ docs-only ใช้ Codex ตามผู้ใช้; task023/runner เก่าเป็นประวัติ ไม่ใช่คิวปัจจุบัน.\n\nข้อความฐาน ณ 2026-10-23 (อ่าน precedence ด้านบนก่อน):"
+    },
+    {
+      "path": "knowledge/school-bot/plan/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: ชี้คิว051/หลักฐานล่าสุด; คง Status/Release Scope."
+    },
+    {
+      "path": "knowledge/school-bot/plan/queue-003.md",
+      "old": "## 1. สถานะภาพรวมและข้อห้าม",
+      "new": "## Override ใบงาน051 — 2026-10-24\n\nส่วนนี้มี precedence เหนือคิว/runner/Waiting on Human เดิมด้านล่าง. ผู้ใช้เลือก Codex สำหรับงานนี้และให้ทำเอกสารก่อน; ลำดับ Claude→AGY→Codex และ task023/AGY เป็นประวัติ ไม่สั่ง rerun งานเดิม.\n\nใช้ [Gateway Rev3](../design/gateway-integration-001.md) และ [receipt](../planning/auth-flow-handoff-001.md): client→HTTP G→gRPC B; browser ผ่าน BFF, ไม่มี HTTP relay/HttpClient หรือ direct public B fallback. HTTP Login เดิมของ G/decoder เป็นอีกขอบเขต. B มี HTTP logout/internal decoder และ 4032 local tests แล้ว แต่ยังไม่พิสูจน์ Gateway/gRPC/DB runtime; fullLogin NOT_READY.\n\n035 และ cType category ตอบแล้ว ไม่ถามธุรกิจซ้ำ. รอทีมตรวจ pre-auth routing/profile linkage. มนุษย์ยังต้องให้ host/env/TLS/secret/service access/staff_admin และ approvals เดิมจาก artifact ที่ครบ; ไม่รอเลือก transport/HTTP exception.\n\nคิวเฉพาะเอกสารใน SA-001/BE-001/BE-039: sys ตรวจ routing/linkage → arch/sys จัด RPC/DTO + HTTP mapping + auth/tenant trust (JWT กับ opaque session), error/timeout/cancellation/retry/private exposure → ส่ง implementation review ให้ G/Light และเตรียม H5. ไม่เขียน transport code/SQL หรือเปิด implementation ในรอบนี้; dependencies/gates เดิมคงทั้งหมด.\n\n## 1. สถานะภาพรวมและข้อห้าม"
+    },
+    {
+      "path": "knowledge/school-bot/plan/queue-003.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: override คิวเดิมตาม049/receipt/คำสั่ง Codex ปัจจุบัน; คงประวัติและทุก gate."
+    },
+    {
+      "path": "knowledge/school-bot/plan/evidence-002.md",
+      "old": "## หลักฐานก่อนคิว",
+      "new": "## หลักฐานก่อนคิว\n\nPrecedence 2026-10-24 (051): อ่าน [Gateway Rev3](../design/gateway-integration-001.md), [receipt](../planning/auth-flow-handoff-001.md) และ [queue-003](queue-003.md) ก่อนฐานเดิม. gRPC/035/cType category ยืนยันแล้ว; ค้าง RPC+HTTP mapping/auth/tenant trust/Light/H5 และ routing/linkage proof. HTTP logout/decoder มีแล้ว; 4032 tests เป็น local/static PASS เดิม, PG integration NOT_RUN; ไม่ปิด G-AUTH/QA หรือ task. ข้อความ task023 ยังไม่มี output เป็นประวัติเมื่อจัดคิว003 ไม่ใช่สถานะเอกสารล่าสุด."
+    },
+    {
+      "path": "knowledge/school-bot/plan/evidence-002.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: แยกมติ transport/035/cType กับหลักฐานค้าง; ไม่เปลี่ยน verdict."
+    },
+    {
+      "path": "knowledge/school-bot/plan/gates-001.md",
+      "old": "## Change Log",
+      "new": "## Precedence 051 — 2026-10-24\n\nG-AUTH/H5 ใช้ [evidence-002](evidence-002.md) ฉบับ051 และ Gateway Rev3: gRPC/035/cType ตอบแล้ว; รอ contract/RPC+HTTP mapping/auth/tenant trust และ Light implementation review. 4032 local tests ไม่ปิด Gateway/gRPC/DB gate; ไม่เพิ่ม gate/คำถามธุรกิจ.\n\n## Change Log\n- 2026-10-24 — ใบงาน051: sync หลักฐาน transport; คง17 gates และเงื่อนไขอนุมัติเดิม."
+    },
+    {
+      "path": "knowledge/school-bot/plan/scope-001.md",
+      "old": "## Change Log",
+      "new": "## Precedence 051 — 2026-10-24\n\nการตีความ API ใน scope เดิมใช้ [Gateway Rev3](../design/gateway-integration-001.md): client→HTTP G→gRPC B ผ่าน BFF ตาม consumer; ไม่มี direct public B/HTTP relay. HTTP Login ของ G แยกจาก service transport. clarification นี้ไม่เพิ่ม feature/task หรืออนุญาต implementation; คิวล่าสุด [queue-003](queue-003.md).\n\n## Change Log\n- 2026-10-24 — ใบงาน051: ชี้ transport ของ scope เดิม; คง44REQ/180AC/110งาน/effort."
+    },
+    {
+      "path": "knowledge/school-bot/plan/release-runbook-001.md",
+      "old": "## Change Log",
+      "new": "## Precedence 051 — 2026-10-24\n\nลำดับ3/6 ต้องรวม B gRPC service และ HTTP→RPC mapping ของ G พร้อม compatibility/health/rollback ของแต่ละฝั่งตาม [Gateway Rev3](../design/gateway-integration-001.md). sys เตรียมลำดับ rollout จริงก่อนคนอนุมัติ; ห้ามเดาลำดับหรือใช้ direct public B/HTTP relay fallback. Login HTTP เดิมของ G แยกขอบเขต. H5/Light/trust/tenant และ Gateway/gRPC/DB runtime ยังต้องมีหลักฐาน; 4032 local tests ไม่แทน. รอบนี้แก้โครงเอกสาร ไม่ execute.\n\n## Change Log\n- 2026-10-24 — ใบงาน051: sync transport ในrunbook; คงจุดหยุด/rollback/ผู้อนุมัติเดิม."
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "Rev2 ใช้ [queue-002](queue-002.md) และrole_aliasesเป็นคิวปัจจุบันเมื่อข้อความเดิมขัดกัน; runนี้เฉพาะ evidence preparation ไม่ dispatch implementation/SQL/deploy",
+      "new": "Precedence 051 (2026-10-24): ใช้ [queue-003](queue-003.md) ฉบับ051 และrole_aliasesเป็นคิวปัจจุบัน; queue-002 เป็นประวัติ. รอบนี้ Codex/docs-only ไม่ dispatch implementation/SQL/deploy."
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "ใช้ [routing ปัจจุบัน](queue-002.md) Rev2;",
+      "new": "ใช้ [routing ปัจจุบัน](queue-003.md) ตาม precedence051 (2026-10-24);"
+    },
+    {
+      "path": "knowledge/school-bot/plan/dispatch-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: ชี้queue-003ทั้งคิว/routing; ไม่เปลี่ยนDAG/concurrency."
+    },
+    {
+      "path": "knowledge/school-bot/plan/SA-001.md",
+      "old": "คง web/HTTPS/4 DB เดิม ไม่มี SchoolBotUser; แยกสิ่งยืนยันแล้วกับข้อเสนอ; trace update check/download/install ถึง REQ-030 และ decisions-002..013; เสนอ disposition ก่อน freeze implementation contract ไม่ตัด requirement หรือเพิ่ม release scope เอง; ถ้าเป็นทางเลือกธุรกิจ/schema/breaking ให้คนตัดสินและบันทึกหลักฐาน",
+      "new": "รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; จัด RPC/HTTP mapping/auth-tenant trust ก่อน implementation"
+    },
+    {
+      "path": "knowledge/school-bot/plan/SA-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: sync Acceptance คู่JSON; precedence051 มีลำดับเหนือข้อความเก่าที่ขัดกัน; คงscope/dependencies/pending."
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "\"รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ\"",
+      "new": "\"รับมติ decisions-025..034 และผล task-013 ล่าสุดก่อน freeze contract; SchoolBot DB แยกจาก 4 DB เดิม ไม่มี SchoolBotUser; UpdateDate/single-column FK+application tenant check; business approved แยก runtime evidence; DES-007/REQ-030 disposition คงต้อง trace ก่อน release/update; ไม่ถามอนุมัติแบบ H4 ซ้ำ; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; จัด RPC/HTTP mapping/auth-tenant trust ก่อน implementation\""
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-006.md",
+      "old": "credential fixtureตรง; tenant/profile/logout/expiryถูก; LoginแยกLicense",
+      "new": "credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; HTTP Login เดิมของ G แยกขอบเขต; cTypeตอบแล้ว ทีมพิสูจน์routing/linkage"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-006.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: sync Acceptance คู่JSON; precedence051 มีลำดับเหนือข้อความเก่าที่ขัดกัน; คงscope/dependencies/pending."
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "\"credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence\"",
+      "new": "\"credential/profile/tenant fixturesจริง; student/employee bind; session channel/expiry/logout; LicenseแยกLogin; DES-012 policy ที่ตอบแล้วไม่แทน G-AUTH/H5 evidence; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; HTTP Login เดิมของ G แยกขอบเขต; cTypeตอบแล้ว ทีมพิสูจน์routing/linkage\""
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-023.md",
+      "old": "HTTPS/secrets/4DB/backup/health/restoreพร้อมreview; ยังไม่deploy shared",
+      "new": "pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; pack G HTTP→RPC/B gRPC พร้อมcompatibility/health/rollback; รอLight/H5"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-023.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: sync Acceptance คู่JSON; precedence051 มีลำดับเหนือข้อความเก่าที่ขัดกัน; คงscope/dependencies/pending."
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "\"pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy\"",
+      "new": "\"pack SchoolBot API/worker→admin Next.js→web-system/BFF→Desktopตามcontract; 4legacy+SchoolBotDB/env/secret refs/health/backup/restore; H5และstaffbootstrapค่าจริงจากคน; ไม่deploy; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; pack G HTTP→RPC/B gRPC พร้อมcompatibility/health/rollback; รอLight/H5\""
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-039.md",
+      "old": "ครบ ac_ids พร้อม evidence ให้ check ตรวจ",
+      "new": "พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; แยก private introspection; 035ตอบแล้ว; รอtrust/tenant/Light/H5 proof"
+    },
+    {
+      "path": "knowledge/school-bot/plan/BE-039.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน051: sync Acceptance คู่JSON; precedence051 มีลำดับเหนือข้อความเก่าที่ขัดกัน; คงscope/dependencies/pending."
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "\"พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check\"",
+      "new": "\"พิสูจน์ ac_ids ตาม DES-012 ฉบับล่าสุด; ตรวจ preconditions ที่ evidence-002.md; ส่ง expected/actual/evidence ให้ check; precedence051 (2026-10-24): Gateway Rev3 client→HTTP G→gRPC B; docs-only ตามqueue-003; แยก private introspection; 035ตอบแล้ว; รอtrust/tenant/Light/H5 proof\""
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "\"ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น\"",
+      "new": "\"ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation\""
+    },
+    {
+      "path": "knowledge/school-bot/plan/tasks-001.json",
+      "old": "  \"change_log\": [",
+      "new": "  \"change_log\": [\n    {\n      \"date\": \"2026-10-24\",\n      \"revision\": 2,\n      \"refs\": [\"design/gateway-integration-001.md\", \"planning/auth-flow-handoff-001.md\", \"plan/queue-003.md\"],\n      \"summary\": \"051: precedence transport/Codex/docs-only; sync SA-001/BE-006/BE-023/BE-039 คู่md; คงscope/IDs/status/dependencies/gates/effort\"\n    },"
+    },
+    {
+      "path": "knowledge/school-bot/backlog.md",
+      "old": "- 2026-10-23 — เพิ่ม BL-002..004 จากผลตรวจ auth/legacy/security ของ arch และ sys สำหรับข้อบกพร่องใน G, A และ legacy web นอกขอบเขต SchoolBot (ติดป้ายยังไม่ผ่าน security triage ของเจ้าของระบบ ไม่เปิด task ใหม่ ส่วนงานในขอบเขต route เข้า task เดิม)",
+      "new": "- 2026-10-23 — เพิ่ม BL-002..004 จากผลตรวจ auth/legacy/security ของ arch และ sys สำหรับข้อบกพร่องใน G, A และ legacy web นอกขอบเขต SchoolBot (ติดป้ายยังไม่ผ่าน security triage ของเจ้าของระบบ ไม่เปิด task ใหม่ ส่วนงานในขอบเขต route เข้า task เดิม)\n- 2026-10-24 — ใบงาน051: เพิ่มคำชี้แจงปัจจุบันต่อท้าย; ไม่แก้ BL เดิม/เพิ่มรายการ.\n\n## คำชี้แจงต่อท้าย — precedence051 (2026-10-24)\n\nBL-002..004 คงประวัติ/เจ้าของ/security triage เดิม. เฉพาะข้อความ BL-004 ว่ารอตกลงแหล่ง is_admin ถูก supersede โดย035 ที่ตอบแล้ว; ไม่เปิดคำถามธุรกิจซ้ำ. งานเดิม SA-001/BE-006/BE-039 อ่าน [queue-003](plan/queue-003.md) และ [Gateway Rev3](design/gateway-integration-001.md): client→HTTP G→gRPC B; ไม่มีHTTP relay/direct public B. ค้างimplementation/trust/tenant/H5/Light; รอบนี้docs-only ไม่เพิ่มscope/BL/task."
+    }
+  ],
+  "new_files": [],
+  "invariants": [
+    "110tasks pending/44REQ/180AC/8phases/17gates/207person-days คงเดิม; effortยังเป็นสมมติฐาน",
+    "JSONเปลี่ยนเฉพาะ4acceptance/latest_contract/เพิ่มchange_log; IDs/dependencies/gate definitions/coverage/schema/metadataเดิมคงทั้งหมด",
+    "ไม่ปิดgate/เปลี่ยนQA verdict; 4032localtestsไม่แทนGateway/gRPC/DBruntime",
+    "คงrelease scope/ประวัติเดิม; backlog append-only; ไม่มีBL/taskใหม่",
+    "ไม่มีsource/knowledge writes/rolechain/git mutations/tests/SQL/network"
+  ],
+  "handoff": "ส่งนายช่าง archiveก่อนapply27editsตามลำดับ; งานamendmentพร้อมบันทึก ไม่มีblockerของใบงาน051. โครงการยังpending: contract/mapping/trust/Light/H5/runtime และhuman artifacts/approvalsเดิมยังค้าง. คิวเอกสารถัดไปให้sysตรวจrouting/linkage แล้วarch/sysจัดRPC+HTTPmapping/trustตามdependenciesเดิม; ไม่เริ่มimplementation ไม่ถาม035/cType/transportซ้ำ. ไม่มีbacklogรายการใหม่."
+}

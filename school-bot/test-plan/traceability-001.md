@@ -4,6 +4,8 @@
 
 ผู้คุม join implementation/validation จาก canonical plan/tasks-001.json revision2 โดยตรง ไม่เปลี่ยน owner หรือ status; ทุก Actual=NOT_RUN
 
+> Precedence 2026-10-24: ขั้นตอน online coverage ใช้ [กลยุทธ์ร่วม Gateway→gRPC](index.md#กลยุทธ์ร่วม-transport--2026-10-24) และ TP Markdown ปัจจุบัน. 180 แถวคือ AC coverage ไม่ใช่ transport readiness/PASS; joined JSON มีเฉพาะ AC expected/IDs/owners/actual จึงคง schema/ข้อมูลเดิม ไม่เพิ่ม transport summary. tp-001.json เป็น raw snapshot รวม amendment เดิม ไม่ใช้ profiles เดิม override กลยุทธ์ปัจจุบัน
+
 | AC | Case IDs | Implementation / role | Validation | Actual |
 | --- | --- | --- | --- | --- |
 | [AC-009-01](../requirement/req-009.md) | TP001-001, TP001-077 | FE-001/front | QA-001/check | NOT_RUN |
@@ -188,5 +190,7 @@
 | [AC-052-05](../requirement/req-052.md) | TP001-076 | BE-037/sys, BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
 
 ## Change Log
+
+- 2026-10-24 — ใบงาน052: เพิ่ม precedence ของ transport procedure; คง joined JSON/180 AC/77 case IDs/owners/actual เดิม ไม่รันทดสอบ
 
 - 2026-10-23 — นายช่างบันทึกและจัดรูปจากผล role ผ่าน Claude; ไม่มี runtime/test verdict หรือการปิด gate

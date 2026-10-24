@@ -1,0 +1,69 @@
+# SA-001 — จัด contracts/backend boundaries และเสนอ disposition ของ update workflow
+
+## Goal
+
+จัด contracts/backend boundaries และเสนอ disposition ของ update workflow
+
+Task: SA-001; Owner: sa; Tier: t1; Phase: P0; Effort: 2 person-days (สมมติฐาน — ยังไม่ยืนยัน ไม่ใช่ deadline และไม่รวมรอคน/เครื่อง/credentials)
+
+## References
+
+- [REQ-027](../requirement/req-027.md)
+- [REQ-029](../requirement/req-029.md)
+- [REQ-030](../requirement/req-030.md)
+- [REQ-033](../requirement/req-033.md)
+- [REQ-036](../requirement/req-036.md)
+
+AC associations เดิม:
+ไม่มีรายการในข้อเสนอ; ตรวจตามเอกสารอ้างอิงและขอบเขตงานนี้
+
+- [DES-002](../design/des-002.md)
+- [DES-003](../design/des-003.md)
+- [DES-004](../design/des-004.md)
+- [DES-007](../design/des-007.md)
+
+ตรวจ [REQ-030 และ AC-030-01..03](../requirement/req-030.md), [Planner review](../planning/review-001.md), [มติระบบเต็ม](../requirement/decisions-002.md), [มติ API](../requirement/decisions-010.md), [มติ DB](../requirement/decisions-011.md), [มติ PK](../requirement/decisions-012.md), [logical baseline](../requirement/decisions-013.md), [data model](../design/data-model.md) และ [risks](../design/risks.md)
+
+## Scope
+
+จัด contract review pack แยก core/projects/release ตาม จัด contracts/backend boundaries และเสนอ disposition ของ update workflow โดยไม่แก้ release scope เอง เพิ่มหัวข้อ clarification ที่ต้องทำก่อน freeze: เทียบ PrepareUpdate/InstallPreparedUpdate ใน DES-007 กับ REQ-030/AC-030-01..03 และมติจริง แยก check/download/install เป็น operation แล้วระบุแต่ละส่วนว่ามี requirement รองรับ เป็นข้อเสนอ design หรือยังไม่มีคำตัดสิน เสนอ disposition พร้อมแหล่งอ้างอิง ผู้ตัดสิน ผลต่อ BE-018/BE-019/QA-010/packaging และ effort ห้ามถือว่าคำว่า full production อนุมัติทุกข้อเสนอ updater แล้ว หากต้องเปลี่ยน requirement/design หรือ scope ให้ส่งผ่าน นายช่าง ไป BA/SA/ผู้ใช้ตามอำนาจและรอคำตอบเฉพาะส่วนที่พึ่งพา ส่วน core/projects ที่ไม่ติดเดินต่อได้
+
+## Out of Scope
+
+งานนอก outputs/AC/references ของ task นี้ การเลือกนโยบายธุรกิจหรือเซ็นอนุมัติแทนคน การเพิ่มหรือตัด frozen release scope และ speculative feature ห้ามแก้ข้ามเขต Owns ของ role ห้าม state-changing git หรือเรียก role ต่อเอง Shared SQL/deploy/publish, installer tests และการเปลี่ยนสถานะหุ่นต้องมีหลักฐานอนุญาตเฉพาะตาม gate ไม่ถือว่าได้สิทธิ์จากการรับแผน
+
+## Expected Output
+
+- contract review pack แยก core/projects/release
+- ตารางเทียบ DES-007 PrepareUpdate/InstallPreparedUpdate กับ REQ-030/AC-030-01..03 และมติจริง พร้อม disposition/ผลกระทบ/ผู้ตัดสิน
+
+ส่ง artifact จริงในเขต Owns ของ role พร้อม references ที่ตรวจย้อนกลับได้ ไม่สร้างสำเนาเอกสารข้ามหมวด หากมีไฟล์เดิมให้ amend พร้อม Change Log วันที่ 2026-10-21
+
+## Acceptance
+
+คง web/HTTPS/4 DB เดิม ไม่มี SchoolBotUser; แยกสิ่งยืนยันแล้วกับข้อเสนอ; trace update check/download/install ถึง REQ-030 และ decisions-002..013; เสนอ disposition ก่อน freeze implementation contract ไม่ตัด requirement หรือเพิ่ม release scope เอง; ถ้าเป็นทางเลือกธุรกิจ/schema/breaking ให้คนตัดสินและบันทึกหลักฐาน
+
+แนบตาราง criterion/AC → วิธีตรวจ → expected/actual → evidence path หรือ source:line และข้อจำกัด งานเตรียมแบบ/คำตัดสินต้องมีรายการประเด็น ผู้ตอบ และผลกระทบที่ตรวจทานได้; ถ้ายังไม่มี AC association ให้ตรวจตาม references โดยไม่สร้าง AC เอง งาน implementation ส่งคำสั่ง/exit code และผล checks ตามส่วนที่เปลี่ยน แยก automated logic, UI, hardware และ installer evidence ห้ามอ้างผ่านเมื่อไม่ได้ตรวจหรืออ้าง task นี้ปิด AC ก่อน QA ตรวจ เกินสองรอบแก้ให้หยุดส่งคนตัดสิน
+
+## Dependencies
+
+ไม่มีรายการในข้อเสนอ; ตรวจตามเอกสารอ้างอิงและขอบเขตงานนี้
+
+Gate preconditions:
+ไม่มีรายการในข้อเสนอ; ตรวจตามเอกสารอ้างอิงและขอบเขตงานนี้
+
+ใช้ DAG ไม่ใช้ phase เป็น barrier ตรวจ deliverable ของ prerequisites และหลักฐานปิด gate จริงก่อนเริ่มส่วนที่พึ่งพา งานที่ขาดคำตอบให้ระบุ Task / Reference / Reason โดยไม่เปลี่ยน Status เอง
+
+## Handoff
+
+ส่ง core/projects/release review pack และ update disposition table ให้ นายช่าง ส่ง DBA/SEC/BE ตาม dependencies ประเด็น updater ส่ง SA/BA/เจ้าของผลิตภัณฑ์เมื่อจำเป็นต้องเปลี่ยนแบบหรือมีคำตัดสินธุรกิจ ก่อนปิด G-RELEASE-DB ต้องมี disposition ที่ trace ได้และ human approval ในเรื่องที่กติกาบังคับ ไม่อ้างว่า BE-019 รองรับ install workflow แล้วหรือว่า workflow ดังกล่าวถูกตัดออก
+
+> Rev2: ขอบเขต References/outputs/acceptance/dependencies ปัจจุบันของ SA-001 ใช้ [canonical JSON](tasks-001.json) แทนข้อความเดิมที่ขัดกัน; role ตาม role_aliases ใน scope-001.md; status คง pending
+
+## Change Log
+
+- 2026-10-23 — reconcile spec-review-001/decisions-032..034; 44REQ/180AC
+
+- 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
+
+- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ

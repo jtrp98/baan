@@ -39,7 +39,12 @@ PM อ่าน knowledge ตาม allowlist และตรวจโครง�
 
 Owner เดิมเป็น alias (รวม Handoff): sa→arch, ba→spec, be→sys, fe→front, dba→vault, tp→inspect, qa→check, sec→jpo, ux→int, pm→gm; ใช้ role_aliases ใน JSON ไม่ renumber
 
+## Precedence 051 — 2026-10-24
+
+การตีความ API ใน scope เดิมใช้ [Gateway Rev3](../design/gateway-integration-001.md): client→HTTP G→gRPC B ผ่าน BFF ตาม consumer; ไม่มี direct public B/HTTP relay. HTTP Login ของ G แยกจาก service transport. clarification นี้ไม่เพิ่ม feature/task หรืออนุญาต implementation; คิวล่าสุด [queue-003](queue-003.md).
+
 ## Change Log
+- 2026-10-24 — ใบงาน051: ชี้ transport ของ scope เดิม; คง44REQ/180AC/110งาน/effort.
 - 2026-10-23 — Rev2: reconcile44/180; แตก36งานscopeเดิม; ดู evidence-002/queue-002; pendingเดิม ไม่ใช่released
 - 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
 

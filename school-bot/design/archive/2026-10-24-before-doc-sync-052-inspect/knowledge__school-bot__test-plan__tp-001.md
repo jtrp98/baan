@@ -1,0 +1,1178 @@
+# TP-001 — แผนทดสอบ 180 AC
+
+วันที่ 2026-10-23 · inspect / Claude Sonnet tier t2 · ผล role: NEEDS_DESIGN_CHANGE
+
+[ใบงาน](../planning/task-018.md) · [ข้อมูลต้นฉบับ](tp-001.json) · [ตาราง AC/เจ้าของงาน](traceability-001.md)
+
+ครบ 180 AC ใน 77 cases ตรวจโดยไล่เทียบทีละ REQ (009..052) กับรายการ AC ที่ grep จาก requirement จริง ไม่ได้รัน script เพราะไม่มีสิทธิ์เขียนไฟล์ชั่วคราว ผู้คุมควรตรวจ join ซ้ำ ส่วนอิสระของ TP-001 จบ คือสร้าง case set ได้ทุก AC แต่ expected ของ AC-040..042 (Guest shared/trash/export/import/history) ยังไม่มีสัญญา design ปัจจุบัน เพราะ DES-003 Rev3 ยังเป็นก่อน decisions-014/015 จึงส่ง arch ส่วน expected เกินข้อความ AC ใน cases เหล่านั้นถือว่า pending ทุก actual=NOT_RUN ไม่มีผลรันจริง ไม่ให้ PASS Cases ที่พึ่ง PGGradeDB จริง (AC-050-02, 051-01..05, 052-01..05) แยก fixtures parity/coexist/crash ไป TP-003 ตาม SA-004
+
+77 cases ครอบคลุม180 AC จาก44REQ ตามการตรวจชุด IDs ของผู้คุม. ทุกเคสยัง NOT_RUN; การนับ coverage ไม่รับรองว่าระบบผ่านหรือปิด task/gate
+
+## สิ่งที่ต้องมีจากคน
+
+- G-AUTH: sanitized credential/lookup/profile/roster/course-teacher fixtures (BE-001) + H5 route/web-principal/staff_admin seed ก่อนรัน cases ฝั่ง Login/school_web/admin
+- G-CORE/G-PROJECT-DB/G-LEARN-DB/G-RELEASE-DB: คนรัน test SQL/rollback/catalog และส่ง revision/hash/environment/ผลจริง ก่อน cases PF-API/PF-CATALOG ที่พึ่ง DB
+- G-UX-ENTRY/PROJECT/LABS/LEARN: signed UX artifact ก่อนปิด expected ฝั่ง UI (ข้อความ/สถานะ/ปุ่ม)
+- G-LEARN: signed content/criteria/pass-fail pairs/ผู้อนุมัติ revision ก่อนใช้ตรวจ AC-037-05/06, 038-01, 044-03 กับเนื้อหาจริง (ตอนนี้ใช้ synthetic fixture ติดป้าย test-only)
+- G-HW: รุ่น/firmware/calibration/stop/disconnect/emergency-stop/platform matrix + คำสั่งอนุญาต motion/upload/torque ก่อน cases PF-HW-*
+- G-DELIVERY: เครื่อง/signing/notarization/network/ช่องทางแจก + artifact signed MSI/PKG ก่อน cases PF-INST-*/PF-HW-*-INST
+- G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB (export): ตาม evidence-002 ก่อน grade write cases ใน TP-003
+- G-QA/G-SEC/G-RELEASE: ไม่เกี่ยวกับ TP-001 แต่ห้ามอ้างผ่านจาก plan นี้
+
+## กลยุทธ์
+
+- ระดับ: unit/static ก่อน; integration ที่ host(fake engine)/API(persistent test DB, ≥2 instances, fake clock); E2E/manual เฉพาะสิ่งที่ต้องเห็นจริง (window controls, installer, hardware) หนึ่ง case ครอบหลาย AC เมื่อ fixture เดียวกัน และ expected ตรวจแยกต่อ AC ได้
+- evidence codes: E-TRACE=bridge/process trace+log (นับ spawn/คำสั่ง/ลำดับ); E-API=request/response+DB rows before/after+audit+instance logs; E-UI=screenshot/video+build hash; E-HW=engine exchange log (bytes_written/read)+บันทึกผู้สังเกต+ชื่อผู้อนุญาต; E-INST=installer log+artifact sha256+OS build+signing status; E-CAT=catalog query output จากคนรัน (revision/hash/env) ทุกชิ้นต้องระบุ build/commit hash และ profile
+- หลักฐานแยกกัน ไม่ใช้แทนกัน: bridge/fake ≠ hardware; source-built ≠ signed installer; mock PGGradeDB ≠ G-PARITY/COEXIST/TARGET; script review/DDL static ≠ catalog runtime; OQ closed ≠ AC ผ่าน
+- Fault/race ที่ต้องมีเสมอสำหรับ money/grade/auth/lease/update: duplicate/lost-response retry, concurrent writers (≥2 process), commit/signer fail, crash ระหว่าง commit, clock rollback/boundary (exp-1s/exp), revoked-during-commit, tenant/ID injection (cross-school, sId==sEmp), stale If-Match/ETag
+- ไม่ใช้ sample/preview/mock เป็นหลักฐานของ native/Cloud/hardware; preview ตรวจเฉพาะ AC-013
+- Hardware: TP ไม่กำหนด pass threshold เอง (latency ฯลฯ) เก็บเป็น observation รอเกณฑ์จากผู้รับรอง; ไม่ motion/upload/torque ก่อนมีคำสั่งอนุญาต
+- TP-003 (depends TP-001+SA-004): รับ AC-049..052 ส่วน PGGradeDB ใช้ TP001-069..076 เป็นฐาน เพิ่ม parity/coexist/crash fixtures; TP-001 ตรวจ logic ฝั่ง SchoolBot/mock target ได้ก่อน แต่ไม่ปิด G-PARITY ฯลฯ
+- expected ที่อ้างตัวเลข/รหัส error มาจาก AC/DES/learning-rules/grade-rules ตรง ๆ ค่าที่ไม่มีใน source ไม่ถูกสร้างใหม่
+
+## Profiles
+
+| ID | Platform | Store | Mode | Prerequisites |
+| --- | --- | --- | --- | --- |
+| PF-UNIT | any CI (Go/TS/C#) | in-memory | unit/domain | source commit hash |
+| PF-STATIC | document/DDL review | db/schoolbot_db.sql, schoolbot.dbml | static | revision ของ SQL/DBML ที่ตรวจ |
+| PF-HOST | Windows 11 25H2 x64 source-built Desktop host (Go/Wails) | local fs + fake credential store + fake clock | fake engine process/test bridge (ไม่แตะ hardware) | build/commit hash<br>fake clock+monotonic harness (TP-002) |
+| PF-UI-WIN | Windows 11 25H2 x64 native UI source-built, WebView2 | local | fake bridge/test device | signed UX artifact ตาม gate ที่เกี่ยว สำหรับ expected ข้อความ/สถานะ |
+| PF-UI-MAC | macOS 15+ Intel และ Apple Silicon native UI source-built | local | fake bridge | เครื่องทดสอบ Mac ทั้งสอง arch<br>signed UX artifact |
+| PF-PREVIEW | browser preview=1 และ browser ไม่มี bridge | browser storage | preview/mock | network spy |
+| PF-API | SchoolBot API ≥2 instances | persistent transactional test SchoolBot DB (ไม่ใช่ shared env) | integration; fake clock; signer/KMS stub | human-run test SQL/rollback/catalog + revision/hash/env/runner (G-CORE/G-PROJECT-DB/G-LEARN-DB/G-RELEASE-DB) |
+| PF-LEGACY | PF-API + Master/School DB sanitized fixtures | SchoolBot DB + School DB fixtures (read) | integration with legacy accounts/profile/roster/course-teacher | BE-001 evidence: password encoding/lookup/profile/tenant (G-AUTH)<br>ไม่เดา credential |
+| PF-WEB | web-system school_web pages (sb-tech-upgrade-web-system) + API | PF-LEGACY | E2E/integration channel=school_web | H5 route/BFF/web-principal/env<br>signed UX (G-UX-LEARN) |
+| PF-ADMIN | Next.js admin school-bot/web channel=staff_admin | PF-API | E2E/integration | staff_admin seed/roles<br>signed UX UX-005..007 |
+| PF-GRADE | PGGradeDB sanitized fixtures + SchoolBot writer | sanitized PGGradeDB test instance | integration/crash/race (TP-003 owns fixtures) | G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB evidence ตาม evidence-002<br>mock ไม่ปิดเงื่อนไข |
+| PF-CATALOG | human-run catalog query on test DB | test SchoolBot DB | runtime evidence review | คนรันระบุ revision/hash/env<br>ผลจริง ไม่ใช่ DDL |
+| PF-HW-WIN-SRC | Windows 11 25H2 x64 source-built engine+host + หุ่นที่ผู้รับรองยืนยันรุ่น | local | hardware HID และ Serial | G-HW approvals+คำสั่งอนุญาต+ผู้รับรอง+emergency-stop provision |
+| PF-HW-MAC-INTEL-SRC | macOS 15+ Intel source-built + หุ่นที่ยืนยันรุ่น | local | hardware HID และ Serial | G-HW<br>Darwin transport build |
+| PF-HW-MAC-ARM-SRC | macOS 15+ Apple Silicon source-built + หุ่นที่ยืนยันรุ่น | local | hardware HID และ Serial | G-HW<br>Darwin transport build |
+| PF-INST-WIN | Windows 11 25H2 x64 บัญชีสะอาด (มี/ไม่มี WebView2) | installed per-user | signed installer artifact | G-DELIVERY signed MSI/Setup + hash<br>ไม่มีเครื่องมือ dev |
+| PF-INST-MAC | macOS 15+ Intel และ Apple Silicon | /Applications + Application Support | signed/notarized Universal PKG | G-DELIVERY signed PKG + notarization<br>เครื่อง Mac ทั้งสอง arch |
+| PF-HW-WIN-INST | Windows 11 25H2 x64 + หุ่น | installed | hardware จาก signed installer | G-HW<br>G-DELIVERY |
+| PF-HW-MAC-INST | macOS 15+ Intel และ Apple Silicon + หุ่น | installed | hardware จาก signed PKG | G-HW<br>G-DELIVERY |
+
+## Cases
+
+### TP001-001
+
+AC: AC-009-01, AC-009-02 · References: DES-001, DES-002, BR-009-01, BR-009-02 · Level: integration · Profiles: PF-HOST, PF-UI-WIN
+
+Fixture: ไม่มี entitlement/credential; fake engine นับ spawn
+
+Action: เปิดแอป เลือก Guest แล้ว Login แยกกันเข้า Block/Arm/Code; เรียก bridge RunV2/Run/Save/Load เก่าตรงข้าม UI; ลอง mode/action นอก allowlist
+
+Expected: ทุกทางถูกปฏิเสธ LICENSE_REQUIRED/MODE_NOT_ALLOWED/ACTION_NOT_ALLOWED; engine spawn=0; มีทางกรอก License; Login ไม่ปลดล็อก; ไม่มี ungated compat path
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-UI
+
+Actual: NOT_RUN
+
+### TP001-002
+
+AC: AC-028-04, AC-034-01 · References: DES-002, BR-009-03 · Level: integration · Profiles: PF-HOST, PF-API
+
+Fixture: เครื่องสะอาดไม่เคยมีสิทธิ์; key ถูก/ผิด/revoked/expired
+
+Action: กรอก key ขณะ offline; กรอก key ผิด/revoked ขณะ online; inject credential-store write fail
+
+Expected: ทุกกรณีไม่ปลดล็อกโหมดหลัก แจ้งให้ออนไลน์/กรอกใหม่ได้; ไม่เก็บ entitlement; write fail→CREDENTIAL_STORE_FAILED ไม่รายงาน ready
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-API+E-UI
+
+Actual: NOT_RUN
+
+### TP001-003
+
+AC: AC-034-03, AC-034-04 · References: DES-002, DES-001, BR-009-03 · Level: integration · Profiles: PF-HOST
+
+Fixture: entitlement checked_at=T; กรณี license_exp ไกล และ license_exp<T+3d; fake wall+monotonic clock; หุ่น busy (fake)
+
+Action: เปิดแอปซ้ำ offline ที่ T+3d-1s, exp-1s, exp, exp+1s; ย้อน wall clock/VM snapshot; เปิด session ค้างข้าม exp ขณะ robot busy
+
+Expected: ก่อน exp ใช้ได้และเปิดซ้ำไม่เลื่อน exp; now>=exp locked+แจ้งต่ออินเทอร์เน็ต; exp=min(T+259200,license_exp); clock ย้อน→CLOCK_UNTRUSTED ต้อง online; timer เก่าไม่ส่งคำสั่งหลังหมด; robot busy→drain+stop ก่อน lock
+
+Evidence ที่ต้องเก็บ: E-TRACE+log เวลา
+
+Actual: NOT_RUN
+
+### TP001-004
+
+AC: AC-034-02, AC-034-05, AC-034-06 · References: DES-002 · Level: integration · Profiles: PF-HOST, PF-API
+
+Fixture: ผลตรวจ: Active, LICENSE_INACTIVE, BINDING_REVOKED, 403 code ไม่รู้จัก, 5xx, 429, network down, success malformed, signature/kid ผิด, device proof ผิด
+
+Action: ตรวจออนไลน์ในสถานะ valid และหลัง expired offline; replay request เดิม
+
+Expected: Active→ปลดล็อก มีสิทธิ์ในเครื่อง exp ใหม่=checked_at+3d; inactive/revoked→denied+invalidate cache ไม่ต่อ ไม่ใช้ค่าเดิมปลดล็อก; 5xx/429/network ไม่เลื่อน exp; malformed/signature ผิด→INVALID_ENTITLEMENT; 403 ไม่รู้ code→locked; replay คืน exp เดิม ไม่ถือเป็น online check ใหม่
+
+Evidence ที่ต้องเก็บ: E-API+E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-005
+
+AC: AC-028-01, AC-028-02 · References: DES-002 · Level: integration · Profiles: PF-API
+
+Fixture: 2 API instances; key K ว่าง; device A/B P-256 proofs
+
+Action: activate A และ B พร้อมกัน ≥50 รอบ; A ซ้ำ; validate ก่อน/หลัง activate; Idempotency-Key เดิม payload ต่าง; inject commit/signer fail; proof ผิด/challenge reuse/เกิน 120s
+
+Expected: เหลือ current binding เดียว อีกฝ่าย 409 DEVICE_LIMIT; A ซ้ำไม่เพิ่ม binding; validate ก่อน→403 DEVICE_NOT_ACTIVATED หลัง→ผ่าน; replay คืน exp เดิม; payload ต่าง 409; fail ไม่ส่งผลสำเร็จ; proof ผิด DEVICE_PROOF_INVALID
+
+Evidence ที่ต้องเก็บ: E-API (DB rows, audit)
+
+Actual: NOT_RUN
+
+### TP001-006
+
+AC: AC-028-03 · References: DES-002 · Level: integration · Profiles: PF-API
+
+Fixture: license expires_at=E; license revoked
+
+Action: activate+validate ที่ E-1s, E, E+1s และหลัง revoke; replay response เดิมหลัง revoke
+
+Expected: now>=E หรือ revoke→ทั้งสอง API ปฏิเสธ license inactive; replay ไม่คืน entitlement เก่า (ตรวจ binding ก่อน)
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-007
+
+AC: AC-027-01, AC-027-02, AC-027-03 · References: DES-002, DES-004, DES-012, BR-027-01 · Level: integration · Profiles: PF-API, PF-ADMIN
+
+Fixture: staff auth ของ /v2/admin ไม่ configured/configured; staff session (staff_admin) ขาด/ไม่ถูกต้อง/หมดอายุ; session ที่ไม่มี StaffRole active ที่มีสิทธิ์ License (role อื่น/ถูกถอน/valid_until หมด); token school_web/desktop; static bearer เดิมของ /v1/admin; ผู้เรียกมีสิทธิ์ + payload valid, ชื่อว่าง/whitespace, expires_at อดีต/=now, ฟิลด์ limit>1
+
+Action: POST/GET /v2/admin/licenses ตามแต่ละ fixture; POST/GET /v1/admin ด้วย static bearer และด้วย staff session; replay create (DES-002 ยังเป็น /admin/licenses รอ arch sync)
+
+Expected: staff auth ไม่ configured→503; ไม่มี/ไม่ถูกต้อง/หมดอายุ→401; มี session แต่ไม่มี StaffRole active ที่มีสิทธิ์ License→403; token channel ผิด→403 CHANNEL_NOT_ALLOWED (DES-004:61). assert เฉพาะ status+error envelope ห้าม assert code ของ 503/403(role) จน arch ผูกกับ /v2/admin/licenses (AUTH_NOT_CONFIGURED DES-004:80 และ STAFF_ROLE_REQUIRED ใน catalog ยังไม่ผูก). /v1/admin ด้วย static bearer สร้าง/ดูรายการไม่ได้ (ตรวจ DB rows ไม่เปลี่ยน ไม่ assert status ที่ AC ไม่ระบุ). ผู้เรียกมีสิทธิ์: valid→201+key เดียว 1 เครื่อง; ชื่อว่าง/หมดอายุ→4xx; สร้างหลายเครื่องไม่ได้; list ไม่มี key เต็ม/hash/device id มี activated_devices 0|1; replay คืน key เดิมเฉพาะ operation/admin เดิม (ดู GAP-02)
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-008
+
+AC: AC-027-04, AC-036-03 · References: DES-002, DES-003 · Level: integration · Profiles: PF-API, PF-LEGACY
+
+Fixture: license+Cloud project ที่บันทึกสำเร็จ
+
+Action: restart ทุก instance; kill ระหว่าง commit; inject DB commit fail แล้ว restart
+
+Expected: หลัง restart list (License สร้าง/เรียกผ่าน /v2/admin ด้วยผู้เรียกที่มีสิทธิ์ตาม BR-027-01; AC-027-04)/Login บัญชีเดิม/โครงงานเดิมครบ; commit fail ไม่รายงานสำเร็จและไม่มีแถวค้างครึ่ง
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-009
+
+AC: AC-035-01, AC-035-02, AC-035-03, AC-035-04 · References: DES-002 · Level: integration · Profiles: PF-API, PF-HOST
+
+Fixture: License bound A; admin/ไม่ใช่ admin/admin โรงเรียนอื่น; เครื่อง B; A มี entitlement เหลือ; fake clock
+
+Action: non-admin unbind; admin unbind (If-Match ถูก/stale); B activate ทันที; B ลอง offline ด้วย entitlement ของ A; A validate online หลังย้าย; A activate กลับเอง; unbind∥activate race
+
+Expected: non-admin ถูกปฏิเสธ binding เดิม; ไม่สร้าง License ใหม่; B activate ได้ทันทีไม่รอ 3 วัน; B ต้องออนไลน์ครั้งแรก; A online→BINDING_REVOKED ไม่ได้สิทธิ์ใหม่; A activate เองไม่ได้ยกเว้น next_device_jkt; BindingEpoch เพิ่ม; audit ครบ
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-010
+
+AC: AC-035-05 · References: DES-002 · Level: integration · Profiles: PF-HOST
+
+Fixture: A entitlement exp=E แล้วย้ายไป B
+
+Action: A offline ที่ E-1s, E, E+1s; A online หลังย้าย
+
+Expected: ก่อน E ใช้ได้; ที่ E locked; ย้ายไม่เลื่อน E; รู้ผลปฏิเสธออนไลน์แล้วหยุดใช้ cache ทันที
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-API
+
+Actual: NOT_RUN
+
+### TP001-011
+
+AC: AC-009-03 · References: DES-001, BR-009 · Level: manual · Profiles: PF-UI-WIN, PF-UI-MAC
+
+Fixture: entitlement valid
+
+Action: ย่อ สลับเต็มจอ ปิดหน้าต่างจากปุ่มในแอป; ปิดขณะ dirty
+
+Expected: ทำได้ครบ; ปิดผ่าน close guard
+
+Evidence ที่ต้องเก็บ: E-UI วิดีโอ
+
+Actual: NOT_RUN
+
+### TP001-012
+
+AC: AC-010-01, AC-010-02, AC-010-03 · References: DES-001 · Level: E2E · Profiles: PF-UI-WIN, PF-PREVIEW
+
+Fixture: network ปิด; Block ที่ยังไม่บันทึก มีลำดับบล็อก/ชื่อที่ผู้ใช้ตั้ง; storage ปกติ/ใช้ไม่ได้; ค่าภาษาที่เก็บ: th/en/zh/ค่าไม่รองรับ/ว่าง
+
+Action: สลับ th→en→zh; เปิดแอปใหม่ในแต่ละกรณี
+
+Expected: ข้อความควบคุมเปลี่ยนตาม offline; งาน/ลำดับ/ชื่อไม่เปลี่ยน ไม่ remount (instance เดิม); เปิดใหม่ใช้ภาษาล่าสุด; ค่าไม่รองรับ/ว่าง/storage ล้ม→ไทย; i18n keys ครบสามภาษา
+
+Evidence ที่ต้องเก็บ: E-UI+E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-013
+
+AC: AC-012-01, AC-012-02, AC-012-03 · References: DES-001, DES-003 · Level: integration · Profiles: PF-HOST, PF-UI-WIN
+
+Fixture: งาน dirty; inject storage fail; inject close-guard fail
+
+Action: เลือก mode อื่น→ยกเลิก/ยืนยัน; Save แล้วออกเมื่อ storage fail; ปิดหน้าต่างเมื่อ guard fail
+
+Expected: มีคำยืนยัน ยกเลิกแล้วอยู่เดิม; save fail→ไม่ออก แสดงข้อความล้มเหลว; guard fail→หน้าต่างเปิด แสดงเหตุผล; ไม่มีสูญเสีย draft
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-UI
+
+Actual: NOT_RUN
+
+### TP001-014
+
+AC: AC-013-01, AC-013-02, AC-013-03 · References: DES-001, DES-005 · Level: E2E · Profiles: PF-PREVIEW, PF-UI-WIN
+
+Fixture: browser ไม่มี preview=1/ไม่มี bridge; preview=1; network spy+device-command spy+FS spy
+
+Action: เปิดไม่มี preview; ใน preview บันทึก/activate/check update; LearnMap, Teacher restart/reset/console, USB ตัวอย่าง
+
+Expected: ไม่มี preview→ข้อผิดพลาด native bridge ไม่มีผลสำเร็จจำลอง; preview บันทึกใน browser ได้ activate/check ไม่เรียก API จริง (request=0); ไม่มีคำสั่งอุปกรณ์ ไม่มีไฟล์ USB คัดลอก ไม่มีผลประเมินถาวร
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-UI
+
+Actual: NOT_RUN
+
+### TP001-015
+
+AC: AC-011-01, AC-011-02 · References: DES-003 · Level: integration · Profiles: PF-HOST
+
+Fixture: Guest local: 2+ งานต่อ Block/Arm/Code
+
+Action: บันทึก/เปิดทุกงาน; แก้ A แล้วเปิดใหม่; บันทึกพร้อมกัน 2 writers; kill ระหว่างเขียน
+
+Expected: เปิดครบไม่ปะปน; A ได้ค่าล่าสุด B ไม่เปลี่ยน; per-project lock+atomic replace ไม่มีไฟล์เสีย; ผลตอบเก่าไม่ล้าง dirty ใหม่
+
+Evidence ที่ต้องเก็บ: E-TRACE+ไฟล์ before/after hash
+
+Actual: NOT_RUN
+
+### TP001-016
+
+AC: AC-011-01, AC-011-02 · References: DES-003, DES-004 · Level: integration · Profiles: PF-API, PF-LEGACY
+
+Fixture: Login นักเรียนและครู; 2+ งานต่อ mode; ผู้ใช้อื่น/โรงเรียนอื่น
+
+Action: บันทึก/เปิด; PUT ด้วย If-Match ตรง/stale 2 clients; เปิดด้วย ID ของผู้อื่น
+
+Expected: ไม่ปะปน; A ใหม่ B เดิม; stale→412 VERSION_CONFLICT ไม่ last-write-wins ไม่สูญ draft; ID ผู้อื่น→404 (ดู GAP-03 เรื่องชื่อฟิลด์ ETag)
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-017
+
+AC: AC-011-03, AC-011-04 · References: DES-003 · Level: integration · Profiles: PF-HOST
+
+Fixture: JSON เสีย/ว่าง/BOM/UTF-8 ผิด; ขนาด 1048576 และ 1048577 bytes; มีทั้ง SchoolBotPoC/ArmStudioPoC และใหม่; มีเฉพาะเก่าที่ valid/เสีย
+
+Action: เปิดไฟล์; เริ่มแอป/รัน migration ซ้ำ
+
+Expected: >1MiB หรือเสีย→ข้อผิดพลาดไม่แสดงสำเร็จ (=1MiB ผ่าน); มีใหม่ไม่ถูกทับ; ไม่มีปลายทาง→คัดลอกเก่าที่ valid ต้นฉบับยังอยู่; เสียแจ้งแยกไม่ขวางงานอื่น; rerun ไม่ทับงานที่ผู้ใช้แก้
+
+Evidence ที่ต้องเก็บ: E-TRACE+ไฟล์ hash
+
+Actual: NOT_RUN
+
+### TP001-018
+
+AC: AC-017-01, AC-017-02, AC-017-03 · References: DES-003, DES-006 · Level: unit · Profiles: PF-UNIT
+
+Fixture: Arm project: 2 ท่า+กลุ่ม; ID ท่าซ้ำ; ค่านอกช่วง (-180..180, สี่ค่า ±135, gripper 0..100 และขอบ ±1); กลุ่มอ้างท่าไม่มี/<2 ท่า
+
+Action: load/validate; save แล้ว reopen
+
+Expected: ได้ชื่อ/ค่า/เวลา/ลำดับ/สมาชิกกลุ่มเดิม; ซ้ำ/นอกช่วง→error; กลุ่มอ้างท่าไม่มีไม่เป็นกลุ่มใช้งาน; reopen ไม่มี connected/uploaded/verified/torque
+
+Evidence ที่ต้องเก็บ: unit log
+
+Actual: NOT_RUN
+
+### TP001-019
+
+AC: AC-025-01, AC-025-02, AC-025-03 · References: DES-001, DES-003, DES-005 · Level: integration · Profiles: PF-HOST, PF-UNIT
+
+Fixture: DSL ถูก; คำสั่งนอก DSL (import/eval/__import__/exec); ไฟล์ schema 1 เตรียมตรง (ไม่พึ่ง save ของ UI) แบบ DSL ถูก + บรรทัดคอมเมนต์ `#` (demo.go:72) ปรับ padding ให้ได้: (A) ASCII 16384/16385 units=bytes; (B) ไทย units≈5.5K ≤16384 แต่ bytes=16384 และ 16385; (C) ไทย units=16385; (D) emoji 8192 ตัว (16384 units, 32768 bytes) และ +1 ASCII (16385 units); schema ผิด. ตรวจ units=String.length, bytes=UTF-8 len ก่อนใช้
+
+Action: (1) โหลดไฟล์ผ่าน UI load (useCodeLab.ts:56); (2) ส่ง source เดียวกันเข้า engine program.run (demo.go:66); (3) รัน DSL ถูก/นอก DSL; (4) บันทึกแล้วเปิด source เดิม; (5) โหลด schema ผิด
+
+Expected: ได้รายการคำสั่ง/steps/ผลในฉาก ไม่มีคำสั่งไปหุ่น; นอก DSL→error ไม่รันเป็น Python; บันทึก/เปิด source เดิม; schema ผิด→error. AC-025-03 (โหลด UI นับ UTF-16 units): units 16384 โหลดได้, 16385→error ตัดที่ units ไม่ใช่ bytes (ครอบ A/C/D). BR-025-03 (รัน นับ UTF-8 bytes): A และ B ที่ bytes 16384 ผ่านด่านขนาด, bytes 16385 engine ปฏิเสธ; B ผ่านโหลด UI แต่ถูกปฏิเสธตอนรัน; emoji 8192 ผ่านโหลดแต่ engine ปฏิเสธ. ไม่ assert code/ข้อความ error ของ engine, ไม่ทดสอบ codepoint/grapheme, ไม่ใช้ DES-003:31,89 เป็น expected; เพดาน bytes ไม่ใช่เกณฑ์ AC-025-03
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-020
+
+AC: AC-026-01, AC-026-02, AC-026-03, AC-026-04 · References: DES-003, DES-005 · Level: unit · Profiles: PF-UNIT, PF-UI-WIN
+
+Fixture: move_right(2)+repeat2(jump); 2 stacks ไม่เชื่อม; expansion 64/65 commands; repeat ซ้อน 8/9 ชั้น; blocks 1000/1001; tiles 0/1/10/11; repeat 0/1/10/11; id ซ้ำ; schema ผิด
+
+Action: compile/run/save/reopen
+
+Expected: ได้ move_right,jump,jump ตามลำดับ; สอง stack→รันไม่ได้แจ้งให้เชื่อม; >64 commands หรือ >8 ชั้น→ปฏิเสธไม่แสดงผลสำเร็จ (64/8 ผ่าน); บันทึก/เปิดได้บล็อก ค่า การเชื่อมเดิม; schema ผิด→error
+
+Evidence ที่ต้องเก็บ: unit log+E-UI
+
+Actual: NOT_RUN
+
+### TP001-021
+
+AC: AC-036-01 · References: DES-003, BR-036-01 · Level: integration · Profiles: PF-HOST
+
+Fixture: Guest+License valid ไม่ Login
+
+Action: บันทึกและเปิดหลายงานทั้งสามโหมด
+
+Expected: ทำได้ในเครื่องโดยไม่ Login ไม่เรียก Cloud API (request=0)
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-022
+
+AC: AC-036-02, AC-036-04 · References: DES-003, DES-004 · Level: integration · Profiles: PF-API, PF-LEGACY, PF-HOST
+
+Fixture: บัญชีเดิม student และ employee (sanitized); Cloud save fail: timeout/503/DB commit fail/lost response; logout แล้ว login บัญชีอื่น
+
+Action: Login แล้ว save/open Cloud; inject fail; retry Idempotency-Key เดิม
+
+Expected: เก็บ/เปิดโครงงานของตนได้; fail→แจ้งล้มเหลว ไม่แสดงสำเร็จ ไม่ผูกบัญชีอื่น ไม่สลับ Guest; retry ไม่สร้างซ้ำ; บัญชีใหม่ไม่เห็น/ไม่รับ callback ของเก่า
+
+Evidence ที่ต้องเก็บ: E-API+E-UI
+
+Actual: NOT_RUN
+
+### TP001-023
+
+AC: AC-036-02 · References: DES-004, DES-012 · Level: integration · Profiles: PF-API, PF-LEGACY
+
+Fixture: บัญชี/โปรไฟล์ sanitized: ถูก, ผิด, ปิด, หลายโปรไฟล์; โรงเรียนไม่มี/มี License; token ผิด channel
+
+Action: login desktop; bind profile; school_web ไม่มี License; ใช้ desktop token เรียก endpoint ครู; ยิงเกิน rate limit; bind ซ้ำ/คนละ P
+
+Expected: ผิด/ปิด→401 UNAUTHORIZED แบบเดียว; ต้องมี License active+device proof; school_web ไม่มี License→403 LICENSE_REQUIRED; ผิดช่อง→403 CHANNEL_NOT_ALLOWED; bind ครั้งเดียว→409 SESSION_ALREADY_BOUND; 429+Retry-After; ไม่ log password/token
+
+Evidence ที่ต้องเก็บ: E-API+log scan
+
+Actual: NOT_RUN
+
+### TP001-024
+
+AC: AC-036-05 · References: DES-004, DES-005, learning-rules-032-034, BR-036-04 · Level: integration · Profiles: PF-API, PF-LEGACY
+
+Fixture: employee P บน Desktop; นักเรียนที่ sId==sEmp (ชน); Guest import มี/ไม่มีประวัติผล
+
+Action: ทดลอง local; เก็บโครงงาน Cloud; POST submission/attempt ตรง; import Guest มีประวัติ; import เฉพาะโครงงาน; retry/worker
+
+Expected: local ได้ Cloud project ได้ (OwnerKind=employee); submission/attempt→403 PROFILE_NOT_ALLOWED ก่อนสร้างผล/job; import ที่มีประวัติ→ปฏิเสธทั้งคำขอ ไม่บางส่วน; import เฉพาะโครงงานผ่าน; ไม่มีแถวผล Cloud ของครู; ไม่เชื่อ ID client
+
+Evidence ที่ต้องเก็บ: E-API DB rows=0
+
+Actual: NOT_RUN
+
+### TP001-025
+
+AC: AC-040-01, AC-040-02, AC-040-03 · References: decisions-014, decisions-015, BR-040 · Level: integration · Profiles: PF-HOST
+
+Fixture: Guest 2 คนใน OS account เดียว; งานสามโหมด; fake clock +31 วัน; export ไฟล์
+
+Action: คนที่ 2 เปิดงานคนแรก; ปิด/เปิดแอปและข้าม 30 วัน; export ทุกโหมดแล้วเปิดกลับ
+
+Expected: เปิดได้ทุกโหมดไม่ขอ PIN; งานที่ไม่สั่งลบยังเปิดได้แม้ผ่าน 30 วัน; ไฟล์ export เปิดกลับเนื้อหาเดิม ต้นฉบับ Guest อยู่ (รูปแบบไฟล์/provenance ดู GAP-04)
+
+Evidence ที่ต้องเก็บ: E-TRACE+ไฟล์ hash
+
+Actual: NOT_RUN
+
+### TP001-026
+
+AC: AC-040-04, AC-040-05, AC-040-06 · References: decisions-015, BR-040-03, BR-040-04 · Level: integration · Profiles: PF-HOST
+
+Fixture: งานลบที่ T; งานปกติ; fake clock ที่ T+29d23h59m, T+30d, clock ย้อน, แอปปิดช่วงนั้น
+
+Action: ลบ; กู้คืน; เปิดแอปที่แต่ละเวลา
+
+Expected: ลบ→อยู่ถังขยะ ไม่บอกลบถาวร; กู้ก่อน 30 วัน เปิดโหมด/เนื้อหาเดิม; ครบ 30 วัน→ลบถาวรตอนเปิดระบบ กู้ไม่ได้ งานปกติอยู่ (ขอบ ±1s และ clock rollback รอ GAP-04)
+
+Evidence ที่ต้องเก็บ: E-TRACE+ไฟล์ list
+
+Actual: NOT_RUN
+
+### TP001-027
+
+AC: AC-041-01, AC-041-02, AC-041-03 · References: decisions-014, BR-041 · Level: integration · Profiles: PF-HOST, PF-API, PF-LEGACY
+
+Fixture: Guest มีงานหลายงานสามโหมด; บัญชี Login
+
+Action: Login ไม่สั่งนำเข้า; เลือก A นำเข้า; เปิดต้นฉบับ
+
+Expected: ไม่มีงานเกิดในบัญชีเอง; A เปิดได้โหมด/เนื้อหาตรง B ไม่ถูกนำเข้า; ต้นฉบับเปิดเนื้อหาเดิม งานอื่นสองพื้นที่ไม่ถูกทับ
+
+Evidence ที่ต้องเก็บ: E-API+E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-028
+
+AC: AC-041-04, AC-041-05 · References: DES-003, BR-041-03 · Level: integration · Profiles: PF-HOST, PF-API
+
+Fixture: import A; lost response; restart แอป; DB fail; 2 clients import พร้อมกัน; บัญชีอื่น
+
+Action: retry import ด้วย receipt/RequestKey เดิม; import ซ้ำ; inject save fail
+
+Expected: สำเนา Cloud เดียว ไม่ทับงานอื่น; fail→ไม่แสดงสำเร็จ ต้นฉบับเปิดได้ ไม่ผูกบัญชีอื่น
+
+Evidence ที่ต้องเก็บ: E-API DB rows
+
+Actual: NOT_RUN
+
+### TP001-029
+
+AC: AC-042-01, AC-042-02, AC-042-03 · References: decisions-014, BR-042 · Level: integration · Profiles: PF-HOST, PF-API, PF-LEGACY
+
+Fixture: Guest ผลภารกิจ A,B (synthetic criteria test-only); บัญชีนักเรียน
+
+Action: เปิดแอปใหม่; Login/import โครงงานเฉพาะ; เลือกย้ายประวัติ A
+
+Expected: Guest เรียกประวัติ/ความคืบหน้า local ได้; Login/import โครงงานไม่สร้างผลในบัญชี; มีเฉพาะ A เข้าตรวจใหม่ B ไม่ย้าย (provenance ดู GAP-04)
+
+Evidence ที่ต้องเก็บ: E-API+E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-030
+
+AC: AC-042-04, AC-042-05, AC-042-06 · References: DES-005, BR-042-03, BR-042-04 · Level: integration · Profiles: PF-API, PF-LEGACY, PF-WEB
+
+Fixture: client แก้ให้รายงานผ่านแต่ Code/Block ไม่ผ่านเกณฑ์; ประวัติ Arm; grader ล้ม
+
+Action: ย้ายประวัติแล้วตรวจใหม่; ครูตรวจ Arm; เปิดประวัติที่ย้าย
+
+Expected: ไม่ผ่านตามค่าที่ client ส่ง; Arm รอครู ไม่นับผ่านก่อนครูมีสิทธิ์; ตรวจใหม่ล้มเหลวไม่ผ่านเอง; ประวัติแยกผล Guest/ผลตรวจใหม่ อ้างภารกิจ/งานถูก ไม่ติดป้ายตัวตนที่ยืนยันแล้ว
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-031
+
+AC: AC-014-01, AC-014-02, AC-014-03 · References: DES-006 · Level: integration · Profiles: PF-HOST, PF-UI-WIN
+
+Fixture: fake device list; profile ยังไม่ยืนยัน/ยืนยัน; device ไม่ตอบ/ตอบ probe
+
+Action: เปิด native ใหม่; กด connect โดยไม่เลือกอุปกรณ์/ไม่ยืนยันโปรไฟล์; probe ไม่ตอบ/ตอบ
+
+Expected: ไม่ connected อัตโนมัติ; connect fail; probe ไม่ตอบไม่เข้า connected ตอบจึงเข้า; trace มีแค่ device.list/board.info ไม่มี servo.set/group/torque
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-032
+
+AC: AC-015-01, AC-015-02, AC-015-03 · References: DES-006 · Level: unit · Profiles: PF-UNIT, PF-UI-WIN
+
+Fixture: profile: ID ซ้ำ; servo 5/6/7; ID 0/254/255; PWM 499/500/2500/2501; pwmMin==pwmMax; กลับทิศ (min>max)
+
+Action: validate; แก้ชื่อ/ค่า servo หลังยืนยัน
+
+Expected: ซ้ำ/≠6/นอกช่วง/ปลายเท่ากัน→ปฏิเสธก่อนเชื่อมต่อ; ถูกต้องและกลับทิศผ่าน; แก้แล้วต้องยืนยันใหม่ก่อน connect
+
+Evidence ที่ต้องเก็บ: unit log+E-UI
+
+Actual: NOT_RUN
+
+### TP001-033
+
+AC: AC-016-01, AC-016-02, AC-016-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: สถานะ disconnected/torque released; send fail inject; fake engine หน่วงตอบ
+
+Action: ส่งท่า; ปรับข้อต่อถี่ N≥20 ครั้งระหว่างงานค้าง
+
+Expected: ไม่มีคำสั่งเคลื่อนไหว+ข้อความอธิบาย; fail→ภาพไม่เคลื่อนราวสำเร็จ+error; trace มีครั้งละ 1 คำขอ coalesce ค่าล่าสุด ค่าสุดท้าย=ค่าล่าสุดที่ยอมรับ
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-034
+
+AC: AC-018-01, AC-018-02, AC-018-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: 2 ท่า 2 รอบ; ท่าแรก send fail; loops 1/9999; 0 ท่า
+
+Action: เล่นลำดับ
+
+Expected: ส่ง 4 ท่าตามลำดับเดิม; ท่าแรกผิดไม่ส่งท่า 2 แสดง error; จบแสดงจบการส่ง ไม่อ้างหุ่นยืนยันเคลื่อนจบ; 0 ท่าเล่นไม่ได้
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-035
+
+AC: AC-019-01, AC-019-02, AC-019-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: 5 ท่า; ชุดแรก fail/ตอบช้า/ตอบซ้ำ; 1,4,5,8,10000,10001 ท่า
+
+Action: upload
+
+Expected: 2 คำขอขนาด 4 และ 1; progress คงเดิมจนชุดแรกตอบแล้วเป็น 4; ชุดแรก fail→ไม่มีชุดสอง ไม่มี verified/complete และ session บอร์ด invalid; 10001→ปฏิเสธ
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-036
+
+AC: AC-020-01, AC-020-02, AC-020-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: ไม่มี upload session; loop ไม่สิ้นสุด; times 0/1/9999/10000; fake timer
+
+Action: เล่นจากบอร์ด
+
+Expected: ไม่มี session→ไม่ส่ง start; วนไม่สิ้นสุด→ไม่ส่ง group.run แจ้งระบุรอบ; start สำเร็จ→ยังแสดงเล่นบนบอร์ดเลยเวลารวมจน stop/error
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-037
+
+AC: AC-021-01, AC-021-02, AC-021-03, AC-021-04 · References: DES-001, DES-006 · Level: integration · Profiles: PF-HOST, PF-UI-WIN
+
+Fixture: เล่นผ่าน fake process; late reply/timer; stop fail; stop ซ้อน 2 ครั้ง; ออก workspace ที่เชื่อมต่อ idle
+
+Action: กด stop; ปล่อย callback เก่า; ออกจาก workspace
+
+Expected: cancel+drain ก่อนคำขอ stop (ลำดับใน trace); ไม่มีท่าถัดไปหลัง stop; stop fail→error ไม่ยืนยันหยุดจริง; ออก workspace→stop request แม้ไม่มีงานรอ; concurrent stop = operation เดียว
+
+Evidence ที่ต้องเก็บ: E-TRACE ลำดับ+timestamp
+
+Actual: NOT_RUN
+
+### TP001-038
+
+AC: AC-022-01, AC-022-02, AC-022-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: profile ปกติ/กลับทิศ; reply PWM ถูก/ผิด ID/เกินช่วง/ไม่ตอบ/stale; ท่าเดิมมีค่า
+
+Action: อ่าน servo ครั้งเดียวและครบหก แล้วสร้างท่า
+
+Expected: ค่าตามการแปลงโปรไฟล์; ท่าใหม่มีค่าหกข้อ; ข้อใดผิด/ไม่ตอบ/นอกช่วง→ไม่แทนท่าเดิมด้วยผลบางส่วน+error
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-039
+
+AC: AC-023-01, AC-023-02, AC-023-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: สถานะ torque released; stop fail; broadcast 255
+
+Action: ปลด/ล็อก; ส่งท่า/เล่น/อัปโหลดหลังปลด; stop ขณะปลด
+
+Expected: enabled=false แล้ว enabled=true ตามลำดับ; หลังปลดถูกกันพร้อมข้อความให้ล็อก; stop ก่อนคำขอล็อก ถ้า stop fail ไม่แสดงล็อกสำเร็จ; torque เฉพาะผู้ใช้สั่งชัดเจน
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-040
+
+AC: AC-024-01, AC-024-02, AC-024-03 · References: DES-006 · Level: integration · Profiles: PF-HOST
+
+Fixture: discovery inject หายขณะ idle; TRANSPORT_ERROR/DEVICE_TIMEOUT/ENGINE_TIMEOUT/ENGINE_BUSY/ENGINE_CANCELLED
+
+Action: หายขณะ idle; error ระหว่างส่งท่า; reconnect
+
+Expected: สถานะ lost+ทางเชื่อมใหม่; error แล้วไม่ส่งท่าเดิมซ้ำ (นับ=1); reconnect probe ใหม่ ไม่ replay upload/ไม่เคลื่อนจนผู้ใช้สั่ง; busy/cancelled อย่างเดียวไม่เป็น lost
+
+Evidence ที่ต้องเก็บ: E-TRACE
+
+Actual: NOT_RUN
+
+### TP001-041
+
+AC: AC-031-05 · References: DES-006, OQ-008 · Level: manual · Profiles: PF-HW-WIN-SRC
+
+Fixture: หุ่นรุ่นที่ผู้รับรองยืนยัน; profile+calibration ที่ลงนาม; HID และ Serial; emergency-stop พร้อม
+
+Action: ตามขั้นตอนที่ผู้อนุญาตกำหนด: probe→connect→คำสั่งควบคุมที่อนุญาตผ่าน native transport (ไม่ใช้ dry-run)
+
+Expected: เชื่อมต่อและส่งคำสั่งจริงได้ ผล exchange delivery=written acknowledged=false bytes_written/read>0; ไม่ใช่ simulated
+
+Evidence ที่ต้องเก็บ: E-HW
+
+Actual: NOT_RUN
+
+### TP001-042
+
+AC: AC-031-05 · References: DES-006, DES-007 · Level: manual · Profiles: PF-HW-WIN-INST
+
+Fixture: เช่น TP001-041 แต่ติดตั้งจาก signed installer
+
+Action: เช่น TP001-041 จากแอปที่ติดตั้ง
+
+Expected: เช่น TP001-041 (หลักฐานแยกจาก source-built)
+
+Evidence ที่ต้องเก็บ: E-HW+E-INST
+
+Actual: NOT_RUN
+
+### TP001-043
+
+AC: AC-032-02 · References: DES-006, decisions-008 · Level: manual · Profiles: PF-HW-MAC-INTEL-SRC, PF-HW-MAC-ARM-SRC
+
+Fixture: หุ่นรุ่นที่ยืนยัน; Darwin HID และ Serial; แยกผลต่อ arch
+
+Action: probe→connect→ส่งคำสั่งตามที่อนุญาต; ลอง path พิมพ์เอง/device ที่ถูกถอด (negative)
+
+Expected: เชื่อมต่อและส่งคำสั่งจริงผ่าน native transport บนทั้ง Intel และ ARM แยกผล; ไม่ใช้ simulator; path นอก enumeration ถูกปฏิเสธ
+
+Evidence ที่ต้องเก็บ: E-HW ต่อ arch
+
+Actual: NOT_RUN
+
+### TP001-044
+
+AC: AC-032-02 · References: DES-006, DES-007 · Level: manual · Profiles: PF-HW-MAC-INST
+
+Fixture: เช่น TP001-043 จาก signed/notarized PKG
+
+Action: เช่น TP001-043 จากแอปที่ติดตั้ง Intel และ ARM
+
+Expected: เช่น TP001-043 (แยกหลักฐานจาก source-built)
+
+Evidence ที่ต้องเก็บ: E-HW+E-INST
+
+Actual: NOT_RUN
+
+### TP001-045
+
+AC: AC-014-03, AC-019-03, AC-021-01, AC-021-03, AC-024-01, AC-024-02 · References: DES-006, quality-attributes · Level: manual · Profiles: PF-HW-WIN-SRC, PF-HW-MAC-INTEL-SRC, PF-HW-MAC-ARM-SRC
+
+Fixture: หุ่นจริง HID/Serial; ผู้รับรองอนุญาต motion/upload/torque เป็นลายลักษณ์อักษร
+
+Action: unplug/replug ขณะ idle และส่งท่า; ดาวน์โหลดไม่ครบ; stale serial reply; stop ระหว่างเล่น (วัด latency)
+
+Expected: พฤติกรรม logic ตรง AC ตามจริง (lost, ไม่ retry, ไม่ verified, stop_requested ≠ stopped); latency/พฤติกรรมกายภาพ = observation ไม่มี threshold (GAP-05)
+
+Evidence ที่ต้องเก็บ: E-HW
+
+Actual: NOT_RUN
+
+### TP001-046
+
+AC: AC-029-01, AC-029-02 · References: DES-007 · Level: integration · Profiles: PF-API, PF-ADMIN
+
+Fixture: manifest valid; version 1.2/1.2.3.4/v1.2.3/ว่าง; platform ไม่รองรับ; URL http/มี userinfo/>2048; hash ยาวผิด/ไม่ใช่ hex; signature ว่าง/ผิด/kid ไม่รู้จัก; size 0; role ไม่ใช่ release_publisher
+
+Action: POST /v2/admin/releases; ซ้ำ version/channel/platform; 2 requests พร้อมกัน; Idempotency-Key เดิม; inject signer/commit fail
+
+Expected: สร้างได้ published=false lifecycle draft; ซ้ำ→409 RELEASE_EXISTS (race เหลือหนึ่ง); invalid ทุกกรณี→ปฏิเสธ 400 INVALID_RELEASE/ARTIFACT; key เดิมคืน release เดิม; fail ไม่คืนสำเร็จ; role ไม่พอ→403
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-047
+
+AC: AC-029-03, AC-030-01 · References: DES-007 · Level: integration · Profiles: PF-API, PF-UNIT
+
+Fixture: releases: draft, published, withdrawn; versions 1.9.0/1.10.0/เท่ากัน; channel/platform ต่างกัน; Mac สอง platform records
+
+Action: GET /updates/check จาก version ต่าง ๆ
+
+Expected: คืนเฉพาะ published ใหม่สุดที่ channel/platform ตรงและ version สูงกว่า (เทียบตัวเลข 1.10.0>1.9.0); ไม่คืน draft/withdrawn/เท่ากัน; ไม่มี→available=false release=null install_supported=false
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-048
+
+AC: AC-030-02, AC-030-03 · References: DES-007 · Level: integration · Profiles: PF-HOST, PF-API, PF-UI-WIN
+
+Fixture: มี release เข้าเงื่อนไข; API timeout/DNS fail/5xx; network+FS+process spy
+
+Action: กดตรวจอัปเดต
+
+Expected: เห็น metadata เท่านั้น ไม่มีดาวน์โหลด/ติดตั้ง/execute (spy=0, ไม่เรียก PrepareUpdate/Install); API เข้าไม่ได้→ข้อผิดพลาดและใช้ local ต่อได้ภายใต้ License
+
+Evidence ที่ต้องเก็บ: E-TRACE+E-UI
+
+Actual: NOT_RUN
+
+### TP001-049
+
+AC: AC-031-01, AC-031-02 · References: DES-007, decisions-019 · Level: manual · Profiles: PF-INST-WIN
+
+Fixture: Win11 25H2 x64 บัญชีสะอาด; มี WebView2 / ไม่มี WebView2; PATH ไม่มี dev tools
+
+Action: ติดตั้ง MSI; เปิดสาม mode และ engines ที่บรรจุ; ไม่มี WebView2 → ยกเลิกขั้นตอน
+
+Expected: เปิดสาม mode+engines ได้ไม่ต้องติดตั้งเครื่องมือพัฒนา; ไม่มี WebView2→มีขั้นตอนขอติดตั้ง; ยกเลิกแล้วไม่แสดงพร้อมใช้
+
+Evidence ที่ต้องเก็บ: E-INST+E-UI
+
+Actual: NOT_RUN
+
+### TP001-050
+
+AC: AC-031-03, AC-031-04 · References: DES-007 · Level: manual · Profiles: PF-INST-WIN
+
+Fixture: installation ทดสอบ; ลบไฟล์ engine; แพ็กเกจใหม่กว่า/เก่ากว่า; แอปเปิดอยู่ (files-in-use); Projects+Device identity
+
+Action: repair; uninstall; upgrade; ติดตั้งเก่ากว่าทับ
+
+Expected: repair คืน engine; uninstall เก็บ Projects และ Device ID เดิม; อัปเกรดได้; เก่ากว่าไม่ downgrade; ไม่ kill process
+
+Evidence ที่ต้องเก็บ: E-INST
+
+Actual: NOT_RUN
+
+### TP001-051
+
+AC: AC-032-01, AC-032-03 · References: DES-007, decisions-019 · Level: manual · Profiles: PF-INST-MAC
+
+Fixture: macOS 15+ Intel และ Apple Silicon; PKG เดียว; มีโครงงานใน Application Support
+
+Action: ติดตั้ง; เปิดแอปและงาน local; ถอนจาก Applications
+
+Expected: เปิดแอป/งาน local ได้ทั้งสอง arch จากแพ็กเกจเดียว; ถอนแล้ว Application Support ยังอยู่
+
+Evidence ที่ต้องเก็บ: E-INST ต่อ arch
+
+Actual: NOT_RUN
+
+### TP001-052
+
+AC: AC-033-01, AC-033-02, AC-033-03, AC-033-04, AC-033-05 · References: data-model, BR-033, decisions-012, decisions-030 · Level: static · Profiles: PF-STATIC
+
+Fixture: db/schoolbot_db.sql และ schoolbot.dbml revision ปัจจุบัน (32 ตาราง/450 ฟิลด์/40 FK)
+
+Action: เทียบชื่อ/PK/ฟิลด์ร่วมหกตัว/ชนิด/FK ทุกตาราง
+
+Expected: ผลเบื้องต้นเท่านั้น ไม่ปิด AC: SchoolBotLicense/SchoolBotLicenseId int4 ตรงตัวพิมพ์; ทุกตารางขึ้นต้น SchoolBot+หกฟิลด์; PK/FK int4 ตรงทุกคู่
+
+Evidence ที่ต้องเก็บ: ตาราง diff+revision
+
+Actual: NOT_RUN
+
+### TP001-053
+
+AC: AC-033-01, AC-033-02, AC-033-03, AC-033-04, AC-033-05 · References: BR-033, decisions-012 · Level: integration · Profiles: PF-CATALOG
+
+Fixture: catalog output จาก test DB ที่ระบบใช้ (information_schema/pg_catalog)
+
+Action: ตรวจ catalog ตาม AC
+
+Expected: ตรงตาม AC-033-01..05 ทุกตารางจริงใน DB ทดสอบ
+
+Evidence ที่ต้องเก็บ: E-CAT
+
+Actual: NOT_RUN
+
+### TP001-054
+
+AC: AC-037-01, AC-037-02, AC-037-03 · References: DES-005, BR-043-04 · Level: integration · Profiles: PF-API, PF-UI-WIN
+
+Fixture: synthetic published curriculum test-only: Course/Lesson เดียวมี Block/Arm/Code mission; revision 1 และ 2
+
+Action: เลือก Activity แต่ละ mode; เปิด Lesson; ส่งงานผิด mode/ผิด revision
+
+Expected: เข้าเนื้อหา/ภารกิจตรง mode; เห็นเป้าหมาย/คำแนะนำ/Activity ตรง; งาน/ผลอ้าง Activity/Mode/Lesson/revision ถูก ไม่ข้ามโหมด/ฉบับ; ผิด mode→ASSESSMENT_METHOD_MISMATCH/ปฏิเสธ
+
+Evidence ที่ต้องเก็บ: E-API+E-UI
+
+Actual: NOT_RUN
+
+### TP001-055
+
+AC: AC-037-04, AC-037-05, AC-037-06 · References: DES-005, BR-044-02 · Level: integration · Profiles: PF-API, PF-ADMIN
+
+Fixture: revision ไม่มี approval/criteria ไม่มี approved_by/at; revision มีหลักฐาน; (เนื้อหาจริง G-LEARN)
+
+Action: เปิด/ปิดบทเรียน; ขอ publish; เรียก list; ตรวจ trace ย้อนกลับ
+
+Expected: เปิด/ปิดไม่สร้าง submission/passed; ไม่มีหลักฐาน→CONTENT_NOT_PUBLISHED/CRITERIA_NOT_APPROVED ไม่เสนอเป็นบทเรียนจริง; กิจกรรมจริงอ้างเนื้อหา/ภารกิจ/เกณฑ์/ผู้อนุมัติ revision ได้
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-056
+
+AC: AC-038-01 · References: DES-005, BR-042-03 · Level: unit · Profiles: PF-UNIT, PF-API
+
+Fixture: golden vectors: trace_equals, steps_at_most 100/101, uses_op, combine all/any; Code และ Block; client อ้างผ่าน; grader ล้ม; submit ซ้ำ; worker restart; pass/fail pairs ของเจ้าของเนื้อหา (G-LEARN)
+
+Action: ส่งภารกิจ
+
+Expected: ผลอัตโนมัติตรงตัวอย่างผ่าน/ไม่ผ่าน; host/server vectors เท่ากัน; ไม่เชื่อ client; grader ล้ม=error ไม่ใช่ not_yet; replay คืน ID เดิม
+
+Evidence ที่ต้องเก็บ: unit log+E-API
+
+Actual: NOT_RUN
+
+### TP001-057
+
+AC: AC-038-02, AC-038-03, AC-038-04 · References: DES-005, DES-004 · Level: integration · Profiles: PF-WEB, PF-API, PF-LEGACY
+
+Fixture: นักเรียนส่ง Arm; ครูมีสิทธิ์วิชา/ห้อง ×2; ผลครูทดลอง/ดาวตัวอย่าง
+
+Action: ส่ง; ครูบันทึกผล; เรียกดู; แก้ผล; ครู 2 คนตรวจพร้อมกัน; stale If-Match
+
+Expected: Arm=awaiting_teacher ไม่ผ่านเอง; ครูบันทึก/ดูผล+ผู้ตรวจ+งานได้; แก้=sequence ใหม่ supersedes ไม่ overwrite; ชนกัน→412 VERSION_CONFLICT; ผลอ้างนักเรียน Activity/Mode/revision/งานถูก ไม่ปนผลครู/ดาวตัวอย่าง
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-058
+
+AC: AC-038-05, AC-039-05 · References: DES-004, DES-005, learning-rules-032-034 · Level: integration · Profiles: PF-WEB, PF-API, PF-LEGACY
+
+Fixture: ครู X ไม่ได้ assigned; นักเรียนห้องเดียวกัน; นักเรียนต่างโรงเรียน; รู้ submission/learner ID; สิทธิ์ถูกถอนระหว่างทำรายการ
+
+Action: ขอรายชื่อ/ผลนักเรียน; ตรวจ Arm; ถอนสิทธิ์ก่อน commit; เรียก desktop token กับ endpoint ครู
+
+Expected: ไม่เห็นข้อมูล/ตรวจไม่ได้ (403/404) ผลเดิมไม่เปลี่ยน; recheck ก่อน commit ปฏิเสธ in-flight; CHANNEL_NOT_ALLOWED; (นิยามรายชื่อ assigned ดู GAP-06)
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-059
+
+AC: AC-039-01, AC-039-02, AC-039-03, AC-039-04 · References: DES-005, BR-039 · Level: integration · Profiles: PF-API, PF-WEB, PF-LEGACY
+
+Fixture: นักเรียน Block/Arm/Code ผลหลายสถานะ; scenario/sample; ผลครูทดลอง; บัญชีอื่น
+
+Action: restart แล้วเปิดใหม่; ครูดู /learners/{id}/progress; logout/login บัญชีอื่น
+
+Expected: นักเรียนเห็นผลของตนไม่ปนครู; ครูที่มีสิทธิ์เห็นตรงประวัติ; Arm ยังไม่ตรวจแยกจากยืนยันแล้ว; ไม่ปนข้ามบัญชี/โหมด/scenario
+
+Evidence ที่ต้องเก็บ: E-API+E-UI
+
+Actual: NOT_RUN
+
+### TP001-060
+
+AC: AC-043-01, AC-043-02, AC-043-03, AC-043-04 · References: DES-005, BR-043 · Level: integration · Profiles: PF-ADMIN, PF-WEB, PF-API
+
+Fixture: staff content_author; admin/ครูโรงเรียน; Course/Level/Subject/RecommendedGrades; Lesson มี slide/แผนครู/ใบงาน/mission×3/quiz/test
+
+Action: สร้าง/แก้ (staff vs school); เลือกใช้; CourseRun ใช้ Level ต่างจากค่าเริ่ม
+
+Expected: ส่วนกลางแก้ได้ โรงเรียนเลือกใช้แต่แก้เนื้อหากลางไม่ได้ (403); เห็น Level/ชั้นเริ่มต้น/วิชา/Lesson/Activity; Level ต่างจากค่าเริ่มต้นได้และอ้าง Level ที่เลือก; mission แต่ละอันใช้ Mode ตน
+
+Evidence ที่ต้องเก็บ: E-API+E-UI
+
+Actual: NOT_RUN
+
+### TP001-061
+
+AC: AC-044-01, AC-044-02, AC-044-03, AC-044-04, AC-044-05 · References: DES-005, BR-044 · Level: integration · Profiles: PF-ADMIN, PF-API
+
+Fixture: staff A (author), B (approver), C ไม่มี role; ผู้เรียนอยู่ revision 1
+
+Action: สลับลำดับ Lesson; แก้ draft; publish ไม่มี approval_ref; A อนุมัติเอง; C อนุมัติ; B อนุมัติ; publish rev 2; พยายามแก้ rev 1; If-Match stale
+
+Expected: ลำดับเปลี่ยนรหัส/ผลอ้างเดิมคงเดิม ไม่แก้โค้ด; draft แก้แล้วเห็นใหม่; ไม่มีหลักฐาน→เผยแพร่ไม่ได้; A→FOUR_EYES_REQUIRED, C→STAFF_ROLE_REQUIRED, ผู้อนุมัติจาก session ไม่ใช่ body; ผู้เรียนเดิมยังเปิด rev 1/ผลเดิม; แก้ฉบับ publish→revision ใหม่ ฉบับเดิมไม่เปลี่ยน
+
+Evidence ที่ต้องเก็บ: E-API+audit
+
+Actual: NOT_RUN
+
+### TP001-062
+
+AC: AC-045-01, AC-045-02, AC-045-03, AC-045-04 · References: DES-005, BR-045, source-review-003 · Level: integration · Profiles: PF-API, PF-ADMIN
+
+Fixture: Course Plan Sheet sanitized: D=TRUE/FALSE, เปลี่ยนเฉพาะ O, มีสื่อ P–X, C ไม่ตรง Unit, สลับลำดับแถว, แถวว่าง/คอลัมน์ขาด
+
+Action: import
+
+Expected: ทุกแถว draft; D=TRUE ติดป้ายอนุมัติจากต้นทาง ไม่ publish เอง; O เปลี่ยนไม่กระทบ; P–X เป็นสื่อชุดสองของ Lesson เดิม ไม่สร้าง Course/Level; รหัส Lesson แยกจาก C และ Unit คงเดิมเมื่อสลับ; แถวผิดรูปแบบรายงานรายแถว
+
+Evidence ที่ต้องเก็บ: E-API+sheet hash
+
+Actual: NOT_RUN
+
+### TP001-063
+
+AC: AC-046-01, AC-046-02, AC-046-05 · References: DES-010, learning-rules-032-034, BR-046 · Level: integration · Profiles: PF-API, PF-WEB
+
+Fixture: Quiz/Test ไม่ปรับ; policy กำหนด; PolicyOverride ครู: เปลี่ยนเวลาสอบ/OpensAt/ClosesAt vs attempts/random/reveal/ข้อ/เฉลย
+
+Action: เปิด/ทำ; ลองเกินจำนวนครั้ง/เกินเวลา; ครูปรับค่าต่าง ๆ; null; Test ไม่มีเวลา; OpensAt>=ClosesAt
+
+Expected: policy สี่ด้านตรวจได้; ค่าเริ่ม Quiz ไม่จำกัด/เฉลยทันที/สูงสุด, Test 1 ครั้ง/จับเวลา/สุ่ม/เฉลยหลังปิด; จำกัดครั้ง/เวลา/เฉลยตรงค่า (server); ครูแก้ได้เฉพาะเวลา/ช่วงเปิด–ปิด; อื่น→403 POLICY_OVERRIDE_NOT_ALLOWED ไม่บันทึกบางส่วน; null กลับ default
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-064
+
+AC: AC-046-03, AC-046-04 · References: DES-010, BR-046-02, BR-046-03 · Level: integration · Profiles: PF-API
+
+Fixture: รายการสุ่มข้อ; bank rev1→rev2; override หลัง attempt เริ่ม
+
+Action: ทำ attempt; แก้ bank/override
+
+Expected: แสดงชุดและลำดับที่ได้รับจริงต่อ attempt; ประวัติเดิมอ้าง snapshot/เกณฑ์เดิม ผลเดิมไม่เปลี่ยน; override ใหม่ไม่เปลี่ยน deadline/เฉลยของ attempt ที่เริ่มแล้ว
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-065
+
+AC: AC-046-06 · References: DES-010, BR-046-06, decisions-025 · Level: integration · Profiles: PF-API
+
+Fixture: นักเรียน A,B; Test 1 ครั้ง; ผล A=6/10; ซ่อม 9/10 และ 4/10; grant 1 ใบ
+
+Action: เปิดซ่อมให้ A; A/B เริ่ม attempt; A ส่ง 2 requests พร้อมกัน/retry
+
+Expected: B ไม่ได้สิทธิ์; A ใช้ 9/10 ไม่มีเพดาน; ซ่อมต่ำกว่าเดิมคงสูงสุด 6/10; grant ถูกใช้ 1 ครั้ง (lock CourseRun) retry ไม่กินซ้ำ
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-066
+
+AC: AC-047-01, AC-047-02, AC-047-03 · References: DES-010, BR-047 · Level: integration · Profiles: PF-API, PF-WEB
+
+Fixture: หลักสูตร A,B; weights 99.99/100/100.01/ติดลบ/ซ้ำ/ขาดกิจกรรม/instruction เป็น source; quiz_counts true/false
+
+Action: ตั้งค่า/เรียกดู; เปลี่ยนคะแนน Quiz ของ B
+
+Expected: เห็นค่ารายหลักสูตร; บันทึกได้เมื่อรวม 100% เท่านั้น (อื่น→SCORING_WEIGHT_INVALID); Quiz ไม่นับน้ำหนัก 0 ยังดูผลได้ คะแนนรวม B ไม่เปลี่ยน; ตั้ง A ไม่กระทบ B
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-067
+
+AC: AC-047-04, AC-047-05 · References: DES-010, learning-rules-032-034, BR-047-04 · Level: unit · Profiles: PF-UNIT, PF-API
+
+Fixture: 8/10@20, 6/10@30, 18/20@50; แล้ว 30/20/50; ค่าหารไม่ลงตัว; max=0; earned>max; CourseRun planned/active; policy NULL
+
+Action: คำนวณ; แก้น้ำหนักก่อน/หลังเริ่ม run
+
+Expected: 79/100 แสดง 16+18+45; run เดิมยัง 79 (แก้หลังเริ่ม→409 SCORING_POLICY_FROZEN); run ใหม่ 30/20/50 ได้ 81; ไม่ปัดรายส่วน; max<=0/earned>max ปฏิเสธ; NULL→POLICY_NOT_CONFIGURED (ตัวเลขทดสอบ ไม่ใช่ค่าเริ่ม)
+
+Evidence ที่ต้องเก็บ: unit log+E-API
+
+Actual: NOT_RUN
+
+### TP001-068
+
+AC: AC-048-01, AC-048-02, AC-048-03, AC-048-04 · References: DES-011, BR-048 · Level: integration · Profiles: PF-API, PF-WEB
+
+Fixture: roster [80,0 ขาดทุกงาน]; เฉลี่ย 70.00 / 70.004 / 70.01; roster ว่าง; roster เปลี่ยนระหว่างเสนอ-ยืนยัน; ครูนอกห้อง; confirm ซ้ำ
+
+Action: สิ้นเทอม ตรวจข้อเสนอ; ยืนยัน
+
+Expected: เฉลี่ย 40 ไม่เสนอที่เกณฑ์ 70; > เกณฑ์ (strict ก่อนปัด) เสนอพร้อมเฉลี่ย/เกณฑ์; =เกณฑ์ไม่เสนอ ส่วนขาด 0; ก่อนยืนยัน Level ไม่เปลี่ยน; ยืนยันแล้วเทอมปัจจุบันเดิม เทอมถัดไปทั้งห้อง Level เดียวกัน ไม่เลือกบางคน; ROSTER_EMPTY; ไม่เปลี่ยน revision/ผลเดิม; confirm ซ้ำ idempotent; ครูนอกสิทธิ์ถูกปฏิเสธ
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-069
+
+AC: AC-049-01, AC-049-03, AC-049-04 · References: DES-008, grade-rules-032-034, BR-049 · Level: integration · Profiles: PF-WEB, PF-API, PF-LEGACY
+
+Fixture: admin(IsAdmin=1)/ครู/license โรงเรียน active vs ไม่; 2 โรงเรียน/2 เทอม; ช่องเดิม
+
+Action: ดูบริบท; สร้างช่องใหม่; ครูสร้าง/แก้ mapping; สลับโรงเรียน/เทอม; preview
+
+Expected: admin เห็นโรงเรียน/เทอม/คาบ/กิจกรรม/ตัวชี้วัด/วิชา/ช่องเดิม; สร้างช่องใหม่ไม่ได้; ครูแก้ไม่ได้ (403); mapping ไม่ใช้ข้ามบริบทอัตโนมัติ; preview ตรงคู่ที่แมพ ไม่เดาหมวดจาก Quiz/Test
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-070
+
+AC: AC-049-02, AC-049-05 · References: DES-008, grade-rules-032-034 · Level: integration · Profiles: PF-API, PF-LEGACY
+
+Fixture: กิจกรรม A→ช่อง X,Y; B→X; 2 processes สร้างพร้อมกัน; mapping ที่ส่งแล้ว; retire/soft-delete/hard-delete; ชุดใหม่
+
+Action: แมพซ้ำ (แก้ชุดเดิม/สร้างชุดใหม่); race; แก้/ลบคู่ที่ล็อก
+
+Expected: A แมพหลายช่องได้; B ซ้ำช่อง A→ปฏิเสธทั้งสองทาง; race เหลือหนึ่ง; ล็อกแล้วแก้/retire/ลบ→409 MAPPING_LOCKED; ชุดใหม่คู่/คะแนนเดิมคงเดิมยังห้ามซ้ำ
+
+Evidence ที่ต้องเก็บ: E-API
+
+Actual: NOT_RUN
+
+### TP001-071
+
+AC: AC-050-01, AC-050-03, AC-050-04 · References: DES-009, grade-rules-032-034, BR-050 · Level: unit · Profiles: PF-UNIT, PF-API
+
+Fixture: 8/10→20; 3/4→10; 3/4→12; 7.4/7.5 boundary; ผลจริง 0; ไม่มีผล; target max parse ไม่ได้; แก้ source/mapping หลัง preview
+
+Action: preview แล้ว confirm
+
+Expected: แสดงเดิม→ใหม่/ต้นทาง/ปลายทาง; 16, 8 (7.5 half-up), 9; 7.4→7; แต่ละช่องคำนวณจากต้นทางครั้งเดียว ค่าส่ง=preview; ผล 0 จริงส่ง 0 ไม่มีผลข้าม+เหตุผล ไม่เสนอ 0; max ผิด→TARGET_NOT_READY; แก้หลัง preview→PREVIEW_STALE ใช้ preview เก่าไม่ได้ (mock target ไม่ปิด G-PARITY/G-TARGET)
+
+Evidence ที่ต้องเก็บ: unit log+E-API
+
+Actual: NOT_RUN
+
+### TP001-072
+
+AC: AC-050-02, AC-051-01, AC-051-02, AC-051-03 · References: DES-009, grade-rules-032-034, BR-051 · Level: integration · Profiles: PF-GRADE, PF-WEB
+
+Fixture: PGGradeDB sanitized; ช่อง SchoolBot ถูกครูแก้หลังส่งรอบก่อน; ปลายทางแก้หลัง preview/หลังเลือกแก้ชน; A,B ชน
+
+Action: ออกจาก preview ไม่ยืนยัน; ส่งใหม่; เลือกทับ A คง B; แก้ปลายทางระหว่างขั้นตอน
+
+Expected: ก่อนยืนยัน/ออกจาก preview ปลายทางไม่เปลี่ยน (hash ก่อน/หลัง); หยุดแสดงรายการชนก่อนเปลี่ยนคะแนน; A=ค่าที่เสนอ B=ค่าครู; แก้ปลายทางอีก→หยุดตรวจใหม่ ไม่เขียนทับเงียบ (CAS/recheck) fixtures ใช้ร่วม TP-003
+
+Evidence ที่ต้องเก็บ: E-API+PG before/after
+
+Actual: NOT_RUN
+
+### TP001-073
+
+AC: AC-051-04, AC-051-05 · References: DES-009, grade-rules-032-034, BR-051-03, BR-051-05 · Level: integration · Profiles: PF-GRADE
+
+Fixture: ช่องครูกรอกเอง; PgtgradeEdit override; ผลพิเศษ รอผล/ขาดสอบ; A ไม่มีผลช่องเดิม=5; C ผลจริง 0; ทุกคนไม่มีผล; ungraded/error; SOURCE_SCOPE_UNPROVEN
+
+Action: ส่งคะแนน; ส่งภายหลังเมื่อ A มีผล
+
+Expected: ค่าคุ้มครองคงเดิม ไม่แทนศูนย์ แม้เลือกทับ; A คง 5 แสดงข้าม (reason code); ผลมาแล้วส่งภายหลังได้; C ส่ง 0 ไม่ข้าม; ทั้งคนข้าม→Outbox skipped ไม่เขียน PG ไม่สร้าง receipt; SCOPE_UNPROVEN=blocked แยกจาก missing
+
+Evidence ที่ต้องเก็บ: E-API+PG diff
+
+Actual: NOT_RUN
+
+### TP001-074
+
+AC: AC-052-01, AC-052-02 · References: DES-009, DES-012, BR-052-01 · Level: integration · Profiles: PF-GRADE, PF-WEB
+
+Fixture: ครูไม่มีสิทธิ์วิชา/ห้อง; ข้ามโรงเรียน/เทอม; ปลายทางล็อก/SubmitPeriod; สิทธิ์/ล็อก/License เปลี่ยนหลัง preview และก่อน worker apply
+
+Action: ส่ง; ยืนยัน preview เดิม
+
+Expected: ถูกปฏิเสธ คะแนนไม่เปลี่ยน; การยืนยันเดิมเขียนไม่ได้ (recheck ที่ confirm และ worker); ไม่เชื่อ ID/สิทธิ์จาก client
+
+Evidence ที่ต้องเก็บ: E-API+PG diff
+
+Actual: NOT_RUN
+
+### TP001-075
+
+AC: AC-052-03, AC-052-04 · References: DES-009, grade-rules-032-034, BR-052-02 · Level: integration · Profiles: PF-GRADE
+
+Fixture: crash หลัง PG commit ก่อนบันทึก receipt; lost response; partial; payload ต่าง; ซ้อนช่อง+learner
+
+Action: ส่งซ้ำ/retry OperationKey เดิม; resume ส่วนค้าง; reconcile unknown
+
+Expected: ไม่บวกซ้ำ ไม่เกิดผลซ้ำ; ซ้อน→EXPORT_IN_PROGRESS; payload ต่าง→IDEMPOTENCY_CONFLICT; partial แสดงผลจริงรายรายการ ส่งต่อเฉพาะค้าง ไม่ซ้ำส่วนสำเร็จ; unknown ต้อง reconcile ไม่ส่งใหม่ทันที (fixtures crash ใช้ร่วม TP-003)
+
+Evidence ที่ต้องเก็บ: E-API+PG receipt
+
+Actual: NOT_RUN
+
+### TP001-076
+
+AC: AC-052-05 · References: DES-009, BR-052-03, BR-052-04, BR-052-05 · Level: integration · Profiles: PF-GRADE
+
+Fixture: ข้อมูลที่มี override/ผลพิเศษ; ตัวอย่างกฎเดิม derived totals/เกรด เทียบ score-record และรายงานเดิม
+
+Action: ส่งแล้วตรวจ audit ฝั่ง SchoolBot และ PgtgradeAuditLog
+
+Expected: audit ครบ BR-052-03 (ต้นทาง+revision, mapping, ปลายทาง, เดิม/ใหม่, ผู้ยืนยัน, เวลา, การแก้ชน, ผลส่ง); ผลรวม/เกรดตรงกฎเดิม; ช่องอื่นคงเดิม; ไม่เรียก score-record service
+
+Evidence ที่ต้องเก็บ: E-API+PG diff+parity report
+
+Actual: NOT_RUN
+
+### TP001-077
+
+AC: AC-009-01, AC-009-03, AC-010-01, AC-011-02 · References: DES-001, DES-007 · Level: E2E · Profiles: PF-INST-WIN, PF-INST-MAC
+
+Fixture: แอปที่ติดตั้งจาก signed artifact
+
+Action: smoke: ไม่มี License ถูกล็อก; window controls; สลับภาษา offline; บันทึก/เปิดงานใหม่
+
+Expected: พฤติกรรมเดียวกับ source-built (TP001-001/011/012/015) บน installed artifact
+
+Evidence ที่ต้องเก็บ: E-INST+E-UI
+
+Actual: NOT_RUN
+
+## Gaps
+
+| ID | AC | Owner | ปัญหา | หลักฐานที่ต้องมี |
+| --- | --- | --- | --- | --- |
+| GAP-01 | AC-025-03, AC-011-03 | spec | AC-025-03 ใช้หน่วย 'ตัวอักษร' (16384) แต่ DES-003 กำหนด source ≤16384 UTF-8 bytes (และระบุให้ตรวจ bytes เพิ่มจาก UI เดิมที่นับ characters) ข้อความไทย/multibyte ให้ผลต่างกัน ไม่รู้ว่าอะไรเป็นเกณฑ์ | spec/arch ยืนยันหน่วยเดียว (char หรือ byte) และผลของ multibyte; TP001-019 ทดสอบเฉพาะ ASCII จนกว่าจะชัด |
+| GAP-02 | AC-027-01, AC-027-02, AC-027-03, AC-027-04 | spec | AC-027-01 อ้าง 'admin key' ได้ 503/401 ตามโมเดล static bearer ที่ decisions-025 ปิด /v1/admin และย้ายไป /v2/admin ด้วย staff_admin session+SchoolBotStaffRole (DES-004: 503 AUTH_NOT_CONFIGURED, 401, 403 STAFF_ROLE_REQUIRED) ไม่มีข้อความ mapping ว่า AC ถือเป็นแบบใหม่ | spec ยืนยันว่า 'admin key' = staff_admin auth config และ amend ถ้อยคำ หรือยืนยันว่า TP001-007 คาดผลตาม DES-004 |
+| GAP-03 | AC-011-01, AC-011-02, AC-027-02, AC-029-01, AC-044-05 | arch | DES-002/003/007 (Rev1–3 ลงวันที่ 2026-10-21) ยังใช้ version/source_version/version:N/If-Match แบบ version ขณะ data-contract-rules Rev6 + decisions-030 ตัดคอลัมน์ Version ใช้ ETag(UpdateDate)/update_date expected conflict/copy/create ระบุชื่อฟิลด์ไม่ได้ | arch sync DES-002/003/007 ให้ตรง ETag/update_date (และ source_version ของ copy) |
+| GAP-04 | AC-040-01, AC-040-02, AC-040-03, AC-040-04, AC-040-05, AC-040-06, AC-041-01, AC-041-02, AC-041-03, AC-041-04, AC-041-05, AC-042-01, AC-042-02, AC-042-03, AC-042-05, AC-042-06, AC-036-01 | arch | DES-003 Rev3 ยังเป็นก่อน decisions-014/015 (Guest namespace 'รอ OQ-007', Guest→Login 'ยังไม่เปิดใช้') และไม่มีสัญญา: พื้นที่ Guest ร่วม, ถังขยะ 30 วัน (timestamp ขณะแอปปิด, clock rollback, ลบถาวรอัตโนมัติเมื่อไร), รูปแบบ export, receipt/dedup ของ import, local history/provenance และรูปแบบส่งประวัติ Guest เข้า revalidate expected ละเอียดของ TP001-025..030 เกินข้อความ AC จึงกำหนดไม่ได้ (ตาม evidence-002 รอ SA-001/002) | arch (SA-001/002) amend DES-003/004/005 + data contract ครอบ REQ-040..042 ก่อน freeze/ก่อน check รันเคสนี้ |
+| GAP-05 | AC-031-05, AC-032-02, AC-014-03, AC-019-03, AC-021-01, AC-021-03, AC-024-01, AC-024-02 | spec | ไม่มีรุ่นหุ่น/firmware/calibration/เกณฑ์ stop latency/unplug/partial download/emergency-stop/ผู้รับรอง/platform matrix (G-HW, OQ-008, BA-003/SA-003 ยังไม่มี artifact) จึงไม่มี pass threshold ฝั่งกายภาพ และ cases PF-HW ทำได้เพียงเตรียมขั้นตอน | BA-003/SA-003 artifact + มนุษย์ผู้รับรองระบุเกณฑ์และคำสั่งอนุญาตก่อนสั่งหุ่น; TP ไม่สร้างเกณฑ์เอง |
+| GAP-06 | AC-038-05, AC-039-02, AC-039-05 | arch | นิยาม 'รายชื่อที่ได้รับมอบหมาย' คลุมเครือ: decisions-015 ให้ผู้ดูแลกำหนด, DES-004 ใช้สิทธิ์วิชา TplanCourseTeacher+ห้อง (School DB) และ TeacherGrant เป็น fallback ที่ยังไม่ตัดสินแต่ไม่อยู่ใน 32 ตาราง (evidence-002: ไม่มี TeacherGrant ใหม่) ต้องรู้ชุดข้อมูลที่เป็น authority เพื่อสร้าง fixture | arch ระบุ authority เดียว (course-teacher∩roster∩term หรืออื่น) + sanitized fixtures (G-AUTH) |
+| GAP-07 | AC-030-02 | arch | DES-007 กำหนด PrepareUpdate/InstallPreparedUpdate (hash/signature/expiry/TOCTOU/allowlist origin/APP_BUSY) แต่ไม่มี AC ใน REQ-029/030/031 ที่ครอบ และ BE-019 เป็น check-only (SA-001 disposition ยังค้างตาม gates-001) cases ความเชื่อถือ artifact/download/install ผูกกับ AC ไม่ได้ ไม่สร้าง AC เอง | SA-001 disposition (เพิ่ม/ตัด workflow) ผ่านผู้คุม/ผู้ใช้; ถ้าคง ให้ spec เพิ่ม AC ก่อนวาง cases |
+| GAP-08 | AC-024-01 | arch | DES-006 ไม่ระบุความถี่/ดีบาวซ์ของ discovery ที่ใช้ตัดสิน lost ขณะ idle ใช้ได้เฉพาะ fake discovery ที่ inject ตรง | SA-003 ระบุ polling/debounce ก่อน hardware case |
+| GAP-09 | AC-037-05, AC-037-06, AC-038-01, AC-044-03 | spec | ยังไม่มี signed content inventory/criteria/pass-fail pairs/ผู้อนุมัติ revision (G-LEARN, BA-002/005/006) cases ใช้ synthetic fixture ติดป้าย test-only ตรวจกลไกได้ แต่ไม่ใช่การรับรองเนื้อหา | spec artifact + ผู้ใช้/ผู้ที่ระบุพิจารณา |
+
+## ส่งต่อ
+
+- TP-001 ส่วนอิสระ: 77 cases ครอบ 180 AC (ตรวจเทียบมือทีละ REQ ไม่มี AC ขาด) ทุก actual=NOT_RUN ไม่มี PASS; ผู้คุมควรตรวจ join ซ้ำเพราะไม่ได้รัน script
+- arch: GAP-03/04/06/07/08 (DES-002/003/007 ยังใช้ version แทน ETag; Guest/trash/export/import/history; assigned roster; update download workflow; discovery interval) ก่อน check รัน TP001-016, 025..030, 058
+- spec: GAP-01/02/05/09 (หน่วย 16384; ถ้อยคำ admin key; เกณฑ์ hardware; content inventory)
+- TP-003 (inspect, depends TP-001+SA-004): รับ TP001-069..076 เป็นฐานสำหรับ AC-049..052 เพิ่ม parity/coexist/crash fixtures บน PGGradeDB sanitized; หลักฐาน G-PARITY/COEXIST/TARGET/AUTHZ/DB ต้องมาก่อน grade-write cases (TP001-072..076)
+- TP-002 (failure fixtures): ต้องการ harness fake clock/monotonic, late callback/drain, import lost response, tenant injection, 30-day clock ใช้กับ TP001-003/010/026/028/037
+- check/QA: join task ผ่าน canonical JSON; รันตาม profile; ไม่ใช้ planner/runner tests แทน; แยก hardware/signed installer; เมื่อ prerequisite ยังไม่มีให้รายงาน blocked ไม่ปรับ expected เอง
+- ไม่ได้แก้ plan/QA หรือไฟล์ใน knowledge (ตามใบงาน read-only) ผู้คุมบันทึก TP-001 deliverable เอง
+
+## Change Log
+
+- 2026-10-23 — นายช่างบันทึกและจัดรูปจากผล role ผ่าน Claude; ไม่มี runtime/test verdict หรือการปิด gate
+
+## Amendment001 — 2026-10-23
+
+[ผลinspect](../planning/inspect-amendment-response-001.json) · [archive/hashก่อนแก้](archive/2026-10-23-before-amendment-001/manifest.json)
+
+ปรับ TP001-007 และ TP001-019 ตาม REQ-027/025 ที่บันทึกแล้ว (เสนอแก้ TP001-008 เพิ่ม 1 จุดให้ผู้คุมตัดสิน) จำนวนและ ID คงเดิม 44/180/77 ทุก actual=NOT_RUN ไม่มี PASS ไม่ปิด runtime. TP001-007 ใช้ staff session บน /v2/admin และ 503/401/403 ตาม BR-027-01 โดยปิด /v1/admin ไม่ยึด static key. รหัส error กรณีไม่มี role ไม่ assert: DES-004:80 ไม่มี STAFF_ROLE_REQUIRED, มีเฉพาะ catalog กลาง data-contract-rules.md:51 และ DES-005/010/011 แต่ไม่มีการผูกกับ /v2/admin/licenses. TP001-019 แยกจุดโหลด UI (UTF-16 units) ออกจากเพดาน runtime (UTF-8 bytes) และเพิ่ม multibyte ที่ยืนยันได้จาก BR-025-03 กับ as-built (demo.go:66,72; useCodeLab.ts:56). DES-003:31,89 ยังขัด (UTF-8 bytes) จึงไม่ใช้เป็น expected. DES-002:27-30 ยังใช้ path /admin/licenses (ไม่มี prefix /v2) ขัดกับ REQ รอ arch sync.
+
+ผู้คุมรับการปรับTP001-008ที่inspectเสนอด้วย เพื่อให้AC-027-04ชัด จำนวนยัง77cases/180AC ทุกactualNOT_RUN
+
+| Gap | สถานะเอกสาร | การจัดการ | ส่วนค้าง |
+| --- | --- | --- | --- |
+| GAP-01 | requirement_clarified_design_sync_pending | REQ-025 BR-025-03/AC-025-03 ระบุหน่วยแยกแล้ว (โหลด UI=UTF-16 units, รัน=UTF-8 bytes) TP001-019 แยก fixture/expected ตามนี้ และเพิ่ม multibyte ที่ยืนยันได้จาก REQ+as-built | DES-003:31,89 ยังกำหนด UTF-8 bytes ขัดกับ REQ ต้อง arch sync ก่อนปิด; ไม่ปิด runtime ไม่ใช่ QA PASS; ถ้าจะให้บันทึก/โหลดตรวจ bytes ต้องให้ผู้ใช้ตัดสิน; owner เปลี่ยนจาก spec เป็น arch |
+| GAP-02 | requirement_clarified_case_aligned_design_sync_pending | TP001-007 ตรง BR-027-01/AC-027-01..03 แล้ว (staff session /v2/admin, 503/401/403, ปิด /v1/admin static bearer); AC-027-04 อยู่ที่ TP001-008 | ข้อความ issue เดิมอ้างว่า DES-004 มี 403 STAFF_ROLE_REQUIRED แต่ DES-004:80 ไม่มี (มีเฉพาะ catalog กลาง data-contract-rules.md:51) ให้แก้ถ้อยคำ; arch ต้อง (1) ผูกรหัส 503/403 ของ /v2/admin/licenses และ role ที่มีสิทธิ์ License (DES-004:59 มี license_admin) (2) sync DES-002:27-30,84 จาก /admin/licenses เป็น /v2/admin; รายชื่อ staff_admin ตั้งต้นยังรอข้อมูล; case auth อื่นไม่แตะจนมี contract ใหม่ |
+
+- 2026-10-23 — archiveก่อนแก้8fieldsของ3cases และเพิ่มคำชี้แจง2gaps ไม่ปิดruntime/QA

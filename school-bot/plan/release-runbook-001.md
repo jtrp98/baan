@@ -16,5 +16,10 @@
 
 คำสั่งลำดับdeployย่อยและrollbackที่รันได้ต้องมาจากengineersก่อนปิดPM-001 ไม่แต่งคำสั่ง/ผู้รัน/วันอนุมัติแทนคน. SchoolBot DBแยก4DBlegacy; ใช้บัญชีเดิมSchool/PGGradeDB; sourceoftruthล่าสุดตามevidence-002.md/decisions-025..034. การประกอบrunbookไม่อนุญาตexecute.
 
+## Precedence 051 — 2026-10-24
+
+ลำดับ3/6 ต้องรวม B gRPC service และ HTTP→RPC mapping ของ G พร้อม compatibility/health/rollback ของแต่ละฝั่งตาม [Gateway Rev3](../design/gateway-integration-001.md). sys เตรียมลำดับ rollout จริงก่อนคนอนุมัติ; ห้ามเดาลำดับหรือใช้ direct public B/HTTP relay fallback. Login HTTP เดิมของ G แยกขอบเขต. H5/Light/trust/tenant และ Gateway/gRPC/DB runtime ยังต้องมีหลักฐาน; 4032 local tests ไม่แทน. รอบนี้แก้โครงเอกสาร ไม่ execute.
+
 ## Change Log
+- 2026-10-24 — ใบงาน051: sync transport ในrunbook; คงจุดหยุด/rollback/ผู้อนุมัติเดิม.
 - 2026-10-23 — ตั้งโครงrunbookตามหน้าที่gm; SQL/rollout/backup/restore/คนรันยังรอartifact

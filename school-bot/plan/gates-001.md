@@ -44,7 +44,12 @@ Critical/Important security ต้องส่งคนทุกข้อ Critic
 
 ใช้ [evidence-002](evidence-002.md) Rev2 แยกมติที่ยืนยันแล้วจากหลักฐานค้าง; export G-PARITY/COEXIST/TARGET/AUTHZ/DB เป็น preconditions ย่อยใต้ G-LEARN-DB เฉพาะงานเขียนเกรด คง17gateIDs
 
+## Precedence 051 — 2026-10-24
+
+G-AUTH/H5 ใช้ [evidence-002](evidence-002.md) ฉบับ051 และ Gateway Rev3: gRPC/035/cType ตอบแล้ว; รอ contract/RPC+HTTP mapping/auth/tenant trust และ Light implementation review. 4032 local tests ไม่ปิด Gateway/gRPC/DB gate; ไม่เพิ่ม gate/คำถามธุรกิจ.
+
 ## Change Log
+- 2026-10-24 — ใบงาน051: sync หลักฐาน transport; คง17 gates และเงื่อนไขอนุมัติเดิม.
 
 - 2026-10-23 — Rev2: นโยบายตอบแล้วไม่ปิด SQL/UX/QA/security/release; ไม่ถามOQ014/016/Learner Aซ้ำ
 

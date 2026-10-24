@@ -2,6 +2,16 @@
 
 วันที่ 2026-10-23 · เจ้าของ: gm · อ้างอิง: [plan/index](index.md), [evidence-002](evidence-002.md), [queue-002](queue-002.md), [backlog](../backlog.md)
 
+## Override ใบงาน051 — 2026-10-24
+
+ส่วนนี้มี precedence เหนือคิว/runner/Waiting on Human เดิมด้านล่าง. ผู้ใช้เลือก Codex สำหรับงานนี้และให้ทำเอกสารก่อน; ลำดับ Claude→AGY→Codex และ task023/AGY เป็นประวัติ ไม่สั่ง rerun งานเดิม.
+
+ใช้ [Gateway Rev3](../design/gateway-integration-001.md) และ [receipt](../planning/auth-flow-handoff-001.md): client→HTTP G→gRPC B; browser ผ่าน BFF, ไม่มี HTTP relay/HttpClient หรือ direct public B fallback. HTTP Login เดิมของ G/decoder เป็นอีกขอบเขต. B มี HTTP logout/internal decoder และ 4032 local tests แล้ว แต่ยังไม่พิสูจน์ Gateway/gRPC/DB runtime; fullLogin NOT_READY.
+
+035 และ cType category ตอบแล้ว ไม่ถามธุรกิจซ้ำ. รอทีมตรวจ pre-auth routing/profile linkage. มนุษย์ยังต้องให้ host/env/TLS/secret/service access/staff_admin และ approvals เดิมจาก artifact ที่ครบ; ไม่รอเลือก transport/HTTP exception.
+
+คิวเฉพาะเอกสารใน SA-001/BE-001/BE-039: sys ตรวจ routing/linkage → arch/sys จัด RPC/DTO + HTTP mapping + auth/tenant trust (JWT กับ opaque session), error/timeout/cancellation/retry/private exposure → ส่ง implementation review ให้ G/Light และเตรียม H5. ไม่เขียน transport code/SQL หรือเปิด implementation ในรอบนี้; dependencies/gates เดิมคงทั้งหมด.
+
 ## 1. สถานะภาพรวมและข้อห้าม
 
 - **Release Scope คงเดิม (Frozen)**: 44 REQ / 180 AC / 110 tasks (`pending` ทั้งหมด) / 8 phases / 17 gates ไม่เพิ่มลด task ไม่เปลี่ยน dependency หรือ gate IDs
@@ -81,5 +91,6 @@
 - ข้อกำหนดด้านความปลอดภัยที่มี task รองรับอยู่ในแผน SchoolBot แล้ว (เช่น การบังคับ `SchoolId` ทุก query ใน `BE-002`/`BE-006`, การปฏิเสธ `purpose`/`aud` และการไม่ log ชื่อ header ใน `BE-039` ตาม `SEC001-001`/`013`, และการแยก process ของ grade writer ใน `BE-023`/`BE-037`/`BE-038`) ให้เดินตาม task เดิมโดยไม่แตกงานซ้ำ
 
 ## Change Log
+- 2026-10-24 — ใบงาน051: override คิวเดิมตาม049/receipt/คำสั่ง Codex ปัจจุบัน; คงประวัติและทุก gate.
 
 - 2026-10-23 — สร้าง `queue-003.md` จากหลักฐานจริงรอบ `task017..026` และ `user-context-001`; บันทึกลำดับ runner `Claude → AGY → Codex` (`--no-fallback`) และจัดคิวงานเตรียม artifact ราย owner โดยคง 110 tasks `pending` / 44 REQ / 180 AC / 17 gates เดิม

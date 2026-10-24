@@ -48,3 +48,8 @@ Append-only เพิ่ม BL-NNN พร้อมวันที่ ที่�
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 - 2026-10-23 — เพิ่ม BL-001 จาก V012-09 แบบ append-only ส่ง arch/vault แก้คำอธิบายและตรวจยอด โดยคง release scope และสถานะเดิม
 - 2026-10-23 — เพิ่ม BL-002..004 จากผลตรวจ auth/legacy/security ของ arch และ sys สำหรับข้อบกพร่องใน G, A และ legacy web นอกขอบเขต SchoolBot (ติดป้ายยังไม่ผ่าน security triage ของเจ้าของระบบ ไม่เปิด task ใหม่ ส่วนงานในขอบเขต route เข้า task เดิม)
+- 2026-10-24 — ใบงาน051: เพิ่มคำชี้แจงปัจจุบันต่อท้าย; ไม่แก้ BL เดิม/เพิ่มรายการ.
+
+## คำชี้แจงต่อท้าย — precedence051 (2026-10-24)
+
+BL-002..004 คงประวัติ/เจ้าของ/security triage เดิม. เฉพาะข้อความ BL-004 ว่ารอตกลงแหล่ง is_admin ถูก supersede โดย035 ที่ตอบแล้ว; ไม่เปิดคำถามธุรกิจซ้ำ. งานเดิม SA-001/BE-006/BE-039 อ่าน [queue-003](plan/queue-003.md) และ [Gateway Rev3](design/gateway-integration-001.md): client→HTTP G→gRPC B; ไม่มีHTTP relay/direct public B. ค้างimplementation/trust/tenant/H5/Light; รอบนี้docs-only ไม่เพิ่มscope/BL/task.

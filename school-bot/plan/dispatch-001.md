@@ -6,7 +6,7 @@
 
 ## First wave
 
-Rev2 ใช้ [queue-002](queue-002.md) และrole_aliasesเป็นคิวปัจจุบันเมื่อข้อความเดิมขัดกัน; runนี้เฉพาะ evidence preparation ไม่ dispatch implementation/SQL/deploy
+Precedence 051 (2026-10-24): ใช้ [queue-003](queue-003.md) ฉบับ051 และrole_aliasesเป็นคิวปัจจุบัน; queue-002 เป็นประวัติ. รอบนี้ Codex/docs-only ไม่ dispatch implementation/SQL/deploy.
 
 12 งานต่อไปนี้ไม่มี task dependency หรือ gate precondition จึงพร้อมสำหรับการเตรียมงานตามบทบาท ยังไม่ได้ dispatch จากการรับแผนนี้
 
@@ -49,7 +49,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 
 ## Routing หลังส่งงาน
 
-ใช้ [routing ปัจจุบัน](queue-002.md) Rev2; ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases
+ใช้ [routing ปัจจุบัน](queue-003.md) ตาม precedence051 (2026-10-24); ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases
 
 ## Effort และข้อจำกัด
 
@@ -58,6 +58,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 Rev2:110 IDs/8phases/17gates, coverage180ACมีimplementationและcheck owner, DAGไม่วน/pendingทั้งหมด; staticแผนไม่ใช่ผลSchoolBot QA/SQL/implementation/release
 
 ## Change Log
+- 2026-10-24 — ใบงาน051: ชี้queue-003ทั้งคิว/routing; ไม่เปลี่ยนDAG/concurrency.
 
 - 2026-10-23 — Rev2: reconcile44/180และคิวqueue-002; ไม่ถามนโยบายเดิมซ้ำ
 

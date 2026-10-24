@@ -4,6 +4,8 @@
 
 ## หลักฐานก่อนคิว
 
+Precedence 2026-10-24 (051): อ่าน [Gateway Rev3](../design/gateway-integration-001.md), [receipt](../planning/auth-flow-handoff-001.md) และ [queue-003](queue-003.md) ก่อนฐานเดิม. gRPC/035/cType category ยืนยันแล้ว; ค้าง RPC+HTTP mapping/auth/tenant trust/Light/H5 และ routing/linkage proof. HTTP logout/decoder มีแล้ว; 4032 tests เป็น local/static PASS เดิม, PG integration NOT_RUN; ไม่ปิด G-AUTH/QA หรือ task. ข้อความ task023 ยังไม่มี output เป็นประวัติเมื่อจัดคิว003 ไม่ใช่สถานะเอกสารล่าสุด.
+
 ยังไม่มีหลักฐานปิด gate/UX/SQL/QA/release ในรอบนี้ ทุก task (110 งาน) ยัง pending. ผู้ใช้ตอบพาธ legacy (`C:\src\sb-web-academic-dev-1`) และยืนยันว่า SchoolBot เป็น 1 service ผ่าน `sb-api-gateway` แล้ว (`planning/user-context-001.md`) — ห้ามถาม 2 เรื่องนี้ซ้ำ เช่นเดียวกับ OQ-014/016 และ Learner A. รอบนี้ได้หลักฐานโค้ด BE-001 รอบ 001/002 (`planning/legacy-auth-review-001.md`, `002.md`, `legacy-source-check-001.json`), ผลทบทวน security (`security.md`, `planning/security-disposition-001.md`, `security-mitigation-001.md`), และการปรับถ้อยคำ REQ-025/027 กับเคสทดสอบ (`planning/spec-test-gaps-review-001.md`, `test-plan/tp-001.json` Amendment001) แล้ว แต่ ณ ตอนจัดทำ queue-003 รายละเอียด gateway integration ของ arch (`task023`) ยังไม่มี output ใน knowledge (ให้อ่าน `planning/handoff-002.md` ที่ผู้คุมจะบันทึกหลังรับงาน arch เป็นสถานะรับล่าสุด) จึงห้ามถือว่า done/approved/route verified จากร่างคิวนี้ และห้ามปิด gate ใดๆ
 
 | Gate | มติที่ยืนยันแล้ว | หลักฐานค้าง/ผู้เตรียม |
@@ -39,5 +41,6 @@ BE-033 weightsรวม100%, Quizไม่นับ0, freezeตอนเริ�
 BE-035หนึ่งsource100%ต่อช่อง,activityหลายช่องข้ามวิชา,ช่องเดิม/กันซ้ำข้ามชุด,immutableหลังส่งรวมretire/soft-delete/partial/pendingตามcontractล่าสุด;036earned/max*targetMax decimal half-up/missing skipคงเดิมแยกจริง0;037ชนต้องresolve/previewใหม่/CAS/owned-only merge/teacher overrideและผลพิเศษคงเดิม/receipt transactionเดียว;038outbox/replay/crash/partial/recheck/authz/auditสองฝั่ง.
 
 ## Change Log
+- 2026-10-24 — ใบงาน051: แยกมติ transport/035/cType กับหลักฐานค้าง; ไม่เปลี่ยน verdict.
 - 2026-10-23 — Rev2: แยก approved decisions กับ evidence; ไม่ปิด gate ไม่เปลี่ยนstatus
 - 2026-10-23 — บันทึกสถานะหลักฐานจาก task017..026 และ user-context-001; ย้ำห้ามถามพาธ legacy และรูปแบบ service ผ่าน gateway ซ้ำ และระบุสถานะ task023 ณ ตอนจัดทำ queue-003 โดยให้อ้างอิงสถานะรับล่าสุดจาก planning/handoff-002.md ที่ผู้คุมบันทึก โดยไม่ปิด gate
