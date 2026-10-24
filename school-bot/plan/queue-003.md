@@ -39,7 +39,7 @@
 2. **ปิด Design Gaps จากแผนทดสอบ `TP-001` (`test-plan/tp-001.json`) และผล `spec-test-gaps-review-001.md`**:
    - **GAP-01 (`DES-003:31,89`)**: ปรับให้ตรง `REQ-025` (`BR-025-03`/`AC-025-03`) ว่าจุดโหลด UI นับ UTF-16 code units (16,384) ส่วนเพดาน 16,384 UTF-8 bytes อยู่ที่ engine ตอนรัน (ห้ามใช้ DES บังคับเปลี่ยนหน่วยโหลดของ REQ เอง)
    - **GAP-02 (`DES-002:27-30,84`, `DES-004:80`)**: เปลี่ยนพาธ `/admin/licenses` เป็น `/v2/admin/licenses` ด้วย `staff_admin` session และผูกรหัส error `503 AUTH_NOT_CONFIGURED` / `401` / `403 STAFF_ROLE_REQUIRED` กับ role ที่มีสิทธิ์ (`license_admin`) ให้ชัดเจน
-   - **GAP-03 (`DES-002`, `DES-003`, `DES-007`)**: ซิงก์การอ้างอิง `version`/`source_version` เดิมให้เป็น `ETag` (`UpdateDate`/`update_date`) ตาม `decisions-030` และ `data-contract-rules.md` Rev6
+   - **GAP-03 (`DES-002`, `DES-003`, `DES-007`)**: ซิงก์การอ้างอิง `version`/`source_version` เดิมให้เป็น `ETag` (`UpdateDate`/`update_date`) ตาม `decisions-030` และ `data-contract-rules.md` Rev7
    - **GAP-04 (`SA-001`/`SA-002` — `DES-003`/`004`/`005`)**: เติมสัญญา Guest shared workspace, ถังขยะ 30 วัน (การนับเวลาขณะปิดแอป/clock rollback/การลบถาวร), รูปแบบไฟล์ export, ใบเสร็จ/การกันซ้ำของ explicit import, และรูปแบบส่ง local history เข้าตรวจใหม่ครอบ `REQ-040..042`
    - **GAP-06 (`DES-004`/`DES-005`)**: ระบุตาราง authority เดียวของ "รายชื่อนักเรียนที่ได้รับมอบหมาย" (เช่น `course-teacher ∩ roster ∩ term` บน School DB โดยไม่มีตาราง `TeacherGrant` ใหม่)
    - **GAP-07 (`SA-001` — `DES-007` เทียบ `REQ-030`/`BE-019`)**: สรุปข้อเสนอ disposition ของ workflow `PrepareUpdate`/`InstallPreparedUpdate` เทียบกับ check-only เพื่อให้ผู้ใช้ตัดสินใจโดยไม่เพิ่ม AC เอง
@@ -91,6 +91,8 @@
 - ข้อกำหนดด้านความปลอดภัยที่มี task รองรับอยู่ในแผน SchoolBot แล้ว (เช่น การบังคับ `SchoolId` ทุก query ใน `BE-002`/`BE-006`, การปฏิเสธ `purpose`/`aud` และการไม่ log ชื่อ header ใน `BE-039` ตาม `SEC001-001`/`013`, และการแยก process ของ grade writer ใน `BE-023`/`BE-037`/`BE-038`) ให้เดินตาม task เดิมโดยไม่แตกงานซ้ำ
 
 ## Change Log
+- 2026-10-24 — แก้หมายเหตุอ้างอิงใน GAP-03 จาก data-contract-rules Rev6 เป็น Rev7 ตามรุ่นปัจจุบันหลังรอบ doc-sync (ใบงาน050); ไม่เปลี่ยนเนื้อหางาน
+
 - 2026-10-24 — ใบงาน051: override คิวเดิมตาม049/receipt/คำสั่ง Codex ปัจจุบัน; คงประวัติและทุก gate.
 
 - 2026-10-23 — สร้าง `queue-003.md` จากหลักฐานจริงรอบ `task017..026` และ `user-context-001`; บันทึกลำดับ runner `Claude → AGY → Codex` (`--no-fallback`) และจัดคิวงานเตรียม artifact ราย owner โดยคง 110 tasks `pending` / 44 REQ / 180 AC / 17 gates เดิม
