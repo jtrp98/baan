@@ -5,6 +5,8 @@
 
 ## Transport — precedence ใบงาน049 (2026-10-24)
 
+ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
+
 อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev10, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev7/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
 
 ## Feasibility
@@ -186,6 +188,7 @@
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
 ## Change Log
+- 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict
 - 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049
 - 2026-10-24 — ใบงาน049: Gateway Rev3/DES-012 Rev8/reuse Rev3/packet Rev5 ชี้ REST→gRPC และขอบเขต HTTP logout; adapter Rev4 คงเดิม ไม่เปลี่ยน counts/tasks/QA verdict
 - 2026-10-24 — ใบงาน048: adapter/packet Rev4 override เฉพาะ cType/category/routing; คง44REQ/180AC/110pending/77TP NOT_RUN; 4032testsไม่ใช่ fullLogin acceptance

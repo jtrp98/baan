@@ -1,4 +1,8 @@
-# Gateway integration — Rev3
+# Gateway integration — Rev4
+
+## Pointer amendment Rev4 — ใบงาน057 (2026-10-24)
+
+อ่าน [gRPC contract Rev1](gateway-grpc-contract-001.md) สำหรับ RPC/DTO, HTTP/error mapping, opaque-session trust boundary และ G/Light review packet. Rev4 เพิ่ม pointer เท่านั้น ไม่แทนมติ transport Rev3 ด้านล่าง; ข้อยกเว้น tenant และ mapper ยังรอ H5/owner ไม่อนุญาต implementation หรือยืนยัน integration.
 
 ## Override Rev3 — transport ปัจจุบัน (2026-10-24)
 
@@ -120,6 +124,7 @@ Task: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ 
 มีลำดับเหนือข้อเสนอ HTTP adapter/HttpClient และการปัด gRPC ด้านบน: `G/AGENTS.md:29` กำหนด REST→gRPC ไป service; `:35,37` กำหนด tenant จาก JWT และ Light review ส่วน hosting/auth pipeline. ข้อเสนอ relay opaque Bearer เดิมจึงมี owner-review gap ทั้ง transport/tenant boundary. คง topology ผ่าน G และ private introspection แยกจาก public service-route; ให้ G/Light กับ B ระบุวิธีที่สอดคล้องมาตรฐานหรือข้อยกเว้นที่ได้รับอนุมัติก่อน implement. ไม่สร้าง proxy/framework/proto หรือเลือก transport ใหม่ในงานนี้. Login เดิมและ local DI ports ไม่พิสูจน์ว่า SchoolBot route พร้อม ดู [reuse](gateway-login-reuse-001.md).
 
 ## Change Log
+- 2026-10-24 — Rev4: ใบงาน057 เพิ่ม pointer สัญญา gRPC Rev1; คง transport/auth/schema/gates เดิม
 - 2026-10-24 — Rev3: ใบงาน049 ยก REST→gRPC ขึ้นเป็น topology ปัจจุบัน; แยก HTTP logout as-built/ผล local tests จาก transport integration; คงประวัติและ H5/Light
 - 2026-10-23 — Rev2: ใบงาน032 ระบุข้อขัดกัน HTTP relay กับกฎ G; คง035/C/H5 และไม่อนุมัติข้อยกเว้นแทน owner
 - 2026-10-23 — ใบงาน030: append override ตาม [decisions-035](../requirement/decisions-035.md) ยืนยันทาง A (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม), กฎ fail-closed และ test scenarios S1–S6; คง H5/technical proof/gates เดิม

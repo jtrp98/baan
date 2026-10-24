@@ -23,3 +23,4 @@ As-built ที่ต้องตรวจซ้ำเองจาก source จ
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน arch ออกแบบ gRPC contract ตามคิว override 051 ขั้นสอง รับหลักฐาน routing/linkage จาก055/056
+- 2026-10-24 — รับผล: state=NEEDS_HUMAN — สร้าง [gateway-grpc-contract-001.md](../design/gateway-grpc-contract-001.md) Rev1 (RPC/DTO 7 RPC, HTTP↔gRPC↔v2 error mapping, metadata allowlist, login selector/admission ตาม evidence002, deadline/retry/limits, private web-principal, G/Light review packet 7 ข้อ) + pointer edits (design/index, gateway-integration Rev4); นายช่างเก็บฉบับก่อนแก้ที่ [archive/2026-10-24-before-grpc-contract-001](../design/archive/2026-10-24-before-grpc-contract-001/manifest.json) แล้ว apply ครบ; ประตูค้าง: G/Light รับรองข้อยกเว้น opaque-session + error mapper, H5 host/env/TLS/peer, selector/cardinality พิสูจน์ต่อ; คำตอบเต็มเก็บที่ [gateway-grpc-contract-response-001.json](gateway-grpc-contract-response-001.json)
