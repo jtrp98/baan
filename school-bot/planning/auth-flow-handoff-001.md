@@ -60,3 +60,9 @@ Loginเต็มยังไม่พร้อม: ต้องจับคู�
 งานถัดไป sys/arch: กำหนด gRPC contract, HTTP mapping และ auth/tenant trust boundary จาก source จริง ก่อนปรับ transport code. ใช้ Application/LogoutService และ persistence เดิมซ้ำได้ พร้อมตรวจ Light/H5 ตามขอบเขตที่มีจริง. รอบนี้ไม่มี code/SQL/runtime เพิ่ม ไม่เปลี่ยน canonical task status หรือ QA verdict.
 
 - 2026-10-24 — Change Log: ปรับเอกสาร transport และขอบเขตผลตรวจตามคำถามผู้ใช้; final knowledge commit หลังบันทึกครบ
+
+## รอบ gRPC contract — ใบงาน055–058 (2026-10-24)
+
+ขั้นต่อจาก "งานถัดไป sys/arch" ด้านบนทำครบในระดับเอกสาร: sys055/056 ตรวจ routing/linkage จาก source จริง (ผล: ไม่มี pre-auth cType selector ที่พิสูจน์แล้ว — web เป็น employee-only เลือกแถวล่าสุดเงียบๆ, mobile แยกประเภทหลังสร้าง token; ดู [evidence001](routing-linkage-evidence-001.json)/[evidence002](routing-linkage-evidence-002.json)), arch057 สร้าง [gRPC contract Rev1](../design/gateway-grpc-contract-001.md) PROPOSED พร้อม review packet G/Light §7, sys058 จัด [H5 questionnaire](h5-questionnaire-001.md) 7 หัวข้อ. ทุกไฟล์อยู่ในสถานะรอเจ้าของ/มนุษย์ (G/Light รับรองข้อยกเว้น opaque-session + mapper, ตอบ H5, พิสูจน์ selector/cardinality) ก่อนเปิด implementation; fullLogin คง NOT_READY และไม่มี code/SQL/runtime ใหม่
+
+- 2026-10-24 — บันทึกผลรอบ contract เฉพาะสถานะ; ประตูเดิมทั้งหมดยังเปิด

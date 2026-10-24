@@ -6,7 +6,7 @@ Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 แล�
 
 ## Waiting on Human
 
-Precedence 2026-10-24: ใช้ [queue-003 ฉบับ051](queue-003.md) และ [evidence-002](evidence-002.md) ก่อนข้อความฐานด้านล่าง: gRPC/035/cType ตอบแล้ว; รอ contract/mapping/trust/Light/H5 และหลักฐาน runtime. รอบนี้ docs-only ใช้ Codex ตามผู้ใช้; task023/runner เก่าเป็นประวัติ ไม่ใช่คิวปัจจุบัน.
+Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับปรับ059](queue-003.md), [H5 questionnaire 7 หัวข้อ](../planning/h5-questionnaire-001.md), [gRPC contract Rev1 §7/open items](../design/gateway-grpc-contract-001.md#7-review-packet-และการตัดสินใจ) และ [evidence-002](evidence-002.md) ก่อนข้อความฐานด้านล่าง. คิวเตรียมเอกสาร 055/056→057→058 ทำครบ; contract ยัง PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session และ mapper, เจ้าของ/มนุษย์ตอบ H5 และหลักฐาน selector/cardinality/linkage/continuation กับ runtime; fullLogin NOT_READY. gRPC/035/cType ตอบแล้ว ไม่ถามซ้ำ. รอบนี้ docs-only ใช้ Codex ตามผู้ใช้; task023/runner เก่าเป็นประวัติ ไม่ใช่คิวปัจจุบัน.
 
 ข้อความฐาน ณ 2026-10-23 (อ่าน precedence ด้านบนก่อน):
 
@@ -111,6 +111,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+- 2026-10-24 — ใบงาน059: ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items; คงข้อความฐาน/Status/dependencies/gates/Release Scope.
 - 2026-10-24 — ใบงาน051: ชี้คิว051/หลักฐานล่าสุด; คง Status/Release Scope.
 
 - 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม

@@ -26,11 +26,15 @@
 
 เอกสารล่าสุด: [Authflow code/localcheck](planning/auth-flow-handoff-001.md) — logoutและinternaldecoderผ่านlocalcheck; fullLoginยังไม่พร้อม
 
-เอกสาร transport ปัจจุบัน: [Gateway Rev3](design/gateway-integration-001.md) — client→HTTP Gateway→gRPC SchoolBot; HTTP logout ที่มีแล้วและผล local4032testsยังไม่ยืนยัน Gateway/gRPC integration.
+เอกสารล่าสุด: [รอบ gRPC contract ใบงาน055–058](planning/gateway-grpc-contract-response-001.json) — sys หลักฐาน routing/linkage 001/002 (ไม่มี pre-auth cType selector ฝั่ง G), arch สร้าง [gRPC contract Rev1](design/gateway-grpc-contract-001.md) PROPOSED + [H5 questionnaire](planning/h5-questionnaire-001.md); รอประตู G/Light และ H5 ยังไม่ implement
+
+เอกสาร transport ปัจจุบัน: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot; contract ยัง PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session/mapper และ H5; HTTP logout ที่มีแล้วและผล local4032testsยังไม่ยืนยัน Gateway/gRPC integration.
 
 เอกสารที่เกี่ยวข้องรอบล่าสุด: [ผลตรวจและรายการแก้ทั้งหมด](planning/transport-docs-review-001.md) — แบบระบบ/คู่มือ/แผน/ทดสอบ/ข้อกำหนด/security ตรวจและปรับตาม owner; รอบนี้เอกสารเท่านั้น ยังไม่ implement.
 
 ## Change Log
+
+- 2026-10-24 — รอบ transport contract (ใบงาน055–059): sys055/056 หลักฐาน routing/linkage ([001](planning/routing-linkage-evidence-001.json)/[002](planning/routing-linkage-evidence-002.json)) สรุปว่าไม่มี pre-auth cType selector ที่พิสูจน์แล้ว (fullLogin คง NOT_READY), arch057 สร้าง [gateway-grpc-contract-001](design/gateway-grpc-contract-001.md) Rev1 PROPOSED + Gateway Rev4 pointer (เก็บฉบับก่อนแก้พร้อม SHA256 ที่ design/archive/2026-10-24-before-grpc-contract-001), sys058 [H5 questionnaire](planning/h5-questionnaire-001.md) 7 หัวข้อ, gm059 sync คิว/แผน; คง 110 tasks pending/77 TP NOT_RUN/Important6 OPEN ไม่มี code/SQL/runtime ใหม่; ประตูค้าง: G/Light รับรองข้อยกเว้น opaque-session + error mapper, เจ้าของ/มนุษย์ตอบ H5, selector/cardinality/linkage พิสูจน์ต่อ
 
 - 2026-10-24 — ตรวจหลังรอบ doc-sync: แก้ช่องสถานะ design ในตาราง Documents เป็น rules Rev7 ให้ตรง data-contract-rules.md จริง และจัดรายการ Change Log สองรายการ (rename 2026-10-23, cType 2026-10-24) ที่วางหลังบรรทัดประวัติก่อนหน้ากลับเข้าลำดับวันที่ใหม่ไปเก่า
 
