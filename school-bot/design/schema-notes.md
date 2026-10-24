@@ -1,4 +1,4 @@
-# หมายเหตุ schema — Rev4
+# หมายเหตุ schema — Rev5
 
 อ่าน [คู่มือ DBML](dbml-guide-001.md) สำหรับแบบเต็ม Rev4 และภาพ integration ที่เลือกเฉพาะจุดเชื่อมตารางเดิม; ชนิดของเส้นและจำนวนตารางในสองภาพต่างกันตามขอบเขตภาพ ไม่ได้เพิ่ม schema
 
@@ -46,8 +46,8 @@
   - `ux_schoolbot_gradeslot_active_ownership`: 1 active ownership ของ `SchoolBotGradeSlot` ต่อ `(SchoolId, NGradeId, AssessmentId, ScoreIdentifier)` เมื่อ `"RetiredAt" IS NULL` (**ไม่กรอง `IsDelete = false`** เพื่อห้ามหลบ ownership ด้วย soft-delete)
   - `ux_schoolbot_scoremapping_active`: 1 active `SchoolBotScoreMapping` ต่อ `(CourseRunId, GradeSlotId)` เมื่อ `"RetiredAt" IS NULL AND "IsDelete" = false`
   - `ux_schoolbot_levelproposal_confirmed_per_run`: 1 finalized `SchoolBotLevelProposal` (`promoted|retained|max_level`) ต่อ `CourseRunId` และ `ux_schoolbot_levelproposal_successor_unique`
-- **CHECK constraints (53 ข้อใน `db/schoolbot_db.sql`)**:
-  - ขอบเขต `SchoolId` 32 ข้อ (ตารางละ 1 ข้อ) + ค่า Enum/State/Lifecycle และคู่คอลัมน์ที่ต้องมาด้วยกัน/ช่วงคะแนนและเวลา 21 ข้อ
+- **ยอด declaration ตาม `db/review-006.md` และนับ SQL ซ้ำ 2026-10-24**: PK 32, UQ 24, CHECK **80**, FK 40, unique indexes 13, non-unique indexes 0; UQ constraints แยกจาก unique indexes ไม่รวมยอดซ้ำกัน
+  - CHECK ขอบเขต `SchoolId` 32 ข้อ (ตารางละ 1 ข้อ) + Enum/State/Lifecycle/คู่คอลัมน์/ช่วงคะแนนเวลาและกฎอื่น 48 ข้อ. ยอด 53/21 เดิมเป็นคำอธิบายคลาดเคลื่อน ไม่ใช่การเพิ่ม constraints รอบนี้; ฉบับเดิมอยู่ใน archive ใบงาน060a
 - **คอลัมน์ Array และ Enum**:
   - `SchoolBotCourseRun.PlanCourseIds` แสดงใน DBML เป็น `jsonb` เพื่อไม่ให้ชนกับ syntax `[...]` ของ DBML parser ส่วน physical SQL ใน `db/schoolbot_db.sql` ใช้ `integer[]` (`int4[]`) พร้อม `CHECK (cardinality("PlanCourseIds") >= 1 AND array_position("PlanCourseIds", NULL) IS NULL)`
   - Enum ใน DBML แสดงค่าที่เป็นไปได้เพื่อการรีวิว ส่วน physical SQL ใช้ `varchar` คู่กับ `CHECK (... IN (...))`
@@ -62,6 +62,8 @@
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-24 — Rev5: ใบงาน060a/BL-001 แก้ยอด declaration ให้ตรง review-006 และ SQL จริง; ไม่แก้ DDL/DBML/สถานะอนุมัติ
 
 - 2026-10-23 — Rev4: เพิ่ม DBML notes/กลุ่มสี และภาพ integration แยก; คง 32 ตาราง/450 ฟิลด์/40 FK และข้อจำกัดเดิม ตรวจเทียบ semantic model ก่อน/หลังแล้ว
 

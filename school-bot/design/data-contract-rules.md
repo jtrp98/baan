@@ -1,4 +1,4 @@
-# กฎข้อมูลและ HTTP contract ร่วม — Rev7
+# กฎข้อมูลและ HTTP contract ร่วม — Rev8
 
 แยกจาก logical data contract ของ SA เพื่อคุมขนาดเอกสาร ชนิด `K`, `I`, `U`, `N`, `Tn` และตารางอ้าง [data-model.md](data-model.md) (Rev5 — ตรงกับ [db/schoolbot_db.sql](../db/schoolbot_db.sql) และ [db/review-005.md](../db/review-005.md) ตามมติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md))
 
@@ -38,7 +38,7 @@ Canonical เพิ่มเติม: [ผลเรียน/policy](learning-r
 
 Progress เป็น read model จาก `Submission`/`Assessment`/`Attempt` ไม่มีตาราง Progress ที่แก้คะแนนเอง ผลต่าง curriculum revision ไม่รวมอัตโนมัติ
 
-Idempotency เก็บ encrypted response 24 ชั่วโมง หลังนั้นลบเฉพาะ ciphertext (`UPDATE ResultCipher = NULL, ResultKeyId = NULL`) และเก็บ tombstone ป้องกันสร้างซ้ำ; retry เก่าได้ `IDEMPOTENCY_EXPIRED` พร้อม `resource_id` เมื่อเปิดเผยได้ Retention ของ tombstone/audit รอเจ้าของข้อมูล ไม่ purge โดยพลการ
+Idempotency ทั่วไปคง encrypted replay window 24 ชั่วโมง; **ข้อยกเว้นเฉพาะ create-license** เสนอ 15 นาที (สมมติฐาน — ยังไม่ยืนยัน), `ReplayUntil ≤ CompletedAt+900 วินาที` ตาม [DES-002](des-002.md). ตอนอ่านต้องตรวจเวลาฝั่ง server: `now >= ReplayUntil` คืน `409 IDEMPOTENCY_EXPIRED` พร้อม `details.resource_id` เมื่อเปิดเผยได้ แม้ purge ยังไม่รัน. ล้าง `ResultCipher`/`ResultKeyId` พร้อมกันเมื่อหมดหน้าต่าง และคง tombstone/ResourceId ป้องกันซ้ำ; ไม่ต่ออายุจาก retry และไม่ลบหลังอ่านครั้งแรก. ตรวจ Principal/RequestKey/RequestHash/สิทธิ์ปัจจุบันก่อน replay; create-license ตรวจ license ไม่ถูก revoke เพิ่มด้วย. envelope key แยกจาก DB และการหมดอายุของ backup ตาม [custody](signing-custody-001.md); ไม่อ้างว่าการล้าง live DB ลบ backup แล้ว. Retention tombstone/audit รอเจ้าของข้อมูล ไม่ purge โดยพลการ. DDL เดิม `db/schoolbot_db.sql:150–165` รองรับโดยไม่เพิ่มคอลัมน์
 
 ## HTTP contract ร่วม
 
@@ -74,6 +74,7 @@ List: `limit` 1–100 ค่าเริ่ม 50, `cursor` opaque; คืน `{
 Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องรักษาขอบเขตที่ client/G/B; gRPC message limits และ mapping ยัง design pending ไม่เท่ากับขนาด JSON โดยอัตโนมัติ และไม่ยก limit ของ engine ตาม HTTP.
 
 ## Change Log
+- 2026-10-24 — Rev8: ใบงาน060a ระบุข้อยกเว้น replay TTL เฉพาะ create-license และ cleanup คู่ฟิลด์; schema/transport/gates คงเดิม
 - 2026-10-24 — Rev7: ระบุ HTTP semantics ฝั่ง client G; ไม่เปลี่ยน schema/status/device proof
 - 2026-10-23 — Rev6: sync032..034/review-006; SQL เดิม
 - 2026-10-22 — Rev5: sync ตาม `db/schoolbot_db.sql` (32 ตาราง), `db/review-005.md` และมติ decisions-027..030; ปรับ placement เป็น SchoolBot DB (10.0.0.128:9499) คู่กับการอ่าน School DB/PGGradeDB ด้วยบัญชี DB เดิมและ re-check ก่อน commit; เปลี่ยน optimistic concurrency จาก `Version` เป็น `UpdateDate` (`clock_timestamp()`, opaque `ETag`/`If-Match`); ปรับกฎ single-column FK + application tenant check และตัด `UQ_SchoolBotAssessment_Submission_Sequence` / `UQ_SchoolBotAttempt_Learner_Seq` / `ScoringPolicy.CurriculumId`

@@ -288,6 +288,13 @@
 2. **`design/data-contract-rules.md`, `des-004.md`, `des-005.md`, `des-008.md`..`des-012.md`**:
    - อัปเดตข้อความเรื่อง single-DB transaction ที่เคยอ้างว่าตาราง SchoolBot อยู่ใน School DB เดียวกับตาราง legacy ให้ตรงกับ `decisions-027` (ตาราง SchoolBot ทั้ง 32 ตาราง commit ใน transaction เดียวกันบน **SchoolBot DB** ส่วนการอ่านสิทธิ์/roster/term จาก **School DB** เป็นการอ่านข้าม DB connection ที่ต้อง re-check ก่อน commit)
 
+## คำชี้แจงยอดปัจจุบัน — BL-001 (2026-10-24, vault)
+
+ยอดในเอกสารนี้เป็นของ Rev5 ณ 2026-10-22 ก่อน decisions-030 (ถอน Version ทั้งหมด) และก่อน sync decisions-032..034 ยอดนับจริงจาก schoolbot_db.sql ปัจจุบัน: **32 ตาราง / 450 ฟิลด์ / 40 FK (36 ในตาราง + 4 DEFERRABLE ใน DO block; ในจำนวนนี้ 1 natural composite = FK_SchoolBotProject_CurrentRevision) / 24 UQ / 80 CHECK (นับตาม declaration) / 13 partial unique index / 0 non-unique index / 1,131 บรรทัด** — ตรงกับ db/review-006.md ทุกตัว ตัวเลข Version (§1/§5) และยอด 23 UQ / 27 FK / 53 CHECK / ~855 บรรทัด ในเอกสารนี้จึงเป็นค่าประวัติ ไม่ใช่ยอดปัจจุบัน
+
+รายละเอียด delta (D1–D7): §1 แถว Business UQ 23 → 24 (นับตก 1 เทียบ §3.2 ของเอกสารเอง) · §1 แถว FK 27 → 40 เส้น และลิสต์ §4 ขาด FK ที่มีใน SQL ปัจจุบัน 12 เส้น (FK_SchoolBotCourseRun_Curriculum, FK_SchoolBotLevelPromotionPolicy_Level, FK_SchoolBotCurriculum_Level, FK_SchoolBotLesson_Curriculum, FK_SchoolBotMission_Lesson, FK_SchoolBotCriteria_Mission, FK_SchoolBotActivity_Lesson, FK_SchoolBotCourseRunActivity_Activity, FK_SchoolBotSubmission_Mission, FK_SchoolBotAttempt_Activity, FK_SchoolBotRetakeGrant_Activity, FK_SchoolBotLevelProposal_TargetCurriculum) · Version 17 ตาราง → 0 ตาราง (decisions-030) · CHECK 53 → 80 (§7.2 จัดกลุ่ม 32+16+18=66 ก็ไม่ตรงยอดรวมของตัวเอง) · จำนวนบรรทัด ~855 → 1,131 · §8 ข้อ 6 อ้าง `schoolbot_pggradedb_grants.sql` ถูกถอนตาม decisions-029 (คงเป็นประวัติ) · เพิ่มยอดฟิลด์รวม 450 — ต้องตรวจความตรงกันอีกครั้งตอนทบทวนสัญญาก่อน implementation
+
 ## Change Log
+- 2026-10-24 — BL-001 ส่วน vault (ใบงาน060c): แนบคำชี้แจงยอดปัจจุบัน + delta D1–D7 โดยรักษาเนื้อหาเดิมทั้งหมด — รันโดย นายช่าง solo (subagent role vault); นายช่างเป็นผู้แนบลงไฟล์
 - 2026-10-22 — MYCELIUM: ถอน Version ที่เหลือทั้งหมดและ AuditEvent.Previous/NewVersion ตาม decisions-030 (ใช้ UpdateDate) — ตัวเลข Version ในเอกสารนี้จึงไม่ใช้แล้ว
 - 2026-10-22 — สร้างเอกสารรีวิว Rev5 ตามคำสั่งผู้ใช้: ตัด non-unique index (`ix_*`) ทั้งหมด 10 ตัว, ตัด composite UNIQUE สำหรับ FK ทั้งหมดและเปลี่ยนเป็น single-column FK, ตัด `Version` จาก 15 ตาราง immutable/append-only, ตัดตาราง `SchoolBotTeacherGrant` ที่ยังไม่มีมติสร้าง, ตัดคอลัมน์ซ้ำซ้อน 2 คอลัมน์ และลด `CHECK` constraint จาก 117 เหลือ 53 ข้อ

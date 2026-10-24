@@ -1,0 +1,41 @@
+# SA-004 — โครงชุดหลักฐาน export contract — Rev1
+
+ใช้ [DES-008](des-008.md), [DES-009](des-009.md), [DES-012](des-012.md), [กฎคะแนน](grade-rules-032-034.md), [credential matrix](credential-matrix-001.md) และ [custody](signing-custody-001.md). สถานะอยู่ที่ [index](index.md); เป็น outline ไม่ใช่ผลรับรอง SA-004 หรือ gate closure
+
+## ชุดหลักฐานที่ต้องจัด
+
+แต่ละรายการแนบ revision/hash ของ source/contract, environment ที่ได้รับอนุญาต, fixture ปิดบังข้อมูล, criterion/AC, วิธีตรวจ, expected, actual, evidence path และข้อจำกัด. ช่อง actual/evidence runtime ยังไม่จัดทำในใบงาน060a; ห้ามเติม PASS จากการมีเอกสาร
+
+| ชุด / เจ้าของเตรียม | Coverage เดิม | Expected ที่ต้องพิสูจน์ |
+|---|---|---|
+| Mapping / sys + inspect | AC-049-01..05 | admin เท่านั้น, ช่องเดิม, หนึ่งกิจกรรมหลายช่องแต่ช่องเดียวไม่รับหลายกิจกรรม, context school/term, preview ตรงคู่, mapping ส่งแล้วล็อกไม่หลบด้วย soft-delete/ชุดใหม่ |
+| Preview / sys + inspect | AC-050-01..04 | แสดงก่อน/หลัง/source/target, อ่านไม่เขียน, 8/10×20=16 และ 3/4×10=8, missing ข้าม, source/mapping เปลี่ยนต้อง preview ใหม่ |
+| Conflict/skip / sys + inspect | AC-051-01..05 | ครูแก้ owned cell ต้องชน, replace/keep รายคน, CAS หลัง resolve, คง override/ผลพิเศษ/unknown JSON, missing คงเดิมแต่คะแนนจริง0ส่งได้ |
+| Authorization / sys + legacy owner | AC-052-01..02 | course-teacher∩roster∩term, Channel/License/tenant/locks ตรวจทั้ง preview/confirm/apply, ถอนสิทธิ์กลางทางต้องหยุด; authority ตาม DES-004 ไม่เดา account/profile join |
+| Recovery/audit / sys + vault + inspect | AC-052-03..05 | assignment ไม่ increment, retry OperationKey/PayloadHash เดิม, crash หลัง PG commit ก่อน outbox ack ต้อง reconcile receipt, partial แสดงจริงรายคน/ช่อง, audit และ derived totals ตรงระบบเดิม |
+
+## Gate evidence เดิมทั้งห้า
+
+| Gate | Artifact ที่ยังต้องได้ | เงื่อนไขก่อนกล่าวว่าผ่าน |
+|---|---|---|
+| G-PARITY | writer/calculator source หรือ authoritative fixtures ที่เจ้าของรับรอง; golden before/after | เทียบระบบเดิม 100% ตาม DES-009 รวมผลพิเศษ/ปัดเศษ/derived fields; reader อย่างเดียวไม่พิสูจน์ writer |
+| G-COEXIST | inventory writers/triggers/functions, race fixtures | xmin + before_document_hash/CAS และ operation lock กันชนจริง; ไม่อ้าง UpdateDate ของ SchoolBot ไปแทน xmin ของ PGGradeDB |
+| G-TARGET | ScoreData/identifier/row cardinality/receipt shape + ขนาดจากข้อมูลปิดบัง | ปลายทางมีอยู่และไม่กำกวม; ไม่สร้าง zero row/ช่องคะแนนโดยอัตโนมัติ; receipt เก็บได้ครบ |
+| G-AUTHZ | สิทธิ์/roster/period/SubmitPeriod/override matrix จากเจ้าของและ negative tests | ไม่ใช้ SchoolId/ปลายทางจาก client, re-check สิทธิ์/locks ก่อน write; unknown ต้อง block |
+| G-DB | account/grants จริงตาม credential matrix, เจ้าของเกรดยอมให้ใช้ + หลักฐานฐานทดสอบ | บัญชีเดิม UPDATE คะแนน+INSERT PGTGradeAuditLog ใน PG transaction เดียวได้; B API ไม่มี PG secret; ไม่รัน GRANT ใหม่ |
+
+เงื่อนไข G-DB เรื่อง process boundary เป็น mitigation หลักฐานประกอบ SEC001-002 ไม่ใช่การแก้ gate/dependency ของแผน. Preview non-production ตาม DES-009 ยังไม่เป็นสิทธิ์ให้เปิด confirm/apply. Error เดิม `WRITER_NOT_VERIFIED`, `CALCULATOR_NOT_VERIFIED`, `COEXISTENCE_NOT_VERIFIED`, `GRADE_SOURCE_UNAVAILABLE`, `RECEIPT_UNAVAILABLE` และ `PREVIEW_STALE`/`VERSION_CONFLICT` ต้องมี expected/actual ที่ client boundary ผ่าน G
+
+## Recovery proof ลำดับขั้นต่ำ
+
+1. หยุดก่อน SchoolBot confirm commit → ไม่มี export/outbox ครึ่งชุด
+2. confirm สำเร็จแต่ response หาย → key เดิมได้ export เดิม
+3. worker fail ก่อน PG commit → ไม่มีคะแนน/receipt ค้างครึ่งคู่
+4. PG commit แล้วขาด SchoolBot ack → unknown/reconciling อ่าน receipt เดิม ไม่ apply ซ้ำ
+5. บางรายการ applied/บางรายการข้ามหรือชน → คง applied, re-preview เฉพาะส่วนที่อนุญาต ไม่เปลี่ยน mapping ที่ล็อก
+6. ถอนสิทธิ์/License/ปลายทางล็อกระหว่างรอ → block ส่วนที่ยังไม่เขียน; ไม่ rollback คะแนนที่ลงแล้วโดยเดา
+
+เลือก reuse contract/outbox/receipt เดิม ไม่เพิ่ม export queue/table/gate ใหม่; ปัดตก happy-path-only และทดสอบ mock อย่างเดียวเพื่อรับรอง cross-DB/legacy coexistence. ให้ผู้คุมส่ง sys/vault/inspect/jpo ตามคิวเดิม; คนลงนามเมื่อมีหลักฐานจริง งานนี้ไม่เรียก role ต่อเองหรือรัน SQL
+
+## Change Log
+- 2026-10-24 — Rev1: ใบงาน060a เตรียม outline SA-004 ครบ 19 AC เดิมและห้า gate พร้อมช่องหลักฐานที่ยังขาด

@@ -89,3 +89,11 @@
 เก็บdesign/index, DES-012, Gateway integration และauth-evidenceแบบbyte-for-byteก่อนapply5editsจากarchใบงาน030ตามคำตอบผู้ใช้. [Manifestพร้อมbytes/SHA256](archive/2026-10-23-before-decisions-035/manifest.json); ไม่มีphysicalschema/SQL delta
 
 - 2026-10-23 — นายช่างรับpolicyแหล่งis_adminตามมติ035 ไม่ปิดruntime/securitygate
+
+## ก่อน gap sync ใบงาน060a — 2026-10-24
+
+เก็บฉบับเดิมทั้งไฟล์ byte-for-byte ใน [archive/2026-10-24-before-gap-sync](archive/2026-10-24-before-gap-sync/manifest.json): index, DES-002 Rev2, DES-003 Rev3, DES-004 Rev10, DES-005 Rev6, DES-006 Rev1, DES-007 Rev2, data-contract-rules Rev7, schema-notes Rev4 และ archive.md รวม 10 ไฟล์. Manifest ระบุชื่อ/bytes/SHA256 ของทุกไฟล์และ hash baseline SQL/DBML สองภาพที่ไม่แก้; สำเนาของ archive.md คือก่อนเพิ่มรายการนี้ ไม่ใช่ archive ซ้อนที่นำไปใช้แทนแบบปัจจุบัน
+
+## Change Log ใบงาน060a
+
+- 2026-10-24 — เพิ่มทะเบียน snapshot ก่อน amend แบบเฉพาะจุด; ประวัติเดิมคง verbatim ในโฟลเดอร์ที่กำหนด ไม่เปลี่ยนสถานะตรวจรับ

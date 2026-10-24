@@ -1,4 +1,4 @@
-# school-bot — Design Index
+# school-bot — Design Index — Rev5
 
 > หน่วยอ่าน = ไฟล์ · สารบัญล้วน · เขียนโดย system-analyst เท่านั้น · 1 แถว = 1 บรรทัด
 > วิธีอ่าน: อ่านไฟล์นี้ก่อน แล้วเปิดเฉพาะไฟล์ des-*.md / data-model.md ที่ packet/brief ระบุ — ห้าม ls ห้ามอ่านข้ามหมวด · ตาราง DES ด้านล่างคือรายชื่อไฟล์ contract ทั้งหมด
@@ -7,7 +7,7 @@
 
 ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
 
-อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev10, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev7/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
+อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev8/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
 
 ## Feasibility
 
@@ -51,12 +51,12 @@
 | ID | ชื่อ | สถานะ | ไฟล์ |
 |---|---|---|---|
 | DES-001 | Desktop host และ IPC (Rev1) | PROPOSED — รอ breaking review | [des-001.md](des-001.md) |
-| DES-002 | License และ device binding (Rev2) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
-| DES-003 | หลายโครงงาน Local/Cloud (Rev3) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
-| DES-004 | Identity และ school authorization (Rev10) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
-| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
-| DES-006 | หุ่นจริง Windows/macOS (Rev1) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
-| DES-007 | Release และ trusted update (Rev2) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
+| DES-002 | License และ device binding (Rev3) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
+| DES-003 | หลายโครงงาน Local/Cloud (Rev4) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
+| DES-004 | Identity และ school authorization (Rev11) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
+| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev7) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
+| DES-006 | หุ่นจริง Windows/macOS (Rev2) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
+| DES-007 | Release และ trusted update (Rev3) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
 | DES-008 | Mapping หลักสูตรกับช่องคะแนน SchoolBright (Rev4) | PROPOSED — OQ-016 ตอบแล้ว; คง H5/web-principal | [des-008.md](des-008.md) |
 | DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
 | DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
@@ -124,8 +124,8 @@
 | [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
-| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev7 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
-| [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy (Rev3 · CONFIRMED — อ้าง db/schoolbot_db.sql และ db/review-005.md (SchoolBot DB 10.0.0.128:9499, 32 ตาราง, ใช้บัญชี DB เดิมบน School DB/PGGradeDB)) |
+| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev8 — baseline CONFIRMED เดิม; ข้อเสนอ create-license TTL 15 นาทีติดสมมติฐานตาม060a, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
+| [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy Rev5 — baseline CONFIRMED เดิม; แก้ยอดตาม review-006: 24 UQ/80 CHECK/13 unique indexes; 32 ตารางและบัญชี DB เดิมคงเดิม |
 | [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev5 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |
 | [os-compatibility-001.md](os-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ OS (Rev2 · EVIDENCE — target ถูกแทนโดย decisions-019; runtime proof ยังรอ) |
@@ -154,6 +154,27 @@
 | [gateway-integration-001.md](gateway-integration-001.md) | Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review; override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
 
 ## ภาคผนวก canonical
+
+### ใบงาน060a — สัญญาเฉพาะเรื่องและชุดหลักฐาน
+
+อ่าน DES หลักแล้วตามลิงก์ในตารางนี้; เป็นส่วนต่อสัญญาเดียวกัน ไม่เพิ่ม DES ID/AC/task. [ผลตรวจและส่งต่อ](gap-sync-review-001.md) ระบุข้อขัดกับ as-built/ขอบเขตและรายการรอคน. คง 110 tasks pending/Release Scope/dependencies/gates และ security findings เดิม; เอกสารพร้อมส่ง review ไม่ใช่ runtime acceptance
+
+| ไฟล์ / Rev | เนื้อหา / สถานะ |
+|---|---|
+| [license-admin-security-001.md](license-admin-security-001.md) Rev1 | PROPOSED — License role/error/replay TTL/cleanup ต่อ DES-002 |
+| [project-api-001.md](project-api-001.md) Rev1 | PROPOSED — API/ETag/immutable revision ต่อ DES-003 |
+| [guest-workspace-001.md](guest-workspace-001.md) Rev1 | PROPOSED — นโยบาย Guest ยืนยันแล้ว; รายละเอียดเวลา/trash/export รอ implementation proof |
+| [guest-import-001.md](guest-import-001.md) Rev1 | PROPOSED — explicit Project import/receipt/dedup ใช้ schema เดิม |
+| [guest-history-001.md](guest-history-001.md) Rev1 | PROPOSED — local history/recheck/provenance; คง employee ไม่สร้างผล Cloud |
+| [teacher-authority-001.md](teacher-authority-001.md) Rev1 | PROPOSED — authority intersection; roster/status/time resolver ยังขาดหลักฐาน |
+| [robot-boundary-001.md](robot-boundary-001.md) Rev1 | PROPOSED — payload/drain-stop; poll 3000ms/debounce0 ติดสมมติฐาน ไม่ใช่ physical SLA |
+| [release-trust-001.md](release-trust-001.md) Rev1 | PROPOSED — registry-gated signer/publisher pin; รอ custody และ re-audit |
+| [update-disposition-001.md](update-disposition-001.md) Rev1 | PROPOSED — รอผู้มีอำนาจเลือก explicit workflow/check-only; ไม่เพิ่ม AC/ตัด scope |
+| [credential-matrix-001.md](credential-matrix-001.md) Rev1 | DRAFT EVIDENCE PACK — process/account/สิทธิ์ที่ต้องใช้; actual grants/account names ยังไม่ยืนยัน |
+| [signing-custody-001.md](signing-custody-001.md) Rev1 | DRAFT EVIDENCE PACK — ผู้ถือ/ที่เก็บ/sign/rotate/revoke/backup รอเจ้าของเติม |
+| [export-proof-pack-001.md](export-proof-pack-001.md) Rev1 | DRAFT EVIDENCE PACK — outline SA-004 ครบ19ACเดิม/ห้าgate; ไม่ใช่ผลทดสอบ |
+| [gap-sync-review-001.md](gap-sync-review-001.md) Rev1 | EVIDENCE — coverage ใบงาน060a และผลตรวจเอกสาร; ไม่ปิด findings/gates |
+| [gap-sync-evidence-001.md](gap-sync-evidence-001.md) Rev1 | EVIDENCE — source/DDL ที่ตรวจจริงและข้อขัดกับเอกสารเดิม |
 
 | ไฟล์ | เนื้อหา / สถานะ |
 |---|---|
@@ -188,6 +209,7 @@
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
 ## Change Log
+- 2026-10-24 — Rev5: ใบงาน060a amend DES-002..007/rules/schema-notes และเชื่อมสัญญาย่อย/SA-004; เก็บก่อนแก้พร้อม SHA256; ไม่เปลี่ยน task status/scope/dependencies/gates
 - 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict
 - 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049
 - 2026-10-24 — ใบงาน049: Gateway Rev3/DES-012 Rev8/reuse Rev3/packet Rev5 ชี้ REST→gRPC และขอบเขต HTTP logout; adapter Rev4 คงเดิม ไม่เปลี่ยน counts/tasks/QA verdict

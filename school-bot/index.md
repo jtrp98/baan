@@ -15,7 +15,7 @@
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 77 cases/180 AC; join implementation/validation ครบ; actual ทุกเคส NOT_RUN, มี design gaps ค้าง |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
-| `uxui` | สารบัญ/เอกสาร UX/UI | ยังไม่มีเอกสาร |
+| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | ร่างแรก int-001 Entry / int-002 Labs — รอเซ็นทุกส่วน |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; mitigation reviewแล้ว ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |

@@ -81,6 +81,10 @@
 ## เอกสารขอบเขตและอ้างอิงในหมวด
 
 - [scope.md](scope.md) — ภาพรวมโมดูล, Target Users, Release Scope, Constraints, Declined และ References
+- [pack-guest-001.md](pack-guest-001.md) — ชุดอ้างอิงมติ Guest ส่งต่อ arch/int (BA-001 · 2026-10-24)
+- [pack-content-inventory-001.md](pack-content-inventory-001.md) — inventory สามโหมด + เกณฑ์/ดาว + คู่ผ่าน–ไม่ผ่าน + ช่องผู้อนุมัติ (BA-002 · ครอบ GAP-09)
+- [pack-hardware-001.md](pack-hardware-001.md) — hardware acceptance pack ครอบ 8 AC + platform matrix + ช่องกรอกคน (BA-003 · ครอบ GAP-05)
+- [pack-delivery-001.md](pack-delivery-001.md) — delivery & decision-owner pack เข้า G-DELIVERY (BA-004)
 - [scope-history-20261023-011.md](scope-history-20261023-011.md) — ส่วนประวัติ/Change Log ที่แยกจาก scope.md; ไม่ใช่สถานะปัจจุบัน
 - [scope-baseline-001.md](scope-baseline-001.md) — หลักฐานความสามารถฐานเดิมและขอบเขต sample/preview/mock ณ 2026-10-21
 - [source-references.md](source-references.md) — รายการไฟล์ source code และเอกสารต้นทางที่ใช้กลั่น requirement
@@ -126,6 +130,8 @@
 | [decisions-035.md](decisions-035.md) | แอดมินโรงเรียนตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server และคง super admin เดิม; ปิดคำถามแหล่ง is_admin ส่ง arch sync |
 
 ## Change Log
+
+- 2026-10-24 — ใบงาน060b: เพิ่ม packs 4 ชุดของ spec (BA-001..004 — guest/content-inventory/hardware/delivery) ครอบ GAP-05/09 พร้อมช่องกรอกคนและป้ายสมมติฐาน; รันโดย นายช่าง solo (subagent role spec); คง 44 REQ/180 AC/DRAFT และมติเดิมทั้งหมด
 
 - 2026-10-24 — ใบงาน053: ชี้ precedence transport และ HTTP client boundary; คง44REQ/180AC/DRAFT ไม่เปลี่ยนผลตรวจรับ
 

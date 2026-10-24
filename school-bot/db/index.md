@@ -9,8 +9,11 @@
 |---|---|---|
 | `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, 13 unique indexes / 0 non-unique indexes, FK คอลัมน์เดียว ตาม review-006) | DRAFT Rev5 — ยังไม่รัน |
 | `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | DRAFT Rev5 — ยังไม่รัน |
+| `review-007.md` | vault ยืนยัน SEC001-009 replay TTL ของ create-license ไม่ต้องแก้ physical DDL (ใบงาน060c) | PASS (static) — read-time gate + cleanup job เป็นงาน application |
+| `pii-inventory-001.md` | ตารางจำแนก PII รายคอลัมน์ 32 ตาราง + ตารางข้อมูลเด็ก 9 ตาราง + flag F1–F7 ส่ง jpo — ตอบ SEC001-010 | สร้างแล้ว — รอ jpo พิจารณา |
+| `db-safe-evidence-001.md` | ชุดคำขอหลักฐาน EV-01..06 จากเจ้าของ Master DB (schema-only + aggregate ปลอด PII ตาม TR-AUTH-03..06) | พร้อมส่งมนุษย์/เจ้าของ DB — นายช่างเป็นผู้ส่ง |
 | `review-006.md` | vault เทียบมติ 032..034: SQL เดิมรองรับทาง A; ช่องว่าง mapping lock/น้ำหนัก/partial apply/ขอบเขตผลต่อรอบเรียน ส่ง arch | NEEDS_DESIGN_CHANGE — static เท่านั้น ไม่มี SQL delta ในรอบนี้ |
-| `review-005.md` | รอบ SQL Rev5 ตามคำสั่ง "อะไรไม่จำเป็นไม่ต้องใส่ / เอา index ออก"; จำนวน constraints ปัจจุบันตรวจแก้ใน review-006 | ประวัติ |
+| `review-005.md` | รอบ SQL Rev5 ตามคำสั่ง "อะไรไม่จำเป็นไม่ต้องใส่ / เอา index ออก"; แนบคำชี้แจงยอดปัจจุบัน BL-001 (delta D1–D7) แล้ว | ประวัติ + คำชี้แจงยอด 2026-10-24 |
 | `review-004.md` | รอบแยก SQL ตาม database (decisions-027 วางตารางที่ SchoolBot DB ของตัวเอง) | ประวัติ |
 | `review-003.md` | รอบถอน index license + รวม SQL หนึ่งไฟล์ต่อ database | ประวัติ |
 | `review-002.md` | รอบ Rev2 (partial index license active ต่อโรงเรียน) + ประเด็น LearnerId ครู/นักเรียนชนกัน | ประวัติ |
@@ -24,6 +27,8 @@
 - ผู้เขียน SQL = `vault` (DBA) · นายช่าง/SA ส่งมอบและตรวจ · ห้าม role ใดรัน SQL เอง (ประตูมนุษย์)
 
 ## Change Log
+
+- 2026-10-24 — ใบงาน060c (นายช่าง solo — subagent role vault): เพิ่ม review-007 (SEC001-009 ไม่แก้ DDL — PASS static), pii-inventory-001 (ตอบ SEC001-010 + flag F1–F7 ส่ง jpo), db-safe-evidence-001 (EV-01..06 รวบชุดเดียว) และแนบคำชี้แจงยอด BL-001 ลง review-005; ไม่มีการเปลี่ยน SQL/รัน DB
 
 - 2026-10-23 — นายช่างบันทึก vault review-006 จาก task-012 พร้อม planning/vault-response-001.json; ผล static 32 ตาราง/450 ฟิลด์/40 FK/24 UQ/80 CHECK/13 unique indexes/non-unique indexes 0 ไม่มีการเปลี่ยน SQL หรือรัน DB; ส่ง design gaps ให้ arch
 
