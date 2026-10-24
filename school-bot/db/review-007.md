@@ -27,8 +27,8 @@ SEC001-009 เสนอ: (1) หน้าต่าง replay สั้นเฉ�
 
 ## 3. ข้อสังเกต integrity (สิ่งที่ต้องมี "นอก" DDL)
 
-1. read-time gate เป็นหลัก: ปฏิเสธ replay เมื่อ `now() > ReplayUntil` (คืน IDEMPOTENCY_EXPIRED + resource_id) แม้ cleanup job ยังไม่รัน (SEC001-009 MUST-1) — เป็นเงื่อนไขของ application ไม่ใช่ schema
-2. ต้องมี cleanup job (MUST-2): `UPDATE ... SET "ResultCipher"=NULL, "ResultKeyId"=NULL WHERE "ReplayUntil" < now() AND "ResultCipher" IS NOT NULL` — DDL ไม่มีกลไกอัตโนมัติ (ไม่มี trigger/partition/TTL policy) และไม่เสนอเพิ่มกลไกใดในรอบนี้
+1. read-time gate เป็นหลัก: ปฏิเสธ replay เมื่อ `now() >= ReplayUntil` (คืน IDEMPOTENCY_EXPIRED + resource_id) แม้ cleanup job ยังไม่รัน (SEC001-009 MUST-1) — เป็นเงื่อนไขของ application ไม่ใช่ schema (แก้ตาม jpo 060f: เดิมเขียน `>` ให้ตรงสัญญา ณ จุดหมดอายุพอดี)
+2. ต้องมี cleanup job (MUST-2): `UPDATE ... SET "ResultCipher"=NULL, "ResultKeyId"=NULL WHERE "ReplayUntil" <= now() AND "ResultCipher" IS NOT NULL` — DDL ไม่มีกลไกอัตโนมัติ (ไม่มี trigger/partition/TTL policy) และไม่เสนอเพิ่มกลไกใดในรอบนี้ · คง tombstone ไม่ออก key ใหม่จาก retry และไม่บันทึก key/cipher ใน log/audit/error
 3. performance: index `ix_schoolbot_idempotency_replay_expiry` เดิมถูกตัดออกตามมติผู้ใช้ 2026-10-22 (review-005 §2 แถวที่ 3) — cleanup job จะใช้ Seq Scan ยอมรับได้ตามมติ "ข้อมูลไม่เยอะ" และตาม review-006 (ห้ามเสนอเพิ่ม index/constraint สวนมติเดิม) — ถ้าอนาคตตารางโตจน purge กระทบ ต้องขอมติใหม่จากคนก่อน
 4. ไม่มี CHECK บังคับ `ReplayUntil > CompletedAt` — คุมใน application ตอน INSERT; ไม่เสนอเพิ่ม CHECK ยิบย่อยสวนแนวตัดทอน Rev5
 5. ตารางนี้ไม่มี FK จากตารางอื่นชี้มา — การ purge/update ไม่กระทบ referential integrity
@@ -39,6 +39,9 @@ SEC001-009 เสนอ: (1) หน้าต่าง replay สั้นเฉ�
 
 **pass** — แนวทาง SEC001-009 ใช้ physical schema ปัจจุบันได้ทันที ไม่ต้องแก้ DDL; งานที่เหลือเป็นของ application (read-time gate + cleanup job + จำกัด TTL ตอน INSERT) และเอกสารสัญญา (arch/SA-001 ระบุค่า TTL เฉพาะ create-license ใน DES-002:51/data-contract-rules:41 ตามที่ SEC001-009 ส่งต่อ — ไม่ใช่งาน vault)
 
+**ข้อจำกัดของข้อสรุปนี้ (เพิ่มตาม jpo 060f):** `UPDATE ... NULL` ไม่พิสูจน์การทำลายสำเนาใน MVCC/WAL/replica/backup และ tombstone ที่ยังคง Principal/ResourceId ก็ยังอาจเป็น PII — ข้อสรุป "ไม่ต้องแก้ DDL" จึง**ไม่ถือว่าปิด SEC001-009** (รอ backup expiry proof และ re-audit ตาม gate เดิม)
+
 ## Change Log
 
 - 2026-10-24 — สร้างครั้งแรก (ใบงาน060c): ยืนยันไม่ต้องแก้ physical DDL พร้อมหลักฐานบรรทัดจริงจาก schoolbot_db.sql — รันโดย นายช่าง solo (subagent role vault)
+- 2026-10-24 — แก้ตามผลตรวจ jpo ใบงาน060f (สวมบท vault โดยนายช่าง solo ตรง): เงื่อนไข read-time gate/cleanup เป็น `now() >= ReplayUntil`, คง tombstone/ไม่ออก key ใหม่/ไม่ log key, และระบุข้อจำกัด MVCC/WAL/backup ว่าไม่ปิด SEC001-009

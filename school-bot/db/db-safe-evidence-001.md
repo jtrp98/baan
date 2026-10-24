@@ -5,10 +5,11 @@
 หลักปลอดภัยของชุดนี้ (ทุกรายการ):
 
 1. ขอเฉพาะโครงสร้าง (schema-only) และผลนับ aggregate — **ไม่ขอค่าจริงที่เป็น PII** (ไม่ขอ username, hash รายแถว, ชื่อ, เลขบัตร ฯลฯ)
-2. กลุ่มไหนนับได้ < 5 แถว ให้ผู้ตอบรวมเป็น "<5"/"other" ก่อนส่ง (กัน re-identify จากกลุ่มเล็ก)
+2. กลุ่มไหนนับได้ < 5 แถว ให้ผู้ตอบรวมเป็น "<5"/"other" ก่อนส่ง (กัน re-identify จากกลุ่มเล็ก) และต้องใช้**กลุ่มที่ไม่ทับซ้อนกัน** พร้อมตรวจ complementary suppression ทั้งชุดก่อนส่ง — ยอดรวมลบกลุ่มที่เปิดเผยต้องไม่ย้อนหาจำนวนกลุ่มที่ซ่อนได้ (เพิ่มตาม jpo 060f)
 3. การรันทุกคำสั่งเป็นพระราชกิจของมนุษย์ (CONVENTIONS §9) — vault เขียนตัวอย่างได้ แต่ห้ามรันเด็ดขาด
 4. ผลลัพธ์ต้องผ่านการตรวจว่าปลอด PII รายแถวก่อนบันทึกเข้า knowledge ใดๆ
 5. ชื่อคอลัมน์ที่อ้าง (nSystemID, sID, sEmp, cType, cDel, PasswordHash, WorkStatus) มาจาก as-built port ที่ auth-evidence-001 อ้าง — (สมมติฐาน — ยังไม่ยืนยัน) จนกว่าจะได้ DDL จริงจาก EV-01..03
+6. DDL (EV-01..03) ส่งเฉพาะ metadata ตามรายการอนุญาต (ชื่อคอลัมน์/ชนิด/NULL/DEFAULT/index/constraint) — DEFAULT/CHECK/index expression/comment อาจมี literal ที่ไม่ควรเปิดเผย จึงต้องตรวจ literal ก่อนส่ง และ**ห้ามส่ง raw dump โดยไม่ทบทวน** (แก้ตาม jpo 060f — ยกเลิกข้อความ "ปลอด PII 100%" เดิม)
 
 ## EV-01 — DDL (schema-only) ของ Master.TUser
 
@@ -42,14 +43,13 @@
 - รูปแบบผลลัพธ์ที่ยอมรับ: ตาราง count รวมรายกลุ่ม — ไม่มีค่ารายแถว ไม่มี username/id จริง
 - ไม่ขอ: ค่า nSystemID/sEmp/sID รายแถว
 
-## EV-05 — Aggregate ปลอด PII: รูปแบบ prefix/ความยาวของ PasswordHash (TR-AUTH-03/05 + M4/C2/C3)
+## EV-05 — Aggregate ปลอด PII: รูปแบบชนิดของ PasswordHash (TR-AUTH-03/05 + M4/C2/C3)
 
 - เหตุผล: ต้องยืนยันสัดส่วนรูปแบบ hash (SHA-1 hex ยาว 40 อักษร / prefix 'v2:' / อื่น) เพื่อเลือก verifier อ้างอิงของ Desktop login (C1–C3) โดยไม่ต้องเห็น hash จริง
-- สิ่งที่ขอ (count รวมเท่านั้น): `GROUP BY length(PasswordHash)` และ `GROUP BY left(PasswordHash, 3)`
-- ตัวอย่างรูปแบบ: `SELECT length(PasswordHash) AS len, count(*) FROM ... GROUP BY 1 ORDER BY 1;`
-  `SELECT left(PasswordHash, 3) AS prefix, count(*) FROM ... GROUP BY 1 HAVING count(*) >= 5;`
-- รูปแบบผลลัพธ์ที่ยอมรับ: ตาราง (len|prefix, count) — กลุ่ม < 5 รวมเป็น "other"
-- ไม่ขอ: ค่า hash จริงใดๆ แม้แต่ตัวอย่างเดียว
+- สิ่งที่ขอ (count รวมเท่านั้น): **ป้ายประเภทคงที่ที่คำนวณภายใน DB** เช่น `SHA1_HEX_40`, `V2_FORMAT`, `NULL_OR_EMPTY`, `OTHER` — ความยาวใช้ช่วงที่กำหนดล่วงหน้า (เช่น `LEN_40`, `LEN_OTHER`) ไม่ใช่ค่ารายแถว
+- ตัวอย่างรูปแบบ: `SELECT CASE WHEN PasswordHash IS NULL OR PasswordHash='' THEN 'NULL_OR_EMPTY' WHEN PasswordHash LIKE 'v2:%' THEN 'V2_FORMAT' WHEN length(PasswordHash)=40 THEN 'SHA1_HEX_40' ELSE 'OTHER' END AS kind, count(*) FROM ... GROUP BY 1;`
+- รูปแบบผลลัพธ์ที่ยอมรับ: ตาราง (kind, count) — กลุ่ม < 5 รวมเป็น "other"
+- **ห้ามส่ง prefix/suffix จริงของ hash ไม่ว่าส่วนใด** (แก้ตาม jpo 060f: `left(PasswordHash,3)` เดิมเปิดเผยส่วนของ credential จริง แม้แสดงเป็นกลุ่ม ≥5)
 
 ## EV-06 — (เสริม, optional) Aggregate กลุ่มบัญชีนักเรียน (ช่วย TR-AUTH-06)
 
@@ -59,9 +59,10 @@
 
 ## ลำดับที่แนะนำ
 
-EV-01..03 ก่อน (ปลอด PII 100% และปลดล็อก TR-AUTH-04 รวมทั้งยืนยันชื่อคอลัมน์ให้ EV-04..06 แม่นขึ้น) → EV-04/05 (ปลดล็อก TR-AUTH-03/05) → EV-06 (เสริม TR-AUTH-06)
+EV-01..03 ก่อน (schema-only พร้อมตรวจ literal ตามหลักข้อ 6 และปลดล็อก TR-AUTH-04 รวมทั้งยืนยันชื่อคอลัมน์ให้ EV-04..06 แม่นขึ้น) → EV-04/05 (ปลดล็อก TR-AUTH-03/05) → EV-06 (เสริม TR-AUTH-06)
 ผลที่ได้ทั้งหมดส่งเข้า design/auth-evidence-001.md revision ถัดไป โดย arch ตรวจก่อนว่าปลอด PII รายแถวจริง
 
 ## Change Log
 
 - 2026-10-24 — สร้างครั้งแรก (ใบงาน060c): รวบคำขอหลักฐาน TR-AUTH-03..06 เป็นชุดเดียวแบบปลอด PII — รันโดย นายช่าง solo (subagent role vault)
+- 2026-10-24 — แก้ตามผลตรวจ jpo ใบงาน060f (สวมบท vault โดยนายช่าง solo ตรง): EV-05 เลิกขอ raw prefix เปลี่ยนเป็นป้ายประเภทคงที่ที่คำนวณใน DB, เพิ่มกฎกลุ่มไม่ทับซ้อน + complementary suppression, ถอนข้อความ "ปลอด PII 100%" ของ EV-01..03 พร้อมบังคับตรวจ literal/ห้าม raw dump

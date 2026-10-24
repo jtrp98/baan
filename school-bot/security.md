@@ -334,3 +334,16 @@ Minor · actual_defect · OPEN
 2026-10-24: [jpo040](planning/logout-security-response-001.json) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](planning/logout-limiting-response-001.json) และ [jpo043](planning/logout-security-response-002.json) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน [QAround001](qa/round-001.md) และ [check](planning/auth-flow-check-response-002.json). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
 
 - 2026-10-24 — นายช่างบันทึกdispositionจากjpo+check; ไม่มีriskacceptanceใหม่
+
+## รอบตรวจรับฝั่ง security ของใบงาน060 — 2026-10-24
+
+[ผลตรวจ jpo ฉบับเต็ม](planning/security-gap-sync-review-001.md) (runner ภายนอก codex t2 ผ่าน baan-role — ตรวจข้ามโมเดลงานที่ solo/subagent เขียนในรอบ060) · สรุปโดยนายช่าง · คงแถวเก่า/status/severity ทั้งหมด — Important6/Medium6/Minor3 ยัง OPEN · ไม่มี risk acceptance หรือ gate closure ใหม่
+
+- SEC001-003/009: arch ฝังเงื่อนไข mitigation ได้ครบในระดับแบบแล้ว (release-trust-001 + DES-007 Rev3 / license-admin-security-001 + DES-002 Rev3 + rules Rev8 ครอบ MUST-1..5) — ยังไม่ใช่ remediation รอพิสูจน์สิทธิ์ registry/custody, pin จริง, negative tests, RC จริง และ backup expiry
+- SEC001-002/006: โครง credential-matrix/signing-custody/export-proof-pack พร้อมให้เจ้าของกรอก — ต้องเติม effective privileges, rate limit ของ signer, ผลสแกน private key, ผู้เขียน registry เทียบผู้ sign/publish และ synthetic fixtures เป็นหลักของ proof pack
+- SEC001-010: รับ pii-inventory-001 เป็นหลักฐานตั้งต้นบางส่วน — vault แก้ตาม findings แล้ว (13 ตารางเด็ก, free-text เพิ่ม, jsonb ผลประเมิน, DeviceJkt/ResultCipher จำแนกใหม่, Session.ExpiresAt + expiry≠deletion) แต่ยังปิดไม่ได้จนครอบ legacy/local files/logs + นโยบาย masking/encryption/access/retention และเส้นทางลบ/ส่งออกรายคน
+- EV-05 (db-safe-evidence-001): แก้แล้ว — เลิกขอ raw hash prefix เปลี่ยนเป็นป้ายประเภทคงที่ใน DB + complementary suppression + ถอน "ปลอด PII 100%" บังคับตรวจ literal ก่อนส่ง DDL
+- review-007: jpo เห็นชอบว่าไม่ต้องแก้ DDL โดยแก้ถ้อยคำเงื่อนไขเป็น now()>=ReplayUntil และระบุข้อจำกัด MVCC/WAL/backup แล้ว — ข้อสรุป DDL ไม่ปิด SEC001-009
+- ไม่พบเหตุเพิ่ม Critical/Important ใหม่จากเอกสารรอบนี้; GDPR applicability ยังตัดสินไม่ได้ (ไม่มีหลักฐานพอตาม Article 3)
+
+- 2026-10-24 — นายช่างบันทึกผล jpo ใบงาน060f (read-only); แก้ 3 ไฟล์ฝั่ง vault ตาม findings แล้ว; ไม่มี risk acceptance หรือการปิด gate

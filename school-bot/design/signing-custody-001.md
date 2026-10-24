@@ -1,4 +1,4 @@
-# Custody matrix — Rev1
+# Custody matrix — Rev2
 
 ร่าง SEC001-006/003/009; อ่าน [DES-002](des-002.md), [DES-007](des-007.md), [mitigation ล่าสุด](../planning/security-mitigation-001.md). สถานะที่ [index](index.md); ตารางไม่บรรจุ key/certificate ส่วน private
 
@@ -19,7 +19,14 @@ SEC001-003 เลือก registry-gated signer เพื่อคง server-as
 
 ข้อเสนอ TTL create-license 15 นาที (สมมติฐาน — ยังไม่ยืนยัน) ไม่ใช่การพิสูจน์ว่า backup ถูกทำลายแล้ว. ถ้า infrastructure ยังบังคับ ciphertext expiry ไม่ได้ให้บันทึก evidence gap ไว้ใน SEC001-009 ห้ามอ้างว่าการ purge live DB อย่างเดียวปิด finding; ไม่เปลี่ยน replay เป็น key:null โดยไม่มี human gate ของ breaking contract
 
-Proof ที่ต้องแนบ: key inventory เฉพาะ metadata, sign/decrypt policy, negative tests (caller ผิด/expเกิน/registryไม่ตรง/publisherอื่น), access audit ปิดบังข้อมูล, rotation+revoke rehearsal และ backup/restore-expiry test. งานนี้ไม่มีการสร้าง key/sign artifact หรือ re-audit
+Proof ที่ต้องแนบ: key inventory เฉพาะ metadata, sign/decrypt policy, negative tests (caller ผิด/expเกิน/registryไม่ตรง/publisherอื่น), access audit ที่ตรวจข้อมูลก่อนนำเข้า knowledge ตาม [export proof pack](export-proof-pack-001.md), rotation+revoke rehearsal และ backup/restore-expiry test. เติมเกณฑ์ตาม mitigation เดิมดังนี้:
+
+- **Entitlement signer rate limit:** ระบุ policy/config, caller/identity, limit/window และจุดบังคับจริง พร้อมผลทดสอบต่ำกว่า/เกิน limit/กลับมาใช้ได้ตาม policy และ audit ว่าคำขอที่ถูกจำกัดไม่เกิด sign; ไม่กำหนดตัวเลขใหม่. ข้อเท็จจริง as-built: `C:/src/schoolbright/target/school-bot/web/src/SchoolBot.Api/Program.cs:49–62,101–105` มี rate limit ของ HTTP license endpoints ยังไม่พิสูจน์ rate limit ที่ entitlement signer
+- **ไม่พบ private key:** แนบผลสแกน repo/payload/CI/log แยกครบสี่พื้นที่ ระบุ source revision, artifact/run, เครื่องมือ/version/rules, ขอบเขต/ข้อยกเว้น และเวลาตรวจ. ห้ามแนบค่า key/snippet; ส่วนที่ไม่ได้สแกนเป็น evidence gap ไม่ใช่ผลว่าไม่พบ และสรุปเฉพาะขอบเขตที่ตรวจจริง
+- **สิทธิ์ custody จริง:** เทียบบุคคล/service identity ที่เขียน registry กับผู้ publish, ผู้สั่ง sign/ผู้ลงนาม และผู้เข้าถึง recovery material รวม restore/decrypt/สิทธิ์ผ่านกลุ่มหรือ role. แนบ access policy/audit และ negative test ว่า publisher/API เขียน registry เองไม่ได้; ระบุสิทธิ์ซ้อน/ข้อจำกัดให้เจ้าของ release/infra และ jpo ตรวจตาม gate เดิม ไม่สรุปการแยกสิทธิ์จากชื่อตำแหน่ง และไม่เพิ่ม four-eyes
+
+ทุกผลตรวจผูก environment, expected/actual และ evidence_ref; เจ้าของรับรองข้อเท็จจริงตามหน้าที่เดิม. งานนี้ไม่มีการสร้าง key/sign artifact หรือ re-audit
 
 ## Change Log
+- 2026-10-24 — Rev2: ใบงาน060g ตาม jpo060f ข้อ 3 เติมหลักฐาน signer rate limit, สแกน private key และเทียบสิทธิ์ registry/publish/sign/recovery ตาม mitigation เดิม; ไม่เปลี่ยน task/gates
 - 2026-10-24 — Rev1: ใบงาน060a ร่าง custody ครบผู้ถือ/ที่เก็บ/สิทธิ์/rotation/revoke/backup และแยก unknown จากข้อเสนอ
