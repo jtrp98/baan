@@ -19,6 +19,10 @@
 | Repository Actor/DDL static | PASS | PostgresSessionLogoutStore.cs:44–63 ตรง canonical A และตัวอย่าง sys044 ครบ 6 กรณี; ตรวจ Session 17 fields, AuditEvent 13 fields และ INSERT 12 fields กับ DDL; token_hash:Varchar และ request_id:Uuid ตรงชนิด |
 | PostgreSQL integration/atomic rollback | NOT_RUN | ไม่มี PostgreSQL execution; transaction/revoke/audit/invalid-row rollback ตรวจได้เฉพาะ source ไม่ยืนยันสถานะข้อมูลจริง |
 
+## เอกสารที่เกี่ยวข้องล่าสุด — 2026-10-24
+
+[ผลตรวจเอกสารทั้งหมด](transport-docs-review-001.md) รวมแบบระบบ คู่มือใน repository แผน/JSON แผนทดสอบ ข้อกำหนด และ security. คำอ้าง revision ในผลรับเก่าด้านล่างเป็นประวัติ; revision ปัจจุบันอ่าน [design index](../design/index.md). รอบนี้docs-only ไม่เพิ่มหรือแก้ implementation ไม่รัน product tests/SQL/DB.
+
 ## Sourceและแบบที่ส่งต่อ
 
 - โค้ดเฉพาะ target/school-bot/web; [logout038](logout-implementation-response-001.json), [component039](gateway-outcome-implementation-response-001.json), [limiting042](logout-limiting-response-001.json)

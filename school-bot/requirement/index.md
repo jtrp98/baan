@@ -13,6 +13,8 @@
 - เลข REQ-001..008 เป็นเลขใน Git index ของเอกสารชุดเดิมที่ นายช่าง ตรวจพบก่อนเริ่มชุดใหม่ จึงสงวนเลขและเริ่มที่ REQ-009
 - สถานะ REQ เก็บในตารางนี้เท่านั้น
 
+ลำดับอ้างอิง transport ปัจจุบัน: [Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev9](../design/des-012.md) มี precedence เหนือถ้อยคำเส้นทาง API เดิมในหมวดนี้: client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B. HTTP paths/status ใน BR/AC ของ REQ-027 รวม AC-027-01/02 เป็นเกณฑ์ที่ client boundary ของ G ไม่บังคับ B expose HTTP และไม่ยืนยันว่ามี RPC mapping แล้ว; HTTP Login เดิมของ G แยกจาก service transport B.
+
 ## รายการ
 
 | id | ชื่อ | status | AC | ไฟล์ |
@@ -124,6 +126,8 @@
 | [decisions-035.md](decisions-035.md) | แอดมินโรงเรียนตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server และคง super admin เดิม; ปิดคำถามแหล่ง is_admin ส่ง arch sync |
 
 ## Change Log
+
+- 2026-10-24 — ใบงาน053: ชี้ precedence transport และ HTTP client boundary; คง44REQ/180AC/DRAFT ไม่เปลี่ยนผลตรวจรับ
 
 - 2026-10-23 — บันทึก decisions-035 ตามคำตอบผู้ใช้เรื่องแหล่ง is_admin; คง44REQ/180AC/สถานะตรวจรับและgate runtimeเดิม
 

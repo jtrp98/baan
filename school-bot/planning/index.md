@@ -1,5 +1,9 @@
 # SchoolBot — Planner proposal
 
+## สถานะเอกสารปัจจุบัน — 2026-10-24
+
+[ผลตรวจเอกสารที่เกี่ยวข้องทั้งหมด](transport-docs-review-001.md) และ [auth-flow ล่าสุด](auth-flow-handoff-001.md) มีลำดับเหนือ metadata ของข้อเสนอเก่าด้านล่าง. แผน canonical อยู่ที่ [plan/index](../plan/index.md): 110 tasks pending/44REQ/180AC. มาตรฐานคือ client→HTTP Gateway→gRPC SchoolBot; รอบนี้แก้เฉพาะเอกสาร ยังไม่ implement. ตาราง74งานด้านล่างเป็นประวัติที่ PM รับไปแล้ว.
+
 ## สถานะ
 
 ADOPTED_BY_PM — PM รับเป็น [แผนหลัก](../plan/index.md) แล้ว เก็บหมวดนี้เป็นข้อเสนอเดิม หลักฐานการรับช่วง และเอกสาร run/ประวัติเก่าของโมดูล (ย้ายมาจาก root วันที่ 2026-10-22 ตามการปรับโครงสร้างให้เข้ามาตรฐาน baan)
@@ -73,3 +77,5 @@ PM รับแล้วผ่าน mycelium-role pm/t2 แบบ read-only; re
 ### Change Log รอบส่งต่อ
 
 - 2026-10-23 — นายช่างเชื่อมผลส่งต่อและคำรับรองเจ้าของแผนหลังบันทึกเอกสารครบ คง index/planner history เดิม
+
+- 2026-10-24 — Change Log: ผู้คุม sync จุดอ่านและงานส่งต่อปัจจุบันจากผล arch050; คงผลรับเก่าและไม่เริ่ม implementation

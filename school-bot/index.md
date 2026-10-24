@@ -28,7 +28,11 @@
 
 เอกสาร transport ปัจจุบัน: [Gateway Rev3](design/gateway-integration-001.md) — client→HTTP Gateway→gRPC SchoolBot; HTTP logout ที่มีแล้วและผล local4032testsยังไม่ยืนยัน Gateway/gRPC integration.
 
+เอกสารที่เกี่ยวข้องรอบล่าสุด: [ผลตรวจและรายการแก้ทั้งหมด](planning/transport-docs-review-001.md) — แบบระบบ/คู่มือ/แผน/ทดสอบ/ข้อกำหนด/security ตรวจและปรับตาม owner; รอบนี้เอกสารเท่านั้น ยังไม่ implement.
+
 ## Change Log
+
+- 2026-10-24 — รับ arch050/gm051/inspect052/spec053/jpo054 และปรับ current pointers; คง44REQ/180AC/110pending/77NOT_RUN และผล4032localเดิม
 
 - 2026-10-24 — รับ arch049 ปรับเอกสาร transport ให้ใช้มาตรฐาน gRPC; คง source/SQL/tasks/QA scope เดิม
 

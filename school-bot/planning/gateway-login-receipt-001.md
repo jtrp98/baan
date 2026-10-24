@@ -1,5 +1,7 @@
 # รับผลตรวจ Gateway Login และแบบ reuse — 001
 
+> สถานะเอกสารปัจจุบัน 2026-10-24: [ผลตรวจเอกสาร](transport-docs-review-001.md) / [Gateway Rev3](../design/gateway-integration-001.md) มี precedence เรื่อง service transport: HTTP G→gRPC B. ผลรับและ revision วันที่2026-10-23 ด้านล่างเก็บตามประวัติ; ไม่ใช่ revision ปัจจุบันหรือหลักฐาน integration.
+
 วันที่ 2026-10-23 · ผู้คุมบันทึกผล sys/Codex t3 และ arch/Codex t1 ตามคำสั่งล่าสุด ใช้ Codex โดยตรง ไม่ fallback
 
 [sys task031](task-031.md) · [ผลตรวจ Login](gateway-login-review-001.md) · [arch task032](task-032.md) · [ผล arch ต้นฉบับ](gateway-login-architecture-response-001.json)
@@ -18,7 +20,7 @@ arch ส่ง NEEDS_DESIGN_CHANGE พร้อม patch proposal: ผู้ค�
 | --- | --- | --- |
 | G/sys และ B | Desktop completion/continuation, IMEI lifecycle, input bounds และ trusted identity adapter contract | DES-004: การเปิด Desktop login; ห้ามเริ่ม verifier ใหม่ระหว่างรอ |
 | legacy/vault | TR-AUTH-02-rest/03..06: TAdmin, AccountId/SId/NSystemId/sEmp, tenant/WorkStatus และ compatibility | เฉพาะ actor/identity mapping ที่ยังพิสูจน์ไม่ได้; ไม่เปิด policy035 |
-| G/Light, B และ infra | review HTTP relay เทียบ REST→gRPC/tenant rule พร้อม H5 transport, exposure, TLS, secret owners และ isolation | gateway-integration-001/DES-012: SchoolBot service-route และ private introspection |
+| G/Light, B และ infra | ตรวจ gRPC service contract/HTTP mapping และ trusted tenant/opaque-session boundary พร้อม H5, exposure, TLS, secret owners และ isolation ตาม Gateway Rev3 | gateway-integration-001/DES-012: SchoolBot service-route และ private introspection |
 | admin BFF/B | staff identity/bootstrap, HttpOnly cookie, Origin/CSRF และ C exchange | staff_admin; school superadmin ไม่ใช่ทางทดแทน |
 
 รายการนี้เป็นการส่งต่อใน knowledge ไม่ได้ส่งข้อความหาเจ้าของระบบภายนอก. ต้องรับ contract/evidence ที่ระบุข้างต้นก่อน implement ส่วนที่พึ่งพา; ไม่ถามมติ035 หรือให้ผู้ใช้เลือก password algorithm ซ้ำ
@@ -35,3 +37,5 @@ arch ส่ง NEEDS_DESIGN_CHANGE พร้อม patch proposal: ผู้ค�
 ## Change Log
 
 - 2026-10-23 — ผู้คุมรับผลตรวจของเดิมและ amend แบบจาก arch ก่อน final knowledge commit; ไม่มี check verdict ใหม่
+
+- 2026-10-24 — Change Log: ผู้คุม sync จุดอ่านและงานส่งต่อปัจจุบันจากผล arch050; คงผลรับเก่าและไม่เริ่ม implementation

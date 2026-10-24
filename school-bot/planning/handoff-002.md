@@ -1,5 +1,7 @@
 # SchoolBot — ส่งต่อหลักฐานรอบ002
 
+> สถานะล่าสุด 2026-10-24: อ่าน [ผลตรวจเอกสาร](transport-docs-review-001.md), [Gateway Rev3](../design/gateway-integration-001.md) และ [auth-flow](auth-flow-handoff-001.md) ก่อนใช้ใบส่งต่อรอบ002. Gateway→SchoolBot ใช้ gRPC; บันทึกรอtask023/runnerด้านล่างเป็นประวัติ และงานปัจจุบันใช้ Codex ตามคำสั่งผู้ใช้. ไม่มี implementation ในรอบเอกสารนี้.
+
 วันที่2026-10-23 · ผู้ใช้สั่งต่อจากรอบ001 และยืนยันให้ Codex เป็น runner ลำดับสุดท้าย
 
 ## ผลที่รับและบันทึกแล้ว
@@ -75,3 +77,5 @@ arch ใบงาน023: Claudeติดweeklylimit; AGY t1หมดเวลา
 [ผลรอบนี้](auth-flow-handoff-001.md) มีลำดับสถานะเหนือข้อความเดิมเฉพาะcode/localtests: logout+localrate/concurrency และinternalwebdecoderเขียนแล้ว; checkPASSlocalscopeและactual4032cases. fullLogin/PG/H5/110task/77TPcase/gatesยังไม่ปิด. ผู้ใช้ไม่ต้องตอบชื่อตารางเองจากคำถามmappingที่ไม่เข้าใจ ทีมรับtechnicalissueกลับตามownerquestion001
 
 - 2026-10-24 — รับผลCodexตามflowและแก้SEC040-001; ปิดfindingเฉพาะlocalscope ไม่เปลี่ยนbaselineImportant6OPEN
+
+- 2026-10-24 — Change Log: ผู้คุม sync จุดอ่านและงานส่งต่อปัจจุบันจากผล arch050; คงผลรับเก่าและไม่เริ่ม implementation

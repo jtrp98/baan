@@ -23,7 +23,13 @@
 
 หลักฐาน source ข้างต้นคงช่วงตรวจเดิม ไม่ใช่การ audit ใหม่; รายการเต็มที่ย้ายจาก scope อยู่ [scope-baseline-001.md](scope-baseline-001.md)
 
+## อ้างอิง transport ปัจจุบัน
+
+[Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev9](../design/des-012.md) มี precedence เฉพาะ transport เหนือข้อความ API เดิม: client→HTTP G→gRPC B. รายการ source และมติข้างต้นคงตามช่วงตรวจเดิม ไม่ใช่หลักฐานว่า integration พร้อม.
+
 ## Change Log
+
+- 2026-10-24 — ใบงาน053: เพิ่มจุดอ่าน transport ปัจจุบัน โดยคง source evidence และมติเดิม verbatim
 
 - 2026-10-22 — เพิ่มมติปัจจุบันและอ้างหลักฐานเดิมที่แยกจาก scope
 

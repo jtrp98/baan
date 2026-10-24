@@ -31,7 +31,7 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 - หลัง Login เลือกนำเข้าเอง คงต้นฉบับ/กันซ้ำ ไม่ auto-upload (REQ-041); ประวัติ Guest local เลือกย้ายได้ ต้องตรวจใหม่ Arm รอครู ไม่ถือ Guest เป็นตัวตนนักเรียน (REQ-042)
 - ทีมร่างเนื้อหา/ภารกิจ/เกณฑ์ครบสามโหมด ให้ผู้ใช้หรือผู้ที่ผู้ใช้ระบุอนุมัติ; ยังไม่มี inventory/criteria/rubric ที่อนุมัติจริง (REQ-037..039)
 - License บังคับ Guest/Login: ครั้งแรกออนไลน์ lease 3 วัน หนึ่ง Key/เครื่อง ผู้ดูแลย้ายทันที สิทธิ์เดิมคงถึงกำหนด (REQ-009/034/035)
-- API รวม Login อยู่ school-bot/web ใช้บัญชี/4 DB เดิม; ตาราง SchoolBot อยู่ DB แยกตาม decisions-027 ไม่สร้าง SchoolBotUser ใช้ PK/FK int4/ฟิลด์มาตรฐาน (REQ-033/036)
+- บริการ SchoolBot (B) อยู่ใน school-bot/web ใช้บัญชี/4 DB เดิม; ตาราง SchoolBot อยู่ DB แยกตาม decisions-027 ไม่สร้าง SchoolBotUser ใช้ PK/FK int4/ฟิลด์มาตรฐาน (REQ-033/036). เส้นทางปัจจุบันใช้ client→HTTP G→gRPC B ตาม [Gateway Rev3](../design/gateway-integration-001.md)/[DES-012 Rev9](../design/des-012.md); browser ผ่าน same-origin BFF และ HTTP Login เดิมของ G แยกจาก service transport B.
 - OS: Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon ทั้งคู่ต้องใช้หุ่นจริง (decisions-019; REQ-031/032)
 
 รวม 44 REQ / 180 AC ตาม [index](index.md); คง release ระบบเต็มและรหัสเดิม
@@ -57,12 +57,13 @@ School Bot มี 3 โหมด Block / Arm / Code สำหรับนัก�
 
 - หลักฐานมาจากการอ่านไฟล์ที่ BA ตรวจอ่าน ไม่ได้รันแอป tests, build, API, installer หรือ hardware
 - มติธุรกิจที่ตอบแล้วใช้ตามแหล่งยืนยัน; AC ยังเป็นเกณฑ์เสนอ ไม่ใช่ผล QA หรือการรับความเสี่ยง
+- งานนี้ docs-only ไม่เริ่ม implementation. ตาม Gateway Rev3 HTTP logout ที่มีแล้วและผล local4032tests ไม่ยืนยัน Gateway/gRPC/DB integration; full Login ยังไม่พร้อม และ H5/Light/runtime gates ยังค้าง.
 - เป้าหมาย OS เป็นมติ ไม่ใช่ compatibility proof; รุ่นหุ่น/firmware/ผู้รับรอง/หลักฐานจริงยังรอทีมเสนอ (decisions-016/019; OQ-008/011)
 - ตำแหน่งภาพเคลื่อนไหวหลังส่งคำสั่งเป็นการคาดการณ์ ไม่ใช่ค่าที่วัดจากหุ่น
 - OS write สำเร็จไม่ยืนยันว่าหุ่นเคลื่อนที่จบ หยุดจริง หรือเก็บชุดท่าถูกต้อง
 - การ cancel process ไม่หยุดชุดท่าที่บอร์ดกำลังเล่น ต้องขอ stop แยก และการสื่อสารขาดอาจส่งไม่ถึง
 - HOME/BOX/POSE0 ยังไม่มี calibrated preset สำหรับ native; native pause/resume และ firmware upgrade ไม่อยู่ในความสามารถปัจจุบัน
-- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป้าหมายให้ API ทั้งหมดอยู่ `school-bot/web` และใช้ User/4 DB เดิมตาม [มติ DB](decisions-011.md)
+- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป็นหลักฐานฐานเดิม ไม่กำหนด public exposure ของ B. Transport ปัจจุบันอ่าน Gateway Rev3/DES-012 Rev9; ไม่มี HTTP relay หรือ direct public B.
 - เป้าหมาย License: ครั้งแรกออนไลน์ แล้วใช้สิทธิ์ในเครื่อง 3 วันตาม [มติ](decisions-005.md); โค้ดเดิมยังไม่บังคับ
 - ไม่มี update download/install, signature verification หรือ rollback
 - เอกสารระบุ Windows installer ยังไม่ลงนาม และ macOS ยังต้อง Developer ID/notarization
@@ -88,9 +89,11 @@ Windows 10 ออกจาก target ตามคำสั่งผู้ใช�
 
 ดู [Source References](source-references.md), decisions-014/015/016/019; OQ-007 ตอบนโยบายธุรกิจครบ ส่วน storage/migration contract ส่ง SA; OQ-008/009/011 และ gates ยังรอหลักฐานจริง
 
-ให้ gm reconcile แผน/JSON 74 งานกับ REQ/AC ปัจจุบัน ไม่เปลี่ยนสถานะงานจากมติธุรกิจอย่างเดียว
+สถานะแผนปัจจุบันใช้ 110 งาน/8 phases/17 gates ใน Constraints; งานเอกสารนี้ไม่เปลี่ยนสถานะงานหรือผลตรวจรับ
 
 ## Change Log
+
+- 2026-10-24 — ใบงาน053: ปรับ current transport/readiness และตัดคำสั่งอ้างแผน74งานที่ล้าสมัย; คง business scope และประวัติเดิม
 
 - 2026-10-23 — นายช่างบันทึกสถานะแผนจาก output gm ที่ตรวจรับแล้วเป็น 110 งาน/180 AC; ไม่เปลี่ยนนโยบายหรือสถานะตรวจรับ requirement
 

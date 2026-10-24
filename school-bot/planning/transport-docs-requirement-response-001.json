@@ -1,0 +1,161 @@
+{
+  "state": "DONE",
+  "summary": "ตรวจเอกสารครบ 44 REQ/180 AC และ 12 OQ แบบ read-only พบจุดชี้สถานะปัจจุบันที่ควรปรับ 3 ไฟล์ ไม่พบข้อกำหนดธุรกิจขัด baseline; ส่งข้อเสนอ exact replacement โดยยังไม่ได้เขียนไฟล์",
+  "coverage": [
+    {
+      "paths": [
+        "requirement/index.md",
+        "requirement/scope.md",
+        "requirement/source-references.md"
+      ],
+      "action": "amend",
+      "reason": "เพิ่ม precedence ของ Gateway Rev3/DES-012 Rev8 ระบุ HTTP client boundary และแก้ข้อความสถานะปัจจุบันที่ล้าสมัย โดยคงหลักฐานเดิม"
+    },
+    {
+      "paths": [
+        "requirement/req-011.md",
+        "requirement/req-013.md",
+        "requirement/req-027.md",
+        "requirement/req-028.md",
+        "requirement/req-029.md",
+        "requirement/req-030.md",
+        "requirement/req-034.md",
+        "requirement/req-035.md",
+        "requirement/req-036.md",
+        "requirement/req-037.md",
+        "requirement/req-038.md",
+        "requirement/req-039.md",
+        "requirement/req-041.md",
+        "requirement/req-042.md",
+        "requirement/req-043.md",
+        "requirement/req-044.md",
+        "requirement/req-045.md",
+        "requirement/req-046.md",
+        "requirement/req-047.md",
+        "requirement/req-048.md",
+        "requirement/req-049.md",
+        "requirement/req-050.md",
+        "requirement/req-051.md",
+        "requirement/req-052.md"
+      ],
+      "action": "consistent",
+      "reason": "กำหนดพฤติกรรมธุรกิจโดยไม่บังคับ B HTTP; REQ-027 มี HTTP paths/status จึงระบุการอ่านเป็น client boundary ที่ G ผ่าน precedence กลางใน requirement/index.md ไม่เติมซ้ำรายไฟล์"
+    },
+    {
+      "paths": [
+        "requirement/req-009.md",
+        "requirement/req-010.md",
+        "requirement/req-012.md",
+        "requirement/req-014.md",
+        "requirement/req-015.md",
+        "requirement/req-016.md",
+        "requirement/req-017.md",
+        "requirement/req-018.md",
+        "requirement/req-019.md",
+        "requirement/req-020.md",
+        "requirement/req-021.md",
+        "requirement/req-022.md",
+        "requirement/req-023.md",
+        "requirement/req-024.md",
+        "requirement/req-025.md",
+        "requirement/req-026.md",
+        "requirement/req-031.md",
+        "requirement/req-032.md",
+        "requirement/req-033.md",
+        "requirement/req-040.md"
+      ],
+      "action": "unrelated",
+      "reason": "เกณฑ์ local/UI/engine/hardware/installer/data ไม่กำหนด service transport; native transport ของหุ่นไม่ใช่เส้น G→B"
+    },
+    {
+      "paths": [
+        "open-questions/index.md",
+        "open-questions/oq-006.md",
+        "open-questions/oq-007.md",
+        "open-questions/oq-008.md",
+        "open-questions/oq-009.md",
+        "open-questions/oq-010.md",
+        "open-questions/oq-011.md",
+        "open-questions/oq-012.md",
+        "open-questions/oq-013.md",
+        "open-questions/oq-014.md",
+        "open-questions/oq-015.md",
+        "open-questions/oq-016.md",
+        "open-questions/oq-017.md"
+      ],
+      "action": "consistent",
+      "reason": "ไม่มีคำถามธุรกิจค้างเรื่องเลือก transport; คง 3 PARTIAL/9 CLOSED และคำตอบเดิม ไม่สร้าง OQ หรือเปลี่ยนสถานะ"
+    },
+    {
+      "paths": [
+        "requirement/scope-history-20261023-011.md",
+        "requirement/scope-baseline-001.md",
+        "open-questions/history-001.md"
+      ],
+      "action": "historical_preserve",
+      "reason": "เป็นประวัติและหลักฐานช่วงตรวจเดิม คง verbatim รวมข้อความ API/ข้อจำกัดเก่า"
+    },
+    {
+      "paths": [
+        "index.md",
+        "design/index.md",
+        "design/gateway-integration-001.md",
+        "design/des-012.md"
+      ],
+      "action": "consistent",
+      "reason": "จุดอ่านปัจจุบันชี้ Gateway Rev3/DES-012 Rev8 แล้ว; แยก HTTP logout/local tests จาก Gateway/gRPC integration ชัดเจน ไม่แก้ไฟล์นอกสิทธิ์ spec"
+    }
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/requirement/index.md",
+      "old": "- สถานะ REQ เก็บในตารางนี้เท่านั้น",
+      "new": "- สถานะ REQ เก็บในตารางนี้เท่านั้น\n\nลำดับอ้างอิง transport ปัจจุบัน: [Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev8](../design/des-012.md) มี precedence เหนือถ้อยคำเส้นทาง API เดิมในหมวดนี้: client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B. HTTP paths/status ใน BR/AC ของ REQ-027 รวม AC-027-01/02 เป็นเกณฑ์ที่ client boundary ของ G ไม่บังคับ B expose HTTP และไม่ยืนยันว่ามี RPC mapping แล้ว; HTTP Login เดิมของ G แยกจาก service transport B."
+    },
+    {
+      "path": "knowledge/school-bot/requirement/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n\n- 2026-10-24 — ใบงาน053: ชี้ precedence transport และ HTTP client boundary; คง44REQ/180AC/DRAFT ไม่เปลี่ยนผลตรวจรับ"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/scope.md",
+      "old": "- API รวม Login อยู่ school-bot/web ใช้บัญชี/4 DB เดิม; ตาราง SchoolBot อยู่ DB แยกตาม decisions-027 ไม่สร้าง SchoolBotUser ใช้ PK/FK int4/ฟิลด์มาตรฐาน (REQ-033/036)",
+      "new": "- บริการ SchoolBot (B) อยู่ใน school-bot/web ใช้บัญชี/4 DB เดิม; ตาราง SchoolBot อยู่ DB แยกตาม decisions-027 ไม่สร้าง SchoolBotUser ใช้ PK/FK int4/ฟิลด์มาตรฐาน (REQ-033/036). เส้นทางปัจจุบันใช้ client→HTTP G→gRPC B ตาม [Gateway Rev3](../design/gateway-integration-001.md)/[DES-012 Rev8](../design/des-012.md); browser ผ่าน same-origin BFF และ HTTP Login เดิมของ G แยกจาก service transport B."
+    },
+    {
+      "path": "knowledge/school-bot/requirement/scope.md",
+      "old": "- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป้าหมายให้ API ทั้งหมดอยู่ `school-bot/web` และใช้ User/4 DB เดิมตาม [มติ DB](decisions-011.md)",
+      "new": "- API ของ SchoolBot ต้นทางใช้ Memory Store และยังไม่เชื่อม user/RBAC; เป็นหลักฐานฐานเดิม ไม่กำหนด public exposure ของ B. Transport ปัจจุบันอ่าน Gateway Rev3/DES-012 Rev8; ไม่มี HTTP relay หรือ direct public B."
+    },
+    {
+      "path": "knowledge/school-bot/requirement/scope.md",
+      "old": "- มติธุรกิจที่ตอบแล้วใช้ตามแหล่งยืนยัน; AC ยังเป็นเกณฑ์เสนอ ไม่ใช่ผล QA หรือการรับความเสี่ยง",
+      "new": "- มติธุรกิจที่ตอบแล้วใช้ตามแหล่งยืนยัน; AC ยังเป็นเกณฑ์เสนอ ไม่ใช่ผล QA หรือการรับความเสี่ยง\n- งานนี้ docs-only ไม่เริ่ม implementation. ตาม Gateway Rev3 HTTP logout ที่มีแล้วและผล local4032tests ไม่ยืนยัน Gateway/gRPC/DB integration; full Login ยังไม่พร้อม และ H5/Light/runtime gates ยังค้าง."
+    },
+    {
+      "path": "knowledge/school-bot/requirement/scope.md",
+      "old": "ให้ gm reconcile แผน/JSON 74 งานกับ REQ/AC ปัจจุบัน ไม่เปลี่ยนสถานะงานจากมติธุรกิจอย่างเดียว",
+      "new": "สถานะแผนปัจจุบันใช้ 110 งาน/8 phases/17 gates ใน Constraints; งานเอกสารนี้ไม่เปลี่ยนสถานะงานหรือผลตรวจรับ"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/scope.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n\n- 2026-10-24 — ใบงาน053: ปรับ current transport/readiness และตัดคำสั่งอ้างแผน74งานที่ล้าสมัย; คง business scope และประวัติเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/requirement/source-references.md",
+      "old": "## Change Log",
+      "new": "## อ้างอิง transport ปัจจุบัน\n\n[Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev8](../design/des-012.md) มี precedence เฉพาะ transport เหนือข้อความ API เดิม: client→HTTP G→gRPC B. รายการ source และมติข้างต้นคงตามช่วงตรวจเดิม ไม่ใช่หลักฐานว่า integration พร้อม.\n\n## Change Log\n\n- 2026-10-24 — ใบงาน053: เพิ่มจุดอ่าน transport ปัจจุบัน โดยคง source evidence และมติเดิม verbatim"
+    }
+  ],
+  "invariants": [
+    "ตรวจนับจากเอกสารได้ 44 REQ/180 AC; ไม่เพิ่ม AC ไม่เปลี่ยน ID/status/BR หรือ business scope",
+    "ไม่ได้เขียน knowledge/source ไม่เรียก role อื่น ไม่ทำ git mutation/tests/SQL/network",
+    "คง scope-history/source evidence/decisions/raw outputs และ Change Log เดิม verbatim; รายการใหม่ใช้วันที่2026-10-24",
+    "cType category/035 และบริการ B เดียวผ่าน G ตอบแล้ว ไม่เปิดถามซ้ำ",
+    "คง C/opaque session/Channel/License/สิทธิ์เดิม ไม่อ้าง acceptance ผ่านหรือ full Login พร้อม",
+    "ยังไม่ระบุ RPC/proto/auth-tenant metadata/error mapping หรืออ้างว่ามี implementation; เป็นงานเทคนิคของ arch ตาม baseline เดิม",
+    "edits เป็นข้อเสนอให้ผู้คุม archive ก่อน apply; REQ รายไฟล์และ OQ คงเดิม"
+  ],
+  "handoff": "โหมดตรวจเอกสารแบบ read-only เสร็จแล้ว ส่งนายช่างพิจารณา exact replacements 8 จุดใน 3 ไฟล์และ archive ก่อน apply; ไม่มีคำถามมนุษย์หรือ business choice ใหม่ งานสัญญา gRPC/HTTP mapping/trust boundary ส่ง arch ตามข้อค้างเดิม"
+}
