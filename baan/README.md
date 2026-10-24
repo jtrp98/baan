@@ -89,7 +89,7 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
 
 session นั้นจะกลายเป็นสมอง — รับ goal แตกงาน สั่ง `baan-role` เปิด session ของแต่ละ role ตาม tier ที่กำหนด ส่งต่อ context ระหว่าง role และรวบรวมประตูมนุษย์มาถามคุณตอนจบ
 
-**โหมด solo** — สั่งเพิ่มใน prompt ว่า "solo" / "ทำเอง" ให้ session ที่สวม นายช่าง **เป็นทั้ง นายช่าง และทีมทั้งทีม**: แตก role เป็น subagent/งานเบื้องหลังของ session เอง (1 role ต่อตัว แนบไฟล์ role + CONVENTIONS ครบ จบด้วย output state) — เหมาะกับแอปที่ไม่มี CLI ให้ baan-role เรียก (เช่น ZCode) หรือกรณีอยากประหยัดโควตา runner · ยังส่ง `baan-role` เฉพาะ: งานตรวจ/รีวิวชิ้นที่ตัวเองเขียน และงาน tier t0/t1 · บันทึกใน knowledge ว่าใครรันจริง — รายละเอียดอยู่ใน `BAAN.md`
+**โหมด solo** — สั่งเพิ่มใน prompt ว่า "solo" / "ทำเอง" ให้ session ที่สวม นายช่าง **เป็นทั้ง นายช่าง และทีมทั้งทีม**: แตก role เป็น subagent/งานเบื้องหลังของ session เอง (1 role ต่อตัว แนบไฟล์ role + CONVENTIONS ครบ จบด้วย output state) — เหมาะกับแอปที่ไม่มี CLI ให้ baan-role เรียก (เช่น ZCode) หรือกรณีอยากประหยัดโควตา runner · งาน `check`/`jpo` ของงานที่ solo เขียนเองใช้ subagent ได้ ถ้าเป็นตัวใหม่ + ตรวจจาก AC/spec เท่านั้น (ไม่แนบคำอ้างผู้เขียน) + ตรวจจริงด้วยหลักฐาน — ข้ามโมเดลผ่าน `baan-role` เหลือเป็นทางเลือกสำหรับงานวิกฤตก่อน production/security สำคัญ/FAIL ซ้ำรอบ · ส่ง `baan-role` บังคับเฉพาะงาน tier t0/t1 และงานที่เกินกำลัง session · บันทึกใน knowledge ว่าใครรันจริง — รายละเอียดอยู่ใน `BAAN.md`
 
 ## มาตรฐานเอกสารข้อมูล
 
@@ -302,6 +302,8 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
 
 ## Change Log
+
+- 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: subagent ตรวจได้แบบมีเงื่อนไขความเป็นอิสระ (ตัวใหม่ + AC/spec เท่านั้น + หลักฐานจริง) ข้ามโมเดลเหลือเป็น escalation สำหรับงานวิกฤต/security/FAIL ซ้ำ
 
 - 2026-10-24 — ขยายโหมด solo: session ที่สวม นายช่าง แตก role เป็น subagent/งานเบื้องหลังของตัวเองได้ (ใช้กับแอปไม่มี CLI เช่น ZCode) — runner ภายนอกเหลือเฉพาะงานตรวจของตัวเอง/tier t0/t1
 

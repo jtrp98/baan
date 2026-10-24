@@ -71,7 +71,8 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
 - **แตก role เป็น subagent/งานเบื้องหลัง — 1 role ต่อตัว** — ส่ง prompt ที่ (1) เปิดด้วยป้าย `[baan-role: <ID>]` (2) แนบเนื้อหาเต็ม `roles/<ID>.md` + `CONVENTIONS.md` (3) ใส่ task + context จาก role ก่อนหน้า แล้วกำหนดให้จบด้วย handoff + **output state เดียว** ตามสัญญา — subagent ถือขอบเขตอ่าน/เขียนของ role นั้นจริงๆ (รวม engineer ห้ามเขียน `knowledge\` — เอกสาร knowledge ยังเป็นของคุณในฐานะผู้คุม)
 - **งานเล็กที่ไม่คุ้แตก subagent คุณทำเองได้ตรงๆ** — แต่ต้องสวมบท role ครบก่อน (อ่านไฟล์ role + CONVENTIONS) และจบด้วย output state เหมือนกัน
 - **ขนานตามกติกาเดิม** — งานอิสระ/เขียนคนละ path เปิดหลาย subagent พร้อมกัน · งานที่เขียน repo เดียวกัน serialize
-- **ยังต้องส่งต่อ runner ภายนอกผ่าน `baan-role` เมื่อ**: (1) งานตรวจ/รีวิวชิ้นที่ solo เขียนเอง (`check`/`jpo`) — ให้ค่ายอื่นตรวจข้ามโมเดล กันผู้เขียนตรวจของตัวเอง (2) งาน tier **t0/t1** ที่ tier ladder จัด model ใหญ่กว่าให้ (3) งานที่เกิน context/ความสามารถของ session นี้ — สั่งด้วย `--tier` อย่างเดียว ระบบสลับ fallback ให้เอง อย่าเลือกตัวรันแทน tier
+- **งานตรวจ (`check`/`jpo`) ของงานที่ solo เขียนเอง — ใช้ subagent ได้ ถ้ารักษาความเป็นอิสระจริง**: (1) checker เป็น **subagent ใหม่** เสมอ ห้ามต่อ context ตัวที่เขียนงาน (2) prompt ของ checker ประกอบจาก **AC/spec + path ของ artifact เท่านั้น** — ห้ามแนบสรุป/คำอ้างของผู้เขียน (กัน นายช่าง ซึ่งเพิ่งรับ output ของ writer ไปปนเปื้อนมุมมองของผู้เขียนเข้างานตรวจ) (3) ตรวจจริงตาม role ด้วยหลักฐาน (รัน/อ่าน/เทียบ) ไม่ใช่อ่านผ่านๆ · **ส่งข้ามโมเดลผ่าน `baan-role` เป็นทางเลือก/escalation** สำหรับ: งานวิกฤตก่อน production · security finding สำคัญ · task ที่ FAIL ซ้ำรอบ — ประตูมนุษย์เดิม (Critical / พ้นรอบที่ 3) ยังบังคับเหมือนเดิม
+- **ยังต้องส่งต่อ runner ภายนอกผ่าน `baan-role` เมื่อ**: (1) งาน tier **t0/t1** ที่ tier ladder จัด model ใหญ่กว่าให้ (2) งานที่เกิน context/ความสามารถของ session นี้ — สั่งด้วย `--tier` อย่างเดียว ระบบสลับ fallback ให้เอง อย่าเลือกตัวรันแทน tier
 - **บันทึกตรงไปตรงมาว่าใครรันจริง** — "รันโดย นายช่าง solo (subagent role X)" / "solo ตรง" / runner ภายนอกตัวไหน — ไม่อ้างสลับกัน
 - กติกาอื่นทั้งหมดยังบังคับเท่าเดิม: ประตูมนุษย์ · `vault` ห้ามรัน SQL · append-only + change log · Git ของ source เป็นของผู้ใช้ (คำสั่ง solo ที่แตะ source = ผู้ใช้อนุญาตแก้ไฟล์นั้นๆ แล้วโดยคำสั่ง)
 
@@ -155,6 +156,8 @@ config ของ workspace (knowledge_roots + targets + defaults) เก็บ�
 ตัวอย่างรูปแบบ: `baan.example.json` ใน package · ดูค่าปัจจุบันด้วย `baan --list`
 
 ## Change Log
+
+- 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: ใช้ subagent ได้เมื่อรักษาความเป็นอิสระจริง (subagent ใหม่ + prompt จาก AC/spec เท่านั้น + ตรวจด้วยหลักฐาน) — ข้ามโมเดลเหลือเป็นทางเลือก/escalation สำหรับงานวิกฤตก่อน production, security finding สำคัญ, FAIL ซ้ำรอบ (เดิมบังคับทุกงาน) เพราะ subagent แยก context จริงและงานตรวจส่วนใหญ่เป็น evidence-based
 
 - 2026-10-24 — ขยายโหมด solo เป็น "ทีมทั้งทีมรันใน session เดียว": แตก role เป็น subagent/งานเบื้องหลังของ session เอง (แอปไม่มี CLI เช่น ZCode ก็ทำงานได้ครบ) — runner ภายนอกเหลือเฉพาะงานตรวจของตัวเอง, tier t0/t1 และงานที่เกินกำลัง session
 
