@@ -21,3 +21,7 @@
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน060 (solo round): แตก 060a ผ่าน baan-role (codex t1), 060b/060c เป็น subagent พื้นหลัง; ผลจะ append ด้านล่างเมื่อรับแล้ว
+- 2026-10-24 — รับ 060b (subagent role spec): NEEDS_HUMAN ตามออกแบบ — packs 4 ชุดครบ (pack-guest/content-inventory/hardware/delivery ครอบ GAP-05/09) บันทึกใน requirement\ + index; คำถามรอคน Q1–Q6 (ผู้อนุมัติเนื้อหา/รุ่นหุ่น/สิทธิ์สั่งหุ่น/ผู้ถือ cert/เกณฑ์ performance)
+- 2026-10-24 — รับ 060c (subagent role vault): DONE — review-007 (SEC001-009 ไม่แก้ DDL, PASS static), pii-inventory-001 (SEC001-010 + flag F1–F7 ส่ง jpo), db-safe-evidence-001 (EV-01..06), BL-001 ส่วน vault แนบท้าย review-005; บันทึกใน db\ + index
+- 2026-10-24 — รับ 060a (runner ภายนอก codex t1 ผ่าน baan-role): NEEDS_HUMAN เฉพาะ GAP-07 — งานครบ 11/11: DES-002 Rev3/003 Rev4/004 Rev11/005 Rev7/006 Rev2/007 Rev3, rules Rev8, schema-notes Rev5 + ไฟล์ใหม่ license-admin-security/project-api/guest-workspace/teacher-authority/robot-boundary/release-trust/update-disposition/credential-matrix/signing-custody/export-proof-pack + gap-sync-review/evidence/validation + archive 10 ไฟล์พร้อม SHA256; คง 110 pending/SQL/DBML เดิม; คำถามคน: GAP-07 คง Prepare/Install พร้อม spec ร่าง AC หรือเลือก check-only ([update-disposition-001](../design/update-disposition-001.md))
+- 2026-10-24 — รับ 060d (subagent role int): NEEDS_HUMAN ตามออกแบบ (รอเซ็น) — สร้างหมวด uxui: int-001-entry (UX-001) + int-002-labs (UX-003) + index; จุดรอเซ็น Q1–Q13 รวบไว้ที่ uxui/index
