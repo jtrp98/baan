@@ -1,4 +1,4 @@
-# ความเสี่ยงและประตูตัดสิน — Rev4
+# ความเสี่ยงและประตูตัดสิน — Rev5
 
 decisions-012 ยืนยัน PK SchoolBot ใหม่เป็น int4 และ FK ชนิดเดียวกันแล้ว ไม่ถามซ้ำ; ไม่ใช่อนุมัติ schema/placement/credential compatibility ที่เหลือ
 
@@ -6,7 +6,7 @@ decisions-012 ยืนยัน PK SchoolBot ใหม่เป็น int4 แ�
 
 | Task / Reference | สิ่งที่ต้องยืนยัน / เหตุผล |
 |---|---|
-| Identity — DES-004, decisions-010/011 | ตำแหน่ง API/Login ยุติแล้ว: web; ต้องตรวจ password compatibility, account↔profile, active/role/scope rules เพื่อ implementation ไม่ใช่รอเลือก API/provider |
+| Identity — DES-004, decisions-010/011 | B เป็นเจ้าของ session/directory/authorization; reuse Login HTTP เดิมของ G. G→B ใช้ gRPC; RPC/trusted tenant/opaque-session mapping และ account↔profile/active/role ยังต้องพิสูจน์ ไม่เลือก transport/provider ใหม่หรือสร้าง verifier ซ้ำ |
 | Guest — DES-003/005 | นโยบายตอบแล้ว; ตาม032 ห้ามนำเข้าผลครู Cloud แต่เก็บโครงงานได้ ตรวจ implementation ต่อ |
 | Learning — DES-005, OQ-009 | ทีมเตรียมเนื้อหา/numeric rubric ให้ผู้ใช้ตรวจตาม015/016; สูตรรวมตอบแล้วตาม034 ไม่กำหนดเกณฑ์ภารกิจแทน |
 | Hardware — DES-006, OQ-008 | รุ่น board/robot, calibration, stop limits และผู้รับรองคือใคร? ไม่ใช้ checkbox หรือ write success แทนผลจริง |
@@ -62,6 +62,7 @@ Rev3 เปลี่ยนแบบ UUID table keys เป็น K ไม่ใ�
 OQ-014/016/ทาง A ตอบครบตาม032..034; ใช้ [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) คง H5 และ G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB งานเนื้อหา/hardware/ส่งมอบรอทีมเตรียมหลักฐาน ไม่ถามนโยบายเดิม
 
 ## Change Log
+- 2026-10-24 — Rev5: แยก transport ที่ยุติแล้วจาก technical gaps; ไม่เปิด gate ใหม่
 - 2026-10-23 — Rev4: syncมติ แยก technical proof
 - 2026-10-21 — Rev3: PK int4 ยืนยันแล้ว; schema/placement/compatibility อื่นยังรอ
 - 2026-10-21 — Rev2: ปิด API location; คง compatibility/schema review

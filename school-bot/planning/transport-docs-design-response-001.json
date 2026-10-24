@@ -1,0 +1,527 @@
+{
+  "state": "DONE",
+  "summary": "ตรวจ inventory 651 Markdown ใน K และเอกสาร B 8 ไฟล์ พร้อม matched lines ตามขอบเขต พบ operative text ที่ยังชี้ direct B/HTTP relay และ revision ไม่ตรงกัน คืน 65 amendments ใน 17 ไฟล์; ตรวจ anchor หลัง normalize CRLF แล้วพบอย่างละหนึ่งจุด ผู้คุมต้อง archive ก่อน apply. As-built อ้างหลักฐาน049: Program.cs:45–48,94 และ LogoutEndpoint.cs:9,22 ยังเป็น HTTP; ไม่ตรวจ source เพิ่ม ไม่เขียนไฟล์ ไม่รัน product tests/SQL/runtime/network/commit. คง cType/035/C/opaque session/License/device/schema และ verdict local4032 เดิม",
+  "coverage": [
+    {
+      "paths": [
+        "knowledge/school-bot/design/index.md",
+        "knowledge/school-bot/design/modules.md",
+        "knowledge/school-bot/design/data-contract-rules.md",
+        "knowledge/school-bot/design/data-dictionary/contract-005.md",
+        "knowledge/school-bot/design/des-004.md",
+        "knowledge/school-bot/design/des-012.md",
+        "knowledge/school-bot/design/auth-evidence-001.md",
+        "knowledge/school-bot/design/gateway-login-reuse-001.md",
+        "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+        "knowledge/school-bot/design/risks.md"
+      ],
+      "classification": "amend",
+      "reason": "แก้ข้อความใช้งานจริง/diagram/checklist/HTTP semantics และ sync Rev; ไม่อาศัย index override อย่างเดียว",
+      "owner": "arch"
+    },
+    {
+      "paths": [
+        "target/school-bot/README.md",
+        "target/school-bot/web/README.md",
+        "target/school-bot/app/README.md",
+        "target/school-bot/docs/ARCHITECTURE.md",
+        "target/school-bot/docs/API.md",
+        "target/school-bot/docs/DEPLOYMENT.md",
+        "target/school-bot/docs/INSTALLERS.md"
+      ],
+      "classification": "amend",
+      "reason": "แยก HTTP local/PoC จาก target Gateway→gRPC; คงคำสั่ง dev และ placeholder เดิม ไม่อ้าง integration พร้อม",
+      "owner": "arch"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/design/gateway-integration-001.md",
+        "knowledge/school-bot/design/desktop-login-adapter-001.md",
+        "knowledge/school-bot/design/gateway-outcome-component-001.md"
+      ],
+      "classification": "current_consistent",
+      "reason": "Gateway Rev3 ระบุ target/gaps และติดป้ายส่วน Rev1–2 ว่าประวัติแล้ว; adapter/decoder ใช้ HTTP Login เดิมของ G ไม่ใช่ G→B transport จึงคง Rev3/Rev4/Rev1 ตามลำดับ",
+      "owner": "arch"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/design/des-001.md",
+        "knowledge/school-bot/design/des-002.md",
+        "knowledge/school-bot/design/des-003.md",
+        "knowledge/school-bot/design/des-005.md",
+        "knowledge/school-bot/design/des-006.md",
+        "knowledge/school-bot/design/des-007.md",
+        "knowledge/school-bot/design/des-008.md",
+        "knowledge/school-bot/design/des-009.md",
+        "knowledge/school-bot/design/des-010.md",
+        "knowledge/school-bot/design/des-011.md",
+        "knowledge/school-bot/design/quality-attributes.md"
+      ],
+      "classification": "current_consistent",
+      "reason": "001/006 เป็น host/IPC/hardware; ที่เหลือกำหนด operation, HTTP ฝั่ง client, BFF, artifact HTTPS และเกณฑ์พิสูจน์ ไม่บังคับ G→B เป็น HTTP. อ่าน semantics ร่วมที่แก้แล้ว; device proof canonicalization ยังเป็น design gap ไม่เปลี่ยนเอง",
+      "owner": "arch"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/design/data-*.md ยกเว้น data-contract-rules.md และไฟล์ history/review/evidence",
+        "knowledge/school-bot/design/data-dictionary/*.md ยกเว้น contract-005.md",
+        "knowledge/school-bot/design/schema-notes.md",
+        "knowledge/school-bot/design/dbml-guide-001.md",
+        "knowledge/school-bot/design/learning-rules-032-034.md",
+        "knowledge/school-bot/design/grade-rules-032-034.md"
+      ],
+      "classification": "current_consistent",
+      "reason": "dictionary 32 ตาราง/450 ฟิลด์และภาพ data flow ไม่ใช่ transport diagram; HttpStatus ยังเป็น HTTP replay, Channel ไม่ใช่ protocol. ไม่มี relational model delta จึงไม่แก้ DBML/SQL หรืออ้าง parser pass ใหม่",
+      "owner": "arch"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/index.md",
+        "knowledge/school-bot/requirement/*.md ยกเว้น decisions-*.md และ scope-history-*.md",
+        "knowledge/school-bot/open-questions/*.md ยกเว้น history-*.md",
+        "knowledge/school-bot/qa/index.md",
+        "knowledge/school-bot/planning/auth-flow-handoff-001.md",
+        "knowledge/school-bot/planning/desktop-login-owner-question-001.md"
+      ],
+      "classification": "current_consistent",
+      "reason": "ไม่พบ business REQ/AC/OQ ที่ต้องเปลี่ยนเพราะ transport; current receipt แยก local4032 จาก Gateway/gRPC แล้ว QA index จำกัด local scope ชัดเจน",
+      "owner": "gm/spec/inspect"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/index.md",
+        "knowledge/school-bot/plan/evidence-002.md",
+        "knowledge/school-bot/plan/queue-003.md",
+        "knowledge/school-bot/plan/SA-001.md",
+        "knowledge/school-bot/plan/BE-023.md",
+        "knowledge/school-bot/plan/BE-039.md",
+        "knowledge/school-bot/plan/release-runbook-001.md",
+        "knowledge/school-bot/planning/index.md",
+        "knowledge/school-bot/planning/handoff-002.md",
+        "knowledge/school-bot/planning/gateway-login-receipt-001.md",
+        "knowledge/school-bot/planning/admin-source-receipt-001.md"
+      ],
+      "classification": "owner_handoff",
+      "reason": "current pointers/checklists ยังอ้างรอ task023 หรือ review HTTP relay; ส่ง exact problems ให้ gm ด้านล่าง โดยไม่แก้บันทึกการรันเดิม",
+      "owner": "gm"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/test-plan/index.md",
+        "knowledge/school-bot/test-plan/tp-001.md",
+        "knowledge/school-bot/test-plan/traceability-001.md"
+      ],
+      "classification": "owner_handoff",
+      "reason": "PF-API/PF-WEB ยังไม่แยก topology ของ integration ที่จะตรวจ; ต้องชี้ target/gaps โดยคง cases/AC/actual เดิม",
+      "owner": "inspect"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/**/archive/**",
+        "knowledge/school-bot/design/archive.md",
+        "knowledge/school-bot/requirement/decisions-001..035.md",
+        "knowledge/school-bot/requirement/scope-history-20261023-011.md",
+        "knowledge/school-bot/design/source-review-001..005.md",
+        "knowledge/school-bot/design/amendment-proposal-001..002.md",
+        "knowledge/school-bot/design/data-model-history-001.md",
+        "knowledge/school-bot/design/data-model-review-001.md",
+        "knowledge/school-bot/design/data-evidence-001..002.md",
+        "knowledge/school-bot/design/dbml-review-001..002.md",
+        "knowledge/school-bot/design/hardware-survey-001.md",
+        "knowledge/school-bot/design/os-compatibility-001.md",
+        "knowledge/school-bot/design/windows10-compatibility-001.md",
+        "knowledge/school-bot/open-questions/history-001.md",
+        "knowledge/school-bot/db/*.md",
+        "knowledge/school-bot/qa/round-001.md",
+        "knowledge/school-bot/security.md",
+        "knowledge/school-bot/planning/*.md ที่ไม่ระบุในกลุ่มข้างต้น"
+      ],
+      "classification": "historical_preserve",
+      "reason": "คง bytes ของ archive/decision/source-review/QA/security evidence และใบงาน/ผลรันเดิม; inventory archive เท่านั้น ไม่ dump archive/raw JSON. รายงาน security เดิมไม่ใช่หลักฐาน deployment ใหม่ จึงไม่เปลี่ยน verdict หรือเปิด business gate",
+      "owner": "เจ้าของเดิม"
+    },
+    {
+      "paths": [
+        "knowledge/school-bot/plan/**/*.md ที่ไม่ระบุใน owner_handoff",
+        "knowledge/school-bot/backlog.md",
+        "target/school-bot/docs/CODE-PROTECTION.md"
+      ],
+      "classification": "unrelated",
+      "reason": "งาน/ข้อพบเดิมไม่สั่ง HTTP relay ไป B; HTTPS artifact, native transport และ code protection อยู่นอกการเปลี่ยน service transport",
+      "owner": "gm"
+    }
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/design/modules.md",
+      "old": "# ขอบเขตโมดูล — Rev2",
+      "new": "# ขอบเขตโมดูล — Rev3"
+    },
+    {
+      "path": "knowledge/school-bot/design/modules.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev3: แก้ topology/diagram และ Login reuse ตาม049; คง engine/DB/schema"
+    },
+    {
+      "path": "knowledge/school-bot/design/modules.md",
+      "old": "             └─ HTTPS → API → Application → Domain",
+      "new": "             └─ HTTPS → G → gRPC → B API → Application → Domain"
+    },
+    {
+      "path": "knowledge/school-bot/design/modules.md",
+      "old": "Desktop เรียก HTTPS เท่านั้น ไม่อ่าน 4 DB โดยตรง ไม่พึ่ง Academic Login API/OIDC; ใช้ข้อมูลบัญชีเดิมผ่าน LegacyCredentials/LegacyDirectory ภายใน web ตาม DES-004",
+      "new": "Desktop→HTTPS G→gRPC B; browser→same-origin BFF→HTTP G→gRPC B. B อยู่ใน school-bot/web รับผิดชอบ session/directory/authorization; reuse HTTP Login เดิมของ G ตาม DES-004/012 ไม่สร้าง verifier ซ้ำ. ไม่อ่าน DB จาก client. RPC mapping/trusted JWT tenant กับ opaque session ยัง design pending ตาม [Gateway Rev3](gateway-integration-001.md); ไม่เปลี่ยน engine IPC/local hardware"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "# กฎข้อมูลและ HTTP contract ร่วม — Rev6",
+      "new": "# กฎข้อมูลและ HTTP contract ร่วม — Rev7"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev7: ระบุ HTTP semantics ฝั่ง client G; ไม่เปลี่ยน schema/status/device proof"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "## HTTP contract ร่วม",
+      "new": "## HTTP contract ร่วม\n\nHTTP paths/JSON/status/headers ด้านล่างและใน DES-002..005/007..012 เป็น client-facing semantics ผ่าน G; G→B ใช้ gRPC ตาม [Gateway Rev3](gateway-integration-001.md). ยังไม่มี RPC/metadata/error mapping ที่ยืนยัน; ไม่แปลง HTTP status เป็น gRPC status โดยตรง. คง ETag/If-Match, idempotency และ device proof เดิม; การรักษา canonical method/path/body ข้าม G ต้องออกแบบก่อน implement. Login HTTP เดิมของ G และ local IPC/hardware ไม่เปลี่ยน."
+    },
+    {
+      "path": "knowledge/school-bot/design/data-contract-rules.md",
+      "old": "ต้องแก้ทั้ง proxy/API/host ให้ตรงกัน ไม่ยก limit ของ engine ตาม HTTP.",
+      "new": "ต้องรักษาขอบเขตที่ client/G/B; gRPC message limits และ mapping ยัง design pending ไม่เท่ากับขนาด JSON โดยอัตโนมัติ และไม่ยก limit ของ engine ตาม HTTP."
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/contract-005.md",
+      "old": "# สัญญาอ้างอิง — กฎข้อมูลและ HTTP contract ร่วม",
+      "new": "# สัญญาอ้างอิง — กฎข้อมูลและ HTTP contract ร่วม — Rev1"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/contract-005.md",
+      "old": "ของ DES ทั้งชุด",
+      "new": "ของ DES ทั้งชุด โดย HTTP เป็นฝั่ง client→G; G→B เป็น gRPC ที่ยังรอ mapping. HttpStatus ของ idempotency ยังคงความหมาย HTTP replay เดิม ไม่เปลี่ยนเป็น gRPC status และไม่เปลี่ยน dictionary/DBML/SQL"
+    },
+    {
+      "path": "knowledge/school-bot/design/data-dictionary/contract-005.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev1: ชี้ HTTP semantics ตาม049; คง data contract"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "# DES-004 — Identity และ school authorization — Rev9",
+      "new": "# DES-004 — Identity และ school authorization — Rev10"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev10: แก้ integration seam ให้ตรง Gateway/Login reuse; คง cType/License/device/session"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "Desktop เรียก HTTPS ไม่มี DB access หรือ Academic Login/OIDC dependency.",
+      "new": "Desktop เรียก HTTPS ผ่าน G และ G→B ใช้ gRPC; ไม่มี client DB access หรือ Academic Login/OIDC dependency."
+    },
+    {
+      "path": "knowledge/school-bot/design/des-004.md",
+      "old": "`LegacyCredentials.Verify(school_id,username,password)→AccountId:I`",
+      "new": "รับผล HTTP Login เดิมของ G ผ่าน adapter ตาม [Login reuse](gateway-login-reuse-001.md) และ [Desktop adapter](desktop-login-adapter-001.md); ยังต้องพิสูจน์ trusted completion/canonical AccountId ไม่ตรวจ password/hash ซ้ำใน B"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev8",
+      "new": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev9"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev9: แก้ operative routing เป็น gRPC; คง C/035 และ H5"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "ข้อเท็จจริงว่า gateway ยังไม่มี HTTP forwarder หมายถึง implementation needed ไม่ใช่เหตุปัด topology ผู้ใช้ ไม่เปลี่ยน C, Channel, License, อายุ session หรือสิทธิ์ตาม025/026 แหล่ง is_admin ยังรอคำตอบตาม addendum; ห้ามสร้างสิทธิ์กลุ่มโรงเรียนจาก JWT ที่ส่ง IsAdmin=0",
+      "new": "public service-route ใช้ client→HTTP G→gRPC B; RPC mapping/trust/tenant ยัง design pending. คง C, Channel, License และอายุ session; แหล่ง is_admin ยุติตาม035 ให้ตรวจกลุ่มฝั่ง server และคง superadmin เดิม โดย mapping/implementation ยังต้องพิสูจน์"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "HTTP forwarder ยังต้อง implement ส่วน auth ยังคงทาง C",
+      "new": "G→B ใช้ gRPC; RPC mapping ยัง design pending ส่วน auth ยังคงทาง C"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "ข้อความเดิมว่า HTTP forwarder ต้อง implement ถูกลดเป็น candidate รอ G/Light review ตาม Gateway integration Rev2 ไม่ใช่ข้อสรุป transport.",
+      "new": "มาตรฐาน G→B เป็น gRPC ตาม Gateway Rev3; G/Light review ตรวจ implementation/trust/tenant ไม่ใช่เลือกระหว่าง HTTP relay กับ gRPC."
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "old": "# Gateway Login reuse — Rev3",
+      "new": "# Gateway Login reuse — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev4: แก้คำสั่ง transport ที่ยังอ่านเป็นตัวเลือก; Login HTTP/decoder คงเดิม"
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "old": "ไม่เลือก HTTP relay หรือ gRPC rewrite เอง: [Gateway Rev2](gateway-integration-001.md) ระบุข้อขัดกับ G/AGENTS.md:29,35,37.",
+      "new": "G→B ใช้ gRPC ตาม [Gateway Rev3](gateway-integration-001.md); ไม่ใช้ HTTP relay เป็น service transport. Login HTTP เดิมของ G คงเดิม; RPC/HTTP mapping และ trusted JWT tenant/opaque session ยัง design pending."
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev5",
+      "new": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev6"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev6: แก้ operative review ให้ตรวจ gRPC/trust ไม่เลือก transport ใหม่"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "G/AGENTS.mdกำหนด REST→gRPC และ protected hosting/auth paths; HTTP relay, opaque bearer isolation และ private ingress ต้องมี precise diff/owner reviewก่อนลง G. รอบนี้ไม่เลือก relay/gRPC rewriteและไม่อ้าง Lightอนุมัติ.",
+      "new": "G/AGENTS.mdกำหนด REST→gRPC ซึ่งเป็น transport ที่เลือกแล้ว; RPC/HTTP mapping, trusted JWT tenant กับ opaque bearer, peer authentication และ private ingress ยัง design pending. ต้องมี precise diff/Light review สำหรับ protected hosting/auth paths ก่อนลง G; ไม่อนุมัติ HTTP relay และไม่ rewrite Login HTTP เดิม."
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "# Auth evidence 001 — รับหลักฐาน BE-001 — Rev3",
+      "new": "# Auth evidence 001 — รับหลักฐาน BE-001 — Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev4: แก้ checklist/routing ปัจจุบัน; คงหลักฐาน source และมติ035"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "| Desktop/browser → B |",
+      "new": "| Desktop/browser → HTTP G → gRPC B |"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "| W BFF → B |",
+      "new": "| W BFF → HTTP G → gRPC B |"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "- **W BFF route**: เพิ่ม upstream ใน `src/server/upstream/registry.ts` (**ข้อเสนอ arch ไม่ใช่สัญญา**: ชื่อ env ตาม convention ของ W `<NAME>_API_URL` เก็บ origin เท่านั้น (`W/src/server/upstream/registry.ts:7-18,56-91`) เช่น `SCHOOL_BOT_API_URL` ตาม P3 เจ้าของ W เป็นผู้ตั้งชื่อจริง; ระวังชื่อซ้ำกับ env override ของ Desktop ใน B (SEC001-008) แม้อยู่คนละ process) และ route kebab-case ใต้ `src/app/api/` ที่ส่ง `JabjaiWebKey-*` ต่อเพียง 1 header; token ฝั่ง client เก็บใน memory ตาม DES-012 §6",
+      "new": "- **W BFF route**: ใช้ gateway upstream เดิม (`GATEWAY_API_URL`) พร้อม SchoolBot route mapping; ห้ามชี้ B ตรง. HTTP G→gRPC B ยังรอ RPC mapping/trusted tenant/opaque-session boundary ตาม Gateway Rev3. คง credential filtering, memory token และ Origin/CSRF ตาม DES-012."
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "เส้นทางเครือข่าย W→B และ B→G (internal หรือ public)",
+      "new": "เส้นทาง W/BFF→HTTP G→gRPC B และ B→private G (ห้ามเปิด introspection ผ่าน public service-route)"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "ส่วน is_admin จาก claim เดิมยังห้ามเปลี่ยนเป็นกลุ่มสิทธิ์จนได้คำตอบมนุษย์",
+      "new": "ส่วน is_admin ใช้มติ035 ตรวจกลุ่มฝั่ง server และคง superadmin เดิม; ค้าง mapping/implementation ไม่รอเลือกนโยบายซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "และ `is_admin` จาก claim `IsAdmin`;",
+      "new": "และ `is_admin` จากกลุ่มฝั่ง server/superadmin ตาม035; ไม่ใช้ claim เพียงอย่างเดียว;"
+    },
+    {
+      "path": "knowledge/school-bot/design/auth-evidence-001.md",
+      "old": "คนต้องระบุว่าการคืน is_admin ถูกต้องหรือไม่ (TR-AUTH-02)",
+      "new": "นโยบาย is_admin ยุติตาม035; ค้าง TR-AUTH-02-rest/03 และ implementation proof"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "ฉบับปัจจุบันคือ DES-012 Rev8, Login reuse Rev3 และ review packet Rev5;",
+      "new": "ฉบับปัจจุบันคือ DES-004 Rev10, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev7/contract-005 Rev1;"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "Identity และ school authorization (Rev9)",
+      "new": "Identity และ school authorization (Rev10)"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "Desktop ↔ SchoolBot API (Rev8)",
+      "new": "Desktop ↔ SchoolBot API (Rev9)"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "Invariants/กติกาข้อมูล (Rev6",
+      "new": "Invariants/กติกาข้อมูล (Rev7"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "TR-AUTH-01..07 + legacy รอบ002 (Rev3",
+      "new": "TR-AUTH-01..07 + legacy รอบ002 (Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "โครงสร้างโมดูลและขอบเขตระบบ (Rev2",
+      "new": "โครงสร้างโมดูลและขอบเขตระบบ (Rev3"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| Rev5 — transport ตาม Gateway Rev3;",
+      "new": "| Rev6 — transport ตาม Gateway Rev3;"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev3",
+      "new": "[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev4"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "API ใหม่ใช้ `/v2`, JSON `snake_case`; DB ใช้ชื่อใน data-model ตรงตัว",
+      "new": "API ใหม่ใช้ `/v2`, JSON `snake_case` เป็น client-facing HTTP ผ่าน G; G→B ใช้ gRPC ที่ยังรอ RPC/trust mapping ตาม Gateway Rev3; DB ใช้ชื่อใน data-model ตรงตัว"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049"
+    },
+    {
+      "path": "target/school-bot/README.md",
+      "old": "ระหว่างพัฒนา API รันที่ `http://localhost:8080`; เมื่อ Deploy เปลี่ยนเป็น HTTPS Domain ได้",
+      "new": "ระหว่างพัฒนา API รันที่ `http://localhost:8080` ตามเดิม. เป้าหมายใช้งานจริงคือ Desktop/Web→HTTP Gateway→gRPC SchoolBot โดยเว็บผ่าน same-origin BFF; ไม่เปิด B เป็น public fallback. B ปัจจุบันยังเป็น HTTP; ต้องทำ RPC/HTTP mapping และ trusted tenant/opaque-session boundary ก่อนใช้งานผ่าน Gateway. ตัวอย่าง Build ด้านล่างสาธิตการฝัง URL เท่านั้น ไม่ยืนยันว่า Gateway integration พร้อม"
+    },
+    {
+      "path": "target/school-bot/web/README.md",
+      "old": "| Api | HTTP routing, JSON options, DI, admin auth, rate limiting, error mapping |",
+      "new": "| Api | HTTP routing ปัจจุบัน, JSON options, DI, admin auth, rate limiting, error mapping |\n\nเป้าหมายคือ client→HTTP Gateway→gRPC SchoolBot; browser ผ่าน same-origin BFF. HTTP ที่มีอยู่และคำสั่ง local ด้านล่างไม่ยืนยัน gRPC integration. RPC/HTTP mapping และ trusted JWT tenant กับ opaque session ยังต้องออกแบบ; Login HTTP เดิมของ Gateway และ outcome decoder ไม่เปลี่ยน."
+    },
+    {
+      "path": "target/school-bot/web/README.md",
+      "old": "ไม่ต้องส่ง body, License, `If-Match` หรือ `Idempotency-Key` และไม่เรียก Gateway",
+      "new": "ไม่ต้องส่ง body, License, `If-Match` หรือ `Idempotency-Key`; use case logout ปัจจุบันไม่เรียก Gateway ออกไป. การเปิดรับ HTTP local นี้ยังไม่ใช่เส้น client→Gateway→gRPC SchoolBot"
+    },
+    {
+      "path": "target/school-bot/web/README.md",
+      "old": "**PoC limitation:** Store หายในทุก restart",
+      "new": "**PoC limitation ของ v1 License/Release:** Store หายในทุก restart"
+    },
+    {
+      "path": "target/school-bot/app/README.md",
+      "old": "Run/build commands: ดู `../README.md` ใช้ `../scripts/build-desktop.ps1`",
+      "new": "Run/build commands: ดู `../README.md` ใช้ `../scripts/build-desktop.ps1`\n\nHost ยังใช้ HTTP API สำหรับ local development. เป้าหมาย online คือ Host→HTTPS Gateway→gRPC SchoolBot ซึ่งยังรอ integration; frontend คงผ่าน core/client.ts และ host ไม่รับหน้าที่เป็น gRPC client. Engine JSON Lines, local storage และ hardware transport คงเดิม ดู `../docs/DEPLOYMENT.md`."
+    },
+    {
+      "path": "target/school-bot/docs/ARCHITECTURE.md",
+      "old": "  ├── HTTPS API client ──→ C# Api → Application → Domain",
+      "new": "  ├── HTTP API client (local PoC) → C# Api → Application → Domain"
+    },
+    {
+      "path": "target/school-bot/docs/ARCHITECTURE.md",
+      "old": "The API runs on localhost during development and on an HTTPS domain after deployment.",
+      "new": "API ปัจจุบันใช้ HTTP บน localhost สำหรับพัฒนา. เป้าหมาย online คือ Desktop/Web→HTTP Gateway→gRPC SchoolBot→Application→Domain; browser ผ่าน same-origin BFF. ยังไม่มี gRPC integration ที่พร้อมใช้; ต้องกำหนด RPC/HTTP mapping, trusted JWT tenant และ opaque-session boundary ก่อน. Login HTTP เดิมของ Gateway/decoder และ engine JSON Lines/local hardware คงเดิม ไม่เปิด direct public SchoolBot fallback."
+    },
+    {
+      "path": "target/school-bot/docs/API.md",
+      "old": "Desktop ใช้ `http://localhost:8080` ระหว่างพัฒนา และเรียก HTTPS Domain เมื่อ Deploy",
+      "new": "Desktop ใช้ `http://localhost:8080` ระหว่างพัฒนา. ตาราง v1 ด้านล่างเป็น HTTP as-built ของ PoC ไม่ใช่ Gateway route หรือ RPC mapping. เป้าหมาย online คือ client→HTTP Gateway→gRPC SchoolBot; browser ผ่าน same-origin BFF. Mapping/auth/tenant ยังต้องออกแบบ ไม่เปิด B เป็น public fallback. Logout HTTP v2 และข้อจำกัดอยู่ใน `../web/README.md`"
+    },
+    {
+      "path": "target/school-bot/docs/DEPLOYMENT.md",
+      "old": "## Build แจกทีมเมื่อมี Domain",
+      "new": "## Build เมื่อ Gateway integration พร้อม"
+    },
+    {
+      "path": "target/school-bot/docs/DEPLOYMENT.md",
+      "old": "ตั้ง public URL ก่อน Build เพื่อให้ executable บน Windows และ `.app` บน Mac มี endpoint มาในตัว",
+      "new": "เป้าหมายคือ Desktop/Web→HTTP Gateway→gRPC SchoolBot; browser ผ่าน same-origin BFF. B ปัจจุบันยังเป็น HTTP ไม่มี Gateway/gRPC integration ที่พร้อมใช้. ต้องกำหนด RPC/HTTP mapping, trusted JWT tenant กับ opaque session และ private exposure ก่อนเปิดใช้งานจริง โดยคง Login HTTP เดิมของ Gateway.\n\nเมื่อ integration พร้อม ให้ตั้ง public Gateway URL ที่ยืนยันแล้วก่อน Build เพื่อให้ executable บน Windows และ `.app` บน Mac มี endpoint มาในตัว"
+    },
+    {
+      "path": "target/school-bot/docs/DEPLOYMENT.md",
+      "old": "URL สามารถมี prefix เช่น `https://api.example.com/school-bot` ได้ ถ้า Reverse Proxy ส่ง path ที่เหลือไป API",
+      "new": "Host รองรับ URL prefix แต่ต้องใช้ Gateway route ที่ยืนยันและทดสอบ mapping แล้ว; การตัด prefix แล้ว HTTP proxy ไป B ไม่ใช่ service transport เป้าหมาย. Domain ตัวอย่างข้างบนไม่ใช่ค่าที่ deploy แล้ว"
+    },
+    {
+      "path": "target/school-bot/docs/DEPLOYMENT.md",
+      "old": "## C# API บน Server",
+      "new": "## HTTP hosting ปัจจุบันสำหรับ local/PoC\n\nคำสั่ง publish และค่า bind ด้านล่างเป็น HTTP as-built ไม่ใช่ขั้น deploy gRPC. การตั้ง trusted proxy/TLS จริงยังต้องผ่าน review และ integration proof; ห้ามใช้ส่วนนี้เปิด B เป็น public fallback."
+    },
+    {
+      "path": "target/school-bot/docs/DEPLOYMENT.md",
+      "old": "ให้ Proxy รับ HTTPS ที่ Domain และส่งต่อไป API; Desktop เรียก HTTPS URL โดยตรง ไม่พึ่ง redirect\nเมื่อใช้ container/hosting อื่น ให้ตั้ง bind address ตามระบบ Hosting นั้น\nตรวจ `GET /healthz` ผ่าน Domain แล้วจึง Build Desktop ด้วย URL นั้น",
+      "new": "เป้าหมาย production ให้ client ติดต่อ HTTP Gateway และ Gateway ติดต่อ B ด้วย gRPC; host/port/health exposure ยังต้องระบุจาก deployment จริง. `GET /healthz` ของ HTTP local ไม่ยืนยัน readiness ของ Gateway/gRPC และไม่ใช่เงื่อนไขเพียงพอสำหรับแจก Desktop"
+    },
+    {
+      "path": "target/school-bot/docs/INSTALLERS.md",
+      "old": "C# API ไม่รวมใน Installer: Deploy ที่ Server แยก แล้วฝัง HTTPS URL ตอน Build\nค่า localhost ใช้ทดลองกับ API บนเครื่องนักพัฒนา; คนละเครื่องจะต้องใช้ API Domain จริง",
+      "new": "C# API ไม่รวมใน Installer. เป้าหมาย online คือ Desktop→HTTPS Gateway→gRPC SchoolBot; ต้องให้ integration พร้อมก่อนฝัง public Gateway URL ที่ยืนยันแล้วตอน Build. ตัวอย่าง URL ด้านล่างเป็น placeholder ไม่ใช่หลักฐานว่า gRPC พร้อม\nค่า localhost คงใช้ทดลอง HTTP API บนเครื่องนักพัฒนา ดู `DEPLOYMENT.md`; engine/local hardware ไม่เปลี่ยน"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "# ความเสี่ยงและประตูตัดสิน — Rev4",
+      "new": "# ความเสี่ยงและประตูตัดสิน — Rev5"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "ตำแหน่ง API/Login ยุติแล้ว: web; ต้องตรวจ password compatibility, account↔profile, active/role/scope rules เพื่อ implementation ไม่ใช่รอเลือก API/provider",
+      "new": "B เป็นเจ้าของ session/directory/authorization; reuse Login HTTP เดิมของ G. G→B ใช้ gRPC; RPC/trusted tenant/opaque-session mapping และ account↔profile/active/role ยังต้องพิสูจน์ ไม่เลือก transport/provider ใหม่หรือสร้าง verifier ซ้ำ"
+    },
+    {
+      "path": "knowledge/school-bot/design/risks.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev5: แยก transport ที่ยุติแล้วจาก technical gaps; ไม่เปิด gate ใหม่"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "ประตูมนุษย์ (Rev4 · PROPOSED)",
+      "new": "ประตูมนุษย์ (Rev5 · PROPOSED)"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "อ่าน DES-012 Rev8 และ Gateway integration Rev3.",
+      "new": "อ่าน DES-012 Rev9 และ Gateway integration Rev3."
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| Rev1 — พร้อม implement/test internal web decoder; ยังไม่มีผล implementation/check |",
+      "new": "| Rev1 — internal decoder มีผล local ตาม auth-flow-handoff-001; ไม่ยืนยัน full Login/Gateway/gRPC |"
+    }
+  ],
+  "owner_handoffs": [
+    {
+      "owner": "gm",
+      "paths": [
+        "knowledge/school-bot/plan/index.md",
+        "knowledge/school-bot/plan/evidence-002.md",
+        "knowledge/school-bot/plan/queue-003.md",
+        "knowledge/school-bot/planning/index.md",
+        "knowledge/school-bot/planning/handoff-002.md"
+      ],
+      "required_change": "current index ยังส่งไปสถานะรอ task023/receipt เก่า: ชี้ Gateway Rev3 และชุด050 พร้อม auth-flow-handoff-001. คงบันทึก task023/029/032 และข้อความลงวันที่เดิม ไม่แปลงประวัติให้เหมือนเคยออกแบบ gRPC แล้ว"
+    },
+    {
+      "owner": "gm",
+      "paths": [
+        "knowledge/school-bot/planning/gateway-login-receipt-001.md",
+        "knowledge/school-bot/planning/admin-source-receipt-001.md"
+      ],
+      "required_change": "gateway-login-receipt:21 แถวงาน G/Light ยังสั่ง 'review HTTP relay เทียบ REST→gRPC/tenant rule': เปลี่ยนงานปัจจุบันเป็นตรวจ gRPC/HTTP mapping และ trusted tenant/opaque-session boundary. admin-source-receipt:9 คำ 'H5 relay/private introspection' ให้ระบุ gRPC service transport/private introspection แยกกัน. คงผลรับ/ประวัติ apply เดิม"
+    },
+    {
+      "owner": "gm",
+      "paths": [
+        "knowledge/school-bot/plan/SA-001.md",
+        "knowledge/school-bot/plan/BE-039.md",
+        "knowledge/school-bot/plan/BE-023.md",
+        "knowledge/school-bot/plan/release-runbook-001.md",
+        "knowledge/school-bot/plan/tasks-001.json"
+      ],
+      "required_change": "SA-001:44 'คง web/HTTPS' ยังไม่แยกขา G→B; BE-039 Goal/checklist และ BE-023:39/runbook:12 ต้องชี้ target HTTP G→gRPC B กับ RPC/trust mapping ที่ยัง pending ก่อน implementation/deploy. gm ตรวจ sync canonical JSON เฉพาะงานเดิม ไม่เพิ่ม task/AC หรือเปลี่ยน pending/gates; ไม่แก้ planning/tasks JSON ที่เป็นประวัติรัน"
+    },
+    {
+      "owner": "inspect",
+      "paths": [
+        "knowledge/school-bot/test-plan/tp-001.md",
+        "knowledge/school-bot/test-plan/index.md"
+      ],
+      "required_change": "clarify PF-API/PF-WEB ที่ tp-001:43–45 ว่า integration เป้าหมายผ่าน HTTP G→gRPC B; ยังรอ RPC/trust contract ก่อนกำหนด assertion รายละเอียด. HTTP local/logout/decoder4032 ไม่ปิด integration. คง77cases/180AC/actual NOT_RUN และไม่แก้ QA round001"
+    }
+  ],
+  "remaining_design_gaps": [
+    "ช่องว่างเดิม049: RPC/DTO และ HTTP route/error/header mapping, timeout/cancellation/retry/message limits ยังไม่กำหนดจากหลักฐานจริง",
+    "trusted JWT tenant ตาม G/AGENTS กับ opaque SchoolBot session, pre-auth selector และ peer authentication/private exposure ยัง design pending; ไม่อนุมัติ bypass JWT หรือสมมติ auth metadata",
+    "การรักษา canonical HTTP method/path/body ของ device proof และ idempotency ข้าม Gateway ต้องกำหนดใน mapping โดยคงสัญญาเดิม",
+    "canonical identity/profile linkage, device completion, session issuance และ H5/Light/runtime integration ยังต้องพิสูจน์; ไม่ใช่คำถาม cType/035/เลือก gRPC ใหม่"
+  ]
+}

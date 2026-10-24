@@ -1,4 +1,4 @@
-# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev5
+# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev6
 
 > Override Rev5 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เรื่อง transport เหนือ packet เดิม: client→HTTP G→gRPC B เป็นมาตรฐานที่เลือกแล้ว ไม่รอเลือก HTTP relay/gRPC ใหม่. G/Light review ยังครอบคลุม implementation/trust/tenant/private exposure และ protected paths; ไม่ใช่อนุมัติ HTTP exception. คง cType/identity/device/session/H5; decoder037 ไม่ขึ้นกับการต่อ transport.
 
@@ -44,7 +44,7 @@ License admission: active SchoolBotLicense ของ school เดียวก�
 
 Review ต้องระบุ route/protocol/controller และ serviceผู้ถือ contract, peer authentication/TLS/exposure, token-family/purpose/expiry checks, tenantจากvalidatedtoken, rate-limit และ timeout. school_idในloginเป็น lookup selectorก่อนauthentication ไม่ใช่ trusted tenant; ต้องตรวจเทียบ tenantจากtrusted outcome ห้ามตัดสินข้อยกเว้น G/AGENTS tenant rule เอง.
 
-G/AGENTS.mdกำหนด REST→gRPC และ protected hosting/auth paths; HTTP relay, opaque bearer isolation และ private ingress ต้องมี precise diff/owner reviewก่อนลง G. รอบนี้ไม่เลือก relay/gRPC rewriteและไม่อ้าง Lightอนุมัติ. H5/deployed configuration/runtime proofเป็น enable gates แยกจากการเขียน unit-tested logic.
+G/AGENTS.mdกำหนด REST→gRPC ซึ่งเป็น transport ที่เลือกแล้ว; RPC/HTTP mapping, trusted JWT tenant กับ opaque bearer, peer authentication และ private ingress ยัง design pending. ต้องมี precise diff/Light review สำหรับ protected hosting/auth paths ก่อนลง G; ไม่อนุมัติ HTTP relay และไม่ rewrite Login HTTP เดิม. H5/deployed configuration/runtime proofเป็น enable gates แยกจากการเขียน unit-tested logic.
 
 ## เหตุที่ยังไม่มี complete slice รอบนี้
 
@@ -73,6 +73,7 @@ Public mapper ในอนาคตแปลง internal403จาก G web authe
 คง canonical_account_id=TMasterDBUser.sID; [036](../planning/desktop-login-mapping-evidence-001.json) ยังไม่พิสูจน์ Master.TUser↔TMasterDBUser↔profile. cType เลือกประเภท ไม่เลือก profile row หรือแก้สูตร NSystemId. G/sys รับตรวจ pre-auth lookup ตาม adapter; legacy/vault รวบรวม lineage/fixtures ที่มีอยู่ แยก tenant, keyต่างกัน, null/0/1/>1 และ cardinality พร้อม current salary/student history rule. ไม่อนุมาน equality/coalesce/FK จากเลขหรือชื่อเหมือนกัน. ข้อค้างนี้เป็น technical evidence เดิม ไม่ใช่คำถาม category ที่ยังไม่ได้คำตอบ; device/session/trusted terminal/H5คงเดิม.
 
 ## Change Log
+- 2026-10-24 — Rev6: แก้ operative review ให้ตรวจ gRPC/trust ไม่เลือก transport ใหม่
 - 2026-10-24 — Rev5: ใบงาน049 แยกมาตรฐาน gRPC ที่ทราบแล้วจาก implementation/trust review ที่ยังค้าง
 - 2026-10-24 — Rev4: category ตอบแล้ว; ส่งทีมตรวจ routing/linkage ต่อ คง canonical AccountId และ admission เดิม
 - 2026-10-24 — Rev3: ใบงาน047แยกขอบเขต035/037/public mapper และรับคำชี้แจง mapping; production prerequisites เดิม

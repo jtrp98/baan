@@ -1,4 +1,4 @@
-# กฎข้อมูลและ HTTP contract ร่วม — Rev6
+# กฎข้อมูลและ HTTP contract ร่วม — Rev7
 
 แยกจาก logical data contract ของ SA เพื่อคุมขนาดเอกสาร ชนิด `K`, `I`, `U`, `N`, `Tn` และตารางอ้าง [data-model.md](data-model.md) (Rev5 — ตรงกับ [db/schoolbot_db.sql](../db/schoolbot_db.sql) และ [db/review-005.md](../db/review-005.md) ตามมติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md))
 
@@ -42,6 +42,8 @@ Idempotency เก็บ encrypted response 24 ชั่วโมง หลั�
 
 ## HTTP contract ร่วม
 
+HTTP paths/JSON/status/headers ด้านล่างและใน DES-002..005/007..012 เป็น client-facing semantics ผ่าน G; G→B ใช้ gRPC ตาม [Gateway Rev3](gateway-integration-001.md). ยังไม่มี RPC/metadata/error mapping ที่ยืนยัน; ไม่แปลง HTTP status เป็น gRPC status โดยตรง. คง ETag/If-Match, idempotency และ device proof เดิม; การรักษา canonical method/path/body ข้าม G ต้องออกแบบก่อน implement. Login HTTP เดิมของ G และ local IPC/hardware ไม่เปลี่ยน.
+
 ผลสำเร็จตามแต่ละ DES; failures:
 `{error:{code:T64,message:T512,request_id:U,details:{field:T128?,current_etag:T64?,retry_after_seconds:integer≥0?,resource_id:K?}?}}`
 
@@ -69,9 +71,10 @@ SchoolBot resource IDs ใช้ `K`; legacy ใช้ `I`; logical keys ใช�
 
 List: `limit` 1–100 ค่าเริ่ม 50, `cursor` opaque; คืน `{items:[],next_cursor:string|null}` โดย cursor ผูก actor/school/filter.
 
-Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องแก้ทั้ง proxy/API/host ให้ตรงกัน ไม่ยก limit ของ engine ตาม HTTP.
+Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องรักษาขอบเขตที่ client/G/B; gRPC message limits และ mapping ยัง design pending ไม่เท่ากับขนาด JSON โดยอัตโนมัติ และไม่ยก limit ของ engine ตาม HTTP.
 
 ## Change Log
+- 2026-10-24 — Rev7: ระบุ HTTP semantics ฝั่ง client G; ไม่เปลี่ยน schema/status/device proof
 - 2026-10-23 — Rev6: sync032..034/review-006; SQL เดิม
 - 2026-10-22 — Rev5: sync ตาม `db/schoolbot_db.sql` (32 ตาราง), `db/review-005.md` และมติ decisions-027..030; ปรับ placement เป็น SchoolBot DB (10.0.0.128:9499) คู่กับการอ่าน School DB/PGGradeDB ด้วยบัญชี DB เดิมและ re-check ก่อน commit; เปลี่ยน optimistic concurrency จาก `Version` เป็น `UpdateDate` (`clock_timestamp()`, opaque `ETag`/`If-Match`); ปรับกฎ single-column FK + application tenant check และตัด `UQ_SchoolBotAssessment_Submission_Sequence` / `UQ_SchoolBotAttempt_Learner_Seq` / `ScoringPolicy.CurriculumId`
 - 2026-10-22 — Rev4: sync ตามมติอนุมัติ decisions-026 (รวม amendment-proposal-001/002 และแก้ 2 จุดตาม decisions-025: school_web ต้องมี License active ของโรงเรียน, Desktop bind ได้ทั้ง student และ employee); เพิ่มกฎ global/tenant uniqueness, CourseRun/Attempt/Retake/GradeSlot/Mapping/Preview/Export/Outbox/LevelProposal, กฎ Origin/Channel และการปิด /v1/admin

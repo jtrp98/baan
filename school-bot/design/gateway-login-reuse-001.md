@@ -1,4 +1,4 @@
-# Gateway Login reuse — Rev3
+# Gateway Login reuse — Rev4
 
 > Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน [receipt](../planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration.
 
@@ -33,7 +33,7 @@ Input bounds ต่างกัน: DES-004 username256/password1024; mobile100/
 
 ## ทางเลือกและหลักฐานค้าง
 
-เลือก reuse pipeline เพราะมี lock/challenge เดิม; ปัด verifier ซ้ำ/ผสม hash สองเส้นเพราะทำ behavior แตกต่าง. เลือก web candidate สำหรับครูเพื่อคง challenges. ไม่สรุป student entrypoint จนมี device contract. ไม่เลือก HTTP relay หรือ gRPC rewrite เอง: [Gateway Rev2](gateway-integration-001.md) ระบุข้อขัดกับ G/AGENTS.md:29,35,37.
+เลือก reuse pipeline เพราะมี lock/challenge เดิม; ปัด verifier ซ้ำ/ผสม hash สองเส้นเพราะทำ behavior แตกต่าง. เลือก web candidate สำหรับครูเพื่อคง challenges. ไม่สรุป student entrypoint จนมี device contract. G→B ใช้ gRPC ตาม [Gateway Rev3](gateway-integration-001.md); ไม่ใช้ HTTP relay เป็น service transport. Login HTTP เดิมของ G คงเดิม; RPC/HTTP mapping และ trusted JWT tenant/opaque session ยัง design pending.
 
 G/sys ต้องให้ completion/continuation DTO, device lifecycle, token trust และ bounds mapping; legacy/vault ให้ TR-AUTH-02-rest/03..06 โดยเฉพาะ identity/tenant/status; G/Light+B ให้ H5 transport/private exposure/TLS/secret-owner และ opaque-token isolation; admin owner ให้ staff bootstrap/BFF/CSRF. ระหว่างนี้ fail closed เฉพาะส่วนที่หลักฐานขาด ไม่เปิดคำถาม035ใหม่.
 
@@ -44,6 +44,7 @@ G/sys ต้องให้ completion/continuation DTO, device lifecycle, token
 ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md).
 
 ## Change Log
+- 2026-10-24 — Rev4: แก้คำสั่ง transport ที่ยังอ่านเป็นตัวเลือก; Login HTTP/decoder คงเดิม
 - 2026-10-24 — Rev3: ใบงาน049 แยก Login reuse เดิมจาก G→B gRPC; คง adapter/admission และประวัติ
 - 2026-10-23 — Rev2: ใบงาน034 รับ033 กำหนด outcome/admission และรายงาน complete-slice gap โดยไม่เปลี่ยน schema/035
 - 2026-10-23 — Rev1: ใบงาน032 รับหลักฐาน031 เลือก reuse แบบมีเงื่อนไข; ไม่เขียน source/SQL ไม่ทดสอบหรือปิด gate

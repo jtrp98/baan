@@ -1,5 +1,13 @@
 # Security — วิธีแก้เทียบสัญญาเดิม
 
+## ประกาศการอ่านปัจจุบัน — 2026-10-24
+
+เอกสารนี้เก็บข้อเสนอ/คำถามของ arch วันที่2026-10-23. อ่าน [คำตอบ mitigation](security-mitigation-001.md) สำหรับข้อพิจารณาที่ตอบภายหลัง และประกาศปัจจุบันใน [security.md](../security.md) กับ [Gateway Rev3](../design/gateway-integration-001.md) ก่อนข้อความที่ขัดกัน. ปัจจุบัน client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B; HTTP Login เดิมของ G เป็นคนละขอบเขตกับ service RPC.
+
+คำถามแหล่ง is_admin ในตารางเดิมไม่ใช่คำถามธุรกิจที่ยังเปิด: ใช้ override decisions-035 ใน Gateway Rev3 ตรวจกลุ่มฝั่ง serverและคง superadminเดิม. mapping/implementation และ JWT tenant/opaque session/metadata/private exposure/TLS/Light/H5 ยังต้องพิสูจน์ ไม่ปิดด้วยการยืนยันมาตรฐาน gRPC. คง C/cType/License/device เดิม.
+
+ไม่แปลงข้อเสนอ worker/process/credential ให้เป็น implementation ที่มีแล้วหรือมติใหม่. ผล HTTP logout/4032 tests และ SEC040-001 อ่านตาม [auth-flow](auth-flow-handoff-001.md) เฉพาะ local per-process ไม่ครอบคลุม distributed/Gateway/gRPC/DB integration. ข้อความ/ผลส่งต่อเดิมคงเป็นหลักฐาน ไม่เปลี่ยน findings/verdict/gates และไม่ขออนุมัติใหม่จากประกาศนี้.
+
 วันที่2026-10-23 · arch / Claude Opus t1 · NEEDS_HUMAN
 
 [ใบงาน021](task-021.md) · [ผลต้นฉบับ](security-disposition-response-001.json) · [รายงานจป.](../security.md)
@@ -107,3 +115,4 @@
 ## Change Log
 
 - 2026-10-23 — นายช่างบันทึกผล role ผ่าน Claude; ไม่เปลี่ยน task verdict/gate และไม่รันระบบ
+- 2026-10-24 — ใบงาน054: เพิ่มประกาศลำดับอ่าน mitigation/Gateway Rev3/decisions-035; คงข้อเสนอและ verdict เดิม ไม่มี implementation หรือ re-audit

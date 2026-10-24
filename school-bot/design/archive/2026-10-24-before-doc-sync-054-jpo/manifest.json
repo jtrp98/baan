@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-24",
+  "role_task": "054-jpo",
+  "reason": "Related-document consistency update only; no implementation",
+  "files": [
+    {
+      "source": "knowledge/school-bot/security.md",
+      "archive": "knowledge__school-bot__security.md",
+      "sha256": "d74001fa012b65251ee66ea5b817c1c4af214c842cd778461f8bb2498738cfeb"
+    },
+    {
+      "source": "knowledge/school-bot/planning/security-mitigation-001.md",
+      "archive": "knowledge__school-bot__planning__security-mitigation-001.md",
+      "sha256": "910ff5e94fffed75085aa8089d0a086acaa0ee37efad7579865fbefec2db69ea"
+    },
+    {
+      "source": "knowledge/school-bot/planning/security-disposition-001.md",
+      "archive": "knowledge__school-bot__planning__security-disposition-001.md",
+      "sha256": "fad4e82ec69105ed7c34063aa5d1ad683d05854ad6ba5ad0cbe61b43098ca7e6"
+    }
+  ]
+}

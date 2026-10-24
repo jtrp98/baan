@@ -5,7 +5,7 @@
 
 ## Transport — precedence ใบงาน049 (2026-10-24)
 
-อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-012 Rev8, Login reuse Rev3 และ review packet Rev5; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
+อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev10, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev7/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
 
 ## Feasibility
 
@@ -31,7 +31,7 @@
 1. อ่าน `modules.md` และ `data-model.md` ก่อน DES ที่เกี่ยวข้อง
 2. “ข้อเท็จจริง” อ้าง source; “ข้อเสนอ” เป็นสัญญาที่รออนุมัติ
 3. อ่าน `quality-attributes.md` สำหรับเกณฑ์พิสูจน์ และ `risks.md` สำหรับประตูมนุษย์
-4. API ใหม่ใช้ `/v2`, JSON `snake_case`; DB ใช้ชื่อใน data-model ตรงตัว
+4. API ใหม่ใช้ `/v2`, JSON `snake_case` เป็น client-facing HTTP ผ่าน G; G→B ใช้ gRPC ที่ยังรอ RPC/trust mapping ตาม Gateway Rev3; DB ใช้ชื่อใน data-model ตรงตัว
 5. ตัวเลข bounds ใหม่เป็นข้อเสนอ SA ไม่ใช่ performance SLA ที่ผู้ใช้อนุมัติ
 6. ฉบับก่อน amendment เก็บแบบ verbatim ที่ [archive.md](archive.md)
 7. เปิด [schoolbot.dbml](schoolbot.dbml) ใน dbdiagram.io; ขอบเขต/ข้อจำกัดของภาพอยู่ใน [schema-notes.md](schema-notes.md)
@@ -51,7 +51,7 @@
 | DES-001 | Desktop host และ IPC (Rev1) | PROPOSED — รอ breaking review | [des-001.md](des-001.md) |
 | DES-002 | License และ device binding (Rev2) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
 | DES-003 | หลายโครงงาน Local/Cloud (Rev3) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
-| DES-004 | Identity และ school authorization (Rev9) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
+| DES-004 | Identity และ school authorization (Rev10) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
 | DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev6) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
 | DES-006 | หุ่นจริง Windows/macOS (Rev1) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
 | DES-007 | Release และ trusted update (Rev2) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
@@ -59,7 +59,7 @@
 | DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
 | DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
 | DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
-| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev8) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
+| DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev9) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
 
 ### REQ mapping
 
@@ -122,9 +122,9 @@
 | [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
-| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev6 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
+| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล (Rev7 · CONFIRMED — sync single-column FK + application tenant check, UpdateDate concurrency (ETag/If-Match) และ re-check ข้าม DB ตาม decisions-027..030 และ db/review-005) |
 | [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy (Rev3 · CONFIRMED — อ้าง db/schoolbot_db.sql และ db/review-005.md (SchoolBot DB 10.0.0.128:9499, 32 ตาราง, ใช้บัญชี DB เดิมบน School DB/PGGradeDB)) |
-| [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev4 · PROPOSED) |
+| [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev5 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |
 | [os-compatibility-001.md](os-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ OS (Rev2 · EVIDENCE — target ถูกแทนโดย decisions-019; runtime proof ยังรอ) |
 | [windows10-compatibility-001.md](windows10-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ Windows 10 (Rev1 · HISTORICAL — ผู้ใช้ยุติ Windows10 target ตาม decisions-019) |
@@ -140,8 +140,8 @@
 | [source-review-003.md](source-review-003.md) | หลักฐาน as-built จากการตรวจ source จริง: โครงสร้าง Course Plan จาก Google Sheet (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-004.md](source-review-004.md) | หลักฐาน as-built จากการตรวจ source จริง: ระบบเกรด SchoolBright บน PGGradeDB (ย้ายมาจาก root วันที่ 2026-10-22) |
 | [source-review-005.md](source-review-005.md) | หลักฐาน as-built จากการตรวจ source จริง: writer คะแนนเดิม score-record (ย้ายมาจาก root วันที่ 2026-10-22) |
-| [auth-evidence-001.md](auth-evidence-001.md) | รับหลักฐาน BE-001: matrix ที่รับ/หักล้าง, policy ที่ยังไม่ยืนยัน, trust boundary, H5 checklist, TR-AUTH-01..07 + legacy รอบ002 (Rev3 · EVIDENCE — ไม่ใช่ verdict) |
-| [modules.md](modules.md) | โครงสร้างโมดูลและขอบเขตระบบ (Rev2 · PROPOSED) |
+| [auth-evidence-001.md](auth-evidence-001.md) | รับหลักฐาน BE-001: matrix ที่รับ/หักล้าง, policy ที่ยังไม่ยืนยัน, trust boundary, H5 checklist, TR-AUTH-01..07 + legacy รอบ002 (Rev4 · EVIDENCE — ไม่ใช่ verdict) |
+| [modules.md](modules.md) | โครงสร้างโมดูลและขอบเขตระบบ (Rev3 · PROPOSED) |
 | [quality-attributes.md](quality-attributes.md) | เกณฑ์คุณภาพและเกณฑ์พิสูจน์ (Rev1 · PROPOSED) |
 | [archive.md](archive.md) และโฟลเดอร์ `archive/` | Verbatim history (ฉบับก่อน amendment เก็บแบบ verbatim) |
 
@@ -162,9 +162,9 @@
 
 | ไฟล์ | ขอบเขต / สถานะปัจจุบัน |
 |---|---|
-| [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — พร้อม implement/test internal web decoder; ยังไม่มีผล implementation/check |
+| [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — internal decoder มีผล local ตาม auth-flow-handoff-001; ไม่ยืนยัน full Login/Gateway/gRPC |
 | [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev4 — 048รับ cType category; รอ pre-auth routing/linkage proof; คง037/047; full Login ready=false |
-| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev5 — transport ตาม Gateway Rev3; category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev6 — transport ตาม Gateway Rev3; category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |
 
 อ่าน037ก่อนข้อความ readiness ของ034 รวม planning/desktop-login-contract-response-001.json และ Gateway Login reuse Rev2. ไม่แก้ plan status, public contract, schema หรือ gate เดิม.
 
@@ -179,13 +179,14 @@
 
 ## จุดอ่าน Login reuse
 
-[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev3 — PROPOSED: reuse HTTP Login เดิมแยกจาก G→B gRPC; อ่าน DES-012 Rev8 และ Gateway integration Rev3. Desktop adapter/identity และ H5 implementation ยังรอหลักฐาน.
+[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev4 — PROPOSED: reuse HTTP Login เดิมแยกจาก G→B gRPC; อ่าน DES-012 Rev9 และ Gateway integration Rev3. Desktop adapter/identity และ H5 implementation ยังรอหลักฐาน.
 
 ## หลักฐานลงโค้ดและตรวจรับล่าสุด
 
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
 ## Change Log
+- 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049
 - 2026-10-24 — ใบงาน049: Gateway Rev3/DES-012 Rev8/reuse Rev3/packet Rev5 ชี้ REST→gRPC และขอบเขต HTTP logout; adapter Rev4 คงเดิม ไม่เปลี่ยน counts/tasks/QA verdict
 - 2026-10-24 — ใบงาน048: adapter/packet Rev4 override เฉพาะ cType/category/routing; คง44REQ/180AC/110pending/77TP NOT_RUN; 4032testsไม่ใช่ fullLogin acceptance
 - 2026-10-24 — รับimplementation039/038/042และcheckเฉพาะscope; ไม่แก้สัญญาหรือschemaจากผลunit tests

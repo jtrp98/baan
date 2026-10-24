@@ -1,5 +1,17 @@
 # SchoolBot — Security review รอบ 001
 
+## ประกาศขอบเขตปัจจุบัน — 2026-10-24
+
+ส่วนนี้กำหนดลำดับการอ่าน ไม่ใช่ re-audit: transport ใช้ [Gateway Rev3](design/gateway-integration-001.md#override-rev3--transport-ปัจจุบัน-2026-10-24) และ design/index.md ก่อนข้อความเก่า: Desktop/Web→HTTP G→gRPC B; browser ผ่าน same-origin BFF ไม่มี HTTP relay หรือ direct public B fallback. HTTP routes/status/payload ที่ระบุให้อ่านเป็นฝั่ง client ของ G; ยังไม่มีหลักฐาน RPC mapping ครบ. HTTP Login เดิมของ G และ decoder เป็นอีกขอบเขต ไม่สั่ง rewrite ตาม service transport.
+
+คงทาง C, opaque session, Channel/License และ device binding. แหล่ง is_admin ใช้ override decisions-035 ใน Gateway Rev3: ตรวจกลุ่มฝั่ง server และคง superadmin เดิม แทนคำแนะนำ claim-only/คำถามแหล่งสิทธิ์เดิม. cType ใช้ตามคำชี้แจงใน [auth-flow](planning/auth-flow-handoff-001.md); ไม่ใช่สิทธิ์ admin หรือหลักฐาน AccountId=ProfileId และไม่เปิดคำถามธุรกิจเดิมซ้ำ.
+
+มาตรฐาน gRPC ยืนยันแล้ว แต่ trust boundary, JWT tenant กับ opaque session, auth/tenant metadata, private exposure/service identity, TLS/peer และ Light/H5 ยังเป็น design/implementation gaps. การเลือก transport ไม่พิสูจน์ controls เหล่านี้ ไม่กำหนดรายละเอียดแทน sys/arch และไม่เพิ่ม finding เพียงเพราะยังไม่ implement. SEC001-002 ยังต้องพิสูจน์ credential/process boundary ของ B/worker; ห้ามตีความว่า G ถือ credential DB หรือ private B ลดผลกระทบจากบัญชี DB กว้างได้เอง.
+
+[auth-flow](planning/auth-flow-handoff-001.md) ระบุ HTTP logout ใน B และผล4032 tests เฉพาะ local/static. SEC040-001 CLOSED เฉพาะ local per-process scope ไม่ครอบคลุม distributed limiting หรือ Gateway/gRPC/DB integration. Important6/Medium6/Minor3 เดิมยัง OPEN; verdict, accepted risks และ gates เดิมไม่เปลี่ยน.
+
+ข้อความรายงานและ source observations วันที่2026-10-23 ด้านล่าง รวม mitigation และคำถามเดิม เก็บเป็นหลักฐานตามเวลานั้น อ่านประกาศนี้ก่อนเมื่อขัดกัน. ไม่ใช่ข้อยืนยัน source ปัจจุบัน และไม่ใช่คำขออนุมัติใหม่.
+
 วันที่ 2026-10-23 · jpo / Claude Sonnet tier t2 · ผล role: NEEDS_HUMAN
 
 [ใบงาน](planning/task-019.md) · [ผลต้นฉบับ](planning/security-response-001.json)
@@ -299,6 +311,7 @@ Minor · actual_defect · OPEN
 ## Change Log
 
 - 2026-10-23 — นายช่างบันทึกและจัดรูปจากผล role ผ่าน Claude; ไม่มี runtime/test verdict หรือการปิด gate
+- 2026-10-24 — ใบงาน054: เพิ่มประกาศ reading precedence ตาม Gateway Rev3 และ auth-flow; คง findings/หลักฐาน/verdict เดิม ไม่มี source review หรือ re-audit เพิ่ม
 
 ## รอบทบทวน mitigation — 2026-10-23
 

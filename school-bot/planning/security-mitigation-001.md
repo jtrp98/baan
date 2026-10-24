@@ -1,5 +1,13 @@
 # Security mitigation — คำตอบ jpo
 
+## ประกาศการอ่านปัจจุบัน — 2026-10-24
+
+อ่านประกาศปัจจุบันใน [security.md](../security.md) และ [Gateway Rev3](../design/gateway-integration-001.md) ก่อนคำตอบวันที่2026-10-23 ด้านล่างเมื่อขัดกัน: client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B; HTTP Login เดิมของ G แยกจาก service RPC. ข้อความ public API ใน SEC001-002 เป็นบริบทการประเมินเดิม ไม่ได้ระบุว่า G ถือ credential DB และการซ่อน B ไม่ปิดความเสี่ยงบัญชี DB กว้าง.
+
+SEC001-001 MUST-3 แบบ claim-only และคำถามแหล่ง is_admin ถูกแทนด้วย override decisions-035 ใน Gateway Rev3: ตรวจกลุ่มฝั่ง serverและคง superadminเดิม. ห้ามใช้ข้อความ service identity แบบ optional ด้านล่างเป็นเหตุเปิด private introspection สู่ public; ต้องพิสูจน์ private exposure/trust ตามแบบปัจจุบัน ส่วนวิธี network/mTLS ยังไม่ถูกเลือกแทนเจ้าของ. JWT tenant/opaque session/metadata/TLS/Light/H5 ยังต้องออกแบบและพิสูจน์ ไม่ใช่รอเลือก gRPC ซ้ำ.
+
+คำตอบและเงื่อนไขเดิมคงเป็นหลักฐาน ไม่มีการแก้ severity/status หรือรับความเสี่ยงใหม่. ขอบเขต HTTP logout/4032 tests และ SEC040-001 อ่านจาก [auth-flow](auth-flow-handoff-001.md): เฉพาะ local per-process ไม่ยืนยัน distributed/Gateway/gRPC/DB integration. คง C/cType/License/device ตามแบบและมติเดิม; ไม่เปิดคำถามธุรกิจหรือขออนุมัติใหม่จากประกาศนี้.
+
 วันที่2026-10-23 · Claude Sonnet t2 · NEEDS_HUMAN
 
 [ใบงาน025](task-025.md) · [ผลต้นฉบับ](security-mitigation-response-001.json) · [ข้อเสนอarch](security-disposition-001.md)
@@ -139,3 +147,4 @@ Optional hardening:
 ## Change Log
 
 - 2026-10-23 — นายช่างบันทึกคำตอบ5ข้อ; finding status/risk acceptance ไม่เปลี่ยน
+- 2026-10-24 — ใบงาน054: เพิ่มประกาศลำดับการอ่าน transport/trust/is_admin; เก็บคำตอบเดิมครบ ไม่เปลี่ยน findings หรืออ้าง re-audit

@@ -1,4 +1,4 @@
-# Auth evidence 001 — รับหลักฐาน BE-001 — Rev3
+# Auth evidence 001 — รับหลักฐาน BE-001 — Rev4
 
 สถานะ: EVIDENCE ไม่ใช่ verdict ของ BE-001/SA-001/G-AUTH และไม่ใช่ผล SEC-001 · ที่มา: [legacy-auth-response-001.json](../planning/legacy-auth-response-001.json) (sys) + arch ตรวจ source:line ซ้ำ · ไม่อ่าน secrets/env ไม่เชื่อม DB ไม่รัน · พาธย่อ `G`=sb-api-gateway `A`=sb-tech-upgrade-academic `W`=sb-tech-upgrade-web-system `B`=school-bot
 
@@ -34,8 +34,8 @@ C1 verifier อ้างอิงของ Desktop (web/mobile/superset) · C2 �
 
 | ขอบเขต | เชื่อได้แค่ |
 |---|---|
-| Desktop/browser → B | ไม่เชื่อ header suffix/body ทุกค่า |
-| W BFF → B | เป็นทางส่งเท่านั้น ไม่ใช่แหล่งตัวตน |
+| Desktop/browser → HTTP G → gRPC B | ไม่เชื่อ header suffix/body ทุกค่า |
+| W BFF → HTTP G → gRPC B | เป็นทางส่งเท่านั้น ไม่ใช่แหล่งตัวตน |
 | B → G web-principal | claims ของ token ที่ G ตรวจแล้ว ผ่านช่องทางที่คนระบุ |
 | B → Master/School DB | บัญชี DB เดิม อ่านอย่างเดียว (decisions-029) |
 
@@ -48,11 +48,11 @@ Implementation gaps (ทีมแก้ได้): IG1 ไม่มี web-princ
 
 ## 6. H5 checklist
 
-- **W BFF route**: เพิ่ม upstream ใน `src/server/upstream/registry.ts` (**ข้อเสนอ arch ไม่ใช่สัญญา**: ชื่อ env ตาม convention ของ W `<NAME>_API_URL` เก็บ origin เท่านั้น (`W/src/server/upstream/registry.ts:7-18,56-91`) เช่น `SCHOOL_BOT_API_URL` ตาม P3 เจ้าของ W เป็นผู้ตั้งชื่อจริง; ระวังชื่อซ้ำกับ env override ของ Desktop ใน B (SEC001-008) แม้อยู่คนละ process) และ route kebab-case ใต้ `src/app/api/` ที่ส่ง `JabjaiWebKey-*` ต่อเพียง 1 header; token ฝั่ง client เก็บใน memory ตาม DES-012 §6
-- **G web-principal**: `GET /api/school-bot/auth/web-principal` ใช้ scheme `JabjaiWebLegacy` อย่างเดียว ปฏิเสธ `purpose`/`aud` คืนค่า `user_id`/`admin_id` ดิบ (ไม่ใช้ `ClaimTypes.Sid`) และ `is_admin` จาก claim `IsAdmin`; สัญญา (DES-012 §2) กำหนดเพียง: scheme นี้อย่างเดียว, ปฏิเสธ purpose/aud, rate limit (school,user), no-store และห้าม log token/claims · กติกา repo G (`G/AGENTS.md` §1 ข้อ6) ให้ใช้ **authorization policy ที่ต้อง authenticated ผ่าน scheme นี้** + `[SbRateLimit]` + Swagger tag — **ไม่อนุมัติ** `[MenuPermission(<เมนูเฉพาะ>)]` เพราะ handler จะ query สิทธิ์ราย MenuId (`TGroupPermissionUser→TGroupPermissionMenu`), fail closed เมื่อไม่ได้ตั้ง MenuId และใช้ `ClaimTypes.Sid` (=`admin_id ?? user_id`) เป็น userId (`G/src/ApiGateway.API/Authorization/MenuPermission.cs:14-19,675-715`) ซึ่งจะจำกัดผู้แลก session ให้เหลือเฉพาะผู้ถือเมนูนั้น และต้องเพิ่มเมนูใน Master DB ซึ่งเกินสัญญา (สิทธิ์จริงตรวจที่ B ตาม DES-012 §4) ถ้าเจ้าของ G ยืนยันว่าต้องใช้เมนู ให้ถือเป็น NEEDS_DESIGN_CHANGE DES-012 แล้วส่งคนตัดสิน; Light review ตาม CODEOWNERS ถ้าแตะส่วนที่ล็อก · คนต้องระบุว่าการคืน is_admin ถูกต้องหรือไม่ (TR-AUTH-02)
+- **W BFF route**: ใช้ gateway upstream เดิม (`GATEWAY_API_URL`) พร้อม SchoolBot route mapping; ห้ามชี้ B ตรง. HTTP G→gRPC B ยังรอ RPC mapping/trusted tenant/opaque-session boundary ตาม Gateway Rev3. คง credential filtering, memory token และ Origin/CSRF ตาม DES-012.
+- **G web-principal**: `GET /api/school-bot/auth/web-principal` ใช้ scheme `JabjaiWebLegacy` อย่างเดียว ปฏิเสธ `purpose`/`aud` คืนค่า `user_id`/`admin_id` ดิบ (ไม่ใช้ `ClaimTypes.Sid`) และ `is_admin` จากกลุ่มฝั่ง server/superadmin ตาม035; ไม่ใช้ claim เพียงอย่างเดียว; สัญญา (DES-012 §2) กำหนดเพียง: scheme นี้อย่างเดียว, ปฏิเสธ purpose/aud, rate limit (school,user), no-store และห้าม log token/claims · กติกา repo G (`G/AGENTS.md` §1 ข้อ6) ให้ใช้ **authorization policy ที่ต้อง authenticated ผ่าน scheme นี้** + `[SbRateLimit]` + Swagger tag — **ไม่อนุมัติ** `[MenuPermission(<เมนูเฉพาะ>)]` เพราะ handler จะ query สิทธิ์ราย MenuId (`TGroupPermissionUser→TGroupPermissionMenu`), fail closed เมื่อไม่ได้ตั้ง MenuId และใช้ `ClaimTypes.Sid` (=`admin_id ?? user_id`) เป็น userId (`G/src/ApiGateway.API/Authorization/MenuPermission.cs:14-19,675-715`) ซึ่งจะจำกัดผู้แลก session ให้เหลือเฉพาะผู้ถือเมนูนั้น และต้องเพิ่มเมนูใน Master DB ซึ่งเกินสัญญา (สิทธิ์จริงตรวจที่ B ตาม DES-012 §4) ถ้าเจ้าของ G ยืนยันว่าต้องใช้เมนู ให้ถือเป็น NEEDS_DESIGN_CHANGE DES-012 แล้วส่งคนตัดสิน; Light review ตาม CODEOWNERS ถ้าแตะส่วนที่ล็อก · นโยบาย is_admin ยุติตาม035; ค้าง TR-AUTH-02-rest/03 และ implementation proof
 - **B session/bootstrap**: `/v2/auth/web-sessions`, `/v2/auth/login` ตาม DES-004/012; ยกเลิก `/v1/admin` และ `SCHOOL_BOT_ADMIN_KEY`/`ARM_ADMIN_KEY` หลังมี staff_admin
 - **ชื่อ env/config**: มีอยู่แล้ว: `GATEWAY_API_URL` (W), `LegacyWebJwt:Secret`/`Jwt:Secret`, `LegacyWeb:HostUrl` (G), `urls`/`HTTP_PORTS`/`HTTPS_PORTS` (B) · ชื่อใหม่ของ B (gateway origin, allowed origins, connection ของ SchoolBot/Master/School) ให้เจ้าของ B ตั้งชื่อ (สมมติฐาน)
-- **คนต้องระบุ**: host/TLS ของ B, เส้นทางเครือข่าย W→B และ B→G (internal หรือ public), allow-list ของ Origin (W, admin web), เจ้าของ repo/ผู้ review แต่ละฝั่ง; agent ไม่ใส่ค่า host/secret แทน
+- **คนต้องระบุ**: host/TLS ของ B, เส้นทาง W/BFF→HTTP G→gRPC B และ B→private G (ห้ามเปิด introspection ผ่าน public service-route), allow-list ของ Origin (W, admin web), เจ้าของ repo/ผู้ review แต่ละฝั่ง; agent ไม่ใส่ค่า host/secret แทน
 - **staff bootstrap**: คนระบุ NCompany/บัญชีที่ใช้เป็น staff_admin คนแรก (ไม่ต้องส่งให้ agent) และเส้นทาง login ที่ออก token ให้บัญชีนั้น; ต้องได้คำตอบ TR-AUTH-03 ก่อน (key คือ `(school_id,user_id)`); แถวแรกของ `SchoolBotStaffRole` (ต้องใช้วิธีนี้เพราะ `POST /v2/admin/staff-roles` ต้องมี staff_admin อยู่ก่อน) ให้ sys เตรียมขั้นตอนใน BE-039/BE-023 โดยใช้ค่าจริงจากคนและไม่บันทึกค่าใน knowledge ถ้าเป็นคำสั่ง SQL ให้ vault ตรวจ ใส่ `reason`/`valid_until`/AuditEvent; การรันบน test DB เป็นหลักฐานของ G-CORE (คนรัน, DBA-003 ตรวจ receipt) ส่วนบน shared/production ต้องให้คนรันภายใต้ G-RELEASE ตาม [release-runbook-001](../plan/release-runbook-001.md) ข้อ 3-6 (CONVENTIONS §9 ข้อ6); re-audit โดยคนที่สองผ่าน `GET /v2/admin/staff-roles` และบันทึกว่าใครทำเมื่อไรตามที่คนแจ้ง
 
 ## หลักฐานเพิ่มเติม Rev3 — มีลำดับเหนือข้อความเดิมที่ขัดกัน
@@ -66,7 +66,7 @@ Implementation gaps (ทีมแก้ได้): IG1 ไม่มี web-princ
 - M10/C11: Default.aspx.cs:193–240 สร้าง IsAdmin จากกลุ่มแอดมิน/ผู้บริหารใน server session; bypassgarde.aspx.cs:55–75 ไม่ส่งค่านั้น แต่ให้ IsAdmin=1 เฉพาะ user_id=0 และ admin_id!=null จึงใช้แทนกันไม่ได้
 - TR-AUTH-01 และ WORKTREE-STATUS ได้หลักฐาน source แล้ว; TR-AUTH-02 ได้ผู้ผลิต session/JWT แต่ยังขาดตัวตรวจ login TAdmin และข้อยุติแหล่งสิทธิ์; TR-AUTH-03/04/05 ยังขาดข้อมูลจริง; TR-AUTH-06 ไม่มีเส้น login นักเรียนใน source ชุดนี้ ไม่มีผล runtime
 
-[gateway-integration-001](gateway-integration-001.md) override routing/trust-boundary/H5 ใน §4–6: W/BFF→G→B และ B→private G; ไม่ตั้ง upstream ของ BFF ไป B โดยตรง ส่วน is_admin จาก claim เดิมยังห้ามเปลี่ยนเป็นกลุ่มสิทธิ์จนได้คำตอบมนุษย์
+[gateway-integration-001](gateway-integration-001.md) override routing/trust-boundary/H5 ใน §4–6: W/BFF→G→B และ B→private G; ไม่ตั้ง upstream ของ BFF ไป B โดยตรง ส่วน is_admin ใช้มติ035 ตรวจกลุ่มฝั่ง server และคง superadmin เดิม; ค้าง mapping/implementation ไม่รอเลือกนโยบายซ้ำ
 
 **Override ตาม [decisions-035](../requirement/decisions-035.md) (มีลำดับเหนือ C11/§6/ข้อความรอคำตอบแหล่ง `is_admin` ด้านบน)**: ผู้ใช้ยืนยันทาง A ให้ตรวจสมาชิกกลุ่ม `แอดมิน/ผู้บริหาร` ฝั่ง server ตามเกณฑ์ `Default.aspx.cs:193–240` ผูกตัวตน/โรงเรียนที่ตรวจแล้ว และคง super admin เดิม (`bypassgarde.aspx.cs:55–75`); JWT ที่ส่ง `IsAdmin=0` ไม่ใช่เหตุตัดสิทธิ์กลุ่ม แต่ห้ามเชื่อ body/header assertion และต้อง fail closed (`503 AUTH_NOT_CONFIGURED`) ตราบที่ข้อมูลกลุ่ม/mapping (`TR-AUTH-03`) ยังไม่พร้อม ทั้งนี้มตินี้ปิดเฉพาะ policy choice `C11` (และส่วนนโยบายของ `TR-AUTH-02`) ส่วน `TR-AUTH-02-rest` (ตัวตรวจ login `TAdmin`), `TR-AUTH-03..06`, `C1–C10`, H5 และ implementation ยังคงค้าง รายละเอียดและ test scenarios S1–S6 อยู่ที่ [gateway-integration-001](gateway-integration-001.md)
 
@@ -75,6 +75,7 @@ Implementation gaps (ทีมแก้ได้): IG1 ไม่มี web-princ
 DES-012 Rev3: `user_id` = `TUser.NSystemId ?? SId` (คือ `TEmployees.sEmp`), `admin_id` = `TAdmins.id` (`WebLoginService.cs:206–217,272`) · ครูรายวิชา: `TplanCourseTeacher (SchoolId, PlanCourseId, SEmp)` `IsActive & !CDel` + `TEmployees` ไม่ถูกลบ (`A/.../TeacherRepository.cs:24–32,111–122`) + `TplanTermSubLevel2` (`PlanCourseRepository.cs:194–215`)
 
 ## Change Log
+- 2026-10-24 — Rev4: แก้ checklist/routing ปัจจุบัน; คงหลักฐาน source และมติ035
 - 2026-10-23 — ใบงาน030: บันทึก override ตาม [decisions-035](../requirement/decisions-035.md) ปิดเฉพาะนโยบาย C11/แหล่ง is_admin; คง C1–C10, TR-AUTH-02-rest..06 และ H5 เดิม
 - 2026-10-23 — Rev3: รับ legacy รอบ002/ผลตรวจ13ไฟล์ แยก session IsAdmin จาก JWT และชี้ routing addendum; ไม่เลือก compatibility policy หรือรับความเสี่ยง
 

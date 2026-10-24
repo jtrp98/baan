@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-24",
+  "role_task": "050-arch",
+  "reason": "Related-document consistency update only; no implementation",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/modules.md",
+      "archive": "knowledge__school-bot__design__modules.md",
+      "sha256": "0d2d93c34ee71bbe8c1fc4053113cf333a6bc8d4e2aaa4fc02f8deca47458f09"
+    },
+    {
+      "source": "knowledge/school-bot/design/data-contract-rules.md",
+      "archive": "knowledge__school-bot__design__data-contract-rules.md",
+      "sha256": "7378f79c38eff3844a971aec276cbbf42cc45dcc2deb56c8a18a8d17978f0feb"
+    },
+    {
+      "source": "knowledge/school-bot/design/data-dictionary/contract-005.md",
+      "archive": "knowledge__school-bot__design__data-dictionary__contract-005.md",
+      "sha256": "6be87e16abb7cfc0badde5e87deddd1e9d3ed7ba1ba8b6d2f0aa86ec8b6f8756"
+    },
+    {
+      "source": "knowledge/school-bot/design/des-004.md",
+      "archive": "knowledge__school-bot__design__des-004.md",
+      "sha256": "5ab0c105bd356d99774d613bfb212017619256001bcdb334d80e19bebfc656d7"
+    },
+    {
+      "source": "knowledge/school-bot/design/des-012.md",
+      "archive": "knowledge__school-bot__design__des-012.md",
+      "sha256": "092cfc85e9b4affb7906ca2e44d410867cf33d6f96e6f2327378ac4540e34f27"
+    },
+    {
+      "source": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "archive": "knowledge__school-bot__design__gateway-login-reuse-001.md",
+      "sha256": "d0166d85e6833ba60e9f9de29d4dd34050742cfb346c0383241b1eb7822ff025"
+    },
+    {
+      "source": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "archive": "knowledge__school-bot__design__desktop-auth-review-packet-001.md",
+      "sha256": "60dfc201bca96f548670a68ae0b3c7c606d345af313eb81fbf8dc8567c337943"
+    },
+    {
+      "source": "knowledge/school-bot/design/auth-evidence-001.md",
+      "archive": "knowledge__school-bot__design__auth-evidence-001.md",
+      "sha256": "d478a4a857acdd2b952aa819afbed388dd838e76413fd5fbbf49e1e7329ecadd"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "knowledge__school-bot__design__index.md",
+      "sha256": "d67442fad0b258baa3eb75ab84b3b6353c5037776de0af2e13c0b4cf4160ed12"
+    },
+    {
+      "source": "target/school-bot/README.md",
+      "archive": "target__school-bot__README.md",
+      "sha256": "790968357bad6e54af416714a9a92bfede5951fa6c2e8b861d339df8b9f402b7"
+    },
+    {
+      "source": "target/school-bot/web/README.md",
+      "archive": "target__school-bot__web__README.md",
+      "sha256": "081efa6dd197b7c4a86233878e3d46eac0ce19d82375b8305f8e2f03f1d56778"
+    },
+    {
+      "source": "target/school-bot/app/README.md",
+      "archive": "target__school-bot__app__README.md",
+      "sha256": "3e6dff51a4e68f26eb8327c0a6d7a97b8b0b7df5a4d670aebc215160e15be966"
+    },
+    {
+      "source": "target/school-bot/docs/ARCHITECTURE.md",
+      "archive": "target__school-bot__docs__ARCHITECTURE.md",
+      "sha256": "00e8ffb210ef3b4ff56ffc31a7a75f86f7cba0888c7c0fe449e793260af9dbc3"
+    },
+    {
+      "source": "target/school-bot/docs/API.md",
+      "archive": "target__school-bot__docs__API.md",
+      "sha256": "8b84dea38b489a1502d6cdaee0b28cbce5db381ef0bcb2b058159f61a8790dde"
+    },
+    {
+      "source": "target/school-bot/docs/DEPLOYMENT.md",
+      "archive": "target__school-bot__docs__DEPLOYMENT.md",
+      "sha256": "3e5b33831d4dc80f7a3f3c00e75a908d243d091cca694506f7b285f3e80396d9"
+    },
+    {
+      "source": "target/school-bot/docs/INSTALLERS.md",
+      "archive": "target__school-bot__docs__INSTALLERS.md",
+      "sha256": "eab4fc15f67d87fc0f24bde45c3a69fe6347ca9ea71627de246f3e08ab33610b"
+    },
+    {
+      "source": "knowledge/school-bot/design/risks.md",
+      "archive": "knowledge__school-bot__design__risks.md",
+      "sha256": "e832f990e303ef21e29c32c2d900487d32452ab96d5b6b5253262d46c30b2b60"
+    }
+  ]
+}
