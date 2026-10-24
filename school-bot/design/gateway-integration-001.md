@@ -1,4 +1,22 @@
-# Gateway integration — Rev2
+# Gateway integration — Rev3
+
+## Override Rev3 — transport ปัจจุบัน (2026-10-24)
+
+**Desktop/Web → HTTP API Gateway → gRPC → SchoolBot service (B)**; browser คงผ่าน same-origin BFF. ฝั่ง client ของ G ใช้ REST/HTTP JSON; G→B ใช้ gRPC ตาม `G/AGENTS.md:29` ไม่ใช่ HTTP proxy และไม่มี direct public B fallback.
+
+ส่วนนี้มี precedence เหนือข้อความ transport ทุกส่วนของ Rev1–Rev2 ด้านล่าง รวม HTTP relay/HttpClient, การปัด gRPC และข้อความรอเลือก transport/HTTP exception. เก็บข้อความเหล่านั้นเป็นประวัติ ไม่ใช่ทางเลือกปัจจุบัน; ไม่ต้องขอเลือก gRPC ซ้ำ. route/payload/status แบบ HTTP อ่านเป็นฝั่ง client ของ G ไม่ใช่หลักฐานว่า B ต้อง expose HTTP endpoint เดียวกันหรือมี RPC mapping แล้ว.
+
+Login HTTP เดิมของ G เป็นคนละขอบเขตกับ service transport ใหม่; ไม่สั่ง rewrite Login หรือ decoder ที่ parse HTTP/JSON outcomes. คง C, opaque session, Channel/License, decisions-035, cType และ private introspection ที่แยกจาก public service-route.
+
+**As-built ที่ตรวจรอบนี้:** `B/web/src/SchoolBot.Api/Program.cs:45–48,94` ผูก LogoutService/PostgresSessionLogoutStore และ `LogoutEndpoint.cs:9,22` รับ HTTP POST แล้วเรียก use case. ยังไม่ครบ G→gRPC→B; inventory csproj/proto และ Program.cs ไม่พบ gRPC registration/reference หรือ .proto ในขอบเขตตรวจ. ใช้ domain/application/logout persistence เดิมซ้ำเมื่อเปลี่ยน transport โดยยังต้องพิสูจน์ integration. [QA round001](../qa/round-001.md) 4032 tests คง verdict local/static เดิม ไม่ใช่ gRPC/Gateway/DB integration proof.
+
+**งานถัดไป sys/arch:** จัดทำ gRPC contract + HTTP mapping + trust boundary ก่อน transport implementation: RPC/DTO, auth/tenant metadata, error mapping, timeout/cancellation/retry และ private exposure ต้องอิงหลักฐานจริง งานนี้ไม่กำหนดรายละเอียดเหล่านั้นแทนเจ้าของ. `G/AGENTS.md:35–37` ยังต้อง reconcile tenant จาก JWT กับ opaque session และผ่าน Light review สำหรับ protected paths; H5/TLS/peer/runtime proof ยังค้าง ไม่ใช่คำถามเลือก transport ใหม่.
+
+เหตุผล: ใช้มาตรฐาน G ที่ยืนยันแล้ว; ไม่ใช้ HTTP relay/HttpClient เป็น service transport เพราะขัดมาตรฐาน และไม่ rewrite Login เดิมเพราะอยู่นอกการเชื่อม G→B.
+
+## ประวัติ Rev1–Rev2 — transport ถูก supersede โดย Rev3
+
+ข้อความเดิมด้านล่างเก็บเพื่อประวัติ; มติ035และสัญญา auth ที่ไม่เกี่ยวกับ transport ยังคงใช้.
 
 วันที่2026-10-23 · ใบงาน029 · สถานะอยู่ที่ [index](index.md)
 
@@ -102,6 +120,7 @@ Task: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ 
 มีลำดับเหนือข้อเสนอ HTTP adapter/HttpClient และการปัด gRPC ด้านบน: `G/AGENTS.md:29` กำหนด REST→gRPC ไป service; `:35,37` กำหนด tenant จาก JWT และ Light review ส่วน hosting/auth pipeline. ข้อเสนอ relay opaque Bearer เดิมจึงมี owner-review gap ทั้ง transport/tenant boundary. คง topology ผ่าน G และ private introspection แยกจาก public service-route; ให้ G/Light กับ B ระบุวิธีที่สอดคล้องมาตรฐานหรือข้อยกเว้นที่ได้รับอนุมัติก่อน implement. ไม่สร้าง proxy/framework/proto หรือเลือก transport ใหม่ในงานนี้. Login เดิมและ local DI ports ไม่พิสูจน์ว่า SchoolBot route พร้อม ดู [reuse](gateway-login-reuse-001.md).
 
 ## Change Log
+- 2026-10-24 — Rev3: ใบงาน049 ยก REST→gRPC ขึ้นเป็น topology ปัจจุบัน; แยก HTTP logout as-built/ผล local tests จาก transport integration; คงประวัติและ H5/Light
 - 2026-10-23 — Rev2: ใบงาน032 ระบุข้อขัดกัน HTTP relay กับกฎ G; คง035/C/H5 และไม่อนุมัติข้อยกเว้นแทน owner
 - 2026-10-23 — ใบงาน030: append override ตาม [decisions-035](../requirement/decisions-035.md) ยืนยันทาง A (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม), กฎ fail-closed และ test scenarios S1–S6; คง H5/technical proof/gates เดิม
 - 2026-10-23 — Rev1: ใบงาน029 รับ topology ผู้ใช้/legacy evidence และตรวจ gateway routing/auth แบบ read-only; แยก implementation จาก unknown คง gates เดิม ไม่มี tests/network probe/deploy

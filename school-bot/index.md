@@ -26,7 +26,11 @@
 
 เอกสารล่าสุด: [Authflow code/localcheck](planning/auth-flow-handoff-001.md) — logoutและinternaldecoderผ่านlocalcheck; fullLoginยังไม่พร้อม
 
+เอกสาร transport ปัจจุบัน: [Gateway Rev3](design/gateway-integration-001.md) — client→HTTP Gateway→gRPC SchoolBot; HTTP logout ที่มีแล้วและผล local4032testsยังไม่ยืนยัน Gateway/gRPC integration.
+
 ## Change Log
+
+- 2026-10-24 — รับ arch049 ปรับเอกสาร transport ให้ใช้มาตรฐาน gRPC; คง source/SQL/tasks/QA scope เดิม
 
 - 2026-10-24 — รับโค้ดและcheckจากCodex; 4032testsผ่านเฉพาะlocalscope คง110tasks pending/77TPcases NOT_RUN/Important6OPEN
 

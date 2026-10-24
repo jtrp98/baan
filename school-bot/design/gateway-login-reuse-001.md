@@ -1,4 +1,6 @@
-# Gateway Login reuse — Rev2
+# Gateway Login reuse — Rev3
+
+> Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน [receipt](../planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration.
 
 สถานะอยู่ที่ [index](index.md). ขอบเขต: auth seam เท่านั้น; ไม่มี schema delta.
 
@@ -42,5 +44,6 @@ G/sys ต้องให้ completion/continuation DTO, device lifecycle, token
 ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md).
 
 ## Change Log
+- 2026-10-24 — Rev3: ใบงาน049 แยก Login reuse เดิมจาก G→B gRPC; คง adapter/admission และประวัติ
 - 2026-10-23 — Rev2: ใบงาน034 รับ033 กำหนด outcome/admission และรายงาน complete-slice gap โดยไม่เปลี่ยน schema/035
 - 2026-10-23 — Rev1: ใบงาน032 รับหลักฐาน031 เลือก reuse แบบมีเงื่อนไข; ไม่เขียน source/SQL ไม่ทดสอบหรือปิด gate

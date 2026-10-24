@@ -1,4 +1,6 @@
-# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev4
+# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev5
+
+> Override Rev5 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เรื่อง transport เหนือ packet เดิม: client→HTTP G→gRPC B เป็นมาตรฐานที่เลือกแล้ว ไม่รอเลือก HTTP relay/gRPC ใหม่. G/Light review ยังครอบคลุม implementation/trust/tenant/private exposure และ protected paths; ไม่ใช่อนุมัติ HTTP exception. คง cType/identity/device/session/H5; decoder037 ไม่ขึ้นกับการต่อ transport.
 
 สถานะอยู่ที่ [index](index.md); อ่านคู่ [adapter](desktop-login-adapter-001.md). เป็น technical handoff ไม่ใช่ Light approval หรือคำถามนโยบาย035.
 
@@ -71,6 +73,7 @@ Public mapper ในอนาคตแปลง internal403จาก G web authe
 คง canonical_account_id=TMasterDBUser.sID; [036](../planning/desktop-login-mapping-evidence-001.json) ยังไม่พิสูจน์ Master.TUser↔TMasterDBUser↔profile. cType เลือกประเภท ไม่เลือก profile row หรือแก้สูตร NSystemId. G/sys รับตรวจ pre-auth lookup ตาม adapter; legacy/vault รวบรวม lineage/fixtures ที่มีอยู่ แยก tenant, keyต่างกัน, null/0/1/>1 และ cardinality พร้อม current salary/student history rule. ไม่อนุมาน equality/coalesce/FK จากเลขหรือชื่อเหมือนกัน. ข้อค้างนี้เป็น technical evidence เดิม ไม่ใช่คำถาม category ที่ยังไม่ได้คำตอบ; device/session/trusted terminal/H5คงเดิม.
 
 ## Change Log
+- 2026-10-24 — Rev5: ใบงาน049 แยกมาตรฐาน gRPC ที่ทราบแล้วจาก implementation/trust review ที่ยังค้าง
 - 2026-10-24 — Rev4: category ตอบแล้ว; ส่งทีมตรวจ routing/linkage ต่อ คง canonical AccountId และ admission เดิม
 - 2026-10-24 — Rev3: ใบงาน047แยกขอบเขต035/037/public mapper และรับคำชี้แจง mapping; production prerequisites เดิม
 - 2026-10-23 — Rev2: ใบงาน037แทนข้อจำกัด component-with-caller ของ034โดยคงข้อความเดิมเป็นประวัติ; production prerequisites ไม่เปลี่ยน

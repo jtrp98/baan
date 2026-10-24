@@ -1,5 +1,7 @@
 # Auth flow — ผลลงโค้ดและตรวจรับ 001
 
+> Transport clarification 2026-10-24: แบบปัจจุบันคือ Desktop/Web → HTTP API Gateway → gRPC → SchoolBot service ตาม [Gateway Rev3](../design/gateway-integration-001.md). โค้ด logout ที่มีตอนนี้เป็น HTTP ใน SchoolBot ยังไม่ต่อ Gateway/gRPC; 4032 tests ยืนยันเฉพาะ local/static เดิม ไม่ใช่ integration.
+
 วันที่2026-10-24 · ผู้ใช้สั่ง “ทำตาม flow เลย” และใช้Codex · นายช่างรับผลทุกroleตามหน้าที่
 
 ## ผลที่ได้
@@ -46,3 +48,11 @@ Loginเต็มยังไม่พร้อม: ต้องจับคู�
 ขั้นเทคนิคถัดไป: sys ตรวจ FindAuthUserDetail/WebLoginService ว่ามี server routing seam ที่เลือกบัญชีไม่กำกวมและผูกกับ authenticated account ได้หรือไม่ ก่อนต่อ caller; ไม่ลอง credential หลาย route. ไม่มี code/SQL/runtime เพิ่มรอบนี้ คงผล4032testsเดิมและ fullLogin NOT_READY.
 
 - 2026-10-24 — Change Log: รับคำชี้แจง cType และสัญญา Rev4; ไม่เปลี่ยน REQ/AC/plan หรือปิด gate
+
+## ปรับเอกสาร transport — 2026-10-24
+
+รับ [arch049](gateway-grpc-doc-amendment-response-001.json): Gateway Rev3 / DES-012 Rev8 / Login reuse Rev3 / review packet Rev5 และ design index สอดคล้อง REST→gRPC. เก็บต้นฉบับทั้ง5ไฟล์พร้อม [SHA256 manifest](../design/archive/2026-10-24-before-grpc-transport-clarification-001/manifest.json). ข้อเสนอ HTTP relay/HttpClient เดิมเป็นประวัติที่ถูก supersede; ไม่ต้องถามเลือก gRPC ซ้ำ. HTTP Login เดิมที่ Gateway และตัวอ่านผล Login เป็นอีกขอบเขตจาก G→B service transport.
+
+งานถัดไป sys/arch: กำหนด gRPC contract, HTTP mapping และ auth/tenant trust boundary จาก source จริง ก่อนปรับ transport code. ใช้ Application/LogoutService และ persistence เดิมซ้ำได้ พร้อมตรวจ Light/H5 ตามขอบเขตที่มีจริง. รอบนี้ไม่มี code/SQL/runtime เพิ่ม ไม่เปลี่ยน canonical task status หรือ QA verdict.
+
+- 2026-10-24 — Change Log: ปรับเอกสาร transport และขอบเขตผลตรวจตามคำถามผู้ใช้; final knowledge commit หลังบันทึกครบ

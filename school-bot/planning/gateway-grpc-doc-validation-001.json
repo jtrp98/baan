@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-24",
+  "kind": "document-validation",
+  "role_response": "gateway-grpc-doc-amendment-response-001.json",
+  "edits": 14,
+  "archived_files": 5,
+  "archive_hashes_match": true,
+  "links_checked": 186,
+  "source_files_checked": 16,
+  "source_changed": [],
+  "sql_unchanged": true,
+  "tests_rerun": false,
+  "scope": "Documents only; existing4032 local/static verdict preserved; Gateway/gRPC/DB integration not established"
+}

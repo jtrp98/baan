@@ -1,0 +1,89 @@
+{
+  "state": "DONE",
+  "summary": "จัดทำ amendment แบบ read-only: Gateway Rev3, DES-012 Rev8, Login reuse Rev3, packet Rev5 และ sync design index; ยังไม่ได้เขียนไฟล์หรือ apply",
+  "as_built_evidence": [
+    "G=target/sb-api-gateway: AGENTS.md:29 กำหนด REST→gRPC; :32 proto มาจาก service; :35 tenant จาก JWT; :36 error middleware; :37 Light review ไม่มีการสำรวจโค้ด G รอบนี้",
+    "B=target/school-bot: web/src/SchoolBot.Api/Program.cs:45–48 ลงทะเบียน PostgresSessionLogoutStore/LogoutService; :94 เรียก MapLogout; LogoutEndpoint.cs:9,22 เป็น HTTP POST /v2/auth/logout→LogoutService",
+    "inventory B พบ 6 csproj และไม่พบ .proto ในขอบเขตค้นที่ไม่รวม bin/obj/.git; csproj ที่อ่านไม่มี gRPC/Protobuf reference และ Program.cs ไม่มี AddGrpc/MapGrpcService จึงยังไม่มีหลักฐาน gRPC implementation ในขอบเขตนี้",
+    "B/web/README.md:14–16 แยก Application จาก HTTP; :38–40 ระบุ HTTP logout ไม่เรียก Gateway; :69 ยังไม่ครอบคลุม DB runtime/deployment; B/README.md:119–128 อธิบาย HTTP loopback",
+    "planning/auth-flow-handoff-001.md:11–18 และ qa/round-001.md:16–21,35–39 ยืนยัน 4032 tests เฉพาะ local/static scope; PostgreSQL integration NOT_RUN และไม่พิสูจน์ Gateway runtime"
+  ],
+  "edits": [
+    {
+      "path": "knowledge/school-bot/design/gateway-integration-001.md",
+      "old": "# Gateway integration — Rev2",
+      "new": "# Gateway integration — Rev3\n\n## Override Rev3 — transport ปัจจุบัน (2026-10-24)\n\n**Desktop/Web → HTTP API Gateway → gRPC → SchoolBot service (B)**; browser คงผ่าน same-origin BFF. ฝั่ง client ของ G ใช้ REST/HTTP JSON; G→B ใช้ gRPC ตาม `G/AGENTS.md:29` ไม่ใช่ HTTP proxy และไม่มี direct public B fallback.\n\nส่วนนี้มี precedence เหนือข้อความ transport ทุกส่วนของ Rev1–Rev2 ด้านล่าง รวม HTTP relay/HttpClient, การปัด gRPC และข้อความรอเลือก transport/HTTP exception. เก็บข้อความเหล่านั้นเป็นประวัติ ไม่ใช่ทางเลือกปัจจุบัน; ไม่ต้องขอเลือก gRPC ซ้ำ. route/payload/status แบบ HTTP อ่านเป็นฝั่ง client ของ G ไม่ใช่หลักฐานว่า B ต้อง expose HTTP endpoint เดียวกันหรือมี RPC mapping แล้ว.\n\nLogin HTTP เดิมของ G เป็นคนละขอบเขตกับ service transport ใหม่; ไม่สั่ง rewrite Login หรือ decoder ที่ parse HTTP/JSON outcomes. คง C, opaque session, Channel/License, decisions-035, cType และ private introspection ที่แยกจาก public service-route.\n\n**As-built ที่ตรวจรอบนี้:** `B/web/src/SchoolBot.Api/Program.cs:45–48,94` ผูก LogoutService/PostgresSessionLogoutStore และ `LogoutEndpoint.cs:9,22` รับ HTTP POST แล้วเรียก use case. ยังไม่ครบ G→gRPC→B; inventory csproj/proto และ Program.cs ไม่พบ gRPC registration/reference หรือ .proto ในขอบเขตตรวจ. ใช้ domain/application/logout persistence เดิมซ้ำเมื่อเปลี่ยน transport โดยยังต้องพิสูจน์ integration. [QA round001](../qa/round-001.md) 4032 tests คง verdict local/static เดิม ไม่ใช่ gRPC/Gateway/DB integration proof.\n\n**งานถัดไป sys/arch:** จัดทำ gRPC contract + HTTP mapping + trust boundary ก่อน transport implementation: RPC/DTO, auth/tenant metadata, error mapping, timeout/cancellation/retry และ private exposure ต้องอิงหลักฐานจริง งานนี้ไม่กำหนดรายละเอียดเหล่านั้นแทนเจ้าของ. `G/AGENTS.md:35–37` ยังต้อง reconcile tenant จาก JWT กับ opaque session และผ่าน Light review สำหรับ protected paths; H5/TLS/peer/runtime proof ยังค้าง ไม่ใช่คำถามเลือก transport ใหม่.\n\nเหตุผล: ใช้มาตรฐาน G ที่ยืนยันแล้ว; ไม่ใช้ HTTP relay/HttpClient เป็น service transport เพราะขัดมาตรฐาน และไม่ rewrite Login เดิมเพราะอยู่นอกการเชื่อม G→B.\n\n## ประวัติ Rev1–Rev2 — transport ถูก supersede โดย Rev3\n\nข้อความเดิมด้านล่างเก็บเพื่อประวัติ; มติ035และสัญญา auth ที่ไม่เกี่ยวกับ transport ยังคงใช้."
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-integration-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev3: ใบงาน049 ยก REST→gRPC ขึ้นเป็น topology ปัจจุบัน; แยก HTTP logout as-built/ผล local tests จาก transport integration; คงประวัติและ H5/Light"
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev7",
+      "new": "# DES-012 — Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API — Rev8\n\n> Override Rev8 (2026-10-24): อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ routing ด้านล่าง: client→HTTP G→gRPC B. ข้อความ Rev5/Rev6 ว่า HTTP forwarder ต้อง implement หรือเป็น candidate เป็นประวัติที่ถูก supersede; HTTP paths/status ในสัญญาไม่ใช่ RPC mapping. คง C/opaque session/035 และ H5; HTTP logout ที่มีแล้วไม่ยืนยัน Gateway/gRPC พร้อม."
+    },
+    {
+      "path": "knowledge/school-bot/design/des-012.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev8: ใบงาน049 ชี้ precedence transport ไป Gateway Rev3; ไม่เปลี่ยน auth/schema หรือ gate"
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "old": "# Gateway Login reuse — Rev2",
+      "new": "# Gateway Login reuse — Rev3\n\n> Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน [receipt](../planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration."
+    },
+    {
+      "path": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev3: ใบงาน049 แยก Login reuse เดิมจาก G→B gRPC; คง adapter/admission และประวัติ"
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev4",
+      "new": "# Desktop auth — packet หลักฐานก่อนต่อ production path — Rev5\n\n> Override Rev5 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เรื่อง transport เหนือ packet เดิม: client→HTTP G→gRPC B เป็นมาตรฐานที่เลือกแล้ว ไม่รอเลือก HTTP relay/gRPC ใหม่. G/Light review ยังครอบคลุม implementation/trust/tenant/private exposure และ protected paths; ไม่ใช่อนุมัติ HTTP exception. คง cType/identity/device/session/H5; decoder037 ไม่ขึ้นกับการต่อ transport."
+    },
+    {
+      "path": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — Rev5: ใบงาน049 แยกมาตรฐาน gRPC ที่ทราบแล้วจาก implementation/trust review ที่ยังค้าง"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## Feasibility",
+      "new": "## Transport — precedence ใบงาน049 (2026-10-24)\n\nอ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-012 Rev8, Login reuse Rev3 และ review packet Rev5; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.\n\n## Feasibility"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "(Rev7) | PROPOSED — topology และแหล่ง is_admin",
+      "new": "(Rev8) | PROPOSED — topology และแหล่ง is_admin"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "Rev2 — HTTP relay รอ G/Light review;",
+      "new": "Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review;"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "| Rev4 — category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |",
+      "new": "| Rev5 — transport ตาม Gateway Rev3; category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |"
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev1 — PROPOSED: reuse W/G login ยืนยันจาก static evidence; Desktop adapter/identity และ H5 transport ยังรอหลักฐาน. อ่านร่วม override DES-004 Rev8, DES-012 Rev6 และ Gateway integration Rev2 ก่อน implement.",
+      "new": "[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev3 — PROPOSED: reuse HTTP Login เดิมแยกจาก G→B gRPC; อ่าน DES-012 Rev8 และ Gateway integration Rev3. Desktop adapter/identity และ H5 implementation ยังรอหลักฐาน."
+    },
+    {
+      "path": "knowledge/school-bot/design/index.md",
+      "old": "## Change Log",
+      "new": "## Change Log\n- 2026-10-24 — ใบงาน049: Gateway Rev3/DES-012 Rev8/reuse Rev3/packet Rev5 ชี้ REST→gRPC และขอบเขต HTTP logout; adapter Rev4 คงเดิม ไม่เปลี่ยน counts/tasks/QA verdict"
+    }
+  ],
+  "remaining_work": [
+    "ผู้คุม archive ฉบับเดิมทั้ง 5 ไฟล์แบบ verbatim ก่อน apply; anchors ไม่ซ้ำภายในไฟล์เป้าหมาย",
+    "sys/arch จัดทำ gRPC contract, HTTP mapping และ trust boundary จาก source จริงก่อน implementation; ยังไม่กำหนด proto/RPC/auth metadata/error mappings ในงานนี้",
+    "G/Light รับ implementation review และ tenant/opaque-session reconciliation; คง H5 และหลักฐาน Gateway/gRPC/DB runtime ที่ยังค้าง"
+  ],
+  "handoff": "ส่งนายช่าง archive/apply amendment แล้วส่ง sys/arch รับ contract ถัดไป; ไม่มี schema proposal สำหรับ vault หรือคำถามเลือก gRPC ซ้ำ ไม่แก้ plan/source/SQL/REQ/AC/QA ไม่รัน tests/network/DB/git mutation"
+}

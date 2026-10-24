@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-24",
+  "reason": "Archive before arch049 gRPC transport document amendment",
+  "files": [
+    {
+      "source": "knowledge/school-bot/design/gateway-integration-001.md",
+      "archive": "gateway-integration-001.md",
+      "sha256": "2b6279731bf56b8658f3b824d92dae01f3969c09c51d8399b0f4d653f29ded57"
+    },
+    {
+      "source": "knowledge/school-bot/design/des-012.md",
+      "archive": "des-012.md",
+      "sha256": "90d98d1be2949e5b6045fa6d2c1a3093a73ae814a2a172306dc68f8cd7c76435"
+    },
+    {
+      "source": "knowledge/school-bot/design/gateway-login-reuse-001.md",
+      "archive": "gateway-login-reuse-001.md",
+      "sha256": "b3941acc24a2a350d349d87cb5e3f8fc4f8e092ae1d5bcc3846e399601bcc7d7"
+    },
+    {
+      "source": "knowledge/school-bot/design/desktop-auth-review-packet-001.md",
+      "archive": "desktop-auth-review-packet-001.md",
+      "sha256": "7de0d8f54a21bcb73f554c06769c9fed5a6ec1a7b87038190752b9dc38601091"
+    },
+    {
+      "source": "knowledge/school-bot/design/index.md",
+      "archive": "index.md",
+      "sha256": "1ed4366fdd44ea459b3d4cb7f3a73188294db6f6ab455f898e73cd7462afb52c"
+    }
+  ]
+}
