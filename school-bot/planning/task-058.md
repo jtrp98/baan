@@ -17,3 +17,4 @@ K=C:/src/schoolbright/knowledge/school-bot. อ่านก่อน: planning/g
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน sys เตรียม H5 artifact ตามคิว override 051 ขั้นสุดท้าย (docs-only)
+- 2026-10-24 — รับผล: state=BLOCKED เฉพาะจุดอ้างอิง — questionnaire 7 หัวข้อสร้างครบ แต่ส่งคืนก่อนอ่าน evidence-002 เพราะใบงานระบุพาธ `planning/evidence-002.md` ผิด (จริงอยู่ที่ `plan/` ความผิดของนายช่าง); นายช่างบันทึก [h5-questionnaire-001.md](h5-questionnaire-001.md) พร้อมแก้พาธและยืนยันแถว G-AUTH ครอบครบเอง; ต้นฉบับที่ [h5-questionnaire-response-001.json](h5-questionnaire-response-001.json); H5 ยังเปิด — รอเจ้าของ/มนุษย์ตอบ
