@@ -61,7 +61,7 @@
 | SchoolBotAssessment | EarnedScore / MaxScore | numeric(18,6) NULL | คะแนนรายบุคคล — บริบท**เด็ก** | SQL:748–749 |
 | SchoolBotAssessment | RuleResults | jsonb NOT NULL | ผล rule การประเมินผูกผู้เรียน | SQL:750 (เดิมรวมเป็น "ผ่าน jsonb" ผิดแหล่ง — แก้ตาม check 060f) |
 
-ตารางที่ไม่มีคอลัมน์ PII เฉพาะตัว (นอกจาก CreateBy/UpdateBy ร่วม): SchoolBotLicense, SchoolBotLicenseBinding, SchoolBotRelease, SchoolBotLevel, SchoolBotCurriculum, SchoolBotLesson, SchoolBotMission, SchoolBotActivity, SchoolBotQuestionBank, SchoolBotCourseRun, SchoolBotScoringPolicy, SchoolBotCourseRunActivity, SchoolBotGradingJob, SchoolBotGradeSlot, SchoolBotScoreMapping (แก้ตาม check 060f: ถอน SchoolBotLevelPromotionPolicy และ SchoolBotGradeSlot ออกจากรายการนี้เพราะมี Reason/OwnershipReason เป็น free-text ที่จำแนกไว้ §3 แล้ว)
+ตารางที่ไม่มีคอลัมน์ PII เฉพาะตัว (นอกจาก CreateBy/UpdateBy ร่วม): SchoolBotLicense, SchoolBotLicenseBinding, SchoolBotRelease, SchoolBotLevel, SchoolBotCurriculum, SchoolBotLesson, SchoolBotMission, SchoolBotActivity, SchoolBotQuestionBank, SchoolBotCourseRun, SchoolBotScoringPolicy, SchoolBotCourseRunActivity, SchoolBotGradingJob, SchoolBotScoreMapping (แก้ตาม check 060f รอบ 1–2: ถอน SchoolBotLevelPromotionPolicy (Reason — SQL:379) และ SchoolBotGradeSlot (OwnershipReason — SQL:889) ออกจากรายการนี้เพราะจำแนกไว้ §3 แล้ว)
 
 ไม่ใช่ PII บุคคล (ระบุกันเข้าใจผิด — ไม่นับใน inventory): `SchoolId`/`SchoolName` (องค์กร), `License.KeyHash/KeyHint/AllowedNextJkt` (credential องค์กร), `DeviceJkt`/`PublicJwk` (อุปกรณ์), `NonceHash/RequestHash/RequestKey/ContentHash/SnapshotHash/PayloadHash/ArtifactHash` (ค่า crypto), `LeaseOwner` (worker instance), `GraderVersion`
 
