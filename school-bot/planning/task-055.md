@@ -21,3 +21,4 @@ Source ที่ตรวจได้ (read-only อย่างเดียว)
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน sys ตรวจ routing/linkage ตามคิว override 051 ขั้นแรก (docs-only)
+- 2026-10-24 — รับผล: state=BLOCKED — legacy เป็น employee-only (cType="1", cDel==null, เลือก sID มากสุดไม่ reject ซ้ำ), B ยังไม่มี login route, และ WebLoginService/FindAuthUserDetail ไม่อยู่ใน legacy (ค้น rg ไม่พบ) → นายช่างยืนยันว่า symbol อยู่ใน G source จึงเปิด [ใบงาน056](task-056.md) ตรวจฝั่ง G ต่อ; หลักฐานเก็บที่ [routing-linkage-evidence-001.json](routing-linkage-evidence-001.json)
