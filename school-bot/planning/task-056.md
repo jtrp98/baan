@@ -26,3 +26,4 @@ Scope ตรวจ G = C:/src/schoolbright/target/sb-api-gateway (อ่าน A
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน sys ตรวจ seam ฝั่ง G ต่อจาก055 ที่ BLOCKED (symbol อยู่ใน G ไม่ใช่ legacy)
+- 2026-10-24 — รับผล: state=DONE — ไม่มี pre-auth cType selector (web=employee-only CType='1'/CDel null ก่อน password, เลือก SId มากสุดเงียบๆ; mobile แยก student/employee หลังสร้าง token), FindAuthUserDetail คืน master projection ไม่มี profile join/cardinality check, identity key ต่างกันระหว่าง WorkStatus/token/2FA (SId vs NSystemId??SId), error contract ฝั่ง G: 401/403/429/400/503-not-configured + HTTP200=password-change/2FA/contact ก่อน session; verdict มีเงื่อนไข ยังไม่พร้อมต่อ caller; หลักฐานเก็บที่ [routing-linkage-evidence-002.json](routing-linkage-evidence-002.json) → ส่งต่อ arch ใบงาน057
