@@ -189,6 +189,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - **plan เลือก tier ได้เฉพาะ task ของ `front` / `sys`** (งาน implement ที่ผ่าน design ของ arch มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน `src/plan.mjs` (บรรทัด `> tier:` ในไฟล์ role และตาราง role ถูก test ให้ตรงกับค่านี้เสมอ)
 - task ที่ไม่พึ่งกัน (dependsOn ว่าง) **รันขนานกัน** ตามลำดับ wave
 - งานง่าย plan ให้น้อย task เอง — ไม่ต้องใช้ทั้งทีม
+- **งานที่เปลี่ยนสิ่งที่มีผู้อ้างอิง ต้องกวาดทุกจุด (related-impact sweep)** — เปลี่ยนสัญญา/ชื่อ/ค่า/revision/สถานะที่มีอยู่แล้ว แผนต้องมี task เก็บเอกสารผู้อ้างอิงทุกจุดตามเจ้าของไฟล์ (รวม index หลักของโมดูล) แม้เป็นงานเล็ก; ไม่มีผู้อ้างอิงต้องระบุไว้ชัดว่าไม่มี
 - สิ่งที่ต้องเป็นประตูมนุษย์ (sign-off int / รัน SQL / ตัดสินธุรกิจ) รวมเป็น `humanGates` รายงานตอนจบ — ไม่ทำแทน
 - default agent = **codex** (`--agent` เปลี่ยนได้)
 - ตัวเปิด session ราย role (มือระดับล่าง) คือคำสั่ง `baan-role`
@@ -299,6 +300,8 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
 
 ## Change Log
+
+- 2026-10-24 — เพิ่มกติกา related-impact sweep ใน charter นายช่าง (BAAN.md), planner prompt และ roles/plan.md — งานที่เปลี่ยนสิ่งที่ถูกอ้างอิงต้องกวาดแก่เอกสารผู้อ้างอิงทุกจุดตามเจ้าของไฟล์
 
 - 2026-10-23 — เพิ่ม DBML แบบเต็ม/ภาพ integration เป็นผลส่งมอบคู่ data model พร้อมบทบาทตรวจและหลักฐาน parser
 

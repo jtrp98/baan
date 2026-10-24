@@ -88,7 +88,8 @@ ${matrix}
 2. **Task tier is selectable only for roles = front / sys** (implementation work already designed by arch — pick within ${IMPLEMENT_TIER_RANGE} by real difficulty) — every other role uses its fixed tier from the list above.
 3. Tasks without dependencies (empty dependsOn) run in parallel — add a dependency only when genuinely required. Two tasks writing to the same target repository must depend on each other unless they provably touch disjoint files/paths — sharing no contract is not the same as sharing no files.
 4. Every task works read-only (no file edits yet) — output is documents/text.
-5. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
+5. Related-impact sweep: if a task changes an existing contract, name, value, revision, or status that other artifacts reference, the plan must also include a follow-up task for each affected document's owner (knowledge categories, index revision/status cells, target-repo docs) — a plan that changes the referenced thing but leaves referencing documents stale is defective. If nothing references the change, say so in the task so it is a decision, not an oversight.
+6. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
 
 ## Reply with JSON only (no text outside the JSON):
 {
