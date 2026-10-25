@@ -64,7 +64,7 @@
 | REQ-051 | คะแนนชนและการคุ้มครองคะแนนครู | DRAFT | 5 | [req-051.md](req-051.md) |
 | REQ-052 | สิทธิ์ การส่งซ้ำ และ audit คะแนน | DRAFT | 5 | [req-052.md](req-052.md) |
 
-รวม 44 REQ / 185 AC (AC-030-04..08 เพิ่มตาม [decisions-036](decisions-036.md) — ข้อเสนอรอผู้ใช้ตรวจรับ)
+รวม 44 REQ / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
 
 ## หมวดตามผลิตภัณฑ์
 
@@ -129,8 +129,11 @@
 | [decisions-034.md](decisions-034.md) | สูตรรวมถ่วงน้ำหนักรายกิจกรรมรวม 100%; แก้น้ำหนักใช้รอบใหม่; ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด; ปิด OQ-014 |
 | [decisions-035.md](decisions-035.md) | แอดมินโรงเรียนตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server และคง super admin เดิม; ปิดคำถามแหล่ง is_admin ส่ง arch sync |
 | [decisions-036.md](decisions-036.md) | GAP-07: คง workflow PrepareUpdate/InstallPreparedUpdate — spec ร่าง AC-030-04..08 (รอผู้ใช้ตรวจรับ) / inspect เพิ่ม coverage / gate เดิม |
+| [decisions-037.md](decisions-037.md) | ตรวจรับ AC-030-04..08 ทั้ง 5 · UX Q5 ถามทุกครั้ง · UX Q9 ป้ายจำลองตลอด session (ยืนยัน BR-013-03) · performance 300MB/5s/30FPS เป็น acceptance ของ G-DELIVERY |
 
 ## Change Log
+
+- 2026-10-24 — decisions-037 (ผู้ใช้ตรวจรับ AC-030-04..08 + UX Q5/Q9 + performance เป็น acceptance): req-030 ถอดป้ายข้อเสนอ, req-013 ยืนยัน BR-013-03, pack-delivery §4 ยืนยัน; 44 REQ/185 AC ยืนยันครบฝั่ง GAP-07
 
 - 2026-10-24 — decisions-036 (มติผู้ใช้ GAP-07: คง Prepare/Install): amend REQ-030 เพิ่ม BR-030-04..06 + AC-030-04..08 (ระบุ "ข้อเสนอรอผู้ใช้ตรวจรับ" ตามเงื่อนไข disposition) — 44 REQ/185 AC; รันโดย นายช่าง solo (สวมบท spec)
 

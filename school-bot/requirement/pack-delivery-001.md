@@ -26,9 +26,9 @@ macOS 15+:
 - macOS: Developer ID Application + Installer, hardened runtime, notarize + staple ก่อนแจก (docs/INSTALLERS.md:171–180); ad-hoc signing ปัจจุบันไม่ใช่ notarized release (BR-032-03)
 - Evidence ที่ต้องเก็บ: signature/notarization receipts, PE/Mach-O/architecture, engine/package hashes, version/notices จากเครื่อง build RC
 
-## 4. Performance — ไม่ถือเป้าเดิมเป็น SLA
+## 4. Performance — ยืนยันเป็น acceptance แล้ว (decisions-037)
 
-README.md:210 (300 MB / 5 s / 30 FPS) เป็น targets ไม่ใช่ผลวัดหรือ SLA (BA-004 acceptance ยืนยันแนวนี้) — ต้องมีวิธีวัดที่ตกลงกัน (cold/warm start, scene/ขนาด, สเปกเครื่อง CPU/RAM/GPU/OS build/web runtime) และผู้รับรองก่อนเป็น acceptance
+ผู้ใช้ยืนยัน 2026-10-24: เป้า **300 MB / เปิด 5 วินาที / 30 FPS ใช้เป็น acceptance ของ G-DELIVERY** พร้อมวิธีวัดตามที่ร่างไว้ (cold/warm start, scene/ขนาด, สเปกเครื่องอ้างอิง CPU/RAM/GPU/OS build/web runtime) — ผู้ตรวจรับรายแพลตฟอร์มยังเป็นช่องกรอกแยกตาม §5 · ผลวัดจริงยังไม่มี (ยังไม่ถือว่าผ่าน)
 
 ## 5. ตาราง decision-owner (ช่องว่างให้คนกรอก)
 
@@ -45,3 +45,4 @@ README.md:210 (300 MB / 5 s / 30 FPS) เป็น targets ไม่ใช่ผ
 ## Change Log
 
 - 2026-10-24 — สร้าง delivery & decision-owner pack ตาม BA-004 (decisions-019/008 + os-compatibility-001); รันโดย นายช่าง solo (subagent role spec); read-only ไม่ถาม OS ซ้ำ ไม่อนุมัติ release
+- 2026-10-24 — decisions-037: §4 performance ยืนยันเป็น acceptance ของ G-DELIVERY (ผู้ตรวจรับรายแพลตฟอร์มยังค้างตาม §5)

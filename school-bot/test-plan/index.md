@@ -28,7 +28,7 @@ E-API สำหรับ integration ต้องมี sanitized HTTP↔RPC cor
 
 | เอกสาร | ขอบเขต | สถานะ |
 | --- | --- | --- |
-| [TP-001](tp-001.md) | 80 cases /185 AC (Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 ตามมติ decisions-036 — AC-030-04..08 เป็นข้อเสนอรอผู้ใช้ตรวจรับ); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime + AC ใหม่รอรับ; ทุก case NOT_RUN |
+| [TP-001](tp-001.md) | 80 cases /185 AC (Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 — AC-030-04..08 ตรวจรับแล้วตาม decisions-037); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime; ทุก case NOT_RUN |
 | [TP-002 fixture plan](tp-002-fixture-plan-001.md) | แผน failure/race fixtures FX-01..05 (fake clock/trash/late callback/import lost response/cross-tenant) — ไม่สั่งหุ่น | เอกสารเตรียม — ยังไม่มี harness/การรัน |
 | [Traceability](traceability-001.md) | 180 AC → cases → implementation/validation owner | IDs/coverage ตรวจแล้ว ไม่ใช่ QA PASS |
 | [Owner dataset](tp-001.json) | ผล inspect ต้นฉบับ | ไม่มี test execution |

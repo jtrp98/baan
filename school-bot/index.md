@@ -7,12 +7,12 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ข้อเสนอรอผู้ใช้ตรวจรับตาม decisions-036); decisions-001..036 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม decisions-037); decisions-001..037 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev8/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED; รอบ060a ปิด GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา (ดู §060a) |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/185 AC |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002 sync + Amendment003 เปิด GAP-07 ตามมติ036) + TP-002 fixture plan; actual ทุกเคส NOT_RUN; AC-030-04..08 รอผู้ใช้รับ |
+| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002+003 — AC GAP-07 ตรวจรับแล้ว) + TP-002 fixture plan; actual ทุกเคส NOT_RUN |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | ร่างแรก int-001 Entry / int-002 Labs — รอเซ็นทุกส่วน |
@@ -35,6 +35,8 @@
 เอกสารล่าสุด: [ใบงาน060 โหมด solo](planning/task-060.md) — ปิด GAP design รอบ060a + packs/DB docs/TP/UX + jpo/check ตรวจข้ามโมเดล (ผล check รอบ 1 FAIL → แก้ครบ ตาม [check-060-docs-review-001](planning/check-060-docs-review-001.md)); ประตูมนุษย์ใหม่: GAP-07 disposition, spec Q1–Q6, UX Q1–Q13, EV-01..06.
 
 ## Change Log
+
+- 2026-10-24 — decisions-037 (มติผู้ใช้ชุดถัดมา): ตรวจรับ AC-030-04..08 ทั้ง 5 (req-030 ถอดป้ายข้อเสนอ) · UX Q5 ถามทุกครั้ง (§4) / Q9 ป้ายจำลองตลอด session (ยืนยัน BR-013-03 ของ REQ-013) · performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY (pack-delivery §4) · คง 110 pending/gates ไม่มี code/SQL/runtime; ค้าง: spec Q1–Q5, UX Q2/Q3/Q6–Q8/Q10/Q11/Q13
 
 - 2026-10-24 — decisions-036 (มติผู้ใช้ผ่านแบบฟอร์มคำถามหลังปิดรอบ060): GAP-07 คง Prepare/Install → REQ-030 +BR-030-04..06 +AC-030-04..08 (ข้อเสนอรอตรวจรับ) รวม 44 REQ/**185 AC** · TP Amendment003 (TP001-048 แก้ + TP001-080 ใหม่ = **80 cases**) · UX Q1/Q4 sign-off บันทึกที่ uxui/int-001 · EV-01..06 เตรียมข้อความให้ผู้ใช้ forward (db-safe-evidence-cover-001) · คง 110 tasks pending/17 gates ไม่มี code/SQL/runtime
 
