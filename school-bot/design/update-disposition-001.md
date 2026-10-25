@@ -19,4 +19,5 @@ Task SA-001/BE-019 · Reference GAP-07, DES-007, REQ-030 · Reason: coverage ย
 
 ## Change Log
 - 2026-10-24 — Rev1: ใบงาน060a แยกสัญญาเฉพาะเรื่องและหลักฐาน; ไม่เปลี่ยน schema/gates/AC
+- 2026-10-24 — **ผู้ใช้เลือก "คง PrepareUpdate/InstallPreparedUpdate"** ผ่านแบบฟอร์มคำถามของนายช่าง — บันทึกเป็น [decisions-036](../requirement/decisions-036.md): spec ร่าง AC-030-04..08 แล้ว (ข้อเสนอรอผู้ใช้ตรวจรับอีกครั้งตามเงื่อนไขของเอกสารนี้), inspect เพิ่ม TP001-080, gate/`install_supported=false` คงเดิมจน implement
 

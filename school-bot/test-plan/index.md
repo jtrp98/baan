@@ -24,17 +24,19 @@
 
 E-API สำหรับ integration ต้องมี sanitized HTTP↔RPC correlation, build/config/proto revision, fault point และ DB before/after+audit ตาม scope; stub/teststore ให้ระบุชัด ไม่ปิด DB runtime. ขั้นตอนร่วมเพิ่มความลึกการตรวจ ไม่เพิ่ม case IDs/AC coverage. ก่อนมี contract ยอมรับเพียงเอกสารเตรียมทดสอบ ไม่ยอมรับความเสี่ยงเพื่อเปิด integration/release.
 
-[QA round001](../qa/round-001.md) คง 4032 local/static PASS เดิม ไม่ใช่ G/gRPC/DB integration; 79 TP cases ยัง NOT_RUN. tp-001.json คงเป็น raw owner snapshot พร้อม amendment เดิม; strategy/profiles เดิมไม่ใช่ runbook ปัจจุบันเมื่อขัดส่วนนี้. Joined JSON คง AC/expected/owner/actual ตาม schema เดิม; ขั้นตอนปัจจุบันอ่าน TP Markdown และส่วนนี้.
+[QA round001](../qa/round-001.md) คง 4032 local/static PASS เดิม ไม่ใช่ G/gRPC/DB integration; 80 TP cases ยัง NOT_RUN. tp-001.json คงเป็น raw owner snapshot พร้อม amendment เดิม; strategy/profiles เดิมไม่ใช่ runbook ปัจจุบันเมื่อขัดส่วนนี้. Joined JSON คง AC/expected/owner/actual ตาม schema เดิม; ขั้นตอนปัจจุบันอ่าน TP Markdown และส่วนนี้.
 
 | เอกสาร | ขอบเขต | สถานะ |
 | --- | --- | --- |
-| [TP-001](tp-001.md) | 79 cases /180 AC (Amendment002 sync GAP-01..04/06/08 + SEC001-003/009); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime; ทุก case NOT_RUN |
+| [TP-001](tp-001.md) | 80 cases /185 AC (Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 ตามมติ decisions-036 — AC-030-04..08 เป็นข้อเสนอรอผู้ใช้ตรวจรับ); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime + AC ใหม่รอรับ; ทุก case NOT_RUN |
 | [TP-002 fixture plan](tp-002-fixture-plan-001.md) | แผน failure/race fixtures FX-01..05 (fake clock/trash/late callback/import lost response/cross-tenant) — ไม่สั่งหุ่น | เอกสารเตรียม — ยังไม่มี harness/การรัน |
 | [Traceability](traceability-001.md) | 180 AC → cases → implementation/validation owner | IDs/coverage ตรวจแล้ว ไม่ใช่ QA PASS |
 | [Owner dataset](tp-001.json) | ผล inspect ต้นฉบับ | ไม่มี test execution |
 | [Joined dataset](traceability-001.json) | REQ+canonical tasks+cases | revision2 |
 
 ## Change Log
+
+- 2026-10-24 — Amendment003 ตาม decisions-036 (นายช่าง solo สวมบท inspect): แก้ TP001-048 + เพิ่ม TP001-080 เปิด coverage GAP-07 (AC-030-04..08 ข้อเสนอรอผู้ใช้ตรวจรับ) — 80 cases/185 AC ทุก actual NOT_RUN
 
 - 2026-10-24 — ใบงาน060e (นายช่าง solo — subagent role inspect): Amendment002 sync TP-001 ตามสัญญาใบงาน060a (แก้ 19 cases เพิ่ม TP001-078/079 — รวม 79 cases ครอบ 180 AC ทุก actual NOT_RUN) + สร้าง TP-002 fixture plan (FX-01..05); ไม่แตะ GAP-07 coverage จนกว่า disposition จะตัดสิน; ไม่มี execution
 

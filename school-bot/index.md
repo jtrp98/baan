@@ -7,12 +7,12 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 180 AC — DRAFT; decisions-001..035 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ข้อเสนอรอผู้ใช้ตรวจรับตาม decisions-036); decisions-001..036 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev8/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED; รอบ060a ปิด GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา (ดู §060a) |
-| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/180 AC |
+| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/185 AC |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 79 cases/180 AC (Amendment002 sync GAP+SEC รอบ060) + TP-002 fixture plan FX-01..05; actual ทุกเคส NOT_RUN; GAP-07 ยังไม่มี coverage |
+| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002 sync + Amendment003 เปิด GAP-07 ตามมติ036) + TP-002 fixture plan; actual ทุกเคส NOT_RUN; AC-030-04..08 รอผู้ใช้รับ |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | ร่างแรก int-001 Entry / int-002 Labs — รอเซ็นทุกส่วน |
@@ -35,6 +35,8 @@
 เอกสารล่าสุด: [ใบงาน060 โหมด solo](planning/task-060.md) — ปิด GAP design รอบ060a + packs/DB docs/TP/UX + jpo/check ตรวจข้ามโมเดล (ผล check รอบ 1 FAIL → แก้ครบ ตาม [check-060-docs-review-001](planning/check-060-docs-review-001.md)); ประตูมนุษย์ใหม่: GAP-07 disposition, spec Q1–Q6, UX Q1–Q13, EV-01..06.
 
 ## Change Log
+
+- 2026-10-24 — decisions-036 (มติผู้ใช้ผ่านแบบฟอร์มคำถามหลังปิดรอบ060): GAP-07 คง Prepare/Install → REQ-030 +BR-030-04..06 +AC-030-04..08 (ข้อเสนอรอตรวจรับ) รวม 44 REQ/**185 AC** · TP Amendment003 (TP001-048 แก้ + TP001-080 ใหม่ = **80 cases**) · UX Q1/Q4 sign-off บันทึกที่ uxui/int-001 · EV-01..06 เตรียมข้อความให้ผู้ใช้ forward (db-safe-evidence-cover-001) · คง 110 tasks pending/17 gates ไม่มี code/SQL/runtime
 
 - 2026-10-24 — ใบงาน060 (โหมด solo): ปิดคิวเตรียมเอกสาร queue-003 §3 ครบ — arch ผ่าน runner ภายนอก codex t1 (GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา + BL-001 + SA-004 ชุดเกณฑ์ + arch-fix Rev2 ตาม jpo) · spec/int/inspect/vault เป็น subagent โดยนายช่างบันทึก (packs 4 ชุดครอบ GAP-05/09, uxui int-001/002 รอเซ็น Q1–Q13, TP 79 cases + TP-002 fixtures, db review-007/pii-inventory/db-safe-evidence + BL-001) · jpo และ check ตรวจข้ามโมเดลผ่าน baan-role (jpo NEEDS_HUMAN ตาม gates เดิม; check รอบ 1 FAIL 4 จุด → เจ้าของไฟล์แก้ครบ) · คง 110 tasks pending/44 REQ/180 AC/17 gates ไม่มี code/SQL/runtime; ประตูมนุษย์ใหม่: GAP-07 disposition (update-disposition-001), spec Q1–Q6 (packs), UX Q1–Q13, EV-01..06 (ส่งเจ้าของ Master DB)
 

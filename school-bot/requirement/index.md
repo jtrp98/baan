@@ -40,7 +40,7 @@
 | REQ-027 | จัดการ license ผ่าน admin API | DRAFT | 4 | [req-027.md](req-027.md) |
 | REQ-028 | Activate, validate และจำกัดอุปกรณ์ | DRAFT | 4 | [req-028.md](req-028.md) |
 | REQ-029 | จัดการ release metadata | DRAFT | 3 | [req-029.md](req-029.md) |
-| REQ-030 | ตรวจข้อมูลอัปเดตจาก Desktop | DRAFT | 3 | [req-030.md](req-030.md) |
+| REQ-030 | ตรวจข้อมูลอัปเดตจาก Desktop | DRAFT | 8 | [req-030.md](req-030.md) |
 | REQ-031 | ติดตั้งและดูแลแอปบน Windows | DRAFT | 5 | [req-031.md](req-031.md) |
 | REQ-032 | ติดตั้งแอปบน macOS | DRAFT | 3 | [req-032.md](req-032.md) |
 | REQ-033 | ชื่อและฟิลด์ข้อมูล SchoolBot | DRAFT | 5 | [req-033.md](req-033.md) |
@@ -64,7 +64,7 @@
 | REQ-051 | คะแนนชนและการคุ้มครองคะแนนครู | DRAFT | 5 | [req-051.md](req-051.md) |
 | REQ-052 | สิทธิ์ การส่งซ้ำ และ audit คะแนน | DRAFT | 5 | [req-052.md](req-052.md) |
 
-รวม 44 REQ / 180 AC
+รวม 44 REQ / 185 AC (AC-030-04..08 เพิ่มตาม [decisions-036](decisions-036.md) — ข้อเสนอรอผู้ใช้ตรวจรับ)
 
 ## หมวดตามผลิตภัณฑ์
 
@@ -128,8 +128,11 @@
 | [decisions-033.md](decisions-033.md) | ใช้เฉพาะช่องคะแนนเดิม แปลงตามสัดส่วนคะแนนเต็มแล้วปัด half-up ข้ามผลที่ยังไม่มีตอนส่งเกรด; ปิด OQ-016 |
 | [decisions-034.md](decisions-034.md) | สูตรรวมถ่วงน้ำหนักรายกิจกรรมรวม 100%; แก้น้ำหนักใช้รอบใหม่; ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด; ปิด OQ-014 |
 | [decisions-035.md](decisions-035.md) | แอดมินโรงเรียนตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server และคง super admin เดิม; ปิดคำถามแหล่ง is_admin ส่ง arch sync |
+| [decisions-036.md](decisions-036.md) | GAP-07: คง workflow PrepareUpdate/InstallPreparedUpdate — spec ร่าง AC-030-04..08 (รอผู้ใช้ตรวจรับ) / inspect เพิ่ม coverage / gate เดิม |
 
 ## Change Log
+
+- 2026-10-24 — decisions-036 (มติผู้ใช้ GAP-07: คง Prepare/Install): amend REQ-030 เพิ่ม BR-030-04..06 + AC-030-04..08 (ระบุ "ข้อเสนอรอผู้ใช้ตรวจรับ" ตามเงื่อนไข disposition) — 44 REQ/185 AC; รันโดย นายช่าง solo (สวมบท spec)
 
 - 2026-10-24 — ใบงาน060b: เพิ่ม packs 4 ชุดของ spec (BA-001..004 — guest/content-inventory/hardware/delivery) ครอบ GAP-05/09 พร้อมช่องกรอกคนและป้ายสมมติฐาน; รันโดย นายช่าง solo (subagent role spec); คง 44 REQ/180 AC/DRAFT และมติเดิมทั้งหมด
 

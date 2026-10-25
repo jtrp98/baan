@@ -11,7 +11,8 @@
 | `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | DRAFT Rev5 — ยังไม่รัน |
 | `review-007.md` | vault ยืนยัน SEC001-009 replay TTL ของ create-license ไม่ต้องแก้ physical DDL (ใบงาน060c) | PASS (static) — read-time gate + cleanup job เป็นงาน application |
 | `pii-inventory-001.md` | ตารางจำแนก PII รายคอลัมน์ 32 ตาราง + ตารางข้อมูลเด็ก 9 ตาราง + flag F1–F7 ส่ง jpo — ตอบ SEC001-010 | สร้างแล้ว — รอ jpo พิจารณา |
-| `db-safe-evidence-001.md` | ชุดคำขอหลักฐาน EV-01..06 จากเจ้าของ Master DB (schema-only + aggregate ปลอด PII ตาม TR-AUTH-03..06) | พร้อมส่งมนุษย์/เจ้าของ DB — นายช่างเป็นผู้ส่ง |
+| `db-safe-evidence-001.md` | ชุดคำขอหลักฐาน EV-01..06 จากเจ้าของ Master DB (schema-only + aggregate ปลอด PII ตาม TR-AUTH-03..06) | พร้อมส่งมนุษย์/เจ้าของ DB — มติ decisions-036: ผู้ใช้เป็นคนส่ง |
+| `db-safe-evidence-cover-001.md` | ข้อความพร้อม forward ถึงเจ้าของ Master DB (สรุป EV-01..06 + เงื่อนไขปลอด PII) | ผู้ใช้ยังไม่ได้ส่ง — รอยืนยัน |
 | `review-006.md` | vault เทียบมติ 032..034: SQL เดิมรองรับทาง A; ช่องว่าง mapping lock/น้ำหนัก/partial apply/ขอบเขตผลต่อรอบเรียน ส่ง arch | NEEDS_DESIGN_CHANGE — static เท่านั้น ไม่มี SQL delta ในรอบนี้ |
 | `review-005.md` | รอบ SQL Rev5 ตามคำสั่ง "อะไรไม่จำเป็นไม่ต้องใส่ / เอา index ออก"; แนบคำชี้แจงยอดปัจจุบัน BL-001 (delta D1–D7) แล้ว | ประวัติ + คำชี้แจงยอด 2026-10-24 |
 | `review-004.md` | รอบแยก SQL ตาม database (decisions-027 วางตารางที่ SchoolBot DB ของตัวเอง) | ประวัติ |
