@@ -6,7 +6,7 @@ Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 แล�
 
 ## Waiting on Human
 
-Precedence 2026-10-24 (มติ decisions-036/037 หลังรอบ060): ผู้ใช้ตัดสิน **GAP-07 = คง Prepare/Install และตรวจรับ AC-030-04..08 ทั้ง 5 ข้อ** (44 REQ/**185 AC** ยืนยันครบฝั่ง GAP-07; TP001-080 เพิ่ม = 80 cases) · **UX ผ่าน: Q1 License Gate, Q4 หมดสิทธิ์=บันทึก+หยุดหุ่นแล้วล็อก, Q5 ถามทุกครั้ง, Q9 ป้ายจำลอง (ยืนยัน BR-013-03)** · **performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY** · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward เจ้าของ Master DB** ([db-safe-evidence-cover-001](../db/db-safe-evidence-cover-001.md)) · คำถามค้างจากรอบ060: spec Q1–Q5 (packs), UX Q2/Q3/Q6–Q8/Q10/Q11/Q13
+Precedence 2026-10-24 (มติ decisions-036/037/038 หลังรอบ060): ผู้ใช้ตัดสินครบเกือบทุกประตูที่เตรียมไว้ — **GAP-07 = คง Prepare/Install + ตรวจรับ AC-030-04..08** (44 REQ/**185 AC**; TP001-080 = 80 cases) · **UX sign-off ครบทั้ง int-001/int-002** (Q1–Q13 ทั้งหมด — G-UX-ENTRY/G-UX-LABS มีหลักฐาน sign-off ครบ, front implement UX-001/UX-003 ได้) · **performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY** · **ผู้อนุมัติเนื้อหา = ผู้ใช้ + ยืนยัน rubric ดาว** · **ยังไม่อนุญาตทดสอบหุ่นจริง (dry-run ต่อ)** · cert signing ยังไม่ระบุ · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward** ([cover-001](../db/db-safe-evidence-cover-001.md) — รอผู้ใช้ส่ง) · **ค้างเหลือ: spec Q3 (รุ่นหุ่น/firmware/calibration/เกณฑ์ stop-unplug-emergency จริง)** และประตูเดิม (G/Light, H5, รัน SQL, ผู้ถือ cert, runtime)
 
 Precedence 2026-10-24 (มติ decisions-036 หลังรอบ060): ผู้ใช้ตัดสิน **GAP-07 = คง Prepare/Install** (spec ร่าง AC-030-04..08 แล้ว — ข้อเสนอรอผู้ใช้ตรวจรับ ก่อน implement; inspect เพิ่ม TP001-080; 44 REQ/**185 AC**/80 cases), **UX Q1 ยืนยัน License Gate ด่านแรก** และ **UX Q4 = ให้บันทึก+ขอหยุดหุ่นแล้วล็อก** (บันทึก sign-off ที่ uxui/int-001) · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward เจ้าของ Master DB** ([db-safe-evidence-cover-001](../db/db-safe-evidence-cover-001.md)) · คำถามค้างจากรอบ060: spec Q1–Q6 (packs), UX Q2/Q3/Q5–Q13, และ AC-030-04..08 รอตรวจรับ
 
@@ -117,7 +117,8 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
-- 2026-10-24 — decisions-036 (นายช่างสวมบท gm ในโหมด solo): บันทึกมติผู้ใช้ 4 ข้อ (GAP-07 คง Prepare/Install → 185 AC/80 cases, UX Q1/Q4 ยืนยัน, EV สรุปข้อความให้ forward); แถว Waiting on Human เพิ่ม precedence ใหม่; Status/dependencies/gates คงเดิม
+- 2026-10-24 — decisions-038 (นายช่างสวมบท gm): UX sign-off ครบทั้งสองไฟล์ (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ) + spec Q1/Q2/Q4/Q5 มีมติ; ค้างเฉพาะ spec Q3 + EV forwarding + ประตูเดิม; คง Status/dependencies/gates
+- 2026-10-24 — decisions-036/037 (นายช่างสวมบท gm ในโหมด solo): บันทึกมติผู้ใช้ GAP-07 (คง Prepare/Install → 185 AC/80 cases), UX Q1/Q4/Q5/Q9, performance = acceptance, EV สรุปข้อความให้ forward; Status/dependencies/gates คงเดิม
 - 2026-10-24 — ใบงาน060 (นายช่างสวมบท gm ในโหมด solo): เพิ่ม precedence รอบ060 — ปิดคิวเอกสาร §3 ครบ + ประตูมนุษย์พร้อมถาม 4 กลุ่มใหม่ (GAP-07/spec Q1–Q6/UX Q1–Q13/EV-01..06); คง Status/Release Scope/dependencies/gates ทั้งหมด
 - 2026-10-24 — ใบงาน059: ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items; คงข้อความฐาน/Status/dependencies/gates/Release Scope.
 - 2026-10-24 — ใบงาน051: ชี้คิว051/หลักฐานล่าสุด; คง Status/Release Scope.

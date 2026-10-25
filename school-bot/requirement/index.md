@@ -130,8 +130,11 @@
 | [decisions-035.md](decisions-035.md) | แอดมินโรงเรียนตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server และคง super admin เดิม; ปิดคำถามแหล่ง is_admin ส่ง arch sync |
 | [decisions-036.md](decisions-036.md) | GAP-07: คง workflow PrepareUpdate/InstallPreparedUpdate — spec ร่าง AC-030-04..08 (รอผู้ใช้ตรวจรับ) / inspect เพิ่ม coverage / gate เดิม |
 | [decisions-037.md](decisions-037.md) | ตรวจรับ AC-030-04..08 ทั้ง 5 · UX Q5 ถามทุกครั้ง · UX Q9 ป้ายจำลองตลอด session (ยืนยัน BR-013-03) · performance 300MB/5s/30FPS เป็น acceptance ของ G-DELIVERY |
+| [decisions-038.md](decisions-038.md) | Sign-off UX ครบทั้ง int-001/int-002 (Q2/Q3/Q6–Q8/Q10/Q11/Q13) · spec Q1 ผู้อนุมัติเนื้อหา=ผู้ใช้ · Q2 ยืนยัน rubric ดาว · Q4 ยังไม่อนุญาตทดสอบหุ่นจริง · Q5 cert ยังไม่ระบุ |
 
 ## Change Log
+
+- 2026-10-24 — decisions-038 (sign-off UX ครบทั้งสองไฟล์ + spec Q1/Q2/Q4/Q5): บันทึกผู้อนุมัติเนื้อหา=ผู้ใช้, rubric ยืนยัน, ยังไม่อนุญาตทดสอบหุ่นจริง, cert ยังไม่ระบุ — เหลือค้างเฉพาะ spec Q3 (ข้อมูลรุ่นหุ่น/calibration จริง); คงจำนวน REQ/AC เดิม
 
 - 2026-10-24 — decisions-037 (ผู้ใช้ตรวจรับ AC-030-04..08 + UX Q5/Q9 + performance เป็น acceptance): req-030 ถอดป้ายข้อเสนอ, req-013 ยืนยัน BR-013-03, pack-delivery §4 ยืนยัน; 44 REQ/185 AC ยืนยันครบฝั่ง GAP-07
 

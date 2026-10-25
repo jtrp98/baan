@@ -34,11 +34,11 @@ macOS 15+:
 
 | ประเด็น | ผู้ถือ/ผู้ตัดสิน (กรอก) | กำหนดเสร็จ | หมายเหตุ |
 |---|---|---|---|
-| ผู้ถือใบรับรอง Windows (code signing) | ______ | ______ | cert หมดอายุ/renewal เป็นของผู้ถือ |
-| ผู้ถือ Apple Developer ID (Application+Installer) | ______ | ______ | ต้องมีสิทธิ์ notarize |
-| ช่องทางแจกจ่าย (เว็บดาวน์โหลด/แฟลช/อื่น) | ______ | ______ | มีผลต่อ quarantine/Gatekeeper และวิธีทดสอบ |
+| ผู้ถือใบรับรอง Windows (code signing) | ______ — **มติ decisions-038 (spec Q5): ยังไม่ระบุ** | ______ | cert หมดอายุ/renewal เป็นของผู้ถือ |
+| ผู้ถือ Apple Developer ID (Application+Installer) | ______ — ยังไม่ระบุ (มติเดียวกัน) | ______ | ต้องมีสิทธิ์ notarize |
+| ช่องทางแจกจ่าย (เว็บดาวน์โหลด/แฟลช/อื่น) | ______ — ยังไม่ระบุ (มติเดียวกัน) | ______ | มีผลต่อ quarantine/Gatekeeper และวิธีทดสอบ |
 | ผู้ตรวจรับ G-DELIVERY รายแพลตฟอร์ม (Win11/mac Intel/mac arm64) | ______ | ______ | แยกรายแพลตฟอร์มได้ |
-| ผู้ยืนยันเกณฑ์ performance + วิธีวัด | ______ | ______ | จนกว่ายืนยัน ไม่ถือ 300MB/5s/30FPS เป็น SLA |
+| ผู้ยืนยันเกณฑ์ performance + วิธีวัด | **ยืนยันแล้ว: ผู้ใช้ (decisions-037 — ใช้ 300MB/5s/30FPS เป็น acceptance)** | — | ผลวัดจริงยังไม่มี |
 
 ข้อจำกัดที่ยังคง: .NET 10 OS matrix รองรับ Win11 25H2; Wails beta.30 เป็น pre-release; ยังไม่ตรวจ artifact จริง — pack นี้เป็นเกณฑ์เสนอ ไม่ใช่ผลตรวจรับ
 
@@ -46,3 +46,4 @@ macOS 15+:
 
 - 2026-10-24 — สร้าง delivery & decision-owner pack ตาม BA-004 (decisions-019/008 + os-compatibility-001); รันโดย นายช่าง solo (subagent role spec); read-only ไม่ถาม OS ซ้ำ ไม่อนุมัติ release
 - 2026-10-24 — decisions-037: §4 performance ยืนยันเป็น acceptance ของ G-DELIVERY (ผู้ตรวจรับรายแพลตฟอร์มยังค้างตาม §5)
+- 2026-10-24 — decisions-038 (spec Q5): ผู้ถือ cert Windows/Apple + ช่องทางแจกจ่าย — ยังไม่ระบุ (G-DELIVERY ค้างเรื่อง signing/custody ต่อ)

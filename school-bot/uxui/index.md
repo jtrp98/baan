@@ -7,15 +7,12 @@
 
 | ไฟล์ | ขอบเขต | สถานะ |
 |---|---|---|
-| [int-001-entry.md](int-001-entry.md) | UX-001 Entry/License/Guest-Login/Shell/Close — ครบทุก state (loading/error/empty/disabled/abnormal) + error→copy mapping + a11y | ร่าง — รอเซ็นทุกส่วน (2026-10-24) |
-| [int-002-labs.md](int-002-labs.md) | UX-003 Labs สามโหมด Arm/Block/Code — ค้นหา/เชื่อมต่อ/โปรไฟล์/ส่งท่า/เล่น/อัปโหลด/หยุด/ขาดการเชื่อมต่อ/Code+Block ทุก state + a11y | ร่าง — รอเซ็นทุกส่วน (2026-10-24) |
+| [int-001-entry.md](int-001-entry.md) | UX-001 Entry/License/Guest-Login/Shell/Close — ครบทุก state + error→copy mapping + a11y | **อนุมัติครบทุกส่วน** (ผู้ใช้ 2026-10-24 · decisions-036/037/038) — signed int artifact |
+| [int-002-labs.md](int-002-labs.md) | UX-003 Labs สามโหมด Arm/Block/Code — ค้นหา/เชื่อมต่อ/โปรไฟล์/ส่งท่า/เล่น/อัปโหลด/หยุด/ขาดการเชื่อมต่อ/Code+Block ทุก state + a11y | **อนุมัติครบทุกส่วน** (ผู้ใช้ 2026-10-24 · decisions-037/038) — signed int artifact |
 
-## จุดที่รอมนุษย์เซ็น (รวบจากทั้งสองไฟล์ — ตอบใน chat ได้)
+## จุดที่รอมนุษย์เซ็น
 
-**ผ่านแล้ว (ผู้ใช้ 2026-10-24 ผ่านแบบฟอร์มคำถาม):** UX-001 Q1 (License Gate ด่านแรก — §1) · UX-001 Q4 (หมดสิทธิ์ระหว่างใช้งาน = ให้บันทึก+ขอหยุดหุ่นแล้วล็อก) · UX-001 Q5 (หน้าเลือก Guest/Login ทุกครั้ง — §4) · UX-003 Q9 (ป้ายโหมดทดลองตลอด session — §1 บางส่วน + §5, ยืนยัน BR-013-03 ด้วย) — ตาม decisions-036/037
-
-ยังค้าง — UX-001: Q2 คำ copy หลัก/a11y · Q3 การแสดงวันสิ้นสิทธิ์ออฟไลน์ · Q6 ตำแหน่งปุ่มหน้าต่าง · Q13 stop ล้มระหว่างปิดหน้าต่าง
-UX-003: Q7 overlay ขาดการเชื่อมต่อ · Q8 ปุ่ม "ขอหยุด" · Q10 ตัวนับความยาว Code Lab · Q11 inline validation โครงงาน Arm
+**ไม่มีค้างสำหรับ UX-001/UX-003** — อนุมัติครบทุกส่วนแล้ว (Q1–Q13 ตอบครบผ่านแบบฟอร์มคำถาม 2026-10-24) · gate G-UX-ENTRY (UX-001) และ G-UX-LABS (UX-003) มีหลักฐาน sign-off ครบ · front เริ่ม implement จากสองไฟล์นี้ได้ · UX-002/004..007 ยังไม่ได้ร่าง (รอ BA-001 output/SA-002/SA-004 ตาม dependency เดิม) — เมื่อร่างจะขอเซ็นแยกตามแต่ละไฟล์
 
 หมายเหตุข้อจำกัด: ร่างทั้งสองอ้างหลักฐาน path:line จาก requirement/DES เป็นหลัก (frontend จริงอยู่ `target/school-bot/app/frontend/src` — ยังไม่ได้อ่านโค้ดรายบรรทัด) · Login flow เขียนตาม target contract มติ035 (fullLogin ยัง NOT_READY) · ยังไม่มี design system กลาง — กติกากลางเฉพาะจุดอยู่ใน int-002 §1
 

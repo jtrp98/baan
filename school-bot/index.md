@@ -7,7 +7,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม decisions-037); decisions-001..037 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม decisions-037); decisions-001..038 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev8/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED; รอบ060a ปิด GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา (ดู §060a) |
 | `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks pending (8 phases / 17 gates), 44 REQ/185 AC |
@@ -15,7 +15,7 @@
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002+003 — AC GAP-07 ตรวจรับแล้ว) + TP-002 fixture plan; actual ทุกเคส NOT_RUN |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
-| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | ร่างแรก int-001 Entry / int-002 Labs — รอเซ็นทุกส่วน |
+| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | int-001 Entry / int-002 Labs — **อนุมัติครบทุกส่วน** (ผู้ใช้ 2026-10-24 ตาม decisions-036/037/038); front implement ได้ |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; รอบ060 ฝัง mitigation SEC001-003/009 ระดับแบบ + jpo ตรวจรับ (security-gap-sync-review-001); ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
@@ -35,6 +35,8 @@
 เอกสารล่าสุด: [ใบงาน060 โหมด solo](planning/task-060.md) — ปิด GAP design รอบ060a + packs/DB docs/TP/UX + jpo/check ตรวจข้ามโมเดล (ผล check รอบ 1 FAIL → แก้ครบ ตาม [check-060-docs-review-001](planning/check-060-docs-review-001.md)); ประตูมนุษย์ใหม่: GAP-07 disposition, spec Q1–Q6, UX Q1–Q13, EV-01..06.
 
 ## Change Log
+
+- 2026-10-24 — decisions-038 (มติผู้ใช้ชุดสุดท้าย): **UX sign-off ครบทั้ง int-001/int-002** (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ — front implement UX-001/UX-003 ได้) · ผู้อนุมัติเนื้อหา=ผู้ใช้ · rubric ดาวยืนยัน · ยังไม่อนุญาตทดสอบหุ่นจริง · cert signing ยังไม่ระบุ · ค้าง: spec Q3 (รุ่นหุ่น/calibration จริง), EV forwarding, ประตูเดิม
 
 - 2026-10-24 — decisions-037 (มติผู้ใช้ชุดถัดมา): ตรวจรับ AC-030-04..08 ทั้ง 5 (req-030 ถอดป้ายข้อเสนอ) · UX Q5 ถามทุกครั้ง (§4) / Q9 ป้ายจำลองตลอด session (ยืนยัน BR-013-03 ของ REQ-013) · performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY (pack-delivery §4) · คง 110 pending/gates ไม่มี code/SQL/runtime; ค้าง: spec Q1–Q5, UX Q2/Q3/Q6–Q8/Q10/Q11/Q13
 
