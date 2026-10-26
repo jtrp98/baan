@@ -26,7 +26,7 @@
 | `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 15 verified / 95 pending |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases / 186 AC (Amendment004); traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
-| [qa/index.md](qa/index.md) | สารบัญ QA findings | GhelperPASS433; authrework2parent4077ผ่านรอcheck; BgRPCrework1parent4032ผ่านรอwirecheck; PG/fullLogin NOT_RUN |
+| [qa/index.md](qa/index.md) | สารบัญ QA findings | GhelperPASS433; Auth/Mathรอcheckหลังparent4077ผ่าน; BgRPCcheckr1FAIL119/150; Gtypedรอcheck; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | เซ็นครบ 7/7 รวม delta042 (decisions-043) |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | static review: Important 6 / Medium 6 / Minor 3 OPEN; SEC001-003/009 mitigation ระดับแบบ; ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001..004 |
