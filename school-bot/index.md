@@ -8,7 +8,7 @@
 - **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 95 pending · 8 phases / 17 gates · 44 REQ / 186 AC / 81 TP cases — ดู [plan/index.md](plan/index.md)
 - **คิว**: [Queue 004](plan/queue-004.md) + [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · รอบล่าสุดปิดที่ [handoff-003](planning/handoff-003.md)
 - **โค้ด**: logout API + Gateway outcome decoder ใน `target/school-bot/web` — test local 4032 ผ่าน ([qa/round-001](qa/round-001.md)); PG/fullLogin NOT_RUN และยังไม่ต่อ Gateway/gRPC จริง
-- **ฐานข้อมูล**: ผู้ใช้ยืนยันรัน `schoolbot_db.sql` สร้างตารางแล้ว ([บันทึก045](requirement/decisions-045.md)); ยังไม่ตรวจ catalog/revision และ API integration บนฐานจริง
+- **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
 - **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session/mapper และ H5
 - **UX**: เซ็นครบ 7/7 ชุดตาม [decisions-043](requirement/decisions-043.md); UX-005 Q39–Q42 และ UX-007 Q43–Q46 รวม delta042 อนุมัติแล้ว
 - **สัญญาที่ UX ต้องใช้**: [gap receipt 7 กลุ่ม](design/learning-ux-contract-gaps-001.md) — technical proof ยัง OPEN · มติ [decisions-042](requirement/decisions-042.md) (ตอบ A: หมดเวลาตรวจคำตอบที่บันทึกทันอัตโนมัติ) ห้ามถามซ้ำ

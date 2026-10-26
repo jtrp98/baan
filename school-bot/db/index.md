@@ -7,6 +7,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
+| [connection-001.md](connection-001.md) | ผลเชื่อมต่อโดยตรงจาก web/.env และ SELECT แบบอ่านอย่างเดียว | สำเร็จ 2026-10-26: SELECT 1 ผ่าน, public SchoolBot* 32 ตาราง, PostgreSQL 15.19; ยังไม่ตรวจ schema parity/API integration |
 | `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PK32/UQ0/FK0/CHECK0; audit fields4ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | ร่างปัจจุบัน Rev7; ผู้ใช้ยืนยันรันสร้างตารางแล้ว — revision/catalog จริงยังไม่ตรวจ ([045](../requirement/decisions-045.md)) |
 | `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | DRAFT Rev7 — ยังไม่รัน |
 | `review-007.md` | vault ยืนยัน SEC001-009 replay TTL ของ create-license ไม่ต้องแก้ physical DDL (ใบงาน060c) | PASS (static) — read-time gate + cleanup job เป็นงาน application |
