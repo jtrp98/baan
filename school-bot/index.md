@@ -6,8 +6,8 @@
 ## สถานะปัจจุบัน (2026-10-26)
 
 - **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 95 pending · 8 phases / 17 gates · 44 REQ / 186 AC / 81 TP cases — ดู [plan/index.md](plan/index.md)
-- **คิว**: กำลังเดิน CONTINUE-NORMAL รอบ [ใบงาน089](planning/task-089.md) จาก [handoff-004](planning/handoff-004.md) ตาม [Queue 006](plan/queue-006.md); เปิดตรวจ auth/แก้ gRPC/ตรวจ G helper ขนานไม่เกิน 3 งาน
-- **โค้ด**: [Bแก้รอบ1](planning/slice-089-grpc-r1-001.md) parent4032ผ่านรอwirecheck; [authcheck089](planning/check-089-auth-001.md)42/45ผ่าน/3ตกกำลังแก้รอบ2; [GhelperPASS](planning/check-089-gateway-r1-001.md)433/433และparentรันซ้ำผ่าน; Gtypedadapterกำลังทำแต่fullbuildยังติดpackages. ยังไม่เปิดgRPCproduction/fullLogin/DBintegration
+- **คิว**: กำลังเดิน CONTINUE-NORMAL รอบ [ใบงาน089](planning/task-089.md) จาก [handoff-004](planning/handoff-004.md) ตาม [Queue 006](plan/queue-006.md); ทำnumerichelpers/GtypedadapterและตรวจBgRPCขนานไม่เกิน3; Authรอfinalcheck
+- **โค้ด**: [Bแก้รอบ1](planning/slice-089-grpc-r1-001.md) parent4032ผ่านรอwirecheck; [authแก้รอบ2](planning/slice-089-auth-r2-001.md) parent4077ผ่านรอfinalcheck; [GhelperPASS](planning/check-089-gateway-r1-001.md)433/433และparentรันซ้ำผ่าน; Gtypedadapterกำลังทำแต่fullbuildยังติดpackages. ยังไม่เปิดgRPCproduction/fullLogin/DBintegration
 - **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
 - **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · ผู้ใช้อนุญาต dev บน branch ที่เตรียมไว้ตาม [046](requirement/decisions-046.md); implementation review/H5/runtime ยังต้องพิสูจน์
 - **License**: create-license replay 15 นาทีอนุมัติแล้วตาม [046](requirement/decisions-046.md); ผู้ใช้พักเรื่อง signer/custody ตาม [047](requirement/decisions-047.md) เก็บค้างก่อนใช้กุญแจจริง งานส่วนที่ไม่พึ่งกุญแจเดินต่อได้
@@ -26,7 +26,7 @@
 | `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 15 verified / 95 pending |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases / 186 AC (Amendment004); traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
-| [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASSเดิม; authcheck089 FAIL42pass/3failรอแก้รอบ2; B gRPCcheck80pass/21failกำลังแก้; PG/fullLogin NOT_RUN |
+| [qa/index.md](qa/index.md) | สารบัญ QA findings | GhelperPASS433; authrework2parent4077ผ่านรอcheck; BgRPCrework1parent4032ผ่านรอwirecheck; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | เซ็นครบ 7/7 รวม delta042 (decisions-043) |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | static review: Important 6 / Medium 6 / Minor 3 OPEN; SEC001-003/009 mitigation ระดับแบบ; ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001..004 |
