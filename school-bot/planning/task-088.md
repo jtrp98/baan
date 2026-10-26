@@ -33,3 +33,6 @@ Lint canonical plan exit1: implement63, ติด human gate62, พร้อม1
 - arch Codex T1 กำลังทำ code-facing Gateway packet. ยังไม่มี code/test/verdict ใหม่จากสามงาน ณ checkpoint นี้
 - gm รอบลองใหม่ส่งคิวครบแล้ว (NEEDS_HUMAN เฉพาะข้อเสนอDAG), บันทึก queue-005. CONTINUE-NORMAL อนุญาตเดินlocal/stubระหว่างเก็บข้อเสนอถามท้ายรอบแล้ว ไม่ถามสิทธิ์นี้ซ้ำ ไม่applycanonicalDAGโดยพลการ
 - arch Codex T1 DONE: บันทึก gateway-logout-slice-001 พร้อม exact wire/peer guard/negativecases; จัด sys B→G แบบ production-registrationปิด เมื่อ repo writerว่าง. ไม่มีSQL/schema/signer dependencyในsubsetนี้
+- sys BE001 AGY T3 DONE: receipt slice-088-auth-001; ผู้คุมregression4032ผ่านจริงหลังแก้sandboxIPC; ส่งcheckT2แล้ว ไม่ปิดtaskจากsubset
+- sys Gateway puremetadata CodexT2 BLOCKEDจากpreflight: ponytail12/agent-skills20requiredfilesขาด บันทึกgateway-preflight-blocker-088. ไม่แก้productcode ไม่สร้างackปลอม เก็บenvironmentrepairคำถามท้ายรอบ
+- sys B gRPCLogout AGY T3 เริ่มแล้วตามpacketarch เมื่อBE001writerจบ; explicitmoduleยังไม่เปิดproduction
