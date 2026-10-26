@@ -19,3 +19,5 @@ Localimplementation/compile/staticrenderพร้อม **รอindependentcheck
 ## Change Log
 
 - 2026-10-26 — รับFrontlocalและparenttypecheck/i18n14/build129/SSR99/15hashbindingผ่าน; เตรียมcheckUIอิสระเมื่อslotว่างและroutehostadaptertechnicalตามDES002.
+
+- 2026-10-26 — ผู้คุมสร้างstaticpreviewPNG1280×1000ด้วยChromeheadless/ownedfreshprofileในworkspace reportsและเปิดดูภาพE1/checkingจริง; หน้าอ่านได้ในviewportนี้. นี่visualspotcheck2panels ไม่99statesinteraction/keyboardproof; ภาพnormal-089/entry-static-preview.png ไม่ใส่binaryในknowledgeและไม่ใช้userbrowserprofile/nativeWails.
