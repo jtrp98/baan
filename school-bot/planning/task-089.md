@@ -39,6 +39,7 @@
 - NumericworkerBLOCKEDเพราะVSTestIPC; parentรัน4077/0/0exit0และตัวอย่าง79/7.5→8ผ่านตามslice-089-math-001. เปิดGowriterBE009เมื่อmathwriterจบและcheckAuth+Mathเมื่อGtypedwriterจบ. GtypedresumeDONE parentcompile/hashผ่านตามslice-089-gateway-typed-001; เปิดcheckGtypedCodexT2เมื่อBcheckจบ.
 - Bwirecheck089FAIL119/150จาก4groupsตามcheck-089-grpc-r1-001. สกัดC#harnessgzipครบจริงแต่PSwrapperยังไม่มี; เตรียมarchT1ตรึงnegativepairsก่อนrework2ไม่ให้sysเดาcodesเองซ้ำ. ไม่เปิดrework3อัตโนมัติ.
 - กวาดรอwirecheck/Gtypedadapterกำลังทำก่อนแก้module/designcurrentstatusเป็นBcheckFAILและGtypedรอcheck (แก้ตามsweep); ไม่เปลี่ยนreceiptประวัติหรือปิดlivegates.
+- AuthMathcheckLb0BL0BLOCKEDเพราะผู้คุมระบุcanonicalpathsไม่ครบ แม้106localchecksผ่าน; บันทึกcheck-089-auth-math-blocker-001และเปิดrecheckด้วยabsolutepathsครบ. ไม่applyการถอนSystemIdcase42/ไม่ถือActivityIdlongMaxเป็นcanonicalexpectedโดยยังไม่อ่านspec.
 - กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
 
 ## Change Log
