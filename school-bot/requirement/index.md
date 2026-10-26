@@ -56,7 +56,7 @@
 | REQ-043 | หลักสูตรกลางแบบ Level และ Activity | DRAFT | 4 | [req-043.md](req-043.md) |
 | REQ-044 | รหัสบทเรียนและ revision หลักสูตร | DRAFT | 5 | [req-044.md](req-044.md) |
 | REQ-045 | นำเข้า Course Plan Sheet | DRAFT | 4 | [req-045.md](req-045.md) |
-| REQ-046 | Quiz/Test และคลังข้อสอบแบบ revision | DRAFT | 6 | [req-046.md](req-046.md) |
+| REQ-046 | Quiz/Test และคลังข้อสอบแบบ revision | DRAFT | 7 | [req-046.md](req-046.md) |
 | REQ-047 | การนับคะแนน Quiz รายหลักสูตร | DRAFT | 5 | [req-047.md](req-047.md) |
 | REQ-048 | เสนอและยืนยันเลื่อน Level ทั้งห้อง | DRAFT | 4 | [req-048.md](req-048.md) |
 | REQ-049 | Mapping หลักสูตรกับช่องคะแนน SchoolBright | DRAFT | 5 | [req-049.md](req-049.md) |
@@ -64,7 +64,9 @@
 | REQ-051 | คะแนนชนและการคุ้มครองคะแนนครู | DRAFT | 5 | [req-051.md](req-051.md) |
 | REQ-052 | สิทธิ์ การส่งซ้ำ และ audit คะแนน | DRAFT | 5 | [req-052.md](req-052.md) |
 
-รวม 44 REQ / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
+รวม 44 REQ / 186 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
+
+ประวัติ REQ-046: [req-046-history-001.md](req-046-history-001.md)
 
 ## หมวดตามผลิตภัณฑ์
 
@@ -135,7 +137,11 @@
 | [decisions-040.md](decisions-040.md) | Sign-off UX-004 เพิ่ม Q26–Q29 รวมกับ decisions-039 เป็นอนุมัติครบ; G-UX-LEARN มีหลักฐาน sign-off ครบ |
 | [decisions-041.md](decisions-041.md) | Sign-off UX-006 ครบ (Q30–Q38); G-UX กลุ่ม mapping/export มีหลักฐานตามเงื่อนไข gate เดิม |
 
+| [decisions-042.md](decisions-042.md) | ผู้ใช้เลือก A: หมดเวลาตรวจคำตอบที่ server บันทึกทัน นับครั้ง/สิทธิ์ซ่อมเดิม ไม่รับย้อนหลัง |
+
 ## Change Log
+
+- 2026-10-26 — ใบงาน075: เพิ่ม decisions-042, BR-046-07/AC-046-07 และแยกประวัติ REQ-046; รวม 44 REQ/186 AC คง DRAFT สูตรเดิมและ gates เดิม
 
 - 2026-10-26 — ใบงาน068: เพิ่มทะเบียนมติ decisions-039..041 ตามหลักฐานมติผู้ใช้เดิม; คง REQ/AC/status และประตูเดิมทั้งหมด
 
