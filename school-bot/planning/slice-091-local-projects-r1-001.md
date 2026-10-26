@@ -15,3 +15,4 @@ Localimplementation/regressionผ่าน รอcheckGoR1อิสระ+update
 ## Change Log
 
 - 2026-10-26 — รับGoR1และparentregression/vetexit0หลังenvironmentretry; เปิดindependentcheck ไม่เชื่อclaim88/1/1หรือhashตารางเป็นผลตรวจรับ.
+- 2026-10-26 — ParentตรวจGOOS=darwin/GOARCH=amd64และarm64ด้วยgo vet ./app/internal/project exit0ทั้งคู่ (scopedenvrestoreแล้ว); ยืนยันเฉพาะcompile/vetของpackageที่เปลี่ยน ไม่ใช่nativeMac/desktop/hardwareproof.
