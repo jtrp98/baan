@@ -15,6 +15,8 @@
 
 ลำดับอ้างอิง transport ปัจจุบัน: [Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev9](../design/des-012.md) มี precedence เหนือถ้อยคำเส้นทาง API เดิมในหมวดนี้: client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B. HTTP paths/status ใน BR/AC ของ REQ-027 รวม AC-027-01/02 เป็นเกณฑ์ที่ client boundary ของ G ไม่บังคับ B expose HTTP และไม่ยืนยันว่ามี RPC mapping แล้ว; HTTP Login เดิมของ G แยกจาก service transport B.
 
+REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fuel-001.md)ชี้fuel1000เป็นก่อนRun; structuralvaliddraftเก็บได้ ไม่มีคำถามธุรกิจใหม่/ACIDsและ44REQ186ACไม่เปลี่ยน.
+
 ## รายการ
 
 | id | ชื่อ | status | AC | ไฟล์ |

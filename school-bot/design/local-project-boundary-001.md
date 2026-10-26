@@ -72,3 +72,7 @@ Sysrework1: containment/sharedlocks/entitlementrecheck→strictcodec→receipt/l
 ## Change Log
 
 - 2026-10-26 — รับarchpacketก่อนGo rework1; NEEDS_REQUIREMENT_CHANGEเฉพาะdraftfuel ส่งspecต่อ ส่วนอื่นพร้อม ไม่SQL/schema/hardware/productionproof.
+
+## Amendment — ผลspecREQ026
+
+2026-10-26 [spec090DONE](../planning/spec-090-draft-fuel-001.md)/REQ026amendmentมีprecedenceเหนือข้อความรอspecในsectionBlockdepth/fuel: **fuel≤1000ตรวจเฉพาะก่อนRun, Save/Load/Migrationไม่rejectstructurallyvaliddraftเพราะfuel/outputcommands**; ไม่มีdraftbudgetต่อstack/รวมdoc. สูตรpurefuel/structuraldepth/count/disabledvalidationจากarchไม่เปลี่ยน. CheckถอนoracleFuelOverflowของstoreและทดสอบdraftกับRunแยก ไม่เปลี่ยนผลharnessเก่าย้อนหลัง. Archต้องalignDES003sentenceตามคำวินิจฉัย ไม่businessgateใหม่.

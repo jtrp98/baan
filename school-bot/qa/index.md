@@ -8,7 +8,7 @@
 | [check089-Gtyped](../planning/check-089-gateway-typed-001.md) | HTTP→typedprotobuf→gRPC TestServer | เดิมFAIL258pass/2fail; [fix parent3/3](../planning/slice-090-gateway-r1-001.md); [JPOพบSEC001-016logleak/017earlydeadline](../planning/jpo-090-gateway-r1-001.md); rework2กำลังทำ |
 | [check089-grpc-r1](../planning/check-089-grpc-r1-001.md) | BtypedgRPCLogoutหลังrework1 direct/wire/log150assertions | FAIL119pass/31fail; แก้rework2แล้ว[parent150/150](../planning/slice-090-grpc-math-parent-001.md)แต่[finalcheckFAIL2222pass12fail8NOT_RUN](../planning/check-090-grpc-r2-001.md)ครบ2reworksรอคนท้ายวง |
 | [check089-Ghelper-r1](../planning/check-089-gateway-r1-001.md) | G requestpreparationหลังแก้รอบ1 | PASS433/433; parentรันซ้ำ433ผ่าน เป็นhelpersubsetไม่ใช่fullG |
-| [localprojects089](../planning/slice-089-local-projects-001.md) | Go v2store/migration | checker90casesส่งoverlay; parent63pass26fail1skip [archboundaryพร้อม](../design/local-project-boundary-001.md)รอGoR1; fuelcaseยังdisputedscopeรอspec |
+| [localprojects089](../planning/slice-089-local-projects-001.md) | Go v2store/migration | checker90casesส่งoverlay; parent63pass26fail1skip [archboundaryพร้อม](../design/local-project-boundary-001.md)รอGoR1; [specRun-only](../planning/spec-090-draft-fuel-001.md)ถอนstoreFuelOverfloworacle/ไม่เปลี่ยนผลเก่าย้อนหลัง |
 | [parent088](../planning/handoff-004.md) | regressionปิดท้ายและcompileGhelper | 4032pass/0fail; Ghelpercompileผ่านแต่solutionbuildติดpackages; ไม่แทนnewcodeacceptance |
 
 ## Change Log
