@@ -204,7 +204,7 @@ baan --goal "..."             # รันครบทุก wave
 baan --resume <runDir>        # ต่อ run ที่ค้าง ข้ามเฉพาะ task ที่ completed (ประหยัด token)
 baan --plan-file <f>          # รันแผนที่แก้เอง
 baan --sweep "Rev3" --sweep "Rev 3" --target school-bot  # หาผู้อ้างอิงทุกจุดของค่าเดิม จัดกลุ่มตามเจ้าของไฟล์
-#   ค่าเริ่มต้นค้นทุก knowledge root · --target เพิ่ม repo ของ target · --sweep-in <dir> ค้นเฉพาะโฟลเดอร์ที่ระบุ
+#   ค่าเริ่มต้นค้นทุก knowledge root · --target เพิ่ม repo ของ target · --sweep-in <โฟลเดอร์ module> ค้นเฉพาะ module นั้น
 #   ใช้ git ls-files (เคารพ .gitignore) ถ้าเป็น git repo · ข้าม archive/ ไฟล์ binary และไฟล์เกิน 2MB
 baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG ของแผน (แผน runtime หรือ plan\tasks-*.json ของโปรเจกต์) — exit 1 เมื่อไม่มีงาน implement หรือเกินครึ่งติดประตูมนุษย์
 # --dry-run ใช้กับทุก route ได้ (รวม --plan-file/--resume) — การ์ดห้ามเรียก provider อยู่ที่ execute จุดเดียว

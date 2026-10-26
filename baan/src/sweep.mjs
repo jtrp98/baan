@@ -70,7 +70,9 @@ export function sweep(roots, terms) {
       const rel = path.relative(root.path, file);
       const lines = [];
       text.split(/\r?\n/).forEach((l, i) => { if (terms.some((t) => l.includes(t))) lines.push(i + 1); });
-      hits.push({ file: path.join(root.label, rel), owner: ownerOf(rel, root.kind), lines });
+      // --sweep-in ชี้โฟลเดอร์ module (label = ชื่อ module) ส่วน knowledge root ใช้ label ว่าง —
+      // ต่อ label ก่อนหาเจ้าของ ให้ path เริ่มที่ <module>/<หมวด> เหมือนกันทั้งสองทาง
+      hits.push({ file: path.join(root.label, rel), owner: ownerOf(root.kind === "target" ? rel : path.join(root.label, rel), root.kind), lines });
     }
   }
   return hits.sort((a, b) => a.owner.localeCompare(b.owner) || a.file.localeCompare(b.file));

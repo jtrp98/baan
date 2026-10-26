@@ -45,6 +45,14 @@ test("sweep (ไม่ใช่ git repo): เจอทุกบรรทัด 
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test("sweep-in ชี้โฟลเดอร์ module: เจ้าของต้องตรงกับตอนค้นจาก knowledge root", () => {
+  const dir = tree({ "mod/db/index.md": "x", "mod/index.md": "x" });
+  try {
+    const hits = sweep([{ path: path.join(dir, "mod"), kind: "knowledge", label: "mod" }], ["x"]);
+    assert.deepEqual(hits.map((h) => [h.owner, h.file.replaceAll("\\", "/")]), [["vault", "mod/db/index.md"], ["นายช่าง", "mod/index.md"]]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test("sweep (git repo): เคารพ .gitignore — toolchain ที่ ignore ไว้ไม่ถูกค้น", () => {
   const dir = tree({ ".gitignore": ".tools/\n", ".tools/go/x.txt": "OLD-NAME", "src/a.cs": "// OLD-NAME" });
   try {
