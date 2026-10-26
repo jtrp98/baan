@@ -29,6 +29,7 @@
 - Authcheck089 FAIL42/45จาก2บั๊ก; สกัดcheck-089-auth-001และเก็บexacttestpatchในreportsเพื่อส่งsysรอบ2. เปิดinspecttraceabilityเมื่อcheckauthจบ. กวาด “รอตรวจซ้ำ/กำลังตรวจอิสระซ้ำ” แล้วแก้module/QAindexตามverdict (แก้ตามsweep); receipt088คงเป็นประวัติ.
 - Ghelpercheck FAIL1792/1795เฉพาะmetadata cap3cases; บันทึกcheck-089-gateway-001และส่งsysCodexT2แก้รอบ1พร้อมindependentregressionpatch. Bwriterและinspectยังทำขนานอยู่ รวมไม่เกิน3.
 - Ghelperrework1DONE ผู้คุมรัน4cases/compileซ้ำexit0ตามslice-089-gateway-r1-001; เปิดindependentcheckใหม่. กวาด1792pass/3failก่อนเปลี่ยนQAstatusตามreceipt (แก้ตามsweep); checkreceiptเดิมคงประวัติ ไม่ปิดcanonicaltask.
+- gmowner-mappingDONE: ผู้คุมapplyเฉพาะfields/5taskMarkdownตามowner-map-089-001 ครบ186ACโดยคง110IDs/17gates/status/DAG; lintยังexit1ตามจริง. เปิดGtypedadapterAGYT3เมื่อgmจบพร้อมscopedread-onlycanonicalproto; Bprotohashยัง37c03...635cตรงฐานตรวจเดิม. ไม่แก้helperที่checkกำลังตรวจ.
 - กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
 
 ## Change Log
