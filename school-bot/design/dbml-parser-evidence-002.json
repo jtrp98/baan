@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-24",
+  "parser": "@dbml/core 10.3.1 (installed by นายช่าง per check-061c request)",
+  "files": {
+    "schoolbot.dbml": {
+      "ok": true,
+      "tables": 32,
+      "fields": 450,
+      "refs": 0,
+      "enums": 21
+    },
+    "schoolbot-integration.dbml": {
+      "ok": true,
+      "tables": 24,
+      "fields": 112,
+      "refs": 0,
+      "enums": 0
+    }
+  }
+}

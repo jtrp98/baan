@@ -57,11 +57,12 @@
 - **อนุมัติแล้ว**: Logical/physical baseline 32 ตารางบน SchoolBot DB (`10.0.0.128:9499`), `CreateBy`/`UpdateBy` เป็น `integer NULL`, การไม่แตะ School DB/PGGradeDB ด้วย GRANT และการใช้ `UpdateDate` แทน `Version` ตาม [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md) และ [db/review-005.md](../db/review-005.md).
 - **ยังไม่อนุมัติ / รอประตูมนุษย์**:
   - การรัน `db/schoolbot_db.sql` บนฐานทดสอบโดยมนุษย์และส่งผลให้ `DBA-003` ตรวจ
-  - การตัดสินใจเลือกแนวทางป้องกัน `LearnerId` ครู/นักเรียนชนกันตาม [db/proposal-learnerkind.md](../db/proposal-learnerkind.md)
+  - ~~การตัดสินใจเลือกแนวทางป้องกัน `LearnerId` ครู/นักเรียนชนกันตาม [db/proposal-learnerkind.md](../db/proposal-learnerkind.md)~~ — ตัดสินแล้ว: ผู้ใช้เลือก**ทาง A** ตาม [decisions-032](../requirement/decisions-032.md) (ส่ง arch sync/app authorization ต่อ)
   - การเปิดเขียนคะแนนลง PGGradeDB (รอผ่าน release gates ทั้งห้า `G-PARITY`, `G-COEXIST`, `G-TARGET`, `G-AUTHZ`, `G-DB` ของ [des-009.md](des-009.md))
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+- 2026-10-24 — แก้ตามข้อเสนอ check-061c: ปรับแถว Learner ใน "ยังไม่อนุมัติ" เป็น "ตัดสินแล้ว ทาง A ตาม decisions-032" ให้ตรง data-model; เพิ่มหลักฐาน parser 10.3.1 ที่ dbml-parser-evidence-002.json
 
 - 2026-10-24 — Rev5: ใบงาน060a/BL-001 แก้ยอด declaration ให้ตรง review-006 และ SQL จริง; ไม่แก้ DDL/DBML/สถานะอนุมัติ
 
