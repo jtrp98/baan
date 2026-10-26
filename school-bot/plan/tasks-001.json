@@ -2,6 +2,11 @@
   "revision": 2,
   "work_date": "2026-10-23",
   "kind": "pm_canonical_plan",
+  "amendment_065": {
+    "date": "2026-10-26",
+    "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index verified15/pending95 แต่ tasks ยัง pending110 จนผู้คุม apply status_sync15 ตาม verdict061; ไม่เพิ่ม verdict/ปิด gate. 44REQ/185AC/80TP/110tasks/8phases/17gates; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
+    "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-062.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"]
+  },
   "phases": [
     {
       "id": "P0",
@@ -389,7 +394,7 @@
         "DES-005",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "DBA-002",
@@ -505,7 +510,7 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "BA-002",
@@ -529,7 +534,7 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "BA-003",
@@ -554,7 +559,7 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "BA-004",
@@ -579,7 +584,7 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "UX-001",
@@ -605,7 +610,7 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "UX-002",
@@ -636,7 +641,7 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "UX-003",
@@ -670,7 +675,7 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "UX-004",
@@ -698,7 +703,7 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "TP-001",
@@ -728,7 +733,7 @@
         "DES-006",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "TP-002",
@@ -1630,7 +1635,7 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "DBA-005",
@@ -3859,7 +3864,7 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "UX-007",
@@ -3953,7 +3958,7 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "TP-003",
@@ -4001,7 +4006,7 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending"
+      "status": "verified"
     },
     {
       "id": "DBA-007",
@@ -4036,7 +4041,7 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "verified"
     }
   ],
   "first_wave": [
@@ -4074,6 +4079,12 @@
     "pm": "gm"
   },
   "change_log": [
+    {
+      "date": "2026-10-26",
+      "revision": 2,
+      "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"],
+      "summary": "065: เพิ่มmetadata precedence/refs; ส่งdelta15ให้ผู้คุมตรวจและapplyแยก ไม่regenerateJSONหรือแก้ประวัติ/gates"
+    },
     {
       "date": "2026-10-24",
       "revision": 2,

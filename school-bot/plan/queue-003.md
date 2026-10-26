@@ -1,5 +1,7 @@
 # SchoolBot — คิวงานต่อเนื่องจากหลักฐานจริง (Queue 003)
 
+Current pointer065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) แทนคิว/ยอด/runner/Waiting on Human ทุกส่วนด้านล่าง. ไฟล์นี้คงประวัติ; ไม่สั่งทำ artifact ที่ครบแล้วซ้ำ. t0–2=codex/t3–5=agy --no-fallback ไม่ใช้native subagent.
+
 วันที่ 2026-10-23 · เจ้าของ: gm · อ้างอิง: [plan/index](index.md), [evidence-002](evidence-002.md), [queue-002](queue-002.md), [backlog](../backlog.md)
 
 ## Override ใบงาน051 — 2026-10-24
@@ -100,6 +102,7 @@
 - ข้อกำหนดด้านความปลอดภัยที่มี task รองรับอยู่ในแผน SchoolBot แล้ว (เช่น การบังคับ `SchoolId` ทุก query ใน `BE-002`/`BE-006`, การปฏิเสธ `purpose`/`aud` และการไม่ log ชื่อ header ใน `BE-039` ตาม `SEC001-001`/`013`, และการแยก process ของ grade writer ใน `BE-023`/`BE-037`/`BE-038`) ให้เดินตาม task เดิมโดยไม่แตกงานซ้ำ
 
 ## Change Log
+- 2026-10-26 — ใบงาน065: เพิ่มcurrent pointerไป004; รักษาข้อความ/วันที่/runnerเดิมเป็นประวัติ.
 - 2026-10-24 — ใบงาน059: เพิ่มผลคิวเอกสาร055–058 และประตูเจ้าของ/มนุษย์ที่ค้าง; คงข้อความเดิม/Status/dependencies/gates/Release Scope.
 - 2026-10-24 — แก้หมายเหตุอ้างอิงใน GAP-03 จาก data-contract-rules Rev6 เป็น Rev7 ตามรุ่นปัจจุบันหลังรอบ doc-sync (ใบงาน050); ไม่เปลี่ยนเนื้อหางาน
 

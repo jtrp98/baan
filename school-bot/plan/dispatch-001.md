@@ -1,5 +1,7 @@
 # SchoolBot — Queue และ Handoff Routing
 
+Precedence065 (2026-10-26): คิว/routing ปัจจุบันใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md). first wave/รายการเตรียมงาน/ยอด180AC-pending110ด้านล่างเป็นฐานประวัติ ไม่ใช่คำสั่ง rerun. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates. รอบ062เอกสารก่อน: UX005/007→check→คนเซ็น; owner packetพร้อมส่ง. t0/t1/t2=codex, t3/t4/t5=agy --no-fallback ไม่ใช้native subagent. คงDAG/effort/owner/tier/gates; ไม่dispatch implementation/SQL/deployก่อนprerequisites.
+
 ## Waiting on Human ก่อนคิว
 
 เริ่มรายงานด้วย [Waiting on Human](gates-001.md) ทั้งหมด โดยระบุ Task / Reference / Reason / ผู้เตรียม / ผู้ตัดสินที่ยังขาด ห้ามสะสม implementation หลังคำถามที่ตัวงานพึ่งพาค้างอยู่ งานเตรียมหลักฐานและสายที่ไม่พึ่งคำตอบเดินต่อได้
@@ -58,6 +60,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 Rev2:110 IDs/8phases/17gates, coverage180ACมีimplementationและcheck owner, DAGไม่วน/pendingทั้งหมด; staticแผนไม่ใช่ผลSchoolBot QA/SQL/implementation/release
 
 ## Change Log
+- 2026-10-26 — ใบงาน065: ชี้คิว004เหนือfirst wave/runnerเก่า โดยไม่เปลี่ยนDAG/concurrency.
 - 2026-10-24 — ใบงาน051: ชี้queue-003ทั้งคิว/routing; ไม่เปลี่ยนDAG/concurrency.
 
 - 2026-10-23 — Rev2: reconcile44/180และคิวqueue-002; ไม่ถามนโยบายเดิมซ้ำ

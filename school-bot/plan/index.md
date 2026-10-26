@@ -2,9 +2,13 @@
 
 ## Release Scope
 
+Amendment065 (2026-10-26): scope เดิม frozen; ฐานปัจจุบัน 44 REQ/185 AC/80 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates ตาม037 และ verdict061. ไม่เปลี่ยน IDs/DAG/effort/owner/tier/gate definitions. ข้อความ180 AC ด้านล่างเป็นฐานประวัติ Rev2.
+
 Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 และ decisions-014/015/016/019..034 ไม่เพิ่ม feature/ลดระบบเต็ม ดู [scope](scope-001.md); 74งานเดิม+36งานย่อย=110งาน คง8phases/17gates; เปลี่ยนscopeเฉพาะผู้ใช้
 
 ## Waiting on Human
+
+Precedence065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) เหนือข้อความฐานด้านล่าง. รอ G/Light รับรอง contract/H5, infra/B/BFF ownership และ technical proof; ผู้ใช้ forward EV/เจ้าของ DB คืนหลักฐาน; spec Q3 และ cert/custody ยังค้าง. UX signed5/7 ตาม036..041; UX-005/007 กำลังร่างตาม062→check→ผู้ใช้เซ็น ยังไม่ผ่านหรือเซ็น. ไม่เปิด implementation ก่อน prerequisites และไม่ปิด H5/G-CORE/UX อัตโนมัติ. t0/t1/t2=codex, t3/t4/t5=agy, --no-fallback; ไม่ใช้ native subagent แทน. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือ gate closure; JSON pending110 รอผู้คุม sync15 ตาม verdictเดิม. ประวัติด้านล่างคงไว้.
 
 Precedence 2026-10-24 (มติ decisions-036/037/038 หลังรอบ060): ผู้ใช้ตัดสินครบเกือบทุกประตูที่เตรียมไว้ — **GAP-07 = คง Prepare/Install + ตรวจรับ AC-030-04..08** (44 REQ/**185 AC**; TP001-080 = 80 cases) · **UX sign-off ครบทั้ง int-001/int-002** (Q1–Q13 ทั้งหมด — G-UX-ENTRY/G-UX-LABS มีหลักฐาน sign-off ครบ, front implement UX-001/UX-003 ได้) · **performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY** · **ผู้อนุมัติเนื้อหา = ผู้ใช้ + ยืนยัน rubric ดาว** · **ยังไม่อนุญาตทดสอบหุ่นจริง (dry-run ต่อ)** · cert signing ยังไม่ระบุ · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward** ([cover-001](../db/db-safe-evidence-cover-001.md) — รอผู้ใช้ส่ง) · **ค้างเหลือ: spec Q3 (รุ่นหุ่น/firmware/calibration/เกณฑ์ stop-unplug-emergency จริง)** และประตูเดิม (G/Light, H5, รัน SQL, ผู้ถือ cert, runtime)
 
@@ -117,6 +121,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+- 2026-10-26 — ใบงาน065: เพิ่ม precedence คิว/runner/ยอดปัจจุบันและ owner packet; คงตาราง Status ตาม verdictเดิม.
 - 2026-10-24 — ใบงาน061 (นายช่างสวมบท gm ตาม verdict check-060 ที่ผ่านนายช่าง): flip BA-001..004 / UX-001 / UX-003 / TP-001 → verified (เหลือ 103 pending) — ตามกติกา verdict ของ check เป็นต้นทางเดียวของ Status; ไม่แตะงานอื่น/dependencies/gates
 - 2026-10-24 — decisions-038 (นายช่างสวมบท gm): UX sign-off ครบทั้งสองไฟล์ (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ) + spec Q1/Q2/Q4/Q5 มีมติ; ค้างเฉพาะ spec Q3 + EV forwarding + ประตูเดิม; คง Status/dependencies/gates
 - 2026-10-24 — decisions-036/037 (นายช่างสวมบท gm ในโหมด solo): บันทึกมติผู้ใช้ GAP-07 (คง Prepare/Install → 185 AC/80 cases), UX Q1/Q4/Q5/Q9, performance = acceptance, EV สรุปข้อความให้ forward; Status/dependencies/gates คงเดิม
