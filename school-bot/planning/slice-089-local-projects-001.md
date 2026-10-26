@@ -11,7 +11,7 @@ DONEตามwriter: app/internal/project/{types,uuid,validator,entitlement,stor
 
 Writerรายงานscratchsmoke6projects/3modes/saveconflict/copy/restart7projects/migrate3slots/rerun/unsupportedblock/entitlementdenyผ่านแล้วลบscratch. ไม่มีreproscratchsourceส่งมาครบจึงไม่อ้างว่าผู้คุมรันbehaviorเหล่านั้นซ้ำ. ส่งcheckเขียนindependenttestsจากspec/currentcodeก่อนรับbehavior; security/FSescape/race/durability/legacyactualformatยังต้องพิสูจน์. ไม่เรียกGotestexistingว่าBE009verified.
 
-คงcanonicalBE009pending/wholeACUI/Cloud/liveentitlement未proved; ไม่มีSQL/network/hardware/sourceGitmutation. Code422/493linesในstore/migrationเกิน300จึงต้องcheckreviewขอบเขตหน้าที่และerrorcontractsตามtarget ไม่แยกเพียงลดบรรทัด.
+คงcanonicalBE009pending/wholeACUI/Cloud/liveentitlementยังไม่พิสูจน์; ไม่มีSQL/network/hardware/sourceGitmutation. Code422/493linesในstore/migrationเกิน300จึงต้องcheckreviewขอบเขตหน้าที่และerrorcontractsตามtarget ไม่แยกเพียงลดบรรทัด.
 
 ## Change Log
 
