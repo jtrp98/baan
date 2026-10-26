@@ -35,7 +35,7 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน pending ทั้งหมด; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 7 (BA-001..004/UX-001/UX-003/TP-001) pending 103; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -47,15 +47,15 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | pending |
 | [DBA-003](DBA-003.md) | Core evidence | dba | P1 | DBA-002 | pending |
 | [BE-002](BE-002.md) | DB integration | be | P1 | DBA-003 | pending |
-| [BA-001](BA-001.md) | Guest policy | ba | P0 | — | pending |
-| [BA-002](BA-002.md) | Learning criteria | ba | P0 | — | pending |
-| [BA-003](BA-003.md) | Robot criteria | ba | P0 | — | pending |
-| [BA-004](BA-004.md) | Delivery criteria | ba | P0 | — | pending |
-| [UX-001](UX-001.md) | Entry UX | ux | P0 | — | pending |
+| [BA-001](BA-001.md) | Guest policy | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
+| [BA-002](BA-002.md) | Learning criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
+| [BA-003](BA-003.md) | Robot criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
+| [BA-004](BA-004.md) | Delivery criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-037/038) |
+| [UX-001](UX-001.md) | Entry UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-001 + check-060 PASS) |
 | [UX-002](UX-002.md) | Projects UX | ux | P3 | BA-001 | pending |
-| [UX-003](UX-003.md) | Labs UX | ux | P0 | — | pending |
+| [UX-003](UX-003.md) | Labs UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-002 + check-060 PASS) |
 | [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | pending |
-| [TP-001](TP-001.md) | AC matrix | tp | P0 | — | pending |
+| [TP-001](TP-001.md) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
 | [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | pending |
 | [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | pending |
 | [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
@@ -117,6 +117,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+- 2026-10-24 — ใบงาน061 (นายช่างสวมบท gm ตาม verdict check-060 ที่ผ่านนายช่าง): flip BA-001..004 / UX-001 / UX-003 / TP-001 → verified (เหลือ 103 pending) — ตามกติกา verdict ของ check เป็นต้นทางเดียวของ Status; ไม่แตะงานอื่น/dependencies/gates
 - 2026-10-24 — decisions-038 (นายช่างสวมบท gm): UX sign-off ครบทั้งสองไฟล์ (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ) + spec Q1/Q2/Q4/Q5 มีมติ; ค้างเฉพาะ spec Q3 + EV forwarding + ประตูเดิม; คง Status/dependencies/gates
 - 2026-10-24 — decisions-036/037 (นายช่างสวมบท gm ในโหมด solo): บันทึกมติผู้ใช้ GAP-07 (คง Prepare/Install → 185 AC/80 cases), UX Q1/Q4/Q5/Q9, performance = acceptance, EV สรุปข้อความให้ forward; Status/dependencies/gates คงเดิม
 - 2026-10-24 — ใบงาน060 (นายช่างสวมบท gm ในโหมด solo): เพิ่ม precedence รอบ060 — ปิดคิวเอกสาร §3 ครบ + ประตูมนุษย์พร้อมถาม 4 กลุ่มใหม่ (GAP-07/spec Q1–Q6/UX Q1–Q13/EV-01..06); คง Status/Release Scope/dependencies/gates ทั้งหมด
