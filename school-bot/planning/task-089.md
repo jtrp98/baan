@@ -38,6 +38,7 @@
 - กวาดqueue-004เพิ่มเติมพบ15ไฟล์/19บรรทัด: แก้currentpointerในplanextension/designindex/ownerpacketเป็นqueue006และtask089 (แก้ตามsweep). dispatch/evidence/learninggapreceipt/JSONmetadata/queue003/planningเก็บเป็นsourceประวัติของรอบก่อนและcitations ไม่ใช้แทนCONTINUE089; ไม่เปลี่ยนสัญญาหรือgatesจากการเปลี่ยนลิงก์.
 - NumericworkerBLOCKEDเพราะVSTestIPC; parentรัน4077/0/0exit0และตัวอย่าง79/7.5→8ผ่านตามslice-089-math-001. เปิดGowriterBE009เมื่อmathwriterจบและcheckAuth+Mathเมื่อGtypedwriterจบ. GtypedresumeDONE parentcompile/hashผ่านตามslice-089-gateway-typed-001; เปิดcheckGtypedCodexT2เมื่อBcheckจบ.
 - Bwirecheck089FAIL119/150จาก4groupsตามcheck-089-grpc-r1-001. สกัดC#harnessgzipครบจริงแต่PSwrapperยังไม่มี; เตรียมarchT1ตรึงnegativepairsก่อนrework2ไม่ให้sysเดาcodesเองซ้ำ. ไม่เปิดrework3อัตโนมัติ.
+- กวาดรอwirecheck/Gtypedadapterกำลังทำก่อนแก้module/designcurrentstatusเป็นBcheckFAILและGtypedรอcheck (แก้ตามsweep); ไม่เปลี่ยนreceiptประวัติหรือปิดlivegates.
 - กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
 
 ## Change Log
