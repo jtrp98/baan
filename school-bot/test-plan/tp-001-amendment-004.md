@@ -17,7 +17,7 @@
 
 หลักฐานที่ check ต้องเก็บ: unit log; E-API แบบ sanitized พร้อม build/config/fixture revision, attempt/snapshot refs, คำตอบและเวลาที่ server บันทึก, fault point, ผล/count/grant/audit ก่อน–หลัง; E-UI สำหรับ reload เท่านั้น. ต้องแยก response หายหลัง commit จากคำตอบที่ server ยังไม่บันทึก
 
-Pending technical proof: DES-010 Rev4/LUX-05 ที่อ่านยังไม่บันทึก amendment076. ใช้042เป็น expected ธุรกิจ; รอ arch/sys ตรึง clock authority/precision, ก่อน–ตรง–หลัง deadline, answers/submit/expiry race, atomic finalize/retry/recovery/DTO. เตรียม fault ก่อน/หลัง commit และ concurrent expiry/reload แต่ไม่เดา equality, error code หรือเวลา recovery. ยังไม่ยอมรับความเสี่ยงเพื่อเปิด gate
+Pending technical proof: DES-010 Rev4/LUX-05 รับ Amendment076 แล้ว แต่รายละเอียดเทคนิคยัง OPEN ตาม amendmentนั้น. ใช้042เป็น expected ธุรกิจ; รอ arch/sys ตรึง clock authority/precision, ก่อน–ตรง–หลัง deadline, answers/submit/expiry race, atomic finalize/retry/recovery/DTO. เตรียม fault ก่อน/หลัง commit และ concurrent expiry/reload แต่ไม่เดา equality, error code หรือเวลา recovery. ยังไม่ยอมรับความเสี่ยงเพื่อเปิด gate
 
 Actual: NOT_RUN ทุกชุดย่อย รวม clock/race/boundary
 
@@ -25,3 +25,4 @@ Traceability: AC-046-07 → TP001-081; AC-046-01..06 คง TP001-063..065. Cove
 
 ## Change Log
 - 2026-10-26 — ใบงาน078: เพิ่ม TP001-081 ตาม042; coverageเท่านั้น ไม่มี test execution
+- 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates

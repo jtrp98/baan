@@ -2,13 +2,13 @@
 
 ## Release Scope
 
-Amendment065 (2026-10-26): scope เดิม frozen; ฐานปัจจุบัน 44 REQ/185 AC/80 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates ตาม037 และ verdict061. ไม่เปลี่ยน IDs/DAG/effort/owner/tier/gate definitions. ข้อความ180 AC ด้านล่างเป็นฐานประวัติ Rev2.
+Amendment065 (2026-10-26): scope เดิม frozen; ฐานปัจจุบัน 44 REQ/186 AC/81 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates ตาม [มติ042](../requirement/decisions-042.md), [AC-046-07](../requirement/req-046.md), [TP001-081/Amendment004](../test-plan/tp-001-amendment-004.md) และ verdict061. ไม่เปลี่ยน IDs/DAG/effort/owner/tier/gate definitions. ข้อความ180 AC ด้านล่างเป็นฐานประวัติ Rev2.
 
 Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 และ decisions-014/015/016/019..034 ไม่เพิ่ม feature/ลดระบบเต็ม ดู [scope](scope-001.md); 74งานเดิม+36งานย่อย=110งาน คง8phases/17gates; เปลี่ยนscopeเฉพาะผู้ใช้
 
 ## Waiting on Human
 
-Precedence065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) เหนือข้อความฐานด้านล่าง. รอ G/Light รับรอง contract/H5, infra/B/BFF ownership และ technical proof; ผู้ใช้ forward EV/เจ้าของ DB คืนหลักฐาน; spec Q3 และ cert/custody ยังค้าง. UX signed5/7 ตาม036..041; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; รอ final073→ผู้ใช้เซ็น Q39–Q46 ยังไม่มีรายงาน073. ไม่เปิด implementation ก่อน prerequisites และไม่ปิด H5/G-CORE/UX อัตโนมัติ. t0/t1/t2=codex, t3/t4/t5=agy, --no-fallback; ไม่ใช้ native subagent แทน. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือ gate closure; JSON sync15verified/95pendingแล้วตาม [status-sync](../planning/status-sync-062-001.json). expired A/B ตาม proposal072 ยังรอผู้ใช้; receipt071 เป็นช่องว่างเทคนิค แยกจาก owner pending เดิม. ประวัติด้านล่างคงไว้.
+Precedence065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) เหนือข้อความฐานด้านล่าง. รอ G/Light รับรอง contract/H5, infra/B/BFF ownership และ technical proof; ผู้ใช้ forward EV/เจ้าของ DB คืนหลักฐาน; spec Q3 และ cert/custody ยังค้าง. UX signed5/7 ตาม036..041; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; รอ check080→ผู้ใช้เซ็น UX-005/007 และ expired-copy delta; รับ actual076/077แล้ว; check080กำลังตรวจ. ไม่เปิด implementation ก่อน prerequisites และไม่ปิด H5/G-CORE/UX อัตโนมัติ. t0/t1/t2=codex, t3/t4/t5=agy, --no-fallback; ไม่ใช้ native subagent แทน. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือ gate closure; JSON sync15verified/95pendingแล้วตาม [status-sync](../planning/status-sync-062-001.json). ผู้ใช้ตอบ A แล้วตาม042: ตรวจ saved answers ที่ server บันทึกทันอัตโนมัติ ข้อว่าง0 เต็มทั้งชุด ไม่รับย้อนหลัง นับครั้ง/สิทธิ์ซ่อมตาม policy เดิม; ไม่ใช่ UX sign-off ไม่ถาม A/B ซ้ำ; receipt071 เป็นช่องว่างเทคนิค แยกจาก owner pending เดิม. ประวัติด้านล่างคงไว้.
 
 Precedence 2026-10-24 (มติ decisions-036/037/038 หลังรอบ060): ผู้ใช้ตัดสินครบเกือบทุกประตูที่เตรียมไว้ — **GAP-07 = คง Prepare/Install + ตรวจรับ AC-030-04..08** (44 REQ/**185 AC**; TP001-080 = 80 cases) · **UX sign-off ครบทั้ง int-001/int-002** (Q1–Q13 ทั้งหมด — G-UX-ENTRY/G-UX-LABS มีหลักฐาน sign-off ครบ, front implement UX-001/UX-003 ได้) · **performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY** · **ผู้อนุมัติเนื้อหา = ผู้ใช้ + ยืนยัน rubric ดาว** · **ยังไม่อนุญาตทดสอบหุ่นจริง (dry-run ต่อ)** · cert signing ยังไม่ระบุ · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward** ([cover-001](../db/db-safe-evidence-cover-001.md) — รอผู้ใช้ส่ง) · **ค้างเหลือ: spec Q3 (รุ่นหุ่น/firmware/calibration/เกณฑ์ stop-unplug-emergency จริง)** และประตูเดิม (G/Light, H5, รัน SQL, ผู้ถือ cert, runtime)
 
@@ -121,6 +121,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
 
 ## Change Log
+- 2026-10-26 — 079: sync042/186AC/81TP และคิวตรวจdelta→เซ็นUX; คงStatus/scope/gates/ประวัติ.
 - 2026-10-26 — 074: sync current notice/คิว UX/expired; คง Status/Release Scope และประวัติ.
 - 2026-10-26 — ใบงาน065: เพิ่ม precedence คิว/runner/ยอดปัจจุบันและ owner packet; คงตาราง Status ตาม verdictเดิม.
 - 2026-10-24 — ใบงาน061 (นายช่างสวมบท gm ตาม verdict check-060 ที่ผ่านนายช่าง): flip BA-001..004 / UX-001 / UX-003 / TP-001 → verified (เหลือ 103 pending) — ตามกติกา verdict ของ check เป็นต้นทางเดียวของ Status; ไม่แตะงานอื่น/dependencies/gates
@@ -137,3 +138,4 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 - 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
 
 - 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ
+- 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates

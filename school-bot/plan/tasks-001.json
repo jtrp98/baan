@@ -4,7 +4,7 @@
   "kind": "pm_canonical_plan",
   "amendment_065": {
     "date": "2026-10-26",
-    "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index/tasks ปัจจุบัน15verified/95pending ตาม planning/status-sync-062-001.json; ไม่เพิ่ม verdict/ปิด gate. 44REQ/185AC/80TP/110tasks/8phases/17gates; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
+    "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index/tasks ปัจจุบัน15verified/95pending ตาม planning/status-sync-062-001.json; ไม่เพิ่ม verdict/ปิด gate. 44REQ/186AC/81TP/110tasks/8phases/17gates ตาม decisions-042/spec075/inspect078; snapshot180/77คงเดิม อ่าน test-plan/tp-001-amendment-004.md; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
     "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-062.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"]
   },
   "phases": [
@@ -2921,6 +2921,7 @@
       "ac_ids": [
         "AC-046-02",
         "AC-046-03",
+        "AC-046-07",
         "AC-036-05"
       ],
       "des_refs": [
@@ -3384,6 +3385,7 @@
         "AC-046-02",
         "AC-046-03",
         "AC-046-04",
+        "AC-046-07",
         "AC-036-05"
       ],
       "des_refs": [
@@ -3647,6 +3649,7 @@
         "AC-046-04",
         "AC-046-05",
         "AC-046-06",
+        "AC-046-07",
         "AC-036-05"
       ],
       "des_refs": [
@@ -3894,6 +3897,7 @@
         "AC-046-04",
         "AC-046-05",
         "AC-046-06",
+        "AC-046-07",
         "AC-047-01",
         "AC-047-02",
         "AC-047-03",
@@ -4079,6 +4083,7 @@
     "pm": "gm"
   },
   "change_log": [
+    {"date":"2026-10-26","revision":2,"summary":"079: มติ042เพิ่มAC-046-07ให้BE-031/FE-021/UX-007/QA-013; 186AC/81cases คงACเดิม/status/DAG/owner/tier/effort/gates/IDs","refs":["requirement/decisions-042.md","requirement/req-046.md","test-plan/tp-001-amendment-004.md"]},
     {"date":"2026-10-26","revision":2,"summary":"074: แก้ notice ตาม status-sync-062-001; คง status/DAG/gates และประวัติ065"},
     {
       "date": "2026-10-26",

@@ -7,12 +7,12 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 185 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม decisions-037); decisions-001..041 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม decisions-037; AC-046-07 ตามมติ042); decisions-001..042 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev7/rules Rev8/DBML Rev5 (32 ตารางเดิม); parser/semantic ผ่าน; DES-001..012 PROPOSED; รอบ060a ปิด GAP-01..04/06/08 + SEC001-003/009 ระดับสัญญา (ดู §060a) |
-| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks: 15 verified / 95 pending (8 phases / 17 gates), 44 REQ/185 AC; verified เป็นงานเอกสาร ไม่ใช่ release/runtime |
+| `plan\index.md` | สารบัญ plan — release scope, phases, ตาราง Tasks และ extension/index.md | 110 tasks: 15 verified / 95 pending (8 phases / 17 gates), 44 REQ/186 AC; verified เป็นงานเอกสาร ไม่ใช่ release/runtime |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002+003 — AC GAP-07 ตรวจรับแล้ว) + TP-002 fixture plan; actual ทุกเคส NOT_RUN |
+| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases/186 AC (รวม Amendment004/TP001-081 ตามมติ042); Traceability/Joined JSON เก็บ snapshot180/77 พร้อม pointer; actual ทุกเคส NOT_RUN |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | UX อนุมัติ 5/7 ชุด: Entry, Labs, Projects, Learning, Mapping ตาม decisions-036..041; UX-005/007 มีร่างและผลตรวจความครบถ้วน check066 แล้ว รอจัดเอกสารขั้นสุดท้าย/ผู้ใช้เซ็น; implementation ต้องผ่าน backend/contract gates ของแต่ละงานด้วย |
@@ -26,7 +26,7 @@
 
 คิวปัจจุบัน: [Queue 004](plan/queue-004.md) · [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · [ผล sync status JSON ตาม verdict เดิม](planning/status-sync-062-001.json) · [ผลตรวจร่าง UX-005/007](planning/check-066-ux-review-001.md). ผลตรวจร่างไม่ใช่ human sign-off หรือ runtime acceptance
 
-รอบสัญญาที่ UX ต้องใช้: [gap receipt 7 กลุ่มจาก arch071](design/learning-ux-contract-gaps-001.md) — ยัง OPEN; [ข้อเสนอผลข้อสอบเมื่อหมดเวลา](requirement/expired-attempt-decision-proposal-001.md) รอผู้ใช้เลือก ไม่ใช่มติหรือ AC ใหม่. ข้อเทคนิคอื่นให้ arch/sys รับต่อ ไม่ให้ผู้ใช้เดา DTO/schema
+รอบสัญญาที่ UX ต้องใช้: [gap receipt 7 กลุ่มจาก arch071](design/learning-ux-contract-gaps-001.md) — technical proof ยัง OPEN. ผู้ใช้เลือก A แล้วตาม [decisions-042](requirement/decisions-042.md): หมดเวลาตรวจคำตอบที่บันทึกทันเวลาอัตโนมัติ; [ข้อเสนอเดิม](requirement/expired-attempt-decision-proposal-001.md) เก็บเป็นประวัติ. ข้อเทคนิคอื่นให้ arch/sys รับต่อ ไม่ให้ผู้ใช้เดา DTO/schema; UX delta042 รอเซ็น Q43 ร่วมกับชุด007
 
 เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
 
@@ -43,6 +43,7 @@
 ## Change Log
 
 - 2026-10-26 — ใบงาน062: sync สารบัญหลักตาม plan/index + extension และ decisions-041 เป็น 15 verified/95 pending, UX signed 5/7; เริ่มร่างสองชุดที่เหลือและบันทึกคำสั่ง runner ของผู้ใช้. ไม่มี gate/runtime/release acceptance ใหม่
+- 2026-10-26 — ผู้ใช้เลือกAจริง→decisions042/AC04607; ปัจจุบัน44REQ/186AC/81TPcases. ผลตรวจ073เป็นฐานUXก่อนdelta042; ส่วนที่เปลี่ยนตามAส่งตรวจเพิ่มและรอhumanUXsignoffแยกจากมติธุรกิจ
 
 - 2026-10-24 — decisions-038 (มติผู้ใช้ชุดสุดท้าย): **UX sign-off ครบทั้ง int-001/int-002** (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ — front implement UX-001/UX-003 ได้) · ผู้อนุมัติเนื้อหา=ผู้ใช้ · rubric ดาวยืนยัน · ยังไม่อนุญาตทดสอบหุ่นจริง · cert signing ยังไม่ระบุ · ค้าง: spec Q3 (รุ่นหุ่น/calibration จริง), EV forwarding, ประตูเดิม
 
