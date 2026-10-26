@@ -5,7 +5,7 @@
 
 ## Transport — precedence ใบงาน049 (2026-10-24)
 
-Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — [Bcheckรอบ1](../planning/check-089-grpc-r1-001.md) FAIL119/150เหลือ4groupsรอnegativeboundary/rework2; [GhelperPASS433](../planning/check-089-gateway-r1-001.md); [Gtypedadapter](../planning/slice-089-gateway-typed-001.md) parentcompile/hashผ่านรอcheckแต่fullbuildติดpackages; production registration ปิด
+Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — [Bcheckรอบ1](../planning/check-089-grpc-r1-001.md) FAIL119/150รอrework2ตามnegativeboundary; [GhelperPASS433](../planning/check-089-gateway-r1-001.md); [Gtypedcheck](../planning/check-089-gateway-typed-001.md) FAIL258/260รอrework1/jpo; fullbuildติดpackagesและproduction registration ปิด
 
 [Negative boundary Rev1](gateway-logout-negative-boundary-001.md) จากarch089พร้อมส่งsysrework2: malformedservice metadata→Internal/INTERNAL_ERROR, exacttrace/lang/header-accounting/correlation; ไม่เพิ่มpubliccodesหรือhuman gate. Runtimehiddenheader/H5proofยังเปิด.
 
@@ -160,7 +160,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 
 ## ช่องว่าง Learning/UX — ใบงาน071
 
-[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 006](../plan/queue-006.md) และ [ใบงาน089](../planning/task-089.md). อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
+[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 006](../plan/queue-006.md) และ [ใบงาน090](../planning/task-090.md). อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
 
 ## ภาคผนวก canonical
 

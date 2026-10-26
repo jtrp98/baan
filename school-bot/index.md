@@ -6,7 +6,7 @@
 ## สถานะปัจจุบัน (2026-10-26)
 
 - **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 95 pending · 8 phases / 17 gates · 44 REQ / 186 AC / 81 TP cases — ดู [plan/index.md](plan/index.md)
-- **คิว**: กำลังเดิน CONTINUE-NORMAL รอบ [ใบงาน089](planning/task-089.md) จาก [handoff-004](planning/handoff-004.md) ตาม [Queue 006](plan/queue-006.md); แก้conversion/ตรึงBnegativeboundary/ตรวจGtypedขนานไม่เกิน3; Localprojectsรอindependentcheck
+- **คิว**: กำลังเดิน CONTINUE-NORMAL [ใบงาน090](planning/task-090.md) ต่อ089 ตาม [Queue 006](plan/queue-006.md); ตรวจLocalprojects/Mathlabelและแก้Gtypedขนานไม่เกิน3; Bgrpcเตรียมrework2ตามarchboundary
 - **โค้ด**: [AuthPASS45/WeightedPASS37/ConversionFAIL2](planning/check-089-auth-math-final-001.md) กำลังแก้conversionรอบ1; [Localprojects](planning/slice-089-local-projects-001.md) parentGotest/vetผ่านแต่newpackageno tests; [Bcheckรอบ1](planning/check-089-grpc-r1-001.md) FAIL119/150เหลือ4groups; [GhelperPASS](planning/check-089-gateway-r1-001.md)433/433; [Gtypedadapter](planning/slice-089-gateway-typed-001.md) parentcompile/hashผ่านรอcheckแต่fullbuildติดpackages. ยังไม่เปิดgRPCproduction/fullLogin/DBintegration
 - **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
 - **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · ผู้ใช้อนุญาต dev บน branch ที่เตรียมไว้ตาม [046](requirement/decisions-046.md); implementation review/H5/runtime ยังต้องพิสูจน์
@@ -31,5 +31,5 @@
 | [security.md](security.md) | ผลตรวจความปลอดภัย | static review: Important 6 / Medium 6 / Minor 3 OPEN; SEC001-003/009 mitigation ระดับแบบ; ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001..004 |
 | `db\` | SQL DDL/rollback + review (`review-001..007.md`, `schoolbot_db.sql`) | ร่างRev7; ผู้ใช้รันDDLแล้ว/directconnectionและนับ32ตารางผ่าน; schema parity/transaction/APIintegrationยังไม่ตรวจ |
-| `planning\` | ใบงาน (task-NNN), handoff, หลักฐานรายรอบ — บันทึกประวัติ ไม่ใช่สถานะ | ล่าสุด: [ใบงาน089](planning/task-089.md) — ทำต่อจาก handoff004 |
+| `planning\` | ใบงาน (task-NNN), handoff, หลักฐานรายรอบ — บันทึกประวัติ ไม่ใช่สถานะ | ล่าสุด: [ใบงาน090](planning/task-090.md) — ปิดreworkและเดินlocalqueueต่อจาก089 |
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง | 001 บทเรียน/3 โหมด · 002 account/profile/tenant · 003 Course Plan Sheet · 004 PGGradeDB · 005 score writer นอก workspace (BLOCKED) |
