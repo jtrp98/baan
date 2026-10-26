@@ -1,0 +1,48 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "check",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-04-48-50-check-tier-t2-1agents-yA7Id8\\report.json",
+  "payload": {
+    "state": "PASS",
+    "summary": "UX-005/007 ผ่านเฉพาะความครบถ้วนของร่างสุดท้าย ครอบคลุม 12+15 AC รวม 25 AC ไม่ซ้ำ เนื้อหาหลังแบ่งไฟล์ครบ และกฎเว็บครูตรง project instruction; Q39–Q46 ยังรอมนุษย์เซ็น",
+    "tasks": [
+      {
+        "id": "UX-005",
+        "verdict": "PASS",
+        "scope": "final draft completeness; awaiting human sign-off"
+      },
+      {
+        "id": "UX-007",
+        "verdict": "PASS",
+        "scope": "final draft completeness; awaiting human sign-off"
+      }
+    ],
+    "findings": [],
+    "checks_run": [
+      "อ่าน index ตามลำดับที่กำหนด แล้วตรวจ AC/spec/DES/data-model และ linked contracts ที่เกี่ยวข้องก่อนเทียบร่าง",
+      "ตรวจ trace กับ tasks-001.json: UX-005 ครบ 12/12, UX-007 ครบ 15/15 รวม 25 AC ไม่ซ้ำ ไม่มีรายการเกินหรือขาด; ตรวจเนื้อหา flow/state ประกอบทุก AC ไม่ใช้เพียงการพบ ID",
+      "วัดไฟล์ที่บันทึกจริงทั้ง 12 ไฟล์: ผ่าน 12/12 ทุกไฟล์ไม่เกิน 11000 UTF-8 bytes; สูงสุด int-007-states.md 10600 bytes",
+      "ตรวจ Markdown links ภายใน 47 จุด รวม anchor 1 จุด: ไม่พบปลายทางหาย; section ที่ย้ายยังเข้าถึงผ่านหัวข้อเดิมและลิงก์ไฟล์ประกอบ",
+      "เทียบ archive ก่อนแบ่งกับชุดปัจจุบัน: 21/21 sections เนื้อหาตรงกันเมื่อไม่นับ CR/บรรทัดว่าง ไม่มี AC/state/Q หาย",
+      "เทียบ archive ก่อนแก้ rule priority: 20 sections; 15 คงเดิม อีก 5 เปลี่ยนเฉพาะคำอธิบายหลักฐาน ลำดับกฎ loading และ visual scope ไม่เปลี่ยนกฎธุรกิจ",
+      "ตรวจตาราง sign-off: Q39–Q46 ครบ 8/8 และยังรอเซ็น ไม่มีการบันทึกผู้อนุมัติแทนมนุษย์",
+      "ตรวจ P9/DESIGN: เว็บครู/Level/เกณฑ์ที่อยู่ web-system ใช้ Skeleton เฉพาะส่วนโหลด, disabled/progress ระหว่างบันทึก และ shared tokens/props; ไม่ขยาย P9 ไป Desktop/admin ส่วนกลาง",
+      "ตรวจเอกสาร keyboard/focus, aria, empty/error, conflict/unknown outcome และ reduced-motion พร้อมตรวจการคง four-eyes, immutable revisions, policy restrictions, freeze weights, retake best และ strict > สำหรับ Level"
+    ],
+    "limitations": [
+      "เป็น static document review ไม่มีผลยืนยัน UI runtime, component implementation หรือ AC ของระบบจริง",
+      "ช่องว่างสัญญาเดิมยังเปิดตาม int-006-admin-trace.md:38–43 และ int-007-trace.md:41–45; ต้องให้ arch รับต่อก่อนเชื่อมส่วนที่พึ่งสัญญา",
+      "ไม่ได้เขียนไฟล์จริง รัน SQL/DB/network/build/product tests ใช้ source Git หรือเรียก role ต่อ; ไม่เปลี่ยน index status และไม่ปิด gates",
+      "ตัวเรียก python ใช้งานไม่ได้ จึงใช้ PowerShell/.NET ตรวจขนาด ลิงก์ AC และ section comparison จนครบ"
+    ],
+    "new_files": [
+      {
+        "path": "knowledge/school-bot/planning/check-073-ux-final-001.md",
+        "content": "# ผลตรวจเอกสาร UX ฉบับสุดท้าย\n\nวันที่ของงาน: 2026-10-26\n\nUX-005: PASS เฉพาะ final draft completeness ครบ 12/12 AC; UX-007: PASS เฉพาะ final draft completeness ครบ 15/15 AC รวม 25 AC ไม่ซ้ำ ไม่ใช่ human approval หรือ runtime acceptance\n\nตรวจไฟล์ร่าง 11 ไฟล์และ uxui/index.md รวม 12 ไฟล์: ทุกไฟล์ ≤11000 UTF-8 bytes สูงสุด 10600 bytes; ลิงก์ภายใน 47 จุดรวม anchor 1 จุดไม่พบปลายทางหาย; 21 sections จาก archive ก่อนแบ่งมีเนื้อหาครบตรงกันเมื่อไม่นับ CR/บรรทัดว่าง ส่วน archive ก่อนแก้ลำดับกฎมี 20 sections: 15 คงเดิม 5 เปลี่ยนตามขอบเขต rule priority/loading/visual ไม่มี business state หรือคำถามเซ็นหาย\n\nหลักฐาน UX-005: int-006-admin-trace.md:13–24 ครบ AC; int-006-admin-curriculum.md:21–43 ครบรหัสถาวร/แก้ร่าง/four-eyes/revision; int-006-admin-import-bank.md:7–38 ครบ import และ bank/policy; int-006-admin-errors-a11y.md:9–51 ครบ error/auth/a11y; int-006-admin-review-signoff.md:9 ระบุกฎเว็บครูและแยก repo ชัดเจน, :19–27 คง Q39–Q42 รอเซ็น\n\nหลักฐาน UX-007: int-007-trace.md:15–29 ครบ AC; int-007-attempt-policy.md:18–32 ครบ attempt/policy/snapshot; int-007-teacher-score.md:13–57 ครบสิทธิ์ครู/ซ่อม/น้ำหนัก/สูตร/Level; int-007-states.md:13–35 ครบ loading/empty/error/auth/conflict; int-007-recovery-a11y.md:9–31 ครบ unknown outcome/keyboard/aria/reduced-motion และ DESIGN/shared props; int-007-attempt-policy.md:38–43 คง Q43–Q46 รอเซ็น\n\nไม่พบข้อบกพร่องที่ทำให้ FAIL ในขอบเขตนี้ ไม่มี security gate ใหม่ ช่องว่างสัญญาเดิมคงแจ้งตรงที่ int-006-admin-trace.md:38–43 และ int-007-trace.md:41–45 ส่ง arch รับต่อก่อน front เชื่อมส่วนที่เกี่ยวข้อง ส่งผู้คุมรับผลและจัด human sign-off ต่อ ไม่แก้ Status หรือปิด gates\n\n## Change Log\n- 2026-10-26 — ตรวจเอกสารที่บันทึกจริงตามใบงาน073; รายงานนี้ส่งเป็นเนื้อหาให้ผู้คุมบันทึก ยังไม่ได้เขียนไฟล์จริง\n\nPASS"
+      }
+    ],
+    "handoff": "ส่งผู้คุมรับ verdict PASS ทั้งสอง task เฉพาะความครบถ้วนของร่าง แล้วจัดให้ผู้ใช้เซ็น Q39–Q46; ส่ง arch รับช่องว่างสัญญาเดิมก่อน front ส่วนที่เกี่ยวข้อง คง human/backend/runtime gates ทั้งหมด"
+  }
+}
