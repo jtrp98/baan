@@ -35,7 +35,7 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 8 (BA-001..004/UX-001/UX-003/TP-001/SA-004) pending 102; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 9 (BA-001..004/UX-001/UX-003/TP-001/SA-004/DBA-001) pending 101; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -43,7 +43,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 |---|---|---|---|---|---|
 | [SA-001](SA-001.md) | Contracts/update | sa | P0 | — | pending |
 | [BE-001](BE-001.md) | Legacy auth | be | P0 | — | pending |
-| [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | pending |
+| [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
 | [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | pending |
 | [DBA-003](DBA-003.md) | Core evidence | dba | P1 | DBA-002 | pending |
 | [BE-002](BE-002.md) | DB integration | be | P1 | DBA-003 | pending |

@@ -11,3 +11,7 @@
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน061; ผลจะ append เมื่อรับ
+
+## Change Log (ต่อ)
+- 2026-10-24 — check-061c: SA-004 PASS (flip แล้ว) · DBA-001 ติด parser → นายช่างติดตั้ง @dbml/core 10.3.1 รันเอง ([dbml-parser-evidence-002](../design/dbml-parser-evidence-002.json): ผ่านทั้งสองไฟล์ ตรง baseline) + แก้ schema-notes Learner ตามข้อเสนอ → check spot ให้ **DBA-001 PASS** (flip แล้ว — รวม 9 verified/101 pending; ปลดล็อก TP-003/DBA-007/UX-006)
+- 2026-10-24 — รับผล int (subagent role int): int-003-projects (UX-002) + int-004-learning (UX-004) บันทึกแล้ว รอเซ็น Q14–Q29
