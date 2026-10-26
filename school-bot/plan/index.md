@@ -8,7 +8,7 @@ Frozen: ระบบเต็ม 44 REQ / 186 AC / 81 TP cases ตาม [มต
 
 ## Waiting on Human
 
-คิวปัจจุบัน: [Queue 005](queue-005.md) · กำลังทำต่อรอบ [089](../planning/task-089.md) จาก [handoff004](../planning/handoff-004.md) · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
+คิวปัจจุบัน: [Queue 006](queue-006.md) · กำลังทำต่อรอบ [089](../planning/task-089.md) จาก [handoff004](../planning/handoff-004.md) · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
 
 - **G/Light/infra/B/BFF**: ผู้ใช้อนุญาตGatewaydevแล้วตาม046; implementation review/H5ยังรอหลักฐาน — fullLogin NOT_READY; B gRPCsubsetยังcheckFAILตามhandoff004 ไม่ถามอนุญาตdevซ้ำ
 - **ผู้ใช้**: forward [DB cover](../db/db-safe-evidence-cover-001.md) ให้เจ้าของ DB → เจ้าของ DB ส่ง EV-01..03 → 04/05 → 06 (optional) · ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว
