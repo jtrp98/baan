@@ -131,8 +131,13 @@
 | [decisions-036.md](decisions-036.md) | GAP-07: คง workflow PrepareUpdate/InstallPreparedUpdate — spec ร่าง AC-030-04..08 (รอผู้ใช้ตรวจรับ) / inspect เพิ่ม coverage / gate เดิม |
 | [decisions-037.md](decisions-037.md) | ตรวจรับ AC-030-04..08 ทั้ง 5 · UX Q5 ถามทุกครั้ง · UX Q9 ป้ายจำลองตลอด session (ยืนยัน BR-013-03) · performance 300MB/5s/30FPS เป็น acceptance ของ G-DELIVERY |
 | [decisions-038.md](decisions-038.md) | Sign-off UX ครบทั้ง int-001/int-002 (Q2/Q3/Q6–Q8/Q10/Q11/Q13) · spec Q1 ผู้อนุมัติเนื้อหา=ผู้ใช้ · Q2 ยืนยัน rubric ดาว · Q4 ยังไม่อนุญาตทดสอบหุ่นจริง · Q5 cert ยังไม่ระบุ |
+| [decisions-039.md](decisions-039.md) | Sign-off UX-002 ครบ (Q14–Q21); UX-004 อนุมัติบางส่วน (Q22–Q25) |
+| [decisions-040.md](decisions-040.md) | Sign-off UX-004 เพิ่ม Q26–Q29 รวมกับ decisions-039 เป็นอนุมัติครบ; G-UX-LEARN มีหลักฐาน sign-off ครบ |
+| [decisions-041.md](decisions-041.md) | Sign-off UX-006 ครบ (Q30–Q38); G-UX กลุ่ม mapping/export มีหลักฐานตามเงื่อนไข gate เดิม |
 
 ## Change Log
+
+- 2026-10-26 — ใบงาน068: เพิ่มทะเบียนมติ decisions-039..041 ตามหลักฐานมติผู้ใช้เดิม; คง REQ/AC/status และประตูเดิมทั้งหมด
 
 - 2026-10-24 — decisions-038 (sign-off UX ครบทั้งสองไฟล์ + spec Q1/Q2/Q4/Q5): บันทึกผู้อนุมัติเนื้อหา=ผู้ใช้, rubric ยืนยัน, ยังไม่อนุญาตทดสอบหุ่นจริง, cert ยังไม่ระบุ — เหลือค้างเฉพาะ spec Q3 (ข้อมูลรุ่นหุ่น/calibration จริง); คงจำนวน REQ/AC เดิม
 
