@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fallbackChainFor } from "../src/plan.mjs";
-import { execute, looksLikeLimitError, looksLikeMissingCli, runWithFallback } from "../src/scheduler.mjs";
+import { execute, looksLikeCapacityError, looksLikeLimitError, looksLikeMissingCli, runWithFallback } from "../src/scheduler.mjs";
 
 const cfg = {
   agents: { codex: {}, agy: {}, claude: {} },
@@ -118,4 +118,42 @@ test("execute: ทั้ง chain ติดโควตาหมด = งาน 
     assert.equal(cp.agent, "claude", "ตัวสุดท้ายที่ลอง");
     assert.deepEqual(cp.fallback, ["codex→agy", "agy→claude"]);
   } finally { rmSync(runDir, { recursive: true, force: true }); }
+});
+
+// ข้อความจริงจาก codex (2026-10-26) — stderr มี transcript ของงานปนอยู่ด้วย
+const capRun = () => ({ ok: false, exitCode: 1, durationMs: 5, timedOut: false, answer: "", error: "", stdout: "", stderr: ["exec", "role says: model is at capacity in docs", "ERROR: Selected model is at capacity. Please try a different model.", "tokens used", "5,171"].join("\n") });
+const noWait = { retryDelaysMs: [30_000, 90_000], sleep: async () => {}, onRetry: () => {} };
+
+test("looksLikeCapacityError: จับเฉพาะบรรทัด ERROR ของ CLI ไม่จับคำว่า capacity ใน transcript", () => {
+  assert.equal(looksLikeCapacityError(capRun()), true);
+  assert.equal(looksLikeCapacityError({ ...capRun(), stderr: "role says: model is at capacity in docs" }), false, "ข้อความกลาง transcript ไม่ใช่ error ของตัวรัน");
+  assert.equal(looksLikeCapacityError({ ...capRun(), ok: true }), false);
+  assert.equal(looksLikeCapacityError({ ...capRun(), timedOut: true }), false);
+});
+
+test("runWithFallback: โมเดลเต็ม = รอแล้วลองตัวเดิมซ้ำก่อน ไม่สลับค่าย", async () => {
+  const seen = [];
+  const waits = [];
+  const res = await runWithFallback(["codex", "agy"], async (a) => {
+    seen.push(a);
+    return seen.length < 3 ? capRun() : okRun();
+  }, () => assert.fail("ต้องไม่สลับ"), { ...noWait, sleep: async (ms) => { waits.push(ms); } });
+  assert.equal(res.agent, "codex");
+  assert.equal(res.r.ok, true);
+  assert.deepEqual(seen, ["codex", "codex", "codex"]);
+  assert.deepEqual(waits, [30_000, 90_000], "รอตามรอบที่กำหนด");
+});
+
+test("runWithFallback: ลองซ้ำครบแล้วยังเต็ม — chain เดียว (--no-fallback) คืนผลล้ม · มีตัวถัดไปค่อยสลับ", async () => {
+  let n = 0;
+  const solo = await runWithFallback(["codex"], async () => { n++; return capRun(); }, () => {}, noWait);
+  assert.equal(n, 3, "ครั้งแรก + retry 2 รอบ");
+  assert.equal(solo.r.ok, false);
+
+  const reasons = [];
+  const seen = [];
+  const res = await runWithFallback(["codex", "agy"], async (a) => { seen.push(a); return a === "codex" ? capRun() : okRun(); }, (_f, _t, why) => reasons.push(why), noWait);
+  assert.deepEqual(seen, ["codex", "codex", "codex", "agy"]);
+  assert.deepEqual(reasons, ["capacity"]);
+  assert.deepEqual(res.trail, ["codex→agy"]);
 });

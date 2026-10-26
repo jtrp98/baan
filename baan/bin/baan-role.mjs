@@ -14,7 +14,7 @@ function printResult(r) {
   const tier = [r.model && `model=${r.model}`, r.effort && `effort=${r.effort}`].filter(Boolean).join(" ");
   const via = r.fallback.length ? ` (สลับตัวรัน: ${r.fallback.join(", ")})` : "";
   console.log(`\n── ${r.agent} (${r.label})${tier ? ` [${tier}]` : ""} ── ${statusLabel(r)} in ${(r.durationMs / 1000).toFixed(1)}s${via}`);
-  if (r.error) console.log(`   spawn error: ${r.error}`);
+  if (r.error) console.log(`   error: ${r.error}`);
   if (r.timedOut) console.log("   ถูกยกเลิกเพราะเกิน timeout");
   console.log((r.answer || "(ไม่มีคำตอบ — ดู raw output ใน reports/) ").split("\n").map((l) => `   ${l}`).join("\n"));
   if (!r.ok) console.log(`   สถานะงาน: ${r.state}${r.marker ? ` (${r.marker})` : ""} — งานไม่สำเร็จ`);
