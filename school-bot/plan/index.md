@@ -96,7 +96,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [FE-016](FE-016.md) | Progress UI | fe | P5 | FE-014, FE-015 | pending |
 | [DBA-006](DBA-006.md) | Release DDL | dba | P3 | DBA-001, SA-001, SEC-001 | pending |
 | [BE-018](BE-018.md) | Release API | be | P3 | BE-005, DBA-006 | pending |
-| [BE-019](BE-019.md) | Update check | be | P4 | BE-018, BE-007, SA-001 | pending |
+| [BE-019](BE-019.md) | Update check/Prepare/Install | be | P4 | BE-018, BE-007, SA-001 | pending |
 | [BE-020](BE-020.md) | Windows MSI | be | P6 | FE-005, FE-016, FE-012, BE-019 | pending |
 | [BE-021](BE-021.md) | macOS PKG | be | P6 | FE-005, FE-016, FE-012, BE-011, BE-012, BE-019 | pending |
 | [BE-022](BE-022.md) | Signing/assets | be | P6 | BE-020, BE-021, SEC-001 | pending |
