@@ -153,9 +153,13 @@
 
 | [gateway-integration-001.md](gateway-integration-001.md) | Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review; override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
 
+## Amendment 076 — 2026-10-26
+
+[DES-010 Rev4](des-010.md), [learning-rules Rev1](learning-rules-032-034.md), [DES-011 Rev4](des-011.md) และ [gap receipt Rev1](learning-ux-contract-gaps-001.md) มี dated amendment076 ตาม042/AC-046-07; คง PROPOSED รอ technical proof ไม่เปิด implementation/gates
+
 ## ช่องว่าง Learning/UX — ใบงาน071
 
-[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; ไม่ใช่สัญญาใหม่หรือ gate passed. คิวปัจจุบันใช้ [Queue 004](../plan/queue-004.md) และ [ใบงาน062](../planning/task-062.md). คง 44 REQ/185 AC, 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ gates เดิม.
+[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 004](../plan/queue-004.md) และ [ใบงาน062](../planning/task-062.md). อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
 
 ## ภาคผนวก canonical
 
@@ -215,6 +219,7 @@
 - 2026-10-24 — แก้ตาม check-061-verify4 (นายช่างสวมบท arch): schoolbot.dbml PlanCourseIds jsonb→integer[] ตรง DDL (schoolbot_db.sql:578) — annotation เท่านั้น schema ไม่เปลี่ยน; parser 10.3.1 ผ่านหลังแก้ ([evidence-003](dbml-parser-evidence-003.json): 32 ตาราง/450 ฟิลด์)
 
 ## Change Log
+- 2026-10-26 — Amendment076: เพิ่ม pointers ผล expired ตาม042; LUX-05 เหลือ technical proof คง PROPOSED/schema/DTO/gates
 - 2026-10-26 — ใบงาน071: เพิ่ม pointer gap receipt Learning/UX และ Queue 004; แก้ disposition pointer ตาม036/037 โดยคงฉบับเดิมเป็นประวัติ; ไม่เปลี่ยน DES revisions/PROPOSED, counts หรือ gates
 - 2026-10-24 — Rev5: ใบงาน060a amend DES-002..007/rules/schema-notes และเชื่อมสัญญาย่อย/SA-004; เก็บก่อนแก้พร้อม SHA256; ไม่เปลี่ยน task status/scope/dependencies/gates
 - 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict

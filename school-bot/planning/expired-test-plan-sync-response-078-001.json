@@ -1,0 +1,72 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "inspect",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-05-08-48-inspect-tier-t2-1agents-OFRSl4\\report.json",
+  "payload": {
+    "state": "DONE",
+    "summary": "จัดทำข้อเสนอ exact edits เพิ่ม coverage AC-046-07 เป็น 81 cases/186 AC; ไม่เขียนไฟล์จริง ไม่รันทดสอบ และไม่เปลี่ยน actual/QA/verdict/gates",
+    "new_files": [
+      {
+        "path": "knowledge/school-bot/test-plan/tp-001-amendment-004.md",
+        "content": "# TP-001 Amendment004 — 2026-10-26\n\n## TP001-081\n\nอ้าง [AC-046-07/BR-046-07](../requirement/req-046.md), [decisions-042](../requirement/decisions-042.md), [DES-010](../design/des-010.md), [LUX-05](../design/learning-ux-contract-gaps-001.md). ต่อจาก TP001-080; cases เดิมไม่เปลี่ยน\n\nระดับ: unit ตรวจคะแนน; integration ตรวจ lifecycle/count/recovery ผ่าน PF-API ตาม index; UI reload เฉพาะเมื่อ backend และ signed UX พร้อม\n\nเงื่อนไขก่อนตรวจ: synthetic Test 10 ข้อละ 1 คะแนน; student มีสิทธิ์และ snapshot/policy เดิม; test environment/transport/DB prerequisites ตาม index พร้อม. Guest ใช้แทน server attempt ไม่ได้; คงข้อห้าม teacher Cloud attempt ตาม REQ-046 เดิม ไม่เพิ่ม manual grading\n\n| ชุดข้อมูล | ขั้นตอน | Expected/assertions |\n|---|---|---|\n| Q1–6 server บันทึกทัน: ถูก4ผิด2; Q7–8 ค้างเครื่อง; Q9–10 ว่าง | ไม่กด submit ปล่อยหมดเวลา แล้วอ่านผล | ปิด attempt อัตโนมัติ ได้4/10; ข้อที่ไม่ได้บันทึกได้0; คะแนนเต็มยัง10 |\n| ไม่มีคำตอบบันทึกเลย | ไม่ส่งและปล่อยหมดเวลา | ได้0/10; ไม่เป็นผลว่างหรือคะแนนเต็ม0 |\n| ผล4/10 ข้างต้น; คำตอบค้าง/ส่งช้าอาจทำให้คะแนนเพิ่ม | ส่งคำตอบเหล่านั้นหลังหมดเวลา แล้วอ่านซ้ำ | ไม่รับย้อนหลัง; ผลยัง4/10; จำนวนครั้งไม่คืนเพราะไม่กดส่ง |\n| ครั้งปกติและรอบซ่อมแยก fixture; ผลก่อนซ่อม6/10 หรือ2/10 | ปล่อยรอบซ่อมหมดเวลาได้4/10; จำลอง response สูญหายหลังปิดผล แล้ว reload/อ่านซ้ำ | นับครั้ง/ใช้สิทธิ์ซ่อมตาม snapshot เดิม ไม่คืนหรือกินซ้ำ; คะแนนสูงสุดเป็น6/10 หรือ4/10 ตามลำดับ; ผลเดิมคงอยู่ ไม่ finalize ซ้ำ |\n\nหลักฐานที่ check ต้องเก็บ: unit log; E-API แบบ sanitized พร้อม build/config/fixture revision, attempt/snapshot refs, คำตอบและเวลาที่ server บันทึก, fault point, ผล/count/grant/audit ก่อน–หลัง; E-UI สำหรับ reload เท่านั้น. ต้องแยก response หายหลัง commit จากคำตอบที่ server ยังไม่บันทึก\n\nPending technical proof: DES-010 Rev4/LUX-05 ที่อ่านยังไม่บันทึก amendment076. ใช้042เป็น expected ธุรกิจ; รอ arch/sys ตรึง clock authority/precision, ก่อน–ตรง–หลัง deadline, answers/submit/expiry race, atomic finalize/retry/recovery/DTO. เตรียม fault ก่อน/หลัง commit และ concurrent expiry/reload แต่ไม่เดา equality, error code หรือเวลา recovery. ยังไม่ยอมรับความเสี่ยงเพื่อเปิด gate\n\nActual: NOT_RUN ทุกชุดย่อย รวม clock/race/boundary\n\nTraceability: AC-046-07 → TP001-081; AC-046-01..06 คง TP001-063..065. Coverage รวมตามฐานเดิม+Amendment004 เป็น81 cases/186 AC ไม่ใช่ผลทดสอบ; snapshot180/77คงเดิม\n\n## Change Log\n- 2026-10-26 — ใบงาน078: เพิ่ม TP001-081 ตาม042; coverageเท่านั้น ไม่มี test execution\n"
+      }
+    ],
+    "edits": [
+      {
+        "path": "knowledge/school-bot/test-plan/tp-001.md",
+        "old": "# TP-001 — แผนทดสอบ 180 AC",
+        "new": "# TP-001 — แผนทดสอบ 186 AC\n\n## Amendment004 — 2026-10-26\n\nปัจจุบัน81 cases/186 AC: เพิ่ม [TP001-081 พร้อม matrix/หลักฐาน/ข้อรอพิสูจน์](tp-001-amendment-004.md) ครอบ AC-046-07 ตาม [decisions-042](../requirement/decisions-042.md). ทุก actual=NOT_RUN. ตัวเลข180/77และ80/185ด้านล่างเป็นประวัติ; raw/Joined JSONยังเป็น snapshot180/77\n\n### Change Log (Amendment004)\n- 2026-10-26 — ใบงาน078: เพิ่ม coverage ผลหมดเวลา; ไม่รันทดสอบ ไม่เปลี่ยน cases เดิมหรือ gates"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "80 TP cases ยัง NOT_RUN.",
+        "new": "81 TP cases ยัง NOT_RUN (Amendment004)."
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "80 cases /185 AC (Amendment002",
+        "new": "81 cases /186 AC ([Amendment004](tp-001-amendment-004.md) ตาม decisions-042 เพิ่ม AC-046-07; ประวัติ Amendment002"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "coverage ปัจจุบัน 185 AC/80 cases อ่าน [TP Amendment003](tp-001.md#amendment003--2026-10-24)",
+        "new": "coverage ปัจจุบัน186 AC/81 cases อ่าน [TP Amendment004](tp-001.md#amendment004--2026-10-26)"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "snapshot ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อที่อยู่ใน TP Amendment003",
+        "new": "snapshot180/77 ยังไม่รวม AC-030-04..08 ใน Amendment003 และ AC-046-07 ใน Amendment004"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "| ผล inspect ต้นฉบับ | ไม่มี test execution |",
+        "new": "| raw snapshot เดิม180 AC/77 cases | ไม่มี test execution |"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "จึงไม่ใช่ joined coverage 185 AC",
+        "new": "และยังไม่รวม AC-046-07 ใน [Amendment004](tp-001-amendment-004.md); จึงไม่ใช่ joined coverage186 AC"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n\n- 2026-10-26 — ใบงาน078 Amendment004 ตาม [decisions-042](../requirement/decisions-042.md): เพิ่ม TP001-081 รวม81 cases/186 AC; snapshot180/77คงเดิม ทุก actual NOT_RUN ไม่มี test execution"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/traceability-001.md",
+        "old": "[แผนทดสอบและ expected evidence](tp-001.md) · [ข้อมูลสำหรับเครื่อง](traceability-001.json)",
+        "new": "[แผนทดสอบและ expected evidence](tp-001.md) · [ข้อมูลสำหรับเครื่อง](traceability-001.json)\n\nตารางนี้และ raw/Joined JSON คง snapshot180 AC/77 cases. Coverage ปัจจุบัน81 cases/186 AC อ่าน TP Amendment003 และ [Amendment004](tp-001-amendment-004.md): AC-046-07 → TP001-081 ตาม decisions-042; ไม่เพิ่มแถวใน snapshot ไม่ใช่ QA PASS"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/traceability-001.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n\n- 2026-10-26 — ใบงาน078: เพิ่ม pointer Amendment004/AC-046-07; คง180แถว/77 case IDs/owners/actualและ JSONเดิม ไม่มี test execution"
+      }
+    ],
+    "case_count": 81,
+    "ac_count": 186,
+    "handoff": "ส่ง gm บันทึกข้อเสนอและ mapping AC-046-07→TP001-081: BE-031/sys, FE-021/front, UX-007/int, QA-013/check; ไม่แก้ canonical task. ให้ check รับ matrix เมื่อ prerequisite พร้อม; arch/sys รับ LUX-05 technical proof. เพิ่ม coverage เท่านั้น ไม่ใช่ test execution"
+  }
+}

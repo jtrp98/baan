@@ -1,0 +1,95 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t1",
+  "role": "arch",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-05-08-45-arch-tier-t1-1agents-vdez3N\\report.json",
+  "payload": {
+    "state": "DONE",
+    "summary": "จัดชุดแก้เฉพาะมติ042แล้ว ยังไม่เขียนไฟล์ ใช้ dated amendment คง PROPOSED, 32 tables, DTO fields และ 17 gates เดิม",
+    "edits": [
+      {
+        "path": "knowledge/school-bot/design/des-010.md",
+        "old": "## Change Log",
+        "new": "## Amendment 076 — 2026-10-26\n\nอ้าง decisions-042:11–16 และ REQ-046 BR/AC-046-07; มี precedence เฉพาะผลหมดเวลา:\n- ปิดด้วย state `expired` เดิม ตรวจอัตโนมัติจากคำตอบที่ server รับและบันทึกทันเวลา แม้ไม่กด submit; ข้อว่างได้ 0 ใช้คะแนนเต็มทั้งชุดตาม snapshot ไม่มีคำตอบได้ 0/เต็มทั้งชุด ไม่รับคำตอบย้อนหลัง\n- นับครั้งตาม max_attempts/Sequence และใช้ RetakeGrant เดิมหากเป็นรอบซ่อม ไม่คืนสิทธิ์เพราะไม่กดส่ง และไม่ consume ซ้ำตอน finalize\n- Mutation answers/submit หลังหมดเวลาไม่รับ answers เพิ่ม; mapping ใช้ `409 ATTEMPT_EXPIRED` เดิม ส่วน GET อ่าน outcome ได้ตามสิทธิ์เดิม ไม่ปฏิเสธการอ่านเพียงเพราะ expired; feedback/เฉลยยังขึ้นกับ reveal ของ snapshot ไม่เปิดทันทีเพราะหมดเวลา\n- ผล expired ที่ตรวจเสร็จเข้า selection ตาม [กฎผลเรียน](learning-rules-032-034.md); Test ครั้งจริง/ซ่อมใช้ best ไม่มีเพดานลดคะแนน\n\nหลักฐาน contract: dictionary/table-024.md:26–33, contract-002.md:34 และ contract-003.md:21,39–43 มี state/คะแนน/snapshot เดิม; ร่าง SQL ../db/schoolbot_db.sql:805–812,827–830 อนุญาต expired กับ EarnedScore numeric(18,6) และ MaxScore เดิม จึงไม่เสนอ field/table/state/API ใหม่ ไม่ใช่หลักฐาน schema/runtime acceptance\n\nAs-built ที่อ่านจริง: target/school-bot/web/src/SchoolBot.Api/Program.cs:42–47,94–129 มี TimeProvider, management memory store และ logout แต่ไม่พบ Attempt route ในไฟล์นี้; ไม่ยืนยันว่ามี clock/finalizer/worker/transaction ของ expired แล้ว\n\nรายละเอียดเทคนิคยัง PROPOSED และต้องตรึง/พิสูจน์: clock และขอบเส้นตาย, save/submit/expiry race, idempotent finalization, crash/retry/recovery, read ระหว่างยัง finalize ไม่เสร็จ และ reveal mapping; ไม่เลือกกลไกใหม่ใน amendment นี้ ไม่ใช้ NULL เป็นคะแนน 0 ที่ตรวจแล้ว\n\nทางเลือกที่ไม่ใช้: ไม่มีคะแนนเมื่อ expired ขัดมติ A; บังคับเปลี่ยนเป็น submitted หรือเพิ่ม storage ไม่จำเป็นต่อมตินี้\n\n## Change Log\n- 2026-10-26 — Amendment076: รับ042/AC-046-07 เฉพาะ expired; คง Rev4/PROPOSED และ gates เดิม"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-rules-032-034.md",
+        "old": "Attempt ใช้ CourseRunId จริงและ submitted results ตาม selection; Test รวมซ่อมใช้ best ไม่มีเพดานลดคะแนน",
+        "new": "Attempt ใช้ CourseRunId จริงและผลที่ตรวจเสร็จของ submitted หรือ expired ตาม selection (decisions-042); NULL ไม่ใช่ผลศูนย์ที่ตรวจแล้ว Test รวมซ่อมใช้ best ไม่มีเพดานลดคะแนน รวมผล expired ด้วย; ProgressView.selected_attempt ใช้ผลที่เลือกนี้โดยคง DTO เดิม"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-rules-032-034.md",
+        "old": "## Change Log",
+        "new": "## Amendment 076 — 2026-10-26\nผล expired ตาม [DES-010 amendment076](des-010.md) ใช้ earned/max เต็มทั้งชุดเข้าสูตร weighted-normalized-v1 เดิม ภายใต้ policy ที่ freeze; quiz_counts=false ยังคงน้ำหนัก0 ผล 0 ที่ตรวจแล้วต่างจากไม่มีผล ไม่ skip เพียงเพราะ expired ไม่มีการคืนครั้ง/สิทธิ์ซ่อม ไม่เปลี่ยน weights/roster/Level threshold\n\n## Change Log\n- 2026-10-26 — Amendment076: แก้ submitted-only ให้รวม expired ที่ตรวจเสร็จตาม042; คง Rev1 และสูตรเดิม"
+      },
+      {
+        "path": "knowledge/school-bot/design/des-011.md",
+        "old": "- `total` รายคน = คะแนนรวมหลักสูตร 0–100 ตาม `ScoringPolicy` revision และ `formula_version` (DES-010) โดยกิจกรรมที่ไม่มีผลใช้ 0",
+        "new": "- `total` รายคน = คะแนนรวมหลักสูตร 0–100 ตาม `ScoringPolicy` revision และ `formula_version` (DES-010) โดยกิจกรรมที่ไม่มีผลใช้ 0; ผล expired ที่ตรวจเสร็จตาม042เข้า selection และสูตรเดิม ไม่ถือว่าขาดผลเพราะไม่กดส่ง คง roster, strict threshold, snapshot/recheck และการยืนยันทั้งห้องเดิม"
+      },
+      {
+        "path": "knowledge/school-bot/design/des-011.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n- 2026-10-26 — Amendment076: ชี้ผล expired ตาม042เข้าสูตรเดิม; คง Rev4/PROPOSED ไม่มี DTO/schema delta"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-ux-contract-gaps-001.md",
+        "old": "ยังไม่กำหนดการเทียบเวลา, transition/recovery และชุดคำตอบ/ผลเมื่อหมดเวลา; ห้าม UX รับรอง auto-submit/auto-score. R/req-046.md:22–28 กำหนดจำกัดเวลาแต่ไม่ตัดสินผล expired",
+        "new": "R/decisions-042.md:11–16 และ AC-046-07 ตอบธุรกิจแล้ว: auto-score คำตอบที่ server บันทึกทัน ข้อว่าง0 เต็มทั้งชุด นับครั้ง/สิทธิ์ซ่อมเดิม; ยังขาด clock/race/idempotent finalization/recovery proof จึงไม่รับรอง runtime สำเร็จ"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-ux-contract-gaps-001.md",
+        "old": "arch/sys ตรึงเวลา/race/retry ทางเทคนิค; spec แยกกติกาคะแนน expired ที่ยังไม่มีมติออกมาให้ผู้ใช้ตัดสินก่อนสัญญาส่วนนั้น ไม่ให้ผู้ใช้เลือก DTO/storage",
+        "new": "arch/sys ตรึงและพิสูจน์เทคนิคตาม DES-010 amendment076; แยก mutations หลัง expired จาก read outcome/feedback ตาม policy เดิม ไม่ถามธุรกิจ042ซ้ำ"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-ux-contract-gaps-001.md",
+        "old": "LUX-05 มีคำถามธุรกิจเฉพาะผลเมื่อหมดเวลา; ที่เหลือเป็นงานเทคนิค/หลักฐานของทีม",
+        "new": "LUX-05 ธุรกิจตอบแล้วตาม042; ส่วนที่เหลือเป็นงานเทคนิค/หลักฐานของทีม"
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-ux-contract-gaps-001.md",
+        "old": "คง 44 REQ/185 AC, 15 verified/95 pending, 32 ตาราง และ DES revisions/PROPOSED เดิม.",
+        "new": "อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม."
+      },
+      {
+        "path": "knowledge/school-bot/design/learning-ux-contract-gaps-001.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n- 2026-10-26 — Amendment076: LUX-05 รับมติ042แล้ว เหลือ technical proof; gaps อื่นไม่เปลี่ยน คง Rev1"
+      },
+      {
+        "path": "knowledge/school-bot/design/index.md",
+        "old": "## ช่องว่าง Learning/UX — ใบงาน071",
+        "new": "## Amendment 076 — 2026-10-26\n\n[DES-010 Rev4](des-010.md), [learning-rules Rev1](learning-rules-032-034.md), [DES-011 Rev4](des-011.md) และ [gap receipt Rev1](learning-ux-contract-gaps-001.md) มี dated amendment076 ตาม042/AC-046-07; คง PROPOSED รอ technical proof ไม่เปิด implementation/gates\n\n## ช่องว่าง Learning/UX — ใบงาน071"
+      },
+      {
+        "path": "knowledge/school-bot/design/index.md",
+        "old": "LUX-01..07: technical gaps OPEN ทั้งหมด; ไม่ใช่สัญญาใหม่หรือ gate passed.",
+        "new": "LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed."
+      },
+      {
+        "path": "knowledge/school-bot/design/index.md",
+        "old": "คง 44 REQ/185 AC, 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ gates เดิม.",
+        "new": "อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม."
+      },
+      {
+        "path": "knowledge/school-bot/design/index.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n- 2026-10-26 — Amendment076: เพิ่ม pointers ผล expired ตาม042; LUX-05 เหลือ technical proof คง PROPOSED/schema/DTO/gates"
+      }
+    ],
+    "coverage": [
+      "อ่าน index ตามลำดับและเอกสารที่ระบุ; มติ042:11–16 ตรง AC-046-07:32",
+      "ตรวจ dictionary/table-024:25–33, contract-002:34–35, contract-003:21,39–49 และ JSON policy; ร่าง DDL:799–831 รองรับค่าคะแนนใน state expired เฉพาะขอบเขตที่อ่าน ไม่ใช่พิสูจน์ schema ทั้งระบบ",
+      "DES-005:97 selected_attempt รองรับ AttemptState/earned เดิม; data-contract-rules:25,39 ไม่พบข้อขัด A จึงไม่แก้สองไฟล์นี้",
+      "DES-011:18,28–30,81–82 คงสูตร/roster/snapshot/recheck; int-007-trace:43 ยังมีข้อความก่อน042 ส่ง owner sync ไม่แก้ข้ามหมวด",
+      "ไม่แก้ relational model/DBML/JSON shape ไม่รัน parser/tests/DB/network/Git และไม่เขียน code/SQL"
+    ],
+    "open_items": [
+      "LUX-05: clock/deadline boundary, race, idempotent finalization, recovery และ read/reveal proof ยัง OPEN; ไม่ยืนยัน endpoint/worker/transaction มีแล้ว",
+      "LUX-01..04/06/07 และ gates เดิมคง OPEN ตามขอบเขต ไม่มี human gate ใหม่จากการ sync มติที่อนุมัติแล้ว"
+    ],
+    "handoff": "ส่งนายช่างรับชุด exact replacements เฉพาะ design 5 ไฟล์ ก่อน apply ให้เก็บฉบับเดิม verbatim ตาม archive convention; งาน read-only นี้เสร็จ ไม่ใช่ release/runtime acceptance งานเทคนิคส่ง arch/sys และ UX ส่ง int ตาม owner เดิม"
+  }
+}

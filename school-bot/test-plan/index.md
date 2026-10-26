@@ -24,20 +24,22 @@
 
 E-API สำหรับ integration ต้องมี sanitized HTTP↔RPC correlation, build/config/proto revision, fault point และ DB before/after+audit ตาม scope; stub/teststore ให้ระบุชัด ไม่ปิด DB runtime. ขั้นตอนร่วมเพิ่มความลึกการตรวจ ไม่เพิ่ม case IDs/AC coverage. ก่อนมี contract ยอมรับเพียงเอกสารเตรียมทดสอบ ไม่ยอมรับความเสี่ยงเพื่อเปิด integration/release.
 
-[QA round001](../qa/round-001.md) คง 4032 local/static PASS เดิม ไม่ใช่ G/gRPC/DB integration; 80 TP cases ยัง NOT_RUN. tp-001.json คงเป็น raw owner snapshot พร้อม amendment เดิม; strategy/profiles เดิมไม่ใช่ runbook ปัจจุบันเมื่อขัดส่วนนี้. Joined JSON คง AC/expected/owner/actual ตาม schema เดิม; ขั้นตอนปัจจุบันอ่าน TP Markdown และส่วนนี้.
+[QA round001](../qa/round-001.md) คง 4032 local/static PASS เดิม ไม่ใช่ G/gRPC/DB integration; 81 TP cases ยัง NOT_RUN (Amendment004). tp-001.json คงเป็น raw owner snapshot พร้อม amendment เดิม; strategy/profiles เดิมไม่ใช่ runbook ปัจจุบันเมื่อขัดส่วนนี้. Joined JSON คง AC/expected/owner/actual ตาม schema เดิม; ขั้นตอนปัจจุบันอ่าน TP Markdown และส่วนนี้.
 
 | เอกสาร | ขอบเขต | สถานะ |
 | --- | --- | --- |
-| [TP-001](tp-001.md) | 80 cases /185 AC (Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 — AC-030-04..08 ตรวจรับแล้วตาม decisions-037); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime; ทุก case NOT_RUN |
+| [TP-001](tp-001.md) | 81 cases /186 AC ([Amendment004](tp-001-amendment-004.md) ตาม decisions-042 เพิ่ม AC-046-07; ประวัติ Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 — AC-030-04..08 ตรวจรับแล้วตาม decisions-037); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime; ทุก case NOT_RUN |
 | [TP-002 fixture plan](tp-002-fixture-plan-001.md) | แผน failure/race fixtures FX-01..05 (fake clock/trash/late callback/import lost response/cross-tenant) — ไม่สั่งหุ่น | เอกสารเตรียม — ยังไม่มี harness/การรัน |
 | [TP-003 grade fixture plan](tp-003-grade-fixture-plan-001.md) | แผน grade parity/coexistence/crash fixtures GF-01..06 ตาม 5 gate ของ SA-004 (AC-049..052) — test DB เท่านั้น ไม่แตะ PGGradeDB จริง | เอกสารเตรียม — ยังไม่มีการรัน |
-| [Traceability](traceability-001.md) | snapshot เดิม 180 AC → cases → implementation/validation owner; coverage ปัจจุบัน 185 AC/80 cases อ่าน [TP Amendment003](tp-001.md#amendment003--2026-10-24) | snapshot ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อที่อยู่ใน TP Amendment003; ไม่ใช่ QA PASS |
-| [Owner dataset](tp-001.json) | ผล inspect ต้นฉบับ | ไม่มี test execution |
-| [Joined dataset](traceability-001.json) | snapshot เดิม 180 AC/77 cases; REQ+canonical tasks+cases | source อ้าง plan/tasks-001.json revision2; ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อใน [TP Amendment003](tp-001.md#amendment003--2026-10-24) จึงไม่ใช่ joined coverage 185 AC |
+| [Traceability](traceability-001.md) | snapshot เดิม 180 AC → cases → implementation/validation owner; coverage ปัจจุบัน186 AC/81 cases อ่าน [TP Amendment004](tp-001.md#amendment004--2026-10-26) | snapshot180/77 ยังไม่รวม AC-030-04..08 ใน Amendment003 และ AC-046-07 ใน Amendment004; ไม่ใช่ QA PASS |
+| [Owner dataset](tp-001.json) | raw snapshot เดิม180 AC/77 cases | ไม่มี test execution |
+| [Joined dataset](traceability-001.json) | snapshot เดิม 180 AC/77 cases; REQ+canonical tasks+cases | source อ้าง plan/tasks-001.json revision2; ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อใน [TP Amendment003](tp-001.md#amendment003--2026-10-24) และยังไม่รวม AC-046-07 ใน [Amendment004](tp-001-amendment-004.md); จึงไม่ใช่ joined coverage186 AC |
 
 - 2026-10-24 — ใบงาน061: เพิ่ม TP-003 grade fixture plan (GF-01..06 ครอบ AC-049..052 ทั้ง 5 gate) — docs-only
 
 ## Change Log
+
+- 2026-10-26 — ใบงาน078 Amendment004 ตาม [decisions-042](../requirement/decisions-042.md): เพิ่ม TP001-081 รวม81 cases/186 AC; snapshot180/77คงเดิม ทุก actual NOT_RUN ไม่มี test execution
 
 - 2026-10-26 — ใบงาน069: แยก Traceability/Joined JSON snapshot เดิม 180 AC/77 cases จาก coverage ปัจจุบันใน TP Amendment003 ที่ 185 AC/80 cases; AC-030-04..08 ทั้ง 5 ข้อตรวจรับแล้วตาม decisions-037 แต่ยังไม่อยู่ใน snapshot. แก้เฉพาะคำอธิบายสารบัญ ไม่เปลี่ยน snapshot/raw/actual/REQ/tasks/status/case IDs และไม่มี test execution
 
