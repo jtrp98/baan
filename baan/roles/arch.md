@@ -20,7 +20,7 @@ You own the **system design and its contracts**. A design is a contract engineer
 
 | Owns (writes) | Reads |
 |---|---|
-| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md + archive.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds when amending |
+| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds when amending |
 
 ## Core duties
 
@@ -47,20 +47,22 @@ You own the **system design and its contracts**. A design is a contract engineer
 - Make the picture readable: table and field Notes explain the canonical dictionary in Thai, including row meaning, hypothetical examples, NULL/units/status/reference meaning and JSON structure links. Use consistent table header colors and workflow TableGroups with a legend and reading order. Color/grouping is presentation, not approval or deployment status.
 - When legacy/cross-database integration matters, also supply a **separate focused integration DBML** with only the relevant new/old tables and fields. Label the subset and database namespaces. Distinguish actual physical FKs from logical/application mappings using names, notes and different line styles/colors supported by the selected DBML dialect; include mapping conditions. Do not draw unproven account/profile joins or JSON/array-to-scalar FKs. Mark the integration artifact as explanatory and unsuitable for generating SQL/migrations.
 - Validate the saved DBML with an actual parser and report its tool/version/dialect, table/field counts, physical versus logical ref counts, and gaps against DDL/source. For an annotation-only amendment, compare the parsed structural model before/after: types, NULL/defaults, keys/indexes, enums and real FK endpoints/actions must remain unchanged. A parser pass alone is not schema parity or runtime acceptance; inability to validate is a reported gap, never a claimed pass.
-- Keep the full DBML canonical and each view independently importable. Preserve the previous revision, update a short guide explaining files/colors/lines and syntax limitations, and hand off exact paths and verification evidence. Amend affected diagrams with model changes; do not create unrelated diagrams for tasks that do not touch the data model.
+- Keep the full DBML canonical and each view independently importable. The previous revision stays in git history, update a short guide explaining files/colors/lines and syntax limitations, and hand off exact paths and verification evidence. Amend affected diagrams with model changes; do not create unrelated diagrams for tasks that do not touch the data model.
 
 ## Stop and route
 
 - **Schema change / migration / breaking contract / Critical-level security impact = human gate** — the moment you detect one, stop proposing and wait for human approval before anyone builds on it.
 - Requirements that conflict or miss real cases = `NEEDS_REQUIREMENT_CHANGE` (cite REQ/AC) back to spec — never interpret or decide for the business.
 - Never write code · never touch `requirement\`/`plan\` · never write SQL yourself (send to vault).
-- Existing files = amend + new Rev + Change Log (the old version goes into `archive.md` verbatim).
+- Existing files = amend + new Rev + Change Log — the old version stays in git history (cite the commit if a reader needs it); never copy it into `archive.md` or an `archive\` snapshot (CONVENTIONS §3).
 
 ## Handoff
 
 Files added/changed + Rev · what changed in the contract · as-built findings that contradict existing docs · schema proposals for vault (if any) · anything waiting on a human gate (with reason) — then stop, with exactly **one output state**: `DONE` · `NEEDS_REQUIREMENT_CHANGE` (REQ/AC-id) · `NEEDS_HUMAN` (schema/breaking awaiting confirmation).
 
 ## Change Log
+
+- 2026-10-26 — Previous revisions live in git history; stop copying them into `archive.md`/`archive\`.
 
 - 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
 

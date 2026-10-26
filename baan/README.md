@@ -89,7 +89,7 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
 
 session นั้นจะกลายเป็นสมอง — รับ goal แตกงาน สั่ง `baan-role` เปิด session ของแต่ละ role ตาม tier ที่กำหนด ส่งต่อ context ระหว่าง role และรวบรวมประตูมนุษย์มาถามคุณตอนจบ
 
-**โหมด solo** — สั่งเพิ่มใน prompt ว่า "solo" / "ทำเอง" ให้ session ที่สวม นายช่าง **เป็นทั้ง นายช่าง และทีมทั้งทีม**: แตก role เป็น subagent/งานเบื้องหลังของ session เอง (1 role ต่อตัว แนบไฟล์ role + CONVENTIONS ครบ จบด้วย output state) — เหมาะกับแอปที่ไม่มี CLI ให้ baan-role เรียก (เช่น ZCode) หรือกรณีอยากประหยัดโควตา runner · ยังส่ง `baan-role` เฉพาะ: งานตรวจ/รีวิวชิ้นที่ตัวเองเขียน และงาน tier t0/t1 · บันทึกใน knowledge ว่าใครรันจริง — รายละเอียดอยู่ใน `BAAN.md`
+**โหมด solo** — สั่งเพิ่มใน prompt ว่า "solo" / "ทำเอง" ให้ session ที่สวม นายช่าง **เป็นทั้ง นายช่าง และทีมทั้งทีม**: แตก role เป็น subagent/งานเบื้องหลังของ session เอง (1 role ต่อตัว แนบไฟล์ role + CONVENTIONS ครบ จบด้วย output state) — เหมาะกับแอปที่ไม่มี CLI ให้ baan-role เรียก (เช่น ZCode) หรือกรณีอยากประหยัดโควตา runner · งาน `check`/`jpo` ของงานที่ solo เขียนเองใช้ subagent ได้ ถ้าเป็นตัวใหม่ + ตรวจจาก AC/spec เท่านั้น (ไม่แนบคำอ้างผู้เขียน) + ตรวจจริงด้วยหลักฐาน — ข้ามโมเดลผ่าน `baan-role` เหลือเป็นทางเลือกสำหรับงานวิกฤตก่อน production/security สำคัญ/FAIL ซ้ำรอบ · ส่ง `baan-role` บังคับเฉพาะงาน tier t0/t1 และงานที่เกินกำลัง session · บันทึกใน knowledge ว่าใครรันจริง — รายละเอียดอยู่ใน `BAAN.md`
 
 ## มาตรฐานเอกสารข้อมูล
 
@@ -178,7 +178,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - **check แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) check เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
 - **Artifact ต้องเซ็นก่อนใช้** — int draft ของ `int` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
 - **vault ห้ามรัน SQL ทุกกรณี** — เขียน script พร้อม rollback plan ให้คนรันเท่านั้น
-- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log
+- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log — ยกเว้น index ที่เป็นสถานะปัจจุบัน (เขียนทับ ไม่มี Change Log/Precedence) · ไม่ทำ snapshot/archive เพราะ knowledge อยู่ใน git · ผลดิบของ role อยู่ที่ `reports/` ไม่คัดลอกเข้า knowledge
 - **เพิ่ม/ลดตำแหน่งได้อิสระ** — แค่เพิ่ม/ลบไฟล์ `.md` ใน `roles/` ระบบหาอัตโนมัติ (ดูรายชื่อด้วย `--list`)
 
 ตัวอย่าง flow งานเต็มรูปแบบ: `plan` วางแผน → `gm` เรียกทีมตามแผน → `spec` เขียน REQ/AC → `int` ร่าง UX รอผู้ใช้เซ็น → `arch` ออกแบบ DES/สัญญา → `vault` รีวิม schema + เขียน SQL (คนรัน) → `front`/`sys` implement ตาม signed artifact → `inspect` วางแผนทดสอบ → `check` เขียน unit test อิสระ + รายงานรอบ → `jpo` รีวิวก่อนขึ้น production
@@ -191,7 +191,9 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - **plan เลือก tier ได้เฉพาะ task ของ `front` / `sys`** (งาน implement ที่ผ่าน design ของ arch มาแล้ว) — role อื่นทุกตัวใช้ tier คงที่ตาม `FIXED_ROLE_TIER` ใน `src/plan.mjs` (บรรทัด `> tier:` ในไฟล์ role และตาราง role ถูก test ให้ตรงกับค่านี้เสมอ)
 - task ที่ไม่พึ่งกัน (dependsOn ว่าง) **รันขนานกัน** ตามลำดับ wave
 - งานง่าย plan ให้น้อย task เอง — ไม่ต้องใช้ทั้งทีม
-- **งานที่เปลี่ยนสิ่งที่มีผู้อ้างอิง ต้องกวาดทุกจุด (related-impact sweep)** — เปลี่ยนสัญญา/ชื่อ/ค่า/revision/สถานะที่มีอยู่แล้ว แผนต้องมี task เก็บเอกสารผู้อ้างอิงทุกจุดตามเจ้าของไฟล์ (รวม index หลักของโมดูล) แม้เป็นงานเล็ก; ไม่มีผู้อ้างอิงต้องระบุไว้ชัดว่าไม่มี
+- **walking skeleton ก่อนเอกสาร** — goal ที่สร้าง/แก้ซอฟต์แวร์ ต้องมีงาน `front`/`sys` อย่างน้อยหนึ่งงานที่ได้ของรันและเทสต์ได้ และงานนั้นห้ามรอประตูมนุษย์ (ทั้งตรงและผ่าน dependsOn) — ของที่ยังรอคน (DB, สัญญาภายนอก, UX ที่ยังไม่เซ็น) ใช้ stub/fake ไปก่อน · งานเอกสารครอบแค่ slice ที่ทำในแผนนั้น และมีได้ไม่เกิน 3 งานในสาย dependency ก่อนงาน implement งานแรก · แผนที่ไม่มีงาน implement ถูกปฏิเสธ เว้นแต่ใส่ `"docsOnly": "<เหตุผล>"`
+- โหมด read-only (ไม่มี `--write`) งาน `front`/`sys` ส่งโค้ดจริงเป็น diff/patch + คำสั่ง test ให้ นายช่าง apply — ไม่ใช่คำอธิบายว่าจะทำอะไรทีหลัง
+- **งานที่เปลี่ยนสิ่งที่มีผู้อ้างอิง ต้องกวาดทุกจุด (related-impact sweep)** — เปลี่ยนสัญญา/ชื่อ/ค่า/revision/สถานะที่มีอยู่แล้ว task ต้องระบุค่าเดิมไว้ให้ นายช่าง ค้นด้วย `baan --sweep` และแทนค่าตรงตัวเอง · แผนมี task ต่อเจ้าของเฉพาะเอกสารที่ความหมายต้องเปลี่ยน (เจ้าของละหนึ่ง task ไม่ใช่ไฟล์ละ task); ไม่มีผู้อ้างอิงต้องระบุไว้ชัดว่าไม่มี
 - สิ่งที่ต้องเป็นประตูมนุษย์ (sign-off int / รัน SQL / ตัดสินธุรกิจ) รวมเป็น `humanGates` รายงานตอนจบ — ไม่ทำแทน
 - default agent = **codex** (`--agent` เปลี่ยนได้)
 - ตัวเปิด session ราย role (มือระดับล่าง) คือคำสั่ง `baan-role`
@@ -201,6 +203,10 @@ baan --goal "..." --dry-run   # gm + plan แล้วดูแผน ยัง�
 baan --goal "..."             # รันครบทุก wave
 baan --resume <runDir>        # ต่อ run ที่ค้าง ข้ามเฉพาะ task ที่ completed (ประหยัด token)
 baan --plan-file <f>          # รันแผนที่แก้เอง
+baan --sweep "Rev3" --sweep "Rev 3" --target school-bot  # หาผู้อ้างอิงทุกจุดของค่าเดิม จัดกลุ่มตามเจ้าของไฟล์
+#   ค่าเริ่มต้นค้นทุก knowledge root · --target เพิ่ม repo ของ target · --sweep-in <โฟลเดอร์ module> ค้นเฉพาะ module นั้น
+#   ใช้ git ls-files (เคารพ .gitignore) ถ้าเป็น git repo · ข้าม archive/ ไฟล์ binary และไฟล์เกิน 2MB
+baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG ของแผน (แผน runtime หรือ plan\tasks-*.json ของโปรเจกต์) — exit 1 เมื่อไม่มีงาน implement หรือเกินครึ่งติดประตูมนุษย์
 # --dry-run ใช้กับทุก route ได้ (รวม --plan-file/--resume) — การ์ดห้ามเรียก provider อยู่ที่ execute จุดเดียว
 ```
 
@@ -211,7 +217,8 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 - **exit code ของ `baan`**: 0 เมื่อทุก task completed เท่านั้น — เจอ needs_*/fail/timeout/blocked ตัวใดตัวหนึ่งจะเป็น 1 พร้อมสรุปสาเหตุราย task
 - **checkpoint ต่อ task**: ทุกงานเขียน `<id>.status.json` ทันทีที่จบ (สถานะ, marker, exit code, attempt, artifact paths) — `--resume` เชื่อเฉพาะ checkpoint (`completed` + มีไฟล์คำตอบจริง) งาน timeout/fail/needs_* และ run เก่าก่อน v0.3 จะถูกรันใหม่
 - **manifest ของ run (`run.json`)**: เก็บ resolved target/cwd/write/projectCtx ตอนสร้าง run — `--resume` คืนบริบทเดิมอัตโนมัติ (flag ที่ส่งเองชนะเสมอ และจะพิมพ์บอกทุกครั้งที่คืนค่า) จึงไม่หลุดเป็นทำงานผิดโปรเจกต์
-- **plan validation ก่อน spawn ใดๆ**: id ต้องเข้า pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (id คือชื่อไฟล์ จึงกัน path traversal), ตรวจ types ของ tasks/dependsOn/humanGates, self-dependency และ cycle
+- **plan validation ก่อน spawn ใดๆ**: id ต้องเข้า pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (id คือชื่อไฟล์ จึงกัน path traversal), ตรวจ types ของ tasks/dependsOn/humanGates/docsOnly, self-dependency และ cycle
+- **DAG lint**: แผนสดจาก planner ถูกปฏิเสธเมื่อไม่มีงาน implement (และไม่มี `docsOnly`) หรือเมื่องาน implement เกินครึ่งติดประตูมนุษย์ · แผนจาก `--plan-file`/`--resume` เตือนอย่างเดียว (run เก่ายัง resume ได้) · `--lint-plan` อ่านได้ทั้งฟิลด์ของ baan (`role`/`dependsOn`/`gateIds`/`humanGate`) และของแผนโปรเจกต์ (`owner`/`depends_on`/`gate_ids`, ชื่อ role เดิม เช่น `fe`/`be` แปลงให้เอง) — งานที่มี gate ถือว่าติดประตู และงานที่พึ่งงานนั้นติดตามไปด้วย
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
@@ -302,6 +309,8 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
 
 ## Change Log
+
+- 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: subagent ตรวจได้แบบมีเงื่อนไขความเป็นอิสระ (ตัวใหม่ + AC/spec เท่านั้น + หลักฐานจริง) ข้ามโมเดลเหลือเป็น escalation สำหรับงานวิกฤต/security/FAIL ซ้ำ
 
 - 2026-10-24 — ขยายโหมด solo: session ที่สวม นายช่าง แตก role เป็น subagent/งานเบื้องหลังของตัวเองได้ (ใช้กับแอปไม่มี CLI เช่น ZCode) — runner ภายนอกเหลือเฉพาะงานตรวจของตัวเอง/tier t0/t1
 

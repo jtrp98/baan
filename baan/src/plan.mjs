@@ -20,6 +20,7 @@ export const FIXED_ROLE_TIER = {
 // ช่วงที่ นายช่าง/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
 // เพราะผู้ใช้อาจตั้งใจรัน front/sys ที่ t0/t1 ผ่าน --plan-file)
 export const IMPLEMENT_TIER_RANGE = "t2–t5";
+export const IMPLEMENT_ROLES = ["front", "sys"];
 
 // ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
 // opencode (Z.AI coding plan เหมาจ่าย) อยู่ก่อน agy/claude ที่กินโควตารายเรียก
@@ -65,11 +66,56 @@ export function findDependencyCycle(tasks) {
   return cycle;
 }
 
+// แปลง task จากแผนได้หลายรูป (แผน runtime ของ baan / tasks JSON ของ gm ที่ใช้ owner+depends_on+gate_ids)
+// ให้ lint ตัวเดียวตรวจได้ทั้งคู่ — แผนโปรเจกต์ใน knowledge ไม่มี schema กลาง แต่ละโปรเจกต์ตั้งชื่อฟิลด์เอง
+export function normalizeDagTasks(tasks) {
+  const nonEmpty = (v) => (Array.isArray(v) ? v.length > 0 : typeof v === "string" && v.trim() !== "");
+  return tasks.map((t) => ({
+    id: t.id,
+    role: resolveRoleName(t.role ?? t.owner),
+    dependsOn: Array.isArray(t.dependsOn ?? t.depends_on) ? (t.dependsOn ?? t.depends_on) : [],
+    gated: nonEmpty(t.gateIds ?? t.gate_ids) || nonEmpty(t.humanGate),
+  }));
+}
+
+// lint รูปร่าง DAG — ที่มา: แผน school-bot (2026-10-26) ผูกงาน implement 61/63 งานไว้หลังประตูมนุษย์
+// ผ่าน dependency ทางอ้อม จนไม่มีโค้ดชิ้นไหนเริ่มได้ ทั้งที่ validation เดิมผ่านหมด
+// เกณฑ์ "เกินครึ่ง" ไม่ใช่ "ทุกงาน" เพราะแผนนั้นมีงาน sys ไม่ติดประตูอยู่หนึ่งงาน (ตรวจหลักฐาน ไม่ใช่โค้ด)
+// เกณฑ์ทุกงานจึงปล่อยแผนที่เป็นต้นเหตุให้ผ่าน
+export function lintPlanDag(tasks, { docsOnly } = {}) {
+  const errors = [];
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+  const blockedMemo = new Map();
+  const isBlocked = (id, seen = new Set()) => {
+    if (blockedMemo.has(id)) return blockedMemo.get(id);
+    const t = byId.get(id);
+    if (!t || seen.has(id)) return false;
+    seen.add(id);
+    const r = t.gated || t.dependsOn.some((d) => isBlocked(d, seen));
+    blockedMemo.set(id, r);
+    return r;
+  };
+  const impl = tasks.filter((t) => IMPLEMENT_ROLES.includes(t.role)).map((t) => t.id);
+  const blocked = impl.filter((id) => isBlocked(id));
+  const free = impl.filter((id) => !blocked.includes(id));
+  if (impl.length === 0) {
+    if (!(typeof docsOnly === "string" && docsOnly.trim())) {
+      errors.push(`แผนไม่มีงาน implement (${IMPLEMENT_ROLES.join("/")}) — ถ้าตั้งใจเป็นงานเอกสารล้วน ใส่ "docsOnly": "<เหตุผล>" ที่ระดับแผน`);
+    }
+  } else if (free.length === 0) {
+    errors.push(`ไม่มี walking skeleton: งาน implement ทั้ง ${impl.length} งานติดประตูมนุษย์ (ตรงหรือผ่าน dependency) — แยกงาน slice แรกที่ใช้ stub/fake แทนของที่รอคน`);
+  } else if (blocked.length * 2 > impl.length) {
+    errors.push(`งาน implement ติดประตูมนุษย์ ${blocked.length}/${impl.length} งาน (เกินครึ่ง) — ย้าย gate ไปผูกที่ task ที่ต่อของจริง ให้งานที่ทำบน stub/fake เดินได้ · เริ่มได้ทันทีตอนนี้: ${free.join(", ")}`);
+  }
+  return { errors, impl, blocked, free };
+}
+
 export function validateAndFixPlan(plan, cfg, opts) {
   if (typeof plan !== "object" || plan === null || Array.isArray(plan)) throw new Error("แผนต้องเป็น object ที่มี tasks");
   if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error("plan.tasks ว่างหรือไม่ใช่ array");
   if ("humanGates" in plan && !Array.isArray(plan.humanGates)) throw new Error("humanGates ต้องเป็น array ของ string");
   if (Array.isArray(plan.humanGates) && plan.humanGates.some((g) => typeof g !== "string")) throw new Error("humanGates ต้องเป็น array ของ string");
+  if ("docsOnly" in plan && typeof plan.docsOnly !== "string") throw new Error("docsOnly ต้องเป็น string (เหตุผลที่แผนนี้ไม่มีงาน implement)");
   const errors = [];
   const ids = new Set();
   for (const t of plan.tasks) {
@@ -107,6 +153,11 @@ export function validateAndFixPlan(plan, cfg, opts) {
   const cycle = findDependencyCycle(plan.tasks);
   if (cycle) errors.push(`dependency วนลูป: ${cycle.join(" → ")}`);
   if (errors.length) throw new Error("แผนไม่ผ่าน validation:\n  " + errors.join("\n  "));
+  // แผนสดจาก planner เท่านั้นที่ lint แบบปฏิเสธ — แผนจาก --plan-file/--resume อาจเขียนก่อนมีกติกานี้
+  // ถ้าปฏิเสธจะ resume run เก่าไม่ได้ จึงเตือนอย่างเดียว
+  const lint = lintPlanDag(normalizeDagTasks(plan.tasks), { docsOnly: plan.docsOnly });
+  if (opts.lintStrict && lint.errors.length) throw new Error("แผนไม่ผ่าน DAG lint:\n  " + lint.errors.join("\n  "));
+  for (const m of lint.errors) console.log(`  ⚠ DAG lint: ${m}`);
   return plan;
 }
 
@@ -122,4 +173,21 @@ export function printPlan(plan) {
   const parallel = plan.tasks.filter((t) => (t.dependsOn ?? []).length === 0).map((t) => t.id);
   console.log(`รันขนานกันได้ตั้งแต่ต้น: ${parallel.join(", ") || "(ไม่มี)"}`);
   if (plan.humanGates?.length) console.log(`ประตูมนุษย์ (รอผู้ใช้ตัดสิน): ${plan.humanGates.join(" · ")}`);
+  if (plan.docsOnly) console.log(`แผนเอกสารล้วน: ${plan.docsOnly}`);
+}
+
+// lint แผนโปรเจกต์ (เช่น plan\tasks-*.json ของ gm) — คืน exit code: 0 ผ่าน · 1 มี error
+export function lintPlanFile(file, readFile, log = console.log) {
+  const json = JSON.parse(readFile(file));
+  const raw = Array.isArray(json) ? json : json.tasks;
+  if (!Array.isArray(raw)) throw new Error(`${file}: ไม่พบ tasks (ต้องเป็น array หรือ object ที่มี tasks)`);
+  const tasks = normalizeDagTasks(raw);
+  const cycle = findDependencyCycle(tasks);
+  const r = lintPlanDag(tasks, { docsOnly: json.docsOnly ?? json.docs_only });
+  const errors = cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`, ...r.errors] : r.errors;
+  log(`DAG lint: ${file}`);
+  log(`  tasks ${tasks.length} · implement ${r.impl.length} · ติดประตูมนุษย์ ${r.blocked.length} · เริ่มได้ทันที ${r.free.length}${r.free.length ? ` (${r.free.join(", ")})` : ""}`);
+  for (const m of errors) log(`  ✗ ${m}`);
+  if (!errors.length) log("  ✓ ผ่าน");
+  return errors.length ? 1 : 0;
 }

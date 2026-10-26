@@ -6,6 +6,8 @@
 
 Read the index of the category you're pointed to first (`requirement\index.md`, `design\index.md`, `plan\index.md` etc.), then open **only the files the brief/task names by exact path** — no `ls` hunting, no reading across categories · grep within permitted files · **status lives in the index only**.
 
+**An index is current state only**: when something changes, overwrite the cell/sentence in place so the index states today's truth — no `## Change Log` in index files, and no "Precedence/Amendment" paragraphs stacked above older text to override it (a reader must never have to work out which paragraph wins). The history of an index is `git log`.
+
 When a named data model/index splits a contract across linked dictionaries or appendices, following those exact links for the assigned scope is allowed. This does not authorize directory hunting or unrelated categories.
 
 ## 2. Write only what you own
@@ -14,7 +16,7 @@ Each role writes only the files/folders it owns (the table in the role file) —
 
 ## 3. Amend, don't regenerate
 
-An existing file = edit only the changed spots (`Edit`), never `Write` over the whole file · add a dated `## Change Log` line every time · append-only files (backlog, security findings) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
+An existing file = edit only the changed spots (`Edit`), never `Write` over the whole file · add a dated `## Change Log` line every time (except index files — §1) · **never copy a file into `archive\`, `archive.md` or a "before-xxx" snapshot before editing** — knowledge is a git repository, so the previous version is a commit; cite it when a reader needs it (snapshot only when the knowledge root has no git repository) · append-only files (backlog, security findings) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
 
 ## 4. Dates come from the user
 
@@ -29,6 +31,8 @@ A number/fact with no source gets tagged `(สมมติฐาน — ยั�
 Source/target repositories: `status/log/diff/show` are readable; state-changing git belongs to the user unless explicitly authorized.
 
 **Configured knowledge exception:** the built-in `commitKnowledge` workflow and `baan --commit --config <workspace-config>` may stage/commit document changes only inside configured `knowledge_roots` that have their own Git repository. This exception is part of the requested knowledge auto-commit workflow; it does not authorize source/target commits, push, branch changes, history rewriting, or arbitrary git operations. Keep the existing per-module grouping and report failures.
+
+**Raw run output stays in the runner's `reports\`** — answer files, response/patch JSON, stdout/stderr and test result files (e.g. `.trx`) are never copied into knowledge; knowledge holds the distilled result (the document change itself, a test summary with command + pass/fail counts) plus the run folder name as the evidence pointer.
 
 The controller must run the final knowledge commit **after saving all role outputs and its own knowledge edits**, including workflows where it writes the documents after a read-only role exits. A role-run completion hook cannot commit files that have not been written yet. Do not clear/replace `knowledge_roots` to bypass this workflow.
 
@@ -49,10 +53,12 @@ End with a **short handoff**: the result (lead with it) → evidence (files/line
 
 1. A major business choice or missing owner confirmation · 2. schema/migration/breaking contract · 3. UX sign-off before FE work depending on it · 4. QA: Critical, or the same task failing its 3rd round · 5. Security: every Critical/Important item (fix, or accept the risk in writing) · 6. real deploy/migration on a shared environment · 7. cutting release scope.
 Approval/signing is a human act — an agent only records it (who/when) as the user stated, never writes it on their behalf.
+A gate blocks only the work that genuinely needs its answer: work that can run against a stub/fake/adapter proceeds, and the gate attaches to the task that connects the real thing (real DB, external system, hardware, signed UX in the shipped screen).
 
 ## 10. Finish rules
 
-**Done = released** (not verified) · release scope frozen — new items go to backlog, not the plan, unless the user moves them · non-blocking findings = backlog, never self-opened tasks · **at most 2 rework rounds per task, then a human decides** (accept / re-scope / drop) · work waiting on a human answer is reported immediately — never queue work behind an open question · documents over budget (~4–10 KB per file by type) = archive/split, not write longer.
+**Done = released** (not verified) · release scope frozen — new items go to backlog, not the plan, unless the user moves them · non-blocking findings = backlog, never self-opened tasks · **at most 2 rework rounds per task, then a human decides** (accept / re-scope / drop) · work waiting on a human answer is reported immediately — never queue work behind an open question · documents over budget (~4–10 KB per file by type) = split into linked parts, not write longer, never archive to shrink.
+Plan Status values: `pending` · `done-local` (code done and its automated tests pass locally, not yet connected to gated real systems — the controller sets it after re-running the tests) · `verified` / `blocked` (only from check's verdict) · `done-local` never closes a gate.
 
 ## 11. Language
 
@@ -65,6 +71,10 @@ Relational data-model work also includes a full, readable DBML artifact kept in 
 
 
 ## Change Log
+
+- 2026-10-26 — Indexes are current state only (no Change Log, no Precedence layers); no archive/snapshot copies (git holds history); raw run output stays in `reports\`.
+
+- 2026-10-26 — Gates block only work that needs their answer (stub/fake work proceeds); add the `done-local` plan status.
 
 - 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
 

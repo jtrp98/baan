@@ -57,7 +57,7 @@ export function pmPrompt(goal, projectCtx, date = localDate()) {
 Reply with the brief text only (no JSON). Write it in Thai.`;
 }
 
-export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate()) {
+export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate(), write = false) {
   const roleContent = readFileSync(path.join(ROLES_DIR, "plan.md"), "utf8").trim();
   const roles = listRoles().map((r) => `- ${r.name} — ${r.title}: ${r.summary}${FIXED_ROLE_TIER[r.name] ? ` (fixed tier ${FIXED_ROLE_TIER[r.name]})` : ` (planner picks tier ${IMPLEMENT_TIER_RANGE} by difficulty)`}`).join("\n");
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
@@ -87,9 +87,11 @@ ${matrix}
 1. Easy work = few tasks (maybe 1–2, or a single task) — pick only the roles that are needed, never the whole team.
 2. **Task tier is selectable only for roles = front / sys** (implementation work already designed by arch — pick within ${IMPLEMENT_TIER_RANGE} by real difficulty) — every other role uses its fixed tier from the list above.
 3. Tasks without dependencies (empty dependsOn) run in parallel — add a dependency only when genuinely required. Two tasks writing to the same target repository must depend on each other unless they provably touch disjoint files/paths — sharing no contract is not the same as sharing no files.
-4. Every task works read-only (no file edits yet) — output is documents/text.
-5. Related-impact sweep: if a task changes an existing contract, name, value, revision, or status that other artifacts reference, the plan must also include a follow-up task for each affected document's owner (knowledge categories, index revision/status cells, target-repo docs) — a plan that changes the referenced thing but leaves referencing documents stale is defective. If nothing references the change, say so in the task so it is a decision, not an oversight.
-6. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
+4. Run mode of this run: ${write ? "**write** — front/sys tasks edit code in the target repository and must leave it buildable with its tests passing." : "**read-only** — no task can edit files, so front/sys tasks output the concrete code change (diff/patch + test command) for the controller to apply; never turn implementation into a description of what to build later."}
+5. Walking skeleton first: if the goal builds or changes software, the plan must contain at least one front/sys task that produces something runnable and testable (a thin vertical slice), and that task must not wait on a human gate directly or through dependsOn — where a dependency is still unanswered (DB not provisioned, external contract unconfirmed, UX not signed), the slice uses a stub/fake/adapter and the gate stays on the later task that connects the real thing. Plans with no implementation task are rejected unless you set "docsOnly" with the reason (e.g. the user asked for documents only).
+6. Time-box documents: spec/arch/int/inspect tasks cover only what the slice being built in this plan needs — never a full-system specification up front — and at most 3 document tasks sit in the dependency chain before the first implementation task.
+7. Related-impact sweep: if a task changes an existing contract, name, value, revision, or status that other artifacts reference, state the old values in that task so the controller can run \`baan --sweep "<old value>"\` — finding referencers is mechanical and verbatim replacements are applied by the controller, so never create a task just to search or to replace text. Add a follow-up task only where a referencing document's meaning must change, one task per owner (not per file). If nothing references the change, say so in the task so it is a decision, not an oversight.
+8. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
 
 ## Reply with JSON only (no text outside the JSON):
 {
@@ -104,7 +106,8 @@ ${matrix}
       "dependsOn": []
     }
   ],
-  "humanGates": ["what needs a human decision (use [] if none) — in Thai"]
+  "humanGates": ["what needs a human decision (use [] if none) — in Thai"],
+  "docsOnly": "only when the plan deliberately has no front/sys task — the reason (Thai); omit otherwise"
 }
 (Do not specify agent — the system assigns it to every task.)`;
 }

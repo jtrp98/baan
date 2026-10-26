@@ -7,18 +7,19 @@ import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
-import { extractJson, fallbackChainFor, printPlan, validateAndFixPlan } from "../src/plan.mjs";
+import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
+import { formatSweep, sweep } from "../src/sweep.mjs";
 import { localDate, parseWorkDate, pmPrompt, plannerPrompt } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", resume: "", list: false, init: false, commit: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -26,6 +27,9 @@ function parseArgs(argv) {
       case "--goal-file": opts.goalFile = argv[++i] ?? ""; opts.explicit.add("goalFile"); break;
       case "--dry-run": opts.dryRun = true; break;
       case "--plan-file": opts.planFile = argv[++i] ?? ""; opts.explicit.add("planFile"); break;
+      case "--lint-plan": opts.lintPlan = argv[++i] ?? ""; break;
+      case "--sweep": opts.sweep.push(argv[++i] ?? ""); break;
+      case "--sweep-in": opts.sweepIn.push(argv[++i] ?? ""); break;
       case "--resume": opts.resume = argv[++i] ?? ""; opts.explicit.add("resume"); break;
       case "--list": opts.list = true; break;
       case "--init": opts.init = true; break;
@@ -42,7 +46,7 @@ function parseArgs(argv) {
         try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
         opts.explicit.add("date"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init] [--commit] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init] [--commit] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
         process.exit(2);
     }
   }
@@ -90,6 +94,11 @@ function autoCommitKnowledge(ws) {
 async function main() {
   let opts;
   try { opts = parseArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
+  // lint ไม่ต้องใช้ config ของ workspace — ตรวจไฟล์แผนที่ไหนก็ได้
+  if (opts.lintPlan) {
+    try { process.exitCode = lintPlanFile(path.resolve(opts.lintPlan), (f) => readFileSync(f, "utf8")); } catch (e) { console.error(`lint แผนไม่ได้: ${e.message}`); process.exitCode = 2; }
+    return;
+  }
   let ws;
   try {
     ws = loadWorkspace(resolveWorkspaceConfig(opts.config || null));
@@ -169,6 +178,22 @@ async function main() {
     return;
   }
 
+  // --sweep: ค่าเริ่มต้นค้นเฉพาะ knowledge — target บางตัวใหญ่มาก จึงรวม target เฉพาะเมื่อระบุ --target
+  if (opts.sweep.length) {
+    const terms = opts.sweep.filter((t) => t.trim());
+    if (!terms.length) { console.error("--sweep ต้องมีข้อความที่จะค้น"); process.exit(2); }
+    const hit = opts.target ? resolveTarget(ws, opts.target) : null;
+    const roots = opts.sweepIn.length
+      ? opts.sweepIn.map((d) => ({ path: path.resolve(d), kind: "knowledge", label: path.basename(path.resolve(d)) }))
+      : [
+          ...(hit ? [hit.knowledgeRoot] : ws.knowledge_roots).map((kr) => ({ path: kr.path, kind: "knowledge", label: "" })),
+          ...(hit ? [{ path: hit.target.path, kind: "target", label: `target:${hit.target.name}` }] : []),
+        ];
+    if (!roots.length) { console.error("ไม่มีที่ให้ค้น — ตั้ง knowledge_roots ใน workspace config หรือใช้ --sweep-in <dir>"); process.exit(2); }
+    console.log(formatSweep(sweep(roots, terms), terms));
+    return;
+  }
+
   // --commit: เก็บกวาดของที่ค้างใน knowledge repo เท่านั้น — ไม่ต้องมี goal
   if (opts.commit) {
     const commits = commitKnowledge(ws, (m) => console.log(`📚 knowledge: ${m}`));
@@ -227,12 +252,12 @@ async function main() {
   console.log(`[pm] ${pm.agent} คำมอบหมาย: ${pmDirective.split("\n")[0].slice(0, 100)}...`);
 
   console.log(`[planner] ${opts.agent} @ ${opts.plannerTier} กำลังวางแผน...`);
-  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx, opts.date));
+  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx, opts.date, opts.write));
   writeAtomic(p.answerFile, p.r.answer);
   if (!p.r.ok) { console.error(`planner ล้มเหลว: exit=${p.r.exitCode} ${p.r.error} (agent สุดท้าย: ${p.agent})`); process.exit(1); }
   let plan;
   try {
-    plan = validateAndFixPlan(extractJson(p.r.answer), cfg, opts);
+    plan = validateAndFixPlan(extractJson(p.r.answer), cfg, { ...opts, lintStrict: true });
   } catch (e) {
     console.error(`แผนจาก planner ใช้ไม่ได้: ${e.message}\nดูผลดิบที่ ${p.answerFile}`);
     process.exit(1);
