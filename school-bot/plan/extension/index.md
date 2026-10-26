@@ -38,8 +38,8 @@
 | [UX-006](../UX-006.md) | เตรียม UX mapping/preview/ชน/export | int | P5 | SA-004, BA-001 | pending |
 | [UX-007](../UX-007.md) | เตรียม UX attempt/นโยบาย/เลื่อน Level | int | P5 | SA-002, BA-002 | pending |
 | [SA-004](../SA-004.md) | เตรียม export contract และ proof pack | arch | P0 | SA-001 | **verified** (ใบงาน061 — check PASS docs-only) |
-| [TP-003](../TP-003.md) | เตรียม grade parity/coexist/crash fixtures | inspect | P1 | TP-001, SA-004 | pending |
-| [DBA-007](../DBA-007.md) | เตรียม cross-DB/export runtime evidence pack | vault | P1 | DBA-001, SA-004 | pending |
+| [TP-003](../TP-003.md) | เตรียม grade parity/coexist/crash fixtures | inspect | P1 | TP-001, SA-004 | **verified** (ใบงาน061 — check PASS) |
+| [DBA-007](../DBA-007.md) | เตรียม cross-DB/export runtime evidence pack | vault | P1 | DBA-001, SA-004 | **verified** (ใบงาน061 — check PASS) |
 
 ## Change Log
 - 2026-10-23 — Rev2: เพิ่ม36งานย่อยของscopeเดิมตามspec-review-001; statusเปลี่ยนได้จากcheckผ่านผู้คุมเท่านั้น

@@ -35,7 +35,7 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 9 (BA-001..004/UX-001/UX-003/TP-001/SA-004/DBA-001) pending 101; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 12 (BA-001..004/UX-001..003/TP-001/SA-004/DBA-001/TP-003/DBA-007) pending 98; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -52,7 +52,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [BA-003](BA-003.md) | Robot criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
 | [BA-004](BA-004.md) | Delivery criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-037/038) |
 | [UX-001](UX-001.md) | Entry UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-001 + check-060 PASS) |
-| [UX-002](UX-002.md) | Projects UX | ux | P3 | BA-001 | pending |
+| [UX-002](UX-002.md) | Projects UX | ux | P3 | BA-001 | **verified** (ใบงาน061 — signed int-003 + check PASS รอบ 3) |
 | [UX-003](UX-003.md) | Labs UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-002 + check-060 PASS) |
 | [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | pending |
 | [TP-001](TP-001.md) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
