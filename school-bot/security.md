@@ -347,3 +347,16 @@ Minor · actual_defect · OPEN
 - ไม่พบเหตุเพิ่ม Critical/Important ใหม่จากเอกสารรอบนี้; GDPR applicability ยังตัดสินไม่ได้ (ไม่มีหลักฐานพอตาม Article 3)
 
 - 2026-10-24 — นายช่างบันทึกผล jpo ใบงาน060f (read-only); แก้ 3 ไฟล์ฝั่ง vault ตาม findings แล้ว; ไม่มี risk acceptance หรือการปิด gate
+
+## G typed logout re-audit — 2026-10-26
+
+[JPO090](planning/jpo-090-gateway-r1-001.md), CodexT2ผ่านbaan-role: HTTP500body/headerssanitizeผ่าน แต่ dependencyGrpcclientlogยังเผยsyntheticupstreamstatusdetail. ไม่พบข้อมูลบุคคลจริงรั่วในรอบนี้; ไม่มีriskacceptance/productionproof.
+
+| ID | Severity | Finding / Owner | Status |
+|---|---|---|---|
+| SEC001-016 | Important | SchoolBotSessionGrpcClient.cs:19; upstreamStatus.Detailเข้าGrpc.Net.Client.Internal.GrpcCall Information/Event3ก่อนsanitize; sysGต้องแก้scopedclientlogboundaryแล้วJPOreaudit | OPEN |
+| SEC001-017 | Minor | SchoolBotLogoutMiddleware.cs:209; earlyupstreamDeadlineExceededตอบ504แทน502ตามarchnegativeboundary; sysGต้องแยกouterexpiry | OPEN |
+
+Currentเพิ่ม2finding: Important7/Medium6/Minor4OPEN รวมของเดิม15ข้อ; SEC040-001ยังCLOSEDเฉพาะlocalscopeเดิม. ผู้คุมส่งG rework2ตามauthorizationfix ไม่รับriskแทนคน และไม่ปิดImportantจากHTTPsanitizeอย่างเดียว.
+
+- 2026-10-26 — appendจากindependentJPO run o1ULFh; ผลextended17/19, boundary9/9, repro3/5; sourcehashesและข้อจำกัดในreceipt.
