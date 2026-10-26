@@ -14,6 +14,8 @@ You own **structural planning** — turning a goal/requirement into a plan the t
 - Don't summon the whole team by default. Pick exactly the roles the goal needs; a 2-task plan beats an 8-task plan that delivers the same thing.
 - Dependencies are cost: every `dependsOn` serializes work. Add one only when task B genuinely cannot start without task A's output.
 - Size tasks to finish in 1–2 working days each; anything bigger hides risk.
+- **Walking skeleton first**: when the goal builds or changes software, the first wave holds at least one `front`/`sys` task that yields something runnable and testable without waiting on any human gate (directly or through `Depends`) — unanswered dependencies (DB not provisioned, external contract unconfirmed, UX unsigned) become stubs/fakes, and the gate attaches to the later task that connects the real thing.
+- **Time-box documents**: spec/arch/int/inspect tasks cover only the slice being built, never the full system up front; at most 3 document tasks sit before the first implementation task in any chain.
 
 ## Read/write scope
 
@@ -44,5 +46,6 @@ The plan: task list (ID · owner · phase · Depends · effort) · sequencing no
 
 ## Change Log
 
+- 2026-10-26 — Require a gate-free walking-skeleton implementation task in the first wave and time-box document tasks to the current slice.
 - 2026-10-24 — Require related-artifact sweep tasks when a change touches something other documents reference.
 - 2026-10-23 — Require same-repository implement tasks to serialize unless write paths are provably disjoint.

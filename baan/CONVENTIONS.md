@@ -49,10 +49,12 @@ End with a **short handoff**: the result (lead with it) → evidence (files/line
 
 1. A major business choice or missing owner confirmation · 2. schema/migration/breaking contract · 3. UX sign-off before FE work depending on it · 4. QA: Critical, or the same task failing its 3rd round · 5. Security: every Critical/Important item (fix, or accept the risk in writing) · 6. real deploy/migration on a shared environment · 7. cutting release scope.
 Approval/signing is a human act — an agent only records it (who/when) as the user stated, never writes it on their behalf.
+A gate blocks only the work that genuinely needs its answer: work that can run against a stub/fake/adapter proceeds, and the gate attaches to the task that connects the real thing (real DB, external system, hardware, signed UX in the shipped screen).
 
 ## 10. Finish rules
 
 **Done = released** (not verified) · release scope frozen — new items go to backlog, not the plan, unless the user moves them · non-blocking findings = backlog, never self-opened tasks · **at most 2 rework rounds per task, then a human decides** (accept / re-scope / drop) · work waiting on a human answer is reported immediately — never queue work behind an open question · documents over budget (~4–10 KB per file by type) = archive/split, not write longer.
+Plan Status values: `pending` · `done-local` (code done and its automated tests pass locally, not yet connected to gated real systems — the controller sets it after re-running the tests) · `verified` / `blocked` (only from check's verdict) · `done-local` never closes a gate.
 
 ## 11. Language
 
@@ -65,6 +67,8 @@ Relational data-model work also includes a full, readable DBML artifact kept in 
 
 
 ## Change Log
+
+- 2026-10-26 — Gates block only work that needs their answer (stub/fake work proceeds); add the `done-local` plan status.
 
 - 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
 
