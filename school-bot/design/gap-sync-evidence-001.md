@@ -16,7 +16,7 @@
 | B/app/internal/engine/manager.go:115–127,188–189; B/engines/zide/src/request.cpp:32–69,122–156; actions.cpp:45–100; protocol.cpp:38–65,90–96; line_reader.cpp:7 | host drain/protocol/bounds ตาม robot-boundary; ไม่ได้สั่งหุ่นหรือวัด physical stop |
 | A/Repositories/Databases/TeacherRepository.cs:24–32,111–124; PlanCourseRepository.cs:194–215 | มี teacher/course/term และ room joins แต่ query ห้องกรอง SchoolId ไม่ครบทุก alias จึงไม่ใช้ query เดิมเป็น authorization proof |
 | A/Entities/JabjaiSchoolSingleDB/TstudentClassroomHistory.cs:8–38; Tterm.cs:8–24; Common/Databases/JabjaiSchoolSingleDBPostgreSQLDBContext.cs:7895–7918,9435–9472,9991 | ยืนยันชื่อ physical/property/keys ของ assignment/history/term; ไม่ยืนยัน active/move/status resolver หรือ timezone ที่ใช้งานจริง |
-| db/schoolbot_db.sql:142–175,182–197,284–335,680–709 | reuse idempotency/audit/projects/submission เดิม; ไม่มี Version. ReplayUntil และ nullable cipher/key-id มีแล้ว; ไม่ต้องเสนอ migration สำหรับรอบนี้ |
+| db/schoolbot_db.sql: SchoolBotIdempotency/AuditEvent/Project/ProjectRevision/Submission | reuse idempotency/audit/projects/submission เดิม; ไม่มี Version. ReplayUntil และ nullable cipher/key-id มีแล้ว; ไม่ต้องเสนอ migration สำหรับรอบนี้ |
 
 ## Change Log
 - 2026-10-24 — Rev1: ใบงาน060a บันทึกหลักฐานไฟล์/บรรทัดที่อ่านจริง; ไม่ใช่ runtime/DB/hardware proof

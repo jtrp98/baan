@@ -41,7 +41,7 @@ UI แสดง local_result/authority=local แยกกับ GET Submission �
 
 ## เหตุผลและหลักฐาน
 
-DDL `db/schoolbot_db.sql:680–709` มี Submission/ProjectRevisionId/Evidence; `:182–197` มี AuditEvent และ Idempotency มี ResourceId. เลือก reuse rows/audit แทนตารางประวัติ Cloud ใหม่; ปัดตกเชื่อ client stars, เดาผู้สร้าง Guest และนำเข้าผลครูเป็นนักเรียน. `app/internal/engine/demo.go:24–66` เป็น bounded runtime ไม่ใช่ authoritative grader
+DDL ตาราง `SchoolBotSubmission` ใน `db/schoolbot_db.sql` มี Submission/ProjectRevisionId/Evidence; ตาราง `SchoolBotAuditEvent` มี AuditEvent และ Idempotency มี ResourceId. เลือก reuse rows/audit แทนตารางประวัติ Cloud ใหม่; ปัดตกเชื่อ client stars, เดาผู้สร้าง Guest และนำเข้าผลครูเป็นนักเรียน. `app/internal/engine/demo.go:24–66` เป็น bounded runtime ไม่ใช่ authoritative grader
 
 ครอบ AC-042-01..06; ต้องพิสูจน์ local restart, เลือกเฉพาะ A, ปลอม passed, Arm รอครู, grader fail, snapshot เปลี่ยน, lost response และ provenance หลัง replay หมดอายุ. รอบนี้ไม่มี runtime proof
 

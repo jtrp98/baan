@@ -1,4 +1,4 @@
-# หมายเหตุ schema — Rev5
+# หมายเหตุ schema — Rev6
 
 อ่าน [คู่มือ DBML](dbml-guide-001.md) สำหรับแบบเต็ม Rev4 และภาพ integration ที่เลือกเฉพาะจุดเชื่อมตารางเดิม; ชนิดของเส้นและจำนวนตารางในสองภาพต่างกันตามขอบเขตภาพ ไม่ได้เพิ่ม schema
 
@@ -23,10 +23,10 @@
 
 ขอบเขต `SchoolId` และการอ้างอิง FK ตาม [db/review-005.md](../db/review-005.md):
 1. **Global เท่านั้น (`SchoolId IS NULL` — 8 ตาราง)**: `SchoolBotLevel`, `SchoolBotLevelPromotionPolicy`, `SchoolBotCurriculum`, `SchoolBotLesson`, `SchoolBotMission`, `SchoolBotCriteria`, `SchoolBotActivity`, `SchoolBotQuestionBank`
-2. **Mixed Global/Tenant (`SchoolId IS NULL OR SchoolId > 0` — 3 ตาราง)**: `SchoolBotRelease`, `SchoolBotIdempotency`, `SchoolBotAuditEvent` — ใน physical DDL ใช้ partial unique index แยก 2 ตัว (`WHERE "SchoolId" IS NULL` และ `WHERE "SchoolId" IS NOT NULL`).
+2. **Mixed Global/Tenant (`SchoolId IS NULL OR SchoolId > 0` — 3 ตาราง)**: `SchoolBotRelease`, `SchoolBotIdempotency`, `SchoolBotAuditEvent` — Release และ Idempotency คงกฎไม่ซ้ำผ่าน application/repository transaction locks แยก global/tenant ตาม data-contract-rules.md; AuditEvent คง append-only ไม่มี partial unique index บังคับกฎดังกล่าว.
 3. **Tenant เท่านั้น (`SchoolId > 0` — 21 ตาราง)**: ตารางอื่นทั้งหมด.
 4. **การตัดทอน Index, Composite FK และคอลัมน์ซ้ำซ้อน (`db/review-005.md`)**:
-   - ตัด non-unique indexes (`ix_*`) ออกทั้งหมด (0 ตัว)
+   - ถอน standalone indexes ทั้ง unique/non-unique ออกทั้งหมด (0 ตัว); คง backing indexes ของ PK/UQ
    - ตัด composite UNIQUE `(SchoolId, ...)` สำหรับทำ composite FK ออกทั้งหมด และใช้ **single-column FK ชี้ PK คอลัมน์เดียว** ทั้งหมด 39 เส้น + 1 natural composite FK `FK_SchoolBotProject_CurrentRevision` (`(SchoolBotProjectId, CurrentRevision) -> (ProjectId, Revision)`) รวม **40 เส้น**; ชั้น application รับผิดชอบตรวจว่า parent และ child อยู่ `SchoolId` เดียวกัน (และ `CriteriaId` อยู่ใน `MissionId` เดียวกัน)
    - ตัดคอลัมน์ `SchoolBotScoringPolicy.CurriculumId` (อ่านจาก `CourseRun.CurriculumId` แทน) และ `SchoolBotScoreOutbox.ScorePreviewId`
    - ตัด `UQ_SchoolBotAssessment_Submission_Sequence` และ `UQ_SchoolBotAttempt_Learner_Seq` (ใช้ row/learner lock ก่อนจัดสรร `Sequence` แทน)
@@ -37,17 +37,10 @@
 
 ## สิ่งที่ diagram ยังไม่บังคับ (บังคับใน physical DDL และ application contract)
 
-- **Partial unique indexes (`ux_*` 13 ตัวใน `db/schoolbot_db.sql`)**:
-  - `ux_schoolbot_license_binding_active`: 1 active binding ต่อ License (`WHERE "DetachedAt" IS NULL AND "IsDelete" = false`)
-  - `ux_schoolbot_release_global` และ `ux_schoolbot_release_tenant`: แยก `SchoolId IS NULL` กับ `SchoolId IS NOT NULL`
-  - `ux_schoolbot_idempotency_global`, `ux_schoolbot_idempotency_tenant` และ `ux_schoolbot_idempotency_nonce`
-  - `ux_schoolbot_staff_role_live`: live uniqueness ของ `SchoolBotStaffRole` (`WHERE "IsDelete" = false`)
-  - `ux_schoolbot_courserun_active_room`: 1 active `SchoolBotCourseRun` ต่อห้อง/ปี/เทอม (`WHERE "Lifecycle" IN ('planned','active','closing') AND "IsDelete" = false`) และ `ux_schoolbot_courserun_one_successor` (1 successor ต่อ `PreviousRunId`)
-  - `ux_schoolbot_gradeslot_active_ownership`: 1 active ownership ของ `SchoolBotGradeSlot` ต่อ `(SchoolId, NGradeId, AssessmentId, ScoreIdentifier)` เมื่อ `"RetiredAt" IS NULL` (**ไม่กรอง `IsDelete = false`** เพื่อห้ามหลบ ownership ด้วย soft-delete)
-  - `ux_schoolbot_scoremapping_active`: 1 active `SchoolBotScoreMapping` ต่อ `(CourseRunId, GradeSlotId)` เมื่อ `"RetiredAt" IS NULL AND "IsDelete" = false`
-  - `ux_schoolbot_levelproposal_confirmed_per_run`: 1 finalized `SchoolBotLevelProposal` (`promoted|retained|max_level`) ต่อ `CourseRunId` และ `ux_schoolbot_levelproposal_successor_unique`
-- **ยอด declaration ตาม `db/review-006.md` และนับ SQL ซ้ำ 2026-10-24**: PK 32, UQ 24, CHECK **80**, FK 40, unique indexes 13, non-unique indexes 0; UQ constraints แยกจาก unique indexes ไม่รวมยอดซ้ำกัน
-  - CHECK ขอบเขต `SchoolId` 32 ข้อ (ตารางละ 1 ข้อ) + Enum/State/Lifecycle/คู่คอลัมน์/ช่วงคะแนนเวลาและกฎอื่น 48 ข้อ. ยอด 53/21 เดิมเป็นคำอธิบายคลาดเคลื่อน ไม่ใช่การเพิ่ม constraints รอบนี้; ฉบับเดิมอยู่ใน archive ใบงาน060a
+- ถอน standalone unique indexes 13 ตัว; กฎ binding, release, idempotency/nonce, staff role, active run/successor, ownership/mapping และ finalized proposal/successor คงเดิมผ่าน application/repository transaction locks ตาม [กฎข้อมูลร่วม](data-contract-rules.md) โดยต้อง serialize logical scope เดียวกันแม้ยังไม่มีแถว
+- คง PK/UQ constraints และ FK; DBML คง inline unique และ `[unique, name: 'UQ_…']` ที่แทน constraints เดิม ถอน partial placeholders และ composite FK-source pseudo-index โดยไม่ถอน composite FK
+- ยอด declaration ปัจจุบัน: standalone unique indexes 0, standalone non-unique indexes 0; PK 32, UQ 24, CHECK 80 และ FK 40. PostgreSQL ยังสร้าง backing indexes ของ PK/UQ; ไม่ใช่การถอน physical indexes ทุกชนิด
+- การบังคับทดแทนด้วย application/repository locks: NOT_IMPLEMENTED — ไม่มี runtime evidence; SQL ยังคง DRAFT ไม่ได้รัน
 - **คอลัมน์ Array และ Enum**:
   - `SchoolBotCourseRun.PlanCourseIds` แสดงใน DBML เป็น `jsonb` เพื่อไม่ให้ชนกับ syntax `[...]` ของ DBML parser ส่วน physical SQL ใน `db/schoolbot_db.sql` ใช้ `integer[]` (`int4[]`) พร้อม `CHECK (cardinality("PlanCourseIds") >= 1 AND array_position("PlanCourseIds", NULL) IS NULL)`
   - Enum ใน DBML แสดงค่าที่เป็นไปได้เพื่อการรีวิว ส่วน physical SQL ใช้ `varchar` คู่กับ `CHECK (... IN (...))`
@@ -62,6 +55,8 @@
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-26 — Rev6: ถอน standalone indexes ตามคำสั่งผู้ใช้ คง PK/UQ/FK และกฎธุรกิจ; application/repository locks ทดแทนยัง NOT_IMPLEMENTED ไม่มี runtime evidence
 - 2026-10-24 — แก้ตามข้อเสนอ check-061c: ปรับแถว Learner ใน "ยังไม่อนุมัติ" เป็น "ตัดสินแล้ว ทาง A ตาม decisions-032" ให้ตรง data-model; เพิ่มหลักฐาน parser 10.3.1 ที่ dbml-parser-evidence-002.json
 
 - 2026-10-24 — Rev5: ใบงาน060a/BL-001 แก้ยอด declaration ให้ตรง review-006 และ SQL จริง; ไม่แก้ DDL/DBML/สถานะอนุมัติ

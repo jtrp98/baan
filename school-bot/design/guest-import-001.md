@@ -32,7 +32,7 @@ Server ตรวจ Channel/License/device proof/ownership แล้วสร้
 
 ## เหตุผลและหลักฐาน
 
-เลือก reuse Idempotency+ResourceId/tombstone เดิม (`db/schoolbot_db.sql:142–175`) และ Project/Revision (`:284–321`); ไม่มี ClientId/import table ใหม่. ปัดตกสุ่ม RequestKey ใหม่ทุก login, dedup ด้วยชื่อ/hash อย่างเดียว และ local receipt อย่างเดียว เพราะ response หาย/หลาย instance ทำซ้ำได้. `app/desktopstorage.go:103–147` ยังเป็น single-slot file store ไม่ใช่ implementation ของข้อเสนอนี้
+เลือก reuse Idempotency+ResourceId/tombstone เดิม (ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql`) และ Project/Revision (ตาราง `SchoolBotProject`/`SchoolBotProjectRevision`); ไม่มี ClientId/import table ใหม่. ปัดตกสุ่ม RequestKey ใหม่ทุก login, dedup ด้วยชื่อ/hash อย่างเดียว และ local receipt อย่างเดียว เพราะ response หาย/หลาย instance ทำซ้ำได้. `app/desktopstorage.go:103–147` ยังเป็น single-slot file store ไม่ใช่ implementation ของข้อเสนอนี้
 
 AC-041-01..05 ต้องตรวจเลือกเฉพาะ A, restart/replay หลัง TTL, response หาย, สอง instance, เปลี่ยนบัญชีระหว่างรอ และ Guest ไม่ถูกแก้. หลักฐาน runtime ยังต้องจัดทำ
 

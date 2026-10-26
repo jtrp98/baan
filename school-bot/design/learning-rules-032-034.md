@@ -1,6 +1,6 @@
 # กฎผลเรียน/policy — Rev1
 
-Canonical ของ DES-004/005/010/011/012 และ dictionary ตาม032..034; หลักฐานแบบคือ ../db/schoolbot_db.sql:572–858 และ ../db/review-006.md ไม่ใช่ runtime
+Canonical ของ DES-004/005/010/011/012 และ dictionary ตาม032..034; หลักฐานแบบคือ ตาราง SchoolBotCourseRun ถึง SchoolBotRetakeGrant ใน ../db/schoolbot_db.sql และ ../db/review-006.md ไม่ใช่ runtime
 
 ## ตัวตนและรอบเรียน
 employee ทดลอง local/เก็บ Project Cloud ได้ แต่ห้ามผล Cloud รวม Submission/Attempt, direct API, Guest import, retry/worker: 403 PROFILE_NOT_ALLOWED ก่อนสร้างผล/job; import ที่มีประวัติผลปฏิเสธทั้งคำขอ โครงงานนำเข้าแยกได้ ครู school_web ตรวจงานนักเรียนได้ตามสิทธิ์เดิม ตรวจ session/profile/SchoolId/Project.OwnerKind=student/OwnerId/roster ก่อน commit ไม่เชื่อ ID จาก client

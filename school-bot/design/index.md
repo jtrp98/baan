@@ -7,7 +7,7 @@
 
 ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
 
-อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev8/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
+อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev9/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
 
 ## Feasibility
 
@@ -125,14 +125,14 @@
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
 | [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev8 — baseline CONFIRMED เดิม; ข้อเสนอ create-license TTL 15 นาทีติดสมมติฐานตาม060a, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
-| [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy Rev5 — baseline CONFIRMED เดิม; แก้ยอดตาม review-006: 24 UQ/80 CHECK/13 unique indexes; 32 ตารางและบัญชี DB เดิมคงเดิม |
+| [schema-notes.md](schema-notes.md) | หมายเหตุ schema/ชนิดข้อมูล legacy Rev6 — standalone indexes 0; คง PK32/UQ24/CHECK80/FK40; กฎความไม่ซ้ำที่ถอด index เป็นหน้าที่ application |
 | [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev5 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |
 | [os-compatibility-001.md](os-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ OS (Rev2 · EVIDENCE — target ถูกแทนโดย decisions-019; runtime proof ยังรอ) |
 | [windows10-compatibility-001.md](windows10-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ Windows 10 (Rev1 · HISTORICAL — ผู้ใช้ยุติ Windows10 target ตาม decisions-019) |
 | [amendment-proposal-001.md](amendment-proposal-001.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026) |
 | [amendment-proposal-002.md](amendment-proposal-002.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026 (แก้ 2 จุดตาม decisions-025)) |
-| [schoolbot.dbml](schoolbot.dbml) | DBML Rev5 — Notes032..034; ผู้คุมตรวจ parser/semantic ผ่านตาม dbml-review-002; 32 ตาราง/450 ฟิลด์/40 FK; คง schema baseline เดิม |
+| [schoolbot.dbml](schoolbot.dbml) | DBML Rev6 — ถอน standalone indexes; คง 32 ตาราง/450 ฟิลด์/40 FK และ UNIQUE constraints; ผลตรวจล่าสุดใน planning/task-084.md |
 | [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพเชื่อม legacy Rev2 (Notes; parser/semantic ผ่าน): SchoolBot 10 + ตารางเดิม 14; FK จริง 4 / logical เส้นประ 12; ใช้อธิบาย ไม่ใช้สร้าง SQL |
 | [dbml-guide-001.md](dbml-guide-001.md) | วิธีอ่านกลุ่มสี เส้นทึบ/ประ และข้อจำกัดของภาพ |
 | [dbml-review-001.md](dbml-review-001.md) | ผลตรวจ parser/ความครบถ้วน/เทียบ contract ก่อนและหลัง |
@@ -152,7 +152,7 @@
 
 ## Amendment 076 — 2026-10-26
 
-[DES-010 Rev4](des-010.md), [learning-rules Rev1](learning-rules-032-034.md), [DES-011 Rev4](des-011.md) และ [gap receipt Rev1](learning-ux-contract-gaps-001.md) มี dated amendment076 ตาม042/AC-046-07; คง PROPOSED รอ technical proof ไม่เปิด implementation/gates
+[DES-010 Rev4](des-010.md), [learning-rules Rev1](learning-rules-032-034.md), [DES-011 Rev5](des-011.md) และ [gap receipt Rev1](learning-ux-contract-gaps-001.md) มี dated amendment076 ตาม042/AC-046-07; คง PROPOSED รอ technical proof ไม่เปิด implementation/gates
 
 ## ช่องว่าง Learning/UX — ใบงาน071
 

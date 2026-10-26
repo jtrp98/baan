@@ -2,7 +2,7 @@
 
 > สถานะ: **อนุมัติครบทุกส่วน** (ผู้ใช้ 2026-10-24 · decisions-041 — Q30–Q38 ผ่านแบบฟอร์มคำถาม) · ทุกข้อที่ไม่มีมติระบุ "ข้อเสนอ (proposal)"
 > วันที่ร่าง: 2026-10-24 · รันโดย นายช่าง solo (subagent role int)
-> ฐานอ้างอิง: REQ-049 · REQ-050 · REQ-051 · REQ-052 · pack-guest-001 (G8) · DES-008 Rev4 · DES-009 Rev4 · grade-rules-032-034 Rev1 · มติ decisions-020/021/022/023/025/027–034
+> ฐานอ้างอิง: REQ-049 · REQ-050 · REQ-051 · REQ-052 · pack-guest-001 (G8) · DES-008 Rev5 · DES-009 Rev4 · grade-rules-032-034 Rev1 · มติ decisions-020/021/022/023/025/027–034
 > หลักการสำคัญ: หน้าทั้งหมดเป็น **เว็บ (W = sb-tech-upgrade-web-system · Next.js โฟลเดอร์ school-bot · เรียกผ่าน BFF `/api/school-bot/*` ด้วย session channel `school_web`)** ไม่ใช่ Desktop (BR-049-05, decisions-021/022) · ผู้ใช้สองกลุ่ม: **admin โรงเรียน** (จัด mapping) และ **ครูรายวิชา** (preview/ยืนยัน/แก้ชน) · a11y ใช้กติกากลางที่อนุมัติแล้วของ int-001/int-002 ต่อโดยไม่เปิดใหม่
 
 ## 1. ภาพรวมหน้าและสิทธิ์ (ข้อเสนอ)
