@@ -1,0 +1,37 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "inspect",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-04-32-32-inspect-tier-t2-1agents-hqY7ou\\report.json",
+  "payload": {
+    "state": "DONE",
+    "summary": "ตรวจแล้ว Traceability/Joined JSON ยังเป็น snapshot เดิม 180 AC/77 cases; coverage ปัจจุบันใน TP Amendment003 คือ 185 AC/80 cases เตรียม exact edits ครบโดยไม่เขียนไฟล์จริง",
+    "edits": [
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "| [Traceability](traceability-001.md) | 180 AC → cases → implementation/validation owner | IDs/coverage ตรวจแล้ว ไม่ใช่ QA PASS |",
+        "new": "| [Traceability](traceability-001.md) | snapshot เดิม 180 AC → cases → implementation/validation owner; coverage ปัจจุบัน 185 AC/80 cases อ่าน [TP Amendment003](tp-001.md#amendment003--2026-10-24) | snapshot ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อที่อยู่ใน TP Amendment003; ไม่ใช่ QA PASS |"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "| [Joined dataset](traceability-001.json) | REQ+canonical tasks+cases | revision2 |",
+        "new": "| [Joined dataset](traceability-001.json) | snapshot เดิม 180 AC/77 cases; REQ+canonical tasks+cases | source อ้าง plan/tasks-001.json revision2; ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อใน [TP Amendment003](tp-001.md#amendment003--2026-10-24) จึงไม่ใช่ joined coverage 185 AC |"
+      },
+      {
+        "path": "knowledge/school-bot/test-plan/index.md",
+        "old": "## Change Log",
+        "new": "## Change Log\n\n- 2026-10-26 — ใบงาน069: แยก Traceability/Joined JSON snapshot เดิม 180 AC/77 cases จาก coverage ปัจจุบันใน TP Amendment003 ที่ 185 AC/80 cases; AC-030-04..08 ทั้ง 5 ข้อตรวจรับแล้วตาม decisions-037 แต่ยังไม่อยู่ใน snapshot. แก้เฉพาะคำอธิบายสารบัญ ไม่เปลี่ยน snapshot/raw/actual/REQ/tasks/status/case IDs และไม่มี test execution"
+      }
+    ],
+    "evidence": [
+      "test-plan/index.md:34,36,40 — old ของทั้งสาม edits พบตรงตัวแห่งละหนึ่งจุด",
+      "test-plan/traceability-001.md:1,5,79–81 — ระบุ 180 AC และ canonical source revision2; นับ AC inventory ได้ 180 แถว",
+      "test-plan/traceability-001.json:2–5 — date=2026-10-23, source อ้าง plan/tasks-001.json revision2, case_count=77, ac_count=180; coverage มี 180 IDs ไม่ซ้ำ และไม่มี AC-030-04..08",
+      "test-plan/tp-001.md:1270–1277 — Amendment003 ระบุ 80 cases/185 AC; แก้ TP001-048 และเพิ่ม TP001-080 ครอบ AC-030-04..08; ทุก actual=NOT_RUN",
+      "requirement/decisions-037.md:7 และ requirement/index.md:67 — ยืนยันตรวจรับ AC เพิ่มทั้ง 5 ข้อและยอดรวม 185 AC",
+      "planning/task-062.md:24 — อ้างฐาน 44 REQ/185 AC/80 test cases สอดคล้องกับ TP Amendment003"
+    ],
+    "handoff": "ส่งนายช่างบันทึก exact edits เฉพาะ test-plan/index.md; ไม่มี blocker ในขอบเขตนี้ ความต่างของ snapshot ระบุชัดแล้ว โดยไม่รับรอง joined185 หรือผล runtime และไม่ส่งต่อรัน tests ในใบงานนี้"
+  }
+}

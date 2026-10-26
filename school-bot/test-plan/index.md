@@ -31,13 +31,15 @@ E-API สำหรับ integration ต้องมี sanitized HTTP↔RPC cor
 | [TP-001](tp-001.md) | 80 cases /185 AC (Amendment002 sync GAP+SEC + Amendment003 เปิด coverage GAP-07 — AC-030-04..08 ตรวจรับแล้วตาม decisions-037); แยก logic/UI/bridge/hardware/installer | GAP ส่วนใหญ่ design_synced — รอ runtime; ทุก case NOT_RUN |
 | [TP-002 fixture plan](tp-002-fixture-plan-001.md) | แผน failure/race fixtures FX-01..05 (fake clock/trash/late callback/import lost response/cross-tenant) — ไม่สั่งหุ่น | เอกสารเตรียม — ยังไม่มี harness/การรัน |
 | [TP-003 grade fixture plan](tp-003-grade-fixture-plan-001.md) | แผน grade parity/coexistence/crash fixtures GF-01..06 ตาม 5 gate ของ SA-004 (AC-049..052) — test DB เท่านั้น ไม่แตะ PGGradeDB จริง | เอกสารเตรียม — ยังไม่มีการรัน |
-| [Traceability](traceability-001.md) | 180 AC → cases → implementation/validation owner | IDs/coverage ตรวจแล้ว ไม่ใช่ QA PASS |
+| [Traceability](traceability-001.md) | snapshot เดิม 180 AC → cases → implementation/validation owner; coverage ปัจจุบัน 185 AC/80 cases อ่าน [TP Amendment003](tp-001.md#amendment003--2026-10-24) | snapshot ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อที่อยู่ใน TP Amendment003; ไม่ใช่ QA PASS |
 | [Owner dataset](tp-001.json) | ผล inspect ต้นฉบับ | ไม่มี test execution |
-| [Joined dataset](traceability-001.json) | REQ+canonical tasks+cases | revision2 |
+| [Joined dataset](traceability-001.json) | snapshot เดิม 180 AC/77 cases; REQ+canonical tasks+cases | source อ้าง plan/tasks-001.json revision2; ยังไม่รวม AC-030-04..08 ทั้ง 5 ข้อใน [TP Amendment003](tp-001.md#amendment003--2026-10-24) จึงไม่ใช่ joined coverage 185 AC |
 
 - 2026-10-24 — ใบงาน061: เพิ่ม TP-003 grade fixture plan (GF-01..06 ครอบ AC-049..052 ทั้ง 5 gate) — docs-only
 
 ## Change Log
+
+- 2026-10-26 — ใบงาน069: แยก Traceability/Joined JSON snapshot เดิม 180 AC/77 cases จาก coverage ปัจจุบันใน TP Amendment003 ที่ 185 AC/80 cases; AC-030-04..08 ทั้ง 5 ข้อตรวจรับแล้วตาม decisions-037 แต่ยังไม่อยู่ใน snapshot. แก้เฉพาะคำอธิบายสารบัญ ไม่เปลี่ยน snapshot/raw/actual/REQ/tasks/status/case IDs และไม่มี test execution
 
 - 2026-10-24 — Amendment003 ตาม decisions-036 (นายช่าง solo สวมบท inspect): แก้ TP001-048 + เพิ่ม TP001-080 เปิด coverage GAP-07 (AC-030-04..08 ข้อเสนอรอผู้ใช้ตรวจรับ) — 80 cases/185 AC ทุก actual NOT_RUN
 
