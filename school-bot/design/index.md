@@ -5,6 +5,8 @@
 
 ## Transport — precedence ใบงาน049 (2026-10-24)
 
+Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — typed gRPC+in-process harness, production registration ปิด; H5/review/runtime ยังแยก
+
 ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
 
 อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev10/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.

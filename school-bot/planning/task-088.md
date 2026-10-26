@@ -32,3 +32,4 @@ Lint canonical plan exit1: implement63, ติด human gate62, พร้อม1
 - sys AGY T3 ครั้งแรกไม่ได้ output เพราะ native read_file ต้องขอ permission ที่ headless ตอบไม่ได้; รายงาน `2026-10-26-08-33-28-sys-tier-t3-1agents-QlMJDV`. ลองใหม่โดยใช้ command tool ที่มีสิทธิ์อยู่แล้วอ่านเฉพาะ source/knowledge ที่อนุญาต ไม่แก้ settings หรือปิด permission guard และห้ามอ่าน .env
 - arch Codex T1 กำลังทำ code-facing Gateway packet. ยังไม่มี code/test/verdict ใหม่จากสามงาน ณ checkpoint นี้
 - gm รอบลองใหม่ส่งคิวครบแล้ว (NEEDS_HUMAN เฉพาะข้อเสนอDAG), บันทึก queue-005. CONTINUE-NORMAL อนุญาตเดินlocal/stubระหว่างเก็บข้อเสนอถามท้ายรอบแล้ว ไม่ถามสิทธิ์นี้ซ้ำ ไม่applycanonicalDAGโดยพลการ
+- arch Codex T1 DONE: บันทึก gateway-logout-slice-001 พร้อม exact wire/peer guard/negativecases; จัด sys B→G แบบ production-registrationปิด เมื่อ repo writerว่าง. ไม่มีSQL/schema/signer dependencyในsubsetนี้
