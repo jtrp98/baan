@@ -153,6 +153,10 @@
 
 | [gateway-integration-001.md](gateway-integration-001.md) | Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review; override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
 
+## ช่องว่าง Learning/UX — ใบงาน071
+
+[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; ไม่ใช่สัญญาใหม่หรือ gate passed. คิวปัจจุบันใช้ [Queue 004](../plan/queue-004.md) และ [ใบงาน062](../planning/task-062.md). คง 44 REQ/185 AC, 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ gates เดิม.
+
 ## ภาคผนวก canonical
 
 ### ใบงาน060a — สัญญาเฉพาะเรื่องและชุดหลักฐาน
@@ -169,7 +173,7 @@
 | [teacher-authority-001.md](teacher-authority-001.md) Rev1 | PROPOSED — authority intersection; roster/status/time resolver ยังขาดหลักฐาน |
 | [robot-boundary-001.md](robot-boundary-001.md) Rev1 | PROPOSED — payload/drain-stop; poll 3000ms/debounce0 ติดสมมติฐาน ไม่ใช่ physical SLA |
 | [release-trust-001.md](release-trust-001.md) Rev1 | PROPOSED — registry-gated signer/publisher pin; รอ custody และ re-audit |
-| [update-disposition-001.md](update-disposition-001.md) Rev1 | PROPOSED — รอผู้มีอำนาจเลือก explicit workflow/check-only; ไม่เพิ่ม AC/ตัด scope |
+| [update-disposition-001.md](update-disposition-001.md) Rev1 | ประวัติ disposition เดิม — ผู้ใช้เลือก explicit PrepareUpdate/InstallPreparedUpdate แล้วตาม [decisions-036](../requirement/decisions-036.md:11) และตรวจรับ AC-030-04..08 ตาม [decisions-037](../requirement/decisions-037.md:7); คงเอกสารเดิมและ gates/implementation เดิม |
 | [credential-matrix-001.md](credential-matrix-001.md) Rev1 | DRAFT EVIDENCE PACK — process/account/สิทธิ์ที่ต้องใช้; actual grants/account names ยังไม่ยืนยัน |
 | [signing-custody-001.md](signing-custody-001.md) Rev1 | DRAFT EVIDENCE PACK — ผู้ถือ/ที่เก็บ/sign/rotate/revoke/backup รอเจ้าของเติม |
 | [export-proof-pack-001.md](export-proof-pack-001.md) Rev1 | DRAFT EVIDENCE PACK — outline SA-004 ครบ19ACเดิม/ห้าgate; ไม่ใช่ผลทดสอบ |
@@ -211,6 +215,7 @@
 - 2026-10-24 — แก้ตาม check-061-verify4 (นายช่างสวมบท arch): schoolbot.dbml PlanCourseIds jsonb→integer[] ตรง DDL (schoolbot_db.sql:578) — annotation เท่านั้น schema ไม่เปลี่ยน; parser 10.3.1 ผ่านหลังแก้ ([evidence-003](dbml-parser-evidence-003.json): 32 ตาราง/450 ฟิลด์)
 
 ## Change Log
+- 2026-10-26 — ใบงาน071: เพิ่ม pointer gap receipt Learning/UX และ Queue 004; แก้ disposition pointer ตาม036/037 โดยคงฉบับเดิมเป็นประวัติ; ไม่เปลี่ยน DES revisions/PROPOSED, counts หรือ gates
 - 2026-10-24 — Rev5: ใบงาน060a amend DES-002..007/rules/schema-notes และเชื่อมสัญญาย่อย/SA-004; เก็บก่อนแก้พร้อม SHA256; ไม่เปลี่ยน task status/scope/dependencies/gates
 - 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict
 - 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049
