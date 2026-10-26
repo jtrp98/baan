@@ -26,6 +26,9 @@ Flags00..ff/versions01..fe/futuresuffix/base trace/lang/Origin+junkorder/limiter
 
 RawanswerมีfullPowerShell/C#source; ผู้คุมสกัดunchangedไปworkspace normal-089/grpc-r2-extended-independent.ps1 เพื่อทวนparent โดยไม่buildหรือแก้product. Parentผลกำลังรอ. ไม่เปลี่ยนcanonicalverified/task/gates.
 
+Parentทวนscriptเดิมจริง exit1: **2222pass/12fail**, additional2072pass/12fail/8NOT_RUN; sourcebinding44documents/DLL/PDBตรงกับcheckerและdisk. Raw normal-089/grpc-r2-extended-parent.log. UUIDduplicateempty/Originduplicate/malformedbinary/duplicateuser-agentได้actualเดิม ไม่ใช่writerclaimหรือstaleDLL.
+
 ## Change Log
 
 - 2026-10-26 — รับfinalcheck2222/12/8; baseline150greenเป็นsubsetเท่านั้น เก็บข้อขอรอบแก้เกิน2ไว้ท้ายวง.
+- 2026-10-26 — parentextendedreproยืนยัน2222/12/8และbinding44ตรงครบ ไม่มีproductrework3.
