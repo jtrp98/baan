@@ -17,7 +17,7 @@
 ## Placement และ integrity
 
 ตามมติ [decisions-027.md](../requirement/decisions-027.md) และ [decisions-029.md](../requirement/decisions-029.md):
-- วางทุกตารางของ SchoolBot (**32 ตาราง**) ใน **SchoolBot DB** (host `10.0.0.128` port `9499`, ชื่อ DB `SchoolBot` เป็นสมมติฐาน, schema `public`) เพื่อ commit domain + `SchoolBotIdempotency` + `SchoolBotAuditEvent` แบบ atomic ในฐานข้อมูลเดียว ([db/schoolbot_db.sql](../db/schoolbot_db.sql) สร้าง role `schoolbot_app` เฉพาะใน SchoolBot DB).
+- วางทุกตารางของ SchoolBot (**32 ตาราง**) ใน **SchoolBot DB** (host `10.0.0.128` port `9499`, ชื่อ DB `SchoolBot` เป็นสมมติฐาน, schema `public`) เพื่อ commit domain + `SchoolBotIdempotency` + `SchoolBotAuditEvent` แบบ atomic ในฐานข้อมูลเดียว ([db/schoolbot_db.sql](../db/schoolbot_db.sql) ไม่สร้าง database role หรือกำหนดสิทธิ์ฐานข้อมูล).
 - การเชื่อมต่อกับ 4 ฐานข้อมูลเดิมของ SchoolBright (Master, School, Logs, PGGradeDB) ใช้ connection แยกด้วย**บัญชี DB เดิม**ของระบบ โดย**ไม่รัน GRANT/REVOKE หรือสร้าง role ใหม่**ใน School DB หรือ PGGradeDB ([decisions-029.md](../requirement/decisions-029.md)).
 - เนื่องจากตาราง SchoolBot อยู่คนละฐานข้อมูลกับ School DB จึง**ไม่มี transaction เดียวครอบข้าม DB**: การตรวจสิทธิ์ครูรายวิชา/ผู้ดูแลโรงเรียน, รายชื่อนักเรียนในห้อง (roster) และสถานะภาคเรียน (term) จาก School DB ต้องอ่านผ่าน connection แยกและ **re-check ก่อน commit** ใน SchoolBot DB ทุกครั้ง (ส่วนการตรวจ `SchoolBotLicense` และ `SchoolBotStaffRole` อยู่ใน SchoolBot DB เดียวกัน).
 
@@ -55,6 +55,8 @@
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-26 — ถอนส่วนสร้าง role/กำหนดสิทธิ์จากร่าง SQL และส่วนถอนสิทธิ์ใน rollback ตามคำสั่งผู้ใช้; โครงสร้างตารางและ constraints คงเดิม
 
 - 2026-10-26 — Rev6: ถอน standalone indexes ตามคำสั่งผู้ใช้ คง PK/UQ/FK และกฎธุรกิจ; application/repository locks ทดแทนยัง NOT_IMPLEMENTED ไม่มี runtime evidence
 - 2026-10-24 — แก้ตามข้อเสนอ check-061c: ปรับแถว Learner ใน "ยังไม่อนุมัติ" เป็น "ตัดสินแล้ว ทาง A ตาม decisions-032" ให้ตรง data-model; เพิ่มหลักฐาน parser 10.3.1 ที่ dbml-parser-evidence-002.json

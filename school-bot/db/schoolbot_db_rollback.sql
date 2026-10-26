@@ -89,14 +89,5 @@ DROP TABLE IF EXISTS public."SchoolBotRelease";
 DROP TABLE IF EXISTS public."SchoolBotLicenseBinding";
 DROP TABLE IF EXISTS public."SchoolBotLicense";
 
--- Revoke schema privileges from role schoolbot_app (keep role at cluster level)
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'schoolbot_app') THEN
-        REVOKE ALL PRIVILEGES ON SCHEMA public FROM schoolbot_app;
-    END IF;
-END
-$$;
-
 
 COMMIT;

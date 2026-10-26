@@ -12,6 +12,7 @@
 --   4. ไม่มีคอลัมน์ Version — optimistic concurrency ใช้ UpdateDate (server ตั้งด้วย clock_timestamp(); decisions-030); AuditEvent ไม่เก็บ Previous/NewVersion
 --   5. ตัดตาราง SchoolBotTeacherGrant (ยังไม่มีมติให้สร้างตาม decisions-026) และตัดคอลัมน์ซ้ำซ้อนที่ derive ได้ (ScoringPolicy.CurriculumId, ScoreOutbox.ScorePreviewId)
 --   6. คงเฉพาะ CHECK ที่กันข้อมูลผิดความหมาย (enum, คู่ค่าที่ต้องมาด้วยกัน, ช่วงคะแนน/เวลา, SchoolId scope)
+-- ไม่สร้าง database role หรือกำหนดสิทธิ์ฐานข้อมูลตามคำสั่งผู้ใช้ 2026-10-26
 -- ทั้งไฟล์รันใน transaction เดียว: ส่วนใดล้ม = rollback ทั้งหมด
 -- CreateBy/UpdateBy = integer NULL: sEmp (พนักงาน/ครู) หรือ sId (นักเรียน) ของผู้ทำ, NULL = ระบบทำเอง (decisions-028)
 -- =============================================================================
@@ -24,16 +25,6 @@ BEGIN;
 -- References: DES-002, DES-007, data-model.md Rev4.1, data-contract-rules.md
 -- #############################################################################
 
--- 1. Create least-privilege application role if not exists
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'schoolbot_app') THEN
-        CREATE ROLE schoolbot_app NOLOGIN;
-    END IF;
-END
-$$;
-
-GRANT USAGE ON SCHEMA public TO schoolbot_app;
 
 -- 2. Table: SchoolBotLicense (DES-002) — Mutable (If-Match on revoke/unbind)
 CREATE TABLE IF NOT EXISTS public."SchoolBotLicense" (
@@ -176,14 +167,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAuditEvent" (
     CONSTRAINT "CK_SchoolBotAuditEvent_SchoolId_Scope" CHECK ("SchoolId" IS NULL OR "SchoolId" > 0)
 );
 
-GRANT SELECT, INSERT, UPDATE ON
-    public."SchoolBotLicense",
-    public."SchoolBotLicenseBinding",
-    public."SchoolBotRelease",
-    public."SchoolBotIdempotency",
-    public."SchoolBotAuditEvent"
-TO schoolbot_app;
-
 
 -- #############################################################################
 -- Section 002: Identity, Session, StaffRole, Projects (4 tables)
@@ -312,13 +295,6 @@ BEGIN
     END IF;
 END
 $$;
-
-GRANT SELECT, INSERT, UPDATE ON
-    public."SchoolBotSession",
-    public."SchoolBotStaffRole",
-    public."SchoolBotProject",
-    public."SchoolBotProjectRevision"
-TO schoolbot_app;
 
 
 -- #############################################################################
@@ -526,17 +502,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotQuestionBank" (
     CONSTRAINT "CK_SchoolBotQuestionBank_Lifecycle" CHECK ("Lifecycle" IN ('draft', 'published', 'retired')),
     CONSTRAINT "CK_SchoolBotQuestionBank_PublishedAt" CHECK ("Lifecycle" <> 'published' OR "PublishedAt" IS NOT NULL)
 );
-
-GRANT SELECT, INSERT, UPDATE ON
-    public."SchoolBotLevel",
-    public."SchoolBotLevelPromotionPolicy",
-    public."SchoolBotCurriculum",
-    public."SchoolBotLesson",
-    public."SchoolBotMission",
-    public."SchoolBotCriteria",
-    public."SchoolBotActivity",
-    public."SchoolBotQuestionBank"
-TO schoolbot_app;
 
 
 -- #############################################################################
@@ -825,17 +790,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRetakeGrant" (
     CONSTRAINT "CK_SchoolBotRetakeGrant_SchoolId_Pos" CHECK ("SchoolId" > 0)
 );
 
-GRANT SELECT, INSERT, UPDATE ON
-    public."SchoolBotCourseRun",
-    public."SchoolBotScoringPolicy",
-    public."SchoolBotCourseRunActivity",
-    public."SchoolBotSubmission",
-    public."SchoolBotGradingJob",
-    public."SchoolBotAssessment",
-    public."SchoolBotAttempt",
-    public."SchoolBotRetakeGrant"
-TO schoolbot_app;
-
 
 -- #############################################################################
 -- Section 005: GradeSlot, ScoreMapping, ScorePreview, Export, Outbox (6 tables, SchoolId > 0)
@@ -1015,15 +969,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreOutbox" (
     )
 );
 
-GRANT SELECT, INSERT, UPDATE ON
-    public."SchoolBotGradeSlot",
-    public."SchoolBotScoreMapping",
-    public."SchoolBotScorePreview",
-    public."SchoolBotScorePreviewItem",
-    public."SchoolBotScoreExport",
-    public."SchoolBotScoreOutbox"
-TO schoolbot_app;
-
 
 -- #############################################################################
 -- Section 006: Level Proposal (1 table, SchoolId > 0)
@@ -1070,9 +1015,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevelProposal" (
         "SuccessorRunId" IS NULL OR "SuccessorRunId" <> "CourseRunId"
     )
 );
-
-
-GRANT SELECT, INSERT, UPDATE ON public."SchoolBotLevelProposal" TO schoolbot_app;
 
 
 COMMIT;
