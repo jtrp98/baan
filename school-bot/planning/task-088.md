@@ -36,3 +36,4 @@ Lint canonical plan exit1: implement63, ติด human gate62, พร้อม1
 - sys BE001 AGY T3 DONE: receipt slice-088-auth-001; ผู้คุมregression4032ผ่านจริงหลังแก้sandboxIPC; ส่งcheckT2แล้ว ไม่ปิดtaskจากsubset
 - sys Gateway puremetadata CodexT2 BLOCKEDจากpreflight: ponytail12/agent-skills20requiredfilesขาด บันทึกgateway-preflight-blocker-088. ไม่แก้productcode ไม่สร้างackปลอม เก็บenvironmentrepairคำถามท้ายรอบ
 - sys B gRPCLogout AGY T3 เริ่มแล้วตามpacketarch เมื่อBE001writerจบ; explicitmoduleยังไม่เปิดproduction
+- check BE001 FAIL: 45cases/32pass/13fail ตาม check-088-auth-001. ส่งแก้รอบ1หลังBwriterจบ; ไม่ให้helperมีauthorityหรือเปิดLogin และไม่ถามcompatibilitypolicyที่ยังรอevidenceระหว่างรอบ
