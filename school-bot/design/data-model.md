@@ -2,7 +2,7 @@
 
 เอกสารนี้อธิบายแบบข้อมูลเป้าหมายของ SchoolBot ตาม SQL ปัจจุบัน **32 ตาราง / 450 ฟิลด์ / PK32** เพื่อให้รู้ว่าตารางไหนเก็บอะไรและใช้ข้อมูลเก่าจากที่ไหน การมีแบบและ SQL ไม่ได้หมายความว่าระบบเชื่อมฐานข้อมูลจริงแล้ว
 
-ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิมยังอยู่; ยังไม่ได้รันฐานจริง
+ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูลและ identity เดิมคงอยู่; CreateBy/CreateDate/UpdateBy/UpdateDate รับ NULL และ DEFAULT NULL ทุกตาราง; ฟิลด์อื่นคง nullability/default เดิม; ยังไม่ได้รันฐานจริง
 
 ## เริ่มอ่านตรงนี้
 
@@ -71,6 +71,8 @@
 [ผลเรียน/policy](learning-rules-032-034.md) และ [mapping/export](grade-rules-032-034.md) ครอบ dictionary/JSON/DBML โดยไม่เพิ่ม physical fields/FK
 
 ## Change Log
+
+- 2026-10-26 — ตั้ง CreateBy/CreateDate/UpdateBy/UpdateDate เป็น nullable DEFAULT NULL ทุกตาราง
 
 - 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 - 2026-10-23 — Rev7: sync032..034; คง32ตาราง/450ฟิลด์

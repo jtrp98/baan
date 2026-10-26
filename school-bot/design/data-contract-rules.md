@@ -6,7 +6,7 @@
 
 Canonical เพิ่มเติม: [ผลเรียน/policy](learning-rules-032-034.md), [mapping/export](grade-rules-032-034.md); เป็น application invariants เพิ่มจาก SQL ด้านล่าง โดยกฎไม่ซ้ำเฉพาะ active ไม่เท่ากับกฎล็อกประวัติ
 
-ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิมยังอยู่; ยังไม่ได้รันฐานจริง
+ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูลและ identity เดิมคงอยู่; CreateBy/CreateDate/UpdateBy/UpdateDate รับ NULL และ DEFAULT NULL ทุกตาราง; ฟิลด์อื่นคง nullability/default เดิม; ยังไม่ได้รันฐานจริง
 
 application/repository ต้องใช้ transaction-scoped lock บน stable key ที่ serialize ทุก writer ของ logical scope เดียวกันข้าม process รวมกรณียังไม่มีแถว: ล็อกก่อนอ่านตรวจซ้ำและถือจน commit/rollback. ทุกเส้นทาง create/update/restore/เปลี่ยนสถานะต้องใช้ protocol เดียวกัน; key มี namespace/canonical encoding และแยก global (`SchoolId=null`) จาก tenant; หลาย locks ใช้ลำดับเดียวกัน. select-before-insert, row lock ของแถวที่ยังไม่มี และ `If-Match` เพียงอย่างเดียวไม่ป้องกัน create race
 
@@ -82,6 +82,8 @@ List: `limit` 1–100 ค่าเริ่ม 50, `cursor` opaque; คืน `{
 Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องรักษาขอบเขตที่ client/G/B; gRPC message limits และ mapping ยัง design pending ไม่เท่ากับขนาด JSON โดยอัตโนมัติ และไม่ยก limit ของ engine ตาม HTTP.
 
 ## Change Log
+
+- 2026-10-26 — ตั้ง CreateBy/CreateDate/UpdateBy/UpdateDate เป็น nullable DEFAULT NULL ทุกตาราง
 
 - 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 

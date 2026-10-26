@@ -4,7 +4,7 @@
 -- Status: DRAFT — เขียนอย่างเดียว ยังไม่เคยรัน; คนเป็นผู้รันบนฐานทดสอบแล้วส่ง DBA-003 ตรวจ
 -- Baseline: decisions-026, decisions-027, decisions-028 · ที่มา: DBA (agy) review-005 (2026-10-22)
 -- ตามคำสั่งผู้ใช้ 2026-10-26: คงเฉพาะ PRIMARY KEY 32 รายการ; ถอน UNIQUE 24, FOREIGN KEY 40 และ CHECK 80
--- คงคอลัมน์ 450 ฟิลด์ ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิม
+-- คง450คอลัมน์และ identity; CreateBy/CreateDate/UpdateBy/UpdateDate เป็น NULL DEFAULT NULL ทุกตาราง (คำสั่งผู้ใช้ 2026-10-26)
 -- ไม่ประกาศ standalone indexes ไม่สร้าง role และไม่กำหนดสิทธิ์ฐานข้อมูล
 -- กฎไม่ซ้ำ/การอ้างอิง/validation เดิมที่ถอนออกไม่ถูกบังคับด้วย SQL; งานนี้ไม่เพิ่ม implementation ฝั่งแอป
 -- ทั้งไฟล์รันใน transaction เดียว: ส่วนใดล้ม = rollback ทั้งหมด
@@ -32,10 +32,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLicense" (
     "BindingEpoch" integer NOT NULL,
     "AllowedNextJkt" varchar(64) NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotLicense" PRIMARY KEY ("SchoolBotLicenseId")
 );
@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLicenseBinding" (
     "LastCheckedAt" timestamptz NOT NULL,
     "LastEntitlementExpiresAt" timestamptz NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotLicenseBinding" PRIMARY KEY ("SchoolBotLicenseBindingId")
 );
@@ -73,10 +73,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRelease" (
     "PublishedAt" timestamptz NULL,
     "WithdrawnAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotRelease" PRIMARY KEY ("SchoolBotReleaseId")
 );
@@ -97,10 +97,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotIdempotency" (
     "CompletedAt" timestamptz NOT NULL,
     "ReplayUntil" timestamptz NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotIdempotency" PRIMARY KEY ("SchoolBotIdempotencyId")
 );
@@ -116,10 +116,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAuditEvent" (
     "RequestId" uuid NOT NULL,
     "Reason" varchar(1000) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotAuditEvent" PRIMARY KEY ("SchoolBotAuditEventId")
 );
@@ -145,10 +145,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotSession" (
     "ExpiresAt" timestamptz NOT NULL,
     "RevokedAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotSession" PRIMARY KEY ("SchoolBotSessionId")
 );
@@ -162,10 +162,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotStaffRole" (
     "ValidUntil" timestamptz NULL,
     "Reason" varchar(1000) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotStaffRole" PRIMARY KEY ("SchoolBotStaffRoleId")
 );
@@ -180,10 +180,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotProject" (
     "Name" varchar(200) NOT NULL,
     "CurrentRevision" integer NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotProject" PRIMARY KEY ("SchoolBotProjectId")
 );
@@ -196,10 +196,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotProjectRevision" (
     "Content" jsonb NOT NULL,
     "ContentHash" varchar(64) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotProjectRevision" PRIMARY KEY ("SchoolBotProjectRevisionId")
 );
@@ -218,10 +218,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevel" (
     "Ordinal" integer NOT NULL,
     "Title" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotLevel" PRIMARY KEY ("SchoolBotLevelId")
 );
@@ -234,10 +234,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevelPromotionPolicy" (
     "Threshold" numeric(9,6) NOT NULL,
     "Reason" varchar(1000) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotLevelPromotionPolicy" PRIMARY KEY ("SchoolBotLevelPromotionPolicyId")
 );
@@ -255,10 +255,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCurriculum" (
     "Lifecycle" varchar(16) NOT NULL,
     "PublishedAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotCurriculum" PRIMARY KEY ("SchoolBotCurriculumId")
 );
@@ -273,10 +273,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLesson" (
     "Objective" jsonb NOT NULL,
     "Instructions" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotLesson" PRIMARY KEY ("SchoolBotLessonId")
 );
@@ -291,10 +291,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotMission" (
     "Instructions" jsonb NOT NULL,
     "Method" varchar(16) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotMission" PRIMARY KEY ("SchoolBotMissionId")
 );
@@ -309,10 +309,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCriteria" (
     "ApprovedBy" varchar(512) NULL,
     "ApprovedAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotCriteria" PRIMARY KEY ("SchoolBotCriteriaId")
 );
@@ -329,10 +329,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotActivity" (
     "Indicators" jsonb NOT NULL,
     "Config" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotActivity" PRIMARY KEY ("SchoolBotActivityId")
 );
@@ -348,10 +348,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotQuestionBank" (
     "Lifecycle" varchar(16) NOT NULL,
     "PublishedAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NULL,
     CONSTRAINT "PK_SchoolBotQuestionBank" PRIMARY KEY ("SchoolBotQuestionBankId")
 );
@@ -375,10 +375,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRun" (
     "EffectiveAt" timestamptz NOT NULL,
     "Lifecycle" varchar(16) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotCourseRun" PRIMARY KEY ("SchoolBotCourseRunId")
 );
@@ -391,10 +391,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoringPolicy" (
     "Revision" integer NOT NULL,
     "Policy" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScoringPolicy" PRIMARY KEY ("SchoolBotScoringPolicyId")
 );
@@ -409,10 +409,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRunActivity" (
     "ClosesAt" timestamptz NULL,
     "PolicyOverride" jsonb NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotCourseRunActivity" PRIMARY KEY ("SchoolBotCourseRunActivityId")
 );
@@ -429,10 +429,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotSubmission" (
     "CurrentAssessmentId" integer NULL,
     "Evidence" jsonb NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotSubmission" PRIMARY KEY ("SchoolBotSubmissionId")
 );
@@ -448,10 +448,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotGradingJob" (
     "NextAttemptAt" timestamptz NOT NULL,
     "LastErrorCode" varchar(64) NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotGradingJob" PRIMARY KEY ("SchoolBotGradingJobId")
 );
@@ -471,10 +471,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAssessment" (
     "AssessorId" integer NULL,
     "SupersedesId" integer NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotAssessment" PRIMARY KEY ("SchoolBotAssessmentId")
 );
@@ -496,10 +496,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAttempt" (
     "EarnedScore" numeric(18,6) NULL,
     "MaxScore" numeric(18,6) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotAttempt" PRIMARY KEY ("SchoolBotAttemptId")
 );
@@ -513,10 +513,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRetakeGrant" (
     "Reason" varchar(1000) NOT NULL,
     "ConsumedAttemptId" integer NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotRetakeGrant" PRIMARY KEY ("SchoolBotRetakeGrantId")
 );
@@ -541,10 +541,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotGradeSlot" (
     "OwnershipReason" varchar(1000) NOT NULL,
     "RetiredAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotGradeSlot" PRIMARY KEY ("SchoolBotGradeSlotId")
 );
@@ -558,10 +558,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreMapping" (
     "Sources" jsonb NOT NULL,
     "RetiredAt" timestamptz NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScoreMapping" PRIMARY KEY ("SchoolBotScoreMappingId")
 );
@@ -578,10 +578,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreview" (
     "SupersedesId" integer NULL,
     "Context" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScorePreview" PRIMARY KEY ("SchoolBotScorePreviewId")
 );
@@ -595,10 +595,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreviewItem" (
     "ReasonCodes" jsonb NOT NULL,
     "Snapshot" jsonb NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScorePreviewItem" PRIMARY KEY ("SchoolBotScorePreviewItemId")
 );
@@ -611,10 +611,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreExport" (
     "ConfirmedAt" timestamptz NOT NULL,
     "State" varchar(32) NOT NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScoreExport" PRIMARY KEY ("SchoolBotScoreExportId")
 );
@@ -635,10 +635,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreOutbox" (
     "ReceiptHash" varchar(64) NULL,
     "LastErrorCode" varchar(64) NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotScoreOutbox" PRIMARY KEY ("SchoolBotScoreOutboxId")
 );
@@ -662,10 +662,10 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevelProposal" (
     "Reason" varchar(1000) NULL,
     "SuccessorRunId" integer NULL,
     "IsDelete" boolean NOT NULL DEFAULT false,
-    "CreateBy" integer NULL,
-    "CreateDate" timestamptz NOT NULL,
-    "UpdateBy" integer NULL,
-    "UpdateDate" timestamptz NOT NULL,
+    "CreateBy" integer NULL DEFAULT NULL,
+    "CreateDate" timestamptz NULL DEFAULT NULL,
+    "UpdateBy" integer NULL DEFAULT NULL,
+    "UpdateDate" timestamptz NULL DEFAULT NULL,
     "SchoolId" integer NOT NULL,
     CONSTRAINT "PK_SchoolBotLevelProposal" PRIMARY KEY ("SchoolBotLevelProposalId")
 );

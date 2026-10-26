@@ -4,7 +4,7 @@
 
 กดชื่อตารางเพื่อดูว่า 1 แถวหมายถึงอะไร ตัวอย่าง ผู้ใช้ข้อมูล ฟิลด์ครบทุกตัว และการเชื่อมตาราง ชนิด/NULL/ค่าเริ่มต้นอ้างจาก SQL ไม่ใช่การคาดเดา
 
-ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิมยังอยู่; ยังไม่ได้รันฐานจริง
+ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูลและ identity เดิมคงอยู่; CreateBy/CreateDate/UpdateBy/UpdateDate รับ NULL และ DEFAULT NULL ทุกตาราง; ฟิลด์อื่นคง nullability/default เดิม; ยังไม่ได้รันฐานจริง
 
 ## สิทธิ์ใช้แอปและผู้ใช้
 
@@ -77,6 +77,8 @@
 Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md)
 
 ## Change Log
+
+- 2026-10-26 — ตั้ง CreateBy/CreateDate/UpdateBy/UpdateDate เป็น nullable DEFAULT NULL ทุกตาราง
 - 2026-10-23 — Rev2: sync032..034; physicalเดิม
 
 - 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

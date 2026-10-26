@@ -14,7 +14,9 @@
 
 ยืนยันชนิดข้อมูล legacy จาก source: Academic `TmasterDbuser.cs:8`; School `Tuser.cs:8,142`, `Temployee.cs:8,92`, `TPlanCourse`, `TPlanCourseTeacher`, `TTerm`; PGGradeDB `Pgtgrade.cs`, `PgtgradeDetail.cs`, `Pgtassessment.cs`, `PgtgradeAuditLog.cs` (ดูรายละเอียดใน [source-review-002.md](source-review-002.md) และ [db/review-001.md](../db/review-001.md)).
 
-ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิมยังอยู่; ยังไม่ได้รันฐานจริง
+ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูลและ identity เดิมคงอยู่; CreateBy/CreateDate/UpdateBy/UpdateDate รับ NULL และ DEFAULT NULL ทุกตาราง; ฟิลด์อื่นคง nullability/default เดิม; ยังไม่ได้รันฐานจริง
+
+CreateBy/CreateDate/UpdateBy/UpdateDate ทุกตารางรับ NULL และ DEFAULT NULL ตามคำสั่งผู้ใช้ 2026-10-26; application เป็นผู้กำหนดค่าจาก server เมื่อเขียนข้อมูล
 
 ## Placement และ integrity
 
@@ -57,6 +59,8 @@ current pointers ทั้ง4คู่ยังมีคอลัมน์เ�
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-26 — ตั้ง CreateBy/CreateDate/UpdateBy/UpdateDate เป็น nullable DEFAULT NULL ทุกตาราง
 
 - 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 

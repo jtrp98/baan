@@ -132,7 +132,7 @@
 | [windows10-compatibility-001.md](windows10-compatibility-001.md) | ผลสำรวจความเข้ากันได้ของ Windows 10 (Rev1 · HISTORICAL — ผู้ใช้ยุติ Windows10 target ตาม decisions-019) |
 | [amendment-proposal-001.md](amendment-proposal-001.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026) |
 | [amendment-proposal-002.md](amendment-proposal-002.md) | ข้อเสนอแก้แบบ (Rev1 · APPLIED — sync เข้า Rev4/DBML Rev2 ตาม decisions-026 (แก้ 2 จุดตาม decisions-025)) |
-| [schoolbot.dbml](schoolbot.dbml) | DBML Rev7 — 32ตาราง/450ฟิลด์/PK32; ไม่มี UNIQUE/index blocks/FK; ผลตรวจใน planning/task-086.md |
+| [schoolbot.dbml](schoolbot.dbml) | DBML Rev7 — 32ตาราง/450ฟิลด์/PK32; ไม่มี UNIQUE/index blocks/FK; ผลตรวจล่าสุดใน planning/task-087.md; audit fields4ตัว nullable DEFAULT NULL |
 | [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพเชื่อม legacy Rev3 — 24ตาราง/112ฟิลด์; physical FK0/logical16; ห้ามใช้สร้าง SQL |
 | [dbml-guide-001.md](dbml-guide-001.md) | วิธีอ่านกลุ่มสี เส้นทึบ/ประ และข้อจำกัดของภาพ |
 | [dbml-review-001.md](dbml-review-001.md) | ผลตรวจ parser/ความครบถ้วน/เทียบ contract ก่อนและหลัง |

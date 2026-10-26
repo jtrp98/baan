@@ -7,7 +7,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PK32/UQ0/FK0/CHECK0; backing indexes เฉพาะ PK) | DRAFT Rev7 — ยังไม่รัน |
+| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PK32/UQ0/FK0/CHECK0; audit fields4ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | DRAFT Rev7 — ยังไม่รัน |
 | `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | DRAFT Rev7 — ยังไม่รัน |
 | `review-007.md` | vault ยืนยัน SEC001-009 replay TTL ของ create-license ไม่ต้องแก้ physical DDL (ใบงาน060c) | PASS (static) — read-time gate + cleanup job เป็นงาน application |
 | `pii-inventory-001.md` | ตารางจำแนก PII รายคอลัมน์ 32 ตาราง + ตารางข้อมูลเด็ก 9 ตาราง + flag F1–F7 ส่ง jpo — ตอบ SEC001-010 | สร้างแล้ว — รอ jpo พิจารณา |

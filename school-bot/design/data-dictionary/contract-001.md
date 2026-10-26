@@ -23,15 +23,17 @@ Legacy term identifier (`NTerm`) ใช้ `T64` ไม่ใช่ `K` หร�
 - อุปกรณ์/บริการ: `device:<H>`, `service:<name>`
 โดย integer ใช้ canonical decimal และ `name` ตรง `[A-Za-z0-9._-]{1,128}` จาก server เท่านั้น
 
+CreateBy/CreateDate/UpdateBy/UpdateDate ทุกตารางรับ NULL และมี DEFAULT NULL ตามคำสั่งผู้ใช้ 2026-10-26; ฐานข้อมูลไม่เติมวันเวลาให้อัตโนมัติ การกำหนดค่าจาก server ยังเป็นหน้าที่ application
+
 **ทุกตาราง** ด้านล่างมี common columns จริง 6 คอลัมน์ (ไม่มีคอลัมน์ `Version` — optimistic concurrency ใช้ `UpdateDate` ที่ server ตั้งด้วย `clock_timestamp()` เป็น opaque `ETag`/`If-Match` ตาม [decisions-030](../../requirement/decisions-030.md)):
 
 | Column | ชนิด/กฎ |
 |---|---|
 | IsDelete | B; เริ่ม false; soft delete โดย authorized operation |
 | CreateBy | I?; server กำหนด — `sEmp` ของพนักงาน/ครู หรือ `sId` ของนักเรียนที่ทำรายการ; `null` = ระบบทำเอง (เช่น ตัวตรวจอัตโนมัติ, worker, งานตามกำหนด หรือ legacy admin ที่ไม่มี `sEmp`); ชนิดผู้ทำเต็มอยู่ใน `SchoolBotAuditEvent.Actor` ตาม [decisions-028](../../requirement/decisions-028.md) |
-| CreateDate | D; server UTC |
+| CreateDate | D?; DEFAULT NULL ใน DB; server UTC เมื่อ application กำหนด |
 | UpdateBy | I?; เริ่มเท่ากับ CreateBy; กฎเดียวกับ CreateBy |
-| UpdateDate | D; เริ่มเท่ากับ CreateDate; ทุกการ UPDATE ต้องตั้งด้วย `clock_timestamp()` บน server และใช้เป็น concurrency token (`ETag`/`If-Match`) ตาม [decisions-030](../../requirement/decisions-030.md) |
+| UpdateDate | D?; DEFAULT NULL ใน DB; เมื่อ application กำหนดจะเริ่มเท่ากับ CreateDate; ทุกการ UPDATE ต้องตั้งด้วย `clock_timestamp()` บน server และใช้เป็น concurrency token (`ETag`/`If-Match`) ตาม [decisions-030](../../requirement/decisions-030.md) |
 | SchoolId | S?; non-null (`SchoolId > 0`) ยกเว้น global rows ที่กำหนดให้ `SchoolId = null` ด้านล่าง |
 
 ทุกตาราง SchoolBot มี PK `SchoolBot<Entity>Id:K` ที่ server จัดสรร (`GENERATED ALWAYS AS IDENTITY`); ไม่มี SQL FOREIGN KEY. ฟิลด์อ้างอิงเดิมยังเก็บ int4 และ application ต้องตรวจแถวแม่ SchoolId และบริบทเอง; CurrentRevision อ้าง ProjectId/Revision เชิงตรรกะ ไม่ใช่ composite FK
