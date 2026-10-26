@@ -33,6 +33,7 @@
 - Bgrpcsysrework1DONE (run0WAi50): writer4032regressionและ9targetedprobesผ่าน แต่รอindependentcheckใหม่ไม่รับsemanticchoicesของwriterเป็นcontract. เปิดcheckBเมื่อGhelpercheckจบ; sysauthrework2เขียนเฉพาะAuth/45testsขนานกับBcheckที่อ่านgrpcfilesเสถียร. Parent4032รอบแรกTestRunAbortedเพราะdatacollectorIPC90sในsandbox ไม่ใช่assertionfail ส่งรันซ้ำด้วยlocalIPCpermissions.
 - GhelperrecheckPASS433/433และparent433/433ตามcheck-089-gateway-r1-001. กวาดรอindependentrecheckก่อนแก้QAstatus (แก้ตามsweep); เก็บslice089r1เป็นประวัติก่อนcheck. Gtypedwriterยังทำคนละไฟล์.
 - ParentBregressionretryผ่าน4032/0/0exit0duration5s บันทึกslice-089-grpc-r1-001. กวาด “กำลังแก้รอบ1” และแก้module/design/QAindexเป็นrepairDONEรอwirecheck (แก้ตามsweep); ไม่เปลี่ยนผลcheck088ย้อนหลัง. Authrework2กำลังทำ ไม่ส่งBหรือGintegrationเป็นverifiedจากregression.
+- Authrework2DONE; parent4077ผ่านและpersistent45casesตรงexactcheckpatchตามslice-089-auth-r2-001. กวาดรอแก้รอบ2ก่อนเปลี่ยนQAstatusเป็นรอfinalcheck. เปิดsysCodexT2numerichelpersเมื่อAuthwriterจบ; ไม่แตะAuth/Grpcที่checkอ่านอยู่.
 - กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
 
 ## Change Log
