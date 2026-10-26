@@ -15,7 +15,7 @@
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 80 cases/185 AC (Amendment002+003 — AC GAP-07 ตรวจรับแล้ว) + TP-002 fixture plan; actual ทุกเคส NOT_RUN |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
-| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | UX อนุมัติ 5/7 ชุด: Entry, Labs, Projects, Learning, Mapping ตาม decisions-036..041; UX-005/007 กำลังร่าง; implementation ต้องผ่าน backend/contract gates ของแต่ละงานด้วย |
+| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | UX อนุมัติ 5/7 ชุด: Entry, Labs, Projects, Learning, Mapping ตาม decisions-036..041; UX-005/007 มีร่างและผลตรวจความครบถ้วน check066 แล้ว รอจัดเอกสารขั้นสุดท้าย/ผู้ใช้เซ็น; implementation ต้องผ่าน backend/contract gates ของแต่ละงานด้วย |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; รอบ060 ฝัง mitigation SEC001-003/009 ระดับแบบ + jpo ตรวจรับ (security-gap-sync-review-001); ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
@@ -23,6 +23,8 @@
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง (ย้ายมาจาก root วันที่ 2026-10-22) | 001: บทเรียนและสร้างงาน 3 โหมด · 002: account/profile/tenant ของ Academic · 003: Course Plan Sheet ป.1–ป.6 · 004: ระบบเกรด PGGradeDB (ทาง A) · 005: score writer อยู่ `sb-service-academic-score-record` นอก workspace (BLOCKED) |
 
 สถานะปัจจุบัน 2026-10-26: [ใบงาน062](planning/task-062.md) เดินต่อ UX-005/UX-007 และเตรียมรับรอง Gateway/DB; 15 verified/95 pending ตามผลตรวจใบงาน061. กติกา runner ล่าสุดจากผู้ใช้: T0–T2 ใช้ Codex, T3–T5 ใช้ AGY และไม่ fallback ข้าม runner. รายการลงวันที่ก่อนหน้าด้านล่างเป็นประวัติ; ไม่ใช้ยอด pending110 เก่าทับสถานะปัจจุบัน
+
+คิวปัจจุบัน: [Queue 004](plan/queue-004.md) · [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · [ผล sync status JSON ตาม verdict เดิม](planning/status-sync-062-001.json) · [ผลตรวจร่าง UX-005/007](planning/check-066-ux-review-001.md). ผลตรวจร่างไม่ใช่ human sign-off หรือ runtime acceptance
 
 เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
 

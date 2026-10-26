@@ -30,3 +30,6 @@
 ## Change Log
 
 - 2026-10-26 — เปิดรอบตามคำสั่งผู้ใช้และกำหนด runner routing ข้างต้น
+- 2026-10-26 — รับร่าง int063/064 เป็น 7 ไฟล์ + ช่องว่างสัญญาที่ส่ง arch067; check066 PASS ความครบถ้วนทั้งสองชุด (27 AC entries/25 AC ไม่ซ้ำ) ยังไม่มี human sign-off. ส่ง int070 จัดแบ่งไฟล์และใช้กฎเฉพาะเว็บครู P9 ให้ตรง repoก่อนส่งเซ็น
+- 2026-10-26 — รับ gm065 สร้าง queue-004/owner-packet-001 และ exact editsแผน; ผู้คุม sync15statusตามverdict061แล้ว (status-sync-062-001.json), ตรวจDAG/owner/tier/effort/phase/gatesเดิมไม่เปลี่ยน. spec068เติมregistry039–041; inspect069แยกJoined snapshot180/77จากTPปัจจุบัน185/80. ไม่มี code/SQL/runtime/approvalใหม่
+- 2026-10-26 — arch067 timeout600sไม่มีanswer; บันทึกexecutionreceiptแยกและส่งtask071ขอบเขตgapreceiptเท่านั้น. ไม่อ้างว่าสัญญาAPIครบหรือเปิดimplementation

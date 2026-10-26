@@ -27,3 +27,4 @@ K=C:/src/schoolbright/knowledge/school-bot. อ่าน K/index.md → design/i
 
 ## Change Log
 - 2026-10-26 — routeจากint063/064ตามช่องว่างจริงที่ต้องตรวจ; Codex t1ตามผู้ใช้
+- 2026-10-26 — runnerหมดเวลา600วินาที ไม่มีanswer (arch-067-timeout-001.json); ไม่รับartifact/ไม่อ้างว่าสัญญาใหม่ครบ. แยกscopeยืนยันgapและrouteในtask-071 โดยคงCodex t1
