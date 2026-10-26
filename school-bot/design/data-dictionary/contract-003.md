@@ -2,7 +2,7 @@
 
 [กลับคู่มือ](../data-model.md) · [สารบัญสัญญา](contract-index.md)
 
-ข้อความจาก data-model Rev5 คงชื่อฟิลด์ ชนิด และกฎเดิม ใช้คู่กับคำอธิบายรายตาราง
+ฐานชนิด/fieldsจากdata-modelRev5 พร้อมJSONreconciliationarch091/DES011ตามChangeLogRev3 ใช้คู่คำอธิบายรายตาราง; physicalfields/SQLเดิม ไม่อนุมัติstored-datarewrite.
 
 ## Enums และ embedded types
 
