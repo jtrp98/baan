@@ -4,7 +4,8 @@
 |---|---|---|
 | [round001](round-001.md) | local logout + Gateway web outcome component | PASSเฉพาะlocalscope; PG/fullLogin NOT_RUN |
 | [check089-auth-final](../planning/check-089-auth-math-final-001.md) | compatibilityrework2 exact45cases | PASS45/45เฉพาะsubset; C1–C10/fullLoginpending |
-| [check089-math](../planning/check-089-auth-math-final-001.md) | weighted/conversionpurehelpers | WeightedPASS37/37; ConversionFAIL31pass/2fail precision/half-up รอrework1 |
+| [check090-math](../planning/check-090-math-r1-001.md) | weighted/conversionpurehelpersrework1 | PASSWeighted37/Conversion33/additional9; ownerlabelpatchพร้อม รอinstall/fullsuite4147 |
+| [check089-Gtyped](../planning/check-089-gateway-typed-001.md) | HTTP→typedprotobuf→gRPC TestServer | FAIL258pass/2fail errorleak/bodydeadline; rework1กำลังทำ Importantรอjpo |
 | [check089-grpc-r1](../planning/check-089-grpc-r1-001.md) | BtypedgRPCLogoutหลังrework1 direct/wire/log150assertions | FAIL119pass/31fail; เหลือ4groups รอexactnegativeboundaryจากarchก่อนsysrework2 |
 | [check089-Ghelper-r1](../planning/check-089-gateway-r1-001.md) | G requestpreparationหลังแก้รอบ1 | PASS433/433; parentรันซ้ำ433ผ่าน เป็นhelpersubsetไม่ใช่fullG |
 | [localprojects089](../planning/slice-089-local-projects-001.md) | Go v2store/migration | parentexistingGotests/vetผ่าน; newpackageno tests รอindependentcheck |
