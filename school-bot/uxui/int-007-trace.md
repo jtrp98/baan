@@ -12,13 +12,13 @@
 
 | AC | ส่วนร่าง / expected | หลักฐาน |
 |---|---|---|
-| AC-046-01 | หลัก §2 เห็นกติกาที่มีผล ไม่ผูกตามชื่อ | requirement/req-046.md:22; design/des-010.md:37–49 |
-| AC-046-02 | หลัก §2 ค่าเริ่มและการจำกัดจริง; states §1–3 | requirement/req-046.md:23; design/des-010.md:42–46 |
-| AC-046-03 | หลัก §2 ครั้งเดิมคงชุด/ลำดับจาก server; ข้อจำกัดด้านล่าง | requirement/req-046.md:24; design/des-010.md:89–100 |
-| AC-046-04 | หลัก §2 snapshot เดิมไม่เปลี่ยน; ไม่แต่ง revision ที่ไม่คืน | requirement/req-046.md:25; design/des-010.md:22 |
-| AC-046-05 | เว็บ T1 เฉพาะเวลา/เปิด–ปิด; field อื่นอ่านอย่างเดียว | requirement/req-046.md:27; design/learning-rules-032-034.md:20–21 |
-| AC-046-06 | เว็บ T2 ก ได้ใบ ข ไม่ได้; 6→9 ใช้ 9; ซ่อม 5 คง 6 | requirement/req-046.md:28; design/des-010.md:51–54 |
-| AC-046-07 | Q43; recovery delta042: 4/10 ไม่รับย้อนหลัง นับสิทธิ์เดิม | requirement/req-046.md §AC-046-07; requirement/decisions-042.md |
+| AC-046-01 | หลัก §2 เห็นกติกาที่มีผล ไม่ผูกตามชื่อ | requirement/req-046.md:24; design/des-010.md:37–49 |
+| AC-046-02 | หลัก §2 ค่าเริ่มและการจำกัดจริง; states §1–3 | requirement/req-046.md:25; design/des-010.md:42–46 |
+| AC-046-03 | หลัก §2 ครั้งเดิมคงชุด/ลำดับจาก server; ข้อจำกัดด้านล่าง | requirement/req-046.md:26; design/des-010.md:89–100 |
+| AC-046-04 | หลัก §2 snapshot เดิมไม่เปลี่ยน; ไม่แต่ง revision ที่ไม่คืน | requirement/req-046.md:27; design/des-010.md:22 |
+| AC-046-05 | เว็บ T1 เฉพาะเวลา/เปิด–ปิด; field อื่นอ่านอย่างเดียว | requirement/req-046.md:29; design/learning-rules-032-034.md:20–21 |
+| AC-046-06 | เว็บ T2 ก ได้ใบ ข ไม่ได้; 6→9 ใช้ 9; ซ่อม 5 คง 6 | requirement/req-046.md:30; design/des-010.md:51–54 |
+| AC-046-07 | Q43; recovery delta042: 4/10 ไม่รับย้อนหลัง นับสิทธิ์เดิม | requirement/req-046.md §AC-046-07; requirement/decisions-042.md |
 | AC-047-01 | เว็บ S1 แยกรายหลักสูตร รวม 100% และ Quiz ไม่นับ=0 | requirement/req-047.md:20; design/learning-rules-032-034.md:13–17 |
 | AC-047-02 | เว็บ S1 Quiz ยังมีผล แต่เปลี่ยน Quiz น้ำหนัก0 ไม่เปลี่ยนรวม | requirement/req-047.md:21; design/des-010.md:48–49 |
 | AC-047-03 | เว็บ S1 อ่านค่าที่บันทึกของ A โดย B ไม่เปลี่ยน | requirement/req-047.md:22; design/des-010.md:75–78 |
@@ -41,7 +41,7 @@ Retry/error/opaque ETag ใช้ `design/data-contract-rules.md:41–66` ไม
 
 1. Resume: AttemptView ไม่มี answers และไม่มีรายการค้นหา attempt ค้างใน DES-010:86–100 แม้ข้อมูล Answers มีใน dictionary contract-002:34 จึงร่างการกลับเข้าครั้งเดิมเมื่อทราบ ID ได้ แต่ยังรับรองการกู้คำตอบ/ค้นหาหลังเปิดแอปใหม่ไม่ได้ ให้ arch ระบุวิธีตามสัญญาก่อน front ทำส่วนนี้
 2. Policy/revision/history: snapshot เก็บไว้ตาม DES-010:22 และ learning-rules:21 แต่ AttemptView ไม่คืน effective_policy, bank_revision, evaluator_version หรือประวัติทุกครั้ง จึงยังทำรายละเอียดย้อนหลังครบ AC-046-03/04 จาก response นี้อย่างเดียวไม่ได้ ห้ามเติม field หรือ endpoint ใน UX เอง
-3. หมดเวลา: business ตอบ A ตาม042/AC-046-07 แล้ว; ยังไม่มี amend076 ของ DES-010/LUX-05 รอ arch/sys ตรึง clock/race/retry/DTO/lifecycle/recovery ไม่รับรอง runtime
+3. หมดเวลา: business ตอบ A ตาม042/AC-046-07 แล้ว; รับ Amendment076 แล้วตาม design/des-010.md:123–135 และ design/learning-ux-contract-gaps-001.md:13,24; technical proof ยัง OPEN: clock/deadline, save/submit/expiry race, idempotent finalization, crash/retry/recovery, read ระหว่าง finalize และ reveal mapping รอ arch/sys ตรึงและพิสูจน์ ไม่รับรอง runtime
 4. Aggregate/Level: ProgressView ที่ DES-005:96–97 มีผลที่เลือก แต่ไม่มี aggregate snapshot/breakdown; ProposalView ที่ DES-011:56–64 ไม่คืน roster/source refs/policy revision ทั้งชุด แม้ server เก็บ snapshot ตาม :30 จึงห้ามนำผลสดมาประกอบอ้างเป็น snapshot เดียวกัน ส่วนรายละเอียดที่ยังอ่านไม่ได้รอ arch ระบุช่องทางในขอบเขตเดิม
 5. Authority/term resolver และการหาทรัพยากรหลัง unknown ที่ไม่มี ID ยังต้องพิสูจน์; ใช้ fail closed ไม่สร้างทางค้นหาหรือสิทธิ์เพิ่มเอง ตาม teacher-authority:17 และ DES-011:81–82
 
@@ -53,8 +53,11 @@ Retry/error/opaque ETag ใช้ `design/data-contract-rules.md:41–66` ไม
 
 ใช้ skill School Bright ตามพาธในใบงาน ตรวจ token/contrast ด้วยการคำนวณเท่านั้น ไม่รัน test/build/SQL/network/Git ไม่แก้ index/status/sign-off เดิม และไม่เขียนไฟล์จริง
 
-## Change Log
-
+## Change Log
+
+
+
+- 2026-10-26 — ใบงาน081: แก้ C080-01..03 เฉพาะ pointer Amendment076 ตาราง 16 AC/3 columns และบรรทัด AC-046-01..06; คง technical proof OPEN และ business/copy/UX sign-off/AC/Q39–46 เดิม
 - 2026-10-26 — 077: delta042 รอ Q43
 
 
