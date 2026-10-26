@@ -5,7 +5,7 @@
 
 ## Transport — precedence ใบงาน049 (2026-10-24)
 
-Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — มีBtypedserver/Grequesthelperแล้ว; [Bcheck101cases](../planning/check-088-grpc-001.md)ผ่าน80/ตก21, [Gbuild](../planning/slice-088-gateway-001.md)ติดpackages; production registration ปิด; หยุดตาม048/[handoff004](../planning/handoff-004.md)
+Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — มีBtypedserver/Grequesthelperแล้ว; [Bcheck101cases](../planning/check-088-grpc-001.md)ผ่าน80/ตก21 กำลังแก้รอบ1ใน [089](../planning/task-089.md), [Gbuild](../planning/slice-088-gateway-001.md)ติดpackages; production registration ปิด
 
 ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
 

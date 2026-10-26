@@ -20,6 +20,12 @@
 
 เก็บคำถามธุรกิจ/สัญญา/schema/SQL/shared environment/security risk/hardware ไว้ถามพร้อมกันเมื่อไม่มีงานพร้อม. ไม่ถาม dev Gateway/replay900/UX7ชุดซ้ำ; signer/custodyยังพักตาม047. ไม่ commit/push/switch source Git ไม่รัน SQLจริง/deploy/hardware.
 
+## Checkpoint และ related-impact sweep
+
+- เปิด check Codex T2 และ gm Codex T2 แล้ว. AGY T3 ครั้งแรก failed เพราะ headless read_file permission ไม่มี output/code verdict (run `2026-10-26-09-50-05-sys-tier-t3-1agents-jAWwt2`); ใช้ setup/agy/grant-read.mjs เพิ่ม read-only เฉพาะ knowledge/school-bot แล้วลองใหม่ ไม่เปิด write/add-dir/skip-permissions.
+- Gateway fetch-sb-packages.ps1 exit1: ไม่มี SB_NUGET_TOKEN/GITHUB_TOKEN และ gh ไม่อยู่ใน PATH; package availability ยัง blocked ไม่ใช่ assertion failure.
+- กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
+
 ## Change Log
 
 - 2026-10-26 — รับ CONTINUE-NORMAL และโมดูลที่ผู้ใช้เลือก พร้อม lint ก่อน dispatch.
