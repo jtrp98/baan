@@ -12,6 +12,20 @@
 
 IDEMPOTENCY_CONFLICT ให้หยุดและตรวจรายการเดิม ไม่สร้าง key ใหม่เพื่อหลบ; IDEMPOTENCY_EXPIRED ใช้ resource_id เมื่อ server อนุญาตให้รู้ หากไม่มีทางอ่านผลให้คงสถานะไม่ทราบผลและติดต่อผู้ดูแล ไม่สรุปว่าไม่เคยบันทึก สำเร็จแล้วจึงใช้ข้อความยืนยันคงอยู่ในหน้า; toast เป็นข้อมูลเสริมเท่านั้น
 
+## delta042
+
+ฐาน042/BR-046-07/AC-046-07; ข้อเสนอ copy/interaction รอ Q43 รวม int-004 §8 delta; Q22–Q29 คงมติเดิม 042ไม่ใช่ UX sign-off
+
+หมดเวลา: ล็อกแก้/บันทึก/ส่ง → “หมดเวลา — กำลังประมวลผลคำตอบที่บันทึกทันเวลา” → อ่านผล server ที่ยืนยันได้ ไม่อ้างว่าผู้เรียนกดส่ง
+
+expired มีผลตรวจได้: “หมดเวลา — คะแนนครั้งนี้ 4/10” เมื่อ policy เปิดคะแนน; ก่อนเปิดใช้ “หมดเวลา — คะแนนและเฉลยจะแสดงตามกำหนด” feedback ตาม policy; ไม่ตี expired/null เป็นไม่มีคะแนนหรือ 0
+
+ตัวอย่างมติ: 10 ข้อละ 1 บันทึกทัน 6 ถูก 4 ค้างเครื่อง 2 ว่าง 2 ได้ 4/10; ไม่บันทึกเลย 0/10 ข้อว่าง 0 เต็มทั้งชุด นับครั้ง/สิทธิ์ซ่อมเดิม ไม่คำนวณคะแนนเอง
+
+unknown/error: “ยังยืนยันผลเมื่อหมดเวลาไม่ได้ — ตรวจสอบการเชื่อมต่อแล้วตรวจสอบผล” ปุ่ม “ตรวจสอบผล” อ่านครั้งเดิม; offline ไม่ส่ง/retry answers หรือ submit ค้างย้อนหลัง ไม่เดาผล/แสดงสำเร็จ อ่านผลไม่ได้ให้ติดต่อผู้ดูแล
+
+aria-live polite ประกาศหมดเวลา/ผลครั้งเดียว; ย้าย focus ไปสถานะเมื่อตัวควบคุมที่ใช้อยู่ถูกปิด; คง keyboard/contrast/reduced-motion เดิม EN: “Time expired — Processing saved answers” / “Expiry result not yet confirmed”
+
 ## 4. SchoolBright / a11y
 
 Desktop และ admin ส่วนกลางใน school-bot ใช้กติกาของตน: TH Sarabun New เนื้อหา 16/32px หัวข้อ 24/48px; spacing ทวีคูณ 8px, radius 12px, target ≥48×48px เว็บใช้ sidebar/header เดิมและ cyan #09C6DD; Desktop app ใช้ orange #FF7A62 ไม่สร้าง shell หรือย้าย framework
@@ -31,6 +45,8 @@ Tab ตามลำดับงาน มี focus outline ชัดและไ
 ไม่มี animation ตกแต่ง เคารพ prefers-reduced-motion: web-system ใช้ shared Skeleton ที่หยุด shimmer ตามกฎ repo และให้ sb-reveal/แถบ progress เคารพ reduced-motion ตามของกลาง โดยคงสถานะที่อ่านได้; ยังไม่ได้ตรวจ implementation ส่วน Desktop/ส่วนกลางที่ใช้ Spinner คงข้อความสถานะและรูปคงที่เมื่อจำกัด motion ภาษาไทยเป็นหลัก สลับ EN ทั้งหน้า เช่น “กำลังบันทึกคำตอบ… / Saving answers…” และ “ยังยืนยันผลการส่งไม่ได้ / Submission not yet confirmed”; เนื้อหาใช้ Text locale ตามสัญญา
 
 
-## Change Log
+## Change Log
+
+- 2026-10-26 — 077: delta042 รอ Q43
 
 - 2026-10-26 — นายช่างแบ่งไฟล์เชิงกลจากเนื้อหา int เดิม ย้ายแต่ละ section ตรงตามต้นฉบับ ไม่เปลี่ยนกฎ ข้อเสนอ หรือคำถามเซ็น
