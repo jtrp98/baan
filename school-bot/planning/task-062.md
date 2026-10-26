@@ -35,3 +35,5 @@
 - 2026-10-26 — arch067 timeout600sไม่มีanswer; บันทึกexecutionreceiptแยกและส่งtask071ขอบเขตgapreceiptเท่านั้น. ไม่อ้างว่าสัญญาAPIครบหรือเปิดimplementation
 - 2026-10-26 — รับ arch071 DONE เฉพาะ gap receipt LUX-01..07 (ทุกgapยังOPEN); spec072ตรวจมติ/OQแล้วเสนอคำถามexpiredA/Bรอผู้ใช้ ไม่amendREQ/ACหรือบันทึกการเลือกแทน
 - 2026-10-26 — int070ส่งexactP9/rulepriority/indexeditsแต่stateBLOCKEDเพราะไม่สามารถบรรจุsection-splitเต็มในresponsebudget; ผู้คุมบันทึกeditsที่ส่งจริงแล้วแก้ส่วนบันทึกที่เหลือด้วยการแบ่งsectionเชิงกลจากร่างเดิมเป็น11ไฟล์ (แต่ละไฟล์<=11000UTF8bytes). เก็บต้นฉบับก่อนแบ่งและSHA256รายsectionที่ux-mechanical-split-062-001.json ไม่เพิ่มเนื้อหาธุรกิจหรือเปลี่ยนQ39–Q46; ส่งcheck073ตรวจsavedartifactsใหม่
+
+- 2026-10-26 — รับมติAจริงเป็น042/AC04607; arch076/int077/inspect078/gm079syncครบเป็น186AC81cases. check080พบ3จุดเอกสาร→081แก้→082PASSครบ. ปิดรอบเอกสารตามhandoff003 รอhumanUXsignoffและowner/API/DBprerequisitesก่อนลงโค้ด

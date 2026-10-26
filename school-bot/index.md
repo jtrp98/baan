@@ -15,7 +15,7 @@
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases/186 AC (รวม Amendment004/TP001-081 ตามมติ042); Traceability/Joined JSON เก็บ snapshot180/77 พร้อม pointer; actual ทุกเคส NOT_RUN |
 | `review\index.md` | สารบัญ review findings | ยังไม่มีเอกสาร |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
-| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | UX อนุมัติ 5/7 ชุด: Entry, Labs, Projects, Learning, Mapping ตาม decisions-036..041; UX-005/007 มีร่างและผลตรวจความครบถ้วน check066 แล้ว รอจัดเอกสารขั้นสุดท้าย/ผู้ใช้เซ็น; implementation ต้องผ่าน backend/contract gates ของแต่ละงานด้วย |
+| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | UX อนุมัติ 5/7 ชุด: Entry, Labs, Projects, Learning, Mapping ตาม decisions-036..041; UX-005/007 ร่างครบ; check073และ080/082ตรวจเอกสารครบแล้ว รอผู้ใช้เซ็น Q39–Q46 รวมdelta042; implementation ต้องผ่าน backend/contract gates ของแต่ละงานด้วย |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Static review: Important6/Medium6/Minor3 OPEN; รอบ060 ฝัง mitigation SEC001-003/009 ระดับแบบ + jpo ตรวจรับ (security-gap-sync-review-001); ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001 เอกสารconstraints; BL-002..004 ข้อพบของG/A/legacyนอกscope ยังไม่ผ่านsecuritytriageเจ้าของระบบ |
 | `db\` | SQL DDL/rollback + review (`review-001..006.md`, `schoolbot_db.sql`) — convention เฉพาะโปรเจกต์ | DRAFT Rev5 (32 ตาราง, ยังไม่รัน); review-006 ส่ง design gaps ให้ arch |
@@ -26,7 +26,7 @@
 
 คิวปัจจุบัน: [Queue 004](plan/queue-004.md) · [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · [ผล sync status JSON ตาม verdict เดิม](planning/status-sync-062-001.json) · [ผลตรวจร่าง UX-005/007](planning/check-066-ux-review-001.md). ผลตรวจร่างไม่ใช่ human sign-off หรือ runtime acceptance
 
-รอบสัญญาที่ UX ต้องใช้: [gap receipt 7 กลุ่มจาก arch071](design/learning-ux-contract-gaps-001.md) — technical proof ยัง OPEN. ผู้ใช้เลือก A แล้วตาม [decisions-042](requirement/decisions-042.md): หมดเวลาตรวจคำตอบที่บันทึกทันเวลาอัตโนมัติ; [ข้อเสนอเดิม](requirement/expired-attempt-decision-proposal-001.md) เก็บเป็นประวัติ. ข้อเทคนิคอื่นให้ arch/sys รับต่อ ไม่ให้ผู้ใช้เดา DTO/schema; UX delta042 รอเซ็น Q43 ร่วมกับชุด007
+รอบสัญญาที่ UX ต้องใช้: [gap receipt 7 กลุ่มจาก arch071](design/learning-ux-contract-gaps-001.md) — technical proof ยัง OPEN. ผู้ใช้เลือก A แล้วตาม [decisions-042](requirement/decisions-042.md): หมดเวลาตรวจคำตอบที่บันทึกทันเวลาอัตโนมัติ; [ข้อเสนอเดิม](requirement/expired-attempt-decision-proposal-001.md) เก็บเป็นประวัติ. ข้อเทคนิคอื่นให้ arch/sys รับต่อ ไม่ให้ผู้ใช้เดา DTO/schema; UX delta042ตรวจเอกสารแล้ว รอเซ็น Q43 ร่วมกับชุด007
 
 เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
 
@@ -122,3 +122,4 @@
 - 2026-10-21 — บันทึก decisions-016 ปิด OQ-006; ผู้ใช้ตรวจรับภาพรวม ทีมเสนอรุ่นหุ่น/OS ให้ตรวจภายหลัง
 - 2026-10-21 — บันทึก decisions-015: ถังขยะ 30 วัน ทีมร่างหลักสูตรให้ตรวจ และกำหนด scope ครูรายชื่อนักเรียน
 - ประวัติก่อนหน้า: [ชุด 1](planning/history-001.md), [ชุด 2](planning/history-002.md)
+- 2026-10-26 — ปิดผลตรวจเอกสารรอบ062ตาม [handoff003](planning/handoff-003.md); ยังไม่มีcode/runtimeหรือhumanUXsign-offใหม่

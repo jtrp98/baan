@@ -9,7 +9,7 @@
 ## Waiting on Human
 - G/Light/infra/B/BFF: รับรองและตอบ H5 ตาม [owner packet](owner-packet-001.md); contract ยัง PROPOSED, fullLogin NOT_READY.
 - ผู้ใช้: forward [DB cover](../db/db-safe-evidence-cover-001.md); เจ้าของ DB ส่ง EV-01..03→04/05→06 optional ตามชุดเดิม. ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว.
-- UX signed 5/7 ตาม decisions-036..041; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; รอ check080→ผู้ใช้เซ็น UX-005/007 และ expired-copy delta. signed baseline5ชุดคงเดิม; รับ actual076/077แล้ว; check080กำลังตรวจ.
+- UX signed 5/7 ตาม decisions-036..041; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; check080/082ตรวจครบแล้ว; รอผู้ใช้เซ็น UX-005/007 และ expired-copy delta. signed baseline5ชุดคงเดิม; รับ actual076/077แล้ว; check080ผ่าน7กลุ่มและข้อพบ3จุดแก้ครบตามcheck082 PASS; UXใหม่ยังรอเซ็น.
 - spec Q3 รุ่นหุ่น/firmware/calibration/stop-unplug-emergency, ผู้ถือ cert/ช่องทางแจกจ่าย และ security/SQL/runtime gates ยังรอคน; หุ่นจริงยังไม่อนุญาตตาม038.
 
 ## คิวที่ทำได้ในรอบเอกสาร
@@ -42,3 +42,4 @@ DBA-002 ยังรอ SA-001/BE-001 แม้ DBA-001 verified; SQL/rollback/c
 - 2026-10-26 — 074: แทนคิวร่าง/JSONรอapply ของ065 ด้วยหลักฐาน062/066/070/split/071/072; ไม่มีผล073หรือ approval ใหม่.
 - 2026-10-26 — ใบงาน065: sync ยอด/verdict/runner และคิวจริง; คง IDs/DAG/effort/owner/tier/gate definitions และ frozen scope.
 - 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
+- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม [check082](../planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure

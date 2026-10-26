@@ -35,7 +35,7 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 ## 4. ลำดับเปิดงานและหลักฐานภายหลัง
 1. ผู้ใช้ส่ง packet/DB cover; รับคำตอบ G/Light/infra/BFF และ EV ตามลำดับข้างต้น. service-route คงปิดระหว่างรอ.
 2. arch/sys reconcile คำตอบกับ contract เดิมผ่านผู้คุม; ตรึง DTO/trailer/manifest และ Login prerequisites ตาม operation. B เป็นเจ้าของ .proto แล้ว sync G หลัง owner รับรอง พร้อม parser/codegen/hash.
-3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-004; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; รอ check080→ผู้ใช้เซ็น UX-005/007 และ expired-copy delta แยกจาก owner approval. signed baseline5ชุดคงอยู่; รับ actual076/077แล้ว; check080กำลังตรวจ หรือ sign-off ใหม่.
+3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-004; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; check080/082ตรวจครบแล้ว; รอผู้ใช้เซ็น UX-005/007 และ expired-copy delta แยกจาก owner approval. signed baseline5ชุดคงอยู่; รับ actual076/077แล้ว; check080ผ่าน7กลุ่มและข้อพบ3จุดแก้ครบตามcheck082 PASS; UXใหม่ยังรอเซ็น หรือ sign-off ใหม่.
 4. Runtime ภายหลัง: HTTP↔RPC mapping, private reachability/no-loop/wrong-peer, spoof/tenant, deadline/cancel/retry/limits/BFF security และ SQL/rollback/catalog/grade proof บน environment ที่คนอนุญาต. 4032 local tests ใช้แทน integration ไม่ได้.
 5. Bootstrap ตาม procedure ที่ review แล้วโดยมนุษย์และผู้ตรวจซ้ำ; shared/production SQL/deploy ต้องมีคำสั่งเจาะจงภายหลัง. Login end-to-end คงปิดถ้า linkage/continuation/device-proof ไม่ครบ. gm รวม release runbook เมื่อหลักฐาน/ชิ้นส่วนครบ.
 
@@ -47,3 +47,4 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 - 2026-10-26 — 074: เพิ่ม pointers/แก้คิว UX; ไม่เพิ่ม approval.
 - 2026-10-26 — ใบงาน065: รวมชุด owner review พร้อมส่ง; แยก approval/DB evidence/UX sign-off/runtime. ไม่มี approval, H5/G-CORE closure หรือคำอนุญาตรันระบบเกิดจากการสร้าง packet.
 - 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
+- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม [check082](../planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure

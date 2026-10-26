@@ -1,0 +1,101 @@
+{
+  "work_date": "2026-10-26",
+  "scope": "documents offered for human sign-off; no product/runtime acceptance",
+  "files": [
+    {
+      "path": "requirement/decisions-042.md",
+      "sha256": "8b49cf81c211d88d5d9244627ebae968778aa73adaf57d93df7cef69848c9cd8",
+      "bytes": 3466
+    },
+    {
+      "path": "requirement/req-046.md",
+      "sha256": "8ea0d7b655ff79c55cc32eceb74bbc1e2651fe2cc92c572c9c702eeda086d73c",
+      "bytes": 4073
+    },
+    {
+      "path": "design/des-010.md",
+      "sha256": "c37adfdee0e8c967c6ea33610e29ec0a5324ec5b7b6c8ce10193877ebd4580ab",
+      "bytes": 16592
+    },
+    {
+      "path": "test-plan/tp-001-amendment-004.md",
+      "sha256": "14f36e8f94d90e7e5fbeb0fd6e6c395cbdc6b037f0b7a1a8c0f5a71381c9dc20",
+      "bytes": 4701
+    },
+    {
+      "path": "plan/tasks-001.json",
+      "sha256": "96159e0235e0396fa37b4869da368cc0610d8ec1ab6b1c32dfd3153c2fb8ae01",
+      "bytes": 117312
+    },
+    {
+      "path": "plan/queue-004.md",
+      "sha256": "c0482a47ba1980c3fd98ef3b426ba58a2b4d3a6835c50392ffb055d445001faa",
+      "bytes": 8672
+    },
+    {
+      "path": "plan/owner-packet-001.md",
+      "sha256": "46e623a947fd3e5ae6a93b412dbec2aa6a03f46f83f08fe4f8cb960115bfeb30",
+      "bytes": 11311
+    },
+    {
+      "path": "planning/handoff-003.md",
+      "sha256": "e4f49bf22bece84230c585072eb3d50aa98f8e7a8ee9c7b8f571e5862517c948",
+      "bytes": 5566
+    },
+    {
+      "path": "uxui/int-006-admin-curriculum.md",
+      "sha256": "9aa30e5a834f839777ef67745f2b5d8fcdca86b0b3dda100b02ae4b4d830dcdb",
+      "bytes": 8999
+    },
+    {
+      "path": "uxui/int-006-admin-errors-a11y.md",
+      "sha256": "9f54404a714ffbdc5b4a5b2c1d0881bc7cd47a83a3c186983c5323163a3ab3d7",
+      "bytes": 9393
+    },
+    {
+      "path": "uxui/int-006-admin-import-bank.md",
+      "sha256": "c43e598c750175090f19e51758558ee20ebdc4cb9c3e2d96a7484486bc7bf2b6",
+      "bytes": 7174
+    },
+    {
+      "path": "uxui/int-006-admin-review-signoff.md",
+      "sha256": "9776af9ffcb598fcac6a7a953aac4de1c2b0ad6e2c4ec90119bcb0a9754cf361",
+      "bytes": 7074
+    },
+    {
+      "path": "uxui/int-006-admin-states.md",
+      "sha256": "f87c851eb6217286943213ad201afe1fab2684f7bed6aaa5a1c540d7dee4ded9",
+      "bytes": 10493
+    },
+    {
+      "path": "uxui/int-006-admin-trace.md",
+      "sha256": "644ecb830f3eaf3ad33bf5515199e97ab797fcb6395521429c2361308dcec5b5",
+      "bytes": 9246
+    },
+    {
+      "path": "uxui/int-007-attempt-policy.md",
+      "sha256": "cbfae64a0b53c32a0d2e76856fe0b3334895245465bf51003702336a116cc871",
+      "bytes": 8496
+    },
+    {
+      "path": "uxui/int-007-recovery-a11y.md",
+      "sha256": "0a3a0962a41a8390bfd71598e6998c01041f7c65a1c6565ce462ac908d86dfda",
+      "bytes": 9169
+    },
+    {
+      "path": "uxui/int-007-states.md",
+      "sha256": "929d4408fbdb6a4df713c7971fc7bb5e0cc543c9cfe00e7a8f61764437ab4a5a",
+      "bytes": 10687
+    },
+    {
+      "path": "uxui/int-007-teacher-score.md",
+      "sha256": "989936b1103d89cfb163c3fa5bc3c1de4bd7bbe1aeda065a18d4124d6338e983",
+      "bytes": 10285
+    },
+    {
+      "path": "uxui/int-007-trace.md",
+      "sha256": "f8261f81cd3fa690541b0611f3b0de87ccd2d36826bceb469585e3e44a94d520",
+      "bytes": 10903
+    }
+  ]
+}

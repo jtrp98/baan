@@ -146,11 +146,9 @@
 | [modules.md](modules.md) | โครงสร้างโมดูลและขอบเขตระบบ (Rev3 · PROPOSED) |
 | [quality-attributes.md](quality-attributes.md) | เกณฑ์คุณภาพและเกณฑ์พิสูจน์ (Rev1 · PROPOSED) |
 | [archive.md](archive.md) และโฟลเดอร์ `archive/` | Verbatim history (ฉบับก่อน amendment เก็บแบบ verbatim) |
-
 | [data-model-history-001.md](data-model-history-001.md) | Change Log เดิม Rev1–Rev5 |
 | [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
-
 | [gateway-integration-001.md](gateway-integration-001.md) | Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review; override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
 
 ## Amendment 076 — 2026-10-26
@@ -249,3 +247,4 @@
 - 2026-10-21 — Rev2: amend ตาม decisions-010/011; API รวม Login อยู่ web, ใช้ 4 DB เดิม; ยัง PROPOSED รอ schema/implementation approval
 - 2026-10-21 — Rev1: เสนอระบบเต็มตาม decisions-001–009 และตรวจ source จริงก่อนออกแบบ
 - 2026-10-21 — MYCELIUM บันทึกผล SA จาก session จริง; แยกกฎข้อมูล/HTTP จาก data-model จึงมี 13 ไฟล์ โดยคง DES-001..007 และเนื้อหาข้อเสนอเดิม
+- 2026-10-26 — ผู้คุมต่อแถวตารางสารบัญที่ถูกบรรทัดว่างคั่น ไม่เปลี่ยนเนื้อหา สถานะ หรือมติ
