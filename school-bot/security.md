@@ -360,3 +360,11 @@ Minor · actual_defect · OPEN
 Currentเพิ่ม2finding: Important7/Medium6/Minor4OPEN รวมของเดิม15ข้อ; SEC040-001ยังCLOSEDเฉพาะlocalscopeเดิม. ผู้คุมส่งG rework2ตามauthorizationfix ไม่รับriskแทนคน และไม่ปิดImportantจากHTTPsanitizeอย่างเดียว.
 
 - 2026-10-26 — appendจากindependentJPO run o1ULFh; ผลextended17/19, boundary9/9, repro3/5; sourcehashesและข้อจำกัดในreceipt.
+
+## G final rework2 disposition — 2026-10-26
+
+[JPO091](planning/jpo-091-gateway-r2-001.md) CodexT2 runLqKvlN และparentextendedซ้ำ81pass15fail/96 exit1: **SEC001-016ImportantOPEN** เพราะopaqueupstreamdetail/logscope/constructorfallbackbypassจริงและsharedchannelmutation; baseline5greenไม่พอ. **SEC001-017MinorCLOSEDเฉพาะlocalearlydeadlinefix** จากindependentwireproof+parent ไม่มีriskacceptance/H5closure. CurrentOPEN: Important7/Medium6/Minor3; OriginalImportant6ไม่เปลี่ยน.
+
+หลังครบ2reworksให้ผู้ใช้ตัดสินadditionalnarrowrepairหรือพักsliceท้ายวง ไม่เปิดr3เอง. B QAtriageMediumUUIDintegrity/Minorerrornormalizationตามsurfaceที่prove ไม่มีcross-tenantproof ไม่เพิ่มduplicateSECIDและQAยังFAIL.
+
+- 2026-10-26 — appendfinalJPO+parent96; nofullpipeline/privatepackage/TLS/production/DB/hardwareproof.

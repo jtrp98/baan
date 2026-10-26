@@ -12,3 +12,9 @@
 ## Change Log
 
 - 2026-10-26 — เริ่มledgerเมื่อBfinalcheckยังFAIL; ไม่ถามผู้ใช้ระหว่างมี21localreadyตามGM.
+
+## Amendment091 — รวมG/เตรียมschema
+
+2026-10-26 [GJPO2+parent96](jpo-091-gateway-r2-001.md)81pass15failยืนยันSEC001-016ImportantยังOPENหลัง2reworks. รวมข้อ1: แนะนำอนุมัติเพิ่มหนึ่งรอบเฉพาะBrawmetadata/wireและGmodule-ownedpublicchannel/logboundary+rejectunsafeclientก่อนRPC แล้วcheck/JPOซ้ำ; อีกทางพักสองslice/productionoff. Minor17fixverifiedlocalCLOSED; BtriageMedium/Minorไม่cross-tenantproofแต่ยังQAFAIL. ไม่เสนอรับriskเป็นdefault/ไม่r3เอง.
+
+Storageproposalใหม่จาก[arch091](arch-091-learning-001.md): AuditReason2048และLesson.ImportSourcejsonbNULL. **ยังไม่ถามจนvaultตรวจimpact/guardedup-downDRAFT/evidenceพร้อมreview**; baselineDDL/model/DBMLไม่เปลี่ยน. OwnerAcademicresolverต้องหาlocalsourceเพิ่มก่อนรวมคำถามที่เหลือจริง ไม่ถามสิ่งที่ทีมยังพิสูจน์จากsourceได้.
