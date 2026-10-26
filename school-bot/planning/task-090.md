@@ -29,3 +29,8 @@ Rawreports/controlstate/testsource/TRXอยู่workspace reports/school-bot/n
 ## Change Log
 
 - 2026-10-26 — เปิดwaveต่อจาก089หลังได้Auth/WPASS/LocalcodeและพบGwire/decimalbug; งานเดิมเดินต่อไม่รีเซ็ตscopeหรือgates.
+
+## Checkpoint
+
+- Related-impactcurrenttask089→090กวาดก่อนแก้module/plan/designindices; receipts/packet089เก็บsourceprovenanceตามเดิม. Gsysrework1เปิดแล้วหลังparentreproredจบ ไม่มีGwriterซ้อน. RoleMathส่งownerlabelpatchและLocalGoยังตรวจอิสระ.
+- เพิ่มscopedread-onlyให้AGYเฉพาะworkspaceรายงาน089/independentBและGcheckfoldersผ่านofficialgrant-read ไม่ขยายwrite/skipguards. RuntimeActivityContextprobeบันทึกข้อจำกัดfutureextensionไว้ในnegativeboundary; ไม่ถือfullW3Cผ่าน.

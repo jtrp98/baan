@@ -36,6 +36,8 @@
 
 รอsysrework2แก้Bและcheckทวนจากrulesนี้; Gmapperต้องใช้correlation/statuspairsเดิม. ผู้คุมกวาดtraceparentทั้งtargetB/G: currentBvalidatorและGrequesthelperเป็นจุดกลไก; CommonGrpc/TraceContextinterceptors/handbook/legacytestsของGไม่เปลี่ยนเพราะไม่ขยายlocalsubsetไปlegacy/protectedpaths. ตรวจGhelperมาตรฐานActivityContextตามruntimeก่อนเสนอแก้ อย่าแก้globalinterceptorsแถม. Existingtestreceiptsเป็นประวัติไม่แทนrulesปัจจุบัน.
 
+ผู้คุมprobeActivityContext.TryParseบนruntimeจริง7inputs: baseline/flagsff/futurebaseรับ, uppercaseIDs/ffversion/v00suffixปฏิเสธ; futurev01พร้อมsuffixvendorถูกSDKปฏิเสธจึงGhelperจะomitoptionaltraceในกรณีนั้น. เป็นcompatibilitylimitationที่ยังไม่รับรองfullW3Cpropagation ไม่ใช้เป็นเหตุขยายGglobalinterceptorหรือแก้helperขณะcriticalrework. Bcustomvalidatorยังต้องทำตามrulesด้านบน; ผลprobeนี้ไม่ใช่GHTTP/RPCtestหรือgateclose.
+
 ## Change Log
 
 - 2026-10-26 — Rev1: สกัดnegativepairs/correlation/accounting/trace/langจากarch; ไม่ปิดH5/production/securityหรืออ้างtestsใหม่ผ่าน.
