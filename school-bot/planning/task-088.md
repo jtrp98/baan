@@ -37,3 +37,5 @@ Lint canonical plan exit1: implement63, ติด human gate62, พร้อม1
 - sys Gateway puremetadata CodexT2 BLOCKEDจากpreflight: ponytail12/agent-skills20requiredfilesขาด บันทึกgateway-preflight-blocker-088. ไม่แก้productcode ไม่สร้างackปลอม เก็บenvironmentrepairคำถามท้ายรอบ
 - sys B gRPCLogout AGY T3 เริ่มแล้วตามpacketarch เมื่อBE001writerจบ; explicitmoduleยังไม่เปิดproduction
 - check BE001 FAIL: 45cases/32pass/13fail ตาม check-088-auth-001. ส่งแก้รอบ1หลังBwriterจบ; ไม่ให้helperมีauthorityหรือเปิดLogin และไม่ถามcompatibilitypolicyที่ยังรอevidenceระหว่างรอบ
+- B gRPCLogout sysDONE/parent4032regressionผ่าน: slice-088-grpc-001. ส่งcheckT2แล้ว ขณะsysAGYT3แก้authรอบ1เฉพาะคนละไฟล์ ไม่รับsubsetก่อนcheck
+- ซ่อมGatewaytoolchain32ไฟล์ตามpinnedcommit/hashโดยไม่ทับของเดิม; preflightexit0แล้ว ส่งsysCodexT2ทำpuremetadatahelperต่อ ไม่ต้องถามติดตั้งซ้ำ รายละเอียดgateway-preflight-blocker-088

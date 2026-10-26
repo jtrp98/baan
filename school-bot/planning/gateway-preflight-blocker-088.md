@@ -13,3 +13,11 @@
 ## Change Log
 
 - 2026-10-26 — เก็บtoolchainblockerและpinnedrepairrequirementsสำหรับถามท้ายรอบ ไม่ถือว่าโค้ดhelperเริ่มแล้ว
+
+## ผลซ่อมภายหลังในรอบเดียวกัน
+
+ผู้คุมพบPythonจริงในcodex-primary-runtime จึงเตรียมsourcearchivesตามcommitที่lockไว้และใช้systemskill-installer helperติดตั้งลงstagingในreports. เทียบrequiredfilesครบ32จุด/16เนื้อหาที่ไม่ซ้ำ SHA256ตรงlockทุกไฟล์. เพิ่มเฉพาะ32ไฟล์ที่ขาดใน~/.agents/skillsและ~/.claude/skills ไม่ทับไฟล์เดิม ไม่แก้settings/manifest/guardหรือรันcodeจากskills
+
+รันpreflightคำสั่งเดิมซ้ำหลังซ่อมได้exit0; รายงาน `reports/school-bot/normal-088/gateway-preflight-after-repair.json`, installplan/hashmaps/archivesอยู่normal-088/toolchain-* ไม่คัดลอกrawเข้าknowledge. Blockerfile-hash-onlyนี้ปิดแล้ว ไม่ต้องถามติดตั้ง32ไฟล์ซ้ำ; ส่งsysCodexT2ทำhelperต่อโดยยังต้องอ่านhandbook/ackตามจริง และไม่เปิดproductionroute
+
+- 2026-10-26 — ซ่อมdependencyแบบpinned/verified/no-overwriteภายในขอบเขตCONTINUE-NORMALที่ให้ลองแก้environment; preflightexit0 ไม่ใช่ผลbuild/helper/Lightreview
