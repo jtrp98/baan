@@ -558,7 +558,7 @@ Table SchoolBotCourseRun [headercolor: #D97706] {
   ClassroomId int4 [not null, note: 'รหัสห้อง TTermSubLevel2.nTermSubLevel2 ใช้ร่วมกับ SchoolId และบริบทปี/เทอม | ข้อกำหนดเดิม: Legacy NTermSubLevel2 within SchoolId']
   NYear int4 [not null, note: 'รหัสปีจากระบบเดิม ใช้เชื่อม TYear.nYear และ TTerm.nYear; ไม่ใช่ numberYear ที่แสดง เช่น 2569 โดยอัตโนมัติ']
   NTerm varchar(64) [not null, note: 'รหัสเทอมเดิมชนิดข้อความจาก TTerm.nTerm; ไม่ใช่การใส่เลข 1 หรือ 2 โดยไม่ resolve | ข้อกำหนดเดิม: Legacy TTerm.NTerm']
-  PlanCourseIds jsonb [not null, note: 'integer[] ของ TPlanCourse.PlanCourseId ที่ผูก run; ต้องมีอย่างน้อยหนึ่งรายการ ไม่มี null และตามสัญญาต้องไม่ซ้ำและตรงห้อง/เทอม | ข้อกำหนดเดิม: Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
+  PlanCourseIds integer[] [not null, note: 'integer[] ของ TPlanCourse.PlanCourseId ที่ผูก run; ต้องมีอย่างน้อยหนึ่งรายการ ไม่มี null และตามสัญญาต้องไม่ซ้ำและตรงห้อง/เทอม | ข้อกำหนดเดิม: Logical I[] (>=1 unique PlanCourseIds); physical DDL in schoolbot_db.sql uses integer[] (int4[]) with cardinality >= 1']
   CurrentPolicyId int4 [null, note: 'FK ไป SchoolBotScoringPolicy; null เฉพาะร่างก่อนเปิด; freeze เมื่อ active']
   PreviousRunId int4 [null, note: 'FK ไป CourseRun ก่อนหน้าที่นำมาสู่ run นี้; null เมื่อไม่ใช่ successor']
   EffectiveAt timestamptz [not null, note: 'เวลา UTC ที่การเปิดใช้ run นี้มีผล รวมกรณี run เทอมถัดไปจากการตัดสิน Level']

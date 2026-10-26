@@ -208,6 +208,8 @@
 
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
+- 2026-10-24 — แก้ตาม check-061-verify4 (นายช่างสวมบท arch): schoolbot.dbml PlanCourseIds jsonb→integer[] ตรง DDL (schoolbot_db.sql:578) — annotation เท่านั้น schema ไม่เปลี่ยน; parser 10.3.1 ผ่านหลังแก้ ([evidence-003](dbml-parser-evidence-003.json): 32 ตาราง/450 ฟิลด์)
+
 ## Change Log
 - 2026-10-24 — Rev5: ใบงาน060a amend DES-002..007/rules/schema-notes และเชื่อมสัญญาย่อย/SA-004; เก็บก่อนแก้พร้อม SHA256; ไม่เปลี่ยน task status/scope/dependencies/gates
 - 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict

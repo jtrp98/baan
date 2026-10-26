@@ -35,7 +35,7 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 12 (BA-001..004/UX-001..003/TP-001/SA-004/DBA-001/TP-003/DBA-007) pending 98; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 13 (+SA-002) pending 97; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -84,7 +84,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [FE-010](FE-010.md) | Sequence/stop | fe | P4 | FE-009, BE-014 | pending |
 | [FE-011](FE-011.md) | Board workflow | fe | P4 | FE-010 | pending |
 | [FE-012](FE-012.md) | Servo/lost | fe | P4 | FE-010 | pending |
-| [SA-002](SA-002.md) | Learning contracts | sa | P5 | BA-001, BA-002, BE-001 | pending |
+| [SA-002](SA-002.md) | Learning contracts | sa | P5 | BA-001, BA-002, BE-001 | **verified** (ใบงาน061 — check PASS: สัญญาสามโหมด/Level/ข้อสอบ/ส่งคะแนน sync มติครบ) |
 | [DBA-005](DBA-005.md) | Learning DDL | dba | P5 | SA-002, DBA-001 | pending |
 | [BE-015](BE-015.md) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006, BE-027, BE-029 | pending |
 | [BA-005](BA-005.md) | Block/Code content | ba | P5 | BA-002 | pending |
