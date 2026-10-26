@@ -124,7 +124,7 @@
 | [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
-| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev8 — baseline CONFIRMED เดิม; ข้อเสนอ create-license TTL 15 นาทีติดสมมติฐานตาม060a, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
+| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev8 — baseline CONFIRMED เดิม; create-license TTL 15 นาทีผู้ใช้อนุมัติตาม decisions-046, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
 | [schema-notes.md](schema-notes.md) | หมายเหตุ schema Rev7 — PK32/UQ0/FK0/CHECK0; relationships/validation เป็นกฎ application |
 | [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev5 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |

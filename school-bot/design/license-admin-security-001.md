@@ -8,10 +8,12 @@
 
 ## Create-license replay
 
-- Create key replay คืน key เดิมเฉพาะ `SchoolId+Principal+Operation+RequestKey+RequestHash` เดิมและยังมี `license_admin`; ตรวจว่า License ไม่ถูก revoke ก่อนคืน key. ข้อเสนอ TTL **15 นาที (สมมติฐาน — ยังไม่ยืนยัน)**: `ReplayUntil ≤ CompletedAt+900 วินาที`; ใช้เวลาฝั่ง server และตรวจ `now < ReplayUntil` ทุกครั้งแม้ purge ยังไม่รัน ไม่ต่อ TTL เมื่อ retry. ตั้งแต่ `now >= ReplayUntil` คืน `409 IDEMPOTENCY_EXPIRED` พร้อม `details.resource_id` เมื่อยังมีสิทธิ์; ไม่สร้าง Key ใหม่และไม่คืน ciphertext/key. ผู้ดูแลใช้ revoke/create เดิมเมื่อกู้ key ไม่ได้
+- Create key replay คืน key เดิมเฉพาะ `SchoolId+Principal+Operation+RequestKey+RequestHash` เดิมและยังมี `license_admin`; ตรวจว่า License ไม่ถูก revoke ก่อนคืน key. TTL **15 นาที (ผู้ใช้อนุมัติตาม decisions-046)**: `ReplayUntil ≤ CompletedAt+900 วินาที`; ใช้เวลาฝั่ง server และตรวจ `now < ReplayUntil` ทุกครั้งแม้ purge ยังไม่รัน ไม่ต่อ TTL เมื่อ retry. ตั้งแต่ `now >= ReplayUntil` คืน `409 IDEMPOTENCY_EXPIRED` พร้อม `details.resource_id` เมื่อยังมีสิทธิ์; ไม่สร้าง Key ใหม่และไม่คืน ciphertext/key. ผู้ดูแลใช้ revoke/create เดิมเมื่อกู้ key ไม่ได้
 - เมื่อพ้น ReplayUntil ล้าง `ResultCipher` และ `ResultKeyId` พร้อมกันด้วย cleanup/read-time cleanup ที่ retry ได้; คง tombstone/ResourceId ป้องกันซ้ำ. envelope key อยู่นอก DB/API host ตาม [custody](signing-custody-001.md); backup ต้องไม่ทำให้ decrypt secret พ้น TTL ได้ (ต้องมีหลักฐานการหมดอายุของ key/material ไม่ใช่อาศัย purge live DB อย่างเดียว). ใช้ `Cache-Control: no-store`, ปิด body logging และไม่ใส่ key ใน audit/error/list/ETag; ไม่ลบหลังอ่านครั้งแรกเพราะ response อาจสูญหาย
 
 หลักฐาน DDL ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql` มีฟิลด์และ pair CHECK อยู่แล้ว; API ปัจจุบัน `Program.cs:107–122` ยังเป็น v1 static bearer. ไม่เปลี่ยน schema; เงื่อนไขนี้เป็นข้อเสนอ tightening ตาม security-mitigation-001 ไม่ใช่ผล re-audit. ปัดตก replay24ชั่วโมงสำหรับ key และการลบหลังอ่านครั้งแรก เพราะเสี่ยง secret ค้างนาน/กู้ response หายไม่ได้ตามลำดับ
 
 ## Change Log
 - 2026-10-24 — Rev1: ใบงาน060a แยก license_admin/error และ replay TTL/cleanup โดยคง schema
+
+- 2026-10-26 — แก้ป้าย create-license TTL 15 นาทีตาม decisions-046 (แก้ตาม sweep); ไม่เปลี่ยน logic/ผลทดสอบ/สมมติฐานอื่น

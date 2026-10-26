@@ -141,4 +141,5 @@
 | [decisions-043.md](decisions-043.md) | อนุมัติ UX-005 Q39–Q42 และ UX-007 Q43–Q46 รวม delta042; UX signed 7/7; ยืนยัน T0–T2 Codex / T3–T5 AGY |
 | [decisions-044.md](decisions-044.md) | คงเฉพาะ PK32; ถอน UNIQUE24/FK40/CHECK80 จากร่าง SQL คงคอลัมน์/ชนิด/NOT NULL/default/identity เดิม |
 | [decisions-045.md](decisions-045.md) | ผู้ใช้ยืนยันรัน schoolbot_db.sql สร้างตารางแล้ว; ยังไม่มีผลตรวจ catalog/API integration และไม่ปิด runtime gates |
+| [decisions-046.md](decisions-046.md) | อนุญาตพัฒนา Gateway บน branch ที่เตรียมไว้; อนุมัติ create-license replay 15 นาที; custody กุญแจเซ็นยังรอคำอธิบาย/คำตอบ |
 

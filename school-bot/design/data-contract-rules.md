@@ -46,7 +46,7 @@ lock ของ finalized proposal และ successor ใช้ namespace/key �
 
 Progress เป็น read model จาก `Submission`/`Assessment`/`Attempt` ไม่มีตาราง Progress ที่แก้คะแนนเอง ผลต่าง curriculum revision ไม่รวมอัตโนมัติ
 
-Idempotency ทั่วไปคง encrypted replay window 24 ชั่วโมง; **ข้อยกเว้นเฉพาะ create-license** เสนอ 15 นาที (สมมติฐาน — ยังไม่ยืนยัน), `ReplayUntil ≤ CompletedAt+900 วินาที` ตาม [DES-002](des-002.md). ตอนอ่านต้องตรวจเวลาฝั่ง server: `now >= ReplayUntil` คืน `409 IDEMPOTENCY_EXPIRED` พร้อม `details.resource_id` เมื่อเปิดเผยได้ แม้ purge ยังไม่รัน. ล้าง `ResultCipher`/`ResultKeyId` พร้อมกันเมื่อหมดหน้าต่าง และคง tombstone/ResourceId ป้องกันซ้ำ; ไม่ต่ออายุจาก retry และไม่ลบหลังอ่านครั้งแรก. ตรวจ Principal/RequestKey/RequestHash/สิทธิ์ปัจจุบันก่อน replay; create-license ตรวจ license ไม่ถูก revoke เพิ่มด้วย. envelope key แยกจาก DB และการหมดอายุของ backup ตาม [custody](signing-custody-001.md); ไม่อ้างว่าการล้าง live DB ลบ backup แล้ว. Retention tombstone/audit รอเจ้าของข้อมูล ไม่ purge โดยพลการ. DDL เดิม ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql` รองรับโดยไม่เพิ่มคอลัมน์
+Idempotency ทั่วไปคง encrypted replay window 24 ชั่วโมง; **ข้อยกเว้นเฉพาะ create-license** 15 นาที (ผู้ใช้อนุมัติตาม decisions-046), `ReplayUntil ≤ CompletedAt+900 วินาที` ตาม [DES-002](des-002.md). ตอนอ่านต้องตรวจเวลาฝั่ง server: `now >= ReplayUntil` คืน `409 IDEMPOTENCY_EXPIRED` พร้อม `details.resource_id` เมื่อเปิดเผยได้ แม้ purge ยังไม่รัน. ล้าง `ResultCipher`/`ResultKeyId` พร้อมกันเมื่อหมดหน้าต่าง และคง tombstone/ResourceId ป้องกันซ้ำ; ไม่ต่ออายุจาก retry และไม่ลบหลังอ่านครั้งแรก. ตรวจ Principal/RequestKey/RequestHash/สิทธิ์ปัจจุบันก่อน replay; create-license ตรวจ license ไม่ถูก revoke เพิ่มด้วย. envelope key แยกจาก DB และการหมดอายุของ backup ตาม [custody](signing-custody-001.md); ไม่อ้างว่าการล้าง live DB ลบ backup แล้ว. Retention tombstone/audit รอเจ้าของข้อมูล ไม่ purge โดยพลการ. DDL เดิม ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql` รองรับโดยไม่เพิ่มคอลัมน์
 
 ## HTTP contract ร่วม
 
@@ -96,3 +96,5 @@ Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 Mi
 - 2026-10-21 — Rev3: แยก resource K จาก request/idempotency U
 - 2026-10-21 — Rev2: session/isolation และ single-DB commit
 - 2026-10-21 — MYCELIUM แยก constraints และ HTTP จากคำตอบ SA Rev1 โดยคงข้อเสนอและสัญญาเดิม
+
+- 2026-10-26 — แก้ป้าย create-license TTL 15 นาทีตาม decisions-046 (แก้ตาม sweep); ไม่เปลี่ยน logic/ผลทดสอบ/สมมติฐานอื่น

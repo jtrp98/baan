@@ -9,7 +9,8 @@
 - **คิว**: [Queue 004](plan/queue-004.md) + [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · รอบล่าสุดปิดที่ [handoff-003](planning/handoff-003.md)
 - **โค้ด**: logout API + Gateway outcome decoder ใน `target/school-bot/web` — test local 4032 ผ่าน ([qa/round-001](qa/round-001.md)); PG/fullLogin NOT_RUN และยังไม่ต่อ Gateway/gRPC จริง
 - **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
-- **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session/mapper และ H5
+- **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · ผู้ใช้อนุญาต dev บน branch ที่เตรียมไว้ตาม [046](requirement/decisions-046.md); implementation review/H5/runtime ยังต้องพิสูจน์
+- **License**: create-license replay 15 นาทีอนุมัติแล้วตาม [046](requirement/decisions-046.md); ผู้ถือ/ที่เก็บกุญแจเซ็นยังไม่กำหนด รออธิบายให้ผู้ใช้เลือก
 - **UX**: เซ็นครบ 7/7 ชุดตาม [decisions-043](requirement/decisions-043.md); UX-005 Q39–Q42 และ UX-007 Q43–Q46 รวม delta042 อนุมัติแล้ว
 - **สัญญาที่ UX ต้องใช้**: [gap receipt 7 กลุ่ม](design/learning-ux-contract-gaps-001.md) — technical proof ยัง OPEN · มติ [decisions-042](requirement/decisions-042.md) (ตอบ A: หมดเวลาตรวจคำตอบที่บันทึกทันอัตโนมัติ) ห้ามถามซ้ำ
 - **รอคน**: ดู [plan/index.md § Waiting on Human](plan/index.md#waiting-on-human)
@@ -19,7 +20,7 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT · decisions-001..045 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT · decisions-001..046 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev8 / rules Rev10 / DBML Rev7 (32 ตาราง); constraints เหลือเฉพาะ PK32 ตามใบงาน086; DES-001..012 PROPOSED |
 | `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 15 verified / 95 pending |

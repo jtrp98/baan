@@ -7,7 +7,7 @@
 
 - จำลองด้วย fake เท่านั้น: fake clock (wall+monotonic+anchor), fake engine transport (scripted JSON Lines), stub G proxy (drop/delay/replay), synthetic School DB fixture, test SchoolBot DB (ไม่ใช่ shared env)
 - **ห้าม**: set system clock ของเครื่องจริง · สั่งหุ่นจริงทุกชนิด (ไม่ HID/Serial จริง, ไม่ motion/upload/torque/stop ลง hardware — dry-run/fake bridge เท่านั้น) · เขียน production DB/PGGradeDB · ใช้ sample/preview/mock เป็นหลักฐาน native/Cloud/hardware
-- ค่าที่เป็นสมมติฐานในสัญญา (TTL 15 นาที, timer sweep 60 วินาที, poll 3000 ms/debounce 0) ต้องติดป้าย (สมมติฐาน — ยังไม่ยืนยัน) ใน expected ของทุก run
+- ค่าที่เป็นสมมติฐานในสัญญา (timer sweep 60 วินาที, poll 3000 ms/debounce 0; TTL 15 นาทีอนุมัติแล้วตาม decisions-046) ต้องติดป้าย (สมมติฐาน — ยังไม่ยืนยัน) ใน expected ของทุก run
 - ทุก fixture ระบุ build/commit hash + profile + evidence code ตาม TP-001; ผลทุกเคสเริ่ม NOT_RUN
 
 ## FX-01 fake clock + monotonic rollback (offline window / TTL / replay window)
@@ -66,8 +66,10 @@
 
 - แผนที่ cases→fixtures: TP001-003/004/010→FX-01a · TP001-007→FX-01b · TP001-026→FX-01a(clock ร่วม)+FX-02 · TP001-028→FX-01c+FX-04a–c · TP001-078→FX-04d · TP001-037/039/040→FX-03 · TP001-058/079→FX-05 · PF-HOST fake clock+monotonic harness ใน Profiles ของ TP-001 อ้างชุดนี้
 - **ไม่มี fixture ของ GAP-07** (PrepareUpdate/InstallPreparedUpdate) จนกว่าผู้มีอำนาจเลือก disposition ตาม update-disposition-001; ไม่มี fixture สั่งหุ่นจริงตาม Acceptance ของ TP-002 ("ไม่สั่งหุ่น"); hardware/unplug/emergency-stop เป็นของ PF-HW ภายใต้ G-HW เท่านั้น
-- ค่าที่ยังเป็นสมมติฐาน: TTL 15 นาที, timer sweep 60 วินาที, poll 3000 ms/debounce 0 — ถ้าสัญญาเปลี่ยน ให้ amend แผนนี้ก่อนรัน
+- TTL 15 นาทีอนุมัติแล้วตาม decisions-046; ค่าที่ยังเป็นสมมติฐาน: timer sweep 60 วินาที, poll 3000 ms/debounce 0 — ถ้าสัญญาเปลี่ยน ให้ amend แผนนี้ก่อนรัน
 
 ## Change Log
 - 2026-10-24 — Rev1: สร้างแผน failure/race fixtures ตามใบงาน060e (fake clock/monotonic, trash 30 วัน/rollback/ปิดแอป, late callback/drain-stop, lost response/receipt/tombstone, cross-tenant GAP-06); docs-only ไม่มีการรัน
 - 2026-10-24 — แก้ตาม check 060f (นายช่างสวมบท inspect): FX-01b ปรับเป็น fixture TTL=900s และทดสอบรอบ ReplayUntil (ไม่ใช่ offset จาก CompletedAt)
+
+- 2026-10-26 — แก้ป้าย create-license TTL 15 นาทีตาม decisions-046 (แก้ตาม sweep); ไม่เปลี่ยน logic/ผลทดสอบ/สมมติฐานอื่น

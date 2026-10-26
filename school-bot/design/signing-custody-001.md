@@ -17,7 +17,7 @@
 
 SEC001-003 เลือก registry-gated signer เพื่อคง server-assigned release_id; ทาง manifest ลงนามใน CI ทั้งก้อนต้องปรับ API flow จึงไม่เลือกในรอบนี้. Release publisher รายบุคคล+audit ไม่ทดแทน OS publisher pin. CI required reviewer/four-eyes หรือ hardware token มีผลเรื่องผู้ควบคุม signing; เจ้าของ release/infra ต้องระบุของที่มีและผู้มีอำนาจตัดสิน residual ตามเงื่อนไข jpo ไม่ขยาย H6/รับความเสี่ยงเอง
 
-ข้อเสนอ TTL create-license 15 นาที (สมมติฐาน — ยังไม่ยืนยัน) ไม่ใช่การพิสูจน์ว่า backup ถูกทำลายแล้ว. ถ้า infrastructure ยังบังคับ ciphertext expiry ไม่ได้ให้บันทึก evidence gap ไว้ใน SEC001-009 ห้ามอ้างว่าการ purge live DB อย่างเดียวปิด finding; ไม่เปลี่ยน replay เป็น key:null โดยไม่มี human gate ของ breaking contract
+TTL create-license 15 นาที (ผู้ใช้อนุมัติตาม decisions-046) ไม่ใช่การพิสูจน์ว่า backup ถูกทำลายแล้ว. ถ้า infrastructure ยังบังคับ ciphertext expiry ไม่ได้ให้บันทึก evidence gap ไว้ใน SEC001-009 ห้ามอ้างว่าการ purge live DB อย่างเดียวปิด finding; ไม่เปลี่ยน replay เป็น key:null โดยไม่มี human gate ของ breaking contract
 
 Proof ที่ต้องแนบ: key inventory เฉพาะ metadata, sign/decrypt policy, negative tests (caller ผิด/expเกิน/registryไม่ตรง/publisherอื่น), access audit ที่ตรวจข้อมูลก่อนนำเข้า knowledge ตาม [export proof pack](export-proof-pack-001.md), rotation+revoke rehearsal และ backup/restore-expiry test. เติมเกณฑ์ตาม mitigation เดิมดังนี้:
 
@@ -30,3 +30,5 @@ Proof ที่ต้องแนบ: key inventory เฉพาะ metadata, si
 ## Change Log
 - 2026-10-24 — Rev2: ใบงาน060g ตาม jpo060f ข้อ 3 เติมหลักฐาน signer rate limit, สแกน private key และเทียบสิทธิ์ registry/publish/sign/recovery ตาม mitigation เดิม; ไม่เปลี่ยน task/gates
 - 2026-10-24 — Rev1: ใบงาน060a ร่าง custody ครบผู้ถือ/ที่เก็บ/สิทธิ์/rotation/revoke/backup และแยก unknown จากข้อเสนอ
+
+- 2026-10-26 — แก้ป้าย create-license TTL 15 นาทีตาม decisions-046 (แก้ตาม sweep); ไม่เปลี่ยน logic/ผลทดสอบ/สมมติฐานอื่น
