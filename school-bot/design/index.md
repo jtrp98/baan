@@ -172,6 +172,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 |---|---|
 | [license-admin-security-001.md](license-admin-security-001.md) Rev1 | PROPOSED — License role/error/replay TTL/cleanup ต่อ DES-002 |
 | [project-api-001.md](project-api-001.md) Rev1 | PROPOSED — API/ETag/immutable revision ต่อ DES-003 |
+| [local-project-boundary-001.md](local-project-boundary-001.md) Rev1 | Archclarificationก่อนGo rework1: revision/errors/sharedOSlocks/anchoredFS/strictJSON/migrationreceipt; fuelของdraftรอspecREQ026 ไม่หยุดส่วนอื่น |
 | [guest-workspace-001.md](guest-workspace-001.md) Rev1 | PROPOSED — นโยบาย Guest ยืนยันแล้ว; รายละเอียดเวลา/trash/export รอ implementation proof |
 | [guest-import-001.md](guest-import-001.md) Rev1 | PROPOSED — explicit Project import/receipt/dedup ใช้ schema เดิม |
 | [guest-history-001.md](guest-history-001.md) Rev1 | PROPOSED — local history/recheck/provenance; คง employee ไม่สร้างผล Cloud |

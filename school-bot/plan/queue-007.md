@@ -4,7 +4,7 @@
 
 ตรวจin-memoryครบBE39+FE24=63: **21tasksมีlocal subsetพร้อม / 5มีงานเดิมหรือผลบางส่วน / 37รอเหตุผลเฉพาะ**. จึงต้องเดินCONTINUEต่อ ไม่หยุดเพราะcanonical62/63gated. คง110tasks/17gates/44REQ186AC81TP/15verified95pending/IDs/DAG. รายการนี้เป็นsubsetreadiness ไม่เปลี่ยนcanonicalstatusและไม่รับรองruntime.
 
-เทียบreceiptล่าสุดหลังGMเริ่มอ่าน: [parentB150/4147ผ่าน](../planning/slice-090-grpc-math-parent-001.md)แต่[finalcheck2222pass12fail8NOT_RUN](../planning/check-090-grpc-r2-001.md)ครบ2reworksต้องรอคำตัดสินท้ายวง; [GJPO](../planning/jpo-090-gateway-r1-001.md)ยังOPENlogleak/earlydeadlineส่งrework2; Local63/26/1รอarchclarificationและrework1. ไม่เปิดimplementationเดิมซ้ำ.
+เทียบreceiptล่าสุดหลังGMเริ่มอ่าน: [parentB150/4147ผ่าน](../planning/slice-090-grpc-math-parent-001.md)แต่[finalcheck2222pass12fail8NOT_RUN](../planning/check-090-grpc-r2-001.md)ครบ2reworksต้องรอคำตัดสินท้ายวง; [GJPO](../planning/jpo-090-gateway-r1-001.md)ยังOPENlogleak/earlydeadlineส่งrework2; Local63/26/1ได้[archboundary](../design/local-project-boundary-001.md)แล้วรอGoR1/Specเฉพาะdraftfuel. ไม่เปิดimplementationเดิมซ้ำ.
 
 ## ลำดับงานพร้อม
 
