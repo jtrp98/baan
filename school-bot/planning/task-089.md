@@ -43,6 +43,7 @@
 - LocalGoDONE/parentGotests+vetexit0ตามslice-089-local-projects-001 แต่newpackageno tests; รอindependentFS/behaviorcheck. เมื่อGoจบเปิดarchT1negativeBและparentverification ไม่เปิดSchoolBotwriterซ้อน.
 - AuthMathfinalcheckFTFIQP: AuthPASS45/45,WeightedPASS37/37,ConversionFAIL31/33จากdecimalmidpointdrift2cases. สกัดindependentMath70tests208lines/hashตรงลงreports ส่งsysT2rework1เฉพาะconversion+installtestsเมื่อslotว่าง/ไม่มีwriterSchoolBotอื่น. ไม่เพิ่มcanonicalverifiedจากsubset.
 - กวาดAuth/Mathรอcheckก่อนแก้modulecurrentstatusเป็นAuth/WPASSและConversionFAIL/rework1 (แก้ตามsweep); receiptsเก่าคงเป็นประวัติก่อนverdict.
+- ArchnegativeBพAQfPCDONE: บันทึกgateway-logout-negative-boundary-001 เชื่อมpacket/indexแล้ว รอMathwriterจบก่อนBsysrework2. กวาดtraceparentทั้งB/Gก่อนคำชี้แจง: Bvalidator/Ghelperเป็นcurrentimpacts; Gglobalprotectedinterceptors/handbook/legacytestsและhistoricalreceiptsคงเดิม ไม่ขยายscope. ตรวจprimaryW3C/RFCรองรับruleอ้างลิงก์ในartifact.
 - กวาดด้วย baan --sweep “หยุดตาม”, “หยุดหลังปิดงาน”, “หยุดก่อนเปิดรอบแก้”: แก้สถานะปัจจุบันใน module/plan/design/QA index ตามคำสั่งเริ่มต่อของผู้ใช้ (แก้ตาม sweep). เก็บ handoff004/decisions048 เป็นประวัติและไม่แก้ผลค้นใน timetableai เพราะคนละงาน. ไม่เปลี่ยนสัญญา/AC/DAG/gates.
 
 ## Change Log

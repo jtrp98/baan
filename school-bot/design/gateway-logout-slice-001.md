@@ -52,6 +52,8 @@ Canonical proto B: `web/src/SchoolBot.Infrastructure/Protos/ServiceSchoolBot/Sch
 
 ## Trust/request boundary
 
+Exact negative cases/correlation/metadata accounting/trace/lang สำหรับ rework2 ใช้ [negative boundary Rev1](gateway-logout-negative-boundary-001.md) ภายใน allowlist ของ packet เดิม; ไม่ใช้ทุก status/code ของสัญญารวมกับ logout subset โดยอัตโนมัติ.
+
 - B order: verified service peer → metadata/Origin → token canonical validation → source/work limiter → LogoutService → existing store. ITrustedGatewayPeerVerifier reads transport context; production default denies all. No trust from x-caller/header/DTO, no TrustAll/IsDevelopment/test-header bypass. Fake verifier only in test assembly
 - G must verify B transport identity before trusting domain trailers. No route registration in production and no outbound call if configuration/trust adapter absent
 - One Authorization Bearer of exact baseline format supplies token; missing/duplicate/malformed/JWT becomes absent. No trim-to-repair and no token from body. Body≤64KiB, body identity ignored
@@ -95,5 +97,7 @@ sys implements product code, check owns independent tests. Expected commands aft
 Light implementation review; H5 listener/TLS/peer/private ingress/source-rate-limit/Origin/BFF-CSRF; real DB atomicity/schema parity; distributed limiter/maintenance/circuit/fullpipeline log redaction/reachability and real Gateway↔B evidence. Packet is not their closure. signer/custody stays deferred047
 
 ## Change Log
+
+- 2026-10-26 — ใบงาน089: เชื่อมคำชี้แจงnegativeboundaryของarchจากcheck119/150; ไม่เปลี่ยนproto/feature/gates.
 
 - 2026-10-26 — บันทึกข้อสรุปarchและtechnicalwirebaselineสำหรับrunnablelocalLogout; ไม่เพิ่มREQ/AC/taskIDหรือschema
