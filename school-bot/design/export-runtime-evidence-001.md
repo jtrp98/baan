@@ -63,11 +63,16 @@ SELECT tc.table_name, tc.constraint_type, kcu.column_name, c.data_type
   2. **Session L (จำลอง writer เดิม/ครูแก้ช่องตัวเอง)**: `UPDATE` แถวเดียวกัน (เปลี่ยน Score ช่องครู) แล้ว `COMMIT` → `xmin` เปลี่ยนเป็น X2
   3. **Session W (จำลอง SchoolBot worker)**: `BEGIN;` → `SELECT ... FOR UPDATE` → `UPDATE ... WHERE <PK ตรง> AND "xmin" = X1` (และเทียบ document hash กับ H1):
 ```sql
--- ตัวอย่าง (รันบน test PGGradeDB clone เท่านั้น; ชื่อคอลัมน์เป็นสมมติฐานตาม source-review-004)
+-- ตัวอย่าง (รันบน test PGGradeDB clone เท่านั้น; ชื่อคอลัมน์ยืนยันด้วย EV-GR-01 ก่อนรันจริง)
+-- แก้ตาม check-061: ใช้ PK ของ detail row ที่ resolve แล้ว (nGradeDetailId ตาม legacy-022 + DBContext:531)
+-- พร้อม tenant/context, xmin และ before_document_hash — ไม่ใช้ NGradeId+SId อย่างเดียว
 UPDATE "PgtgradeDetail" SET "ScoreData" = :new_json
- WHERE "NGradeId" = :n AND "SId" = :sid AND "xmin" = :xmin_from_snapshot;
+ WHERE "NGradeDetailId" = :resolved_pk            -- PK จริงของแถวที่ resolve ตรงหนึ่งรายการ
+   AND "SchoolId" = :school_id                     -- tenant ตรงบริบท
+   AND "xmin" = :xmin_from_snapshot                -- CAS ของแท้
+   AND <before_document_hash> = :h1;               -- เทียบ hash ก่อนพิสูจน์เขียน
 ```
-  4. บันทึก affected rows และ state ที่ worker เห็น
+  4. บันทึก affected rows และ state ที่ worker เห็น · เพิ่ม fixture **แถวบริบทซ้ำ** (NGradeId+SId เดียวกันแต่คนละ nGradeDetailId) เพื่อยืนยันว่า CAS ด้วย PK ไม่แตะแถวอื่นในบริบทเดียวกัน (แก้ตาม check-061)
 - **ผลที่ยอมรับ**: affected rows = **0** → worker มาร์ก conflict รายคนนั้นและ rollback; ค่าที่ writer เดิมเขียน (X2) อยู่ครบไม่ถูกทับ; conflict ปรากฏที่ client boundary (paused_conflict/reason_code ตาม DES-009)
 - **ห้าม**: อ้าง `UpdateDate` ของ SchoolBot ไปแทน `xmin` ของ PGGradeDB; ถือว่า affected=0 จากเงื่อนไข PK อย่างเดียวแล้วเรียกว่า "CAS ผ่าน"; รันบน PGGradeDB จริง
 
@@ -91,7 +96,7 @@ UPDATE "PgtgradeDetail" SET "ScoreData" = :new_json
 - **ห้าม**: เขียน receipt นอก TX เดียวกับคะแนนแล้วอ้างว่า atomic
 
 ### EV-RC-02 — crash หลัง PG commit ก่อน SchoolBot ack → reconcile จาก receipt (recovery ลำดับ 4; AC-052-03/04)
-- **สิ่งที่ต้องรัน**: (1) apply สำเร็จครบ (UPDATE + INSERT receipt + COMMIT) แต่**จำลอง crash ก่อนข้อ 5 ของลำดับ DES-009** — ไม่อัปเดต `SchoolBotScoreOutbox` (2) รอบ worker ถัดไป/จำลอง reconcile: ค้น receipt ใน clone ด้วย marker ของ OperationKey (`Application='SchoolBot'` + `MethodName='ScoreExport.Apply'` + grade context) → UPDATE test-SchoolBot DB outbox เป็น `State='applied'`, `ReceiptId`, `ReceiptHash` (3) สาขาตรงข้าม: ไม่พบ receipt → ถือว่ายังไม่เคย commit (retry ได้) ไม่ใช่ apply ใหม่ทับ (4) partial (AC-052-04): fixture 3 คน (applied/conflict/blocked) → export state `completed_with_skips`/`paused_conflict` ตามจริง แสดงผลรายคน
+- **สิ่งที่ต้องรัน**: (1) apply สำเร็จครบ (UPDATE + INSERT receipt + COMMIT) แต่**จำลอง crash ก่อนข้อ 5 ของลำดับ DES-009** — ไม่อัปเดต `SchoolBotScoreOutbox` (2) **ให้ worker จริงบน test env ทำ reconcile เองหลัง failpoint** (แก้ตาม check-061: ผู้ตรวจอ่านผลเท่านั้น ห้าม "จำลอง reconcile" แล้ว UPDATE outbox เอง — มิฉะนั้นหลักฐานกำหนดผลเองได้): worker ค้น receipt ใน clone ด้วย marker ของ OperationKey (`Application='SchoolBot'` + `MethodName='ScoreExport.Apply'` + grade context) → UPDATE test-SchoolBot DB outbox เป็น `State='applied'`, `ReceiptId`, `ReceiptHash` (3) สาขาตรงข้าม: อ่าน receipt ไม่สำเร็จ/ยืนยันไม่ได้ → **คง unknown/reconciling ต่อ** ห้ามถือว่า retry write ได้จนกว่า worker จะยืนยันได้ว่าไม่เคย commit (แก้ตาม check-061) (4) partial (AC-052-04): fixture 3 คน (applied/conflict/blocked) → export state `completed_with_skips`/`paused_conflict` ตามจริง แสดงผลรายคน
 - **ผลที่ยอมรับ**: สาขา 2 — `xmin`/`ScoreData` ของแถวเป้าหมาย**ไม่เปลี่ยนเพิ่ม**จากรอบก่อน (EV-SN-01); state รายคนตรงความจริง; คงผลคนที่สำเร็จ ไม่ rollback โดยเดา (recovery ลำดับ 5–6)
 - **ห้าม**: apply ซ้ำเมื่อสถานะไม่แน่ใจ; rollback คะแนนที่ลงแล้วโดยไม่มีหลักฐาน
 
@@ -170,4 +175,5 @@ UPDATE "PgtgradeDetail" SET "ScoreData" = :new_json
 
 ## Change Log
 
+- 2026-10-24 — แก้ตาม check-061-verify: EV-RC-02 reconcile ต้องทำโดย worker จริง+unknown คง reconciling; EV-CX-01 ใช้ PK (nGradeDetailId)+tenant+xmin+before_document_hash และเพิ่ม fixture แถวบริบทซ้ำ
 - 2026-10-24 — Rev1: สร้างชุดคำขอ/ขั้นตอนหลักฐาน runtime cross-DB/export ครอบ G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB (docs-only, SQL ตัวอย่างจำกัด test-SchoolBot DB/test clone เท่านั้น) — รันโดย นายช่าง solo (subagent role vault)

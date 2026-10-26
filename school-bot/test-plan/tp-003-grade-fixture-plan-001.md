@@ -38,9 +38,11 @@
 | id | จุดตรวจ · AC ที่ครอบ | วิธีจำลอง | Expected หลัก |
 | --- | --- | --- | --- |
 | GF-03a | ครู(writer เดิม)แก้ช่อง SchoolBot หลังรอบก่อน · AC-051-01/03 | legacy-writer simulator UPDATE PgtgradeDetail ระหว่าง preview(จับ xmin)→worker apply; รวม inject delay ให้แก้หลัง snapshot เพียงเสี้ยววินาทีก่อน UPDATE | `SELECT..FOR UPDATE` + `UPDATE..WHERE PK + xmin(snapshot) + before_document_hash` → affected 0 → conflict รายคน rollback คนนั้น คงคนอื่น; export=paused_conflict แสดงรายการชน; ห้ามอ้าง UpdateDate ของ SchoolBot DB แทน xmin ของ PGGradeDB |
-| GF-03b | resolve replace/keep แล้วชนซ้ำ · AC-051-02/03 | หลังพบชน resolve {A:replace_owned, B:keep_destination} → preview ใหม่ (SupersedesId ชี้ใบเดิม) → inject ปลายทางเปลี่ยนอีกก่อน confirm/apply | A ได้ค่าที่เสนอเมื่อ CAS ผ่าน B คงค่าครู; ปลายทางเปลี่ยนอีก→409 TARGET_CHANGED/PREVIEW_STALE ตรวจชนใหม่ ไม่เขียนทับล่าสุดเงียบ; resolve ใช้ได้เฉพาะ conflict ที่ server ตรวจพบ; replace_owned ไม่ override lock/สิทธิ์/ผลพิเศษ/PgtgradeEdit; ครูต้อง confirm preview ใหม่อีกครั้ง |
+| GF-03b | resolve replace/keep **สำเร็จ** (ไม่มีแก้แทรก) · AC-051-02/03 (แยก case ตาม check-061) | หลังพบชน resolve {A:replace_owned, B:keep_destination} → preview ใหม่ → confirm → apply **โดยไม่ inject อะไรระหว่างทาง** | A ได้ค่าที่เสนอเมื่อ CAS ผ่าน (before/after snapshot ยืนยันเฉพาะช่อง A เปลี่ยนเป็นค่าเสนอ) และ B คงค่าครูเดิม (snapshot ยืนยันไม่เปลี่ยน) — พิสูจน์เส้นทางสำเร็จของ replace/keep แยกจากกรณีชนซ้ำ |
+| GF-03b2 | resolve แล้วชนซ้ำ/ข้อมูลเปลี่ยนแทรก · AC-051-03 | เช่นเดิมของ GF-03b แต่ inject ปลายทางเปลี่ยนอีกหลัง resolve/preview ใหม่ ก่อน confirm/apply | 409 TARGET_CHANGED/PREVIEW_STALE ตรวจชนใหม่ หยุดก่อนเขียนทับค่าล่าสุดเงียบ; resolve ใช้ได้เฉพาะ conflict ที่ server ตรวจพบ; replace_owned ไม่ override lock/สิทธิ์/ผลพิเศษ/PgtgradeEdit; ครูต้อง confirm preview ใหม่อีกครั้ง |
 | GF-03c | create race/ช่องซ้ำ · AC-049-02, AC-049-05 | สอง process พร้อมกัน: สร้าง GradeSlot ช่องเดียวกันแม้ยังไม่มี slot; เพิ่มกิจกรรม B เป็น source ที่สองของช่องที่ A ใช้ (PUT ชุดเดิม); สร้าง mapping ใหม่ B→ช่องของ A (POST); retire/soft-delete แล้วเปิดช่องเดิม | advisory lock คีย์ช่อง canonical + ล็อก CourseRun/GradeSlot/Mapping ตาม PK + อ่านประวัติซ้ำหลัง lock กัน create race ข้าม process; ผ่านรอดเดียว อีกฝ่าย 409; source ที่สอง→409 MAPPING_SOURCE_COUNT_INVALID; B→ช่องของ A ปฏิเสธตาม ux_schoolbot_scoremapping_active/ตระกูล SLOT_ALREADY_OWNED ไม่ประดิษฐ์รหัสใหม่; ux_schoolbot_gradeslot_active_ownership กัน ownership active ซ้ำรวม IsDelete/RetiredAt; retire/soft-delete แล้วเปิดช่องเดิม→409 MAPPING_LOCKED ห้าม hard-delete หลบ |
 | GF-03d | outbox lease/serialize/EXPORT_IN_PROGRESS · AC-052-03 | worker สองตัว claim outbox เดียวกัน; ขณะ pending/running/unknown มี operation ใหม่ซ้อนช่อง+learner เดิม; worker recheck ก่อน apply | lease+UpdateDate(clock_timestamp()) เดียวชนะ (CreateBy/UpdateBy=null); serialize ต่อ SchoolId/grade context/learner; ซ้อน→409 EXPORT_IN_PROGRESS reconcile ก่อน; worker recheck source/policy/mapping/สิทธิ์/License/locks ก่อน PG transaction และไม่เติมผลใหม่ลงช่องที่ยืนยันให้ข้าม |
+| GF-03d2 | lease boundary ก่อน/ตรง/หลัง LeaseUntil + worker เก่ากลับมา · AC-052-03 (เพิ่มตาม check-061) | fake clock ขับ `LeaseUntil`: (1) claim ที่ LeaseUntil−1s (ยังอยู่ในอายุ) (2) เที่ยงพอดี LeaseUntil (หมดอายุแล้ว) (3) LeaseUntil+1s; และ worker เก่า (W1) กลับมาทำงานต่อหลัง outbox ถูก W2 claim ใหม่แล้ว | ก่อนหมดอายุ: W2 ปฏิเสธ/รอ ผู้ถือ lease = W1 เท่านั้น; ที่/หลังหมดอายุ: W2 claim ได้ + W1 ต้องตรวจ lease ของตนก่อนเขียน — พบไม่ใช่ของตน → หยุด ไม่เขียนคะแนน/receipt ซ้ำ; ทุกกรณีตรวจผู้ถือ lease ปัจจุบัน + receipt ใน audit + คะแนนจริงจาก before/after snapshot — ไม่มีสอง receipt ต่อการ apply หนึ่งครั้ง |
 
 วิธี/ห้ามแตะ: test SchoolBot DB + test PG store (schema เดิม xmin แท้) + legacy-writer simulator + fault injection (delay/failpoint ระหว่าง read→update); ห้ามแตะ PGGradeDB จริงทุกชนิด · ห้ามเรียก sb-service-academic-score-record เดิม · ห้ามรัน SQL กับ production · ห้าม GRANT/สร้าง role
 
@@ -95,13 +97,13 @@
 | AC-050-03 | GF-01a, GF-01b |
 | AC-050-04 | GF-01d |
 | AC-051-01 | GF-03a, GF-05c |
-| AC-051-02 | GF-03b |
-| AC-051-03 | GF-01d, GF-03a, GF-03b |
+| AC-051-02 | GF-03b, GF-03b2 |
+| AC-051-03 | GF-01d, GF-03a, GF-03b, GF-03b2 |
 | AC-051-04 | GF-02a, GF-04a, GF-05d |
 | AC-051-05 | GF-01b, GF-04c |
 | AC-052-01 | GF-05a, GF-05b, GF-05d |
 | AC-052-02 | GF-05b, GF-06b6 |
-| AC-052-03 | GF-02b, GF-03d, GF-04d, GF-06a, GF-06b1, GF-06b2, GF-06b3, GF-06b4, GF-06c |
+| AC-052-03 | GF-02b, GF-03d, GF-03d2, GF-04d, GF-06a, GF-06b1, GF-06b2, GF-06b3, GF-06b4, GF-06c |
 | AC-052-04 | GF-02a, GF-02b, GF-03a, GF-04a, GF-06b4, GF-06b5, GF-06b6 |
 | AC-052-05 | GF-02a, GF-04a, GF-04d, GF-06a |
 
@@ -119,4 +121,5 @@
 
 ## Change Log
 
+- 2026-10-24 — แก้ตาม check-061-verify: เพิ่ม GF-03d2 (lease boundary ก่อน/ตรง/หลัง LeaseUntil + worker เก่ากลับมา) และแยก GF-03b เป็น case สำเร็จล้วน + case ชนซ้ำ; อัปเดต coverage
 - 2026-10-24 — Rev1: สร้างแผน grade parity/coexistence/crash fixtures (GF-01..06) แยกตาม 5 gate ของ SA-004 Rev2 ครอบ AC-049..052 พร้อม coverage table และข้อจำกัดรอของจริง; docs-only read-only ทุก actual=NOT_RUN — รันโดย นายช่าง solo (subagent role inspect)
