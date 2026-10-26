@@ -43,6 +43,7 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 [receipt071](../design/learning-ux-contract-gaps-001.md): LUX-01..07 draft/approval, Sheet, bank draft, attempt, expired/time, aggregate/proposal, G→B ยัง OPEN ทางเทคนิค. [042](../requirement/decisions-042.md): ผู้ใช้เลือก A แล้ว มี precedence เหนือ proposal072; ตรวจ saved answers ทันเวลาอัตโนมัติ ข้อว่าง0 เต็มทั้งชุด ไม่รับย้อนหลัง นับครั้ง/ซ่อมตาม policy เดิม. ไม่ถามซ้ำ ไม่ใช่ UX sign-off. ปัจจุบัน44REQ/186AC/81TP ตาม [AC07](../requirement/req-046.md)/[Amendment004](../test-plan/tp-001-amendment-004.md); snapshot180/77คงเดิม. H5 เดิมคงค้างตาม §1.
 
 ## Change Log
+- 2026-10-26 — ใบงาน089: เปลี่ยน current queue pointers เป็น006ตาม related-impact sweep; คงคำขอหลักฐาน/เจ้าของ/ประตูเดิม ไม่มีการส่งข้อความหรือรับรองแทนผู้ใช้.
 - 2026-10-26 — 079: sync042/186AC/81TP และคิวเอกสาร; ไม่เพิ่มowner approval/H5/gate closure.
 - 2026-10-26 — 074: เพิ่ม pointers/แก้คิว UX; ไม่เพิ่ม approval.
 - 2026-10-26 — ใบงาน065: รวมชุด owner review พร้อมส่ง; แยก approval/DB evidence/UX sign-off/runtime. ไม่มี approval, H5/G-CORE closure หรือคำอนุญาตรันระบบเกิดจากการสร้าง packet.
