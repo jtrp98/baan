@@ -6,7 +6,7 @@ import { loadWorkspace, resolveRoleName, resolveWorkspaceConfig } from "./config
 import { DEFAULT_TIMEOUT_SEC, resolveTimeout, validateTimeout } from "./timeout.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { parseWorkDate } from "./prompts.mjs";
-import { classifyOutcome, runWithFallback } from "./scheduler.mjs";
+import { capacityRetryText, classifyOutcome, runWithFallback, switchReasonText } from "./scheduler.mjs";
 
 export { DEFAULT_TIMEOUT_SEC };
 export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--timeout <sec>] [--cwd <dir>] [--list]`;
@@ -66,7 +66,8 @@ export function createRunDir(reportsDir, { role, tier, write, count }, now = new
 // สลับตัวรันเมื่อติดโควตาเฉพาะตอนสั่ง agent เดียวพร้อม --tier: --all รันทุกตัวอยู่แล้ว (สลับ = ได้คำตอบซ้ำ)
 // และไม่มี tier = ไม่รู้ model ของตัวสำรอง
 // attempt(agent, isRequested) — --model/--effort ที่ผู้ใช้ส่งเป็นชื่อเฉพาะของ agent ที่สั่ง ตัวสำรองต้องใช้ค่าของ tier
-export async function runRoleAgents({ cfg, opts, selected, attempt, onResult = () => {}, log = console.log }) {
+// retry: แทนค่าการรอเมื่อโมเดลเต็ม (ใช้ตอนทดสอบเพื่อไม่ต้องรอจริง)
+export async function runRoleAgents({ cfg, opts, selected, attempt, onResult = () => {}, log = console.log, retry = {} }) {
   const canFallback = opts.fallback && !!opts.tier && selected.length === 1;
   const runOne = async (name) => {
     const tierChain = canFallback ? fallbackChainFor(cfg, opts.tier, name) : [];
@@ -74,7 +75,8 @@ export async function runRoleAgents({ cfg, opts, selected, attempt, onResult = (
     const { r, agent, trail } = await runWithFallback(
       chain,
       (a) => attempt(a, a === name),
-      (from, to, reason) => log(`${from} ${reason === "missing" ? "ไม่ได้ติดตั้งบนเครื่อง" : "ติดโควตา/limit"} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${opts.tier})`),
+      (from, to, reason) => log(`${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${opts.tier})`),
+      { onRetry: (...a) => log(capacityRetryText(...a)), ...retry },
     );
     const cls = classifyOutcome(r);
     const res = { ...r, requested: name, agent, fallback: trail, state: cls.state, marker: cls.marker, ok: cls.ok, cliOk: r.ok };

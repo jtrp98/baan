@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
-import { execute, runWithFallback } from "../src/scheduler.mjs";
+import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
@@ -76,7 +76,7 @@ export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, p
       if (def.promptVia === "arg") args.push(promptText);
       return runner(def, args, def.promptVia, promptText, opts.cwd, resolveTimeout(opts, cfg.tiers[tier]), def.answerFrom === "answerFile" ? answerFile : undefined);
     },
-    (from, to) => console.log(`[${fileName.split(".")[0]}] ${from} ติดโควตา/limit — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
+    (from, to, reason) => console.log(`[${fileName.split(".")[0]}] ${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
   );
   return { r, agent, answerFile };
 }

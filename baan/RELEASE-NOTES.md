@@ -2,6 +2,18 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.19.0 — 2026-10-26 · ตัวรันไม่ล้มเงียบ: retry เมื่อโมเดลเต็ม + เหตุล้มอยู่ใน report + agy โหมดเขียนอ่านนอก cwd
+
+ที่มา: run จริงของ school-bot — codex T2 ล้มทันทีด้วย `ERROR: Selected model is at capacity` (สั่ง `--no-fallback` จึงไม่มีทางรอด) และ agy T3 โหมดเขียน (cwd = target) อ่าน knowledge ไม่ได้ จบ exit 0 คำตอบว่าง · ทั้งสองกรณี `report.json` มี `error` ว่าง ต้องเปิด stderr เองถึงรู้เหตุ
+
+### เพิ่ม
+- **retry เมื่อโมเดลเต็มชั่วคราว** — บรรทัด error ของ CLI ที่บอก `at capacity`/`overloaded` = รอ 30s แล้ว 90s ลองตัวรันเดิมซ้ำ · ใช้ได้แม้ `--no-fallback` เพราะไม่เปลี่ยนตัวรัน · ลองครบยังเต็มค่อยนับเป็นเหตุสลับตาม `_fallback` · ทำงานขนานได้เหมือนเดิม (รอเฉพาะงานที่เต็ม แต่ wave ถัดไปของ `baan` จะเริ่มหลังงานนั้นจบ)
+- **`setup/agy/grant-read.mjs`** — เพิ่ม/ถอน allow-rule `read_file(<dir>)` ใน settings ของ agy (ไม่ระบุ = ราก workspace จาก `baan.config.json`, สำรองเดิมเป็น `.baan-bak`) ให้งาน `--write` อ่าน knowledge/repo อื่นใน workspace ได้ โดยไม่ขยายสิทธิ์เขียนแบบ `--add-dir` (live test: อ่านได้ · `write_file` ไปที่เดียวกันยังถูกปฏิเสธ) — แนะนำรันครั้งเดียวต่อเครื่องถ้าใช้ agy โหมดเขียน (ดู `setup/agy/README.md`)
+
+### เปลี่ยน
+- **ช่อง `error`** ใน `report.json`/checkpoint มีบรรทัด error ที่ CLI ประกาศเองจาก stderr (`ERROR:`/`AGY_ERROR:`/`jetski:` ฯลฯ) เมื่อล้มหรือคำตอบว่าง — เดิมมีเฉพาะ spawn error · agy ถูกปฏิเสธสิทธิ์อ่านมีคำแนะนำทางแก้ต่อท้าย · `baan-role` แสดงเป็น `error:` แทน `spawn error:`
+- tests 112 → 121
+
 ## 0.18.0 — 2026-10-26 · ดันให้ถึงโค้ดเร็ว + เอกสารเบาลง (จากผลตรวจอิสระ)
 
 ที่มา: ผลตรวจอิสระของ framework เทียบกับ school-bot — 6 วันมีใบงานเขียนโค้ด 5/80 ใบ, งาน implement 62/63 ติดประตูมนุษย์ทางอ้อม, archive กิน 39% ของ knowledge, index.md เป็น change log 70%, response JSON ดิบ 63 ไฟล์ปนใน knowledge และ sweep มติเดียวใช้ 9 role calls

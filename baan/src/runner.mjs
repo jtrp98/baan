@@ -15,6 +15,7 @@ function killTree(child) {
 // jetski ของ agy กันอ่านไฟล์นอก workspace และ headless ปฏิเสธคำขอแทนการถาม จนได้คำตอบว่างเปล่า
 // (พบจริงจาก SA ที่ cwd=target อ่าน knowledge/ ไม่ได้) · โหมดเขียนไม่ใส่ เพราะ --add-dir
 // ขยายขอบเขต "การเขียน" ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนจึงต้องอยู่ใน cwd เท่านั้น
+// ส่วนการอ่านนอก cwd ในโหมดเขียนให้ผ่าน allow-rule read_file ของเครื่อง (setup/agy/grant-read.mjs) ซึ่งไม่ให้สิทธิ์เขียน
 export function buildArgs(def, model, effort, write, answerFile, workspaceRoot = "") {
   const fill = (arr) => arr.map((a) => a.replaceAll("<ANSWER>", answerFile).replaceAll("<MODEL>", model).replaceAll("<EFFORT>", effort).replaceAll("<WORKSPACE_ROOT>", workspaceRoot));
   return [
@@ -23,6 +24,24 @@ export function buildArgs(def, model, effort, write, answerFile, workspaceRoot =
     ...(!write && workspaceRoot && def.workspaceDirArgs ? fill(def.workspaceDirArgs) : []),
     ...fill(write ? def.writeArgs : def.readArgs),
   ];
+}
+
+// เหตุที่ล้มต้องอยู่ใน report.json เลย — เดิม error ว่างเมื่อ process จบเอง (codex "at capacity" exit 1,
+// agy ถูกปฏิเสธสิทธิ์แต่ exit 0 คำตอบว่าง) ต้องไปเปิด stderr เองถึงรู้
+// stderr ของ codex มี transcript ทั้งงานปนอยู่ จึงเลือกเฉพาะบรรทัดที่ CLI ประกาศ error เอง ไม่ใช่ทั้งก้อน
+const ERROR_LINE = /^(?:ERROR|AGY_ERROR|API Error|Error|fatal|jetski):/;
+const ERROR_TEXT_CAP = 600;
+const ERROR_HINTS = [
+  [/"read_file" permission/, "อ่านไฟล์นอก cwd ไม่ได้ — ให้สิทธิ์อ่านด้วย setup/agy/grant-read.mjs (อย่าใช้ --add-dir/--dangerously-skip-permissions ในโหมดเขียน)"],
+];
+
+export function summarizeStderr(stderr) {
+  const lines = String(stderr ?? "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (!lines.length) return "";
+  const picked = [...new Set(lines.filter((l) => ERROR_LINE.test(l)))].slice(-3);
+  let text = picked.length ? picked.join(" | ") : lines.join("\n").length <= ERROR_TEXT_CAP ? lines.join(" | ") : "";
+  for (const [re, hint] of ERROR_HINTS) if (re.test(text)) text += ` → ${hint}`;
+  return text.length > ERROR_TEXT_CAP ? `${text.slice(0, ERROR_TEXT_CAP)}…` : text;
 }
 
 // runCli คืนผลเสมอ (ไม่ reject) เพื่อให้ scheduler จัดการความล้มเหลวเป็นสถานะงานต่อเนื่องได้
@@ -57,7 +76,9 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
       if (def.answerFrom === "answerFile" && answerFileHint) {
         try { answer = readFileSync(answerFileHint, "utf8").trim(); } catch { /* agent ไม่ได้เขียนไฟล์ = ไม่มีคำตอบ */ }
       } else answer = stdout.trim();
-      resolve({ ok: code === 0 && !timedOut, exitCode: code, durationMs: Date.now() - started, timedOut, answer, error: "", stdout, stderr });
+      const ok = code === 0 && !timedOut;
+      const error = ok && answer ? "" : summarizeStderr(stderr);
+      resolve({ ok, exitCode: code, durationMs: Date.now() - started, timedOut, answer, error, stdout, stderr });
     });
     if (promptVia === "stdin") {
       child.stdin.on("error", () => {}); // กัน crash ถ้า process ตายก่อนรับ stdin

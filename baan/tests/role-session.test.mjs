@@ -105,3 +105,18 @@ test("bin: ไม่ระบุ --agent ได้ข้อความที่
   assert.equal(badDate.status, 2);
   assert.match(badDate.stderr, /YYYY-MM-DD/);
 });
+
+test("runRoleAgents: --no-fallback ยัง retry ตัวเดิมเมื่อโมเดลเต็ม และ error ของ CLI ขึ้นใน log", async () => {
+  const cap = { ...limitRun(), stderr: "ERROR: Selected model is at capacity. Please try a different model.", error: "ERROR: Selected model is at capacity. Please try a different model." };
+  let n = 0;
+  const logs = [];
+  const [r] = await runRoleAgents({
+    cfg, opts: mkOpts({ fallback: false }), selected: ["codex"], log: (m) => logs.push(m),
+    attempt: async () => (++n < 2 ? cap : okRun()),
+    retry: { sleep: async () => {} },
+  });
+  assert.equal(n, 2);
+  assert.equal(r.state, "completed");
+  assert.deepEqual(r.fallback, []);
+  assert.match(logs.join("\n"), /codex โมเดลเต็มชั่วคราว/);
+});

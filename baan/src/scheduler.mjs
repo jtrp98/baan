@@ -99,16 +99,42 @@ export function looksLikeMissingCli(r) {
   return MISSING_CLI_PATTERNS.some((p) => p.test(hay));
 }
 
-// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit หรือไม่ได้ติดตั้งบนเครื่อง
+// โมเดลเต็มชั่วคราว (codex: "ERROR: Selected model is at capacity") หายเองในไม่กี่นาที — รอแล้วลองตัวเดิมซ้ำก่อน
+// แทนการสลับค่ายทันที งานที่สั่ง --no-fallback จึงยังรอดได้เพราะไม่เปลี่ยนตัวรัน · ลองครบแล้วยังเต็มค่อยนับเป็นเหตุสลับ
+// จับเฉพาะบรรทัดที่ CLI ประกาศ error เอง เพราะ stderr ของ codex มี transcript ของงานปนอยู่
+const CAPACITY_ERROR_RE = /^(?:ERROR|AGY_ERROR|API Error|Error):.*\b(?:at capacity|overloaded)\b/im;
+export const CAPACITY_RETRY_DELAYS_MS = [30_000, 90_000];
+
+export function looksLikeCapacityError(r) {
+  if (r.ok || r.timedOut) return false;
+  return CAPACITY_ERROR_RE.test(`${r.error ?? ""}\n${r.stderr ?? ""}`);
+}
+
+export function switchReasonText(reason) {
+  if (reason === "missing") return "ไม่ได้ติดตั้งบนเครื่อง";
+  if (reason === "capacity") return "โมเดลยังเต็มหลังลองซ้ำครบ";
+  return "ติดโควตา/limit";
+}
+
+const sleepMs = (ms) => new Promise((res) => setTimeout(res, ms));
+export const capacityRetryText = (agent, n, total, delayMs) => `${agent} โมเดลเต็มชั่วคราว (at capacity) — รอ ${Math.round(delayMs / 1000)}s แล้วลองใหม่ (${n}/${total})`;
+const logRetry = (...a) => console.log(capacityRetryText(...a));
+
+// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit, ไม่ได้ติดตั้งบนเครื่อง หรือเต็มจนลองซ้ำครบ
 // ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ baan-role เพื่อให้กติกาการสลับเป็นชุดเดียว
-export async function runWithFallback(chain, attempt, onSwitch = () => {}) {
+export async function runWithFallback(chain, attempt, onSwitch = () => {}, { retryDelaysMs = CAPACITY_RETRY_DELAYS_MS, sleep = sleepMs, onRetry = logRetry } = {}) {
   const trail = [];
   let r = null;
   let agent = chain[0];
   for (let i = 0; i < chain.length; i++) {
     agent = chain[i];
     r = await attempt(agent);
-    const reason = looksLikeLimitError(r) ? "limit" : looksLikeMissingCli(r) ? "missing" : null;
+    for (let k = 0; k < retryDelaysMs.length && looksLikeCapacityError(r); k++) {
+      onRetry(agent, k + 1, retryDelaysMs.length, retryDelaysMs[k]);
+      await sleep(retryDelaysMs[k]);
+      r = await attempt(agent);
+    }
+    const reason = looksLikeLimitError(r) ? "limit" : looksLikeMissingCli(r) ? "missing" : looksLikeCapacityError(r) ? "capacity" : null;
     if (r.ok || reason === null || i + 1 >= chain.length) break;
     trail.push(`${chain[i]}→${chain[i + 1]}`);
     onSwitch(chain[i], chain[i + 1], reason);
@@ -147,7 +173,8 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
         chain,
         (agent) => runTask(cfg, { ...opts, timeoutSec: resolveTimeout(opts, cfg.tiers?.[t.tier]) }, runDir, t, ctxBlocks, agent),
-        (from, to, reason) => console.log(`  ${t.id}: ${from} ${reason === "missing" ? "ไม่ได้ติดตั้งบนเครื่อง" : "ติดโควตา/limit"} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
+        (from, to, reason) => console.log(`  ${t.id}: ${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
+        { onRetry: (...a) => console.log(`  ${t.id}: ${capacityRetryText(...a)}`) },
       );
       t.agent = usedAgent;
       return { t, r, fallbackTrail };

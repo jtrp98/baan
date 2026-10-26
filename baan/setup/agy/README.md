@@ -31,6 +31,20 @@ agy agents                                                   # ต้องเ�
 cd <repo baan>; npm run smoke:live -- --agents agy       # ต้องได้ PASS — "RO กันเขียน" ต้องเป็น ✅
 ```
 
+## สิทธิ์อ่านนอก cwd สำหรับงาน `--write` — ตั้งครั้งเดียวต่อ workspace
+
+งานเขียนรันโดยให้ cwd เป็น target repo แต่ต้องอ่าน `knowledge/` หรือ repo อื่นใน workspace ด้วย ซึ่ง agy แบบ headless จะปฏิเสธเงียบๆ
+(`jetski: ... required the "read_file" permission ... auto-denied` แล้ว exit 0 คำตอบว่าง) · `--add-dir` ใช้ในโหมดเขียนไม่ได้เพราะเปิดสิทธิ์เขียนตามไปด้วย
+ทางที่ใช้คือ allow-rule `read_file(<dir>)` ใน `~\.gemini\antigravity-cli\settings.json` ซึ่งให้**แค่สิทธิ์อ่าน** (live test 2026-10-26: อ่านได้ · `write_file` ไปที่เดียวกันยังถูกปฏิเสธ)
+
+```powershell
+cd C:\src\schoolbright                                       # โฟลเดอร์ที่มี baan.config.json
+node <repo baan>\baan\setup\agy\grant-read.mjs             # เพิ่ม read_file(<ราก workspace>) · สำรองเดิมไว้ที่ settings.json.baan-bak
+node <repo baan>\baan\setup\agy\grant-read.mjs <dir>       # หรือระบุโฟลเดอร์เอง (เช่น repo legacy นอก workspace) · ถอนด้วย --remove
+```
+
+อย่าใช้ `--dangerously-skip-permissions` แทน — อนุมัติทุก tool รวมการเขียนนอก cwd
+
 ## ข้อจำกัดที่รู้แล้ว
 
 - guard ตรวจว่าเป็นเซสชัน `baan-readonly` จาก command line ของ process `agy` (ผ่าน PowerShell/CIM, Windows) — ถ้าตรวจไม่ได้
