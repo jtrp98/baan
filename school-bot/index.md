@@ -26,6 +26,8 @@
 
 คิวปัจจุบัน: [Queue 004](plan/queue-004.md) · [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md) · [ผล sync status JSON ตาม verdict เดิม](planning/status-sync-062-001.json) · [ผลตรวจร่าง UX-005/007](planning/check-066-ux-review-001.md). ผลตรวจร่างไม่ใช่ human sign-off หรือ runtime acceptance
 
+รอบสัญญาที่ UX ต้องใช้: [gap receipt 7 กลุ่มจาก arch071](design/learning-ux-contract-gaps-001.md) — ยัง OPEN; [ข้อเสนอผลข้อสอบเมื่อหมดเวลา](requirement/expired-attempt-decision-proposal-001.md) รอผู้ใช้เลือก ไม่ใช่มติหรือ AC ใหม่. ข้อเทคนิคอื่นให้ arch/sys รับต่อ ไม่ให้ผู้ใช้เดา DTO/schema
+
 เอกสารล่าสุด: [ผลตรวจ Login Gateway และแบบ reuse ด้วย Codex](planning/gateway-login-receipt-001.md) — source review/contract amend; adapter/H5 ยังมี technical gaps
 
 เอกสารล่าสุด: [Authflow code/localcheck](planning/auth-flow-handoff-001.md) — logoutและinternaldecoderผ่านlocalcheck; fullLoginยังไม่พร้อม

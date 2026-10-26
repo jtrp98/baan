@@ -35,9 +35,13 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 ## 4. ลำดับเปิดงานและหลักฐานภายหลัง
 1. ผู้ใช้ส่ง packet/DB cover; รับคำตอบ G/Light/infra/BFF และ EV ตามลำดับข้างต้น. service-route คงปิดระหว่างรอ.
 2. arch/sys reconcile คำตอบกับ contract เดิมผ่านผู้คุม; ตรึง DTO/trailer/manifest และ Login prerequisites ตาม operation. B เป็นเจ้าของ .proto แล้ว sync G หลัง owner รับรอง พร้อม parser/codegen/hash.
-3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-004; UX-005/007 ร่างได้ทันที→check→ผู้ใช้เซ็น แยกจาก owner approval นี้. signed 5/7 เดิมคงอยู่; draft ใหม่ยังไม่ถือว่าผ่านหรือเซ็น.
+3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-004; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; รอ final073→ผู้ใช้เซ็น แยกจาก owner approval. signed 5/7 เดิมคงอยู่; ยังไม่มีรายงาน073/sign-offใหม่.
 4. Runtime ภายหลัง: HTTP↔RPC mapping, private reachability/no-loop/wrong-peer, spoof/tenant, deadline/cancel/retry/limits/BFF security และ SQL/rollback/catalog/grade proof บน environment ที่คนอนุญาต. 4032 local tests ใช้แทน integration ไม่ได้.
 5. Bootstrap ตาม procedure ที่ review แล้วโดยมนุษย์และผู้ตรวจซ้ำ; shared/production SQL/deploy ต้องมีคำสั่งเจาะจงภายหลัง. Login end-to-end คงปิดถ้า linkage/continuation/device-proof ไม่ครบ. gm รวม release runbook เมื่อหลักฐาน/ชิ้นส่วนครบ.
 
+## ข้อมูลรับเพิ่มเติม
+[receipt071](../design/learning-ux-contract-gaps-001.md): LUX-01..07 draft/approval, Sheet, bank draft, attempt, expired/time, aggregate/proposal, G→B ยัง OPEN ทางเทคนิค. [proposal072](../requirement/expired-attempt-decision-proposal-001.md): expired A/B รอผู้ใช้; ยังไม่เลือก A. H5 เดิมคงค้างตาม §1.
+
 ## Change Log
+- 2026-10-26 — 074: เพิ่ม pointers/แก้คิว UX; ไม่เพิ่ม approval.
 - 2026-10-26 — ใบงาน065: รวมชุด owner review พร้อมส่ง; แยก approval/DB evidence/UX sign-off/runtime. ไม่มี approval, H5/G-CORE closure หรือคำอนุญาตรันระบบเกิดจากการสร้าง packet.

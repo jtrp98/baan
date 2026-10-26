@@ -1,6 +1,6 @@
 # SchoolBot — Index งานย่อย Rev2
 
-เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-004](../queue-004.md); JSON รอผู้คุม sync15 ตามหลักฐาน ไม่เพิ่ม verdict.
+เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-004](../queue-004.md); JSON sync15verified/95pendingแล้วตาม [status-sync](../../planning/status-sync-062-001.json); ไม่เพิ่ม verdict.
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
@@ -42,5 +42,6 @@
 | [DBA-007](../DBA-007.md) | เตรียม cross-DB/export runtime evidence pack | vault | P1 | DBA-001, SA-004 | **verified** (ใบงาน061 — check PASS) |
 
 ## Change Log
+- 2026-10-26 — 074: แก้ notice JSON; คง Status/ประวัติ.
 - 2026-10-26 — ใบงาน065: แก้คำสรุปที่ขัดตาราง; ไม่แตะ Status/verdict.
 - 2026-10-23 — Rev2: เพิ่ม36งานย่อยของscopeเดิมตามspec-review-001; statusเปลี่ยนได้จากcheckผ่านผู้คุมเท่านั้น

@@ -4,7 +4,7 @@
 
 ## หลักฐานก่อนคิว
 
-Precedence065 (2026-10-26): อ่าน [queue-004](queue-004.md)/[owner packet](owner-packet-001.md) ก่อนฐาน051/Rev2และตารางเดิม. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates; JSONรอsync15. GAP-07/AC030-04..08, rubric/ผู้อนุมัติเนื้อหา และperformance300MB/5s/30FPSมีมติ036..038แล้ว; ไม่ถามซ้ำ. UX signed5/7 ตาม036..041; UX005/007กำลังร่างรอcheck+คนเซ็น. packs/DB request+cover/SA004/TP003/DBA007พร้อมแล้ว ไม่สั่งเตรียมซ้ำ. ค้าง owner G/Light/H5, EV forwarding/DB evidence, spec Q3/cert/custody และ SQL/runtime/security/release. gRPC Rev1 §7/Gateway Rev4 ยังรอรับรอง; 4032localไม่แทนintegration. ใช้runnerตาม062: t0–2 codex/t3–5 agy --no-fallback ไม่ใช้native subagent. ฐานเดิมด้านล่างคงเป็นประวัติ ไม่ปิดgateจากnoticeนี้.
+Precedence065 (2026-10-26): อ่าน [queue-004](queue-004.md)/[owner packet](owner-packet-001.md) ก่อนฐาน051/Rev2และตารางเดิม. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates; JSON sync15แล้วตาม [status-sync](../planning/status-sync-062-001.json). GAP-07/AC030-04..08, rubric/ผู้อนุมัติเนื้อหา และperformance300MB/5s/30FPSมีมติ036..038แล้ว; ไม่ถามซ้ำ. UX signed5/7 ตาม036..041; UX005/007ร่างครบหลัง070/split; check066 PASS draft completeness; รอ final073+คนเซ็น. expired A/B รอคำตอบตาม queue004; ยังไม่มีรายงาน073. packs/DB request+cover/SA004/TP003/DBA007พร้อมแล้ว ไม่สั่งเตรียมซ้ำ. ค้าง owner G/Light/H5, EV forwarding/DB evidence, spec Q3/cert/custody และ SQL/runtime/security/release. gRPC Rev1 §7/Gateway Rev4 ยังรอรับรอง; 4032localไม่แทนintegration. ใช้runnerตาม062: t0–2 codex/t3–5 agy --no-fallback ไม่ใช้native subagent. ฐานเดิมด้านล่างคงเป็นประวัติ ไม่ปิดgateจากnoticeนี้.
 
 Precedence 2026-10-24 (051): อ่าน [Gateway Rev3](../design/gateway-integration-001.md), [receipt](../planning/auth-flow-handoff-001.md) และ [queue-003](queue-003.md) ก่อนฐานเดิม. gRPC/035/cType category ยืนยันแล้ว; ค้าง RPC+HTTP mapping/auth/tenant trust/Light/H5 และ routing/linkage proof. HTTP logout/decoder มีแล้ว; 4032 tests เป็น local/static PASS เดิม, PG integration NOT_RUN; ไม่ปิด G-AUTH/QA หรือ task. ข้อความ task023 ยังไม่มี output เป็นประวัติเมื่อจัดคิว003 ไม่ใช่สถานะเอกสารล่าสุด.
 
@@ -43,6 +43,7 @@ BE-033 weightsรวม100%, Quizไม่นับ0, freezeตอนเริ�
 BE-035หนึ่งsource100%ต่อช่อง,activityหลายช่องข้ามวิชา,ช่องเดิม/กันซ้ำข้ามชุด,immutableหลังส่งรวมretire/soft-delete/partial/pendingตามcontractล่าสุด;036earned/max*targetMax decimal half-up/missing skipคงเดิมแยกจริง0;037ชนต้องresolve/previewใหม่/CAS/owned-only merge/teacher overrideและผลพิเศษคงเดิม/receipt transactionเดียว;038outbox/replay/crash/partial/recheck/authz/auditสองฝั่ง.
 
 ## Change Log
+- 2026-10-26 — 074: แก้ current notice; เก็บ baseline/ประวัติเดิม.
 - 2026-10-26 — ใบงาน065: เพิ่ม amendment แยกมติ/artifact/verdict/หลักฐานที่ยังรอ; คงประวัติและgate definitions.
 - 2026-10-24 — ใบงาน051: แยกมติ transport/035/cType กับหลักฐานค้าง; ไม่เปลี่ยน verdict.
 - 2026-10-23 — Rev2: แยก approved decisions กับ evidence; ไม่ปิด gate ไม่เปลี่ยนstatus
