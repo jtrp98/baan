@@ -6,8 +6,8 @@
 ## สถานะปัจจุบัน (2026-10-26)
 
 - **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 95 pending · 8 phases / 17 gates · 44 REQ / 186 AC / 81 TP cases — ดู [plan/index.md](plan/index.md)
-- **คิว**: [Queue 005](plan/queue-005.md) ตาม CONTINUE-NORMAL + [ชุดส่งต่อเจ้าของ Gateway/DB](plan/owner-packet-001.md); กำลังทำ [ใบงาน088](planning/task-088.md) · รอบก่อน [handoff-003](planning/handoff-003.md)
-- **โค้ด**: logout API + Gateway outcome decoder ใน `target/school-bot/web` — test local 4032 ผ่าน ([qa/round-001](qa/round-001.md)); PG/fullLogin NOT_RUN และยังไม่ต่อ Gateway/gRPC จริง
+- **คิว**: หยุดหลังปิดงานที่เปิดอยู่ตาม [048](requirement/decisions-048.md); จุดต่อคือ [handoff-004](planning/handoff-004.md) และ [Queue 005](plan/queue-005.md) · [ใบงาน088](planning/task-088.md)
+- **โค้ด**: เพิ่มBtypedgRPCLogoutและGrequesthelperสำหรับdev; parentregression4032ผ่าน. [gRPCcheck](planning/check-088-grpc-001.md)80/101ผ่าน/21ตก; [authแก้รอบ1](planning/slice-088-auth-r1-001.md)รอตรวจซ้ำ; [Gbuild](planning/slice-088-gateway-001.md)ติดpackages. ยังไม่เปิดgRPCproduction/fullLogin/DBintegration
 - **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
 - **transport**: [Gateway Rev4](design/gateway-integration-001.md) + [gRPC contract Rev1](design/gateway-grpc-contract-001.md) — client→HTTP Gateway→gRPC SchoolBot · ผู้ใช้อนุญาต dev บน branch ที่เตรียมไว้ตาม [046](requirement/decisions-046.md); implementation review/H5/runtime ยังต้องพิสูจน์
 - **License**: create-license replay 15 นาทีอนุมัติแล้วตาม [046](requirement/decisions-046.md); ผู้ใช้พักเรื่อง signer/custody ตาม [047](requirement/decisions-047.md) เก็บค้างก่อนใช้กุญแจจริง งานส่วนที่ไม่พึ่งกุญแจเดินต่อได้
@@ -20,16 +20,16 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT · decisions-001..047 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT · decisions-001..048 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev8 / rules Rev10 / DBML Rev7 (32 ตาราง); constraints เหลือเฉพาะ PK32 ตามใบงาน086; DES-001..012 PROPOSED |
 | `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 15 verified / 95 pending |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
 | [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases / 186 AC (Amendment004); traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
-| [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASS local logout/component; PG/fullLogin NOT_RUN |
+| [qa/index.md](qa/index.md) | สารบัญ QA findings | round001 PASSเดิม; authใหม่แก้รอบ1รอตรวจซ้ำ; B gRPCcheck80pass/21fail; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | เซ็นครบ 7/7 รวม delta042 (decisions-043) |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | static review: Important 6 / Medium 6 / Minor 3 OPEN; SEC001-003/009 mitigation ระดับแบบ; ยังไม่มี re-audit runtime |
 | [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001..004 |
-| `db\` | SQL DDL/rollback + review (`review-001..007.md`, `schoolbot_db.sql`) | ร่างปัจจุบัน Rev7 (32 ตาราง; PK32/UQ0/FK0/CHECK0); ผู้ใช้ยืนยันรัน DDL แล้วตามบันทึก045; catalog/revision/runtime ยังไม่ตรวจ |
-| `planning\` | ใบงาน (task-NNN), handoff, หลักฐานรายรอบ — บันทึกประวัติ ไม่ใช่สถานะ | ล่าสุด: [handoff-003](planning/handoff-003.md) · ประวัติเก่า: [history-001](planning/history-001.md), [history-002](planning/history-002.md) |
+| `db\` | SQL DDL/rollback + review (`review-001..007.md`, `schoolbot_db.sql`) | ร่างRev7; ผู้ใช้รันDDLแล้ว/directconnectionและนับ32ตารางผ่าน; schema parity/transaction/APIintegrationยังไม่ตรวจ |
+| `planning\` | ใบงาน (task-NNN), handoff, หลักฐานรายรอบ — บันทึกประวัติ ไม่ใช่สถานะ | ล่าสุด: [handoff-004](planning/handoff-004.md) — ปิดรอบ088และหยุดตาม048 |
 | `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง | 001 บทเรียน/3 โหมด · 002 account/profile/tenant · 003 Course Plan Sheet · 004 PGGradeDB · 005 score writer นอก workspace (BLOCKED) |

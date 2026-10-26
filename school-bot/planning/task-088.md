@@ -40,3 +40,4 @@ Lint canonical plan exit1: implement63, ติด human gate62, พร้อม1
 - B gRPCLogout sysDONE/parent4032regressionผ่าน: slice-088-grpc-001. ส่งcheckT2แล้ว ขณะsysAGYT3แก้authรอบ1เฉพาะคนละไฟล์ ไม่รับsubsetก่อนcheck
 - ซ่อมGatewaytoolchain32ไฟล์ตามpinnedcommit/hashโดยไม่ทับของเดิม; preflightexit0แล้ว ส่งsysCodexT2ทำpuremetadatahelperต่อ ไม่ต้องถามติดตั้งซ้ำ รายละเอียดgateway-preflight-blocker-088
 - ผู้ใช้สั่งปิดงานที่กำลังทำแล้วหยุด ตามdecisions048. รับผลสามงานที่เปิดอยู่และทำparentverification/knowledgehandoffให้ครบ ไม่เปิดงานถัดไปหรือreworkรอบใหม่หลังผลออก
+- รับผลครบแล้วและหยุด: authรอบ1DONEรอindependentrecheck; gRPCcheckFAIL101cases/21fail; Ghelpercompileผ่านแต่fullbuildBLOCKEDpackages. Parentfinalregression4032ผ่าน5s. จุดต่อhandoff004; ไม่มีrolejobค้าง ไม่dispatchlocalmath/TP002หรือแก้gRPCรอบใหม่
