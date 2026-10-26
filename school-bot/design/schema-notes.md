@@ -1,18 +1,20 @@
-# หมายเหตุ schema — Rev6
+# หมายเหตุ schema — Rev7
 
-อ่าน [คู่มือ DBML](dbml-guide-001.md) สำหรับแบบเต็ม Rev4 และภาพ integration ที่เลือกเฉพาะจุดเชื่อมตารางเดิม; ชนิดของเส้นและจำนวนตารางในสองภาพต่างกันตามขอบเขตภาพ ไม่ได้เพิ่ม schema
+อ่าน [คู่มือ DBML](dbml-guide-001.md) สำหรับแบบเต็ม Rev7 และภาพ integration ที่เลือกเฉพาะจุดเชื่อมตารางเดิม; ชนิดของเส้นและจำนวนตารางในสองภาพต่างกันตามขอบเขตภาพ ไม่ได้เพิ่ม schema
 
 ## ขอบเขตและหลักฐาน
 
-ครบ **32 ตาราง** ตาม [data-model.md](data-model.md) Rev5, [db/schoolbot_db.sql](../db/schoolbot_db.sql) และผลการตัดทอนใน [db/review-005.md](../db/review-005.md) ภายใต้มติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md) (ตาราง `SchoolBotTeacherGrant` เป็นทางสำรองตาม [des-004.md](des-004.md) ที่ยังไม่ได้ตัดสินให้สร้าง จึงไม่รวมใน 32 ตารางของ SQL และ DBML).
+ครบ **32 ตาราง** ตาม [data-model.md](data-model.md) Rev8, [db/schoolbot_db.sql](../db/schoolbot_db.sql) และผลการตัดทอนใน [db/review-005.md](../db/review-005.md) ภายใต้มติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md) (ตาราง `SchoolBotTeacherGrant` เป็นทางสำรองตาม [des-004.md](des-004.md) ที่ยังไม่ได้ตัดสินให้สร้าง จึงไม่รวมใน 32 ตารางของ SQL และ DBML).
 
-คงไว้ในไฟล์ [schoolbot.dbml](schoolbot.dbml) ไฟล์เดียวเพื่อให้คัดลอกหรือนำเข้าไปเปิดใน [dbdiagram.io](https://dbdiagram.io) ได้ครบทั้ง 32 ตาราง (40 Foreign Keys) ทันทีโดยไม่ต้องรวมไฟล์เอง.
+คงไว้ในไฟล์ [schoolbot.dbml](schoolbot.dbml) ไฟล์เดียวเพื่อให้คัดลอกหรือนำเข้าไปเปิดใน [dbdiagram.io](https://dbdiagram.io) ได้ครบทั้ง 32 ตาราง (PK32; ไม่มี FOREIGN KEY) ทันทีโดยไม่ต้องรวมไฟล์เอง.
 
 มติ [decisions-012.md](../requirement/decisions-012.md) ใช้ PK/FK domain `int4`; Cloud keys ออกโดย server (`GENERATED ALWAYS AS IDENTITY`). `ResourceId`/`EntityId` เป็น `int4` ส่วน `SchoolBotScoreOutbox.ReceiptId` เป็น `int8` (`bigint`) อ้าง `PGTGradeAuditLog.GradeAuditLogId` แบบ logical. UUID คงเฉพาะ `RequestKey`/`RequestId`, `OperationKey`, logical keys (`*Key`) และ embedded IDs.
 
 ตาม [decisions-028.md](../requirement/decisions-028.md) คอลัมน์ `CreateBy` และ `UpdateBy` ของทุกตารางเป็น `integer NULL` (`int4 null` — เก็บ `sEmp` ของพนักงาน/ครู หรือ `sId` ของนักเรียน; `NULL` = ระบบทำเอง). ตาม [decisions-030.md](../requirement/decisions-030.md) ถอนคอลัมน์ `Version` ออกจากทุกตารางและถอน `PreviousVersion`/`NewVersion` ออกจาก `SchoolBotAuditEvent` โดยใช้ `UpdateDate` (ที่ server ตั้งด้วย `clock_timestamp()`) เป็น optimistic concurrency token (`ETag`/`If-Match` แบบ opaque string).
 
 ยืนยันชนิดข้อมูล legacy จาก source: Academic `TmasterDbuser.cs:8`; School `Tuser.cs:8,142`, `Temployee.cs:8,92`, `TPlanCourse`, `TPlanCourseTeacher`, `TTerm`; PGGradeDB `Pgtgrade.cs`, `PgtgradeDetail.cs`, `Pgtassessment.cs`, `PgtgradeAuditLog.cs` (ดูรายละเอียดใน [source-review-002.md](source-review-002.md) และ [db/review-001.md](../db/review-001.md)).
+
+ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูล NOT NULL/NULL ค่าเริ่มต้น และ identity เดิมยังอยู่; ยังไม่ได้รันฐานจริง
 
 ## Placement และ integrity
 
@@ -26,24 +28,24 @@
 2. **Mixed Global/Tenant (`SchoolId IS NULL OR SchoolId > 0` — 3 ตาราง)**: `SchoolBotRelease`, `SchoolBotIdempotency`, `SchoolBotAuditEvent` — Release และ Idempotency คงกฎไม่ซ้ำผ่าน application/repository transaction locks แยก global/tenant ตาม data-contract-rules.md; AuditEvent คง append-only ไม่มี partial unique index บังคับกฎดังกล่าว.
 3. **Tenant เท่านั้น (`SchoolId > 0` — 21 ตาราง)**: ตารางอื่นทั้งหมด.
 4. **การตัดทอน Index, Composite FK และคอลัมน์ซ้ำซ้อน (`db/review-005.md`)**:
-   - ถอน standalone indexes ทั้ง unique/non-unique ออกทั้งหมด (0 ตัว); คง backing indexes ของ PK/UQ
-   - ตัด composite UNIQUE `(SchoolId, ...)` สำหรับทำ composite FK ออกทั้งหมด และใช้ **single-column FK ชี้ PK คอลัมน์เดียว** ทั้งหมด 39 เส้น + 1 natural composite FK `FK_SchoolBotProject_CurrentRevision` (`(SchoolBotProjectId, CurrentRevision) -> (ProjectId, Revision)`) รวม **40 เส้น**; ชั้น application รับผิดชอบตรวจว่า parent และ child อยู่ `SchoolId` เดียวกัน (และ `CriteriaId` อยู่ใน `MissionId` เดียวกัน)
+   - ถอน standalone indexes ทั้ง unique/non-unique ออกทั้งหมด (0 ตัว); คงเฉพาะ backing indexes ของ PK
+   - ถอน FOREIGN KEY ทั้ง40เส้นและ UNIQUE/CHECK ทั้งหมด; relationships เดิมเป็น logical references ใน dictionary และภาพ integration ไม่ใช่ SQL constraints
    - ตัดคอลัมน์ `SchoolBotScoringPolicy.CurriculumId` (อ่านจาก `CourseRun.CurriculumId` แทน) และ `SchoolBotScoreOutbox.ScorePreviewId`
    - ตัด `UQ_SchoolBotAssessment_Submission_Sequence` และ `UQ_SchoolBotAttempt_Learner_Seq` (ใช้ row/learner lock ก่อนจัดสรร `Sequence` แทน)
 
-วง FK ของ current pointer ทั้ง 4 คู่ (`SchoolBotLicense.CurrentBindingId`, `SchoolBotProject.CurrentRevision`, `SchoolBotSubmission.CurrentAssessmentId`, `SchoolBotCourseRun.CurrentPolicyId`) กำหนดใน physical DDL เป็น `DEFERRABLE INITIALLY DEFERRED` เพื่อให้สร้างแถวหลัก/แถวลูกและอัปเดต pointer ใน transaction เดียวกันได้.
+current pointers ทั้ง4คู่ยังมีคอลัมน์เดิม แต่ไม่มี FK/DEFERRABLE เพิ่มผ่าน DO block; application ต้องตรวจความถูกต้องเอง
 
 `Owner`/`Profile` เป็น polymorphic; ใช้ `SchoolId`+`kind`+legacy ID ตรวจใน trusted adapter ห้าม FK ไปสองตารางพร้อมกัน. ใน schema ปัจจุบัน `LearnerId` รับเฉพาะ `student` (`sId`) เพื่อกัน `sEmp` ของครูชนกับ `sId` นักเรียน (ดูข้อเสนอทางเลือกใน [db/proposal-learnerkind.md](../db/proposal-learnerkind.md)).
 
-## สิ่งที่ diagram ยังไม่บังคับ (บังคับใน physical DDL และ application contract)
+## ข้อจำกัดของร่าง SQL ปัจจุบัน
 
 - ถอน standalone unique indexes 13 ตัว; กฎ binding, release, idempotency/nonce, staff role, active run/successor, ownership/mapping และ finalized proposal/successor คงเดิมผ่าน application/repository transaction locks ตาม [กฎข้อมูลร่วม](data-contract-rules.md) โดยต้อง serialize logical scope เดียวกันแม้ยังไม่มีแถว
-- คง PK/UQ constraints และ FK; DBML คง inline unique และ `[unique, name: 'UQ_…']` ที่แทน constraints เดิม ถอน partial placeholders และ composite FK-source pseudo-index โดยไม่ถอน composite FK
-- ยอด declaration ปัจจุบัน: standalone unique indexes 0, standalone non-unique indexes 0; PK 32, UQ 24, CHECK 80 และ FK 40. PostgreSQL ยังสร้าง backing indexes ของ PK/UQ; ไม่ใช่การถอน physical indexes ทุกชนิด
+- คงเฉพาะ PRIMARY KEY; DBML ไม่มี UNIQUE markers/index blocks/physical refs. ความสัมพันธ์เดิมแสดงใน dictionary และภาพ integration แบบ logical-only
+- ยอด declaration ปัจจุบัน: PK32, UNIQUE0, FK0, CHECK0; standalone indexes0. PostgreSQL ยังสร้าง backing indexes ของ PK32
 - การบังคับทดแทนด้วย application/repository locks: NOT_IMPLEMENTED — ไม่มี runtime evidence; SQL ยังคง DRAFT ไม่ได้รัน
 - **คอลัมน์ Array และ Enum**:
-  - `SchoolBotCourseRun.PlanCourseIds` แสดงใน DBML เป็น `jsonb` เพื่อไม่ให้ชนกับ syntax `[...]` ของ DBML parser ส่วน physical SQL ใน `db/schoolbot_db.sql` ใช้ `integer[]` (`int4[]`) พร้อม `CHECK (cardinality("PlanCourseIds") >= 1 AND array_position("PlanCourseIds", NULL) IS NULL)`
-  - Enum ใน DBML แสดงค่าที่เป็นไปได้เพื่อการรีวิว ส่วน physical SQL ใช้ `varchar` คู่กับ `CHECK (... IN (...))`
+  - `SchoolBotCourseRun.PlanCourseIds` ยังคง integer[] ใน SQL และ DBML; จำนวนสมาชิก/NULL ใน array/ค่าซ้ำเป็นกฎฝั่งแอป ไม่มี CHECK บังคับ
+  - ค่าประเภท/สถานะเดิมเป็น allowed values ของแอป; SQL และ DBML ใช้ varchar เดิม ไม่มี enum type หรือ CHECK จำกัดค่า
 
 ## สถานะการอนุมัติและสิ่งที่ยังรอ
 
@@ -55,6 +57,8 @@
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
 
 ## Change Log
+
+- 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 
 - 2026-10-26 — ถอนส่วนสร้าง role/กำหนดสิทธิ์จากร่าง SQL และส่วนถอนสิทธิ์ใน rollback ตามคำสั่งผู้ใช้; โครงสร้างตารางและ constraints คงเดิม
 

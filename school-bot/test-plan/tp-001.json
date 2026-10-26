@@ -1292,9 +1292,9 @@
       "profile_ids": [
         "PF-STATIC"
       ],
-      "fixture": "db/schoolbot_db.sql และ schoolbot.dbml revision ปัจจุบัน (32 ตาราง/450 ฟิลด์/40 FK)",
-      "action": "เทียบชื่อ/PK/ฟิลด์ร่วมหกตัว/ชนิด/FK ทุกตาราง",
-      "expected": "ผลเบื้องต้นเท่านั้น ไม่ปิด AC: SchoolBotLicense/SchoolBotLicenseId int4 ตรงตัวพิมพ์; ทุกตารางขึ้นต้น SchoolBot+หกฟิลด์; PK/FK int4 ตรงทุกคู่",
+      "fixture": "db/schoolbot_db.sql และ schoolbot.dbml revision ปัจจุบัน (32ตาราง/450ฟิลด์/PK32; UQ0/FK0/CHECK0)",
+      "action": "เทียบชื่อ/PK/ฟิลด์ร่วมหกตัว/ชนิดทุกตาราง และยืนยันไม่มี UNIQUE/FK/CHECK ในร่าง",
+      "expected": "ผลเบื้องต้นเท่านั้น ไม่ปิด AC: SchoolBotLicense/SchoolBotLicenseId int4 ตรงตัวพิมพ์; ทุกตารางขึ้นต้น SchoolBot+หกฟิลด์; PK32เป็นint4 คอลัมน์อ้างอิงเดิมชนิดคงเดิม และ UQ0/FK0/CHECK0",
       "evidence": "ตาราง diff+revision",
       "actual": "NOT_RUN"
     },

@@ -1,4 +1,5 @@
-// SchoolBot integration — Rev2
+// SchoolBot integration — Rev3: logical references only
+// Change Log: 2026-10-26 — คง PK ของตาราง SchoolBot; เปลี่ยน4FKเดิมเป็นlogical ไม่มีphysicalFK
 // Change Log: 2026-10-23 — Notes เท่านั้น structure เดิม; ผู้คุมตรวจ parser หลังบันทึก
 // Change Log: 2026-10-23 — ภาพย่อจุดเชื่อมข้อมูลเดิม; ไม่ใช่ DDL และไม่เพิ่ม FK ข้าม DB
 Project SchoolBotIntegration {
@@ -6,9 +7,9 @@ Project SchoolBotIntegration {
   Note: '''
   เริ่มอ่านจาก Session/Project/CourseRun แล้วดู GradeSlot และ ScoreOutbox. ภาพนี้แสดงเฉพาะฟิลด์สำคัญ ไม่ใช่ schema ครบ.
   สีน้ำเงิน = SchoolBot ใหม่; ม่วง = บัญชี Master เดิม; เขียว = ข้อมูล School เดิม; ส้ม = คะแนน PGGradeDB เดิม.
-  เส้นทึบ FK_* = FK จริงในร่าง SQL ของ SchoolBot; เส้นประสีส้ม LOGICAL_* = การเทียบรหัส/ตรวจเงื่อนไขเท่านั้น ไม่ใช่ physical FK.
+  ทุกเส้น LOGICAL_* เป็นการอ้างอิงเชิงตรรกะเท่านั้น (16เส้น); ร่าง SQL ไม่มี physical FK. PK ของ SchoolBot ยังคงอยู่.
   LegacyMaster/LegacySchool/LegacyGrade เป็น namespace ของภาพเพื่อแยกฐานข้อมูล ไม่ใช่ชื่อ schema ที่ใช้ deploy.
-  ห้ามนำไฟล์ภาพ integration นี้ไปสร้าง SQL/migration. แบบครบ 32 ตาราง/450 ฟิลด์/40 FK อยู่ที่ schoolbot.dbml.
+  ห้ามนำไฟล์ภาพ integration นี้ไปสร้าง SQL/migration. แบบครบ 32 ตาราง/450 ฟิลด์/PK32 และ FK0 อยู่ที่ schoolbot.dbml.
   กฎ032..034: employee มี Project Cloud แต่ไม่มีผล Cloud รวม import; ช่องเดิมเท่านั้นและ ownership ที่ confirm แล้วคงประวัติรวม partial/pending. อ่าน grade-rules-032-034.md และ learning-rules-032-034.md; ไม่เพิ่ม field/ref.
   AccountId ไม่เท่ากับรหัสนักเรียน/ครู; ไม่วาด account-profile join ที่ยังพิสูจน์ไม่ได้.
   '''
@@ -222,10 +223,10 @@ Table LegacyGrade.PGTGradeAuditLog [headercolor: #D97706] {
   Note: 'ตารางเดิม — ตาราง audit เดิมของฐานเกรด ซึ่ง DES-009 กำหนดให้ใช้เก็บ durable receipt ของการส่งคะแนน | ใช้เชื่อม: SchoolBotScoreOutbox.ReceiptId → GradeAuditLogId แบบ logical ข้าม DB; ตรวจ SchoolId/OperationKey/PayloadHash ตาม receipt contract | receipt ตามแบบ; INSERT คู่คะแนนใน PGGradeDB transaction | ภาพแสดงบางฟิลด์ ไม่ใช่ schema ที่สำรวจจากฐานจริง. คู่มือและหลักฐาน: data-dictionary/legacy-025.md'
 }
 
-Ref FK_SchoolBotAssessment_Submission: SchoolBotAssessment.SubmissionId > SchoolBotSubmission.SchoolBotSubmissionId [color: #475569]
-Ref FK_SchoolBotAttempt_CourseRun: SchoolBotAttempt.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [color: #475569]
-Ref FK_SchoolBotGradeSlot_CourseRun: SchoolBotGradeSlot.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [color: #475569]
-Ref FK_SchoolBotScoreOutbox_PreviewItem: SchoolBotScoreOutbox.ScorePreviewItemId > SchoolBotScorePreviewItem.SchoolBotScorePreviewItemId [color: #475569]
+Ref LOGICAL_INTERNAL_SchoolBotAssessment_Submission: SchoolBotAssessment.SubmissionId > SchoolBotSubmission.SchoolBotSubmissionId [inactive, color: #EA580C]
+Ref LOGICAL_INTERNAL_SchoolBotAttempt_CourseRun: SchoolBotAttempt.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [inactive, color: #EA580C]
+Ref LOGICAL_INTERNAL_SchoolBotGradeSlot_CourseRun: SchoolBotGradeSlot.CourseRunId > SchoolBotCourseRun.SchoolBotCourseRunId [inactive, color: #EA580C]
+Ref LOGICAL_INTERNAL_SchoolBotScoreOutbox_PreviewItem: SchoolBotScoreOutbox.ScorePreviewItemId > SchoolBotScorePreviewItem.SchoolBotScorePreviewItemId [inactive, color: #EA580C]
 
 // เส้นประทุกเส้นเป็นภาพอ้างอิงเชิงตรรกะ ห้ามสร้างเป็น SQL FK ข้ามฐาน
 // LOGICAL_01: ตรวจ nCompany กับ SchoolId; เว็บอาจ null
@@ -294,5 +295,5 @@ Note LogicalLegend [color: #FFF7ED] {
 }
 
 Note EvidenceLimits [color: #FEF3C7] {
-  'ตารางเดิมที่เลือก 14 ตาราง/12 เส้น logical; namespace แทน DB; LOGICAL_* เส้นประสีส้มไม่ใช่ FK ห้ามใช้สร้าง SQL | int/bigint/boolean อิง CLR+EF; string เป็น logical ยังไม่ยืนยัน physical; subset ไม่ใช่ schema เต็ม ห้ามเติม PK/UNIQUE | ห้าม AccountId=profile ID; link ยังไม่พิสูจน์ เมื่อ kind=employee ใช้ note: Session.ProfileId/Project.OwnerId→TEmployees.sEmp ร่วม SchoolId แทนเส้น student | PlanCourseIds เป็น integer[]; schoolbot.dbml เดิมใช้ jsonb แทนเพื่อ compatibility แต่ภาพ integration นี้แสดง int4[]: ไม่วาด array→int; ตรวจ TPlanCourseTerm.nTerm และ TPlanTermSubLevel2 ผ่าน PlanId/ห้อง/SchoolID; สิทธิ์ครูผ่าน TPlanCourseTeacher | Submission/Attempt/ScorePreviewItem.LearnerId→TUser.sID ร่วม SchoolId เฉพาะ student; PreviewItem.Snapshot.cells[].grade_detail_id→PGTGradeDetail.nGradeDetailId ใช้ note ไม่วาด jsonb→int; ตรวจ SchoolID/sID/nGradeId และ ScoreData[].AssessmentId/ScoreIdentifier | override อ่าน PGTGradeEdits.GradeDetailID→PGTGradeDetail.nGradeDetailId ร่วม SchoolID; settings ตรวจปี/ระดับชั้นห้อง ห้ามวาด ref บนปีอย่างเดียว | Submission ไม่มี CourseRunId; Project→Submission ต้องผ่าน ProjectRevision; receipt/writer/lock codes ยังไม่พิสูจน์ runtime คง gates เดิม | คง 32 ตาราง/450 ฟิลด์/40 FK และ constraints เดิม; ตัวอย่างระบุว่าสมมติ | หลักฐาน EF ตามลิงก์ design/data-dictionary/legacy-*.md: PGGradeDBPostgreSQLDBContext.cs:216,529,737,888; JabjaiSchoolSingleDBPostgreSQLDBContext.cs:8052,9991,10345'
+  'ตารางเดิมที่เลือก 14 ตาราง/12 เส้น logical ข้ามฐาน +4เส้น logical ภายใน SchoolBot; namespace แทน DB; LOGICAL_* เส้นประสีส้มไม่ใช่ FK ห้ามใช้สร้าง SQL | int/bigint/boolean อิง CLR+EF; string เป็น logical ยังไม่ยืนยัน physical; subset ไม่ใช่ schema เต็ม ห้ามเติม PK/UNIQUE | ห้าม AccountId=profile ID; link ยังไม่พิสูจน์ เมื่อ kind=employee ใช้ note: Session.ProfileId/Project.OwnerId→TEmployees.sEmp ร่วม SchoolId แทนเส้น student | PlanCourseIds เป็น integer[]; schoolbot.dbml เดิมใช้ jsonb แทนเพื่อ compatibility แต่ภาพ integration นี้แสดง int4[]: ไม่วาด array→int; ตรวจ TPlanCourseTerm.nTerm และ TPlanTermSubLevel2 ผ่าน PlanId/ห้อง/SchoolID; สิทธิ์ครูผ่าน TPlanCourseTeacher | Submission/Attempt/ScorePreviewItem.LearnerId→TUser.sID ร่วม SchoolId เฉพาะ student; PreviewItem.Snapshot.cells[].grade_detail_id→PGTGradeDetail.nGradeDetailId ใช้ note ไม่วาด jsonb→int; ตรวจ SchoolID/sID/nGradeId และ ScoreData[].AssessmentId/ScoreIdentifier | override อ่าน PGTGradeEdits.GradeDetailID→PGTGradeDetail.nGradeDetailId ร่วม SchoolID; settings ตรวจปี/ระดับชั้นห้อง ห้ามวาด ref บนปีอย่างเดียว | Submission ไม่มี CourseRunId; Project→Submission ต้องผ่าน ProjectRevision; receipt/writer/lock codes ยังไม่พิสูจน์ runtime คง gates เดิม | คง 32 ตาราง/450 ฟิลด์/PK32; ไม่มี UNIQUE/FK/CHECK ในร่าง SQL; ตัวอย่างระบุว่าสมมติ | หลักฐาน EF ตามลิงก์ design/data-dictionary/legacy-*.md: PGGradeDBPostgreSQLDBContext.cs:216,529,737,888; JabjaiSchoolSingleDBPostgreSQLDBContext.cs:8052,9991,10345'
 }

@@ -39,7 +39,7 @@ SELECT tc.table_name, tc.constraint_type, kcu.column_name, c.data_type
  WHERE tc.table_schema='public' AND tc.constraint_type IN ('PRIMARY KEY','FOREIGN KEY')
  ORDER BY tc.table_name, tc.constraint_type;
 ```
-- **ผลที่ยอมรับ**: ตาราง `SchoolBot*` ครบ **32** ตรง DDL; PK int4 ทุกตาราง; FK **40** เส้น (รวม natural composite `FK_SchoolBotProject_CurrentRevision`) int4 ตรงคู่ทุกเส้น; UQ 24 / CHECK 80 / standalone indexes 0 (backing indexes ของ PK/UQ คงเดิม); กฎที่ถอน partial unique indexes ต้องมีหลักฐาน concurrent application transaction/lock ตาม data-contract-rules ตรง schema-notes (หมายเหตุ: `SchoolBotScoreOutbox.ReceiptId` int8 logical reference ไม่ใช่ FK — ไม่นับ)
+- **ผลที่ยอมรับ**: ตาราง SchoolBot32/ฟิลด์450 ตรง DDL; PK int4 ทั้ง32ตาราง; UNIQUE0/FK0/CHECK0 และ standalone indexes0. NOT NULL/default/identity เดิมคงอยู่; backing indexes ของ PK32ยังมี. ความสัมพันธ์/validationเดิมเป็น application rules ต้องมีหลักฐานแยก ไม่อ้างการบังคับจาก DB
 - **ห้าม**: รันบน production; แก้ DDL ให้ตัวเลขตรง; อ้างผลจากไฟล์ SQL โดยไม่รันจริง
 
 ### EV-DB-02 — บัญชีเดิม UPDATE คะแนน + INSERT `PgtgradeAuditLog` ใน transaction เดียว (G-DB ตาม DES-009/decisions-029)
@@ -174,6 +174,8 @@ UPDATE "PgtgradeDetail" SET "ScoreData" = :new_json
 ผ่าน EV ทั้งหมดบน test clone **ไม่เท่ากับปิด gate** — จนกว่า gates ทั้งห้าผ่านและมนุษย์ลงนาม confirm ยังตอบ 503 ตามรหัส gate ที่ค้าง (G-DB → `RECEIPT_UNAVAILABLE`); preview แบบ non-production เปิดได้ก่อนตาม DES-009 แต่ไม่ใช่สิทธิ์เปิด confirm/apply · ไม่เพิ่ม export queue/table/gate ใหม่ตาม export-proof-pack-001
 
 ## Change Log
+
+- 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 
 - 2026-10-26 — ปรับ EV-DB-01 ตามคำสั่งถอน standalone indexes; ไม่ถือว่ามี runtime evidence แล้ว
 

@@ -4,8 +4,8 @@
 
 | ไฟล์ | ดูอะไร |
 |---|---|
-| [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพย่อ **24 ตาราง / 112 ฟิลด์**: SchoolBot 10 ตาราง + ตารางเดิม 14 ตาราง; FK จริงที่อยู่ในภาพ 4 เส้น และ logical mapping 12 เส้น |
-| [schoolbot.dbml](schoolbot.dbml) | แบบเต็ม **32 ตาราง / 450 ฟิลด์ / 40 FK** ของ SchoolBot ใหม่ แบ่งสี 10 กลุ่ม ทุกตารางและฟิลด์มีคำอธิบายไทย |
+| [schoolbot-integration.dbml](schoolbot-integration.dbml) | ภาพย่อ **24 ตาราง / 112 ฟิลด์**: SchoolBot 10 ตาราง + ตารางเดิม 14 ตาราง; ไม่มี physical FK; logical mapping16เส้น |
+| [schoolbot.dbml](schoolbot.dbml) | แบบเต็ม **32 ตาราง / 450 ฟิลด์ / PK32; FK0** ของ SchoolBot ใหม่ แบ่งสี 10 กลุ่ม ทุกตารางและฟิลด์มีคำอธิบายไทย |
 
 แต่ละไฟล์นำเข้าแยกได้ ไม่ต้องรวมไฟล์ คัดลอกทั้งไฟล์ไปวางใน editor ของ [dbdiagram.io](https://dbdiagram.io) แล้วเปิด Note ของตาราง/ฟิลด์ที่ต้องการอ่าน ชื่อตาราง/คอลัมน์คงชื่อจริงเพื่อใช้เทียบ SQL ได้
 
@@ -35,7 +35,7 @@ Note ของตารางมีหน้าที่ “หนึ่งแ�
 | เขียว | นักเรียน ครู วิชา แผนรายวิชา ห้อง และเทอมเดิม |
 | ส้ม | หัวคะแนน ช่องคะแนน ผลรายนักเรียน override การตั้งค่า และ audit เดิม |
 
-- **เส้นทึบชื่อ `FK_*`** เป็น FK จริงของ SchoolBot ตาม SQL และเลือกมาเฉพาะเส้นที่มีทั้งสองตารางในภาพ
+- **ทุกเส้นในภาพ integration เป็น LOGICAL_* เส้นประ** สำหรับอธิบายรหัสอ้างอิง ไม่มี SQL FOREIGN KEY
 - **เส้นประสีส้มชื่อ `LOGICAL_*`** เป็นการเทียบรหัส/ตรวจเงื่อนไขโดย application ข้ามฐาน ไม่ใช่ FK ที่ต้องสร้าง อ่านเงื่อนไขของแต่ละหมายเลขใน Note `LogicalLegend`
 - `LegacyMaster`, `LegacySchool`, `LegacyGrade` เป็น namespace สำหรับแบ่งฐานในภาพ ไม่ใช่ชื่อ schema สำหรับ deploy
 - ตารางเดิมแสดงเฉพาะคอลัมน์ที่เกี่ยวข้อง ไม่ใช่ schema ทั้งตาราง ชนิด `string` บางช่องเป็นชนิดเชิงตรรกะจาก C# ซึ่งยังไม่ยืนยัน physical varchar/ความยาว
@@ -52,17 +52,19 @@ Note ของตารางมีหน้าที่ “หนึ่งแ�
 
 ## ขอบเขต
 
-แบบเต็มคง schema เดิม; integration ใช้อธิบายเท่านั้น **ห้ามนำภาพ integration ไปสร้าง SQL/migration** ไม่เพิ่มตารางในฐานเดิมหรือสร้าง FK ข้าม DB การเขียนคะแนนจริงยังขึ้นกับสัญญาและหลักฐานใน DES-009
+แบบเต็มตรง SQL ที่คงเฉพาะ PRIMARY KEY; UNIQUE/FK/CHECK เป็น0. ความสัมพันธ์เดิมดู dictionary; integration ใช้อธิบายเท่านั้น **ห้ามนำภาพ integration ไปสร้าง SQL/migration** ไม่เพิ่มตารางในฐานเดิมหรือสร้าง FK ข้าม DB การเขียนคะแนนจริงยังขึ้นกับสัญญาและหลักฐานใน DES-009
 
 ตรวจด้วย `@dbml/core 10.3.1` โหมด `dbmlv2` ซึ่งรองรับ [กลุ่มสี Note และ inactive ref](https://dbml.dbdiagram.io/syntax/enrichment-visualization/) ตัว parser แบบ legacy บางตัวไม่รองรับ syntax visualization ใหม่
 
 อ่านเพิ่มเติม: [คู่มือข้อมูล](data-model.md) · [ตารางเดิมและฟิลด์เชื่อม](data-legacy-001.md) · [ผลตรวจ DBML](dbml-review-001.md)
 
-## Amendment 032..034
+## ประวัติ Amendment 032..034 (ผลตรวจฉบับเก่า)
 
 Full Rev5/integration Rev2 เปลี่ยน Notes เท่านั้น; [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) เป็นกฎแอป arch ไม่ได้รัน parser ใน session ของตน ผู้คุมตรวจหลังบันทึกด้วย @dbml/core10.3.1/dbmlv2 และเทียบ semantic ผ่านแล้วตาม [dbml-review-002](dbml-review-002.md): type/NULL/default/PK/index/enum/FK/actions เดิม คง32/450/40FK และ24/112/4FK+12logical
 
 ## Change Log
+
+- 2026-10-26 — ตามคำสั่งเหลือเฉพาะ PK: ถอน UNIQUE/FK/CHECK จากร่าง SQL; ความสัมพันธ์และ validation เดิมเป็นกฎฝั่ง application ไม่ใช่การบังคับในฐานข้อมูล
 - 2026-10-23 — นายช่างบันทึกผล parser/semantic หลัง arch ตาม dbml-review-002 ผ่านทั้งสองไฟล์ โดย SQL/structural model เดิม
 - 2026-10-23 — Rev2: ระบุขอบเขต Notes/validation
 

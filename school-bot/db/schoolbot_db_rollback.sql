@@ -1,5 +1,5 @@
 -- =============================================================================
--- Rollback: schoolbot_db_rollback.sql — ย้อนกลับ schoolbot_db.sql ทั้งหมด (Rev5 Slimmed — 32 ตาราง)
+-- Rollback: schoolbot_db_rollback.sql — ย้อนกลับ schoolbot_db.sql ทั้งหมด (Rev7 — 32 ตาราง, PRIMARY KEY only)
 -- Target Database: SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot — ชื่อ DB เป็นสมมติฐาน), schema: public
 -- Status: DRAFT — เขียนอย่างเดียว ยังไม่เคยรัน; คนเป็นผู้รันบนฐานทดสอบแล้วส่ง DBA-003 ตรวจ
 -- Baseline: decisions-026, decisions-027, decisions-028 · ที่มา: DBA (agy) review-005 (2026-10-22)
@@ -33,11 +33,6 @@ DROP TABLE IF EXISTS public."SchoolBotGradeSlot";
 -- Section 004 Rollback: CourseRun, Policy, Attempt, Submission, Grading (8 tables)
 -- #############################################################################
 
-ALTER TABLE IF EXISTS public."SchoolBotSubmission"
-    DROP CONSTRAINT IF EXISTS "FK_SchoolBotSubmission_CurrentAssessment";
-
-ALTER TABLE IF EXISTS public."SchoolBotCourseRun"
-    DROP CONSTRAINT IF EXISTS "FK_SchoolBotCourseRun_CurrentPolicy";
 
 DROP TABLE IF EXISTS public."SchoolBotRetakeGrant";
 DROP TABLE IF EXISTS public."SchoolBotAttempt";
@@ -67,8 +62,6 @@ DROP TABLE IF EXISTS public."SchoolBotLevel";
 -- Section 002 Rollback: Identity, Session, StaffRole, Projects (4 tables)
 -- #############################################################################
 
-ALTER TABLE IF EXISTS public."SchoolBotProject"
-    DROP CONSTRAINT IF EXISTS "FK_SchoolBotProject_CurrentRevision";
 
 DROP TABLE IF EXISTS public."SchoolBotProjectRevision";
 DROP TABLE IF EXISTS public."SchoolBotProject";
@@ -80,8 +73,6 @@ DROP TABLE IF EXISTS public."SchoolBotSession";
 -- Section 001 Rollback: Base, License, Release, Idempotency, Audit (5 tables)
 -- #############################################################################
 
-ALTER TABLE IF EXISTS public."SchoolBotLicense"
-    DROP CONSTRAINT IF EXISTS "FK_SchoolBotLicense_CurrentBinding";
 
 DROP TABLE IF EXISTS public."SchoolBotAuditEvent";
 DROP TABLE IF EXISTS public."SchoolBotIdempotency";

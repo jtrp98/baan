@@ -139,4 +139,5 @@
 
 | [decisions-042.md](decisions-042.md) | ผู้ใช้เลือก A: หมดเวลาตรวจคำตอบที่ server บันทึกทัน นับครั้ง/สิทธิ์ซ่อมเดิม ไม่รับย้อนหลัง |
 | [decisions-043.md](decisions-043.md) | อนุมัติ UX-005 Q39–Q42 และ UX-007 Q43–Q46 รวม delta042; UX signed 7/7; ยืนยัน T0–T2 Codex / T3–T5 AGY |
+| [decisions-044.md](decisions-044.md) | คงเฉพาะ PK32; ถอน UNIQUE24/FK40/CHECK80 จากร่าง SQL คงคอลัมน์/ชนิด/NOT NULL/default/identity เดิม |
 

@@ -34,7 +34,7 @@ Legacy term identifier (`NTerm`) ใช้ `T64` ไม่ใช่ `K` หร�
 | UpdateDate | D; เริ่มเท่ากับ CreateDate; ทุกการ UPDATE ต้องตั้งด้วย `clock_timestamp()` บน server และใช้เป็น concurrency token (`ETag`/`If-Match`) ตาม [decisions-030](../../requirement/decisions-030.md) |
 | SchoolId | S?; non-null (`SchoolId > 0`) ยกเว้น global rows ที่กำหนดให้ `SchoolId = null` ด้านล่าง |
 
-ทุกตาราง SchoolBot มี PK `SchoolBot<Entity>Id:K` ที่ server จัดสรร (`GENERATED ALWAYS AS IDENTITY`); FK ทั้งหมดใช้ single-column FK ชี้ PK คอลัมน์เดียว (`K`) โดยชั้น application บังคับตรวจว่า parent และ child อยู่ `SchoolId` เดียวกัน (ยกเว้น `FK_SchoolBotProject_CurrentRevision` ที่ชี้ `(ProjectId, Revision)` ตามธรรมชาติของเลข revision) ตาม [db/review-005.md](../../db/review-005.md); legacy refs:I ไม่เป็น physical FK ข้าม DB
+ทุกตาราง SchoolBot มี PK `SchoolBot<Entity>Id:K` ที่ server จัดสรร (`GENERATED ALWAYS AS IDENTITY`); ไม่มี SQL FOREIGN KEY. ฟิลด์อ้างอิงเดิมยังเก็บ int4 และ application ต้องตรวจแถวแม่ SchoolId และบริบทเอง; CurrentRevision อ้าง ProjectId/Revision เชิงตรรกะ ไม่ใช่ composite FK
 
 `K` เป็น JSON integer; create ไม่รับ PK จาก client และคืน `K` หลัง commit เท่านั้น ห้าม wrap/reuse เมื่อเต็ม; `CurrentRevision`, `Revision`, `Sequence`, `BindingEpoch` เป็น `N` ไม่ใช่ row ID
 
