@@ -1,6 +1,6 @@
 # QA round001 — auth flow local subset
 
-วันที่2026-10-24 · ผู้ตรวจ: check/Codex t2 · verdictจาก [ผล check](../planning/auth-flow-check-response-002.json) ไม่ใช่คำตัดสินของsys
+วันที่2026-10-24 · ผู้ตรวจ: check/Codex t2 · verdictจาก [ผล check](../../../reports/school-bot/planning/auth-flow-check-response-002.json) ไม่ใช่คำตัดสินของsys
 
 2026-10-24: ยืนยัน PASS เฉพาะ local/runtime และ static contract ที่ตรวจครบจาก parent actual run ไม่รัน build/tests ซ้ำ ไม่แก้ไฟล์ ปิด SEC040-001 เฉพาะ local per-process ตาม conditional close ของ jpo043; PostgreSQL integration/atomic rollback ยัง NOT_RUN และ Important เดิม 6 ข้อยัง OPEN
 
@@ -13,7 +13,7 @@
 
 ## Actual run
 
-[ผลรันจริง](../planning/auth-flow-test-check-002.json): 4032 passed / 0 failed / 0 skipped, exit 0. [TRXที่ผ่าน](auth-flow-tests-002.trx) · [TRXรอบแรก](auth-flow-tests-001.trx). ชุดนี้รวมregressionเดิม70casesกับtestsใหม่จากcheck; แยกจากTP001 77casesที่ยัง NOT_RUN. ใช้syntheticfixtures และin-processAPI/teststore ไม่มีconnectionไปDBจริง
+[ผลรันจริง](../planning/auth-flow-test-check-002.json): 4032 passed / 0 failed / 0 skipped, exit 0. [TRXที่ผ่าน](../../../reports/school-bot/qa/auth-flow-tests-002.trx) · [TRXรอบแรก](../../../reports/school-bot/qa/auth-flow-tests-001.trx). ชุดนี้รวมregressionเดิม70casesกับtestsใหม่จากcheck; แยกจากTP001 77casesที่ยัง NOT_RUN. ใช้syntheticfixtures และin-processAPI/teststore ไม่มีconnectionไปDBจริง
 
 ## ขอบเขต
 
@@ -38,7 +38,7 @@ Limitations:
 - ไม่ให้PASSแก่canonical BE-002/BE-006/BE-039, full Login, 77TPcases หรือgatesเดิม; Important6ยังOPEN
 - ไม่ยืนยันGateway wire parity, cross-pod capacity, H5/deployment, UIหรือhardware; ไม่แก้source/tests/knowledge ไม่ใช้Git ไม่รันSQL/DB/network/login และไม่rebuild EXE/installer
 
-SEC040-001: CLOSEDเฉพาะlocal scopeตามcheck+เงื่อนไขjpo043. [jpo](../planning/logout-security-response-002.json) · security disposition: ใช้ close_when ใน logout-security-response-002.json ของ jpo043: source limiter ไม่เปลี่ยนและ actual TRX มี successful cases ครบ8criteria ปิดเฉพาะ logout limiting ภายใน process ไม่ขยายเป็น cross-pod/deployment/full security
+SEC040-001: CLOSEDเฉพาะlocal scopeตามcheck+เงื่อนไขjpo043. [jpo](../../../reports/school-bot/planning/logout-security-response-002.json) · security disposition: ใช้ close_when ใน logout-security-response-002.json ของ jpo043: source limiter ไม่เปลี่ยนและ actual TRX มี successful cases ครบ8criteria ปิดเฉพาะ logout limiting ภายใน process ไม่ขยายเป็น cross-pod/deployment/full security
 
 | เกณฑ์ | ผล | หลักฐาน |
 | --- | --- | --- |

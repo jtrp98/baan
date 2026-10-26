@@ -1,9 +1,0 @@
-{
-  "date": "2026-10-24",
-  "reason": "เก็บฉบับก่อน apply ใบงาน057: สร้าง gateway-grpc-contract-001.md ใหม่ + pointer amendments (design/index.md, gateway-integration-001.md Rev3→Rev4)",
-  "files": [
-    {"path": "index.md", "sha256": "8f18599e07e47d632735d9f6eefcc70a6de3b277104c352f6052401ff21b0a22"},
-    {"path": "gateway-integration-001.md", "sha256": "815f3c2ea4c6ee02e81d61f7c3b3160265c9cb7ab82d9d76c0714fbb89015863"}
-  ],
-  "source": "planning/gateway-grpc-contract-response-001.json (arch057/Codex t1, state=NEEDS_HUMAN)"
-}

@@ -14,7 +14,7 @@ ADOPTED_BY_PM — PM รับเป็น [แผนหลัก](../plan/index
 - [tasks และ gates](tasks-001.json)
 - [ผลตรวจและประเด็นส่ง PM](review-001.md)
 - [brief ที่เปิดงาน](task-003.md)
-- [PM adoption/render contract](pm-response-001.json)
+- [PM adoption/render contract](../../../reports/school-bot/planning/pm-response-001.json)
 - [ผลตรวจหลังบันทึกแผน PM](pm-review-001.md)
 - [ใบงานเปิด PM](task-004.md)
 
@@ -67,10 +67,10 @@ PM รับแล้วผ่าน mycelium-role pm/t2 แบบ read-only; re
 ## รอบส่งต่อมติ — 2026-10-23
 
 - [handoff-001.md](handoff-001.md) — ผล spec/vault/arch/gm และคิวถัดไป 44 REQ/180 AC/110 งาน
-- [spec-review-001.md](spec-review-001.md) / [spec-response-001.json](spec-response-001.json) — REQ/AC ตาม decisions-032..034
-- [arch-review-001.md](arch-review-001.md) / [arch-response-001.json](arch-response-001.json) — DES/JSON/invariants และผล DBML หลังบันทึก
-- [gm-review-001.md](gm-review-001.md) / [gm-response-001.json](gm-response-001.json) / [gm-response-002.json](gm-response-002.json) — เจ้าของแผนรับร่างและ correction
-- [vault-response-001.json](vault-response-001.json) — SQL static findings ส่ง arch; บันทึกหลักที่ ../db/review-006.md
+- [spec-review-001.md](spec-review-001.md) / [spec-response-001.json](../../../reports/school-bot/planning/spec-response-001.json) — REQ/AC ตาม decisions-032..034
+- [arch-review-001.md](arch-review-001.md) / [arch-response-001.json](../../../reports/school-bot/planning/arch-response-001.json) — DES/JSON/invariants และผล DBML หลังบันทึก
+- [gm-review-001.md](gm-review-001.md) / [gm-response-001.json](../../../reports/school-bot/planning/gm-response-001.json) / [gm-response-002.json](../../../reports/school-bot/planning/gm-response-002.json) — เจ้าของแผนรับร่างและ correction
+- [vault-response-001.json](../../../reports/school-bot/planning/vault-response-001.json) — SQL static findings ส่ง arch; บันทึกหลักที่ ../db/review-006.md
 - [gm-recovery-001.json](gm-recovery-001.json) — ร่าง workproduct ที่กู้หลัง timeout และ gm ยืนยัน SHA256 ก่อนบันทึก
 - ใบงานต่อเนื่อง task-011.md..task-016.md เป็นประวัติ run นี้ ไม่ใช่การเปลี่ยนสถานะ task ใน canonical plan
 

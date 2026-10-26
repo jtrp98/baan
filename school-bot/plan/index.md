@@ -1,28 +1,23 @@
 # SchoolBot — Canonical Plan
 
+> สถานะปัจจุบันของแผน — เขียนทับให้เป็นความจริงวันนี้ ไม่มี Change Log (ประวัติดู `git log` ของไฟล์นี้) · เจ้าของ: gm
+
 ## Release Scope
 
-Amendment065 (2026-10-26): scope เดิม frozen; ฐานปัจจุบัน 44 REQ/186 AC/81 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates ตาม [มติ042](../requirement/decisions-042.md), [AC-046-07](../requirement/req-046.md), [TP001-081/Amendment004](../test-plan/tp-001-amendment-004.md) และ verdict061. ไม่เปลี่ยน IDs/DAG/effort/owner/tier/gate definitions. ข้อความ180 AC ด้านล่างเป็นฐานประวัติ Rev2.
-
-Frozen: ระบบเต็ม 44 REQ/180 AC ตาม spec-review-001 และ decisions-014/015/016/019..034 ไม่เพิ่ม feature/ลดระบบเต็ม ดู [scope](scope-001.md); 74งานเดิม+36งานย่อย=110งาน คง8phases/17gates; เปลี่ยนscopeเฉพาะผู้ใช้
+Frozen: ระบบเต็ม 44 REQ / 186 AC / 81 TP cases ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ [tasks-001.json](tasks-001.json)
 
 ## Waiting on Human
 
-Precedence065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) เหนือข้อความฐานด้านล่าง. รอ G/Light รับรอง contract/H5, infra/B/BFF ownership และ technical proof; ผู้ใช้ forward EV/เจ้าของ DB คืนหลักฐาน; spec Q3 และ cert/custody ยังค้าง. UX signed5/7 ตาม036..041; UX-005/007 ร่างครบ11ไฟล์หลัง070/split; check066 PASS draft completeness; DES/UX ตาม042บันทึกแล้ว; check080/082ตรวจครบแล้ว; รอผู้ใช้เซ็น UX-005/007 และ expired-copy delta; รับ actual076/077แล้ว; check080ผ่าน7กลุ่มและข้อพบ3จุดแก้ครบตามcheck082 PASS; UXใหม่ยังรอเซ็น. ไม่เปิด implementation ก่อน prerequisites และไม่ปิด H5/G-CORE/UX อัตโนมัติ. t0/t1/t2=codex, t3/t4/t5=agy, --no-fallback; ไม่ใช้ native subagent แทน. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือ gate closure; JSON sync15verified/95pendingแล้วตาม [status-sync](../planning/status-sync-062-001.json). ผู้ใช้ตอบ A แล้วตาม042: ตรวจ saved answers ที่ server บันทึกทันอัตโนมัติ ข้อว่าง0 เต็มทั้งชุด ไม่รับย้อนหลัง นับครั้ง/สิทธิ์ซ่อมตาม policy เดิม; ไม่ใช่ UX sign-off ไม่ถาม A/B ซ้ำ; receipt071 เป็นช่องว่างเทคนิค แยกจาก owner pending เดิม. ประวัติด้านล่างคงไว้.
+คิวปัจจุบัน: [Queue 004](queue-004.md) · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
 
-Precedence 2026-10-24 (มติ decisions-036/037/038 หลังรอบ060): ผู้ใช้ตัดสินครบเกือบทุกประตูที่เตรียมไว้ — **GAP-07 = คง Prepare/Install + ตรวจรับ AC-030-04..08** (44 REQ/**185 AC**; TP001-080 = 80 cases) · **UX sign-off ครบทั้ง int-001/int-002** (Q1–Q13 ทั้งหมด — G-UX-ENTRY/G-UX-LABS มีหลักฐาน sign-off ครบ, front implement UX-001/UX-003 ได้) · **performance 300MB/5s/30FPS = acceptance ของ G-DELIVERY** · **ผู้อนุมัติเนื้อหา = ผู้ใช้ + ยืนยัน rubric ดาว** · **ยังไม่อนุญาตทดสอบหุ่นจริง (dry-run ต่อ)** · cert signing ยังไม่ระบุ · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward** ([cover-001](../db/db-safe-evidence-cover-001.md) — รอผู้ใช้ส่ง) · **ค้างเหลือ: spec Q3 (รุ่นหุ่น/firmware/calibration/เกณฑ์ stop-unplug-emergency จริง)** และประตูเดิม (G/Light, H5, รัน SQL, ผู้ถือ cert, runtime)
-
-Precedence 2026-10-24 (มติ decisions-036 หลังรอบ060): ผู้ใช้ตัดสิน **GAP-07 = คง Prepare/Install** (spec ร่าง AC-030-04..08 แล้ว — ข้อเสนอรอผู้ใช้ตรวจรับ ก่อน implement; inspect เพิ่ม TP001-080; 44 REQ/**185 AC**/80 cases), **UX Q1 ยืนยัน License Gate ด่านแรก** และ **UX Q4 = ให้บันทึก+ขอหยุดหุ่นแล้วล็อก** (บันทึก sign-off ที่ uxui/int-001) · **EV-01..06 = นายช่างสรุปข้อความให้ผู้ใช้ forward เจ้าของ Master DB** ([db-safe-evidence-cover-001](../db/db-safe-evidence-cover-001.md)) · คำถามค้างจากรอบ060: spec Q1–Q6 (packs), UX Q2/Q3/Q5–Q13, และ AC-030-04..08 รอตรวจรับ
-
-Precedence 2026-10-24 (ใบงาน060 โหมด solo): รอบ060 ปิดคิวเตรียมเอกสาร §3 ของ [queue-003 ฉบับปรับ059](queue-003.md) ครบ (arch GAP sync + packs + DB docs + TP + UX drafts + ตรวจข้ามโมเดล jpo/check — ดู [task-060](../planning/task-060.md)) ประตูมนุษย์ที่พร้อมถามแล้วเพิ่มเติมจากฐานด้านล่าง: (1) ~~GAP-07~~ (ตัดสินแล้ว — decisions-036) (2) คำถาม spec Q1–Q6 ของ [packs 4 ชุด](../requirement/index.md) (3) จุดเซ็น UX Q1–Q13 ([uxui/index](../uxui/index.md)) (4) คำขอหลักฐาน EV-01..06 ([db-safe-evidence-001](../db/db-safe-evidence-001.md)). คงทั้งหมด: 110 tasks pending, ไม่มี code/SQL/runtime ใหม่, gates เดิมทั้งหมดยังไม่ปิด.
-
-Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับปรับ059](queue-003.md), [H5 questionnaire 7 หัวข้อ](../planning/h5-questionnaire-001.md), [gRPC contract Rev1 §7/open items](../design/gateway-grpc-contract-001.md#7-review-packet-และการตัดสินใจ) และ [evidence-002](evidence-002.md) ก่อนข้อความฐานด้านล่าง. คิวเตรียมเอกสาร 055/056→057→058 ทำครบ; contract ยัง PROPOSED รอ G/Light รับรองข้อยกเว้น opaque-session และ mapper, เจ้าของ/มนุษย์ตอบ H5 และหลักฐาน selector/cardinality/linkage/continuation กับ runtime; fullLogin NOT_READY. gRPC/035/cType ตอบแล้ว ไม่ถามซ้ำ. รอบนี้ docs-only ใช้ Codex ตามผู้ใช้; task023/runner เก่าเป็นประวัติ ไม่ใช่คิวปัจจุบัน.
-
-ข้อความฐาน ณ 2026-10-23 (อ่าน precedence ด้านบนก่อน):
-
-มติ Guest/Level/ข้อสอบ/สูตร/mapping/Learner A, แบบ H4, พาธ legacy (`C:\src\sb-web-academic-dev-1`) และรูปแบบ SchoolBot เป็น 1 service ผ่าน `sb-api-gateway` ตอบแล้ว (ห้ามถามซ้ำ); ณ ตอนจัดทำ queue-003 ยังค้างผล arch task023 (ให้อ่าน `planning/handoff-002.md` ที่ผู้คุมจะบันทึกหลังรับงาน arch เป็นสถานะรับล่าสุด), หลักฐาน DB/legacy จากเจ้าของระบบ, SQL/runtime, H5 env/host/secret/web-principal/staff_admin ตั้งต้น, signed UX, เนื้อหา/criteria, หุ่น/ส่งมอบ และ export subconditions/QA/security/release ดู [หลักฐานค้าง](evidence-002.md) และ [คิวล่าสุด](queue-003.md) ทีมต้องเตรียม artifact ให้ครบก่อนถามคน
+- **G/Light/infra/B/BFF**: รับรอง gRPC contract (ยัง PROPOSED) และตอบ H5 — fullLogin NOT_READY จนกว่าจะได้คำตอบ
+- **ผู้ใช้**: forward [DB cover](../db/db-safe-evidence-cover-001.md) ให้เจ้าของ DB → เจ้าของ DB ส่ง EV-01..03 → 04/05 → 06 (optional) · ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว
+- **ผู้ใช้**: เซ็น UX-005/007 และ expired-copy delta (Q39–Q46) — ตรวจเอกสารผ่านแล้ว (check080/082 PASS)
+- **ยังเปิด**: spec Q3 (รุ่นหุ่น/firmware/calibration/stop-unplug-emergency) · ผู้ถือ cert/ช่องทางแจกจ่าย · gates security/SQL/runtime · ทดสอบหุ่นจริงยังไม่อนุญาต (decisions-038)
+- **ตอบแล้ว ห้ามถามซ้ำ**: Guest/Level/ข้อสอบ/สูตร/mapping/Learner A, แบบ H4, พาธ legacy `C:\src\sb-web-academic-dev-1`, SchoolBot = 1 service ผ่าน `sb-api-gateway`, gRPC/035/cType, expired attempt = A (มติ042)
 
 ## Phases
+
 
 | Phase | ขอบเขต | Tasks | Effort* |
 |---|---|---:|---:|
@@ -39,9 +34,9 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 15 (+UX-006) pending 95; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คือ 74 งานเดิม · อีก 36 งานอยู่ที่ [extension/index.md](extension/index.md) (รวม 110) · Owner ใช้ชื่อ role เดิม (sa/be/fe/…) resolve ผ่าน role_aliases ใน [tasks-001.json](tasks-001.json) · dependencies ในตารางย่อ — gate preconditions อยู่ในไฟล์ต่อ task และ JSON
 
-Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
+Status: `pending` · `done-local` (โค้ด+test ผ่านในเครื่อง นายช่างลงหลังรัน test ซ้ำ ไม่ปิด gate) · `verified`/`blocked` (มาจาก verdict ของ check ผ่าน นายช่าง เท่านั้น)
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
@@ -119,24 +114,3 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [SEC-002](SEC-002.md) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
 | [PM-001](PM-001.md) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
 | [PM-002](PM-002.md) | Release receipts | pm | P7 | PM-001 | pending |
-
-## Change Log
-- 2026-10-26 — 079: sync042/186AC/81TP และคิวตรวจdelta→เซ็นUX; คงStatus/scope/gates/ประวัติ.
-- 2026-10-26 — 074: sync current notice/คิว UX/expired; คง Status/Release Scope และประวัติ.
-- 2026-10-26 — ใบงาน065: เพิ่ม precedence คิว/runner/ยอดปัจจุบันและ owner packet; คงตาราง Status ตาม verdictเดิม.
-- 2026-10-24 — ใบงาน061 (นายช่างสวมบท gm ตาม verdict check-060 ที่ผ่านนายช่าง): flip BA-001..004 / UX-001 / UX-003 / TP-001 → verified (เหลือ 103 pending) — ตามกติกา verdict ของ check เป็นต้นทางเดียวของ Status; ไม่แตะงานอื่น/dependencies/gates
-- 2026-10-24 — decisions-038 (นายช่างสวมบท gm): UX sign-off ครบทั้งสองไฟล์ (G-UX-ENTRY/G-UX-LABS มีหลักฐานครบ) + spec Q1/Q2/Q4/Q5 มีมติ; ค้างเฉพาะ spec Q3 + EV forwarding + ประตูเดิม; คง Status/dependencies/gates
-- 2026-10-24 — decisions-036/037 (นายช่างสวมบท gm ในโหมด solo): บันทึกมติผู้ใช้ GAP-07 (คง Prepare/Install → 185 AC/80 cases), UX Q1/Q4/Q5/Q9, performance = acceptance, EV สรุปข้อความให้ forward; Status/dependencies/gates คงเดิม
-- 2026-10-24 — ใบงาน060 (นายช่างสวมบท gm ในโหมด solo): เพิ่ม precedence รอบ060 — ปิดคิวเอกสาร §3 ครบ + ประตูมนุษย์พร้อมถาม 4 กลุ่มใหม่ (GAP-07/spec Q1–Q6/UX Q1–Q13/EV-01..06); คง Status/Release Scope/dependencies/gates ทั้งหมด
-- 2026-10-24 — ใบงาน059: ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items; คงข้อความฐาน/Status/dependencies/gates/Release Scope.
-- 2026-10-24 — ใบงาน051: ชี้คิว051/หลักฐานล่าสุด; คง Status/Release Scope.
-
-- 2026-10-23 — Rev2: reconcile44/180/110งาน; แยกส่วนต่อคุมขนาด; คง74IDs/8phases/17gates/pendingเดิม
-- 2026-10-23 — แก้ fixed metadata ของ SA-004 (`tasks-001.json` /tasks/107/tier) จาก t2 เป็น t1 ตามบทบาท arch; คง 110 tasks/180 AC, scope/dependencies/status/gates เดิม และบันทึก advisory V012-09 เป็น BL-001 ใน backlog โดยไม่เพิ่มงานในแผน
-- 2026-10-23 — รับหลักฐานรอบ task017..026 อัปเดต Waiting on Human ชี้ไปที่ queue-003.md และบันทึก BL-002..004 นอกขอบเขตโดยคง 110 tasks pending / 44 REQ / 180 AC / 17 gates เดิม
-
-- 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
-
-- 2026-10-23 — นายช่าง (BAAN) ปรับชื่อผู้คุมจาก MYCELIUM เป็นนายช่าง ในข้อความส่งต่อ ตามการเปลี่ยนชื่อระบบเป็น BAAN (release 0.12.0) — รายการลงวันที่เดิมที่อ้าง MYCELIUM คงไว้ตามประวัติ
-- 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
-- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม [check082](../planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure

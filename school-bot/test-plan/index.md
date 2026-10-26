@@ -51,4 +51,4 @@ E-API สำหรับ integration ต้องมี sanitized HTTP↔RPC cor
 
 - 2026-10-23 — นายช่างบันทึกและจัดรูปจากผล role ผ่าน Claude; ไม่มี runtime/test verdict หรือการปิด gate
 
-- 2026-10-23 — Amendment001 ปรับTP001-007/008/019ตามspec; 77/180เดิม, GAP01/02ยังรอdesignsync; [archive manifest](archive/2026-10-23-before-amendment-001/manifest.json)
+- 2026-10-23 — Amendment001 ปรับTP001-007/008/019ตามspec; 77/180เดิม, GAP01/02ยังรอdesignsync; archive manifest (ใน tag `school-bot-pre-cleanup-2026-10-26`)

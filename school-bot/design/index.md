@@ -35,7 +35,7 @@
 3. อ่าน `quality-attributes.md` สำหรับเกณฑ์พิสูจน์ และ `risks.md` สำหรับประตูมนุษย์
 4. API ใหม่ใช้ `/v2`, JSON `snake_case` เป็น client-facing HTTP ผ่าน G; G→B ใช้ gRPC ที่ยังรอ RPC/trust mapping ตาม Gateway Rev3; DB ใช้ชื่อใน data-model ตรงตัว
 5. ตัวเลข bounds ใหม่เป็นข้อเสนอ SA ไม่ใช่ performance SLA ที่ผู้ใช้อนุมัติ
-6. ฉบับก่อน amendment เก็บแบบ verbatim ที่ [archive.md](archive.md)
+6. ฉบับก่อน amendment อยู่ใน git history (ไม่คัดลอกเก็บแล้ว — ของเดิมก่อนเคลียร์ดูที่ tag `school-bot-pre-cleanup-2026-10-26`)
 7. เปิด [schoolbot.dbml](schoolbot.dbml) ใน dbdiagram.io; ขอบเขต/ข้อจำกัดของภาพอยู่ใน [schema-notes.md](schema-notes.md)
 
 สถานะเอกสารอยู่ใน index นี้เท่านั้น
@@ -145,7 +145,6 @@
 | [auth-evidence-001.md](auth-evidence-001.md) | รับหลักฐาน BE-001: matrix ที่รับ/หักล้าง, policy ที่ยังไม่ยืนยัน, trust boundary, H5 checklist, TR-AUTH-01..07 + legacy รอบ002 (Rev4 · EVIDENCE — ไม่ใช่ verdict) |
 | [modules.md](modules.md) | โครงสร้างโมดูลและขอบเขตระบบ (Rev3 · PROPOSED) |
 | [quality-attributes.md](quality-attributes.md) | เกณฑ์คุณภาพและเกณฑ์พิสูจน์ (Rev1 · PROPOSED) |
-| [archive.md](archive.md) และโฟลเดอร์ `archive/` | Verbatim history (ฉบับก่อน amendment เก็บแบบ verbatim) |
 | [data-model-history-001.md](data-model-history-001.md) | Change Log เดิม Rev1–Rev5 |
 | [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |

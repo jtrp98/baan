@@ -14,7 +14,7 @@
 
 วันที่ 2026-10-23 · jpo / Claude Sonnet tier t2 · ผล role: NEEDS_HUMAN
 
-[ใบงาน](planning/task-019.md) · [ผลต้นฉบับ](planning/security-response-001.json)
+[ใบงาน](planning/task-019.md) · [ผลต้นฉบับ](../../reports/school-bot/planning/security-response-001.json)
 
 ตรวจแบบ static จาก source จริงของ target/school-bot (API, Desktop host, frontend, build scripts, manifests) และเส้นทาง legacy-token ใน sb-api-gateway แล้ว พบ Important 6 รายการ (planned_gap 4, deployment_unknown 1 และ web-principal 1) และ Medium/Minor 9 รายการ ไม่พบ Critical. ระบบปัจจุบันเป็น PoC ที่ไม่มี identity, entitlement หรือ update-install จริง (API ใช้ memory store และ install_supported=false) ช่องว่างส่วนใหญ่จึงเป็นงานที่ยังไม่ได้ implement ตามแผน ไม่ใช่ช่องโหว่ที่เปิดอยู่ในโค้ดตอนนี้. ที่เป็น actual defect มีเฉพาะ SEC001-007/008/013/014/015 ซึ่งผลกระทบจำกัด. ตรวจ CVE ของ dependency และสถานะกฎหมายปัจจุบันไม่ได้ เพราะ WebFetch/WebSearch ไม่ได้รับสิทธิ์ในรอบนี้ จึงไม่ประกาศ compliant หรือ vulnerable ในสองเรื่องนี้. รอบนี้ไม่มีการเขียน source/knowledge, ไม่มี request/login จริงและไม่มี network probe.
 
@@ -315,7 +315,7 @@ Minor · actual_defect · OPEN
 
 ## รอบทบทวน mitigation — 2026-10-23
 
-[คำตอบjpoครบ5ข้อ](planning/security-mitigation-001.md) · [ข้อมูลต้นฉบับ](planning/security-mitigation-response-001.json)
+[คำตอบjpoครบ5ข้อ](planning/security-mitigation-001.md) · [ข้อมูลต้นฉบับ](../../reports/school-bot/planning/security-mitigation-response-001.json)
 
 ตอบ 5 ข้อจาก DES-002/004/007/009/012, db/schoolbot_db.sql:142-167 และ source gateway (อ่านอย่างเดียว) ความเห็นนี้ไม่ใช่การปิด finding ทุก Important ยัง OPEN จนมี code จริงและ jpo re-audit ไม่มี risk acceptance แทนคน คำตอบ 'service เดียวผ่าน gateway' ยืนยันเฉพาะ routing ไม่ยืนยัน host/TLS/exposure/secret/instance จึงไม่ปิด SEC001-011/012 และไม่ปิด auth gap ใด รอผลอ่าน legacy ของ sys และ arch ปรับ topology ก่อนประเมิน SEC001-002 ใหม่ (gateway ซ่อน API ลด exposure ตรง แต่ไม่ลดความกว้างของ credential) ตัวเลข TTL/limit ทุกค่าเป็น (สมมติฐาน — ยังไม่ยืนยัน) CVE/กฎหมาย/ข้อกำหนด CA ยังไม่ได้ตรวจแหล่งทางการ
 
@@ -331,7 +331,7 @@ Minor · actual_defect · OPEN
 
 ## Logoutsubset — SEC040-001
 
-2026-10-24: [jpo040](planning/logout-security-response-001.json) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](planning/logout-limiting-response-001.json) และ [jpo043](planning/logout-security-response-002.json) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน [QAround001](qa/round-001.md) และ [check](planning/auth-flow-check-response-002.json). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
+2026-10-24: [jpo040](../../reports/school-bot/planning/logout-security-response-001.json) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](../../reports/school-bot/planning/logout-limiting-response-001.json) และ [jpo043](../../reports/school-bot/planning/logout-security-response-002.json) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน [QAround001](qa/round-001.md) และ [check](../../reports/school-bot/planning/auth-flow-check-response-002.json). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
 
 - 2026-10-24 — นายช่างบันทึกdispositionจากjpo+check; ไม่มีriskacceptanceใหม่
 

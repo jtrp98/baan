@@ -20,7 +20,6 @@
 | `review-002.md` | รอบ Rev2 (partial index license active ต่อโรงเรียน) + ประเด็น LearnerId ครู/นักเรียนชนกัน | ประวัติ |
 | `review-001.md` | รอบแรก บันทึก db/001–007 + rollback (DRAFT ไม่รัน) และประเด็นส่ง sec ตรวจ PII | ประวัติ |
 | `proposal-learnerkind.md` | ข้อเสนอแก้ `LearnerId` ครู/นักเรียนชนกัน (SA) | ผู้ใช้เลือก A ตาม decisions-032; ส่ง arch sync/app authorization |
-| `archive\` | DDL/rollback ฉบับก่อนหน้า (rev1, rev4, rev5 เก่า, split-rev1, grants ที่ถอน) — verbatim | ประวัติ |
 
 ## หมายเหตุ
 
