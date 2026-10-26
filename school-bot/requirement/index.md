@@ -142,4 +142,5 @@
 | [decisions-044.md](decisions-044.md) | คงเฉพาะ PK32; ถอน UNIQUE24/FK40/CHECK80 จากร่าง SQL คงคอลัมน์/ชนิด/NOT NULL/default/identity เดิม |
 | [decisions-045.md](decisions-045.md) | ผู้ใช้ยืนยันรัน schoolbot_db.sql สร้างตารางแล้ว; ยังไม่มีผลตรวจ catalog/API integration และไม่ปิด runtime gates |
 | [decisions-046.md](decisions-046.md) | อนุญาตพัฒนา Gateway บน branch ที่เตรียมไว้; อนุมัติ create-license replay 15 นาที; custody กุญแจเซ็นยังรอคำอธิบาย/คำตอบ |
+| [decisions-047.md](decisions-047.md) | ผู้ใช้พักเรื่อง signer/custody ของ License ไว้ก่อน; คำอนุญาต dev Gateway และ replay 15 นาทีคงเดิม |
 
