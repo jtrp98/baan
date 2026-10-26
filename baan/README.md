@@ -178,7 +178,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - **check แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) check เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
 - **Artifact ต้องเซ็นก่อนใช้** — int draft ของ `int` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
 - **vault ห้ามรัน SQL ทุกกรณี** — เขียน script พร้อม rollback plan ให้คนรันเท่านั้น
-- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log
+- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log — ยกเว้น index ที่เป็นสถานะปัจจุบัน (เขียนทับ ไม่มี Change Log/Precedence) · ไม่ทำ snapshot/archive เพราะ knowledge อยู่ใน git · ผลดิบของ role อยู่ที่ `reports/` ไม่คัดลอกเข้า knowledge
 - **เพิ่ม/ลดตำแหน่งได้อิสระ** — แค่เพิ่ม/ลบไฟล์ `.md` ใน `roles/` ระบบหาอัตโนมัติ (ดูรายชื่อด้วย `--list`)
 
 ตัวอย่าง flow งานเต็มรูปแบบ: `plan` วางแผน → `gm` เรียกทีมตามแผน → `spec` เขียน REQ/AC → `int` ร่าง UX รอผู้ใช้เซ็น → `arch` ออกแบบ DES/สัญญา → `vault` รีวิม schema + เขียน SQL (คนรัน) → `front`/`sys` implement ตาม signed artifact → `inspect` วางแผนทดสอบ → `check` เขียน unit test อิสระ + รายงานรอบ → `jpo` รีวิวก่อนขึ้น production
@@ -193,7 +193,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - งานง่าย plan ให้น้อย task เอง — ไม่ต้องใช้ทั้งทีม
 - **walking skeleton ก่อนเอกสาร** — goal ที่สร้าง/แก้ซอฟต์แวร์ ต้องมีงาน `front`/`sys` อย่างน้อยหนึ่งงานที่ได้ของรันและเทสต์ได้ และงานนั้นห้ามรอประตูมนุษย์ (ทั้งตรงและผ่าน dependsOn) — ของที่ยังรอคน (DB, สัญญาภายนอก, UX ที่ยังไม่เซ็น) ใช้ stub/fake ไปก่อน · งานเอกสารครอบแค่ slice ที่ทำในแผนนั้น และมีได้ไม่เกิน 3 งานในสาย dependency ก่อนงาน implement งานแรก · แผนที่ไม่มีงาน implement ถูกปฏิเสธ เว้นแต่ใส่ `"docsOnly": "<เหตุผล>"`
 - โหมด read-only (ไม่มี `--write`) งาน `front`/`sys` ส่งโค้ดจริงเป็น diff/patch + คำสั่ง test ให้ นายช่าง apply — ไม่ใช่คำอธิบายว่าจะทำอะไรทีหลัง
-- **งานที่เปลี่ยนสิ่งที่มีผู้อ้างอิง ต้องกวาดทุกจุด (related-impact sweep)** — เปลี่ยนสัญญา/ชื่อ/ค่า/revision/สถานะที่มีอยู่แล้ว แผนต้องมี task เก็บเอกสารผู้อ้างอิงทุกจุดตามเจ้าของไฟล์ (รวม index หลักของโมดูล) แม้เป็นงานเล็ก; ไม่มีผู้อ้างอิงต้องระบุไว้ชัดว่าไม่มี
+- **งานที่เปลี่ยนสิ่งที่มีผู้อ้างอิง ต้องกวาดทุกจุด (related-impact sweep)** — เปลี่ยนสัญญา/ชื่อ/ค่า/revision/สถานะที่มีอยู่แล้ว task ต้องระบุค่าเดิมไว้ให้ นายช่าง ค้นด้วย `baan --sweep` และแทนค่าตรงตัวเอง · แผนมี task ต่อเจ้าของเฉพาะเอกสารที่ความหมายต้องเปลี่ยน (เจ้าของละหนึ่ง task ไม่ใช่ไฟล์ละ task); ไม่มีผู้อ้างอิงต้องระบุไว้ชัดว่าไม่มี
 - สิ่งที่ต้องเป็นประตูมนุษย์ (sign-off int / รัน SQL / ตัดสินธุรกิจ) รวมเป็น `humanGates` รายงานตอนจบ — ไม่ทำแทน
 - default agent = **codex** (`--agent` เปลี่ยนได้)
 - ตัวเปิด session ราย role (มือระดับล่าง) คือคำสั่ง `baan-role`
@@ -203,6 +203,9 @@ baan --goal "..." --dry-run   # gm + plan แล้วดูแผน ยัง�
 baan --goal "..."             # รันครบทุก wave
 baan --resume <runDir>        # ต่อ run ที่ค้าง ข้ามเฉพาะ task ที่ completed (ประหยัด token)
 baan --plan-file <f>          # รันแผนที่แก้เอง
+baan --sweep "Rev3" --sweep "Rev 3" --target school-bot  # หาผู้อ้างอิงทุกจุดของค่าเดิม จัดกลุ่มตามเจ้าของไฟล์
+#   ค่าเริ่มต้นค้นทุก knowledge root · --target เพิ่ม repo ของ target · --sweep-in <dir> ค้นเฉพาะโฟลเดอร์ที่ระบุ
+#   ใช้ git ls-files (เคารพ .gitignore) ถ้าเป็น git repo · ข้าม archive/ ไฟล์ binary และไฟล์เกิน 2MB
 baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG ของแผน (แผน runtime หรือ plan\tasks-*.json ของโปรเจกต์) — exit 1 เมื่อไม่มีงาน implement หรือเกินครึ่งติดประตูมนุษย์
 # --dry-run ใช้กับทุก route ได้ (รวม --plan-file/--resume) — การ์ดห้ามเรียก provider อยู่ที่ execute จุดเดียว
 ```

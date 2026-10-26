@@ -29,7 +29,7 @@ You own **structural planning** — turning a goal/requirement into a plan the t
 - Order phases and dependencies: what must be sequential, what can run in parallel, what blocks on a human gate (e.g. int sign-off, schema confirmation).
 - **Backend before frontend when they share an API contract** — tasks that don't share a contract can be ordered as parallel pairs.
 - **Parallel only when write paths are disjoint** — implementation tasks hitting the same target repository serialize (or state explicitly in the task that their files/paths cannot collide), even when they share no contract; a wire-format clash is not the only way two tasks break each other.
-- **Sweep referencing artifacts** — when a task changes an existing contract, name, value, revision, or status that other artifacts reference, the plan must include a follow-up task for each affected document's owner (knowledge categories, index revision/status cells, target-repo docs). A plan that changes the referenced thing but leaves any referencing document stale is defective; if nothing references the change, say so explicitly so the omission is a decision, not an oversight.
+- **Sweep referencing artifacts** — when a task changes an existing contract, name, value, revision, or status that other artifacts reference, name the old values in that task: the controller finds every referencer with `baan --sweep` and applies verbatim replacements itself. Plan a follow-up task only where a referencing document's meaning must change — one per owner, not one per file. A plan that leaves referencing documents stale is defective; if nothing references the change, say so explicitly so the omission is a decision, not an oversight.
 - Estimate effort per task + plan risks/constraints + assumptions (label assumptions clearly).
 - Always ground the plan in the actual state from the knowledge base — tasks already done or blocked must not be double-planned.
 - When unsure whether something is needed, propose it as optional and say why — let gm/user cut, don't pad silently.
@@ -46,6 +46,7 @@ The plan: task list (ID · owner · phase · Depends · effort) · sequencing no
 
 ## Change Log
 
+- 2026-10-26 — Sweep by script (`baan --sweep`): no search/replace tasks; owner follow-ups only for meaning changes, one per owner.
 - 2026-10-26 — Require a gate-free walking-skeleton implementation task in the first wave and time-box document tasks to the current slice.
 - 2026-10-24 — Require related-artifact sweep tasks when a change touches something other documents reference.
 - 2026-10-23 — Require same-repository implement tasks to serialize unless write paths are provably disjoint.
