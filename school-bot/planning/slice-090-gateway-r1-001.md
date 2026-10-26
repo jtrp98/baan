@@ -10,6 +10,9 @@ Current SHA256: Middleware `FABD8ABFF8AE43CC6B05B76CB771F0CAC56548A959C4F1D7859E
 
 สถานะ **done-local เฉพาะสอง fix ที่ parent reproduce ผ่าน**; Important disclosure ยัง OPEN รอ JPO independent reaudit ไม่ใช่การรับ risk. Full solutionติด private packages; actualB/DB/TLS/H5/production route NOT_RUN. ไม่ปิด canonical task/gate.
 
+Parent regressionต่อ: `pwsh -NoProfile -File reports/gateway-logout-2026-10-26/compile-helper.ps1` exit0 (standalone full SchoolBot module/warnaserror) และ `pwsh -NoProfile -File C:/src/schoolbright/reports/school-bot/normal-089/independent-helper-check.ps1` **433pass/0fail**, sourcehelperhashเดิม221134…AA1. ผลนี้ไม่แทน260case typedadapter suiteหรือJPO verdict.
+
 ## Change Log
 
 - 2026-10-26 — รับ sys rework1 และ parent green3; เปิด JPO CodexT2ตรวจอิสระ ไม่อาศัย writerclaims ปิดfinding.
+- 2026-10-26 — ผู้คุมทวนmodulecompileและhelper433หลังfixผ่าน คงproduction/H5/privatefeedข้อจำกัดเดิม.
