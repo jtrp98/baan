@@ -1,5 +1,5 @@
 # ชุดส่งต่อเจ้าของ — Owner Packet 001
-วันที่ 2026-10-26 · gm · ใบงาน065 · อ้าง [คิวปัจจุบัน](queue-004.md)
+วันที่ 2026-10-26 · gm · ใบงาน065 · อ้าง [คิวปัจจุบัน](queue-006.md)
 
 ## วัตถุประสงค์และผู้ส่ง
 พร้อมให้ผู้ใช้ส่งถึง G owner/Light/infra/B owner/BFF owners และเจ้าของ Master/School/PGGradeDB. ผู้ใช้เป็นผู้ส่งจริง; packet นี้ไม่ยืนยันว่ามีการติดต่อหรือได้รับ approval. ทบทวนสัญญาปัจจุบันและคืนหลักฐานในงานเดิม SA-001/BE-001/BE-039/SEC-001/DBA-002/DBA-007 ไม่เพิ่ม scope.
@@ -35,7 +35,7 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 ## 4. ลำดับเปิดงานและหลักฐานภายหลัง
 1. ผู้ใช้ส่ง packet/DB cover; รับคำตอบ G/Light/infra/BFF และ EV ตามลำดับข้างต้น. service-route คงปิดระหว่างรอ.
 2. arch/sys reconcile คำตอบกับ contract เดิมผ่านผู้คุม; ตรึง DTO/trailer/manifest และ Login prerequisites ตาม operation. B เป็นเจ้าของ .proto แล้ว sync G หลัง owner รับรอง พร้อม parser/codegen/hash.
-3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-004; ผู้ใช้เซ็น UX-005/007 Q39–Q46 รวม delta042 แล้วตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; UX signed 7/7. Owner approval และ technical proof คงแยกตามเดิม
+3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-006; ผู้ใช้เซ็น UX-005/007 Q39–Q46 รวม delta042 แล้วตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; UX signed 7/7. Owner approval และ technical proof คงแยกตามเดิม
 4. Runtime ภายหลัง: HTTP↔RPC mapping, private reachability/no-loop/wrong-peer, spoof/tenant, deadline/cancel/retry/limits/BFF security และ SQL/rollback/catalog/grade proof บน environment ที่คนอนุญาต. 4032 local tests ใช้แทน integration ไม่ได้.
 5. Bootstrap ตาม procedure ที่ review แล้วโดยมนุษย์และผู้ตรวจซ้ำ; shared/production SQL/deploy ต้องมีคำสั่งเจาะจงภายหลัง. Login end-to-end คงปิดถ้า linkage/continuation/device-proof ไม่ครบ. gm รวม release runbook เมื่อหลักฐาน/ชิ้นส่วนครบ.
 

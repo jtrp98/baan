@@ -158,7 +158,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 
 ## ช่องว่าง Learning/UX — ใบงาน071
 
-[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 004](../plan/queue-004.md) และ [ใบงาน062](../planning/task-062.md). อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
+[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 006](../plan/queue-006.md) และ [ใบงาน089](../planning/task-089.md). อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
 
 ## ภาคผนวก canonical
 
