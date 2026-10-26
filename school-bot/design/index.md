@@ -173,7 +173,7 @@
 | [teacher-authority-001.md](teacher-authority-001.md) Rev1 | PROPOSED — authority intersection; roster/status/time resolver ยังขาดหลักฐาน |
 | [robot-boundary-001.md](robot-boundary-001.md) Rev1 | PROPOSED — payload/drain-stop; poll 3000ms/debounce0 ติดสมมติฐาน ไม่ใช่ physical SLA |
 | [release-trust-001.md](release-trust-001.md) Rev1 | PROPOSED — registry-gated signer/publisher pin; รอ custody และ re-audit |
-| [update-disposition-001.md](update-disposition-001.md) Rev1 | ประวัติ disposition เดิม — ผู้ใช้เลือก explicit PrepareUpdate/InstallPreparedUpdate แล้วตาม [decisions-036](../requirement/decisions-036.md:11) และตรวจรับ AC-030-04..08 ตาม [decisions-037](../requirement/decisions-037.md:7); คงเอกสารเดิมและ gates/implementation เดิม |
+| [update-disposition-001.md](update-disposition-001.md) Rev1 | ประวัติ disposition เดิม — ผู้ใช้เลือก explicit PrepareUpdate/InstallPreparedUpdate แล้วตาม [decisions-036](../requirement/decisions-036.md) บรรทัด 11 และตรวจรับ AC-030-04..08 ตาม [decisions-037](../requirement/decisions-037.md) บรรทัด 7; คงเอกสารเดิมและ gates/implementation เดิม |
 | [credential-matrix-001.md](credential-matrix-001.md) Rev1 | DRAFT EVIDENCE PACK — process/account/สิทธิ์ที่ต้องใช้; actual grants/account names ยังไม่ยืนยัน |
 | [signing-custody-001.md](signing-custody-001.md) Rev1 | DRAFT EVIDENCE PACK — ผู้ถือ/ที่เก็บ/sign/rotate/revoke/backup รอเจ้าของเติม |
 | [export-proof-pack-001.md](export-proof-pack-001.md) Rev1 | DRAFT EVIDENCE PACK — outline SA-004 ครบ19ACเดิม/ห้าgate; ไม่ใช่ผลทดสอบ |
