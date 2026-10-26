@@ -1,0 +1,188 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "check",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-04-28-31-check-tier-t2-1agents-e2sIzO\\report.json",
+  "payload": {
+    "state": "PASS",
+    "summary": "UX-005 และ UX-007 ผ่านการตรวจความครบถ้วนของร่าง: 27/27 AC entries รวม 25 AC ไม่ซ้ำ มี flow/state รองรับจริง ไม่พบข้อขัดแย้งที่ต้องแก้ก่อนส่งพิจารณา UX ผลนี้ไม่ใช่ runtime acceptance หรือ human sign-off; ทั้งสอง task ยัง pending",
+    "tasks": [
+      {
+        "id": "UX-005",
+        "verdict": "PASS",
+        "scope": "draft completeness only; awaiting human sign-off",
+        "ac_results": [
+          {
+            "id": "AC-044-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:25–29 แยกลำดับจาก LessonKey พร้อมตัวอย่างย้าย 6→7"
+          },
+          {
+            "id": "AC-044-02",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:21–31 บันทึกและเปิดอ่านร่างกลับ; int-006-admin-trace.md:39 แจ้งช่องว่าง read-back"
+          },
+          {
+            "id": "AC-044-03",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:37–41; int-006-admin-states.md:29,55–56 กั้นหลักฐานไม่ครบและผู้สร้าง/ผู้แก้อนุมัติเอง"
+          },
+          {
+            "id": "AC-044-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:37–43 ผู้เรียนฉบับ 3 คงฉบับและผลเดิมเมื่อเผยแพร่ฉบับ 4"
+          },
+          {
+            "id": "AC-044-05",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:35 สร้าง revision ใหม่และคง published children เดิม"
+          },
+          {
+            "id": "AC-045-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:49–53 ทุกแถวเป็น draft มีต้นทางและป้าย D=TRUE แยกจาก publish"
+          },
+          {
+            "id": "AC-045-02",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:54 เปลี่ยนเฉพาะ O ต้องไม่เปลี่ยนเนื้อหา รหัส หรือลำดับ"
+          },
+          {
+            "id": "AC-045-03",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:51,55 แสดงสื่อสองชุดภายใต้ Lesson เดียว"
+          },
+          {
+            "id": "AC-045-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:25–27,51–56 แสดง C/Unit แยกจากรหัสถาวร ไม่เดารหัสจากต้นทาง"
+          },
+          {
+            "id": "AC-043-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:11–23; int-006-admin-states.md:70–78 แยก staff_admin จาก school_web และสิทธิ์เนื้อหากลาง"
+          },
+          {
+            "id": "AC-046-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:70–78 แสดง policy จริงครบจำนวนครั้ง เวลา เฉลย และการสุ่ม"
+          },
+          {
+            "id": "AC-046-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-006-admin-curriculum.md:66–82; int-006-admin-trace.md:24 แก้ bank เป็น revision ใหม่ คง snapshot/เกณฑ์/ผลเดิม"
+          }
+        ]
+      },
+      {
+        "id": "UX-007",
+        "verdict": "PASS",
+        "scope": "draft completeness only; awaiting human sign-off",
+        "ac_results": [
+          {
+            "id": "AC-046-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-attempt-policy.md:18–20 แสดง effective policy ไม่อนุมานจากชื่อ Quiz/Test"
+          },
+          {
+            "id": "AC-046-02",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-attempt-policy.md:20–30; int-007-states.md:13–15,31 ครบค่าเริ่ม เพดาน เวลา และการเปิดผล"
+          },
+          {
+            "id": "AC-046-03",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-attempt-policy.md:22,28,32 ใช้ชุดและลำดับเดิม; int-007-trace.md:41–42 ระบุข้อจำกัด history/resume"
+          },
+          {
+            "id": "AC-046-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-attempt-policy.md:32 คง snapshot/deadline/ผลเดิม และไม่แต่งเลข revision ที่ response ไม่คืน"
+          },
+          {
+            "id": "AC-046-05",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:11–15; int-007-states.md:16 เปลี่ยนเฉพาะเวลา/ช่วงเปิด–ปิด ไม่บันทึกส่วนต้องห้าม"
+          },
+          {
+            "id": "AC-046-06",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:19–21 ให้สิทธิ์หนึ่งครั้งเฉพาะคน พร้อมตัวอย่าง 6→9 ใช้ 9 และซ่อม 5 คง 6"
+          },
+          {
+            "id": "AC-047-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:9,25; int-007-states.md:18 แยกบริบทและกั้นน้ำหนักไม่ครบ 100%"
+          },
+          {
+            "id": "AC-047-02",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:25,35; int-007-trace.md:22 Quiz ไม่นับมีน้ำหนัก 0 ยังดูผลได้และไม่เปลี่ยนคะแนนรวม"
+          },
+          {
+            "id": "AC-047-03",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:9,25,35; int-007-trace.md:23 อ่านน้ำหนักตามบริบท A โดย B ไม่เปลี่ยน"
+          },
+          {
+            "id": "AC-047-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:27–35 ตารางแสดง 16+18+45=79 และไม่ปัดรายส่วน"
+          },
+          {
+            "id": "AC-047-05",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:35–37 รอบเริ่มแล้วอ่านอย่างเดียว รอบเดิม 79 รอบใหม่ 81 ไม่ย้อนหลัง"
+          },
+          {
+            "id": "AC-048-01",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:43–49 ทุกคนใน roster; 80/0 เฉลี่ย 40 และเสนอเมื่อสูงกว่าเกณฑ์"
+          },
+          {
+            "id": "AC-048-02",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:49 proposed รอครูยืนยัน ทุกคนยัง Level เดิมก่อนยืนยัน"
+          },
+          {
+            "id": "AC-048-03",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:49–53 ยืนยันทั้งห้อง มีผลเทอมหน้า ไม่เปลี่ยนเทอมปัจจุบัน"
+          },
+          {
+            "id": "AC-048-04",
+            "verdict": "PASS",
+            "evidence": "uxui/int-007-teacher-score.md:47–50 เท่ากันไม่เสนอเลื่อน gap=0; ต่ำกว่า retained พร้อมส่วนที่ขาด"
+          }
+        ]
+      }
+    ],
+    "findings": [],
+    "checks_run": [
+      "อ่าน index ตามลำดับที่กำหนด แล้วอ่าน AC/spec ก่อนร่าง ตรวจ canonical JSON เฉพาะ UX-005/007: 12+15 entries, 25 unique AC; trace ไม่มีขาด เกิน หรือซ้ำภายใน task",
+      "ตรวจ saved artifacts 7 ไฟล์ รวม 481 บรรทัด เทียบ requirement/มติ/DES/data-model และ dictionary/JSON/rules ที่เกี่ยวข้อง",
+      "ตรวจ Markdown table cell integrity ด้วย Node แบบอ่านอย่างเดียว: 10 ตาราง 94 แถวรวม header/separator ไม่พบจำนวนเซลล์ผิด",
+      "ตรวจ local Markdown links 18 จุด: พบไฟล์ปลายทางครบ; ตรวจ explicit K path:line references 90 จุด: พบไฟล์และช่วงบรรทัดครบ พร้อมอ่านเทียบสาระหลักฐานที่ใช้ตัดสิน",
+      "เทียบ int-004/int-005 และ decisions-039..041: ไม่พบการย้ายหน้าครูเข้า Desktop เปิดเผยค่าเฉลี่ยห้องแก่นักเรียน หรือเปลี่ยนกฎ mapping/export ที่เซ็นแล้ว",
+      "คำนวณตัวอย่างเอกสารแยกจากระบบ: น้ำหนักเดิมได้ 79 ใหม่ได้ 81; roster 80/0 เฉลี่ย 40; 70>70 เป็น false และ gap=0",
+      "คำนวณ contrast จาก sRGB: dark/white 15.29, grey/white 5.92, red/white 5.08, dark/cyan 7.38, dark/orange 5.98; cyan/white 2.07 ซึ่งร่างห้ามใช้เป็นข้อความปกติบนขาว",
+      "python.exe เริ่มไม่ได้เพราะ WindowsApps alias จึงใช้ Node ตรวจ static สำเร็จแทน ไม่ได้สร้างไฟล์หรือรัน build/tests/SQL/DB/network/Git"
+    ],
+    "limitations": [
+      "PASS ทุก AC หมายถึงร่างมีข้อกำหนด flow/state ครบเท่านั้น ไม่ใช่ยืนยันพฤติกรรม production หรือผลทดสอบ AC runtime; ไม่มี UI จริงให้ตรวจ keyboard, screen reader, layout หรือ contrast ทุกสถานะ",
+      "UX-005 ยังขาดสัญญา Sheet preview/import/atomicity/dedup/stable-key mapping รวม draft read-back/metadata และ bank draft read/edit ตาม design/des-005.md:73–85 และ des-010.md:60–73; ร่างแจ้งไว้ที่ int-006-admin-trace.md:38–43 จึงไม่ใช่ช่องว่างที่ปกปิด",
+      "UX-007 ยังขาดสัญญาค้นหา attempt ค้าง/คืน answers/effective policy/history, expired lifecycle และ aggregate/proposal detail ตาม design/des-010.md:86–100 และ des-011.md:56–64; ร่างแจ้งไว้ที่ int-007-trace.md:41–45",
+      "Gateway/gRPC mapping, opaque-session trust, H5 และ authority/term resolver ยังต้องมีหลักฐานจากเจ้าของก่อนเชื่อมระบบ; การเซ็น UX ไม่รับรอง contract ที่ยัง PROPOSED",
+      "ไม่ได้ตรวจซ้ำ source implementation ที่ผู้ร่างกล่าวถึง ไม่ audit schema/DBML และไม่ใช้คำกล่าวอ้างของผู้เขียนเป็น runtime evidence",
+      "Q39–Q46 ยังไม่มี human sign-off; ไม่เปลี่ยน canonical status ไม่เปิด gates และไม่ได้บันทึกรายงานลงดิสก์"
+    ],
+    "new_files": [
+      {
+        "path": "knowledge/school-bot/planning/check-066-ux-review-001.md",
+        "content": "# ผลตรวจใบงาน066 — รอบแรก\n\nวันที่ 2026-10-26 · ผู้ตรวจอิสระ: check\n\nผล: UX-005 PASS 12/12 และ UX-007 PASS 15/15 เฉพาะความครบถ้วนของร่าง รวม 27 entries/25 unique AC ไม่พบข้อบกพร่องที่บล็อกการส่งพิจารณา UX ทั้งสอง task ยังคง pending จนได้ human sign-off ที่ต้องใช้\n\n## วิธีตรวจและขอบเขต\n\nอ่าน index ตามใบงาน แล้วอ่าน canonical AC/spec ก่อน saved artifacts ตรวจ data-model เต็มพร้อม dictionary/JSON/rules ในขอบเขต ตรวจมติและ transport/auth boundary รวมเทียบ UX ที่เซ็นแล้ว ไม่อ่าน writer response หรือใบงาน063/064 ไม่แก้ไฟล์ ไม่รัน production/unit tests/build/SQL/DB/network/Git\n\n## หลักฐานรายกลุ่ม AC\n\nUX-005:\n- AC-044-01/02: int-006-admin-curriculum.md:21–31 มีสร้าง/บันทึก/อ่านร่างกลับ และลำดับแยกจาก LessonKey\n- AC-044-03/04/05: ไฟล์เดียวกัน:35–43 มี immutable revision, four-eyes, หลักฐานอนุมัติ และคง revision/ผลผู้เรียนเดิม; states:29,55–59 ครอบปฏิเสธ/ชน\n- AC-045-01/02/03/04: ไฟล์หลัก:49–60 มีทุกแถว draft, D เป็นป้ายต้นทาง, O ไม่มีผล, P–X ใต้ Lesson เดิม และ C/Unit แยกรหัสถาวร\n- AC-043-01: ไฟล์หลัก:11–23 และ states:70–78 แยกส่วนกลาง/โรงเรียน/ช่องทางและสิทธิ์สด\n- AC-046-01/04: ไฟล์หลัก:66–82 มี policy จริงครบและ bank revision ใหม่ไม่เปลี่ยน attempt เก่า\n\nUX-007:\n- AC-046-01/02/03/04: int-007-attempt-policy.md:18–32 มีค่าเริ่มและ effective policy, ชุด/ลำดับจริง, deadline, บันทึก/ส่ง/ทำต่อ/อ่านผล และคง snapshot เดิม\n- AC-046-05/06: int-007-teacher-score.md:9–21 จำกัดครูเฉพาะเวลา/ช่วงเปิด–ปิด ให้ซ่อมรายคนหนึ่งครั้ง พร้อมตัวอย่างคะแนนสูงสุดไม่มีเพดาน\n- AC-047-01/02/03: ไฟล์เดียวกัน:9,25–37 แยกบริบท น้ำหนักครบ 100%, Quiz ไม่นับเป็น 0 แต่ยังดูผลได้ และแสดง policy ที่บันทึก\n- AC-047-04/05: ไฟล์เดียวกัน:27–37 แสดงส่วนคะแนน 16+18+45=79 และรอบใหม่ 81 โดยรอบเดิมไม่เปลี่ยน\n- AC-048-01/02/03/04: ไฟล์เดียวกัน:43–53 มี roster ทุกคน/missing0, strict > ก่อนปัด, เท่ากัน gap0, รอครูยืนยันทั้งห้องและมีผลเทอมหน้า รวม retained/max_level/stale/ไม่มีเทอมหน้า\n\nพาธไฟล์ร่างข้างต้นอยู่ใต้ uxui/ หลักฐาน AC ต้นทางคือ requirement/req-043.md:21, req-044.md:21–25, req-045.md:21–24, req-046.md:22–28, req-047.md:20–25 และ req-048.md:22–25\n\n## ผลตรวจร่วม\n\nstate ครอบ loading/empty/error/disabled/read-only/ข้อมูลผิดรูปและ unknown mutation มีทางแก้ ไม่อ้าง timeout เป็น rollback หรือ success ไม่ replay คำสั่งข้ามบัญชี ครู/Guest ไม่สร้างผล Cloud นอกสิทธิ์ ไม่ขยายสิทธิ์ครูเป็นทั้งโรงเรียน\n\nint-004:13–14,73–105 และ int-005:15–21,122–147 ยังคงสอดคล้องกับร่างใหม่ ไม่เปิด sign-off เดิมซ้ำ ส่วน UX ใหม่ระบุรอ Q39–Q46 ชัดเจน\n\nตรวจอัตโนมัติแบบอ่านอย่างเดียว: 7 ไฟล์/481 บรรทัด, 10 ตาราง/94 แถว จำนวนเซลล์ถูกต้อง, local links 18 จุดถึงไฟล์ครบ และ explicit K path:line 90 จุดไม่มีไฟล์หรือช่วงบรรทัดขาด ตรวจสูตรตัวอย่างและ contrast ได้ตรงร่าง การคำนวณนี้ไม่ใช่ผลรันระบบ\n\n## ข้อจำกัดและงานส่งต่อ\n\nไม่มี blocking findings หรือ production bugs จากการตรวจครั้งนี้ ไม่มี security gate ใหม่\n\nช่องว่างสัญญาที่เปิดเผยแล้ว: int-006-admin-trace.md:38–43 และ int-007-trace.md:41–45 ต้องส่ง arch ระบุ read-back/import/dedup/resume/history/expired/aggregate และ transport mapping ก่อน front เชื่อมส่วนที่พึ่งพา ไม่สมมติ endpoint/field หรือรับรอง atomicity เพิ่มเอง\n\nไม่มี UI จริงให้ตรวจ runtime/a11y ไม่มีการรับรอง schema/DBML/DB หรือ implementation ความไม่มี UI เป็นข้อจำกัดที่แจ้งแล้ว ไม่ใช่เหตุ FAIL ของงานตรวจร่างนี้ ไม่มีข้อเสนอ backlog เพิ่ม\n\nส่งผู้คุมรับ verdict เอกสาร แล้วส่ง arch รับข้อจำกัดสัญญาและผู้ใช้พิจารณา Q39–Q46 ไม่เปลี่ยน status หรือบันทึกการอนุมัติแทนมนุษย์ รายงานนี้เป็นเนื้อหาส่งคืน ยังไม่ได้เขียนไฟล์จริง\n\n## Change Log\n\n- 2026-10-26 — ตรวจรอบแรกจาก AC/spec และ saved artifacts; UX-005/007 ผ่านเฉพาะ draft completeness\n\nPASS"
+      }
+    ],
+    "handoff": "ส่งนายช่าง: รับ PASS เฉพาะร่างทั้งสอง task; ไม่มี blocking findings ส่ง arch รับช่องว่างสัญญาที่ระบุไว้ก่อน front เชื่อมระบบ และเตรียมให้ผู้ใช้พิจารณา Q39–Q46 คง UX-005/007 pending ไม่บันทึก sign-off หรือเปลี่ยน gate แทนมนุษย์"
+  }
+}
