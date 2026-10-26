@@ -60,4 +60,6 @@ JSON เป็นข้อมูลหลายฟิลด์ซ้อนกั
 
 ## Change Log
 
+- 2026-10-26 — arch091: Snapshotใช้[LevelSnapshotRev3](contract-003.md)/[projection](../learning-snapshot-projection-001.md)รวมfrozenpolicyrevision/currentcurriculum/rosterSourceResultRefsตามDES011; physicalfieldsเดิมทั้งหมด. ตรวจreadercompatก่อนเขียนใหม่/ไม่backfillเก่าด้วยผลสด.
+
 - 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

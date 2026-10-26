@@ -58,13 +58,13 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 | DES-002 | License และ device binding (Rev3) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
 | DES-003 | หลายโครงงาน Local/Cloud (Rev4) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
 | DES-004 | Identity และ school authorization (Rev11) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
-| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev7) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
+| DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev8) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
 | DES-006 | หุ่นจริง Windows/macOS (Rev2) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
 | DES-007 | Release และ trusted update (Rev3) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
 | DES-008 | Mapping หลักสูตรกับช่องคะแนน SchoolBright (Rev4) | PROPOSED — OQ-016 ตอบแล้ว; คง H5/web-principal | [des-008.md](des-008.md) |
 | DES-009 | Preview ยืนยัน และส่งคะแนนกลับ SchoolBright (Rev4) | PROPOSED — sync decisions-027..030 (G-DB ใช้บัญชี DB เดิมตาม decisions-029) และ db/review-005; export ปิดจนผ่าน G-PARITY/G-COEXIST/G-TARGET/G-AUTHZ/G-DB | [des-009.md](des-009.md) |
-| DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev4) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
-| DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev4) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
+| DES-010 | Question Bank, Attempt และนโยบายคะแนน (Rev5) | PROPOSED — สูตร/freeze/ขอบเขตครู/ทาง A ตอบแล้ว; รอ implementation proof | [des-010.md](des-010.md) |
+| DES-011 | ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง (Rev6) | PROPOSED — สูตรตอบแล้ว; รอตรวจ roster/วันสิ้นเทอม | [des-011.md](des-011.md) |
 | DES-012 | Auth ข้ามระบบ: web-system / admin web / Desktop ↔ SchoolBot API (Rev9) | PROPOSED — topology และแหล่ง is_admin ยืนยันแล้ว ([decisions-035](../requirement/decisions-035.md)); รอพิสูจน์ mapping/implementation และ H5 | [des-012.md](des-012.md), [routing addendum](gateway-integration-001.md) |
 
 ### REQ mapping
@@ -160,7 +160,17 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 
 ## ช่องว่าง Learning/UX — ใบงาน071
 
-[Gap receipt Rev1](learning-ux-contract-gaps-001.md) — LUX-01..07: technical gaps OPEN ทั้งหมด; LUX-05 ธุรกิจตอบแล้วตาม042 เหลือ technical proof ไม่ใช่ gate passed. คิวปัจจุบันใช้ [Queue 007](../plan/queue-007.md) และ [ใบงาน091](../planning/task-091.md); archLearningกำลังตรึงinternalcontracts. อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
+[Packet091](../planning/arch-091-learning-001.md)พร้อมlocalcontractsต่อจาก[gapreceipt](learning-ux-contract-gaps-001.md): LUX01/03draftread-edit, LUX04resume/read/reveal, LUX05finalizer/recovery, LUX06completefixtureprojection. LUX02validatorพร้อมแต่persistรอsourceidentity/newcolumnproposal; LUX07manifestdraftรอownerreview. Schema/storageproposalยังไม่อนุมัติ; roster/term/H5/DBruntimeยังOPEN ไม่ใช่gatepassed. คิว[007](../plan/queue-007.md)/[091](../planning/task-091.md); 44REQ186AC81TP/15verified95pending/32tables17gatesคงเดิม.
+
+| สัญญา091 | ขอบเขตปัจจุบัน |
+|---|---|
+| [curriculumdraft](learning-curriculum-draft-001.md) Rev1 | localread/editพร้อม; approvalT2048storageรอvault+human |
+| [bankdraft](learning-bank-draft-001.md) Rev1 | localread/edit/visibilityพร้อม; fullpublishรอapprovalstorage |
+| [attemptread](learning-attempt-read-001.md) Rev1 | discovery/savedanswers/history/effectivepolicy/revealพร้อมlocal |
+| [attemptfinalizer](learning-attempt-finalization-001.md) Rev1 | 042clock/race/replay/recoverylocalพร้อม; DB/workerproofยังเปิด |
+| [snapshotprojection](learning-snapshot-projection-001.md) Rev1 | completefixturesพร้อม/JSONdictionaryreconciled; readercompat/realrosterยังเปิด |
+| [Sheetimport](learning-sheet-import-001.md) Rev1 | suppliedvalidatorพร้อม; sourceidentity/ImportSourceproposalยังรอ |
+| [typedmanifestdraft](learning-grpc-manifest-001.md) Rev1 | DTO/mapperfixturesทำได้; G/Light/B/H5reviewไม่ผ่านโดยอัตโนมัติ |
 
 ## ภาคผนวก canonical
 

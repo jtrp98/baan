@@ -29,3 +29,8 @@ ArchLearningpacketต้องrouteinternalcontractsก่อนต่อUI/back
 ## Change Log
 
 - 2026-10-26 — เปิด091หลังFrontlocalส่งมอบและGoR1เริ่ม; 090เก็บประวัติtransport/specครบแล้ว ไม่สร้างarchive/snapshotหรือresetงานเดิม.
+
+## Checkpoint
+
+- ArchLearningGN9DS5ส่งpacketแล้ว สกัด[7contracts](arch-091-learning-001.md)/DES005Rev8/010Rev5/011Rev6/rulesRev2/dictionary003Rev3ตามexactoutput. Academic13hashตรงแต่resolversemanticsยังไม่prove; rawtable/relationalDDLไม่เปลี่ยน. SourcecommentsFKเก่าในDES/rulesแก้ตามarch; aftersweepเหลือdb/review005historicalreceiptตั้งใจเก็บ. NewAuditReason2048/ImportSourcejsonbเป็นproposal ต้องvaultimpact+guardedSQLdraftก่อนถามคนท้ายวง.
+- Frontparenttypecheck/i18n14/build129/SSR99/hashbinding15ผ่าน เปิดCodexT2checkUIreadonlyแล้วขนานGoR1writer. Current3roles=GoR1/G2/checkUI; archLearningจบ. เตรียมvaultproposal/corepersistence/inspectjoin/GMstagedproof tasksในreports ไม่เปิด4rolesหรือwriterrepoเดียวกันซ้อน.

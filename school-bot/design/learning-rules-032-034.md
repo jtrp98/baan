@@ -1,4 +1,4 @@
-# กฎผลเรียน/policy — Rev1
+# กฎผลเรียน/policy — Rev2
 
 Canonical ของ DES-004/005/010/011/012 และ dictionary ตาม032..034; หลักฐานแบบคือ ตาราง SchoolBotCourseRun ถึง SchoolBotRetakeGrant ใน ../db/schoolbot_db.sql และ ../db/review-006.md ไม่ใช่ runtime
 
@@ -22,11 +22,13 @@ AttemptSnapshot ใน JSON เดิมเพิ่ม effective_policy:Assessm
 RetakeGrant หนึ่งใบเพิ่มหนึ่งครั้งเฉพาะคน/activity/run ล็อก CourseRun ก่อนนับ Sequence/เพดาน/consume และ commit พร้อม attempt/audit/idempotency; retry ไม่กิน grant ซ้ำ
 Level ใช้ทุกคนใน roster งานขาด/ไม่มีผล=0 quiz ไม่นับน้ำหนัก0 ไม่ renormalize; average=SUM(total)/member_count เทียบ strict> ก่อนปัด; roster ว่าง409 ROSTER_EMPTY ไม่สร้าง successor; snapshot/recheck ตาม DES-011; export ใช้ skip แยกต่างหาก
 
-SQL คุม FK/UQ/state/bounds; profile/JSON/freeze/weights/run-binding เป็น application invariants Recheck สิทธิ์/License/roster ข้าม DB ก่อน commit ไม่อ้าง atomic ข้ามฐาน ปัดตก LearnerKind B, ผูกผลด้วยเวลา/sId อย่างเดียว, policy ย้อนหลัง และ flag/counter ใหม่
+SQLคงเฉพาะPK; applicationต้องserializeและตรวจrelationships/uniqueness/state/bounds/profile/JSON/freeze/weights/run-bindingเองผ่านtransactionlocksตามdata-contract-rules. Recheck สิทธิ์/License/roster ข้าม DB ก่อน commit ไม่อ้าง atomic ข้ามฐาน ปัดตก LearnerKind B, ผูกผลด้วยเวลา/sId อย่างเดียว, policy ย้อนหลัง และ flag/counter ใหม่
 
 ## Amendment 076 — 2026-10-26
 ผล expired ตาม [DES-010 amendment076](des-010.md) ใช้ earned/max เต็มทั้งชุดเข้าสูตร weighted-normalized-v1 เดิม ภายใต้ policy ที่ freeze; quiz_counts=false ยังคงน้ำหนัก0 ผล 0 ที่ตรวจแล้วต่างจากไม่มีผล ไม่ skip เพียงเพราะ expired ไม่มีการคืนครั้ง/สิทธิ์ซ่อม ไม่เปลี่ยน weights/roster/Level threshold
 
 ## Change Log
+
+- 2026-10-26 — Rev2 arch091: PK-onlywordingและ[finalization](learning-attempt-finalization-001.md)/[snapshotprojection](learning-snapshot-projection-001.md)ชี้technicalcontractsของ042/ผลรวมเดิม ไม่เพิ่มbusinesspolicy/physicalschema.
 - 2026-10-26 — Amendment076: แก้ submitted-only ให้รวม expired ที่ตรวจเสร็จตาม042; คง Rev1 และสูตรเดิม
 - 2026-10-23 — Rev1: sync032..034/review-006; physical เดิม

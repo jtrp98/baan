@@ -21,5 +21,6 @@ LUX-05 ธุรกิจตอบแล้วตาม042; ส่วนที�
 คิวใช้ plan/queue-004.md และ planning/task-062.md:28,33–34. FE ต้องรอทั้งสัญญา/backend และ UX sign-off ของตน; receipt นี้ไม่ปิด gate. อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
 
 ## Change Log
+- 2026-10-26 — Rev2 arch091: รับ[7technicalcontracts](../planning/arch-091-learning-001.md)และDES005Rev8/010Rev5/011Rev6/dictionary003Rev3. Gapตารางเดิมเป็นfindingต้นทาง; localread/edit/attempt/finalizer/projectionพร้อมตามสัญญาใหม่ แต่approvalstorage/importprovenance/sourceidentity/roster/readercompat/ownerH5ยังOPEN. ไม่schemaapproval/runtimeproof.
 - 2026-10-26 — Amendment076: LUX-05 รับมติ042แล้ว เหลือ technical proof; gaps อื่นไม่เปลี่ยน คง Rev1
 - 2026-10-26 — Rev1: รับช่องว่างจาก int-006 T3/int-007 §3 แล้วตรวจ canonical; ไม่รับผล067 ไม่เพิ่ม endpoint/field/schema/lifecycle หรือผลตรวจ runtime.
