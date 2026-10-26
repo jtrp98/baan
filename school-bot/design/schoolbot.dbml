@@ -1,5 +1,6 @@
-// SchoolBot schema — Rev5: sync032..034 เฉพาะ Notes
+// SchoolBot schema — Rev6: standalone indexes removed; PK/UQ/FK retained
 // Change Log:
+// - 2026-10-26 — Rev6: ถอน standalone indexes 13 รายการและ FK-source pseudo-index; คง 24 UNIQUE constraints, 32 PK และ 40 FK.
 // - 2026-10-23 — Rev5: physical structure เดิม; ผู้คุมตรวจ parser/semantic หลังบันทึก
 // - 2026-10-23 — Rev4: ขยาย Note จาก dictionary 32 ตาราง/450 ฟิลด์ เพิ่มตัวอย่างและกลุ่มสี; คง schema/index/40 FK ตาม SQL เดิม; ภาพ legacy แยกที่ schoolbot-integration.dbml.
 // - 2026-10-22 — Rev3: sync 100% with db/schoolbot_db.sql (Rev5 Slimmed, 32 tables, 40 refs) and db/review-005.md per decisions-027..030 (SchoolBot DB 10.0.0.128:9499, remove SchoolBotTeacherGrant/ScoringPolicy.CurriculumId/non-unique indexes/composite FK uniques, single-column FKs, UpdateDate concurrency).
@@ -12,9 +13,10 @@ Project SchoolBot {
   Note: '''
   เริ่มดูตามกลุ่มสี 01–10; เปิด Note ของตาราง/ฟิลด์เพื่ออ่านหน้าที่ หนึ่งแถว ตัวอย่าง และกฎข้อมูลภาษาไทยครบ 450 ฟิลด์.
   ภาพนี้มีเฉพาะ SchoolBot ใหม่ 32 ตารางและ FK จริง 40 เส้น; ดู schoolbot-integration.dbml สำหรับภาพตารางเดิมและ logical mappings.
+  ไม่มี standalone indexes; indexes ที่เหลือในภาพเป็นตัวแทน UNIQUE constraints เดิมเท่านั้น. กฎ active/global/tenant/nonce ที่ถอน partial indexes ต้องบังคับใน application; ยังไม่ยืนยัน implementation.
   SQL ยังเป็นร่างไม่ได้รัน; การยืนยันแบบไม่ใช่การยืนยันว่า deploy แล้ว.
   กฎ032..034: learning-rules-032-034.md และ grade-rules-032-034.md นิยาม profile/import, freeze, mapping lock และ JSON skipped_cells; เป็นกฎแอป ไม่ใช่ SQL constraint ใหม่.
-  Diagram artifact (Rev5) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
+  Diagram artifact (Rev6) ตรงกับ physical DDL ปัจจุบันใน db/schoolbot_db.sql (32 ตาราง, 40 Foreign Keys) และ db/review-005.md ตามมติ decisions-026..030.
   คงไว้ในไฟล์เดียวเพื่อให้เปิดและวางใน dbdiagram.io ได้ครบทั้ง 32 ตารางทันที (ตารางสำรอง SchoolBotTeacherGrant ยังไม่สร้างตาม decisions-026).
   วางทุกตารางของ SchoolBot (32 ตาราง) ใน SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot, schema public) ตาม decisions-027 เพื่อรองรับ atomic transaction ระหว่าง domain, idempotency และ audit.
   Master, School, Logs และ PGGradeDB ต่อผ่าน connection แยกด้วยบัญชี DB เดิม (ไม่รัน GRANT/สร้าง role ใน School DB หรือ PGGradeDB ตาม decisions-029); การอ่านสิทธิ์ครู/roster/term จาก School DB ต้อง re-check ก่อน commit ใน SchoolBot DB.
@@ -213,7 +215,6 @@ Table SchoolBotLicenseBinding [headercolor: #2563EB] {
 
   indexes {
     (LicenseId, Epoch) [unique, name: 'UQ_SchoolBotLicenseBinding_LicenseId_Epoch']
-    (LicenseId) [note: 'Partial unique index ux_schoolbot_license_binding_active WHERE DetachedAt IS NULL AND IsDelete = false in DDL']
   }
 
   Note: 'หน้าที่: เก็บประวัติการผูกใบอนุญาตกับ installation key และอายุสิทธิ์ออฟไลน์ที่ออกให้ | หนึ่งแถว: การผูก License กับ device key หนึ่งครั้งในหนึ่ง Epoch | ใช้เมื่อ: activate สร้าง binding; validate ต่ออายุ entitlement; unbind ปิด binding เดิม | ตัวอย่าง: สมมติ: ย้าย License จากเครื่องเก่าไปเครื่องใหม่ โดยเก็บ binding เก่าไว้เป็นประวัติ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-002.md | ข้อกำหนดเดิม: SchoolBot DB (DES-002). มี active binding ได้ไม่เกินหนึ่งต่อ License; LastEntitlementExpiresAt <= License.ExpiresAt และ <= LastCheckedAt + 259200 วินาที.'
@@ -236,11 +237,6 @@ Table SchoolBotRelease [headercolor: #475569] {
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotRelease_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
 
-  indexes {
-    (VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_global WHERE SchoolId IS NULL in DDL']
-    (SchoolId, VersionText, Channel, Platform) [note: 'Partial unique index ux_schoolbot_release_tenant WHERE SchoolId IS NOT NULL in DDL']
-  }
-
   Note: 'หน้าที่: เก็บรายการรุ่นซอฟต์แวร์และ manifest ที่ลงนามสำหรับตรวจสอบไฟล์ติดตั้ง | หนึ่งแถว: หนึ่งเวอร์ชัน ต่อ channel ต่อ platform ใน catalog กลางหรือของโรงเรียนหนึ่ง | ใช้เมื่อ: ผู้เผยแพร่สร้าง/เผยแพร่/ถอนรุ่น; Desktop ตรวจอัปเดตและตรวจความน่าเชื่อถือก่อนติดตั้ง | ตัวอย่าง: สมมติ: รุ่น 2.1.0 ช่อง stable สำหรับ windows-amd64 | ขอบเขต: รองรับทั้งส่วนกลาง (SchoolId=NULL) และรายโรงเรียน (SchoolId>0) | คู่มือ: data-dictionary/table-003.md | ข้อกำหนดเดิม: SchoolBot DB (DES-007). รองรับทั้ง global catalog (SchoolId IS NULL) และ targeted release รายโรงเรียน.'
 }
 
@@ -250,7 +246,7 @@ Table SchoolBotIdempotency [headercolor: #64748B] {
   Operation varchar(200) [not null, note: 'ชื่อ operation ที่แยกขอบเขตคำสั่ง เช่น การสร้าง resource คนละประเภทต้องไม่ใช้ผลแทนกัน']
   RequestKey uuid [not null, note: 'UUID จาก Idempotency-Key ใช้ระบุคำสั่งเดิมขณะ retry']
   RequestHash varchar(64) [not null, note: 'SHA-256 ของ request ที่ทำ canonical แล้ว; Key เดิมแต่เนื้อหาต่างต้องเป็น conflict']
-  NonceHash varchar(64) [null, note: 'hash ของ nonce สำหรับกัน replay ของ device challenge; null เมื่อ operation ไม่ใช้ nonce | ข้อกำหนดเดิม: Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
+  NonceHash varchar(64) [null, note: 'hash ของ nonce สำหรับกัน replay ของ device challenge; null เมื่อ operation ไม่ใช้ nonce | ข้อกำหนดเดิม: NonceHash ที่ไม่เป็น NULL ต้องไม่ซ้ำ; application ต้องบังคับแบบ atomic ไม่มี standalone index ใน DDL']
   HttpStatus int4 [not null, note: 'HTTP status ของผลที่บันทึกไว้สำหรับ replay ตามสัญญาช่วง 100–599']
   ResultCipher bytea [null, note: 'response ที่เข้ารหัสเป็น bytes; null เมื่อไม่มี ciphertext ให้ replay รวมกรณีล้างหลังหมดอายุ']
   ResultKeyId varchar(128) [null, note: 'ชื่ออ้างอิงกุญแจที่ใช้เข้ารหัส ResultCipher ไม่ใช่ตัวกุญแจ; null พร้อม ResultCipher']
@@ -263,12 +259,6 @@ Table SchoolBotIdempotency [headercolor: #64748B] {
   UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotIdempotency_SchoolId_Scope: SchoolId IS NULL OR SchoolId > 0']
-
-  indexes {
-    (Principal, Operation, RequestKey) [note: 'Partial unique index ux_schoolbot_idempotency_global WHERE SchoolId IS NULL in DDL']
-    (SchoolId, Principal, Operation, RequestKey) [note: 'Partial unique index ux_schoolbot_idempotency_tenant WHERE SchoolId IS NOT NULL in DDL']
-    (NonceHash) [note: 'Partial unique index ux_schoolbot_idempotency_nonce WHERE NonceHash IS NOT NULL in DDL']
-  }
 
   Note: 'หน้าที่: จำผลคำสั่งเพื่อให้การส่งคำขอซ้ำไม่สร้างข้อมูลหรือทำธุรกรรมซ้ำ | หนึ่งแถว: ผลคำสั่งหนึ่งชุด ภายใต้โรงเรียน ผู้กระทำ Operation และ RequestKey เดียวกัน | ใช้เมื่อ: API mutation ตรวจคำขอซ้ำ บันทึกผลร่วมกับ domain transaction และคืนผล replay | ตัวอย่าง: สมมติ: บันทึกโครงงานสำเร็จแต่เครือข่ายขาด การ retry ด้วย RequestKey เดิมได้รับผลเดิม | ขอบเขต: รองรับทั้งส่วนกลาง (SchoolId=NULL) และรายโรงเรียน (SchoolId>0) | คู่มือ: data-dictionary/table-004.md | ข้อกำหนดเดิม: SchoolBot DB. บันทึก idempotency ร่วม transaction เดียวกับ domain mutation ใน SchoolBot DB.'
 }
@@ -327,10 +317,6 @@ Table SchoolBotStaffRole [headercolor: #7C3AED] {
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Home SchoolId (> 0) of the staff employee account']
 
-  indexes {
-    (SchoolId, EmployeeId, Role) [note: 'Partial unique index ux_schoolbot_staff_role_live WHERE IsDelete = false in DDL']
-  }
-
   Note: 'หน้าที่: กำหนดสิทธิ์งานส่วนกลางให้พนักงาน SchoolBright เป็นรายบทบาท | หนึ่งแถว: สิทธิ์หนึ่งบทบาทของพนักงานหนึ่งคนในโรงเรียนต้นสังกัดหนึ่ง | ใช้เมื่อ: ผู้ดูแลมอบ/ถอนสิทธิ์; admin API ตรวจบทบาทและช่วงเวลาที่มีผล | ตัวอย่าง: สมมติ: พนักงานคนหนึ่งเป็น content_author แต่อีกคนเป็น content_approver | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-007.md | ข้อกำหนดเดิม: SchoolBot DB (DES-012 Rev2). สิทธิ์พนักงานส่วนกลางของ SchoolBright สำหรับเรียก /v2/admin/* (รวม four-eyes content_author vs content_approver).'
 }
 
@@ -347,10 +333,6 @@ Table SchoolBotProject [headercolor: #0891B2] {
   UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotProject_SchoolId_Pos: SchoolId > 0']
-
-  indexes {
-    (SchoolBotProjectId, CurrentRevision) [note: 'Composite FK source for FK_SchoolBotProject_CurrentRevision (DEFERRABLE INITIALLY DEFERRED)']
-  }
 
   Note: 'หน้าที่: เก็บตัวโครงงาน Cloud ชื่อ เจ้าของ โหมด และ pointer ไปฉบับปัจจุบัน | หนึ่งแถว: หนึ่งโครงงานของหนึ่ง profile โดยมี revision เนื้อหาได้หลายฉบับ | ใช้เมื่อ: สร้าง เปิด เปลี่ยนชื่อ บันทึก สำเนา และ soft delete โครงงาน | ตัวอย่าง: สมมติ: นักเรียนมีโครงงาน Block ชื่อ เดินไปถึงธง และบันทึกแล้ว 3 revision | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-008.md | ข้อกำหนดเดิม: SchoolBot DB (DES-003). OwnerKind/OwnerId/SchoolId และ Mode เปลี่ยนไม่ได้; FK_SchoolBotProject_CurrentRevision เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
@@ -570,11 +552,6 @@ Table SchoolBotCourseRun [headercolor: #D97706] {
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotCourseRun_SchoolId_Pos: SchoolId > 0']
 
-  indexes {
-    (SchoolId, ClassroomId, NYear, NTerm) [note: 'Partial unique index ux_schoolbot_courserun_active_room WHERE Lifecycle IN (planned,active,closing) AND IsDelete = false in DDL']
-    (PreviousRunId) [note: 'Partial unique index ux_schoolbot_courserun_one_successor WHERE PreviousRunId IS NOT NULL AND IsDelete = false in DDL']
-  }
-
   Note: 'หน้าที่: นำหลักสูตรกลางฉบับหนึ่งมาเปิดใช้จริงกับห้อง ปี และเทอมของโรงเรียน | หนึ่งแถว: การเปิดใช้ curriculum revision หนึ่งกับห้องหนึ่งในปี/เทอมหนึ่ง | ใช้เมื่อ: ผู้ดูแลโรงเรียนเปิด/ปิดหลักสูตร; ครูตั้งคะแนนและกิจกรรม; ตรวจ roster, mapping, export และการต่อ Level | ตัวอย่าง: สมมติ: ห้อง ป.4/1 ใช้ Beginner revision 2 ในเทอมที่เลือก และผูกวิชาวิทยาการคำนวณของห้องนั้น | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-018.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3, DES-010 Rev3, DES-011 Rev3). การเปิดใช้หลักสูตรกลางกับห้อง/ปี/เทอมและชุดวิชา PlanCourseIds ของโรงเรียน; FK_SchoolBotCourseRun_CurrentPolicy เป็น DEFERRABLE INITIALLY DEFERRED.'
 }
 
@@ -740,10 +717,6 @@ Table SchoolBotGradeSlot [headercolor: #DB2777] {
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotGradeSlot_SchoolId_Pos: SchoolId > 0']
 
-  indexes {
-    (SchoolId, NGradeId, AssessmentId, ScoreIdentifier) [note: 'Partial unique index ux_schoolbot_gradeslot_active_ownership WHERE RetiredAt IS NULL (without IsDelete filter) in DDL']
-  }
-
   Note: 'หน้าที่: บันทึกว่าช่องคะแนนเดิมใดได้รับการยืนยันให้ SchoolBot ดูแล โดยไม่ได้สร้างหัวช่องคะแนนเดิมขึ้นใหม่ | หนึ่งแถว: สิทธิ์ดูแลช่องปลายทางหนึ่งช่องที่ระบุด้วย SchoolId/NGradeId/AssessmentId/ScoreIdentifier | ใช้เมื่อ: ผู้ดูแลโรงเรียนยืนยัน ownership; mapping เลือกปลายทาง; preview/worker ตรวจสิทธิ์ช่องก่อนใช้ | ตัวอย่าง: สมมติ: ผู้ดูแลเลือกช่องคะแนนเก็บที่ว่างและยืนยันให้ใช้รับผลจากกิจกรรม SchoolBot | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-026.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3). ช่องคะแนนย่อยใน PGGradeDB ที่ school_admin ยืนยันให้ SchoolBot ดูแล.'
 }
 
@@ -759,10 +732,6 @@ Table SchoolBotScoreMapping [headercolor: #DB2777] {
   UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotScoreMapping_SchoolId_Pos: SchoolId > 0']
-
-  indexes {
-    (CourseRunId, GradeSlotId) [note: 'Partial unique index ux_schoolbot_scoremapping_active WHERE RetiredAt IS NULL AND IsDelete = false in DDL']
-  }
 
   Note: 'หน้าที่: กำหนดว่าจะนำคะแนนจากกิจกรรมใดไปใส่ GradeSlot ใด แยกจากการถือครองช่อง | หนึ่งแถว: ชุดแหล่งคะแนนหนึ่งชุดสำหรับ GradeSlot หนึ่งใน CourseRun หนึ่ง | ใช้เมื่อ: ผู้ดูแลสร้าง/แก้/retire mapping; ครูอ่านเพื่อ preview; server คำนวณคะแนนช่อง | ตัวอย่าง: สมมติ: ผล Test กิจกรรมหนึ่งถูกแมพเข้าช่องคะแนนปลายทางที่ผู้ดูแลเลือกไว้ | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-027.md | ข้อกำหนดเดิม: SchoolBot DB (DES-008 Rev3). การผูก GradeSlot กับ Activity/Indicator โดย school_admin.'
 }
@@ -868,11 +837,6 @@ Table SchoolBotLevelProposal [headercolor: #65A30D] {
   UpdateBy int4 [null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
   UpdateDate timestamptz [not null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [not null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: CK_SchoolBotLevelProposal_SchoolId_Pos: SchoolId > 0']
-
-  indexes {
-    (CourseRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_confirmed_per_run WHERE State IN (promoted,retained,max_level) AND IsDelete = false in DDL']
-    (SuccessorRunId) [note: 'Partial unique index ux_schoolbot_levelproposal_successor_unique WHERE SuccessorRunId IS NOT NULL AND IsDelete = false in DDL']
-  }
 
   Note: 'หน้าที่: เก็บผลเสนอและการตัดสิน Level ของทั้งห้องสำหรับเทอมถัดไป โดยไม่แก้ทะเบียนชั้นเรียนเดิม | หนึ่งแถว: ใบเสนอหนึ่งชุดจาก CourseRun หนึ่ง พร้อมคะแนนและ roster ณ ตอนประเมิน | ใช้เมื่อ: สิ้นเทอมสร้างข้อเสนอ; ครู confirm/decline; ระบบสร้าง successor CourseRun | ตัวอย่าง: สมมติ: ค่าเฉลี่ยห้องสูงกว่าเกณฑ์ ระบบเสนอหลักสูตร Level ถัดไปให้ครูยืนยันทั้งห้อง | ขอบเขต: ข้อมูลรายโรงเรียน: SchoolId ต้องมากกว่า 0 และอ่าน/เขียนภายใต้โรงเรียนนั้น | คู่มือ: data-dictionary/table-032.md | ข้อกำหนดเดิม: SchoolBot DB (DES-011 Rev3). ข้อเสนอเลื่อน Level ทั้งห้องเมื่อสิ้นเทอมและการยืนยันของครู.'
 }

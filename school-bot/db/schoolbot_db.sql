@@ -1,11 +1,13 @@
 -- =============================================================================
--- Migration: schoolbot_db.sql — ตาราง SchoolBot ทั้งหมด (32 ตาราง) ใน SchoolBot DB (Rev5 Slimmed)
+-- Migration: schoolbot_db.sql — ตาราง SchoolBot ทั้งหมด (32 ตาราง) ใน SchoolBot DB (Rev6 — standalone indexes removed)
 -- Target Database: SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot — ชื่อ DB เป็นสมมติฐาน), schema: public
 -- Status: DRAFT — เขียนอย่างเดียว ยังไม่เคยรัน; คนเป็นผู้รันบนฐานทดสอบแล้วส่ง DBA-003 ตรวจ
 -- Baseline: decisions-026, decisions-027, decisions-028 · ที่มา: DBA (agy) review-005 (2026-10-22)
--- การตัดทอนตามคำสั่งผู้ใช้ 2026-10-22:
---   1. ตัด non-unique index (ix_*) ออกทั้งหมด (0 ตัว)
---   2. คงเฉพาะ unique constraint / partial unique index ที่บังคับกฎธุรกิจจริงและกันข้อมูลซ้ำ/ผิด
+-- การตัดทอนตามคำสั่งผู้ใช้ 2026-10-26:
+--   1. ไม่ประกาศ standalone indexes: CREATE INDEX และ CREATE UNIQUE INDEX รวม 0 ตัว
+--   2. คง PK 32, UNIQUE constraints 24, FK 40 และ CHECK 80; backing indexes ของ PK/UNIQUE ยังคงมี
+--      กฎธุรกิจเดิมที่เคยบังคับด้วย partial unique indexes 13 ตัวเป็นหน้าที่ application
+--      การป้องกัน concurrency ของกฎเหล่านี้ยังไม่ได้ implement หรือยืนยันในงานตรวจนี้
 --   3. ตัด composite UNIQUE (SchoolId, ...) ที่ใช้ทำ composite FK ออกทั้งหมด เปลี่ยนเป็น single-column FK ชี้ PK
 --   4. ไม่มีคอลัมน์ Version — optimistic concurrency ใช้ UpdateDate (server ตั้งด้วย clock_timestamp(); decisions-030); AuditEvent ไม่เก็บ Previous/NewVersion
 --   5. ตัดตาราง SchoolBotTeacherGrant (ยังไม่มีมติให้สร้างตาม decisions-026) และตัดคอลัมน์ซ้ำซ้อนที่ derive ได้ (ScoringPolicy.CurriculumId, ScoreOutbox.ScorePreviewId)
@@ -99,10 +101,6 @@ BEGIN
 END
 $$;
 
--- Business Rule: At most ONE active (non-detached, non-deleted) binding per License
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_license_binding_active"
-    ON public."SchoolBotLicenseBinding" ("LicenseId")
-    WHERE "DetachedAt" IS NULL AND "IsDelete" = false;
 
 -- 4. Table: SchoolBotRelease (DES-007) — Mutable (publish/withdraw with If-Match)
 CREATE TABLE IF NOT EXISTS public."SchoolBotRelease" (
@@ -129,14 +127,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRelease" (
     CONSTRAINT "CK_SchoolBotRelease_PublishedAt" CHECK ("Lifecycle" <> 'published' OR "PublishedAt" IS NOT NULL)
 );
 
--- Null-safe uniqueness for global (SchoolId IS NULL) and tenant-specific releases
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_release_global"
-    ON public."SchoolBotRelease" ("VersionText", "Channel", "Platform")
-    WHERE "SchoolId" IS NULL;
-
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_release_tenant"
-    ON public."SchoolBotRelease" ("SchoolId", "VersionText", "Channel", "Platform")
-    WHERE "SchoolId" IS NOT NULL;
 
 -- 5. Table: SchoolBotIdempotency (data-model.md)
 CREATE TABLE IF NOT EXISTS public."SchoolBotIdempotency" (
@@ -166,17 +156,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotIdempotency" (
     )
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_idempotency_global"
-    ON public."SchoolBotIdempotency" ("Principal", "Operation", "RequestKey")
-    WHERE "SchoolId" IS NULL;
-
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_idempotency_tenant"
-    ON public."SchoolBotIdempotency" ("SchoolId", "Principal", "Operation", "RequestKey")
-    WHERE "SchoolId" IS NOT NULL;
-
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_idempotency_nonce"
-    ON public."SchoolBotIdempotency" ("NonceHash")
-    WHERE "NonceHash" IS NOT NULL;
 
 -- 6. Table: SchoolBotAuditEvent (data-model.md)
 CREATE TABLE IF NOT EXISTS public."SchoolBotAuditEvent" (
@@ -276,9 +255,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotStaffRole" (
     CONSTRAINT "CK_SchoolBotStaffRole_ValidWindow" CHECK ("ValidUntil" IS NULL OR "ValidUntil" > "ValidFrom")
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_staff_role_live"
-    ON public."SchoolBotStaffRole" ("SchoolId", "EmployeeId", "Role")
-    WHERE "IsDelete" = false;
 
 -- 3. Table: SchoolBotProject (DES-003) — Mutable (save/rename/delete with If-Match)
 CREATE TABLE IF NOT EXISTS public."SchoolBotProject" (
@@ -602,15 +578,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRun" (
     )
 );
 
--- Business Rule: At most one non-closed, non-deleted CourseRun per (SchoolId, ClassroomId, NYear, NTerm)
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_courserun_active_room"
-    ON public."SchoolBotCourseRun" ("SchoolId", "ClassroomId", "NYear", "NTerm")
-    WHERE "Lifecycle" IN ('planned', 'active', 'closing') AND "IsDelete" = false;
-
--- Business Rule: At most one non-deleted successor CourseRun per PreviousRunId
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_courserun_one_successor"
-    ON public."SchoolBotCourseRun" ("PreviousRunId")
-    WHERE "PreviousRunId" IS NOT NULL AND "IsDelete" = false;
 
 -- 2. Table: SchoolBotScoringPolicy (DES-010) — Immutable revision (CurriculumId removed as redundant with CourseRun.CurriculumId)
 CREATE TABLE IF NOT EXISTS public."SchoolBotScoringPolicy" (
@@ -904,13 +871,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotGradeSlot" (
     )
 );
 
--- Critical invariant (DES-008 / amendment-proposal-001):
--- ONE active GradeSlot per (SchoolId, NGradeId, AssessmentId, ScoreIdentifier).
--- Predicate checks ONLY "RetiredAt" IS NULL (intentionally does NOT exclude "IsDelete" = true
--- so soft-delete cannot be used to bypass slot ownership history).
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_gradeslot_active_ownership"
-    ON public."SchoolBotGradeSlot" ("SchoolId", "NGradeId", "AssessmentId", "ScoreIdentifier")
-    WHERE "RetiredAt" IS NULL;
 
 -- 2. Table: SchoolBotScoreMapping (DES-008) — Mutable (PUT / POST retire with If-Match)
 CREATE TABLE IF NOT EXISTS public."SchoolBotScoreMapping" (
@@ -935,10 +895,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreMapping" (
     CONSTRAINT "CK_SchoolBotScoreMapping_SchoolId_Pos" CHECK ("SchoolId" > 0)
 );
 
--- Business Rule: One active mapping per (CourseRunId, GradeSlotId)
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_scoremapping_active"
-    ON public."SchoolBotScoreMapping" ("CourseRunId", "GradeSlotId")
-    WHERE "RetiredAt" IS NULL AND "IsDelete" = false;
 
 -- 3. Table: SchoolBotScorePreview (DES-009) — Mutable state (POST confirm / POST resolve with If-Match)
 CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreview" (
@@ -1115,15 +1071,6 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevelProposal" (
     )
 );
 
--- Business Rule: At most ONE finalized (promoted/retained/max_level) proposal per CourseRunId
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_levelproposal_confirmed_per_run"
-    ON public."SchoolBotLevelProposal" ("CourseRunId")
-    WHERE "State" IN ('promoted', 'retained', 'max_level') AND "IsDelete" = false;
-
--- Business Rule: Each SuccessorRunId can only be linked to at most one non-deleted proposal
-CREATE UNIQUE INDEX IF NOT EXISTS "ux_schoolbot_levelproposal_successor_unique"
-    ON public."SchoolBotLevelProposal" ("SuccessorRunId")
-    WHERE "SuccessorRunId" IS NOT NULL AND "IsDelete" = false;
 
 GRANT SELECT, INSERT, UPDATE ON public."SchoolBotLevelProposal" TO schoolbot_app;
 
