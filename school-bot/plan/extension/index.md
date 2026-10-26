@@ -35,7 +35,7 @@
 | [QA-015](../QA-015.md) | ตรวจ mapping/preview/คะแนนชน | check | P5 | FE-024, TP-003, DBA-007 | pending |
 | [QA-016](../QA-016.md) | ตรวจ export authz/outbox/receipt recovery | check | P5 | QA-015, BE-038 | pending |
 | [UX-005](../UX-005.md) | เตรียม UX admin หลักสูตร/คลังข้อสอบ | int | P5 | BA-002, SA-002 | pending |
-| [UX-006](../UX-006.md) | เตรียม UX mapping/preview/ชน/export | int | P5 | SA-004, BA-001 | pending |
+| [UX-006](../UX-006.md) | เตรียม UX mapping/preview/ชน/export | int | P5 | SA-004, BA-001 | **verified** (ใบงาน061 — signed int-005 ครบ + check PASS รอบ 10) |
 | [UX-007](../UX-007.md) | เตรียม UX attempt/นโยบาย/เลื่อน Level | int | P5 | SA-002, BA-002 | pending |
 | [SA-004](../SA-004.md) | เตรียม export contract และ proof pack | arch | P0 | SA-001 | **verified** (ใบงาน061 — check PASS docs-only) |
 | [TP-003](../TP-003.md) | เตรียม grade parity/coexist/crash fixtures | inspect | P1 | TP-001, SA-004 | **verified** (ใบงาน061 — check PASS) |
