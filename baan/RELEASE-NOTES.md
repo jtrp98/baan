@@ -2,6 +2,28 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.18.0 — 2026-10-26 · ดันให้ถึงโค้ดเร็ว + เอกสารเบาลง (จากผลตรวจอิสระ)
+
+ที่มา: ผลตรวจอิสระของ framework เทียบกับ school-bot — 6 วันมีใบงานเขียนโค้ด 5/80 ใบ, งาน implement 62/63 ติดประตูมนุษย์ทางอ้อม, archive กิน 39% ของ knowledge, index.md เป็น change log 70%, response JSON ดิบ 63 ไฟล์ปนใน knowledge และ sweep มติเดียวใช้ 9 role calls
+
+### ⚠ ต้องทำตอนอัปเกรด
+- **planner ปฏิเสธแผนที่ไม่มีงาน implement** (`baan --goal`) — goal ที่ตั้งใจเป็นเอกสารล้วน planner ต้องใส่ `"docsOnly": "<เหตุผล>"` (prompt บอกให้แล้ว) · แผนสดที่งาน implement ทุกงานหรือเกินครึ่งติดประตูมนุษย์ก็ถูกปฏิเสธ · แผนจาก `--plan-file`/`--resume` แค่เตือน — run เก่ายัง resume ได้
+- **index เปลี่ยนวิธีเขียน** — `index.md` ของโมดูลและ index ทุกหมวดเป็น "สถานะปัจจุบัน": เขียนทับ ไม่มี `## Change Log` ไม่ซ้อนย่อหน้า Precedence/Amendment · index เดิมที่ยังมี change log/precedence ให้เขียนใหม่ครั้งเดียวเมื่อแตะ (school-bot ทำแล้ว)
+- **เลิก snapshot/archive** — ไม่คัดลอกไฟล์ไป `archive\`/`archive.md`/`before-xxx` ก่อนแก้อีก (ใช้ git) · ผลดิบของ role (response JSON/stdout/.trx) ไม่เก็บใน knowledge — ของเดิมในโมดูลอื่นย้ายออกเมื่อสะดวก (ทำ tag กันประวัติก่อนลบ)
+- **status ใหม่ `done-local`** ในคอลัมน์ Status ของแผน — ตารางเดิมใช้ต่อได้ ไม่ต้องแก้
+
+### เพิ่ม
+- **walking skeleton + time-box** (charter ข้อ 10, planner prompt, roles plan/gm) — งานที่สร้าง/แก้ซอฟต์แวร์ต้องมีงาน `front`/`sys` ที่ได้ของรันได้และไม่รอประตูมนุษย์ (ของที่รอคนใช้ stub/fake) · เอกสารทำเท่าที่ slice ใช้ ไม่เกิน 3 งานก่อนงานโค้ดแรก · ใบงานเอกสารล้วนติดกัน 5 ใบ = หยุดเสนอ slice โค้ด · CONVENTIONS §9: ประตูขวางเฉพาะงานที่ต้องใช้คำตอบนั้นจริง
+- **`baan --lint-plan <tasks.json>`** — ตรวจรูปร่าง DAG ทั้งแผน runtime และแผนโปรเจกต์ของ gm (อ่าน `owner`/`depends_on`/`gate_ids` + ชื่อ role เดิม) — exit 1 เมื่อไม่มีงาน implement หรือเกินครึ่งติดประตูทางตรง/ทางอ้อม (แผน school-bot จริงได้ exit 1: 62/63)
+- **สถานะ `done-local`** — โค้ด+test ผ่านในเครื่อง นายช่างลงเองหลังรัน test ซ้ำ ไม่ต้องรอรอบ check · ไม่ปิด gate · ยังต้องผ่าน check ก่อน `verified`
+- **`baan --sweep "<ค่าเดิม>" [--target <t>] [--sweep-in <module dir>]`** — หาผู้อ้างอิงทุกจุดเป็นตาราง เจ้าของ|ไฟล์|บรรทัด ใช้ `git ls-files` (เคารพ .gitignore) ข้าม archive/binary/ไฟล์เกิน 2MB · related-impact sweep ใหม่: ค้นด้วย script → แทนค่าตรงตัว นายช่าง แก้เองไม่แตก task/ไม่เปิดรอบ check → task ต่อเจ้าของเฉพาะที่ความหมายเปลี่ยน (เจ้าของละหนึ่ง) → รัน sweep ซ้ำเป็นหลักฐาน
+
+### เปลี่ยน
+- **planner prompt เลิกบังคับ "ทุก task read-only ผลเป็นเอกสาร"** — บอกโหมดรันตาม `--write` แทน: read-only = front/sys ส่ง diff/patch + คำสั่ง test จริง
+- **เอกสารเบา** (charter ข้อ 11, CONVENTIONS §1/§3/§6/§10, role arch) — ประวัติอยู่ใน git · index = สถานะปัจจุบัน · ผลดิบอยู่ `reports\` · เอกสารเกินงบให้แยกไฟล์ ไม่ archive
+- **ผ่อนกติกา check/jpo ในโหมด solo** — ใช้ subagent ตรวจได้เมื่อเป็น subagent ใหม่ + prompt จาก AC/spec + path เท่านั้น + ตรวจด้วยหลักฐาน · ข้ามโมเดลผ่าน `baan-role` เหลือเป็น escalation (งานวิกฤตก่อน production, security finding สำคัญ, FAIL ซ้ำ)
+- tests 100 → 112
+
 ## 0.17.0 — 2026-10-24 · โหมด solo — ทีมทั้งทีมรันใน session เดียว (subagent แทน runner ภายนอก)
 
 ### เพิ่ม
