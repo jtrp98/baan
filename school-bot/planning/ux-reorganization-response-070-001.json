@@ -1,0 +1,118 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "int",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-04-37-42-int-tier-t2-1agents-KuqjdQ\\report.json",
+  "payload": {
+    "state": "BLOCKED",
+    "summary": "เตรียม exact edits เรื่อง P9/rule priority และสารบัญแล้ว แต่ยังส่ง section split ฉบับเต็มไม่ได้ภายใต้ JSON ชุดเดียว ≤6500 tokens; ไม่เขียนไฟล์จริง ไม่เปลี่ยน Q39–Q46 หรือ signed artifacts 001–005",
+    "new_files": [],
+    "edits": [
+      {
+        "path": "knowledge/school-bot/uxui/int-006-admin-trace.md",
+        "old": "อ่าน `target/sb-tech-upgrade-web-system/AGENTS.md:5–15`: มีข้อกำหนด Zustand/BFF/UI กลาง และ P9 ใช้ Skeleton ห้าม Spinner ขัดกับใบงาน063 และ skill ที่กำหนด Spinner ร่าง admin นี้ใช้ Spinner ตามคำสั่งผู้ใช้โดยตรง; ไม่ย้าย stack ไม่แก้กฎเว็บโรงเรียน งานเชื่อม school_web ต้องส่งข้อขัดกันให้เจ้าของ repo รับทราบ ไม่อ้างว่าตรวจ implementation/policy อื่นใน repo แล้ว",
+        "new": "อ่าน `target/sb-tech-upgrade-web-system/AGENTS.md` → `_docs/policy/project-policy.md` → `CLAUDE.md` → `DESIGN.md` และ `.claude/rules/loading.md` แล้ว: ลำดับคือคำสั่งผู้ใช้ > กฎ repo > workflow ระดับเครื่อง > skill ทั่วไป ข้อความ Spinner ในใบงาน063 เป็น brief ของผู้คุม ไม่ใช่คำสั่งผู้ใช้โดยตรง เว็บครู/Level/หน้าเกณฑ์ admin ที่อยู่ web-system จึงใช้ P9: Skeleton เฉพาะส่วนที่ยังโหลด, งานบันทึกใช้ปุ่ม disabled หรือ `.sb-progress-bar`; ไม่ใช้ Spinner หรือข้อความโหลดแทนโครงข้อมูล เคารพ reduced-motion และ shared component ตาม repo การแก้ให้ตรงกฎเดิมไม่ต้องขอ human approval ใหม่ ส่วน Desktop และ admin ส่วนกลางใน school-bot คงกติกาของตน ไม่ลาก P9 ข้าม repo; component/font/spacing ของ web-system ยึด DESIGN และ shared props เดิม ไม่ hardcode หรือเปลี่ยน stack อ่านเฉพาะเอกสารกฎ ยังไม่ได้อ่าน component หรือยืนยัน UI runtime"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-006-admin-trace.md",
+        "old": "## Change Log",
+        "new": "## Change Log\r\n\r\n- 2026-10-26 — ใบงาน070: แก้ที่มาของ brief Spinner และลำดับกฎ แยกแพลตฟอร์ม; Q39–Q42 และข้อจำกัดสัญญาคงเดิม ยังไม่ได้ตรวจ component/runtime"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-006-admin-states.md",
+        "old": "ข้อเสนอ: Sidebar+Header, spacing",
+        "new": "ข้อเสนอส่วนนี้ใช้กับ admin ส่วนกลางใน school-bot; school_web ยึดกฎ repo ตาม [T4](int-006-admin-trace.md#t4-source-และข้อจำกัดหลักฐาน) โดยใช้ DESIGN/shared props เดิมสำหรับ component/font/spacing และ P9 สำหรับ loading ไม่บังคับค่าของ skill ข้าม repo\r\n\r\nข้อเสนอ: Sidebar+Header, spacing"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-006-admin-states.md",
+        "old": "## Change Log",
+        "new": "## Change Log\r\n\r\n- 2026-10-26 — ใบงาน070: ระบุขอบเขตกติกาส่วนกลางและชี้กฎเฉพาะ school_web; ไม่เปลี่ยนกฎธุรกิจหรือ sign-off"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "ทุกแถวใช้ auth/conflict/unknown และ a11y ใน §2–§4 ร่วมกัน Empty แสดงข้อความอย่างเดียว ไม่มี CTA ในพื้นที่ empty; loading ใช้ Spinner พร้อมข้อความ",
+        "new": "ทุกแถวใช้ auth/conflict/unknown และ a11y ใน §2–§4 ร่วมกัน Empty แสดงข้อความอย่างเดียว ไม่มี CTA ในพื้นที่ empty\r\n\r\nแยก loading ตาม repo: Desktop และ admin ส่วนกลางใน school-bot คงกติกาของตน; เว็บครู/Level/หน้าเกณฑ์ admin ที่อยู่ web-system ใช้ P9 ตาม AGENTS → project-policy → CLAUDE → DESIGN และ loading.md ซึ่งมีลำดับสูงกว่า skill ทั่วไป โหลดข้อมูลใช้ shared Skeleton รูปร่างตรงข้อมูลเฉพาะส่วนที่ยังโหลด ไม่บังส่วนที่พร้อมแล้ว ไม่ใช้ Spinner หรือข้อความโหลดแทนโครงข้อมูล กลุ่มใช้ SkeletonStatus (role=status, aria-busy, ข้อความ sr-only) และ shape เป็น aria-hidden; error จบ Skeleton แล้วแสดงทางแก้ ข้อมูลใหม่ใช้ sb-reveal ตาม repo; refresh หลังบันทึกในบริบทเดิมคงข้อมูลเดิม งานบันทึกปิดปุ่มซ้ำด้วย disabled; หากต้องบังพื้นที่ใช้ .sb-progress-track > .sb-progress-bar พร้อมข้อความ ไม่ใช้ Spinner ตารางด้านล่างระบุข้อความสถานะเพื่อ i18n/a11y; บน web-system ข้อความอ่านข้อมูลเป็น sr-only ของ Skeleton"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "| ตั้งเวลา | กำลังอ่าน/บันทึกเวลา… |",
+        "new": "| ตั้งเวลา | Skeleton ช่องเวลาเมื่ออ่าน; บันทึกใช้ disabled — กำลังอ่าน/บันทึกเวลา… |"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "| เปิดซ่อม | กำลังอ่านรายชื่อ/เปิดสิทธิ์… |",
+        "new": "| เปิดซ่อม | Skeleton รายชื่อเมื่ออ่าน; เปิดสิทธิ์ใช้ disabled — กำลังอ่านรายชื่อ/เปิดสิทธิ์… |"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "| น้ำหนัก/คะแนน | กำลังอ่านนโยบาย/ผลคะแนน… |",
+        "new": "| น้ำหนัก/คะแนน | Skeleton แถวตั้งค่า/ตารางคะแนนเมื่ออ่าน; บันทึกใช้ disabled — กำลังอ่านนโยบาย/ผลคะแนน… |"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "| Level | กำลังประเมิน/อ่านข้อเสนอ/ยืนยัน… |",
+        "new": "| Level | Skeleton ผลข้อเสนอเมื่ออ่าน; ประเมิน/ยืนยันใช้ disabled — กำลังประเมิน/อ่านข้อเสนอ/ยืนยัน… |"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "| เกณฑ์ admin | กำลังอ่าน/บันทึกเกณฑ์… |",
+        "new": "| เกณฑ์ admin | ใช้กฎ repo ที่หน้านี้อยู่: web-system อ่านเป็น Skeleton และบันทึกใช้ disabled; ส่วนกลางคงกติกาของตน — กำลังอ่าน/บันทึกเกณฑ์… |"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "ใช้ TH Sarabun New เนื้อหา 16/32px หัวข้อ 24/48px; spacing ทวีคูณ 8px, radius 12px, target ≥48×48px เว็บใช้ sidebar/header เดิมและ cyan #09C6DD; Desktop app ใช้ orange #FF7A62 ไม่สร้าง shell หรือย้าย framework",
+        "new": "Desktop และ admin ส่วนกลางใน school-bot ใช้กติกาของตน: TH Sarabun New เนื้อหา 16/32px หัวข้อ 24/48px; spacing ทวีคูณ 8px, radius 12px, target ≥48×48px เว็บใช้ sidebar/header เดิมและ cyan #09C6DD; Desktop app ใช้ orange #FF7A62 ไม่สร้าง shell หรือย้าย framework\r\n\r\nเฉพาะ web-system ยึด DESIGN/shared component เดิม: ฟอนต์จาก theme เดิม; หัวการ์ด/หัวส่วนใช้ text-xl font-bold เนื้อหา text-sm และหัวตาราง/label text-xs ตามบริบท ไม่ hardcode ค่าจาก skill; spacing ใช้ token โดย page wrapper ตาม P10 หาก PageShell/token ยังไม่ merge ให้ใช้รูปแบบเดิมที่ DESIGN ระบุ ไม่อ้างว่าตรวจสถานะ merge แล้ว ฟอร์ม/ตาราง/ปุ่มใช้ของกลางและ meaningful props ตาม P11 เช่น pending ของ Button ไม่ copy component หรือเปลี่ยน stack การอ้างนี้มาจากเอกสารกฎ ยังไม่ได้อ่าน implementation ของ component"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "ไม่มี animation ตกแต่ง เคารพ prefers-reduced-motion; Spinner คงข้อความสถานะอ่านได้และใช้รูปคงที่เมื่อจำกัด motion ภาษาไทยเป็นหลัก สลับ EN ทั้งหน้า เช่น “กำลังบันทึกคำตอบ… / Saving answers…” และ “ยังยืนยันผลการส่งไม่ได้ / Submission not yet confirmed”; เนื้อหาใช้ Text locale ตามสัญญา",
+        "new": "ไม่มี animation ตกแต่ง เคารพ prefers-reduced-motion: web-system ใช้ shared Skeleton ที่หยุด shimmer ตามกฎ repo และให้ sb-reveal/แถบ progress เคารพ reduced-motion ตามของกลาง โดยคงสถานะที่อ่านได้; ยังไม่ได้ตรวจ implementation ส่วน Desktop/ส่วนกลางที่ใช้ Spinner คงข้อความสถานะและรูปคงที่เมื่อจำกัด motion ภาษาไทยเป็นหลัก สลับ EN ทั้งหน้า เช่น “กำลังบันทึกคำตอบ… / Saving answers…” และ “ยังยืนยันผลการส่งไม่ได้ / Submission not yet confirmed”; เนื้อหาใช้ Text locale ตามสัญญา"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-states.md",
+        "old": "## Change Log",
+        "new": "## Change Log\r\n\r\n- 2026-10-26 — ใบงาน070: แก้ loading เว็บครู/Level/เกณฑ์ใน web-system ให้ตรง P9 และแยก DESIGN/shared props จากกติกา Desktop/ส่วนกลาง; Q43–Q46 คงเดิม ไม่มี UI/runtime verification"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-trace.md",
+        "old": "ยังไม่ได้อ่าน AppView/Seg implementation และไม่ได้ตรวจ stack ของเว็บครู/admin",
+        "new": "ยังไม่ได้อ่าน AppView/Seg หรือ implementation ของ component เว็บครู/admin; รอบ070 อ่านเฉพาะกฎ web-system ตาม AGENTS → project-policy → CLAUDE → DESIGN และ loading.md: repo มีลำดับสูงกว่า skill ทั่วไป ใช้ P9 และ DESIGN/shared props สำหรับหน้าที่อยู่ repo นี้ตาม [states §1/§4](int-007-states.md) ไม่ขยายกฎไป Desktop/ส่วนกลาง ไม่เปลี่ยน stack และไม่อ้าง UI verified"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/int-007-trace.md",
+        "old": "## Change Log",
+        "new": "## Change Log\r\n\r\n- 2026-10-26 — ใบงาน070: เพิ่มหลักฐานกฎ repo ที่อ่านและขอบเขต P9/DESIGN; ข้อจำกัดสัญญาและ Q43–Q46 คงเดิม"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/index.md",
+        "old": "## จุดที่รอมนุษย์เซ็น",
+        "new": "| [int-006-admin-curriculum.md](int-006-admin-curriculum.md) | UX-005 admin หลักสูตร/import/bank · [states/a11y](int-006-admin-states.md) · [trace/ข้อจำกัด/Sign-off](int-006-admin-trace.md) | ผ่าน check-066 เฉพาะ draft completeness 12/12 AC; Q39–Q42 ยังรอเซ็น |\r\n| [int-007-attempt-policy.md](int-007-attempt-policy.md) | UX-007 Attempt/policy/Level · [เว็บครู/คะแนน](int-007-teacher-score.md) · [states/a11y](int-007-states.md) · [trace/ข้อจำกัด](int-007-trace.md) | ผ่าน check-066 เฉพาะ draft completeness 15/15 AC; Q43–Q46 ยังรอเซ็น |\r\n\r\n## จุดที่รอมนุษย์เซ็น"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/index.md",
+        "old": "**UX-006 (int-005) อนุมัติครบทุกส่วนแล้ว (decisions-041)** — UX ที่ผ่านการเซ็นรวม 5/7 ไฟล์; เหลือรอเซ็น: UX-005, UX-007 (กำลังร่าง)",
+        "new": "**UX-006 (int-005) อนุมัติครบทุกส่วนแล้ว (decisions-041)** — UX ที่ผ่านการเซ็นรวม 5/7 ชุด; UX-005 และ UX-007 มีร่างครบและผ่าน [check-066](../planning/check-066-ux-review-001.md) เฉพาะ draft completeness แล้ว ทุกข้อ Q39–Q46 ยังรอ human sign-off"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/index.md",
+        "old": "หมายเหตุข้อจำกัด: ร่างทั้งสองอ้างหลักฐาน path:line จาก requirement/DES เป็นหลัก (frontend จริงอยู่ `target/school-bot/app/frontend/src` — ยังไม่ได้อ่านโค้ดรายบรรทัด) · Login flow เขียนตาม target contract มติ035 (fullLogin ยัง NOT_READY) · ยังไม่มี design system กลาง — กติกากลางเฉพาะจุดอยู่ใน int-002 §1",
+        "new": "หมายเหตุข้อจำกัด: UX-005/007 แยก source evidence และช่องว่างสัญญาไว้ใน companion trace ของแต่ละชุด trace ระบุหลักฐานจาก App.tsx แต่ยังไม่ได้อ่าน component ที่แสดง UX เหล่านี้หรือยืนยัน UI/runtime; check-066 ไม่ใช่ human sign-off หรือ AC runtime acceptance · Login flow ยังคง target contract และ gates เดิม (fullLogin ยัง NOT_READY) · กฎ web-system ยึด repo/ DESIGN/shared props ตามที่ระบุในร่าง ไม่ใช้แทนกติกา Desktop/admin ส่วนกลาง"
+      },
+      {
+        "path": "knowledge/school-bot/uxui/index.md",
+        "old": "## Change Log",
+        "new": "## Change Log\r\n\r\n- 2026-10-26 — ใบงาน070: เพิ่ม UX-005/007 และ companion ปัจจุบัน แก้ข้อความกำลังร่างตาม check-066; signed รวม 5/7 เท่าเดิม ทุกข้อ Q39–Q46 รอเซ็น"
+      }
+    ],
+    "moved_sections": [],
+    "questions_changed": false,
+    "limitations": [
+      "Task: ใบงาน070 §1 / Reference: ขนาดจริง 14785,17619,13615,12128 UTF-8 bytes / Reason: ต้องส่ง section เดียวกันทั้ง new_files.content และ edits.old; ตัวเลือกย้ายเนื้อหาน้อยตามงบไฟล์ใช้ประมาณ 8043 tokens เฉพาะสองช่องนี้ ยังไม่รวม navigation/Change Log/P9 จึงเกินเพดานส่งมอบ",
+      "ชุดนี้เป็น exact edits เฉพาะส่วนที่ไม่ติดข้อจำกัดรูปแบบ ยังไม่ใช่ชุดพร้อมบันทึกครบใบงาน: ไม่มี companion ใหม่ ไม่มีการย้าย section และยังไม่ผ่านเกณฑ์ ≤11000 bytes",
+      "คำนวณหลังจำลองใช้ edits ในหน่วยความจำ: int-006-admin-curriculum 14785B; int-006-admin-states 18308B; int-006-admin-trace 14728B; int-007-states 16090B; int-007-attempt-policy 8505B; int-007-teacher-score 10285B; int-007-trace 10407B; uxui/index 6228B โดยคง CRLF ตามต้นฉบับ",
+      "ตรวจ unique exact old ทุกจุดตามลำดับใช้และคำนวณ UTF-8 เท่านั้น ไม่ใช่ product test; อ่านเฉพาะเอกสารกฎของเว็บครู ไม่ได้อ่าน component หรือยืนยัน UI/runtime"
+    ],
+    "handoff": "ผู้คุมโปรดตอบ: อนุญาตให้แบ่ง JSON หลายชุด ชุดละไม่เกิน 6500 tokens เพื่อส่ง moved sections เต็มพร้อม exact old/new ครบหรือไม่? หลังแก้ข้อจำกัดรูปแบบจึงส่งกลับ int ทำ section split/navigation ให้ครบ; ข้อจำกัดสัญญาเดิมส่ง arch และ Q39–Q46 ยังรอมนุษย์เซ็น"
+  }
+}

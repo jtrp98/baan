@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-26",
+  "scope": "mechanical split only; exact section bytes preserved",
+  "source": "int063/064 output, with int070 supplied rule-priority/loading edits applied before splitting",
+  "sections": [
+    {
+      "from": "int-006-admin-curriculum.md",
+      "to": "int-006-admin-import-bank.md",
+      "heading": "## 4. นำเข้า Course Plan Sheet — Q40",
+      "content_sha256": "af2e6ece8f8db941d0a5c6868f43a7cc5900fd8671c8b6ace054711364431c7e",
+      "bytes": 3545
+    },
+    {
+      "from": "int-006-admin-curriculum.md",
+      "to": "int-006-admin-import-bank.md",
+      "heading": "## 5. คลังข้อสอบและ policy — Q41",
+      "content_sha256": "3006da2d5e5d7d5c9152afb2b672a9cb514ac8db98f5e6ae1e1220c16c493bed",
+      "bytes": 2951
+    },
+    {
+      "from": "int-006-admin-states.md",
+      "to": "int-006-admin-errors-a11y.md",
+      "heading": "## S4. Error → ทางแก้",
+      "content_sha256": "da3151372a802760356900ff0cba0ded88916cdda56f356deb6ea6ea9f2ecdb8",
+      "bytes": 3634
+    },
+    {
+      "from": "int-006-admin-states.md",
+      "to": "int-006-admin-errors-a11y.md",
+      "heading": "## S5. Auth, role และ tenant",
+      "content_sha256": "e1d91d3da640aaf02556c763286c7d94de4baafb2cd88274a73bd90fce3b9969",
+      "bytes": 2141
+    },
+    {
+      "from": "int-006-admin-states.md",
+      "to": "int-006-admin-errors-a11y.md",
+      "heading": "## S6. SchoolBright และ a11y",
+      "content_sha256": "ef66827bdd27442e6c72bb76a269045abfed85db84a1c3b5b23a3dae5ca898c2",
+      "bytes": 2937
+    },
+    {
+      "from": "int-006-admin-trace.md",
+      "to": "int-006-admin-review-signoff.md",
+      "heading": "## T4. Source และข้อจำกัดหลักฐาน",
+      "content_sha256": "117cb6e0abd0a6cbb244bfd098de3c7154df51f294d560ef5941132355d5e16a",
+      "bytes": 2620
+    },
+    {
+      "from": "int-006-admin-trace.md",
+      "to": "int-006-admin-review-signoff.md",
+      "heading": "## T5. Sign-off table",
+      "content_sha256": "f9709d43698d8d0e9bb7043ba604852ea610092eca677fe39338f8dcbd2a632a",
+      "bytes": 3287
+    },
+    {
+      "from": "int-006-admin-trace.md",
+      "to": "int-006-admin-review-signoff.md",
+      "heading": "## T6. ส่งต่อ",
+      "content_sha256": "d1a25980cb91fa5f7d04cb6abb02c7a04deadeb11410651efa714a0fcc14ae71",
+      "bytes": 508
+    },
+    {
+      "from": "int-007-states.md",
+      "to": "int-007-recovery-a11y.md",
+      "heading": "## 3. ไม่ทราบผล mutation — Q43–Q46",
+      "content_sha256": "ca1042ea07757f37aa70baa3d78a56ac37cfa492e3f751ca3bcfd4e84e08046a",
+      "bytes": 2054
+    },
+    {
+      "from": "int-007-states.md",
+      "to": "int-007-recovery-a11y.md",
+      "heading": "## 4. SchoolBright / a11y",
+      "content_sha256": "898db8acfc7f093ee491f8e651b0e78865ee3485c0483977b457ba89d298e4f1",
+      "bytes": 4130
+    }
+  ]
+}
