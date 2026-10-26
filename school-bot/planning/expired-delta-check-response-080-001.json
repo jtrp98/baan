@@ -1,0 +1,59 @@
+{
+  "work_date": "2026-10-26",
+  "runner": "baan-role/codex",
+  "tier": "t2",
+  "role": "check",
+  "source_report": "C:\\src\\AICode\\baan\\baan\\reports\\2026-10-26-05-19-03-check-tier-t2-1agents-oPfbo4\\report.json",
+  "payload": {
+    "state": "FAIL",
+    "summary": "ใบงาน080: ตรวจเอกสาร 10 กลุ่ม ผ่าน 7 ไม่ผ่าน 3 พบเอกสารอ้าง amendment076 คลาดเคลื่อนและ trace เสียรูปแบบ กฎธุรกิจ042สอดคล้องกัน ไม่ตัดสิน product QA หรือเปลี่ยนสถานะ task/gate",
+    "findings": [
+      {
+        "id": "C080-01",
+        "reference": "uxui/int-007-trace.md:45; test-plan/tp-001-amendment-004.md:20; design/des-010.md:123; design/learning-ux-contract-gaps-001.md:24",
+        "actual": "UX trace ระบุว่ายังไม่มี amendment076 และ TP081 ระบุว่าฉบับที่อ่านยังไม่บันทึก amendment076 แต่ saved artifacts มี amendment นี้แล้ว",
+        "expected": "เอกสารปัจจุบันแยกว่าบันทึกสัญญา076แล้ว ส่วน clock/race/finalization/recovery/read-reveal ยังรอตรึงและพิสูจน์",
+        "fix": "int/inspect ปรับข้อความให้ชี้ amendment076 ที่บันทึกแล้ว และคง technical proof เป็น OPEN/PROPOSED"
+      },
+      {
+        "id": "C080-02",
+        "reference": "uxui/int-007-trace.md:22",
+        "actual": "บรรทัดว่างหลัง AC-046-07 ตัดตาราง ทำให้ 9 แถว AC-047-01..AC-048-04 เป็นกลุ่มแถวที่ไม่มี header/separator",
+        "expected": "trace ทั้ง 16 AC อยู่ในตารางที่อ่านได้ครบ 3 คอลัมน์",
+        "fix": "int ลบบรรทัดว่างที่ตัดตาราง หรือเพิ่ม header/separator ให้ตารางส่วนต่อ"
+      },
+      {
+        "id": "C080-03",
+        "reference": "uxui/int-007-trace.md:15; requirement/req-046.md:24",
+        "actual": "หลักฐาน AC-046-01..06 ใน trace:15–20 ชี้ REQ บรรทัด22,23,24,25,27,28 ซึ่งไม่ตรง AC ที่ระบุ",
+        "expected": "อ้างบรรทัด24,25,26,27,29,30 ตามลำดับในไฟล์ปัจจุบัน",
+        "fix": "int แก้เลขบรรทัดอ้างอิงทั้ง 6 จุด แล้วตรวจซ้ำหลังจัดตาราง"
+      }
+    ],
+    "checks_run": [
+      "PASS — อ่าน042/AC04607ก่อนเทียบ artifacts: saved answers ทันเวลาเท่านั้น ข้อว่าง0 เต็มทั้งชุด ตัวอย่าง4/10 และไม่บันทึกเลย0/10 นับครั้ง/ซ่อมตาม snapshot",
+      "PASS — DES-010:125–135, learning-rules:10,28 และ DES-011:28 รวม expired ที่ตรวจเสร็จเข้าสูตรเดิม แยก NULL จาก0 คง best/reveal/weights/roster",
+      "PASS — int-004:88 และ recovery-a11y:17–27 มีหยุดแก้→pending→อ่านผล server; unknown ไม่อ้างสำเร็จ ไม่คำนวณเอง ไม่ส่งย้อนหลัง; delta รอ Q43 และ Q39–Q46 ยังรอเซ็น",
+      "PASS — TP081 มี expected สำหรับบางคำตอบ/ไม่มีคำตอบ/ส่งช้า/ซ่อมสูงสุด/ผลตอบกลับสูญหาย/ไม่ consume ซ้ำ; actual ทุกชุดย่อย NOT_RUN",
+      "PASS — current notices ระบุ81 cases/186 AC และแยก legacy Markdown/raw/Joined snapshot180/77 โดยไม่อ้าง reruntime",
+      "PASS — parse canonical JSON:110 tasks/8 phases/17 gates;15 verified/95 pending; AC04607 ผูกเฉพาะ BE-031/FE-021/UX-007/QA-013 ทั้งสี่ยัง pending",
+      "PASS — UX006/007 ครบ11ไฟล์ ขนาด7074–10687 bytes ทุกไฟล์≤11000; ตรวจลิงก์35จุดไม่พบไฟล์ปลายทางหาย และ anchor delta042 มีจริง",
+      "FAIL — ตาราง trace มี9แถวขาด header/separator ตาม C080-02",
+      "FAIL — source references ของ6 AC คลาดเคลื่อนตาม C080-03",
+      "FAIL — ข้อความเรื่องการมี amendment076 ไม่ตรง saved artifacts ตาม C080-01"
+    ],
+    "limitations": [
+      "ตรวจเฉพาะความสอดคล้องของเอกสาร ไม่ใช่ product QA; ไม่รัน code/tests/SQL/DB/runtime/network/Git และไม่เขียนไฟล์จริง",
+      "ตรวจ raw/Joined snapshot ผ่าน current notices เท่านั้น ไม่ตรวจเนื้อหา JSON สองชุดนั้นหรือพิสูจน์ว่า bytes ไม่เปลี่ยน",
+      "ไม่มี baseline diff จึงยืนยันได้เฉพาะโครงสร้าง/สถานะปัจจุบัน ไม่รับรองประวัติว่า DAG/owner/tier/gate ไม่เคยเปลี่ยน",
+      "technical proof ที่ประกาศ OPEN ไม่ใช่เหตุ FAIL; ไม่ขยาย schema/DBML audit หรือรีวิว layout ฐานเดิมของ int-004"
+    ],
+    "new_files": [
+      {
+        "path": "knowledge/school-bot/planning/check-080-expired-delta-001.md",
+        "content": "# ผลตรวจ delta หมดเวลา — ใบงาน080\n\nวันที่ 2026-10-26 · ผู้ตรวจ check · ตรวจ saved documents แบบ read-only\n\nผล: FAIL เฉพาะความพร้อมของเอกสาร ตรวจ10กลุ่ม ผ่าน7 ไม่ผ่าน3 ไม่ใช่ product QA และยังไม่ได้บันทึกไฟล์นี้จริง\n\nข้อแก้ไข:\n- C080-01: uxui/int-007-trace.md:45 และ test-plan/tp-001-amendment-004.md:20 ยังกล่าวว่าไม่มี amendment076 ทั้งที่ design/des-010.md:123–135 และ learning-ux-contract-gaps-001.md:24 บันทึกแล้ว ให้แก้การอ้างฉบับปัจจุบันโดยคง technical proof OPEN\n- C080-02: uxui/int-007-trace.md:22 ตัดตาราง ทำให้9แถวส่วนต่อไม่มี header/separator\n- C080-03: trace:15–20 อ้าง AC04601..06 ผิดบรรทัด ต้องเป็น requirement/req-046.md:24,25,26,27,29,30 ตามลำดับ\n\nหลักฐานที่สอดคล้อง: decisions-042:11–16, req-046:32, DES-010:125–135, learning-rules:10,28 และ DES-011:28 คงผล4/10จากคำตอบทันเวลา คะแนนเต็มทั้งชุด นับสิทธิ์เดิม ไม่รับย้อนหลัง และไม่ตี NULL เป็น0; recovery-a11y:17–27 คง pending/read-server และรอ Q43\n\nTP081:13–24 ครอบ expected ธุรกิจ ทุก actual NOT_RUN; coverage81/186 แยก snapshot180/77 ตาม notices ตรวจ canonical JSON ได้110tasks/8phases/17gates/15verified/95pending และ AC04607 อยู่เฉพาะ4taskที่กำหนด ทุก task ยัง pending\n\nตรวจ UX006/007 จำนวน11ไฟล์ ทุกไฟล์≤11000 bytes สูงสุด10687; ลิงก์35จุดมีไฟล์ปลายทางครบ พบตารางเสีย1กลุ่มและอ้างบรรทัดผิด6จุด\n\nข้อจำกัด: ไม่ตรวจ runtime/source/SQL/DBML ไม่เทียบ baseline diff และไม่ตรวจ raw/Joined bytes ไม่ปิด UX/gates/task จากผลนี้ ไม่มี security gate หรือ backlog ใหม่\n\nส่งนายช่างคืน int/inspect แก้3จุดแล้วรับตรวจซ้ำก่อนเสนอเซ็น\n\n## Change Log\n- 2026-10-26 — ตรวจ delta042 จากมติและ saved artifacts; ผล FAIL เฉพาะเอกสาร"
+      }
+    ],
+    "handoff": "ส่งนายช่างคืน int แก้ trace และ inspect แก้ข้อความ TP081 แล้วตรวจเอกสารซ้ำก่อนเสนอ human sign-off; คง4task pending, Q39–Q46 และ gates เดิม ไม่ dispatch ต่อเอง"
+  }
+}
