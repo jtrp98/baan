@@ -15,3 +15,4 @@
 ## Change Log
 
 - 2026-10-24 — นายช่างบันทึก verdicts รอบ 1–3 และ flip ตามกติกา (verdict ของ check เป็นต้นทางเดียวของคอลัมน์ Status)
+- 2026-10-24 — เพิ่มเติมรอบ 4–7 (UX-004/SA-002): SA-002 **PASS** รอบเดียว (flip → 13 verified) + DBML PlanCourseIds jsonb→integer[] แก้ตามข้อเสนอ (parser ผ่าน evidence-003) · UX-004 FAIL 4 จุด (ครู disabled บน Quiz/Test, state สิทธิ์ข้อสอบ, รายการวิชา, state หน้าความคืบหน้า) → แก้ครบ → ผิดโครงสร้างคอลัมน์ 4 แถว → แก้ครบ → **PASS รอบ 7** (flip → 14 verified/96 pending)

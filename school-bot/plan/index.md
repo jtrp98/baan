@@ -35,7 +35,7 @@ Precedence 2026-10-24 (ใบงาน059): ใช้ [queue-003 ฉบับป
 
 ## Tasks
 
-ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 13 (+SA-002) pending 97; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
+ตารางนี้คง74งานเดิม; [index ส่วนต่อ36งาน](extension/index.md) รวม110งาน — ณ ใบงาน061: verified 14 (+UX-004) pending 96; Ownerเก่า resolveผ่าน role_aliases ในJSON/บทบาทที่ scope-001.md; IDsเดิมไม่เปลี่ยน
 
 Status อยู่ที่ index; task ใหม่ pending ทั้งหมด verified/blocked มาจาก QA verdict ผ่าน นายช่าง เท่านั้น Dependencies ในตารางย่อ; gate preconditions อยู่ในใบงานและ [canonical JSON](tasks-001.json)
 
@@ -54,7 +54,7 @@ Status อยู่ที่ index; task ใหม่ pending ทั้งหม
 | [UX-001](UX-001.md) | Entry UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-001 + check-060 PASS) |
 | [UX-002](UX-002.md) | Projects UX | ux | P3 | BA-001 | **verified** (ใบงาน061 — signed int-003 + check PASS รอบ 3) |
 | [UX-003](UX-003.md) | Labs UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-002 + check-060 PASS) |
-| [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | pending |
+| [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | **verified** (ใบงาน061 — signed int-004 ครบ + check PASS รอบ 7) |
 | [TP-001](TP-001.md) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
 | [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | pending |
 | [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | pending |
