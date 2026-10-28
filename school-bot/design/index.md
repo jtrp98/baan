@@ -7,6 +7,8 @@
 
 Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — [Bcheckรอบ1](../planning/check-089-grpc-r1-001.md) FAIL119/150กำลังrework2ตามnegativeboundary; [GhelperPASS433](../planning/check-089-gateway-r1-001.md); Gtypedเดิม[FAIL258/260](../planning/check-089-gateway-typed-001.md) แก้แล้ว[parent3/3และcompile/helper433ผ่าน](../planning/slice-090-gateway-r1-001.md); [JPOพบlogleak/earlydeadline](../planning/jpo-090-gateway-r1-001.md)กำลังrework2; fullbuildติดpackagesและproduction registration ปิด
 
+**G entry ปัจจุบัน: [controller + module-owned channel Rev1](gateway-controller-entry-001.md)** ตามมติ050/Amendment049 — precedence เหนือข้อความ minimal endpoint/middleware ในเอกสาร gateway ด้านล่าง; transport/กฎ error เดิมคง.
+
 [Negative boundary Rev1](gateway-logout-negative-boundary-001.md) จากarch089พร้อมส่งsysrework2: malformedservice metadata→Internal/INTERNAL_ERROR, exacttrace/lang/header-accounting/correlation; ไม่เพิ่มpubliccodesหรือhuman gate. Runtimehiddenheader/H5proofยังเปิด.
 
 ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
