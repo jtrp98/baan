@@ -32,7 +32,7 @@ export function buildArgs(def, model, effort, write, answerFile, workspaceRoot =
 const ERROR_LINE = /^(?:ERROR|AGY_ERROR|API Error|Error|fatal|jetski):/;
 const ERROR_TEXT_CAP = 600;
 const ERROR_HINTS = [
-  [/"read_file" permission/, "อ่านไฟล์นอก cwd ไม่ได้ — ให้สิทธิ์อ่านด้วย setup/agy/grant-read.mjs (อย่าใช้ --add-dir/--dangerously-skip-permissions ในโหมดเขียน)"],
+  [/"read_file" permission/, "อ่านไฟล์นอก cwd ไม่ได้ — ให้สิทธิ์อ่านด้วย setup/agy/grant-read.mjs (รันจากโฟลเดอร์ workspace = ราก workspace + reports/ ของ baan · อย่าใช้ --add-dir/--dangerously-skip-permissions ในโหมดเขียน)"],
 ];
 
 export function summarizeStderr(stderr) {
