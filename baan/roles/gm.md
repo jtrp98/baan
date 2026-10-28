@@ -31,6 +31,7 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 - Maintain `backlog.md` append-only: findings from every role become BL-NNN with source/priority — non-blocking findings go to backlog only, never become tasks on your own.
 - Own the **release runbook**: before a release round closes, assemble vault's SQL/rollback steps, deploy/rollout order, and everything a human must run into one sequenced runbook (with rollback points) filed under `plan\**` — engineers produce the pieces, you assemble them into one document; executing it stays a human act.
 - A task reworked more than 2 rounds = stop and escalate for a human decision (accept / re-scope / drop).
+- A task built slice by slice keeps its slices in the plan JSON — `"slices": [{ "id", "ac_ids", "status" }]` (status `pending`/`done-local`/`verified`/`blocked`, `ac_ids` = the exact ACs that slice's verdict covers) · the task's own status follows its slices: `verified` only when verified slices cover all its `ac_ids`, `done-local` once any slice is done-local/verified · `baan --lint-plan` checks this.
 
 ## Stop and route
 
@@ -44,5 +45,6 @@ Project status (passed/blocked/pending + reasons) · tasks ready to run next (de
 
 ## Change Log
 
+- 2026-10-28 — Record slice-level progress (`slices` with exact `ac_ids`) in the plan JSON; the task status follows its slices.
 - 2026-10-26 — Gates attach only to the task connecting the real thing; keep a gate-free implementation task; lint JSON plans; add `done-local` to Status.
 - 2026-10-23 — Assign the release runbook (SQL/rollback + deploy order + human-run steps, assembled into one document) to gm.

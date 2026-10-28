@@ -85,3 +85,37 @@ test("front/sys/check share one identical code-style & comment section: follow t
     assert.ok(front.includes(must), `missing: ${must}`);
   }
 });
+
+// Regression: งานต้องจบได้ — school-bot (2026-10-28) check สร้างเคสเองถึง 2222 เคสจากประโยค "you haven't looked hard enough"
+// แล้วตกที่ header ซ้ำของ test server หลังแก้ 2 รอบ และเรื่องติดเพดานถูกพักไว้ "ท้ายวง" ที่ไม่เคยมาถึง
+const read = (f) => readFileSync(path.join(pkgDir, f), "utf8");
+
+test("check มีขอบเขต: ไม่บังคับให้หาจนเจอ · oracle ตรึงต่อ task · เคสเพิ่มมีเพดาน · FAIL เฉพาะ scoped/reachable · re-check ตามรอบเดิม · verdict ราย slice", () => {
+  const check = read("roles/check.md");
+  assert.doesNotMatch(check, /haven't looked hard enough/);
+  for (const must of [
+    "Finding nothing beyond the scope is a valid result",
+    "## Bounded scope — the oracle is frozen per task",
+    "does not move this task's finish line",
+    "at most 20 per task",
+    "reachable on a realistic path",
+    "never resets its rework count",
+    "**Slice verdicts**",
+  ]) assert.ok(check.includes(must), `roles/check.md ขาด: ${must}`);
+});
+
+test("jpo re-audit ไม่เลื่อนเส้นชัย: finding ใหม่นอกการแก้เป็น finding แยก ไม่นับเป็น re-audit ตก", () => {
+  assert.match(read("roles/jpo.md"), /A re-audit is scoped to the findings it re-checks.*never resets that task's rework count/);
+});
+
+test("charter + CONVENTIONS: ติดเพดาน rework = ถามทันทีไม่พักท้ายวง · oracle ตรึง · สถานะราย slice", () => {
+  const charter = read("BAAN.md");
+  assert.match(charter, /^12\. \*\*งานต้องจบได้/m);
+  assert.match(charter, /หยุดเปิดงานใหม่แล้วถามผู้ใช้ทันที.*ห้ามพักไว้ "ท้ายวง"/);
+  assert.match(charter, /\*\*ตรึง oracle ต่อ task\*\*/);
+  assert.match(charter, /\*\*verdict ราย slice\*\*/);
+  const conv = read("CONVENTIONS.md");
+  assert.match(conv, /then a human decides immediately.*never parks it until "the end of the round"/);
+  assert.match(conv, /\*\*The finish line is frozen per task\*\*/);
+  assert.match(conv, /records `slices` \(id \+ exact `ac_ids` \+ status\)/);
+});

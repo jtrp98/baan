@@ -57,8 +57,9 @@ A gate blocks only the work that genuinely needs its answer: work that can run a
 
 ## 10. Finish rules
 
-**Done = released** (not verified) · release scope frozen — new items go to backlog, not the plan, unless the user moves them · non-blocking findings = backlog, never self-opened tasks · **at most 2 rework rounds per task, then a human decides** (accept / re-scope / drop) · work waiting on a human answer is reported immediately — never queue work behind an open question · documents over budget (~4–10 KB per file by type) = split into linked parts, not write longer, never archive to shrink.
-Plan Status values: `pending` · `done-local` (code done and its automated tests pass locally, not yet connected to gated real systems — the controller sets it after re-running the tests) · `verified` / `blocked` (only from check's verdict) · `done-local` never closes a gate.
+**Done = released** (not verified) · release scope frozen — new items go to backlog, not the plan, unless the user moves them · non-blocking findings = backlog, never self-opened tasks · **at most 2 rework rounds per task, then a human decides immediately** (accept / re-scope / drop) — the controller stops opening new work and asks now, never parks it until "the end of the round" · work waiting on a human answer is reported immediately — never queue work behind an open question · documents over budget (~4–10 KB per file by type) = split into linked parts, not write longer, never archive to shrink.
+**The finish line is frozen per task**: a check/audit judges against the AC ids, test-plan cases and design/contract revisions named when the task (or slice) started; a rule added later — even one prompted by that task's own findings — applies to the next task, not this verdict.
+Plan Status values: `pending` · `done-local` (code done and its automated tests pass locally, not yet connected to gated real systems — the controller sets it after re-running the tests) · `verified` / `blocked` (only from check's verdict) · `done-local` never closes a gate · a task built slice by slice records `slices` (id + exact `ac_ids` + status) and is `verified` only when verified slices cover all its ACs.
 
 ## 11. Language
 
@@ -71,6 +72,8 @@ Relational data-model work also includes a full, readable DBML artifact kept in 
 
 
 ## Change Log
+
+- 2026-10-28 — Rework cap reached = ask the human immediately (no end-of-round parking); finish line frozen per task; slice-level statuses with exact AC coverage.
 
 - 2026-10-26 — Indexes are current state only (no Change Log, no Precedence layers); no archive/snapshot copies (git holds history); raw run output stays in `reports\`.
 

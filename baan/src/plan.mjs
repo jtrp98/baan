@@ -70,12 +70,68 @@ export function findDependencyCycle(tasks) {
 // ให้ lint ตัวเดียวตรวจได้ทั้งคู่ — แผนโปรเจกต์ใน knowledge ไม่มี schema กลาง แต่ละโปรเจกต์ตั้งชื่อฟิลด์เอง
 export function normalizeDagTasks(tasks) {
   const nonEmpty = (v) => (Array.isArray(v) ? v.length > 0 : typeof v === "string" && v.trim() !== "");
+  const list = (v) => (Array.isArray(v) ? v : []);
   return tasks.map((t) => ({
     id: t.id,
     role: resolveRoleName(t.role ?? t.owner),
     dependsOn: Array.isArray(t.dependsOn ?? t.depends_on) ? (t.dependsOn ?? t.depends_on) : [],
     gated: nonEmpty(t.gateIds ?? t.gate_ids) || nonEmpty(t.humanGate),
+    status: typeof t.status === "string" ? t.status.trim().toLowerCase() : "",
+    acIds: list(t.acIds ?? t.ac_ids),
+    slices: list(t.slices).map((s) => ({
+      id: s?.id,
+      acIds: list(s?.acIds ?? s?.ac_ids),
+      status: typeof s?.status === "string" ? s.status.trim().toLowerCase() : "",
+    })),
   }));
+}
+
+export const PLAN_STATUSES = ["pending", "done-local", "verified", "blocked"];
+
+// สถานะที่ task ควรเป็นตาม slices — task ที่ไม่มี slices ใช้สถานะของตัวเอง (แผนเก่าไม่มีฟิลด์นี้)
+export function deriveTaskStatus(t) {
+  if (!t.slices.length) return t.status;
+  const covered = new Set(t.slices.filter((s) => s.status === "verified").flatMap((s) => s.acIds));
+  if (t.acIds.length && t.acIds.every((a) => covered.has(a))) return "verified";
+  if (t.slices.some((s) => s.status === "done-local" || s.status === "verified")) return "done-local";
+  return "pending";
+}
+
+// lint ความคืบหน้า — ที่มา: school-bot (2026-10-28) คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local สักงาน
+// และ verified ต้องครอบทั้ง task ขณะที่งานจริงเดินทีละ slice จึงไม่มีงานโค้ดไหนดูเหมือนเสร็จเลย
+// error = สถานะอ้างเกินหลักฐาน (กระทบ exit code) · warning = ความคืบหน้าที่มีจริงแต่ไม่ถูกลง (ไม่กระทบ)
+export function lintPlanProgress(tasks) {
+  const errors = [];
+  const warnings = [];
+  for (const t of tasks) {
+    if (t.status && !PLAN_STATUSES.includes(t.status)) warnings.push(`${t.id}: status "${t.status}" ไม่อยู่ใน ${PLAN_STATUSES.join("/")}`);
+    t.slices.forEach((s, i) => {
+      const sid = s.id ?? `slice#${i + 1}`;
+      if (!PLAN_STATUSES.includes(s.status)) errors.push(`${t.id}/${sid}: status ของ slice ต้องเป็น ${PLAN_STATUSES.join("/")}`);
+      else if (s.status !== "pending" && !s.acIds.length) errors.push(`${t.id}/${sid}: slice ที่ ${s.status} ต้องระบุ ac_ids ที่ verdict ครอบ`);
+      const outside = t.acIds.length ? s.acIds.filter((a) => !t.acIds.includes(a)) : [];
+      if (outside.length) errors.push(`${t.id}/${sid}: ac_ids นอก task (${outside.join(", ")}) — slice ครอบได้เฉพาะ AC ของ task ที่ตรึงไว้`);
+    });
+    if (!t.slices.length) continue;
+    const derived = deriveTaskStatus(t);
+    if (t.status === "verified" && derived !== "verified") {
+      const covered = new Set(t.slices.filter((s) => s.status === "verified").flatMap((s) => s.acIds));
+      const missing = t.acIds.filter((a) => !covered.has(a));
+      errors.push(`${t.id}: status verified แต่ slice ที่ verified ยังไม่ครอบ AC ${missing.length ? missing.join(", ") : "(task ไม่มี ac_ids)"}`);
+    } else if (derived !== "pending" && t.status !== "blocked" && PLAN_STATUSES.indexOf(derived) > PLAN_STATUSES.indexOf(t.status)) {
+      warnings.push(`${t.id}: status "${t.status || "(ว่าง)"}" แต่ slices บอกว่าเป็น ${derived} แล้ว — ลงสถานะในแผนให้ตรง`);
+    }
+  }
+  const impl = tasks.filter((t) => IMPLEMENT_ROLES.includes(t.role));
+  const count = (list, st) => list.filter((t) => deriveTaskStatus(t) === st).length;
+  const implProgress = { verified: count(impl, "verified"), doneLocal: count(impl, "done-local"), total: impl.length };
+  const docsVerified = count(tasks.filter((t) => !IMPLEMENT_ROLES.includes(t.role)), "verified");
+  // 5 = ค่าเดียวกับ time-box ใบงานเอกสารล้วน 5 ใบในกติกาข้อ 10 ของ charter
+  if (impl.length && implProgress.verified + implProgress.doneLocal === 0 && docsVerified >= 5) {
+    warnings.push(`งานเอกสาร verified แล้ว ${docsVerified} งาน แต่งาน implement ${impl.length} งานยังไม่มี done-local/verified เลย — ลง done-local ให้งานที่ test ผ่านในเครื่องแล้ว หรือเปิด slice โค้ดถัดไป`);
+  }
+  const slices = tasks.flatMap((t) => t.slices);
+  return { errors, warnings, implProgress, slices: { verified: slices.filter((s) => s.status === "verified").length, total: slices.length } };
 }
 
 // lint รูปร่าง DAG — ที่มา: แผน school-bot (2026-10-26) ผูกงาน implement 61/63 งานไว้หลังประตูมนุษย์
@@ -184,9 +240,12 @@ export function lintPlanFile(file, readFile, log = console.log) {
   const tasks = normalizeDagTasks(raw);
   const cycle = findDependencyCycle(tasks);
   const r = lintPlanDag(tasks, { docsOnly: json.docsOnly ?? json.docs_only });
-  const errors = cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`, ...r.errors] : r.errors;
+  const p = lintPlanProgress(tasks);
+  const errors = [...(cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`] : []), ...r.errors, ...p.errors];
   log(`DAG lint: ${file}`);
   log(`  tasks ${tasks.length} · implement ${r.impl.length} · ติดประตูมนุษย์ ${r.blocked.length} · เริ่มได้ทันที ${r.free.length}${r.free.length ? ` (${r.free.join(", ")})` : ""}`);
+  log(`  ความคืบหน้างาน implement: verified ${p.implProgress.verified} · done-local ${p.implProgress.doneLocal} / ${p.implProgress.total}${p.slices.total ? ` · slice verified ${p.slices.verified}/${p.slices.total}` : ""}`);
+  for (const m of p.warnings) log(`  ⚠ ${m}`);
   for (const m of errors) log(`  ✗ ${m}`);
   if (!errors.length) log("  ✓ ผ่าน");
   return errors.length ? 1 : 0;

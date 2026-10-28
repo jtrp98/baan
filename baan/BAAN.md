@@ -85,6 +85,8 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
 - `NEEDS_*` = role นั้นหยุดเพราะเจอปัญหาเหนืออำนาจตัวเอง — **คุณ route ต่อ** (DES → `arch` · REQ/AC → `spec` · คำถามธุรกิจ → ผู้ใช้) อย่าแก้เอง
 - verdict ของ check (`PASS`/`FAIL` ราย task) = ต้นทางเดียวของ `verified`/`blocked` ในคอลัมน์ Status ของ `plan\index.md` — **คุณเป็นคนลงคอลัมน์แทน** (check/engineer ห้ามเขียนเอง)
 - **`done-local`** = โค้ดของ task เสร็จและ test อัตโนมัติผ่านในเครื่อง แต่ยังไม่ได้ต่อของจริงที่รอประตู (DB ร่วม, ระบบภายนอก, หุ่นจริง, deploy) — คุณลงเองได้ทันทีหลัง**รันคำสั่ง test ของ engineer ซ้ำเองแล้วผ่าน** (บันทึกคำสั่ง + ผล) ไม่ต้องรอรอบ check · `done-local` ไม่ปิด gate และยังต้องผ่าน check ก่อนเป็น `verified` แต่นับเป็นความคืบหน้าจริงในรายงาน
+- **ลงสถานะในไฟล์แผนตอนปิด slice นั้นเลย** — `plan\index.md` และ JSON ของแผน (ถ้ามี) ไม่ใช่เขียนแค่ในคิว/ใบงานว่า "local ready" (school-bot เคยมี 21 งาน local ready ในคิว แต่ JSON ไม่มี `done-local` สักงาน ความคืบหน้าจึงมองไม่เห็น)
+- **verdict ราย slice** — task ที่ทำทีละ slice: check ตัดสินเฉพาะ AC ที่ slice นั้นครอบ → คุณลงที่ `slices` ของ task (`id`/`ac_ids`/`status`) · task เป็น `verified` เมื่อ slice ที่ verified ครอบ `ac_ids` ของ task ครบ · มี slice ไหน done-local/verified แล้ว task อย่างน้อยต้องเป็น `done-local` — `baan --lint-plan` ตรวจให้
 - handoff ทุกอัน lead with result → หลักฐาน → blockers → role ถัดไป — คุณใช้ส่วนนี้ตัดสินจังหวะต่อไป
 
 ## Hard rules ที่คุณ (ผู้คุม) ต้องบังคับเอง
@@ -114,6 +116,10 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
     - **ไม่ทำ snapshot/archive** — ห้ามคัดลอกไฟล์ไป `archive\`, `archive.md` หรือโฟลเดอร์ "before-xxx" ก่อนแก้ · ฉบับก่อนแก้คือ commit — อ้าง hash ในใบงานเมื่อต้องชี้ (ทำ snapshot ได้เฉพาะ knowledge root ที่ไม่มี git)
     - **index = สถานะปัจจุบันอย่างเดียว** — เขียนทับ cell/ประโยคเดิมให้เป็นความจริงวันนี้ · ไม่มี Change Log ใน index · ไม่ซ้อนย่อหน้า "Precedence/Amendment" ไว้เหนือข้อความเก่า (คนอ่านต้องไม่ต้องไล่ว่าย่อหน้าไหนชนะ) — ประวัติดูจาก `git log`
     - **ผลดิบของ role อยู่ที่ `reports\`** (baan-role เก็บให้แล้ว) — ห้ามคัดลอกคำตอบ/response JSON/stdout/ไฟล์ผล test (.trx) เข้า knowledge · knowledge เก็บเฉพาะผลที่สกัดแล้ว (ตัวเอกสารที่แก้, สรุปผล test พร้อมคำสั่งและจำนวนผ่าน/ตก) + ชื่อโฟลเดอร์ run เป็นหลักฐาน
+12. **งานต้องจบได้ — ตรึงเส้นชัย และถามทันทีเมื่อติดเพดาน**:
+    - **ตรึง oracle ต่อ task**: ใบงานของ check/jpo ระบุ AC ids + test-plan cases + revision ของ design/สัญญาที่ใช้ตัดสิน ณ วันเปิด task/slice · ห้ามสั่ง "ตรวจ boundary เพิ่มเติม" แบบไม่มีขอบ · finding ที่ทำให้ arch ออกกฎใหม่ = กฎนั้นผูกกับ task/slice **ถัดไป** ไม่เลื่อนเส้นชัยของ task เดิม (ขอบเขตเต็มอยู่ใน `roles/check.md` หัวข้อ "Bounded scope")
+    - **ติดเพดาน rework (แก้ครบ 2 รอบแล้วยัง FAIL หรือ jpo ยังมี Critical/Important) = หยุดเปิดงานใหม่แล้วถามผู้ใช้ทันที** แม้อยู่ในโหมด "ทำจนหมดงานแล้วถามทีเดียว" — role ที่รันอยู่ปล่อยให้จบ แล้วถามพร้อมทางเลือก (รับ slice นี้แล้วย้าย finding ที่เหลือเข้า backlog · ตัดขอบเขต · แก้เพิ่มอีกรอบ · ทิ้ง) และข้อแนะนำ · ห้ามพักไว้ "ท้ายวง" เพราะงาน pending ที่เหลือเยอะทำให้ท้ายวงไม่มาถึง
+    - **check/jpo ไม่กิน slot เกินครึ่ง** — ถ้า slot ส่วนใหญ่เป็นงานตรวจและ writer ว่าง ให้เปิด writer ก่อนเปิดงานตรวจใหม่
 
 ## ลำดับงานแนะนำ
 
@@ -169,6 +175,8 @@ config ของ workspace (knowledge_roots + targets + defaults) เก็บ�
 ตัวอย่างรูปแบบ: `baan.example.json` ใน package · ดูค่าปัจจุบันด้วย `baan --list`
 
 ## Change Log
+
+- 2026-10-28 — เพิ่มกติกาข้อ 12 (ตรึง oracle ต่อ task · ติดเพดาน rework = หยุดถามทันทีไม่พักท้ายวง · งานตรวจไม่กิน slot เกินครึ่ง) และให้ลง `done-local`/verdict ราย slice ในไฟล์แผนตอนปิด slice — ผลวิเคราะห์ school-bot: 91 ใบงานแต่ไม่มีงานโค้ด verified/done-local สักงาน, check gRPC logout สร้างเคสเองถึง 2222 เคสแล้วตกที่ header ซ้ำของ test server หลังแก้ 2 รอบ, เรื่องติดเพดานถูกพักท้ายวงตั้งแต่ 2026-10-26 และวันเดียวมี check 31 runs/267 นาทีเทียบ writer 26 runs
 
 - 2026-10-26 — เพิ่มกติกาข้อ 11 (ไม่ทำ snapshot/archive ใช้ git · index เป็นสถานะปัจจุบัน ไม่มี Change Log/Precedence · ผลดิบอยู่ที่ reports) และเปลี่ยน related-impact sweep ให้ค้นด้วย `baan --sweep` + งานแทนค่าตรงตัว นายช่าง แก้เองไม่แตก task ต่อเจ้าของ — ผลตรวจอิสระพบ archive กิน 39% ของ knowledge school-bot, index.md เป็น change log 70% และ sweep มติเดียวใช้ 9 role calls
 
