@@ -368,3 +368,19 @@ Currentเพิ่ม2finding: Important7/Medium6/Minor4OPEN รวมของ
 หลังครบ2reworksให้ผู้ใช้ตัดสินadditionalnarrowrepairหรือพักsliceท้ายวง ไม่เปิดr3เอง. B QAtriageMediumUUIDintegrity/Minorerrornormalizationตามsurfaceที่prove ไม่มีcross-tenantproof ไม่เพิ่มduplicateSECIDและQAยังFAIL.
 
 - 2026-10-26 — appendfinalJPO+parent96; nofullpipeline/privatepackage/TLS/production/DB/hardwareproof.
+
+## Logout transport re-audit หลังมติ049/050 — 2026-10-28
+
+[JPO092](planning/jpo-092-logout-r4-001.md) AGY T2 run WZnc4m (Codex ติดโควตา ผู้ใช้สั่งใช้ agy) บน G r4 controller + module-owned channel ([แบบ](design/gateway-controller-entry-001.md)) และ B rework3:
+
+| ID | Severity | Status ใหม่ | หลักฐาน |
+|---|---|---|---|
+| SEC001-016 | Important | **CLOSED เฉพาะ local logout slice** | ไม่มี reflection, reject channel/client/invoker ที่ไม่ผ่าน factory ก่อน RPC, sanitizing logger ทุกระดับ/scope/EventId3, ไม่ fallback ไป generated client, ไม่ mutate LoggerFactory ของ caller · r4 96/0, 5/0, 3/0 + surface probe 6/0 |
+| SEC001-017 | Minor | CLOSED (คงเดิม — regression ผ่าน) | early deadline 502 / outer 504 / slow body 504 RPC0 |
+
+B QA triage (ไม่มี SEC ID): UUID duplicate Medium และ Origin/binary/transport duplicate Minor — **CLOSED** จาก source + oracle 2234/0
+พื้นผิวใหม่ r4: SmartScheme selector ส่งเฉพาะ `/api/school-bot/service/v2` ไป SchoolBotOpaque, route อื่นคง JWT และ revoked JWT ยังถูก control plane ตัด 401 · SliceGate 404 เมื่อ Production/ไม่มี module/Enabled=false — ไม่พบ finding ใหม่
+
+Current OPEN: Important6/Medium6/Minor3 · ไม่ใช่ risk acceptance · ไม่ปิด H5/TLS/production registration/full private build/DB/BFF CSRF
+
+- 2026-10-28 — append JPO092 WZnc4m; SEC001-016 CLOSED local scope

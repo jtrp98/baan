@@ -10,7 +10,7 @@ Frozen: ระบบเต็ม 44 REQ / 186 AC / 81 TP cases ตาม [มต
 
 คิวปัจจุบัน: [Queue 007](queue-007.md) — GMตรวจ63tasksมี21localready/5partial/37waiting · กำลังทำต่อ [091](../planning/task-091.md) หลัง090 · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
 
-- **G/Light/infra/B/BFF**: ผู้ใช้อนุญาตGatewaydevแล้วตาม046; implementation review/H5ยังรอหลักฐาน — fullLogin NOT_READY; B gRPC logout rework3 **check PASS** (parent2234/0+4147/0, [check อิสระ](../planning/check-092-grpc-r3-001.md) 2234/0) รอJPOซ้ำ — ลง done-local ใน JSON ไม่ได้เพราะไม่มี AC ใดผูก logout transport (ต้องให้ spec ผูก AC ก่อน); G typed logout เหลือ1/96 กำลังแก้รอบเล็กตาม Amendment [มติ049](../requirement/decisions-049.md) · ไม่ถามอนุญาตdevซ้ำ
+- **G/Light/infra/B/BFF**: ผู้ใช้อนุญาตGatewaydevแล้วตาม046; implementation review/H5ยังรอหลักฐาน — fullLogin NOT_READY; logout transport local slice **ผ่านครบ**: B rework3 [check PASS](../planning/check-092-grpc-r3-001.md) 2234/0 + G controller r4 ตาม[มติ050](../requirement/decisions-050.md) + [JPO092](../planning/jpo-092-logout-r4-001.md) SEC001-016 CLOSED local — ลง verified/done-local ใน JSON ไม่ได้เพราะไม่มี AC ใดผูก logout transport (ต้องให้ spec ผูก AC ก่อน) · production/H5/fullLogin ยังปิด · ไม่ถามอนุญาตdevซ้ำ
 - **ผู้ใช้**: forward [DB cover](../db/db-safe-evidence-cover-001.md) ให้เจ้าของ DB → เจ้าของ DB ส่ง EV-01..03 → 04/05 → 06 (optional) · ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว
 - **UX เซ็นแล้ว**: ผู้ใช้อนุมัติ UX-005/007 และ expired-copy delta Q39–Q46 ตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; ไม่อยู่ในรายการรอคนแล้ว
 - **ยังเปิด**: spec Q3 (รุ่นหุ่น/firmware/calibration/stop-unplug-emergency) · ผู้ถือ cert/ช่องทางแจกจ่าย · gates security/SQL/runtime · ทดสอบหุ่นจริงยังไม่อนุญาต (decisions-038)
