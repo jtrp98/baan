@@ -26,3 +26,4 @@
 ## Change Log
 
 - 2026-10-28 — เปิด092 ตามมติ049; ยืนยันไม่มีroleค้างรันก่อนเปิดwriterสองrepo
+- 2026-10-28 — B run FkPMk4 (agy gemini-3.8-flash-medium) exit0 แต่ไม่มีhandoff/state: stdoutบรรทัดเดียว stderr "root agent idle; waiting for 1 background task", ไม่มีไฟล์web/ถูกแก้ → runner failure ไม่นับรอบแก้; เปิดB ใหม่ด้วยagy T3 สั่งforegroundทุกคำสั่ง
