@@ -206,7 +206,7 @@ baan --plan-file <f>          # รันแผนที่แก้เอง
 baan --sweep "Rev3" --sweep "Rev 3" --target school-bot  # หาผู้อ้างอิงทุกจุดของค่าเดิม จัดกลุ่มตามเจ้าของไฟล์
 #   ค่าเริ่มต้นค้นทุก knowledge root · --target เพิ่ม repo ของ target · --sweep-in <โฟลเดอร์ module> ค้นเฉพาะ module นั้น
 #   ใช้ git ls-files (เคารพ .gitignore) ถ้าเป็น git repo · ข้าม archive/ ไฟล์ binary และไฟล์เกิน 2MB
-baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG ของแผน (แผน runtime หรือ plan\tasks-*.json ของโปรเจกต์) — exit 1 เมื่อไม่มีงาน implement หรือเกินครึ่งติดประตูมนุษย์
+baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG + ความคืบหน้าของแผน (แผน runtime หรือ plan\tasks-*.json ของโปรเจกต์) — exit 1 เมื่อไม่มีงาน implement, เกินครึ่งติดประตูมนุษย์ หรือสถานะอ้างเกิน slice ที่ verified
 # --dry-run ใช้กับทุก route ได้ (รวม --plan-file/--resume) — การ์ดห้ามเรียก provider อยู่ที่ execute จุดเดียว
 ```
 
@@ -219,6 +219,7 @@ baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG ของ�
 - **manifest ของ run (`run.json`)**: เก็บ resolved target/cwd/write/projectCtx ตอนสร้าง run — `--resume` คืนบริบทเดิมอัตโนมัติ (flag ที่ส่งเองชนะเสมอ และจะพิมพ์บอกทุกครั้งที่คืนค่า) จึงไม่หลุดเป็นทำงานผิดโปรเจกต์
 - **plan validation ก่อน spawn ใดๆ**: id ต้องเข้า pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (id คือชื่อไฟล์ จึงกัน path traversal), ตรวจ types ของ tasks/dependsOn/humanGates/docsOnly, self-dependency และ cycle
 - **DAG lint**: แผนสดจาก planner ถูกปฏิเสธเมื่อไม่มีงาน implement (และไม่มี `docsOnly`) หรือเมื่องาน implement เกินครึ่งติดประตูมนุษย์ · แผนจาก `--plan-file`/`--resume` เตือนอย่างเดียว (run เก่ายัง resume ได้) · `--lint-plan` อ่านได้ทั้งฟิลด์ของ baan (`role`/`dependsOn`/`gateIds`/`humanGate`) และของแผนโปรเจกต์ (`owner`/`depends_on`/`gate_ids`, ชื่อ role เดิม เช่น `fe`/`be` แปลงให้เอง) — งานที่มี gate ถือว่าติดประตู และงานที่พึ่งงานนั้นติดตามไปด้วย
+- **progress lint (ราย slice)**: task ที่ทำทีละ slice เก็บ `"slices": [{ "id", "ac_ids", "status" }]` — `--lint-plan` แสดงความคืบหน้างาน implement (verified/done-local/slice) · **error** เมื่อ task อ้าง `verified` แต่ slice ที่ verified ยังไม่ครอบ `ac_ids` ครบ, slice ที่ไม่ใช่ pending ไม่ระบุ AC หรืออ้าง AC นอก task · **warning** (ไม่กระทบ exit code) เมื่อ slices ไปไกลกว่าสถานะที่ลงไว้ หรือเอกสาร verified ≥ 5 งานแต่งาน implement ยังไม่มี done-local/verified เลย
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
@@ -312,6 +313,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 ## Change Log
 
+- 2026-10-28 — check มีขอบเขต + oracle ตรึงต่อ task · ติดเพดาน rework = ถามทันที · สถานะราย slice + progress lint ใน `--lint-plan`
 - 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: subagent ตรวจได้แบบมีเงื่อนไขความเป็นอิสระ (ตัวใหม่ + AC/spec เท่านั้น + หลักฐานจริง) ข้ามโมเดลเหลือเป็น escalation สำหรับงานวิกฤต/security/FAIL ซ้ำ
 
 - 2026-10-24 — ขยายโหมด solo: session ที่สวม นายช่าง แตก role เป็น subagent/งานเบื้องหลังของตัวเองได้ (ใช้กับแอปไม่มี CLI เช่น ZCode) — runner ภายนอกเหลือเฉพาะงานตรวจของตัวเอง/tier t0/t1
