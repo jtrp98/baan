@@ -27,3 +27,5 @@
 
 - 2026-10-28 — เปิด092 ตามมติ049; ยืนยันไม่มีroleค้างรันก่อนเปิดwriterสองrepo
 - 2026-10-28 — B run FkPMk4 (agy gemini-3.8-flash-medium) exit0 แต่ไม่มีhandoff/state: stdoutบรรทัดเดียว stderr "root agent idle; waiting for 1 background task", ไม่มีไฟล์web/ถูกแก้ → runner failure ไม่นับรอบแก้; เปิดB ใหม่ด้วยagy T3 สั่งforegroundทุกคำสั่ง
+- 2026-10-28 — G DOsn1C: oracleเดิม95/1 + reflection mutation → ผู้ใช้อนุมัติรอบเล็กหนึ่งจุด (Amendment มติ049) [receipt](slice-092-gateway-r3-001.md) · B sjuk7W DONE อ้าง2234/0+4147/0 ผ่านrunnerของตัวเอง [receipt](slice-092-grpc-r3-001.md)
+- 2026-10-28 — ผู้คุมทวนscriptตรึงไม่ได้: เครื่องไม่มี pwsh (PowerShell 7) · ตัวเลขที่writerอ้างว่ารันด้วยpwshจึงตรวจย้อนไม่ได้ · พักการเปิด G รอบเล็กและ check/JPO จนมีpwsh (oracleทุกชุดต้องใช้)

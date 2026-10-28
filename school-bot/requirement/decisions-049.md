@@ -24,6 +24,15 @@
 - คำอนุญาต dev Gateway และ replay 900 ตาม [046](decisions-046.md), การพัก signer ตาม [047](decisions-047.md) คงเดิม
 - มติ [048](decisions-048.md) (หยุดหลังปิดงานรอบ 088) ไม่เปลี่ยนด้วยมตินี้ — การเปิด role แก้จริงรอคำสั่งเริ่มวงจากผู้ใช้
 
+## Amendment — Gateway รอบเล็กเพิ่มหนึ่งจุด (2026-10-28)
+
+หลัง Gateway rework3 ([slice-092-gateway-r3-001](../planning/slice-092-gateway-r3-001.md)) oracle เดิมเหลือตก 1/96 (`shared-channel-factory-not-mutated`) และ client ยังใช้ reflection แทน LoggerFactory ของ channel ที่ caller ส่งมา ผู้ใช้เลือก "แก้อีกจุดเดียว":
+
+- ถอด reflection/private-field mutation ของ channel ที่ caller ส่งมา · client ที่ channel ไม่ได้สร้างผ่าน sanitizing factory ต้องถูก reject แบบ fail closed (RPC0)
+- ห้ามแก้ assertion/expected/logsink · seam ใหม่ของ harness (สร้าง channel ผ่าน `CreateSanitizingLoggerFactory`) ให้ JPO อิสระตัดสินว่าตรงแบบหรือไม่ ไม่ใช่ writer/ผู้คุมตัดสิน
+- ยังตกอีก = กลับมาถามผู้ใช้ ไม่มีรอบเพิ่มอัตโนมัติ · ไม่ใช่ risk acceptance
+
 ## Change Log
 
 - 2026-10-28 — ผู้ใช้ตอบในแชต: แก้รอบ 3 แบบแคบทั้ง B gRPC และ Gateway
+- 2026-10-28 — ผู้ใช้อนุมัติ Gateway รอบเล็กเพิ่มหนึ่งจุด (ถอด reflection mutation + reject channel ที่ไม่ sanitize)
