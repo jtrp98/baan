@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.getstudentgradeinfo_v5(p_xmlcourselist xml, p_xmlstudentlist xml, p_schoolid integer, p_isyearlyreport boolean)
+CREATE OR REPLACE FUNCTION public.getstudentgradeinfohistory_v2(p_xmlcourselist xml, p_xmlstudentlist xml, p_schoolid integer, p_isyearlyreport boolean)
  RETURNS TABLE(sid integer, sstudentid text, ngradeid integer, splaneid integer, nterm text, nterm2 text, ntsublevel integer, ntermsublevel2 integer, nyear integer, sterm1 text, sterm2 text, roomname text, coursecode text, coursename text, coursetype integer, coursegroup integer, coursetotalhour double precision, coursestatus integer, coursehour double precision, firstname text, lastname text, titledesc text, term1score text, term2score text, getscore100 text, getgradelabel text, ncredit double precision, gradexncredit double precision, getspecial text, gpa double precision, coursetypeorder integer, sortnumber integer, getscore50 text)
  LANGUAGE plpgsql
  ROWS 100000
@@ -8,7 +8,7 @@ BEGIN
 IF (p_IsYearlyReport =false) THEN
 RETURN QUERY WITH tmp_StudentGradeInfo AS
 (
-	SELECT * FROM GetStudentGradeInfoCommon_V2(p_XMLCourseList, p_XMLStudentList, p_SchoolId)
+	SELECT * FROM GetStudentGradeInfoCommonHistory_V2(p_XMLCourseList, p_XMLStudentList, p_SchoolId)
 )
 ,tmp_StudentGradeInfo2 AS
 (SELECT
@@ -22,7 +22,7 @@ RETURN QUERY WITH tmp_StudentGradeInfo AS
 					G."getSpecial",
 					coalesce(nullif(g."gpa"::text, '')::double precision, 0) as gpa,
 					G."nOrder" courseTypeOrder,
-                    COALESCE(G."SortNumber", 999999) sortNumber,
+					G."SortNumber" sortNumber,
  --case when (G."getScore100" is not null and G."getScore100" != '''')
 					--then
 					--to_char(coalesce(nullif(g."getScore100"::text, '')::double precision, 0) / 2, 'FM9999.99')
@@ -44,7 +44,7 @@ END AS getScore50
 ELSE
 RETURN QUERY WITH tmp_StudentGradeInfo AS
 (
-	SELECT * FROM GetStudentGradeInfoCommon_V2(p_XMLCourseList, p_XMLStudentList, p_SchoolId)
+	SELECT * FROM GetStudentGradeInfoCommonHistory_V2(p_XMLCourseList, p_XMLStudentList, p_SchoolId)
 )
 ,tmp_StudentGradeInfoYearly AS (
 select distinct
@@ -232,7 +232,7 @@ END AS getscore50
 						GROUP BY z."sid", z."nterm",z."nstudentnumber"
 
 					 ) r on g."sid" = r."sid" AND g."nterm" = r."nterm"
-		order by g."coursegroup", g."coursetypeorder", COALESCE(g."sortnumber", 999999), g."coursecode"
+		order by "coursegroup","coursetypeorder", COALESCE("sortnumber", 999999), "coursecode"
 )
  select * from tmp_StudentGradeInfo2;
 END IF;

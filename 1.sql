@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.getstudentgradeinfohistory_v2(p_xmlcourselist xml, p_xmlstudentlist xml, p_schoolid integer, p_isyearlyreport boolean)
+CREATE OR REPLACE FUNCTION public.getstudentgradeinfohistory_v3(p_xmlcourselist xml, p_xmlstudentlist xml, p_schoolid integer, p_isyearlyreport boolean)
  RETURNS TABLE(sid integer, sstudentid text, ngradeid integer, splaneid integer, nterm text, nterm2 text, ntsublevel integer, ntermsublevel2 integer, nyear integer, sterm1 text, sterm2 text, roomname text, coursecode text, coursename text, coursetype integer, coursegroup integer, coursetotalhour double precision, coursestatus integer, coursehour double precision, firstname text, lastname text, titledesc text, term1score text, term2score text, getscore100 text, getgradelabel text, ncredit double precision, gradexncredit double precision, getspecial text, gpa double precision, coursetypeorder integer, sortnumber integer, getscore50 text)
  LANGUAGE plpgsql
  ROWS 100000
