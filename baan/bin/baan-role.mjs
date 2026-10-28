@@ -3,7 +3,7 @@
 // ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ baan
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { REPORTS_DIR, ROLES_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
+import { ROLES_DIR, listRoles, loadAgentsConfig, loadWorkspace, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
@@ -103,7 +103,7 @@ async function main() {
     fullTask = roleDirective(opts.role, task, null, "", workDate);
   }
 
-  const runDir = createRunDir(REPORTS_DIR, { role: opts.role, tier: opts.tier, write: opts.write, count: runnable.length });
+  const runDir = createRunDir(reportsDirOf(workspaceRoot), { role: opts.role, tier: opts.tier, write: opts.write, count: runnable.length });
 
   const resolveME = (name, isRequested) => {
     const t = (tiers[opts.tier] ?? {})[name] ?? {};

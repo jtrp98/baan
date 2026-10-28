@@ -6,8 +6,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { summarizeStderr } from "../src/runner.mjs";
-import { applyRules, defaultDirs, readRule } from "../setup/agy/grant-read.mjs";
-import { REPORTS_DIR } from "../src/config.mjs";
+import { applyRules, readRule } from "../setup/agy/grant-read.mjs";
 
 const AGY_DENIED = 'jetski: no output produced — a tool required the "read_file" permission that headless mode cannot prompt for, so it was auto-denied.';
 
@@ -50,14 +49,6 @@ test("grant-read: read_file rule เป็น absolute path · ไม่ยอ�
   assert.deepEqual(applyRules(added, [readRule(dir)], true), base, "ถอนแล้วกลับเหมือนเดิม");
   assert.equal(added.model, "m", "setting อื่นอยู่ครบ");
   assert.deepEqual(applyRules({}, [readRule(dir)]).permissions.allow, [`read_file(${dir})`], "ยังไม่มี permissions เลยก็ได้");
-});
-
-// Regression (2026-10-28): agy โหมดเขียนล้มที่ 29 วิ เพราะใบงานชี้คำตอบของ arch ใน baan/reports/ ซึ่งอยู่นอก workspace
-test("grant-read: ค่าเริ่มต้นให้อ่านทั้งราก workspace และ reports/ ของ baan · ไม่เจอ workspace ยังได้ reports/", () => {
-  const root = path.resolve("C:/src/schoolbright");
-  assert.deepEqual(defaultDirs(root), [root, REPORTS_DIR]);
-  assert.deepEqual(defaultDirs(""), [REPORTS_DIR]);
-  assert.equal(path.basename(REPORTS_DIR), "reports");
 });
 
 test("grant-read CLI: เขียนลง settings ที่ระบุและสำรองไฟล์เดิม", async () => {

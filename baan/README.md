@@ -13,7 +13,7 @@
 - **จ่าย model ตามความยากงาน** — งานคิดหนักใช้ model แพง งานจำนวนมากใช้ model เบา ผ่านระบบ tier
 - **อ่านอย่างเดียวโดยดีฟอลต์** — ทุก session เริ่มแบบ read-only จะแก้ไฟล์ได้ต่อเมื่อสั่ง `--write` ชัดๆ
 
-คุณสมบัติ: **zero runtime dependency** (ต้องมีแค่ Node.js ≥ 18) · รัน local ทั้งหมด · รายงานของทุก run เก็บไว้ในเครื่อง (`reports/`)
+คุณสมบัติ: **zero runtime dependency** (ต้องมีแค่ Node.js ≥ 18) · รัน local ทั้งหมด · รายงานของทุก run เก็บไว้ในเครื่อง (`<ราก workspace>/reports/baan/`)
 
 ## เริ่มต้นใช้งาน
 
@@ -75,7 +75,7 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
   setup\agy\                ← profile baan-readonly ของ agy (agent.md + guard hook) — ติดตั้งครั้งเดียวต่อเครื่อง
   scripts\                  ← live-smoke.mjs (npm run smoke:live — ใช้โควตาจริง)
   tests\                    ← regression tests (npm test)
-  reports\                  ← ผลการรันทุกครั้ง
+  reports\                  ← ผลการรันเมื่อหา workspace ไม่เจอ (ปกติอยู่ที่ <ราก workspace>\reports\baan\)
 ```
 
 ## การสวมบท นายช่าง (โหมดหลัก)
@@ -135,7 +135,7 @@ baan-role --list              # ดูรายชื่อ agent + tier
 - **cwd เริ่มต้น = ไดเรกทอรีที่เรียก** · `--cwd` แบบ relative อิงจากที่เรียก
 - **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
-- **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
+- **runDir ไม่ชนกัน**: `<ราก workspace>/reports/baan/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
 - **ป้าย `[baan-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท นายช่าง ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
 - **auto commit ที่เก็บเอกสารหลังจบ run** — knowledge root ไหนเป็น git repo (มี `.git`) จะถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` เช่น `school-bot: add db/review-001.md, index.md +2 more` · ไฟล์ที่ commit ไม่ทับของ module อื่นที่ staged ค้างไว้ · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังเมื่อไหร่แจ้งเตือนแล้วไปต่อ ไม่ลากผล run ไปตายด้วย · เรียกด้วยมือได้ด้วย `baan --commit` (โค้ดอยู่ที่ `src/knowledge-commit.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ gm/plan ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `baan` และ `baan-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
@@ -283,10 +283,10 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - โหมดเริ่มต้น **read-only** — ป้องกัน agent แก้ไฟล์โดยไม่ตั้งใจ จะเปิด `--write` เมื่อไรก็ตั้งใจ
   - แต่ละค่ายบังคับ read-only ต่างกัน: codex = sandbox `-s read-only` · agy = `--agent baan-readonly` (profile ระดับผู้ใช้ที่ตัดเครื่องมือเขียนออก + guard hook ยืนยันว่ารันได้แค่คำสั่งอ่าน) · claude = `--allowedTools` เฉพาะ Read/Grep/Glob + คำสั่งอ่านอย่างเดียว (git status/log/diff/show ฯลฯ) — claude ใน read-only จึง**รัน node/npm ไม่ได้โดยตั้งใจ** · opencode = ไม่ใส่ `--auto` ในโหมดอ่าน — non-interactive ที่ไม่มี `--auto` จะปฏิเสธการกระทำที่ต้องขออนุญาต (เช่น แก้ไฟล์) ให้เอง (โหมด write จึงต้องใส่ `--auto` เพราะไม่มีคนกดอนุมัติกลางทาง)
   - **agy ต้องติดตั้ง profile `baan-readonly` ครั้งเดียวต่อเครื่อง** — ไฟล์และขั้นตอนอยู่ที่ `setup/agy/README.md` (ไม่มี profile = agy ล้มทุกงาน read-only และไม่สลับตัวรันให้)
-  - **agy ในโหมด headless อ่านไฟล์นอก cwd ไม่ได้** — นายช่างจึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก baan.config.json ที่เดินขึ้นจาก cwd) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนตามไปด้วย — งานเขียน (cwd = target repo) ที่ต้องอ่าน knowledge/repo อื่นให้ตั้ง allow-rule `read_file(<ราก workspace>)` + `read_file(<baan>/reports)` (คำตอบของ role ก่อนหน้าที่ใบงานชี้ไป) ครั้งเดียวต่อเครื่องด้วย `node setup/agy/grant-read.mjs` (ให้แค่สิทธิ์อ่าน ตรวจแล้วว่าเขียนยังถูกปฏิเสธ — ดู `setup/agy/README.md`)
+  - **agy ในโหมด headless อ่านไฟล์นอก cwd ไม่ได้** — นายช่างจึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก baan.config.json ที่เดินขึ้นจาก cwd) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนตามไปด้วย — งานเขียน (cwd = target repo) ที่ต้องอ่าน knowledge/repo อื่นให้ตั้ง allow-rule `read_file(<ราก workspace>)` ครั้งเดียวต่อเครื่องด้วย `node setup/agy/grant-read.mjs` (ให้แค่สิทธิ์อ่าน ตรวจแล้วว่าเขียนยังถูกปฏิเสธ — ดู `setup/agy/README.md`)
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
 - **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox ปลอมเป็นรูป workspace จริง (มี `baan.config.json` ที่ราก + ไฟล์ลับนอก cwd) แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ใน cwd และนอก cwd (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
-- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
+- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `<ราก workspace>/reports/baan/<timestamp>-…-<สุ่ม>/` — อยู่ในขอบเขต workspace เพื่อให้ role ถัดไป (รวม agy ที่สิทธิ์อ่านผูกกับ workspace) อ่านคำตอบของ role ก่อนหน้าได้ · หา workspace ไม่เจอ = `reports/` ของ package
 - เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
 
 ## สถานะการทดสอบ

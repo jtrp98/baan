@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { findWorkspaceConfig, loadWorkspace, resolveWorkspaceConfig } from "../src/config.mjs";
+import { REPORTS_DIR, findWorkspaceConfig, loadWorkspace, reportsDirOf, resolveWorkspaceConfig, workspaceRootOf } from "../src/config.mjs";
 
 const realConfig = { main_root: "C:/src", knowledge_roots: [{ name: "k", path: "C:/k", targets: [] }], defaults: { agent: "codex" } };
 
@@ -104,4 +104,18 @@ test("loadWorkspace อ่านจากไฟล์ที่ระบุได
     writeFileSync(configFile, "{ broken", "utf8");
     assert.throws(() => loadWorkspace(configFile), /อ่าน config ไม่ได้/);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// Regression (2026-10-28): run dir อยู่ใน package (นอก workspace) — agy T3 โหมดเขียนอ่านโค้ดต้นแบบของ arch ไม่ได้ ล้มที่ 29 วิ
+test("run dir อยู่ใต้ราก workspace (reports/baan) ที่ agy มีสิทธิ์อ่านอยู่แล้ว · ไม่เจอ workspace = reports/ ของ package", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-test-"));
+  try {
+    writeFileSync(path.join(root, "baan.config.json"), JSON.stringify(realConfig), "utf8");
+    const target = path.join(root, "target", "repo");
+    mkdirSync(target, { recursive: true });
+    const dir = reportsDirOf(workspaceRootOf(null, target));
+    assert.equal(dir, path.join(root, "reports", "baan"));
+    assert.ok(!path.relative(root, dir).startsWith(".."), "ต้องอยู่ในขอบเขต workspace");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  assert.equal(reportsDirOf(""), REPORTS_DIR);
 });
