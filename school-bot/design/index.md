@@ -1,19 +1,27 @@
-# school-bot — Design Index — Rev5
+# school-bot — Design Index — Rev6
 
 > หน่วยอ่าน = ไฟล์ · สารบัญล้วน · เขียนโดย system-analyst เท่านั้น · 1 แถว = 1 บรรทัด
 > วิธีอ่าน: อ่านไฟล์นี้ก่อน แล้วเปิดเฉพาะไฟล์ des-*.md / data-model.md ที่ packet/brief ระบุ — ห้าม ls ห้ามอ่านข้ามหมวด · ตาราง DES ด้านล่างคือรายชื่อไฟล์ contract ทั้งหมด
 
-## Transport — precedence ใบงาน049 (2026-10-24)
+## Gateway — transport และ local logout ปัจจุบัน
 
-Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout-slice-001.md) ตาม arch088/มติ046 — [Bcheckรอบ1](../planning/check-089-grpc-r1-001.md) FAIL119/150กำลังrework2ตามnegativeboundary; [GhelperPASS433](../planning/check-089-gateway-r1-001.md); Gtypedเดิม[FAIL258/260](../planning/check-089-gateway-typed-001.md) แก้แล้ว[parent3/3และcompile/helper433ผ่าน](../planning/slice-090-gateway-r1-001.md); [JPOพบlogleak/earlydeadline](../planning/jpo-090-gateway-r1-001.md)กำลังrework2; fullbuildติดpackagesและproduction registration ปิด
+Transport: Desktop/Web → HTTP API Gateway → gRPC SchoolBot service (B); เว็บผ่าน same-origin BFF และไม่มี direct public B fallback. Login HTTP เดิมของ G เป็นคนละขอบเขตกับ G→B service transport.
 
-**G entry ปัจจุบัน: [controller + module-owned channel Rev1](gateway-controller-entry-001.md)** ตามมติ050/Amendment049 — precedence เหนือข้อความ minimal endpoint/middleware ในเอกสาร gateway ด้านล่าง; transport/กฎ error เดิมคง.
+G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogoutService ใน controller pipeline เดิม; SmartScheme เลือก SchoolBotOpaque ตาม service prefix. Channel/client สร้างผ่าน CreateChannel/CreateGeneratedClient โดยไม่ใช้ reflection. รูปแบบ entry ตามมติ050 และ Amendment049; BL-005 ข้อ 2 ปรับเอกสารให้ตรง as-built โดยไม่เปลี่ยนสัญญา transport/error/metadata/trailer.
 
-[Negative boundary Rev1](gateway-logout-negative-boundary-001.md) จากarch089พร้อมส่งsysrework2: malformedservice metadata→Internal/INTERNAL_ERROR, exacttrace/lang/header-accounting/correlation; ไม่เพิ่มpubliccodesหรือhuman gate. Runtimehiddenheader/H5proofยังเปิด.
+| เอกสาร | ขอบเขต / สถานะปัจจุบัน |
+|---|---|
+| [Gateway integration](gateway-integration-001.md) Rev5 | topology และ controller integration; local logout มี implementation แล้ว ส่วน Login/exchange/private introspection และ integration จริงยังไม่รับรองจากหลักฐานนี้ |
+| [gRPC contract](gateway-grpc-contract-001.md) Rev2 | สัญญารวม; local logout ใช้ subset ของ packet ส่วน RPC อื่นยังเป็นข้อเสนอและมีข้อค้างเดิม |
+| [Logout slice](gateway-logout-slice-001.md) Rev1 | local logout ผ่านหลักฐาน JPO092 ตามขอบเขตที่รายงาน; ไม่มี production registration ที่รับรอง |
+| [Negative boundary](gateway-logout-negative-boundary-001.md) Rev2 | คง error pairs, metadata accounting, correlation และ trace/lang; แยกบริบท direct invocation ของ B จาก G entry |
+| [Controller entry](gateway-controller-entry-001.md) Rev2 | controller/service และ module-owned channel ตรง as-built; JPO092 ตรวจ surface และ assertion ที่เปลี่ยนความหมายแล้ว |
 
-ใบงาน057: [gRPC contract Rev1](gateway-grpc-contract-001.md) — PROPOSED; RPC/DTO, HTTP/error mapping และ trust boundary รอ G/Light/H5 โดยเฉพาะข้อยกเว้น JWT-only สำหรับ opaque session. Gateway integration Rev4 เพิ่ม pointer เท่านั้น ฐาน transport Rev3 และ gates เดิมคงอยู่.
+[JPO092](../planning/jpo-092-logout-r4-001.md): SEC001-016 CLOSED เฉพาะ local logout slice; SEC001-017 และ B UUID/Origin/binary/transport duplicate findings CLOSED ตามรายงาน. G repro 3/0, regression 5/0, extended 96/0, surface probe 6/0; B extended 2234/0 และ 8 NOT_RUN เดิม. ตัวเลขเหล่านี้รับจากรายงาน JPO ไม่ใช่การรันทดสอบใหม่ของรอบเอกสารนี้.
 
-อ่าน [Gateway integration Rev3](gateway-integration-001.md) ก่อนข้อความ transport เก่า: Desktop/Web→HTTP G→gRPC B. ฉบับปัจจุบันคือ DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3 และ HTTP rules Rev10/contract-005 Rev1; adapter Rev4 คงเดิมเพราะ HTTP/JSON outcomes เป็น Login เดิมของ G. คำอ้าง revision เก่าด้านล่างเป็นประวัติเมื่อขัดกับส่วนนี้. มาตรฐาน transport ยืนยันแล้ว; implementation/trust/tenant/H5/Light ยังต้องพิสูจน์. HTTP logout และ 4032 local tests ไม่ปิด Gateway/gRPC/DB integration.
+ยังไม่ได้ตรวจตาม JPO092: TLS/mTLS/peer จริง (H5), physical HTTP/2 hidden headers บน Kestrel, 8 wire fixtures ของ B, Program.cs/production registration, full private NuGet build, PostgreSQL/atomicity, BFF CSRF และ Light CODEOWNERS review. ไม่ปิด G-AUTH หรือรับรอง full Login/release จาก local logout.
+
+เอกสารร่วมที่อ้างอยู่: DES-004 Rev11, DES-012 Rev9, Login reuse Rev4, review packet Rev6, auth-evidence Rev4, modules Rev3, HTTP rules Rev10/contract-005 Rev1 และ Desktop adapter Rev4; BL-005 ข้อ 2 ไม่เปลี่ยน revisions หรือสัญญาของเอกสารร่วมเหล่านี้.
 
 ## Feasibility
 
@@ -39,7 +47,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 1. อ่าน `modules.md` และ `data-model.md` ก่อน DES ที่เกี่ยวข้อง
 2. “ข้อเท็จจริง” อ้าง source; “ข้อเสนอ” เป็นสัญญาที่รออนุมัติ
 3. อ่าน `quality-attributes.md` สำหรับเกณฑ์พิสูจน์ และ `risks.md` สำหรับประตูมนุษย์
-4. API ใหม่ใช้ `/v2`, JSON `snake_case` เป็น client-facing HTTP ผ่าน G; G→B ใช้ gRPC ที่ยังรอ RPC/trust mapping ตาม Gateway Rev3; DB ใช้ชื่อใน data-model ตรงตัว
+4. API ใหม่ใช้ `/v2`, JSON `snake_case` เป็น client-facing HTTP ผ่าน G; G→B ใช้ gRPC ตาม Gateway integration Rev5/gRPC contract Rev2 โดย local logout มี controller/service และ typed RPC แล้ว; RPC อื่นและ trust integration จริงยังมีข้อค้างตามสัญญา; DB ใช้ชื่อใน data-model ตรงตัว
 5. ตัวเลข bounds ใหม่เป็นข้อเสนอ SA ไม่ใช่ performance SLA ที่ผู้ใช้อนุมัติ
 6. ฉบับก่อน amendment อยู่ใน git history (ไม่คัดลอกเก็บแล้ว — ของเดิมก่อนเคลียร์ดูที่ tag `school-bot-pre-cleanup-2026-10-26`)
 7. เปิด [schoolbot.dbml](schoolbot.dbml) ใน dbdiagram.io; ขอบเขต/ข้อจำกัดของภาพอยู่ใน [schema-notes.md](schema-notes.md)
@@ -154,7 +162,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 | [data-model-history-001.md](data-model-history-001.md) | Change Log เดิม Rev1–Rev5 |
 | [data-evidence-001.md](data-evidence-001.md) / [ส่วน 2](data-evidence-002.md) | ผลเทียบ source กับแบบและขอบเขตสิ่งที่ยังไม่ยืนยัน |
 | [data-model-review-001.md](data-model-review-001.md) | ผลตรวจความครบถ้วนของคู่มือและหลักฐาน arch ใบงาน 009 |
-| [gateway-integration-001.md](gateway-integration-001.md) | Rev3 — client HTTP→G→gRPC B; รอ implementation/trust/tenant และ G/Light review; override routing/แหล่ง is_admin ของ DES-012/auth-evidence ตาม [decisions-035](../requirement/decisions-035.md); รอพิสูจน์ mapping/implementation และ H5 |
+| [gateway-integration-001.md](gateway-integration-001.md) | Rev5 — client HTTP→G controller/service→gRPC B; local logout มี implementation และหลักฐาน JPO092; คงแหล่ง is_admin ตาม decisions-035 ส่วน mapping/งาน auth อื่นและ H5/G/Light ยังมีข้อค้าง |
 
 ## Amendment 076 — 2026-10-26
 
@@ -209,7 +217,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 |---|---|
 | [gateway-outcome-component-001.md](gateway-outcome-component-001.md) | Rev1 — internal decoder มีผล local ตาม auth-flow-handoff-001; ไม่ยืนยัน full Login/Gateway/gRPC |
 | [desktop-login-adapter-001.md](desktop-login-adapter-001.md) | Rev4 — 048รับ cType category; รอ pre-auth routing/linkage proof; คง037/047; full Login ready=false |
-| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev6 — transport ตาม Gateway Rev3; category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |
+| [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md) | Rev6 — transport ตาม Gateway integration Rev5; category ตอบแล้ว; ทีมตรวจ routing/profile linkage ต่อ; device/session/H5เดิม ไม่บล็อก decoder |
 
 อ่าน037ก่อนข้อความ readiness ของ034 รวม planning/desktop-login-contract-response-001.json และ Gateway Login reuse Rev2. ไม่แก้ plan status, public contract, schema หรือ gate เดิม.
 
@@ -224,43 +232,10 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 
 ## จุดอ่าน Login reuse
 
-[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev4 — PROPOSED: reuse HTTP Login เดิมแยกจาก G→B gRPC; อ่าน DES-012 Rev9 และ Gateway integration Rev3. Desktop adapter/identity และ H5 implementation ยังรอหลักฐาน.
+[gateway-login-reuse-001.md](gateway-login-reuse-001.md) Rev4 — PROPOSED: reuse HTTP Login เดิมแยกจาก G→B gRPC; อ่าน DES-012 Rev9 และ Gateway integration Rev5. Desktop adapter/identity และ H5 implementation ยังรอหลักฐาน.
 
 ## หลักฐานลงโค้ดและตรวจรับล่าสุด
 
 [Authflowreceipt](../planning/auth-flow-handoff-001.md) และ [QAround001](../qa/round-001.md) มีลำดับสถานะเหนือข้อความ037ว่าไม่มีผลimplementation/check เฉพาะlocalcomponent/logout: codeมีแล้วและcheckPASSlocalscope. คงfullLoginready=false, PG/H5/runtime/gatesเดิม
 
 - 2026-10-24 — แก้ตาม check-061-verify4 (นายช่างสวมบท arch): schoolbot.dbml PlanCourseIds jsonb→integer[] ตรง DDL (schoolbot_db.sql:578) — annotation เท่านั้น schema ไม่เปลี่ยน; parser 10.3.1 ผ่านหลังแก้ ([evidence-003](dbml-parser-evidence-003.json): 32 ตาราง/450 ฟิลด์)
-
-## Change Log
-- 2026-10-26 — Amendment076: เพิ่ม pointers ผล expired ตาม042; LUX-05 เหลือ technical proof คง PROPOSED/schema/DTO/gates
-- 2026-10-26 — ใบงาน071: เพิ่ม pointer gap receipt Learning/UX และ Queue 004; แก้ disposition pointer ตาม036/037 โดยคงฉบับเดิมเป็นประวัติ; ไม่เปลี่ยน DES revisions/PROPOSED, counts หรือ gates
-- 2026-10-24 — Rev5: ใบงาน060a amend DES-002..007/rules/schema-notes และเชื่อมสัญญาย่อย/SA-004; เก็บก่อนแก้พร้อม SHA256; ไม่เปลี่ยน task status/scope/dependencies/gates
-- 2026-10-24 — ใบงาน057: เพิ่ม pointer ไป gateway-grpc-contract-001 Rev1 และ Gateway Rev4 เฉพาะ pointer; ไม่เปลี่ยน task status/gates/QA verdict
-- 2026-10-24 — ใบงาน050: sync operative routing/diagram/HTTP semantics และ Rev; คง schema/gates/QA และประวัติ049
-- 2026-10-24 — ใบงาน049: Gateway Rev3/DES-012 Rev8/reuse Rev3/packet Rev5 ชี้ REST→gRPC และขอบเขต HTTP logout; adapter Rev4 คงเดิม ไม่เปลี่ยน counts/tasks/QA verdict
-- 2026-10-24 — ใบงาน048: adapter/packet Rev4 override เฉพาะ cType/category/routing; คง44REQ/180AC/110pending/77TP NOT_RUN; 4032testsไม่ใช่ fullLogin acceptance
-- 2026-10-24 — รับimplementation039/038/042และcheckเฉพาะscope; ไม่แก้สัญญาหรือschemaจากผลunit tests
-
-- 2026-10-24 — ใบงาน047: adapter/packet Rev3 มี precedence เฉพาะ request bounds และ future public error mapper; component037ไม่เปลี่ยน, full Login ready=false และ plan statusเดิม
-- 2026-10-23 — ใบงาน037: เพิ่ม gateway-outcome-component Rev1; adapter/packet Rev2 อนุญาต internal web decoder โดยไม่มี production caller; full Login ready=false, ไม่มี source/SQL/runtime/check verdict ใหม่
-- 2026-10-23 — ใบงาน034: DES-004 Rev9/DES-012 Rev7/Login reuse Rev2 พร้อม Desktop adapter และ review packet; complete backend slice ยังไม่พร้อม ไม่มี source/SQL/runtime หรือ check verdict ใหม่
-- 2026-10-23 — ใบงาน032 รับ task031/Git metadata; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
-- 2026-10-23 — ใบงาน030: sync [decisions-035](../requirement/decisions-035.md) ปิดนโยบายแหล่ง is_admin (ตรวจกลุ่มแอดมิน/ผู้บริหารฝั่ง server + คง superadmin เดิม); คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด G-AUTH/H5
-- 2026-10-23 — ใบงาน029: DES-012 Rev5/auth-evidence Rev3 และ gateway-integration Rev1; คง110tasks pending/77cases NOT_RUN/Important6 OPEN ไม่ปิด gate
-- 2026-10-23 — เพิ่ม auth-evidence-001 (arch ใบงาน 020); DES-004 Rev7/DES-012 Rev4 แก้เฉพาะข้อเท็จจริง/ลิงก์ สัญญา/schema ไม่เปลี่ยน
-- 2026-10-23 — นายช่างบันทึก dbml-review-002: @dbml/core10.3.1/dbmlv2 ผ่านทั้งสองไฟล์ โครงสร้างและ SQL ไม่เปลี่ยน ปิดเฉพาะข้อค้าง parser ของ arch
-- 2026-10-23 — Rev4: sync44REQ/180AC และ review-006; ไม่เปิด gate SQL/QA/release
-- 2026-10-23 — DBML Rev4 เพิ่ม notes ทุกตาราง/450 ฟิลด์ กลุ่มสี 10 กลุ่ม และ integration 24 ตารางจากผล arch ใบงาน 010; schema/index/40 FK เดิมไม่เปลี่ยน
-- 2026-10-23 — เพิ่มคู่มือ data model Rev6, dictionary 32 ตาราง/450 ฟิลด์, แผนที่ legacy พร้อมฟิลด์เชื่อม และภาคผนวกสัญญาเดิมตามผล arch ใบงาน 009; ไม่เปลี่ยน schema/สถานะตรวจรับ
-- 2026-10-23 — แก้พาธ `school-bot-v2` → `school-bot` ตาม [decisions-031](../requirement/decisions-031.md)
-- 2026-10-22 — แปลง index เข้าโครงมาตรฐาน baan + รับ source-review-001..005 เข้าหมวด design (ย้ายจาก root โดยนายช่าง)
-- 2026-10-21 — บันทึกการเลือก OS ของผู้ใช้ตาม decisions-019; เก็บ survey เดิมเป็นหลักฐาน ไม่แก้ข้อเท็จจริง source หรืออ้าง QA ผ่าน
-- 2026-10-21 — amend OS survey Rev2 และเพิ่ม Windows10 review ตาม decisions-017; ไม่ปิด G-DELIVERY/OQ-011
-- 2026-10-21 — เพิ่ม hardware-survey-001 และ os-compatibility-001 เพื่อ BA-003/004 และ SA-003; ไม่ปิด human gates
-- 2026-10-21 — บันทึกผู้ใช้ยืนยัน DBML เป็น baseline; คงประเด็น pending ตามขอบเขตจริง ไม่ถือว่า SQL/UX/release เสร็จแล้ว
-- 2026-10-21 — Rev3: PK int4 ตาม decisions-012; คงประตู schema/compatibility เดิม
-- 2026-10-21 — Rev2: amend ตาม decisions-010/011; API รวม Login อยู่ web, ใช้ 4 DB เดิม; ยัง PROPOSED รอ schema/implementation approval
-- 2026-10-21 — Rev1: เสนอระบบเต็มตาม decisions-001–009 และตรวจ source จริงก่อนออกแบบ
-- 2026-10-21 — MYCELIUM บันทึกผล SA จาก session จริง; แยกกฎข้อมูล/HTTP จาก data-model จึงมี 13 ไฟล์ โดยคง DES-001..007 และเนื้อหาข้อเสนอเดิม
-- 2026-10-26 — ผู้คุมต่อแถวตารางสารบัญที่ถูกบรรทัดว่างคั่น ไม่เปลี่ยนเนื้อหา สถานะ หรือมติ

@@ -1,4 +1,18 @@
-# Gateway–SchoolBot gRPC contract — Rev1
+# Gateway–SchoolBot gRPC contract — Rev2
+
+## Amendment Rev2 — G entry และเจ้าของ mapping ตามมติ050 / BL-005 ข้อ 2 (2026-10-28)
+
+ส่วนนี้มี precedence เฉพาะ entry/registration/ผู้ทำ HTTP mapping ของ local logout ใน §3/§5 และคำอธิบาย implementation ใน §1/§2/§7; RPC อื่นยังคงขอบเขตข้อเสนอเดิม. ใช้ [controller entry Rev2](gateway-controller-entry-001.md) และ [logout slice Rev1](gateway-logout-slice-001.md).
+
+§3: G รับ logout ด้วย SchoolBotAuthController ใน controller pipeline เดิม. SmartScheme selector ส่ง prefix `/api/school-bot/service/v2` ไป SchoolBotOpaque ซึ่งคืน NoResult; opaque token ไม่เข้า JwtBearerHandler. ไม่ใช้ branch ก่อน UseAuthentication และไม่พึ่ง AllowAnonymous เพียงอย่างเดียว. B ยังคงเป็น authority ของ session/tenant/Channel/License/membership/revocation; การมี local entry ไม่ปิด G/Light/H5 หรือเปิด production.
+
+§5: SchoolBotAuthController ส่งงานให้ SchoolBotLogoutService; service รับ RpcException แล้วใช้ SchoolBotTrailerValidator ตรวจ peer/status/code/correlation ก่อนสร้าง HTTP response ตามสัญญาเดิม. คำว่า mapper เฉพาะ Q สำหรับ logout จึงหมายถึง service นี้ ไม่ใช่ global exception middleware และไม่ใช่ controller catch แล้วกลืน failure. HTTP validation ของ logout อยู่ใน controller/service ก่อน RPC; ข้อ 415/JSON validation ของ operation อื่นไม่ทำให้ logout เริ่ม parse JSON body.
+
+หลักฐาน G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:38–58; SchoolBotLogoutRegistration.cs:120–133; SchoolBotLogoutService.cs:40–173,185–223. Client ของ logout ใช้ CreateChannel/CreateGeneratedClient ตาม SchoolBotSessionGrpcClient.cs:17–102; คำว่า named gRPC client ใน review packet ไม่ใช่ข้ออ้างว่า logout ใช้ global client registration.
+
+ข้อความ “ยังไม่มี .proto/codegen”, “ก่อน implementation” และ “ยังไม่ได้รัน” ในฉบับแรกเป็นหลักฐาน ณ ใบงาน057 สำหรับ logout; อ่านขอบเขต wire subset จาก logout slice และผลตรวจที่ [JPO092](../planning/jpo-092-logout-r4-001.md). ไม่ถือว่า RPC Login/exchange/session/me/revoke ถูก implement หรือรับรองตามไปด้วย. สถานะปัจจุบันอยู่ที่ [index](index.md).
+
+คง DTO/field numbers, error pairs, metadata/trailer limits, deadline/retry และ transport เดิม. ไม่เลือก global mapper หรือ middleware entry เพราะมติ050 กำหนด controller และ local logout มี service รับผิดชอบ mapping อยู่แล้ว.
 
 วันที่ 2026-10-24 · ใบงาน057 · สถานะและรายการรอรับรองอยู่ที่ [index](index.md)
 
@@ -153,4 +167,5 @@ G/Light ต้องรับต่อก่อน implementation:
 ADR: ใช้ application logout เดิมแทนเขียน persistence ที่ G; ใช้ typed RPC แทน generic tunnel; ใช้ C exchange/opaque session แทนแชร์ signing secret หรือบังคับ JWT คู่; companion trailer เฉพาะ B แทนเปลี่ยน global G envelope; ไม่ retry mutation เพื่อเลี่ยง OTP/consume/commit ซ้ำ. ข้อยกเว้น tenant และ mapper ยังต้อง owner รับรอง ไม่ถือว่าร่างคือ approval.
 
 ## Change Log
+- 2026-10-28 — Rev2: มติ050 / BL-005 ข้อ 2 ชี้แจง controller/opaque scheme และ SchoolBotLogoutService เป็นผู้ทำ logout mapping; แยกหลักฐานก่อน implementation ออกจาก local logout ปัจจุบัน โดยไม่เปลี่ยน RPC/DTO/error/metadata/trailer/transport หรือ gates.
 - 2026-10-24 — Rev1: ร่าง RPC/DTO, HTTP/error mapping, trust boundary, login admission, deadlines/limits และ G/Light review packet; ไม่มี source/schema/runtime/gate delta.

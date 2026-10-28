@@ -1,4 +1,12 @@
-# Logout negative boundary — Rev1
+# Logout negative boundary — Rev2
+
+## Amendment Rev2 — ขอบเขตคำว่า directadapter ตามมติ050 / BL-005 ข้อ 2 (2026-10-28)
+
+ส่วนนี้มี precedence เฉพาะคำอธิบาย entry และหลักฐานรอบตรวจ ไม่เปลี่ยน negative boundary. G entry ปัจจุบันคือ SchoolBotAuthController → SchoolBotLogoutService ตาม [controller entry Rev2](gateway-controller-entry-001.md); direct invocation ฝั่ง G ใช้ controller/service ไม่ใช่ middleware.
+
+คำว่า directadapter ในย่อหน้าหลัง error table อยู่ในบริบทการเรียก adapter โดยตรงเพื่ออธิบายการแข่งขัน context cancellation กับ timer ฝั่ง B ไม่ใช่ชื่อ G entry. กฎ branchcontext ชนะเมื่อทั้งสอง signal พร้อมกันคงเดิม และ transport ยังอาจจบก่อนตอบ; ห้ามเปลี่ยนกฎนี้เป็นกฎของ controller G จากการแก้คำเรียก. รอบเอกสารนี้ไม่ได้ตรวจ B adapter ซ้ำ จึงไม่อ้างหลักฐาน runtime ใหม่ของ B.
+
+ข้อความรอ sys rework2 ใน Impact/limits เป็นประวัติใบงาน089; หลักฐานภายหลังอ่าน [JPO092](../planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md). คง error pairs, validation order, metadata accounting, UUID correlation, trace/lang และ runtime/H5 limitations เดิมทั้งหมด.
 
 วันที่2026-10-26 · arch CodexT1 · run `2026-10-26-11-08-46-arch-tier-t1-1agents-pAQfPC` · ผู้คุมสกัด
 
@@ -40,4 +48,5 @@
 
 ## Change Log
 
+- 2026-10-28 — Rev2: มติ050 / BL-005 ข้อ 2 แยกความหมาย directadapter ในบริบท B ออกจาก controller/service entry ของ G และระบุ rework2 เป็นประวัติ; ไม่เปลี่ยน cancellation/error/metadata/trailer หรือ transport.
 - 2026-10-26 — Rev1: สกัดnegativepairs/correlation/accounting/trace/langจากarch; ไม่ปิดH5/production/securityหรืออ้างtestsใหม่ผ่าน.

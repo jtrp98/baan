@@ -1,4 +1,16 @@
-# Gateway logout — local gRPC slice
+# Gateway logout — local gRPC slice — Rev1
+
+## Amendment Rev1 — controller entry ตามมติ050 / BL-005 ข้อ 2 (2026-10-28)
+
+Rev1 เป็นการใส่เลข revision ครั้งแรกของไฟล์นี้; เนื้อหาใบงาน088/089 ด้านล่างคงเป็นฐานและประวัติเดิม. ส่วนนี้มี precedence เฉพาะ G entry, channel construction และ harness seam ตาม [controller entry Rev2](gateway-controller-entry-001.md).
+
+HTTP adapter ของ G คือ SchoolBotAuthController → SchoolBotLogoutService สำหรับ `/api/school-bot/service/v2/auth/logout`. ใช้ AddSchoolBotLogoutModule และ MapControllers พร้อม prefix convention; SmartScheme เลือก SchoolBotOpaque แทนการแยก pipeline ก่อน authentication. ไม่มี SchoolBotLogoutMiddleware, UseSchoolBotLogout หรือ MapSchoolBotLogout เป็น entry ปัจจุบัน.
+
+Harness ฝั่ง G ใช้ AddSchoolBotLogoutModule กับ UseRouting/UseAuthentication/UseAuthorization/MapControllers; direct invocation ใช้ controller/service. Channel สร้างด้วย SchoolBotSessionGrpcClient.CreateChannel และ generated client ด้วย CreateGeneratedClient; constructor ปฏิเสธ instance ที่ไม่มี provenance ก่อน RPC. ไม่ใช้ reflection หรือ fallback ไป generated client ดิบ.
+
+หลักฐาน G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58; SchoolBotLogoutRegistration.cs:97–163; SchoolBotSessionGrpcClient.cs:17–102. ข้อความ “All packet outcomes initially NOT_RUN” เป็นประวัติเริ่มต้นของ packet; ผลตรวจภายหลังอ้าง [JPO092](../planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md).
+
+คง wire baseline, negative boundary, HTTP/RPC outcomes, limits และกฎ cancellation เดิมทุกข้อ. การเปลี่ยน harness entry ไม่อนุญาตแก้ assertion/expected/logsink นอกขอบเขตที่ controller-entry §D และ JPO ระบุ; ไม่ใช้ผล local ปิด production/H5/DB/BFF gates.
 
 วันที่ 2026-10-26 · เจ้าของ: arch Codex T1 · ผู้สกัดบันทึก: นายช่าง · ใบงาน088
 
@@ -98,6 +110,7 @@ Light implementation review; H5 listener/TLS/peer/private ingress/source-rate-li
 
 ## Change Log
 
+- 2026-10-28 — Rev1: มติ050 / BL-005 ข้อ 2 เพิ่มเลข revision ครั้งแรกและชี้แจง controller/service, module-owned channel และ harness seam; คงประวัติ088/089, wire/error/metadata/trailer/transport และ gates เดิม.
 - 2026-10-26 — ใบงาน089: เชื่อมคำชี้แจงnegativeboundaryของarchจากcheck119/150; ไม่เปลี่ยนproto/feature/gates.
 
 - 2026-10-26 — บันทึกข้อสรุปarchและtechnicalwirebaselineสำหรับrunnablelocalLogout; ไม่เพิ่มREQ/AC/taskIDหรือschema

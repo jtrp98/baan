@@ -62,3 +62,4 @@ BL-002..004 คงประวัติ/เจ้าของ/security triage �
 
 - 2026-10-28 — เพิ่ม BL-005
 - 2026-10-28 — BL-005 ข้อ (1) เสร็จ: [Amendment005](test-plan/tp-001-amendment-005.md) เพิ่ม TP001-082 ครอบ AC-036-06 (82 cases / 187 AC, actual NOT_RUN) · ข้อ (2) sweep เอกสาร gateway ยังค้าง
+- 2026-10-28 — BL-005 ข้อ (2) เสร็จ — **BL-005 ปิด**: arch Codex T1 run oJUppA เสนอ amend 6 ไฟล์ บันทึกตรงตัวแล้ว: gateway-integration Rev5, gRPC contract Rev2, logout slice Rev1 (ใส่เลขครั้งแรก), negative boundary Rev2 (แยก directadapter ฝั่ง B จาก G entry), controller entry Rev2, design/index Rev6 (เขียนสถานะปัจจุบัน เอา pointer ชั่วคราวและ Change Log ออกตามกติกา index) · sweep หลังแก้: hit ที่เหลือเป็นประวัติ/amendment หรืออ้าง Gateway Rev3 ในฐานะมติ transport ที่ยังถูก

@@ -1,4 +1,16 @@
-# Gateway integration — Rev4
+# Gateway integration — Rev5
+
+## Amendment Rev5 — G controller entry ตามมติ050 / BL-005 ข้อ 2 (2026-10-28)
+
+ส่วนนี้มี precedence เฉพาะรูปแบบ G entry/registration และข้อความ readiness ของ local logout ใน Rev1–Rev4 ด้านล่าง ตาม [controller entry Rev2](gateway-controller-entry-001.md). เส้นปัจจุบันคือ client HTTP → SchoolBotAuthController → SchoolBotLogoutService → typed gRPC client → B; เว็บยังผ่าน BFF และไม่มี direct public B fallback.
+
+G ใช้ controller กับ `/api` prefix convention เดิม โดย module ลงทะเบียนผ่าน AddSchoolBotLogoutModule และรับ route ผ่าน MapControllers. SmartScheme เลือก SchoolBotOpaque สำหรับ `/api/school-bot/service/v2`; handler คืน NoResult ไม่แปลง opaque token เป็น JWT. จึงไม่ใช้ public relay branch ก่อน UseAuthentication/UserEnricher, minimal endpoint หรือ SchoolBotLogoutMiddleware. AllowAnonymous ของ logout ทำงานร่วมกับ scheme selector ไม่ใช่มาตรการแยก token เพียงอย่างเดียว.
+
+ข้อเท็จจริงจาก G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58, SchoolBotLogoutRegistration.cs:15–28,97–163 และ SchoolBotLogoutService.cs:24–223. Channel/client สร้างผ่าน CreateChannel/CreateGeneratedClient และตรวจ provenance โดยไม่ใช้ reflection ตาม SchoolBotSessionGrpcClient.cs:17–102. ผลตรวจ local และข้อที่ยังไม่ได้ตรวจอ่านจาก [JPO092](../planning/jpo-092-logout-r4-001.md) และ [index](index.md).
+
+ข้อความว่าไม่พบ SchoolBot route/ยังต้องเริ่ม transport implementation ในหลักฐานรอบเก่าเป็นประวัติของรอบนั้น ไม่ใช่สถานะ local logout ปัจจุบัน; ไม่ขยายผลไป Login/exchange/private introspection หรือ production. คง transport, authority ของ B, error/metadata/trailer และ gates เดิมทั้งหมด.
+
+เหตุผล: ใช้ controller convention ที่มติ050 เลือกและโค้ดใช้อยู่แล้ว; ไม่เลือก middleware/minimal entry หรือ HTTP relay เพราะเป็นรูปแบบที่ถูกแทนแล้ว ไม่ได้เพิ่มทางเลือก transport ใหม่.
 
 ## Pointer amendment Rev4 — ใบงาน057 (2026-10-24)
 
@@ -124,6 +136,7 @@ Task: DES-012 §2/§4, C11/TR-AUTH-02; Reference: มติ025 H3/026 และ 
 มีลำดับเหนือข้อเสนอ HTTP adapter/HttpClient และการปัด gRPC ด้านบน: `G/AGENTS.md:29` กำหนด REST→gRPC ไป service; `:35,37` กำหนด tenant จาก JWT และ Light review ส่วน hosting/auth pipeline. ข้อเสนอ relay opaque Bearer เดิมจึงมี owner-review gap ทั้ง transport/tenant boundary. คง topology ผ่าน G และ private introspection แยกจาก public service-route; ให้ G/Light กับ B ระบุวิธีที่สอดคล้องมาตรฐานหรือข้อยกเว้นที่ได้รับอนุมัติก่อน implement. ไม่สร้าง proxy/framework/proto หรือเลือก transport ใหม่ในงานนี้. Login เดิมและ local DI ports ไม่พิสูจน์ว่า SchoolBot route พร้อม ดู [reuse](gateway-login-reuse-001.md).
 
 ## Change Log
+- 2026-10-28 — Rev5: มติ050 / BL-005 ข้อ 2 ปรับคำอธิบาย G entry เป็น controller/service และ module-owned channel ตาม as-built; จำกัดข้อความ implementation เดิมให้เป็นประวัติของรอบตรวจ คง transport/error/metadata/trailer/schema และ gates เดิม.
 - 2026-10-24 — Rev4: ใบงาน057 เพิ่ม pointer สัญญา gRPC Rev1; คง transport/auth/schema/gates เดิม
 - 2026-10-24 — Rev3: ใบงาน049 ยก REST→gRPC ขึ้นเป็น topology ปัจจุบัน; แยก HTTP logout as-built/ผล local tests จาก transport integration; คงประวัติและ H5/Light
 - 2026-10-23 — Rev2: ใบงาน032 ระบุข้อขัดกัน HTTP relay กับกฎ G; คง035/C/H5 และไม่อนุมัติข้อยกเว้นแทน owner

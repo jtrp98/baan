@@ -1,4 +1,14 @@
-# Gateway SchoolBot entry — controller + module-owned channel (Rev1)
+# Gateway SchoolBot entry — controller + module-owned channel (Rev2)
+
+## Amendment Rev2 — หลักฐาน as-built หลังมติ050 / BL-005 ข้อ 2 (2026-10-28)
+
+Rev2 ไม่เปลี่ยนแบบ entry/channel ของ Rev1. เอกสาร gateway-integration Rev5, gateway-grpc-contract Rev2, gateway-logout-slice Rev1 และ gateway-logout-negative-boundary Rev2 อธิบาย entry ปัจจุบันไว้ในแต่ละไฟล์แล้ว; ไม่ต้องอาศัย pointer ชั่วคราวใน index เพื่อเลือกแบบ.
+
+ข้อเท็จจริงจาก G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58 เรียก SchoolBotLogoutService; SchoolBotLogoutRegistration.cs:97–163 ลงทะเบียน module/controller และ selector; SchoolBotSessionGrpcClient.cs:17–102 สร้าง channel/client และตรวจ provenance. ไม่พบ SchoolBotLogoutMiddleware.cs หรือ UseSchoolBotLogout/MapSchoolBotLogout ใน source กลุ่มนี้ และไม่พบการใช้ System.Reflection/BindingFlags.
+
+ชื่อ marker ใน as-built มีทั้ง SchoolBotLogoutModuleMarker และ SchoolBotLogoutMarker; registration เพิ่มทั้งสอง และ gate ยอมรับเมื่อพบอย่างใดอย่างหนึ่ง ตาม SchoolBotLogoutRegistration.cs:41–57,101–107. Options.Enabled มีค่าเริ่มต้น true ตาม SchoolBotLogoutOptions.cs:5. นี่เป็นรายละเอียด implementation ปัจจุบัน ไม่ใช่ข้อเสนอเปลี่ยน gate.
+
+ข้อ A ที่ระบุสมมติฐาน selector, ตาราง §D และรายการ §E เป็นบริบท ณ ออก Rev1 ก่อน JPO. อ่านผล surface probe และการประเมิน assertion ที่ [JPO092](../planning/jpo-092-logout-r4-001.md); สถานะปัจจุบันและขอบเขตที่ยังไม่ได้ตรวจอยู่ใน [index](index.md). ผล local ไม่ขยายเป็นการรับรอง production/H5/Light/DB/BFF.
 
 วันที่2026-10-28 · arch AGY T1 (gemini-4-argon-high) run 2026-10-28-06-13-11-arch-tier-t1-1agents-vMHqG4 DONE · นายช่างสกัด · ตาม[มติ050](../requirement/decisions-050.md) + Amendment [มติ049](../requirement/decisions-049.md)
 
@@ -53,4 +63,5 @@ Assertion ที่ความหมายเปลี่ยน (JPO อิส�
 
 ## Change Log
 
+- 2026-10-28 — Rev2: มติ050 / BL-005 ข้อ 2 ผูกแบบกับ as-built และหลักฐาน JPO092, ระบุชื่อ marker จริง และจำกัดข้อความก่อน JPO ให้เป็นประวัติ; ไม่เปลี่ยน entry/channel contract, error/metadata/trailer/transport หรือ gates.
 - 2026-10-28 — Rev1 จาก arch vMHqG4 ตามมติ050 + Amendment049
