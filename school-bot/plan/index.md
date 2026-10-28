@@ -4,7 +4,7 @@
 
 ## Release Scope
 
-Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกตามคำสั่งผู้ใช้ 2026-10-28 — พฤติกรรมเดิม ไม่ใช่ feature ใหม่; TP ยังไม่มี case) / 81 TP cases ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ [tasks-001.json](tasks-001.json)
+Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกตามคำสั่งผู้ใช้ 2026-10-28 — พฤติกรรมเดิม ไม่ใช่ feature ใหม่) / 82 TP cases (TP001-082 ครอบ AC-036-06 ตาม [Amendment005](../test-plan/tp-001-amendment-005.md)) ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ [tasks-001.json](tasks-001.json)
 
 ## Waiting on Human
 

@@ -61,3 +61,4 @@ BL-002..004 คงประวัติ/เจ้าของ/security triage �
 - ขอบเขต: ไม่เพิ่ม feature/scope · งานเอกสารของ inspect/arch
 
 - 2026-10-28 — เพิ่ม BL-005
+- 2026-10-28 — BL-005 ข้อ (1) เสร็จ: [Amendment005](test-plan/tp-001-amendment-005.md) เพิ่ม TP001-082 ครอบ AC-036-06 (82 cases / 187 AC, actual NOT_RUN) · ข้อ (2) sweep เอกสาร gateway ยังค้าง

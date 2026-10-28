@@ -2,7 +2,7 @@
 
 [แผนทดสอบและ expected evidence](tp-001.md) · [ข้อมูลสำหรับเครื่อง](traceability-001.json)
 
-ตารางนี้และ raw/Joined JSON คง snapshot180 AC/77 cases. Coverage ปัจจุบัน81 cases/186 AC อ่าน TP Amendment003 และ [Amendment004](tp-001-amendment-004.md): AC-046-07 → TP001-081 ตาม decisions-042; ไม่เพิ่มแถวใน snapshot ไม่ใช่ QA PASS
+ตารางนี้และ raw/Joined JSON คง snapshot180 AC/77 cases. Coverage ปัจจุบัน 82 cases / 187 AC อ่าน TP Amendment003, [Amendment004](tp-001-amendment-004.md) และ [Amendment005](tp-001-amendment-005.md) (ส่วนต่อท้ายไฟล์นี้): AC-046-07 → TP001-081 ตาม decisions-042; ไม่เพิ่มแถวใน snapshot ไม่ใช่ QA PASS
 
 ผู้คุม join implementation/validation จาก canonical plan/tasks-001.json revision2 โดยตรง ไม่เปลี่ยน owner หรือ status; ทุก Actual=NOT_RUN
 
@@ -191,7 +191,17 @@
 | [AC-052-04](../requirement/req-052.md) | TP001-075 | BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
 | [AC-052-05](../requirement/req-052.md) | TP001-076 | BE-037/sys, BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
 
+## ส่วนต่อ Traceability หลัง snapshot 180/77 — Amendment005
+
+> ตารางหลักด้านบนคง 180 แถวตรงกับ `traceability-001.json` · AC ที่เพิ่มใน Amendment003 (AC-030-04..08 → TP001-080) และ Amendment004 (AC-046-07 → TP001-081) อ่านในไฟล์ amendment ของตน · รายการนี้เพิ่มเฉพาะ Amendment005 · coverage ปัจจุบัน 187 AC / 82 cases
+
+| AC | Case IDs | Implementation / role | Validation | Actual |
+| --- | --- | --- | --- | --- |
+| [AC-036-06](../requirement/req-036.md) | [TP001-082](tp-001-amendment-005.md) | BE-006/sys, BE-039/sys, FE-002/front | QA-001/check | NOT_RUN |
+
 ## Change Log
+
+- 2026-10-28 — Amendment005: เพิ่มส่วนต่อ traceability AC-036-06 → TP001-082 (BE-006/sys, BE-039/sys, FE-002/front → QA-001/check); คงตารางหลัก 180 แถวและ JSON snapshot 180/77 ทุก actual NOT_RUN
 
 - 2026-10-26 — ใบงาน078: เพิ่ม pointer Amendment004/AC-046-07; คง180แถว/77 case IDs/owners/actualและ JSONเดิม ไม่มี test execution
 

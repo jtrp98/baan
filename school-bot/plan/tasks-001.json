@@ -4,7 +4,7 @@
   "kind": "pm_canonical_plan",
   "amendment_065": {
     "date": "2026-10-26",
-    "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index/tasks ปัจจุบัน15verified/95pending ตาม planning/status-sync-062-001.json; ไม่เพิ่ม verdict/ปิด gate. 44REQ/187AC(+AC-036-06 2026-10-28)/81TP/110tasks/8phases/17gates ตาม decisions-042/spec075/inspect078; snapshot180/77คงเดิม อ่าน test-plan/tp-001-amendment-004.md; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
+    "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index/tasks ปัจจุบัน15verified/95pending ตาม planning/status-sync-062-001.json; ไม่เพิ่ม verdict/ปิด gate. 44REQ/187AC(+AC-036-06 2026-10-28)/82TP(+TP001-082 Amendment005)/110tasks/8phases/17gates ตาม decisions-042/spec075/inspect078; snapshot180/77คงเดิม อ่าน test-plan/tp-001-amendment-004.md; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
     "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-062.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"]
   },
   "phases": [

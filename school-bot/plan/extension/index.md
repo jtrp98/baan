@@ -1,6 +1,6 @@
 # SchoolBot — Index งานย่อย Rev2
 
-เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-006](../queue-006.md); JSON sync15verified/95pendingแล้วตาม [status-sync](../../planning/status-sync-062-001.json); ไม่เพิ่ม verdict. ปัจจุบัน44REQ/187AC(+AC-036-06)/81TP ตาม042/078; อ้าง [หลักฐานปัจจุบัน](../index.md#release-scope).
+เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-006](../queue-006.md); JSON sync15verified/95pendingแล้วตาม [status-sync](../../planning/status-sync-062-001.json); ไม่เพิ่ม verdict. ปัจจุบัน44REQ/187AC(+AC-036-06)/82TP(+TP001-082) ตาม042/078; อ้าง [หลักฐานปัจจุบัน](../index.md#release-scope).
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
