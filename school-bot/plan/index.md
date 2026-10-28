@@ -4,7 +4,7 @@
 
 ## Release Scope
 
-Frozen: ระบบเต็ม 44 REQ / 186 AC / 81 TP cases ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ [tasks-001.json](tasks-001.json)
+Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกตามคำสั่งผู้ใช้ 2026-10-28 — พฤติกรรมเดิม ไม่ใช่ feature ใหม่; TP ยังไม่มี case) / 81 TP cases ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ [tasks-001.json](tasks-001.json)
 
 ## Waiting on Human
 
@@ -60,7 +60,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
 | [BE-004](BE-004.md) | Signed lease | be | P2 | BE-003 | pending |
 | [BE-005](BE-005.md) | Key transfer | be | P2 | BE-004 | pending |
-| [BE-006](BE-006.md) | Login/session | be | P3 | BE-007, BE-001 | pending |
+| [BE-006](BE-006.md) | Login/session | be | P3 | BE-007, BE-001 | **done-local** (slice gRPC logout AC-036-06 local — [check092](../planning/check-092-grpc-r3-001.md)/[jpo092](../planning/jpo-092-logout-r4-001.md); full Login ยังค้าง) |
 | [BE-007](BE-007.md) | Host entitlement | be | P2 | BE-005, SEC-001 | pending |
 | [DBA-004](DBA-004.md) | Projects DDL | dba | P3 | DBA-001, SA-001, BA-001 | pending |
 | [BE-008](BE-008.md) | Cloud projects | be | P3 | BE-006, DBA-004 | pending |

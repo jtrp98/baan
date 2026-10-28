@@ -5,7 +5,7 @@
 
 ## สถานะปัจจุบัน (2026-10-26)
 
-- **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 95 pending · 8 phases / 17 gates · 44 REQ / 186 AC / 81 TP cases — ดู [plan/index.md](plan/index.md)
+- **แผน**: 110 tasks — 15 verified (งานเอกสารทั้งหมด) / 2 done-local (BE-006, BE-039 slice logout) / 93 pending · 8 phases / 17 gates · 44 REQ / 187 AC (AC-036-06 เพิ่ม 2026-10-28) / 81 TP cases — ดู [plan/index.md](plan/index.md)
 - **คิว**: กำลังเดิน CONTINUE-NORMAL [ใบงาน091](planning/task-091.md) ต่อ090 ตาม [Queue 007](plan/queue-007.md) (21localready/5partial/37waitingจาก63tasks); [ใบงาน092](planning/task-092.md) ตาม[มติ049](requirement/decisions-049.md)/[050](requirement/decisions-050.md): logout transport local slice ผ่านครบ — B [checkPASS2234/0](planning/check-092-grpc-r3-001.md), G controller r4 parent96/5/3/433 และ[JPO092](planning/jpo-092-logout-r4-001.md) SEC001-016 CLOSED เฉพาะlocal; production/H5ยังปิด; Localoverlay63pass26fail1skip; [archpacketพร้อม](design/local-project-boundary-001.md)GoR1DONEรอcheck; [Entry66PASS/shellclosecauseFAIL](planning/check-091-front-entry-001.md)กำลังFrontR1; checkGo/checkBackendขนานFrontR1close-reasonไม่เกิน3
 - **โค้ด**: AuthPASS45; [Mathหลังแก้PASS70+9](planning/check-090-math-r1-001.md) ownerlabelpatchติดตั้งแล้ว[parent4147ผ่าน](planning/slice-090-grpc-math-parent-001.md); [Localprojects](planning/slice-089-local-projects-001.md) parentoverlay63pass26fail1skip; archpacketพร้อม/[GoR1parentregressionผ่าน](planning/slice-091-local-projects-r1-001.md)รอcheckGo/[fuelRun-onlyชัดแล้ว](planning/spec-090-draft-fuel-001.md); [Bcheckรอบ1](planning/check-089-grpc-r1-001.md) เดิมFAIL119/150; parent150ผ่านแต่[finalcheckFAIL2222/12/8](planning/check-090-grpc-r2-001.md)หลัง2reworks; [GhelperPASS](planning/check-089-gateway-r1-001.md)433/433; [Gtypedcheck](planning/check-089-gateway-typed-001.md) เดิมFAIL258/260; [fix parent3/3](planning/slice-090-gateway-r1-001.md)[JPOพบlogleak](planning/jpo-090-gateway-r1-001.md)[parent5/5หลังrework2](planning/slice-091-gateway-r2-001.md)แต่[JPO2FAIL81/15](planning/jpo-091-gateway-r2-001.md)ครบ2reworks. [BE003/028helpersparent4147ผ่าน](planning/slice-091-pure-backend-001.md)รอcheck; FullGbuildติดpackages; ยังไม่เปิดgRPCproduction/fullLogin/DBintegration
 - **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)); [เชื่อมต่อจริงสำเร็จ](db/connection-001.md) จาก `web/.env`: SELECT 1 ผ่าน พบ public SchoolBot* 32 ตาราง (PostgreSQL 15.19); ยังไม่ตรวจ schema parity/revision และ API integration
@@ -20,12 +20,12 @@
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 186 AC — DRAFT · decisions-001..050 |
+| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 187 AC — DRAFT · decisions-001..050 |
 | `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
 | `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev8 / rules Rev10 / DBML Rev7 (32 ตาราง); constraints เหลือเฉพาะ PK32 ตามใบงาน086; DES-001..012 PROPOSED |
 | `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 15 verified / 95 pending |
 | `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases / 186 AC (Amendment004); traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
+| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 81 cases / 186 AC (Amendment004) — AC-036-06 ยังไม่มี case; traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
 | [qa/index.md](qa/index.md) | สารบัญ QA findings | GhelperPASS433/AuthPASS45/MathPASS70+9; BgRPC rework3 checkPASS2234/0 ([check092](planning/check-092-grpc-r3-001.md)); Glogout r4 JPO PASS96/0 ([jpo092](planning/jpo-092-logout-r4-001.md)); GtypedFAIL258/260→rework1/jpo; Localprojectsรอcheck; PG/fullLogin NOT_RUN |
 | [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | เซ็นครบ 7/7 รวม delta042 (decisions-043) |
 | [security.md](security.md) | ผลตรวจความปลอดภัย | Important6/Medium6/Minor3OPEN (SEC001-016 CLOSED local ตาม[JPO092](planning/jpo-092-logout-r4-001.md)); [JPO2](planning/jpo-091-gateway-r2-001.md)16OPEN/17CLOSEDlocalfix; Importantเดิม6คงOPEN |

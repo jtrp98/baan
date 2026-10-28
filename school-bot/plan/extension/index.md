@@ -1,6 +1,6 @@
 # SchoolBot — Index งานย่อย Rev2
 
-เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-006](../queue-006.md); JSON sync15verified/95pendingแล้วตาม [status-sync](../../planning/status-sync-062-001.json); ไม่เพิ่ม verdict. ปัจจุบัน44REQ/186AC/81TP ตาม042/078; อ้าง [หลักฐานปัจจุบัน](../index.md#release-scope).
+เป็นส่วนต่อของ [plan/index](../index.md); Amendment065 (2026-10-26): ส่วนต่อนี้ verified4/pending32 ตาม verdict061 รวมทั้งแผน verified15/pending95. ข้อความ pending ทุกงานเป็นฐาน Rev2 ที่ถูก supersede; คง scope/IDs/DAG/effort/owner/tier/gates. คิวปัจจุบัน [queue-006](../queue-006.md); JSON sync15verified/95pendingแล้วตาม [status-sync](../../planning/status-sync-062-001.json); ไม่เพิ่ม verdict. ปัจจุบัน44REQ/187AC(+AC-036-06)/81TP ตาม042/078; อ้าง [หลักฐานปัจจุบัน](../index.md#release-scope).
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
@@ -19,7 +19,7 @@
 | [BE-036](../BE-036.md) | ทำ preview snapshot/แปลงคะแนน | sys | P5 | BE-035, BE-033 | pending |
 | [BE-037](../BE-037.md) | ทำ grade writer/ชน/CAS/receipt | sys | P5 | BE-036, SA-004, DBA-007, TP-003 | pending |
 | [BE-038](../BE-038.md) | ทำ export outbox/authz/replay/recovery | sys | P5 | BE-037, BE-032 | pending |
-| [BE-039](../BE-039.md) | ทำ web-principal/BFF/session และ staff bootstrap | sys | P0 | BE-001, SA-001, SEC-001 | pending |
+| [BE-039](../BE-039.md) | ทำ web-principal/BFF/session และ staff bootstrap | sys | P0 | BE-001, SA-001, SEC-001 | **done-local** (slice Gateway logout AC-036-06 local — [slice r4](../../planning/slice-092-gateway-r4-001.md)/[jpo092](../../planning/jpo-092-logout-r4-001.md); web-principal/BFF ยังค้าง) |
 | [FE-017](../FE-017.md) | เชื่อม Guest export/ถังขยะ | front | P3 | FE-003, BE-024, UX-002 | pending |
 | [FE-018](../FE-018.md) | เชื่อมเลือกนำเข้า project/history | front | P5 | FE-017, BE-025, BE-026, UX-002, UX-004 | pending |
 | [FE-019](../FE-019.md) | เชื่อม admin หลักสูตร/revision/นำเข้า | front | P5 | BE-027, BE-028, UX-005 | pending |

@@ -53,3 +53,11 @@ Append-only เพิ่ม BL-NNN พร้อมวันที่ ที่�
 ## คำชี้แจงต่อท้าย — precedence051 (2026-10-24)
 
 BL-002..004 คงประวัติ/เจ้าของ/security triage เดิม. เฉพาะข้อความ BL-004 ว่ารอตกลงแหล่ง is_admin ถูก supersede โดย035 ที่ตอบแล้ว; ไม่เปิดคำถามธุรกิจซ้ำ. งานเดิม SA-001/BE-006/BE-039 อ่าน [queue-003](plan/queue-003.md) และ [Gateway Rev3](design/gateway-integration-001.md): client→HTTP G→gRPC B; ไม่มีHTTP relay/direct public B. ค้างimplementation/trust/tenant/H5/Light; รอบนี้docs-only ไม่เพิ่มscope/BL/task.
+
+### BL-005 — test case สำหรับ AC-036-06 (logout) และ sweep เอกสาร gateway ตามมติ050
+
+- วันที่: 2026-10-28 · ที่มา: [ใบงาน092](planning/task-092.md), spec run 5OJQP0, arch run vMHqG4 · ผู้บันทึก: นายช่าง
+- รายละเอียด: (1) AC-036-06 เพิ่มแล้วแต่ test-plan ยังครอบ 186 AC/81 cases — ต้องให้ `inspect` เพิ่ม case/traceability (TP-001 amendment ถัดไป) ก่อน slice logout จะเป็น verified ได้ (2) เอกสาร gateway-integration-001 / gateway-grpc-contract-001 §3/§5 / gateway-logout-slice-001 / negative-boundary (`directadapter`) / design index ยังพูดถึง minimal endpoint/middleware — ตอนนี้ใช้ pointer precedence ไป [gateway-controller-entry-001](design/gateway-controller-entry-001.md); ต้อง arch amend ตามรายการบรรทัดใน arch E
+- ขอบเขต: ไม่เพิ่ม feature/scope · งานเอกสารของ inspect/arch
+
+- 2026-10-28 — เพิ่ม BL-005

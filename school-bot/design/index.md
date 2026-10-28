@@ -162,7 +162,7 @@ Local dev slice ปัจจุบัน: [Gateway logout packet](gateway-logout
 
 ## ช่องว่าง Learning/UX — ใบงาน071
 
-[Packet091](../planning/arch-091-learning-001.md)พร้อมlocalcontractsต่อจาก[gapreceipt](learning-ux-contract-gaps-001.md): LUX01/03draftread-edit, LUX04resume/read/reveal, LUX05finalizer/recovery, LUX06completefixtureprojection. LUX02validatorพร้อมแต่persistรอsourceidentity/newcolumnproposal; LUX07manifestdraftรอownerreview. Schema/storageproposalยังไม่อนุมัติ; roster/term/H5/DBruntimeยังOPEN ไม่ใช่gatepassed. คิว[007](../plan/queue-007.md)/[091](../planning/task-091.md); 44REQ186AC81TP/15verified95pending/32tables17gatesคงเดิม.
+[Packet091](../planning/arch-091-learning-001.md)พร้อมlocalcontractsต่อจาก[gapreceipt](learning-ux-contract-gaps-001.md): LUX01/03draftread-edit, LUX04resume/read/reveal, LUX05finalizer/recovery, LUX06completefixtureprojection. LUX02validatorพร้อมแต่persistรอsourceidentity/newcolumnproposal; LUX07manifestdraftรอownerreview. Schema/storageproposalยังไม่อนุมัติ; roster/term/H5/DBruntimeยังOPEN ไม่ใช่gatepassed. คิว[007](../plan/queue-007.md)/[091](../planning/task-091.md); 44REQ187AC81TP/15verified2done-local93pending/32tables17gatesคงเดิม.
 
 | สัญญา091 | ขอบเขตปัจจุบัน |
 |---|---|

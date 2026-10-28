@@ -48,7 +48,7 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 | REQ-033 | ชื่อและฟิลด์ข้อมูล SchoolBot | DRAFT | 5 | [req-033.md](req-033.md) |
 | REQ-034 | ตรวจ License ออนไลน์และสิทธิ์ออฟไลน์ 3 วัน | DRAFT | 6 | [req-034.md](req-034.md) |
 | REQ-035 | ผู้ดูแลปลดเครื่องและย้าย Key เดิม | DRAFT | 5 | [req-035.md](req-035.md) |
-| REQ-036 | Guest Local และ Login Cloud | DRAFT | 5 | [req-036.md](req-036.md) |
+| REQ-036 | Guest Local และ Login Cloud | DRAFT | 6 | [req-036.md](req-036.md) |
 | REQ-037 | หลักสูตรและภารกิจสามโหมด | DRAFT | 6 | [req-037.md](req-037.md) |
 | REQ-038 | ประเมิน Code/Block อัตโนมัติและ Arm โดยครู | DRAFT | 5 | [req-038.md](req-038.md) |
 | REQ-039 | ความคืบหน้าและการติดตามโดยครู | DRAFT | 5 | [req-039.md](req-039.md) |
@@ -66,7 +66,7 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 | REQ-051 | คะแนนชนและการคุ้มครองคะแนนครู | DRAFT | 5 | [req-051.md](req-051.md) |
 | REQ-052 | สิทธิ์ การส่งซ้ำ และ audit คะแนน | DRAFT | 5 | [req-052.md](req-052.md) |
 
-รวม 44 REQ / 186 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
+รวม 44 REQ / 187 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
 
 ประวัติ REQ-046: [req-046-history-001.md](req-046-history-001.md)
 
