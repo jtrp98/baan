@@ -2,6 +2,26 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.20.0 — 2026-10-28 · งานต้องจบได้: check มีขอบเขต + เส้นชัยตรึงต่อ task + ถามทันทีเมื่อติดเพดาน rework + สถานะราย slice
+
+ที่มา: วิเคราะห์ school-bot — 91 ใบงานแต่ไม่มีงานโค้ด verified/done-local สักงาน · check gRPC logout สร้างเคสเองถึง 2222 เคสแล้วตกที่ header ซ้ำของ test server หลังแก้ 2 รอบ · เรื่องติดเพดานถูกพักไว้ "ท้ายวง" ที่ไม่เคยมาถึง · วันเดียวมี check 31 runs/267 นาทีเทียบ writer 26 runs · คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local สักงาน
+
+### ⚠ ต้องทำตอนอัปเกรด
+- **prompt รันต่อของ workspace** (เช่น `CONTINUE-NORMAL.md`/`CONTINUE.md`) ที่สั่ง "ถามประตูมนุษย์ทีเดียวตอนจบ" ต้องเพิ่มข้อยกเว้น: ติดเพดาน rework = หยุดเปิดงานใหม่แล้วถามทันที · ใบงาน check/jpo ต้องระบุ oracle (AC ids + test-plan cases + revision ของ design) · ลง done-local/verdict ราย slice ในไฟล์แผน (schoolbright แก้แล้ว)
+- **`baan --lint-plan` exit 1 เพิ่ม** เมื่อ task อ้าง `verified` แต่ `slices` ที่ verified ยังไม่ครอบ `ac_ids` ครบ, slice ไม่ระบุ AC หรืออ้าง AC นอก task — แผนที่ไม่มีฟิลด์ `slices` ไม่กระทบ
+- **task ที่ติดเพดาน rework อยู่แล้ว** (เช่น school-bot: B gRPC, G JPO) — session ถัดไปจะหยุดถามเรื่องเหล่านี้ก่อนเปิดงานใหม่
+
+### เพิ่ม
+- **charter ข้อ 12 "งานต้องจบได้"** — ตรึง oracle ต่อ task (กฎที่ arch ออกหลังเปิด task ผูกกับ task ถัดไป) · ติดเพดาน rework (แก้ครบ 2 รอบยังตก หรือ jpo ยังมี Critical/Important) = หยุดเปิดงานใหม่แล้วถามทันทีแม้ในโหมด "ทำจนหมดงานแล้วถามทีเดียว" · งานตรวจกิน slot ได้ไม่เกินครึ่ง
+- **สถานะราย slice** — task ใน JSON ของแผนเก็บ `"slices": [{ "id", "ac_ids", "status" }]` · task เป็น `verified` เมื่อ slice ที่ verified ครอบ `ac_ids` ครบ · มี slice done-local/verified แล้ว task อย่างน้อย `done-local` · นายช่างลงในไฟล์แผนตอนปิด slice ทันที
+- **progress lint ใน `--lint-plan`** — แสดงความคืบหน้างาน implement (verified/done-local/slice) · error เมื่อสถานะอ้างเกินหลักฐาน · warning (ไม่กระทบ exit code) เมื่อ slices ไปไกลกว่าสถานะที่ลงไว้ หรือเอกสาร verified ≥ 5 งานแต่งานโค้ดยังไม่มี done-local/verified (แผน school-bot จริง: 15 เทียบ 0)
+
+### เปลี่ยน
+- **role check มีขอบเขต** — เอาประโยค "haven't looked hard enough" ออก · ตัดสินตาม AC/test-plan/revision ที่ระบุตอนเปิด task และเขียน revision ไว้หัวรายงาน · เคสเพิ่มไม่เกิน 20 ต่อ task ห้ามชุดเคสแบบ combinatorial · FAIL เฉพาะ scoped AC ตก หรือ Critical/Important ที่เกิดได้จริงใน deployment ตามแบบ (artefact ของ test host/hardening = backlog) · re-check หลังแก้ = เคสที่ตกรอบก่อน + regression · verdict ราย slice
+- **role jpo** — re-audit ครอบเฉพาะ finding ที่ทวน + สิ่งที่การแก้เปลี่ยน · ของใหม่เป็น finding แยก ไม่รีเซ็ตรอบ rework
+- **CONVENTIONS §10 / role gm** — เพดาน rework = คนตัดสินทันที · finish line ตรึงต่อ task · บันทึก slices พร้อม `ac_ids` ที่แน่นอน
+- tests 121 → 129
+
 ## 0.19.0 — 2026-10-26 · ตัวรันไม่ล้มเงียบ: retry เมื่อโมเดลเต็ม + เหตุล้มอยู่ใน report + agy โหมดเขียนอ่านนอก cwd
 
 ที่มา: run จริงของ school-bot — codex T2 ล้มทันทีด้วย `ERROR: Selected model is at capacity` (สั่ง `--no-fallback` จึงไม่มีทางรอด) และ agy T3 โหมดเขียน (cwd = target) อ่าน knowledge ไม่ได้ จบ exit 0 คำตอบว่าง · ทั้งสองกรณี `report.json` มี `error` ว่าง ต้องเปิด stderr เองถึงรู้เหตุ
