@@ -146,4 +146,5 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 | [decisions-046.md](decisions-046.md) | อนุญาตพัฒนา Gateway บน branch ที่เตรียมไว้; อนุมัติ create-license replay 15 นาที; custody กุญแจเซ็นยังรอคำอธิบาย/คำตอบ |
 | [decisions-047.md](decisions-047.md) | ผู้ใช้พักเรื่อง signer/custody ของ License ไว้ก่อน; คำอนุญาต dev Gateway และ replay 15 นาทีคงเดิม |
 | [decisions-048.md](decisions-048.md) | ปิดผลสามงานที่กำลังรันแล้วหยุดก่อน ไม่เปิดงานชุดถัดไป; เก็บข้อค้างไว้รอบหน้า |
+| [decisions-049.md](decisions-049.md) | อนุมัติแก้รอบ 3 แบบแคบหนึ่งรอบ: B gRPC raw wire boundary และ Gateway log/channel boundary พร้อม check/JPO ซ้ำด้วย oracle เดิม; ไม่ใช่ risk acceptance |
 

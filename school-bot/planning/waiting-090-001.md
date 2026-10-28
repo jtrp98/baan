@@ -18,3 +18,7 @@
 2026-10-26 [GJPO2+parent96](jpo-091-gateway-r2-001.md)81pass15failยืนยันSEC001-016ImportantยังOPENหลัง2reworks. รวมข้อ1: แนะนำอนุมัติเพิ่มหนึ่งรอบเฉพาะBrawmetadata/wireและGmodule-ownedpublicchannel/logboundary+rejectunsafeclientก่อนRPC แล้วcheck/JPOซ้ำ; อีกทางพักสองslice/productionoff. Minor17fixverifiedlocalCLOSED; BtriageMedium/Minorไม่cross-tenantproofแต่ยังQAFAIL. ไม่เสนอรับriskเป็นdefault/ไม่r3เอง.
 
 Storageproposalใหม่จาก[arch091](arch-091-learning-001.md): AuditReason2048และLesson.ImportSourcejsonbNULL. **ยังไม่ถามจนvaultตรวจimpact/guardedup-downDRAFT/evidenceพร้อมreview**; baselineDDL/model/DBMLไม่เปลี่ยน. OwnerAcademicresolverต้องหาlocalsourceเพิ่มก่อนรวมคำถามที่เหลือจริง ไม่ถามสิ่งที่ทีมยังพิสูจน์จากsourceได้.
+
+## Amendment — ข้อ1 ตอบแล้ว (2026-10-28)
+
+ผู้ใช้ตอบข้อ1 ตาม[มติ049](../requirement/decisions-049.md): แก้รอบ3แบบแคบหนึ่งรอบทั้งBrawmetadata/wireboundaryและGmodule-ownedchannel/logboundary แล้วcheck/JPOซ้ำด้วยoracleเดิม (B 2234assertions+baseline150/G JPOextended96+baseline5) — ไม่ใช่riskacceptance ถ้ายังตกกลับมาถามผู้ใช้ ไม่เปิดรอบ4เอง. ข้อ2–4คงรอเดิม.
