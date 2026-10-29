@@ -82,11 +82,13 @@ export function normalizeDagTasks(tasks) {
     risk: typeof t.risk === "string" ? t.risk.trim().toLowerCase() : (t.risk ?? null),
     wave: t.wave ?? null,
     oracle: nonEmpty(t.oracle),
+    ref: nonEmpty(t.ref),
     slices: list(t.slices).map((s) => ({
       id: s?.id,
       acIds: list(s?.acIds ?? s?.ac_ids),
       status: typeof s?.status === "string" ? s.status.trim().toLowerCase() : "",
       oracle: nonEmpty(s?.oracle),
+      ref: nonEmpty(s?.ref),
     })),
   }));
 }
@@ -134,10 +136,23 @@ export function lintPlanVerification(tasks) {
   const foundations = tasks.filter((t) => fanOut.get(t.id) >= threshold).sort(byFanOut).map((t) => t.id);
   const unrated = open.filter((t) => foundations.includes(t.id) && t.risk === null).sort(byFanOut);
   if (unrated.length) warnings.push(`task ฐานราก (งานพึ่ง ≥ ${threshold}) ยังไม่ระบุ risk ${unrated.length} งาน — high = ตรวจทันทีก่อนงานต่อยอด · low = มี contract test กั้นแล้วรอ wave gate ได้: ${listIds(unrated)}`);
-  const noOracle = tasks.flatMap((t) => (t.slices.length
+  const labels = (list) => `${list.slice(0, 10).join(", ")}${list.length > 10 ? ` +${list.length - 10}` : ""}`;
+  const verifiedUnits = tasks.flatMap((t) => (t.slices.length
     ? t.slices.map((s, i) => ({ ...s, label: `${t.id}/${s.id ?? `slice#${i + 1}`}` }))
-    : [{ ...t, label: t.id }])).filter((u) => u.status === "verified" && !u.oracle).map((u) => u.label);
-  if (noOracle.length) warnings.push(`verified แต่ไม่มี oracle (revision ที่ใช้ตัดสิน) ${noOracle.length} จุด — เมื่อเอกสารเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${noOracle.slice(0, 10).join(", ")}${noOracle.length > 10 ? ` +${noOracle.length - 10}` : ""}`);
+    : [{ ...t, label: t.id }])).filter((u) => u.status === "verified");
+  const noOracle = verifiedUnits.filter((u) => !u.oracle).map((u) => u.label);
+  if (noOracle.length) warnings.push(`verified แต่ไม่มี oracle (revision ที่ใช้ตัดสิน) ${noOracle.length} จุด — เมื่อเอกสารเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noOracle)}`);
+  // ไม่มี oracle ถูกเตือนบรรทัดบนแล้ว — บรรทัดนี้เฉพาะ ledger ที่มีครึ่งเดียว
+  const noRef = verifiedUnits.filter((u) => u.oracle && !u.ref).map((u) => u.label);
+  if (noRef.length) warnings.push(`verified มี oracle แต่ไม่มี ref (commit ที่ตรวจ) ${noRef.length} จุด — เมื่อโค้ดเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noRef)}`);
+  const unchecked = (id) => byId.get(id)?.risk === "high" && deriveTaskStatus(byId.get(id)) !== "verified";
+  const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
+  if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — ตรวจ task high ก่อน ไม่งั้นถ้ามันตกต้องรื้องานเหล่านี้ตาม: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
+  const waveSizes = new Map();
+  for (const t of tasks) if (isWave(t.wave)) waveSizes.set(t.wave, (waveSizes.get(t.wave) ?? 0) + 1);
+  // 6 = เพดานขนาด wave (3–6 task) ใน roles/gm.md — diff ทั้ง wave ใหญ่กว่านี้ผู้ตรวจ gate ใบเดียวเริ่มหลุด (recall ตกตามขนาดก้อน)
+  const bigWaves = [...waveSizes].filter(([, n]) => n > 6).sort(([a], [b]) => a - b);
+  if (bigWaves.length) warnings.push(`wave ที่มีเกิน 6 task: ${bigWaves.map(([w, n]) => `wave ${w} (${n})`).join(", ")} — แบ่ง wave ให้ check ใบเดียวต่อ gate ยังตรวจทั่วถึง`);
   const riskCounts = { high: 0, low: 0, unrated: 0 };
   for (const t of tasks) riskCounts[RISK_LEVELS.includes(t.risk) ? t.risk : "unrated"]++;
   const waves = new Set(tasks.map((t) => t.wave).filter(isWave)).size;

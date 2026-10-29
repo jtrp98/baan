@@ -44,7 +44,7 @@ test("ติดประตูครึ่งพอดี = ผ่าน · เ�
 
 test("normalize อ่านฟิลด์ของแผนโปรเจกต์และชื่อ role เดิม", () => {
   const [t] = normalizeDagTasks([{ id: "FE-006", owner: "fe", depends_on: ["BE-1"], gate_ids: ["G-UX"], status: "Pending", ac_ids: ["AC-1"] }]);
-  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, oracle: false, slices: [] });
+  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, oracle: false, ref: false, slices: [] });
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
@@ -194,4 +194,32 @@ test("lintPlanFile พิมพ์สรุป risk/wave เมื่อแผ�
   assert.match(used.out, /⚠ task ที่ยังไม่ verified และไม่มี ac_ids/);
   assert.doesNotMatch(run({ tasks: chain() }).out, /ตรวจตามความเสี่ยง/);
   assert.equal(run({ tasks: chain({ SA: { risk: "medium" } }) }).code, 1);
+});
+
+test("verified ที่มี oracle แต่ไม่มี ref = warning · มีครบ = เงียบ · ไม่มีทั้งคู่เตือนแค่ oracle", () => {
+  const r = verify(chain({
+    "BE-1": { status: "verified", oracle: "DES-1 Rev2" },
+    "BE-2": { slices: [{ id: "s1", ac_ids: ["AC-2"], status: "verified", oracle: "DES-1 Rev2" }] },
+    "FE-1": { status: "verified" },
+  }));
+  assert.match(r.warnings.join("\n"), /มี oracle แต่ไม่มี ref .* 2 จุด .*: BE-1, BE-2\/s1$/m);
+  assert.doesNotMatch(r.warnings.join("\n"), /ไม่มี ref .*FE-1/, "FE-1 ไม่มี oracle — เตือนบรรทัด oracle บรรทัดเดียวพอ");
+  assert.doesNotMatch(verify(chain({ "BE-1": { status: "verified", oracle: "DES-1 Rev2", ref: "abc1234" } })).warnings.join(), /ไม่มี ref/);
+});
+
+test("งานที่ done-local แล้วแต่พึ่ง task high ที่ยังไม่ verified = warning (pipelining) · high ผ่านแล้ว = เงียบ", () => {
+  const early = verify(chain({ SA: { ac_ids: ["AC-0"], risk: "high" }, "BE-1": { status: "done-local" } }));
+  assert.match(early.warnings.join("\n"), /ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ 1 งาน .*BE-1←SA/);
+  assert.deepEqual(early.errors, []);
+  const ok = verify(chain({ SA: { ac_ids: ["AC-0"], risk: "high", status: "verified", oracle: "R1", ref: "c1" }, "BE-1": { status: "done-local" } }));
+  assert.doesNotMatch(ok.warnings.join(), /ต่อยอดจาก task high/);
+  assert.doesNotMatch(verify(chain({ SA: { ac_ids: ["AC-0"], risk: "low" }, "BE-1": { status: "done-local" } })).warnings.join(), /ต่อยอดจาก task high/);
+});
+
+test("wave เกิน 6 task = warning ไม่ใช่ error · ไม่เกินเงียบ", () => {
+  const many = (n) => Array.from({ length: n }, (_, i) => ({ id: `T${i}`, owner: "be", depends_on: [], ac_ids: [`AC-${i}`], wave: 1 }));
+  const r = verify(many(7));
+  assert.match(r.warnings.join(), /wave ที่มีเกิน 6 task: wave 1 \(7\)/);
+  assert.deepEqual(r.errors, []);
+  assert.doesNotMatch(verify(many(6)).warnings.join(), /เกิน 6 task/);
 });
