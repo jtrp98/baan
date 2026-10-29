@@ -8,8 +8,10 @@
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
 | [connection-001.md](connection-001.md) | ผลเชื่อมต่อโดยตรงจาก web/.env และ SELECT แบบอ่านอย่างเดียว | สำเร็จ 2026-10-26: SELECT 1 ผ่าน, public SchoolBot* 32 ตาราง, PostgreSQL 15.19; ยังไม่ตรวจ schema parity/API integration |
-| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PK32/UQ0/FK0/CHECK0; audit fields4ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | ร่างปัจจุบัน Rev7; ผู้ใช้ยืนยันรันสร้างตารางแล้ว — revision/catalog จริงยังไม่ตรวจ ([045](../requirement/decisions-045.md)) |
-| `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | DRAFT Rev7 — ยังไม่รัน |
+| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PK32/UQ0/FK0/CHECK0; audit fields4ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | physical Rev7; ใบงาน094 ให้ CREATE หยุดเมื่อตารางมีอยู่ ใช้เฉพาะฐานใหม่ — ผู้ใช้ยืนยันสร้างตารางแล้ว แต่ revision/catalog จริงยังไม่ตรวจ ([045](../requirement/decisions-045.md)) |
+| `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | รอคน review/รัน — physical Rev7; เพิ่ม guard ล็อก+ตรวจว่างครบ32ก่อน DROP (094); ไม่มีผล rollback |
+| `schoolbot_catalog_review.sql` | C0–C5: inventory/คอลัมน์/PK/constraints/indexes จาก snapshot read-only เดียว เพื่อ AC-033-01..05 | เตรียมแล้ว 2026-10-29 — รอมนุษย์ review/รันบนฐานที่ API ทดสอบใช้ |
+| [review-008.md](review-008.md) | ใบงาน094 DBA-002/004: runbook + [ACครบ11รายการแยกtask](review-008-ac.md) + [parity/ข้อแก้เอกสาร](review-008-parity.md) + [physical Project fields](review-008-project.md) | พร้อมคน review — static32ตาราง/450ฟิลด์/PK32; ยังรอ catalog/rollback/API evidence ไม่ปิด gate |
 | `review-007.md` | vault ยืนยัน SEC001-009 replay TTL ของ create-license ไม่ต้องแก้ physical DDL (ใบงาน060c) | PASS (static) — read-time gate + cleanup job เป็นงาน application |
 | `pii-inventory-001.md` | ตารางจำแนก PII รายคอลัมน์ 32 ตาราง + ตารางข้อมูลเด็ก 9 ตาราง + flag F1–F7 ส่ง jpo — ตอบ SEC001-010 | สร้างแล้ว — รอ jpo พิจารณา |
 | `db-safe-evidence-001.md` | ชุดคำขอหลักฐาน EV-01..06 จากเจ้าของ Master DB (schema-only + aggregate ปลอด PII ตาม TR-AUTH-03..06) | พร้อมส่งมนุษย์/เจ้าของ DB — มติ decisions-036: ผู้ใช้เป็นคนส่ง |
@@ -26,13 +28,5 @@
 
 - ไม่แตะ School DB และ PGGradeDB — ใช้บัญชี DB เดิมตาม [decisions-029](../requirement/decisions-029.md)
 - ผู้เขียน SQL = `vault` (DBA) · นายช่าง/SA ส่งมอบและตรวจ · ห้าม role ใดรัน SQL เอง (ประตูมนุษย์)
-
-## Change Log
-
-- 2026-10-24 — ใบงาน060c (นายช่าง solo — subagent role vault): เพิ่ม review-007 (SEC001-009 ไม่แก้ DDL — PASS static), pii-inventory-001 (ตอบ SEC001-010 + flag F1–F7 ส่ง jpo), db-safe-evidence-001 (EV-01..06 รวบชุดเดียว) และแนบคำชี้แจงยอด BL-001 ลง review-005; ไม่มีการเปลี่ยน SQL/รัน DB
-
-- 2026-10-23 — นายช่างบันทึก vault review-006 จาก task-012 พร้อม planning/vault-response-001.json; ผล static 32 ตาราง/450 ฟิลด์/40 FK/24 UQ/80 CHECK/13 unique indexes/non-unique indexes 0 ไม่มีการเปลี่ยน SQL หรือรัน DB; ส่ง design gaps ให้ arch
-
-- 2026-10-22 — สร้างสารบัญหมวด db ตามมาตรฐาน baan (นายช่าง — งานปรับโครงสร้างเอกสารทุก module)
 
 Back-links: `..\index.md`
