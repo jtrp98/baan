@@ -529,7 +529,21 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 2
+      "wave": 2,
+      "slices": [
+        {
+          "id": "BE-002-S1-db-adapters",
+          "ac_ids": [
+            "AC-027-04",
+            "AC-036-02",
+            "AC-036-03",
+            "AC-033-05"
+          ],
+          "status": "done-local",
+          "evidence": "reports/baan/2026-10-29-05-17-07-sys-tier-t3-1agents-snBHxc; parent rerun dotnet test web/SchoolBot.slnx 4176/0 + SchoolBotDbAdapterContractTests 7/0",
+          "note": "2026-10-29 repositories/config + tenant recheck + ETag บน backing store (file/memory) แทน DB จริง — DB จริงอยู่ที่ DBA-003/G-CORE · contract test ล็อก interface ISchoolBotDbAdapter"
+        }
+      ]
     },
     {
       "id": "BA-001",
@@ -4224,7 +4238,8 @@
     {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)","refs":["planning/task-094.md"]},
     {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5","refs":["planning/task-094.md"]},
     {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-002 verified จาก check-094-DBA-002-004-001 PASS (AGY T2 ข้ามโมเดลกับ writer vault Codex T2) · deliverable db/schoolbot_db.sql + rollback + catalog C0–C5 + runbook review-008 · writer จบ NEEDS_HUMAN เพราะการรัน SQL เป็นของคน (DBA-003)","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-004 verified จาก check-094-DBA-002-004-001 PASS · project DDL ใน db/schoolbot_db.sql · backlog arch: parity เอกสาร review-008-parity","refs":["planning/task-093.md"]}
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-004 verified จาก check-094-DBA-002-004-001 PASS · project DDL ใน db/schoolbot_db.sql · backlog arch: parity เอกสาร review-008-parity","refs":["planning/task-093.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-002 slice S1 db-adapters done-local — parent รัน test ซ้ำ 4176/0 + contract 7/0 · risk low รอ wave gate","refs":["planning/task-094.md"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
