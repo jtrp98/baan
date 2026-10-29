@@ -58,7 +58,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | **verified** (ใบงาน061 — signed int-004 ครบ + check PASS รอบ 7) |
 | [TP-001](TP-001.md) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
 | [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | pending |
-| [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | pending |
+| [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | **verified** (ใบงาน093 — [check PASS](../planning/check-093-SEC-001-001.md) · [security-review-093-001](../design/security-review-093-001.md) · ข้อรอคน H1/H2/H4/H5) |
 | [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
 | [BE-004](BE-004.md) | Signed lease | be | P2 | BE-003 | pending |
 | [BE-005](BE-005.md) | Key transfer | be | P2 | BE-004 | pending |
