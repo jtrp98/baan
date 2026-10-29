@@ -457,9 +457,11 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
-      "wave": 2
+      "wave": 2,
+      "oracle": "oracle pack DBA-002 (ตรึง 2026-10-29): DES-002 Rev3 · TP001-052/053 — check-094-DBA-002-004-001 PASS (static; ผลรัน SQL/catalog C0–C5 = DBA-003/G-CORE)",
+      "ref": "6c9f798"
     },
     {
       "id": "DBA-003",
@@ -1087,9 +1089,11 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
-      "wave": 2
+      "wave": 2,
+      "oracle": "oracle pack DBA-004 (ตรึง 2026-10-29): DES-003 Rev4 · TP001-008/015/016/022/023/052/053/077 — check-094-DBA-002-004-001 PASS (static; SQL จริง = G-PROJECT-DB ที่ QA-002)",
+      "ref": "6c9f798"
     },
     {
       "id": "BE-008",
@@ -4218,7 +4222,9 @@
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: BE-001 verified จาก check-093-BE-001-003 PASS หลัง rework 2 รอบ (รอบ1 ตก 5 ข้อหลักฐาน · รอบ2 เหลือ token canonical) · deliverable design/auth-evidence-001.md Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006","refs":["planning/task-093.md"]},
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: TP-002 verified จาก wave gate check-093-wave1-gate-001 PASS (risk low — ตรวจครั้งเดียวที่ gate) + ความสอดคล้องข้าม task SA-001/BE-001/SEC-001/TP-002 ผ่าน","refs":["planning/task-093.md"]},
     {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)","refs":["planning/task-094.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5","refs":["planning/task-094.md"]}
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5","refs":["planning/task-094.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-002 verified จาก check-094-DBA-002-004-001 PASS (AGY T2 ข้ามโมเดลกับ writer vault Codex T2) · deliverable db/schoolbot_db.sql + rollback + catalog C0–C5 + runbook review-008 · writer จบ NEEDS_HUMAN เพราะการรัน SQL เป็นของคน (DBA-003)","refs":["planning/task-093.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-004 verified จาก check-094-DBA-002-004-001 PASS · project DDL ใน db/schoolbot_db.sql · backlog arch: parity เอกสาร review-008-parity","refs":["planning/task-093.md"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",

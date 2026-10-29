@@ -46,7 +46,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [SA-001](SA-001.md) | Contracts/update | sa | P0 | — | **verified** (ใบงาน093 — [check PASS](../planning/check-093-SA-001-001.md) · [contract-review-sa-001](../design/contract-review-sa-001.md) Rev1) |
 | [BE-001](BE-001.md) | Legacy auth | be | P0 | — | **verified** (ใบงาน093 — [check PASS รอบ 3](../planning/check-093-BE-001-003.md) · [auth-evidence-001](../design/auth-evidence-001.md) Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006) |
 | [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
-| [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | pending |
+| [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | **verified** (ใบงาน094 — [check PASS](../planning/check-094-DBA-002-004-001.md) static · รัน SQL/catalog C0–C5 = คน → DBA-003) |
 | [DBA-003](DBA-003.md) | Core evidence | dba | P1 | DBA-002 | pending |
 | [BE-002](BE-002.md) | DB integration | be | P1 | DBA-002 (stub DB; ต่อ DB จริงหลัง DBA-003) | pending |
 | [BA-001](BA-001.md) | Guest policy | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
@@ -65,7 +65,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [BE-005](BE-005.md) | Key transfer | be | P2 | BE-004 | pending |
 | [BE-006](BE-006.md) | Login/session | be | P3 | BE-007, BE-001 | **done-local** (slice gRPC logout AC-036-06 local — [check092](../planning/check-092-grpc-r3-001.md)/[jpo092](../planning/jpo-092-logout-r4-001.md); full Login ยังค้าง) |
 | [BE-007](BE-007.md) | Host entitlement | be | P2 | BE-005, SEC-001 | pending |
-| [DBA-004](DBA-004.md) | Projects DDL | dba | P3 | DBA-001, SA-001, BA-001 | pending |
+| [DBA-004](DBA-004.md) | Projects DDL | dba | P3 | DBA-001, SA-001, BA-001 | **verified** (ใบงาน094 — [check PASS](../planning/check-094-DBA-002-004-001.md) static · SQL จริง = G-PROJECT-DB ที่ QA-002) |
 | [BE-008](BE-008.md) | Cloud projects | be | P3 | BE-006, DBA-004 | pending |
 | [BE-009](BE-009.md) | Local projects | be | P3 | BE-007, BA-001 | pending |
 | [BE-010](BE-010.md) | Host/IPC | be | P3 | BE-007, SA-003 | pending |
