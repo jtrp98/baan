@@ -331,14 +331,23 @@
         "REQ-033",
         "REQ-036"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-027-01",
+        "AC-029-01",
+        "AC-029-03",
+        "AC-030-01",
+        "AC-033-04",
+        "AC-033-05"
+      ],
       "des_refs": [
         "DES-002",
         "DES-003",
         "DES-004",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 1
     },
     {
       "id": "BE-001",
@@ -358,11 +367,18 @@
         "REQ-038",
         "REQ-039"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-036-02",
+        "AC-036-06",
+        "AC-038-05",
+        "AC-039-05"
+      ],
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 1
     },
     {
       "id": "DBA-001",
@@ -394,7 +410,9 @@
         "DES-005",
         "DES-007"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — check PASS static + parser 10.3.1 evidence",
+      "ref": "0b6687b"
     },
     {
       "id": "DBA-002",
@@ -421,11 +439,19 @@
         "REQ-035",
         "REQ-036"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-033-01",
+        "AC-033-02",
+        "AC-033-03",
+        "AC-033-04",
+        "AC-033-05"
+      ],
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 2
     },
     {
       "id": "DBA-003",
@@ -458,7 +484,9 @@
         "DES-002",
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 4
     },
     {
       "id": "BE-002",
@@ -466,7 +494,7 @@
       "tier": "t3",
       "phase": "P1",
       "depends_on": [
-        "DBA-003"
+        "DBA-002"
       ],
       "gate_ids": [],
       "effort_days": 2,
@@ -480,11 +508,18 @@
         "REQ-033",
         "REQ-036"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-027-04",
+        "AC-036-02",
+        "AC-036-03",
+        "AC-033-05"
+      ],
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 2
     },
     {
       "id": "BA-001",
@@ -510,7 +545,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
+      "ref": "0b6687b"
     },
     {
       "id": "BA-002",
@@ -534,7 +571,9 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
+      "ref": "0b6687b"
     },
     {
       "id": "BA-003",
@@ -559,7 +598,9 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
+      "ref": "0b6687b"
     },
     {
       "id": "BA-004",
@@ -584,7 +625,9 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 ตาม check-060 + decisions-037/038",
+      "ref": "0b6687b"
     },
     {
       "id": "UX-001",
@@ -610,7 +653,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — signed int-001 + check-060 PASS",
+      "ref": "0b6687b"
     },
     {
       "id": "UX-002",
@@ -641,7 +686,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — signed int-003 + check-061 PASS รอบ 3",
+      "ref": "0b6687b"
     },
     {
       "id": "UX-003",
@@ -675,7 +722,9 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — signed int-002 + check-060 PASS",
+      "ref": "0b6687b"
     },
     {
       "id": "UX-004",
@@ -703,7 +752,9 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — signed int-004 + check-061 PASS รอบ 7",
+      "ref": "0b6687b"
     },
     {
       "id": "TP-001",
@@ -733,7 +784,9 @@
         "DES-006",
         "DES-007"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — Amendment002/003 + check-060 PASS",
+      "ref": "0b6687b"
     },
     {
       "id": "TP-002",
@@ -757,11 +810,20 @@
         "REQ-034",
         "REQ-035"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-021-02",
+        "AC-024-02",
+        "AC-034-03",
+        "AC-034-04",
+        "AC-035-05",
+        "AC-039-05"
+      ],
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 1
     },
     {
       "id": "SEC-001",
@@ -785,14 +847,27 @@
         "REQ-035",
         "REQ-036"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-027-01",
+        "AC-028-01",
+        "AC-028-03",
+        "AC-030-04",
+        "AC-030-05",
+        "AC-034-06",
+        "AC-035-01",
+        "AC-035-04",
+        "AC-036-06",
+        "AC-038-05"
+      ],
       "des_refs": [
         "DES-001",
         "DES-002",
         "DES-004",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 1
     },
     {
       "id": "BE-003",
@@ -823,7 +898,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 3
     },
     {
       "id": "BE-004",
@@ -852,7 +929,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 3
     },
     {
       "id": "BE-005",
@@ -880,7 +959,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 3
     },
     {
       "id": "BE-006",
@@ -920,7 +1001,9 @@
           "evidence": "planning/slice-092-grpc-r3-001.md; planning/check-092-grpc-r3-001.md; planning/jpo-092-logout-r4-001.md",
           "note": "2026-10-28 B gRPC logout local: parent 2234/0 + 4147/0, check PASS, JPO B triage CLOSED — ครอบเฉพาะส่วน local ของ AC-036-06; full Login/FE-002/License-unaffected end-to-end/production/H5 ยังรอ จึงไม่ลง verified"
         }
-      ]
+      ],
+      "risk": "high",
+      "wave": 4
     },
     {
       "id": "BE-007",
@@ -957,7 +1040,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 3
     },
     {
       "id": "DBA-004",
@@ -983,11 +1068,20 @@
         "REQ-033",
         "REQ-036"
       ],
-      "ac_ids": [],
+      "ac_ids": [
+        "AC-011-01",
+        "AC-011-02",
+        "AC-036-02",
+        "AC-036-03",
+        "AC-033-04",
+        "AC-033-05"
+      ],
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high",
+      "wave": 2
     },
     {
       "id": "BE-008",
@@ -1022,7 +1116,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 4
     },
     {
       "id": "BE-009",
@@ -1053,7 +1149,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 4
     },
     {
       "id": "BE-010",
@@ -1084,7 +1182,8 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "SA-003",
@@ -1111,7 +1210,8 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BE-011",
@@ -1256,7 +1356,9 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 5
     },
     {
       "id": "FE-002",
@@ -1285,7 +1387,9 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 5
     },
     {
       "id": "FE-003",
@@ -1315,7 +1419,8 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low"
     },
     {
       "id": "FE-004",
@@ -1650,7 +1755,9 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "ใบงาน061 — check-061 PASS (สัญญาสามโหมด/Level/ข้อสอบ/ส่งคะแนน)",
+      "ref": "0b6687b"
     },
     {
       "id": "DBA-005",
@@ -1693,7 +1800,8 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BE-015",
@@ -1729,7 +1837,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BA-005",
@@ -1756,7 +1865,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BA-006",
@@ -1783,7 +1893,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BE-016",
@@ -2247,7 +2358,9 @@
         "DES-002",
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "low",
+      "wave": 5
     },
     {
       "id": "QA-002",
@@ -2833,7 +2946,8 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BE-028",
@@ -2896,7 +3010,8 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "risk": "high"
     },
     {
       "id": "BE-030",
@@ -3215,10 +3330,7 @@
         "SA-001",
         "SEC-001"
       ],
-      "gate_ids": [
-        "G-AUTH",
-        "G-CORE"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ web-principal/BFF/session และ staff bootstrap",
       "outputs": [
@@ -3247,7 +3359,9 @@
           "evidence": "planning/slice-092-gateway-r4-001.md; planning/jpo-092-logout-r4-001.md; design/gateway-controller-entry-001.md",
           "note": "2026-10-28 G logout controller r4 (มติ050): parent compile/433/3/5/96 + JPO SEC001-016 CLOSED local + surface probe 6/0 — ครอบเฉพาะส่วน local ของ AC-036-06; production registration/H5/TLS/BFF CSRF ยังรอ จึงไม่ลง verified"
         }
-      ]
+      ],
+      "risk": "high",
+      "wave": 2
     },
     {
       "id": "FE-017",
@@ -3913,7 +4027,9 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "check-061 PASS รอบ 10 + decisions-041 signed",
+      "ref": "0b6687b"
     },
     {
       "id": "UX-007",
@@ -4008,7 +4124,9 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "check-061c PASS docs-only (planning/task-061.md)",
+      "ref": "0b6687b"
     },
     {
       "id": "TP-003",
@@ -4056,7 +4174,9 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "check-061 PASS รอบ 2 (fixtures เอกสาร)",
+      "ref": "0b6687b"
     },
     {
       "id": "DBA-007",
@@ -4091,7 +4211,9 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "verified"
+      "status": "verified",
+      "oracle": "check-061 PASS รอบ 2 (runtime pack ไม่ใช่ผลรัน)",
+      "ref": "0b6687b"
     }
   ],
   "first_wave": [
@@ -4156,7 +4278,8 @@
       ],
       "summary": "reconcile44/180; แตก36งานในscopeเดิม; คง17gates/8phases/74IDsเดิม/pendingทั้งหมด"
     },
-    {"date":"2026-10-26","revision":2,"summary":"089: รับ owner mapping AC-030-04..08 ตามมติ037; BE-019 Host workflow, BE-020/021 package recovery, QA-010 validation; TP-001 sync186AC; คง frozen scope/IDs/status/DAG/dependencies/gates/owner/tier/effort","refs":["planning/traceability-089-001.md","requirement/req-030.md","requirement/decisions-037.md","requirement/decisions-038.md","test-plan/tp-001.md"]}
+    {"date":"2026-10-26","revision":2,"summary":"089: รับ owner mapping AC-030-04..08 ตามมติ037; BE-019 Host workflow, BE-020/021 package recovery, QA-010 validation; TP-001 sync186AC; คง frozen scope/IDs/status/DAG/dependencies/gates/owner/tier/effort","refs":["planning/traceability-089-001.md","requirement/req-030.md","requirement/decisions-037.md","requirement/decisions-038.md","test-plan/tp-001.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป","refs":["plan/index.md","planning/check-061-verdicts-001.md","planning/status-sync-062-001.json"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
