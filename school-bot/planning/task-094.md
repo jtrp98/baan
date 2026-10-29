@@ -17,3 +17,4 @@ oracle pack ในหัวข้อ Acceptance ของ [DBA-002](../plan/DBA-
 ## Change Log
 
 - 2026-10-29 — เปิด094 · ไม่มี role ค้างรัน · lint แผน ✓
+- 2026-10-29 — DBA-002/DBA-004 verified (check PASS static; รัน SQL = คน/DBA-003) · BE-039 S2 verified (check PASS + jpo ไม่มี Critical/Important) · BE-002: wave gate FAIL F1/F2 → rework1 → F2 ยังตก → rework 2/2 ล้มกลางทาง (DNS ของเครื่อง resolve agy/codex ไม่ได้) → slice blocked · worktree B test ตก 1 จากการแก้ค้าง · รอเครือข่ายแล้วรัน rework 2/2 ซ้ำ
