@@ -46,16 +46,16 @@ SchoolBot แยก DB; legacy ใช้ connection เดิม/re-check ข้
 
 Check ↔ AC-030-01..03; PrepareUpdate ↔ AC-030-04/08; InstallPreparedUpdate ↔ AC-030-05..08. ผู้ใช้เลือกคงและรับ AC แล้ว; “รออนุมัติ” ใน DES-007/ตารางเดิมเป็นประวัติก่อน037. AC-030-04..08 ใช้ trace ไม่เพิ่มเส้นชัย SA-001
 
-BE-018 รับ registry/sign/publish; BE-019 คง prepare/install และ trust/close/recovery guards; QA-010 ตรวจ check/prepare/install แยกกัน; packaging BE-020/021/022 ส่ง signed artifacts/repair proof ราย OS. Effort updater คงอยู่ ให้เจ้าของงานประเมิน ไม่มีตัวเลข. install_supported=false คงจน implement ตาม036; business approval ไม่ปิด G-RELEASE-DB/security/runtime
+BE-018 รับ registry/sign/publish; BE-019 คง prepare/install และ trust/close/recovery guards; QA-010 ตรวจ check/prepare/install แยกกัน; packaging BE-020/021/022 ส่ง signed artifacts/repair proof ราย OS. Effort updater คงอยู่ ให้เจ้าของงานประเมิน ยังไม่มีประมาณการเพิ่ม. install_supported=false คงจน implement ตาม036; business approval ไม่ปิด G-RELEASE-DB/security/runtime
 
 ## ช่องว่างและผู้รับต่อ
 
-- **ข้อเสนอ:** gRPC §2 ยังไม่มี core/projects/release manifest; arch/sys/G/Light จัด RPC/DTO/error รวม RELEASE_EXISTS, device proof/global tenant ก่อนเชื่อม local/stub เดินต่อได้
+- **ข้อเสนอ:** gRPC §2 ยังไม่มี core/projects/release manifest; arch/sys/G/Light จัด RPC/DTO/error รวม RELEASE_EXISTS, device proof/global tenant ก่อนเชื่อมจริง; local/stub เดินต่อได้
 - **เอกสารคลาดเคลื่อน:** Project API Rev1 ยังอ้าง composite FK; License authorization Rev1 อ้าง pair CHECK; E4/กฎร่วม Rev10 ไม่มีแล้ว. เสนอ backlog ให้ arch/vault ปรับถ้อยคำ ไม่เสนอใส่ constraints คืน
 - **รอคนเดิม:** Task BE-018/019/022 · Reference release-trust Rev1 · Reason: ใครถือ cert/รับรอง registry/publisher pin? ผู้ใช้/เจ้าของ signing ตอบเพื่อปลดล็อก trusted artifact จริง; คงการพัก License custody
 - **รอหลักฐานเดิม:** Task DBA-003 · Reference AC-033-04/05 · Reason: catalog ของ DB ทดสอบตรง revision ใด? เจ้าของ DB/vault ส่งเพื่อทำ TP001-053; รอบนี้ไม่เชื่อม DB. H5/tenant/private-peer รอ G/Light/infra/B ไม่ถาม dev ซ้ำ
 
-เลือก reuse สัญญา/มติเดิม ปัดตกสำเนาซ้ำที่เสี่ยงขัดกัน. ไม่มี schema/model delta; ใช้[DBML](dbml-guide-001.md) ไม่รัน parser/parity; ไม่ audit dictionary/legacy/JSON ทั้งชุด
+เลือก reuse สัญญา/มติเดิม ปัดตกสำเนาซ้ำที่เสี่ยงขัดกัน. ไม่มี schema/model delta; ใช้ [DBML](dbml-guide-001.md) ไม่รัน parser/parity; ไม่ audit dictionary/legacy/JSON ทั้งชุด
 
 ## Change Log
 
