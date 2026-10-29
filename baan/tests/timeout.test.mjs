@@ -71,7 +71,7 @@ test("role fallback ใช้ timeout ที่ resolve แล้วเหมื
       seen.push([agent, opts.timeoutSec]);
       return seen.length === 1 ? limitRun() : okRun();
     } });
-    assert.deepEqual(seen, [["codex", 75], ["agy", 75]]);
+    assert.deepEqual(seen, [["codex", 75], ["claude", 75]]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

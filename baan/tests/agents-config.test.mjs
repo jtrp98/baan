@@ -34,8 +34,10 @@ test("_fallback ของทุก tier ต้องเป็นลำดับ 
   }
 });
 
-test("agy ครบทุก tier แล้วหลัง Argon เปิดตัว (2026-10-17)", () => {
-  for (const tier of ["t0", "t1", "t2"]) {
+// t0 = null เพราะ argon-high คือเพดาน Gemini ใน agy models และใช้ที่ t1 แล้ว — ไม่มีตัวที่เหนือ t1 จริง
+test("agy: t1/t2 = gemini-4-argon · t3–t5 = flash · t0 = null (ไม่มี overdrive เหนือ t1)", () => {
+  assert.equal(cfg.tiers.t0.agy, null);
+  for (const tier of ["t1", "t2"]) {
     assert.match(cfg.tiers[tier].agy.model, /^gemini-4-argon-(high|medium|low)$/, `tier ${tier}: agy ต้องใช้ gemini-4-argon`);
   }
   for (const tier of ["t3", "t4", "t5"]) {
@@ -103,17 +105,16 @@ test("opencode: ไม่มี effortArgs (effort อยู่ใน model stri
   assert.ok(def.writeArgs.includes("--auto"), "write-mode ต้อง --auto เพราะไม่มีคนกดอนุมัติกลางทาง");
 });
 
-// ผัง GLM ผ่าน Z.AI coding plan (cost 0): t2 = anchor ที่ผู้ใช้วัดจาก Intelligence Index (5.3 max ≈ sonnet high)
-// t0/t1 = null เพราะ GLM เพดานอยู่ t2 — null ทำให้ fallbackChainFor ข้าม opencode ไปค่ายอื่นของ tier นั้นเอง
-test("opencode: t2/t3 = glm-5.3 (max/high) · t4/t5 = glm-5.3-flash (max/high) · t0/t1 = null ตาม Intelligence Index", () => {
-  for (const tier of ["t0", "t1"]) assert.equal(cfg.tiers[tier].opencode, null, `${tier}: ไม่มี GLM ระดับทัดเทียม opus/astra`);
+// GLM-5.3 (max) ได้ 32 บน AA v5.0 — ต่ำกว่า t1/t2 ค่ายอื่น (46–52) และพอๆ กับ Gemini Flash high ที่ไม่ผ่าน t2
+// t0–t2 = null ให้ fallbackChainFor ข้าม opencode ไปค่ายอื่นเอง · t3 = flash#high · t4/t5 = flash#low — เหตุผลเต็มที่ docs/tier-selection-prompt.md
+test("opencode: t0–t2 = null (GLM ไม่ถึงระดับ) · t3/t4/t5 = flash (high/low/low) ตามชนิดงาน", () => {
+  for (const tier of ["t0", "t1", "t2"]) assert.equal(cfg.tiers[tier].opencode, null, `${tier}: GLM ยังไม่ถึงระดับ tier นี้`);
   const expect = {
-    t2: "zai-coding-plan/glm-5.3#max",
-    t3: "zai-coding-plan/glm-5.3#high",
-    t4: "zai-coding-plan/glm-5.3-flash#max",
-    t5: "zai-coding-plan/glm-5.3-flash#high",
+    t3: "zai-coding-plan/glm-5.3-flash#high",
+    t4: "zai-coding-plan/glm-5.3-flash#low",
+    t5: "zai-coding-plan/glm-5.3-flash#low",
   };
-  for (const [tier, model] of Object.entries(expect)) assert.equal(cfg.tiers[tier].opencode.model, model, `tier ${tier} ผัง GLM ผิด`);
+  for (const [tier, model] of Object.entries(expect)) assert.equal(cfg.tiers[tier].opencode?.model, model, `tier ${tier} ผัง GLM ผิด`);
 });
 
 // profile ของ agy ต้องมากับ package — readArgs อ้างชื่อ profile นี้ เครื่องที่ไม่มีจะล้มทุกงาน read-only

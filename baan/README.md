@@ -245,29 +245,34 @@ baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG + คว�
 
 - **claude**: ยืนยันผ่าน `--output-format json` — `--model haiku` ได้ `claude-haiku-5-5` จริง และ JSON มี `total_cost_usd` ต่อ run ด้วย (เอาไปเก็บสถิติ cost ต่อ tier ได้)
 - **codex**: header ของ `codex exec` พิมพ์ model/effort ที่ใช้จริงออกมาขณะรัน
-- **codex (บัญชี ChatGPT)**: สลับ model ได้เฉพาะชื่อที่อยู่ใน `/model` ของ codex เอง ได้แก่ `gpt-6.1-sol` (default), `gpt-6-astra` (frontier), `gpt-6-sol`, `gpt-6-luna` (fast/cheap), `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` — ชื่ออื่นเช่น `gpt-6.1-codex` หรือ `gpt-6.1` จะโดน API ปฏิเสธ (ตรวจรายชื่อล่าสุดได้จาก `/model` ใน codex interactive)
+- **codex (บัญชี ChatGPT)**: สลับ model ได้เฉพาะชื่อที่อยู่ใน `/model` ของ codex เอง ได้แก่ `gpt-6.1-sol` (default), `gpt-6-astra` (frontier), `gpt-6.1-terra`, `gpt-6-sol`, `gpt-6-luna` (fast/cheap), `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` — ชื่ออื่นเช่น `gpt-6.1-codex` หรือ `gpt-6.1` จะโดน API ปฏิเสธ (ตรวจรายชื่อล่าสุดได้จาก `/model` ใน codex interactive) · Terra ต้องใช้ Codex CLI ≥ 0.159.0 ตาม [OpenAI Docs](https://learn.chatgpt.com/docs/models)
 - **agy**: เป็น multi-provider (gemini/claude/gpt-oss) — ชื่อ model ฝัง effort ไว้ในตัวเลย เช่น `gemini-3.8-flash-low`, `claude-opus-5-5-high` (ดูทั้งหมดด้วย `agy models`) และ**ต้องวาง `--model` ก่อน `--print`** เพราะ `--print` จะกลืน argument ถัดไปเป็น prompt (baan-role จัดการลำดับนี้ให้อยู่แล้ว)
 - **opencode**: รัน GLM ผ่าน **Z.AI Coding Plan (เหมาจ่าย cost 0 ต่อครั้ง)** — login ครั้งเดียวด้วย `opencode auth login` (เลือก Z.AI Coding Plan) · syntax variant `#low/#high/#max` มีตั้งแต่ **opencode 2.1.4** (ของเดิม 1.19.0 ส่ง effort ทาง CLI ไม่ได้) · ต้องมี opencode CLI ติดตั้ง (`npm i -g opencode-ai`)
 
-tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค่ายอื่นจัดตัวทัดเทียมตามระดับ, T0 = overdrive):
+tier ladder ปัจจุบัน (เลือกตามความยากและขอบเขตงาน โดยคำนึงถึงเวลา โควตา และความเสี่ยงแก้ซ้ำ; T0 = overdrive):
 
 | tier | เหมาะกับ | claude | codex | agy | opencode |
 |---|---|---|---|---|---|
-| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / max | gpt-6-astra / max | gemini-4-argon-high | — |
-| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6-astra / high | gemini-4-argon-high | — |
-| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | sonnet / high | gpt-6.1-sol / high | gemini-4-argon-medium | glm-5.3 / max |
-| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / medium | gpt-6.1-sol / low | gemini-3.8-flash-medium | glm-5.3 / high |
-| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / high | gemini-3.8-flash-low | glm-5.3-flash / max |
-| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / medium | gemini-3.8-flash-low | glm-5.3-flash / high |
+| t0 | งานยากมาก "ไม่จบไม่สิ้น" ประเด็นซับซ้อน ต้องคิดลึกสุด | opus / xhigh | gpt-6-astra / max | — | — |
+| t1 | งานคิดยาก ออกแบบสถาปัตยกรรม ตัดสินใจสำคัญ | opus / high | gpt-6.1-sol / high | gemini-4-argon-high | — |
+| t2 | โค้ดซับซ้อน หลายไฟล์ มีเงื่อนไข | opus / medium | gpt-6.1-sol / medium | gemini-4-argon-medium | — |
+| t3 | งานพัฒนาปกติ คุณภาพดี ราคาสมดุล | sonnet / high | gpt-6.1-terra / medium | gemini-3.8-flash-medium | glm-5.3-flash / high |
+| t4 | งานประจำ เขียน test, refactor เล็กน้อย | haiku / medium | gpt-6-luna / medium | gemini-3.8-flash-low | glm-5.3-flash / low |
+| t5 | งานจำนวนมาก สรุป/จัดหมวด/ตอบคำถามง่าย | haiku / low | gpt-6-luna / low | gemini-3.8-flash-low | glm-5.3-flash / low |
 
 หมายเหตุ:
+- **Codex เลือกตามงานและความคุ้มค่า** — t1 ใช้ Sol high สำหรับการออกแบบและเหตุผลซับซ้อน, t2 ใช้ Sol medium สำหรับโค้ดหลายไฟล์, t3 ใช้ Terra medium สำหรับงานตามแบบที่ขอบเขตชัด, t4 ใช้ Luna medium สำหรับ test จากเคสที่ระบุ/refactor เล็ก, t5 ใช้ Luna low สำหรับสรุป/จัดหมวดตรงไปตรงมา · t0 สงวน Astra max สำหรับปัญหาที่ยากเกิน t1 · อิงความถนัดจาก [OpenAI Docs](https://learn.chatgpt.com/docs/models); เป็นค่าเริ่มต้นที่ยังไม่ได้วัดคุณภาพ BAAN จริง
+- **Claude เลือกตามงานและความคุ้มค่า** — t0 ใช้ Opus xhigh (max ได้ +1 คะแนนแต่ช้ากว่า ~6 เท่า สงวนเป็น override รายงาน), t2 ใช้ Opus medium แทน Sonnet high (คะแนนสูงกว่าชัดเจน งานตรวจพลาดแล้วแก้ซ้ำแพง), t3 ใช้ Sonnet high (medium คะแนนตกจาก 41 เหลือ 30) · alias `opus`/`sonnet`/`haiku` = รุ่น 5.5 เฉพาะ Anthropic API/บัญชีสมาชิก · เหตุผลรายละเอียดใน `docs/tier-selection-prompt.md` ของ repo
+- **Agy (Gemini) เลือกตามงานและความคุ้มค่า** — t1 ใช้ Argon high สำหรับงานสถาปัตยกรรมและตัดสินใจสำคัญ (เพดานสูงสุดของ Gemini ใน `agy models` ปัจจุบัน ยังไม่มี Carbon หรือ effort สูงกว่า `high` — t0 จึงเป็น `null`), t2 ใช้ Argon medium (ค่าเริ่มต้นของ Argon สำหรับงานหลายไฟล์/ตรวจความถูกต้อง ไม่ลดลงไป 3.8 Flash เพราะช่องว่างด้านโค้ดห่างมาก), t3 ใช้ 3.8 Flash medium (ค่าเริ่มต้นของ 3.8 Flash สำหรับงานพัฒนาตามแบบ ไม่ใช้ Flash high เพราะได้คะแนนเพิ่มแค่ +1 แต่เปลือง thinking tokens), t4/t5 ใช้ 3.8 Flash low สำหรับงานตามรูปแบบเดิมและสรุป/จัดหมวด (เป็นตัวเบาสุดของ Gemini ใน CLI ปัจจุบัน) · เหตุผลรายละเอียดใน `docs/tier-selection-prompt.md`
+- **OpenCode (GLM) เลือกตามงานและความคุ้มค่า** — t0–t2 เป็น `null`: GLM-5.3 (max) ได้ 32 บน AA v5.0 ต่ำกว่า t1/t2 ของค่ายอื่น (46–52) และพอๆ กับ Gemini Flash high ที่ไม่ผ่าน t2 · t3 ใช้ Flash high (หักเครดิตแผนเพียง ~1/3 ของ 5.3 ต่อ token), t4/t5 ใช้ Flash low สำหรับงานตามแบบและสรุป/จัดหมวด · `glm-5.3-highspeed` เป็นโหมดเสิร์ฟเร็วที่ปล่อยแบบไม่ประกาศ ไม่มีเอกสาร/คะแนน ยังไม่เลือก · เหตุผลรายละเอียดใน `docs/tier-selection-prompt.md`
+- **Intelligence Index เป็นข้อมูลประกอบ** — v5 ณ 2026-10-29 ของ Codex t0–t5 = 57 / 50 / 46 / 38 / 18 / 10 · Claude t0–t5 = 57 / 52 / 48 / 41 / 25 / 19 · Agy (Gemini) t0–t5 = null / 50 / N/A / 30 / 22 / 22 ตาม [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models) · OpenCode (GLM) t0–t2 = null · t3–t5 = N/A (AA v5.0 ไม่มีคะแนน GLM-5.3-Flash; GLM-5.3 max = 32 ตาม [หน้าโมเดล](https://artificialanalysis.ai/models/glm-5-3)) · ไม่เพิ่ม effort เพื่อไล่คะแนนค่ายอื่น; ราคา API ต่อ benchmark task ไม่ใช่อัตราหักโควตาของบัญชีสมาชิก
 - **สลับตัวรันอัตโนมัติเมื่อติดโควตา (`_fallback` ต่อ tier ใน agents.json)**: ตัวรันที่สั่ง (defaults.agent หรือ `--agent`) เป็นตัวแรกเสมอ — ถ้าล้มเหลวด้วยข้อความโควตา/limit (เช่น `usage limit reached`, `rate limit`, `credits balance ... too low`) ระบบสลับไปตัวถัดไปตามลำดับ `_fallback` ของ tier นั้นทันที · **ล้มด้วยเหตุอื่นไม่สลับ** (กันเผาโควตาซ้ำหลายเท่า) · ตัวรันจริงและเส้นทางการสลับถูกบันทึกใน checkpoint และ summary
 - **โมเดลเต็มชั่วคราว** (เช่น codex `ERROR: Selected model is at capacity`) = รอ 30s แล้ว 90s ลองตัวเดิมซ้ำก่อน — ใช้ได้แม้สั่ง `--no-fallback` เพราะไม่เปลี่ยนตัวรัน · ลองครบแล้วยังเต็มถึงนับเป็นเหตุสลับตาม `_fallback`
 - **ล้มแล้วเหตุอยู่ใน `error`** ของ `report.json`/checkpoint — ดึงบรรทัด error ที่ CLI ประกาศเองจาก stderr (`ERROR:`/`AGY_ERROR:`/`jetski:` ฯลฯ) ไม่ต้องเปิดไฟล์ stderr ก่อนถึงรู้
-- **t3–t5 จัดคู่ model ให้ความสามารถใกล้กันใน tier เดียว** — สลับตัวรันตอนติดโควตาแล้วคุณภาพไม่ตกหนัก · agy ใช้ flash-low ซ้ำทั้ง t4/t5 เพราะขั้นความสามารถของ Gemini มีให้เลือกแค่นั้น (เช่นเดียวกับ argon-high ที่ซ้ำ t0/t1 — agy ไม่มี effort `max`)
+- **fallback ต้องยังเหมาะกับงานใน tier เดียวกัน** — คะแนนข้ามค่ายอาจต่างกัน; การจัดตามความคุ้มค่าไม่ได้รับรองว่าคุณภาพเท่ากัน · งานที่ต้องวิเคราะห์หลายไฟล์/ออกแบบเคสใหม่/แตะความปลอดภัยไม่ควรใช้ t4/t5 แม้จำนวนบรรทัดน้อย · agy ใช้ flash-low ซ้ำทั้ง t4/t5 ตามตัวเลือกที่ตั้งไว้
 - **`null` = ยังไม่มี model ทัดเทียมใน tier นั้น** — ใช้ `--all` แล้ว agent ตัวนั้นจะถูกข้ามอัตโนมัติพร้อมข้อความแจ้ง แต่ถ้าระบุ `--agent <name>` ตรงๆ จะ error ทันที
 - **t0 ยืด timeout อัตโนมัติเป็น 3600 วินาที/agent** (ปกติ 1800) เพราะงานหนักกินเวลานาน — override ด้วย `--timeout` ได้เสมอ (ตั้งที่ `"_timeoutSec"` ใน tier)
-- effort `xhigh`/`max` ของ codex กินโควตา ChatGPT เร็วกว่าปกติ — ใช้เฉพาะ t0 จริงๆ
+- effort สูงของ codex อาจเพิ่มเวลาและโควตาเมื่อเทียบกับ effort ต่ำของ model เดียวกัน — ค่าเริ่มต้น t1–t5 ไม่ใช้ `xhigh`/`max`; ถ้างานเกินขอบเขตให้เลือก tier สูงขึ้นเมื่อเปิด task ไม่ใช่เพิ่ม effort ทุกงาน
 - agy มี `gpt-oss-120b-medium` (open-weight ราคาถูกมาก) เผื่อทำ tier สำหรับงานจำนวนมาก
 - แก้/เพิ่ม tier ได้ที่ส่วน `"tiers"` ใน `agents.json` · ชื่อ model ล่าสุดของแต่ละค่ายเช็คได้เสมอ (เช่น `agy models`)
 
@@ -313,6 +318,10 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 - ต่อยอดเป็น MCP server เพื่อให้ AI session ใดก็เรียกทีมนี้เป็น tool ได้
 
 ## Change Log
+
+- 2026-10-29 — รวมตาราง tier ทุกค่ายเป็น AA v5.0 ชุดเดียว: claude t0 `opus/xhigh` · t2 `opus/medium` · t3 `sonnet/high` · tier ที่ค่ายไม่ถึงระดับตั้ง `null` — agy t0 (ไม่มีตัวเหนือ argon-high) และ opencode t0–t2 (GLM-5.3 max = 32 บน v5.0 ไม่ใช่ 45 ของ v4.3.2)
+- 2026-10-29 — ปรับ OpenCode (GLM) ตามชนิดงานและความคุ้มค่า: t1 ตั้ง `glm-5.3#max` เป็นเพดานค่ายและใช้ซ้ำที่ t0 เป็นเพดานสำรอง (เดิม null ทั้งคู่), t2 `glm-5.3#high`, t3 `glm-5.3-flash#high`, t4/t5 `glm-5.3-flash#low` (แก้ draft เดิมที่วาง `flash#max` ที่ t4 และไม่มี `#low` เลย — ขัดหลักสงวน effort สูงสุดไว้กับงานยาก) · ~~คะแนนอ้าง AA v4.3.2~~ — ถูกแทนด้วย entry ด้านบน (AA เสนอ v5.0 จริง GLM-5.3 max = 32 → t0–t2 เป็น null)
+- 2026-10-29 — ปรับเฉพาะ Codex ตามชนิดงานและความคุ้มค่า: t1 Sol high, t2 Sol medium, t3 Terra medium, t4 Luna medium, t5 Luna low; t0 คง Astra max เป็น overdrive · ใช้ Intelligence Index เป็นข้อมูลประกอบและไม่เร่ง effort เพื่อเทียบคะแนนเพื่อน · เพิ่ม prompt ให้ค่ายอื่นเลือกตามหลักเดียวกันที่ `docs/tier-selection-prompt.md` ในราก repo · ยังไม่ได้วัดคุณภาพหรือโควตาผ่าน BAAN จริง
 
 - 2026-10-29 — verification lint เตือนเพิ่ม: ledger ไม่มี `ref` · งานต่อยอด task high ที่ยังไม่ผ่าน · wave เกิน 6 task
 - 2026-10-29 — ตรวจตามความเสี่ยง (charter ข้อ 13): oracle pack · `risk`/`wave` ต่อ task · ledger `oracle`+`ref` · verification lint ใน `--lint-plan`
