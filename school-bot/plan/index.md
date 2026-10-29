@@ -11,6 +11,7 @@ Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกต�
 คิวปัจจุบัน: [Queue 007](queue-007.md) — GMตรวจ63tasksมี21localready/5partial/37waiting · กำลังทำต่อ [091](../planning/task-091.md) หลัง090 · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
 
 - **G/Light/infra/B/BFF**: ผู้ใช้อนุญาตGatewaydevแล้วตาม046; implementation review/H5ยังรอหลักฐาน — fullLogin NOT_READY; logout transport local slice **ผ่านครบ**: B rework3 [check PASS](../planning/check-092-grpc-r3-001.md) 2234/0 + G controller r4 ตาม[มติ050](../requirement/decisions-050.md) + [JPO092](../planning/jpo-092-logout-r4-001.md) SEC001-016 CLOSED local — ลงใน JSON เป็น slice `done-local` ของ BE-006/BE-039 ผูก AC-036-06 แล้ว (ครอบเฉพาะส่วน local) — `verified` รอ full Login/H5/production · production/H5/fullLogin ยังปิด · ไม่ถามอนุญาตdevซ้ำ
+- **pilot SB-W1 (ใบงาน093) ปิดแล้ว — 4 task verified**; ข้อรอคนที่เปิด: H1 (G/infra) · H2 (DB+infra privileges, license_admin) · H4 (cert/pins/custody) · H5 (DPO) · TR-AUTH-03/04 (DBA Master) · TR-AUTH-06 (legacy) · GAP-AUTH-006 (roster) — ป้อน gate ที่ QA ไม่ขวาง SB-W2 บน stub ([ผลวัด+ตาราง](../planning/pilot-093-metrics-001.md))
 - **ผู้ใช้**: forward [DB cover](../db/db-safe-evidence-cover-001.md) ให้เจ้าของ DB → เจ้าของ DB ส่ง EV-01..03 → 04/05 → 06 (optional) · ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว
 - **UX เซ็นแล้ว**: ผู้ใช้อนุมัติ UX-005/007 และ expired-copy delta Q39–Q46 ตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; ไม่อยู่ในรายการรอคนแล้ว
 - **ยังเปิด**: spec Q3 (รุ่นหุ่น/firmware/calibration/stop-unplug-emergency) · ผู้ถือ cert/ช่องทางแจกจ่าย · gates security/SQL/runtime · ทดสอบหุ่นจริงยังไม่อนุญาต (decisions-038)
@@ -43,7 +44,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
 | [SA-001](SA-001.md) | Contracts/update | sa | P0 | — | **verified** (ใบงาน093 — [check PASS](../planning/check-093-SA-001-001.md) · [contract-review-sa-001](../design/contract-review-sa-001.md) Rev1) |
-| [BE-001](BE-001.md) | Legacy auth | be | P0 | — | pending |
+| [BE-001](BE-001.md) | Legacy auth | be | P0 | — | **verified** (ใบงาน093 — [check PASS รอบ 3](../planning/check-093-BE-001-003.md) · [auth-evidence-001](../design/auth-evidence-001.md) Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006) |
 | [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
 | [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | pending |
 | [DBA-003](DBA-003.md) | Core evidence | dba | P1 | DBA-002 | pending |
@@ -57,7 +58,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [UX-003](UX-003.md) | Labs UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-002 + check-060 PASS) |
 | [UX-004](UX-004.md) | Learning UX | ux | P5 | BA-002 | **verified** (ใบงาน061 — signed int-004 ครบ + check PASS รอบ 7) |
 | [TP-001](TP-001.md) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
-| [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | pending |
+| [TP-002](TP-002.md) | Failure fixtures | tp | P1 | TP-001 | **verified** (ใบงาน093 — [wave gate PASS](../planning/check-093-wave1-gate-001.md) · tp-002-fixture-*) |
 | [SEC-001](SEC-001.md) | Trust review | sec | P0 | — | **verified** (ใบงาน093 — [check PASS](../planning/check-093-SEC-001-001.md) · [security-review-093-001](../design/security-review-093-001.md) · ข้อรอคน H1/H2/H4/H5) |
 | [BE-003](BE-003.md) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
 | [BE-004](BE-004.md) | Signed lease | be | P2 | BE-003 | pending |

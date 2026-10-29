@@ -25,3 +25,4 @@ oracle pack ในหัวข้อ Acceptance ของ [SA-001](../plan/SA-00
 ## Change Log
 
 - 2026-10-29 — เปิด093 · ไม่มี role ค้างรัน · lint แผน ✓ (ติดประตู 20/63)
+- 2026-10-29 — ปิด SB-W1: SA-001/SEC-001 L1 PASS รอบเดียว · BE-001 L1 FAIL→rework 2 รอบ→PASS · TP-002 wave gate PASS · 4 task verified พร้อม oracle+ref · [ผลวัด pilot](pilot-093-metrics-001.md) ผ่านเกณฑ์ 4/4 · ข้อรอคน H1/H2/H4/H5 + TR-AUTH-03/04/06 + GAP-AUTH-006

@@ -382,9 +382,11 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
-      "wave": 1
+      "wave": 1,
+      "oracle": "oracle pack BE-001 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-022/023/058/079/082 — check-093-BE-001-003 PASS (rework 2/2)",
+      "ref": "50cfe90"
     },
     {
       "id": "DBA-001",
@@ -827,9 +829,11 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "low",
-      "wave": 1
+      "wave": 1,
+      "oracle": "oracle pack TP-002 (ตรึง 2026-10-29): DES-001 Rev1 · TP001-003/010/037/040/045/058/079 — check-093-wave1-gate-001 PASS (wave gate)",
+      "ref": "11e9442"
     },
     {
       "id": "SEC-001",
@@ -4199,7 +4203,9 @@
     {"date":"2026-10-29","revision":2,"summary":"ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป","refs":["plan/index.md","planning/check-061-verdicts-001.md","planning/status-sync-062-001.json"]},
     {"date":"2026-10-29","revision":2,"summary":"re-gate ตามข้อ 10 (ผู้ใช้อนุมัติ): ถอด gate จากงานที่ทำบน stub/fake ได้ 43 งาน · ผู้ถือใหม่ QA-001 G-AUTH, BE-023 G-AUTH (DES-012 channel production), QA-002 G-PROJECT-DB+G-GUEST, QA-004 G-LEARN, QA-010 G-RELEASE-DB · G-CORE/G-LEARN-DB/G-DELIVERY คงที่ DBA-003/QA-015-016/QA-008-010 · คง G-ROBOT-CONTRACT ที่ BE-010 (สัญญา breaking + สั่งเคลื่อนที่หุ่น) · ปิด G-UX-ENTRY/PROJECT/LABS/LEARN จาก sign-off ที่มีอยู่ · งาน verified คง gate_ids เป็นประวัติ (BAAN 0.21.1 ไม่นับว่าขวาง)","refs":["plan/gates-001.md","requirement/decisions-041.md","requirement/decisions-043.md"]},
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SA-001 verified จาก check-093-SA-001-001 PASS (L1 ทันที, AGY T2 ข้ามโมเดลกับ writer Codex T1) · deliverable design/contract-review-sa-001.md Rev1","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SEC-001 verified จาก check-093-SEC-001-001 PASS (AGY T2 ข้ามโมเดลกับ writer Codex T2) · deliverable design/security-review-093-001.md + evidence/compliance · ข้อรอคน H1/H2/H4/H5 ไปที่ Waiting on Human (H3 พักตามมติ047)","refs":["planning/task-093.md"]}
+    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SEC-001 verified จาก check-093-SEC-001-001 PASS (AGY T2 ข้ามโมเดลกับ writer Codex T2) · deliverable design/security-review-093-001.md + evidence/compliance · ข้อรอคน H1/H2/H4/H5 ไปที่ Waiting on Human (H3 พักตามมติ047)","refs":["planning/task-093.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: BE-001 verified จาก check-093-BE-001-003 PASS หลัง rework 2 รอบ (รอบ1 ตก 5 ข้อหลักฐาน · รอบ2 เหลือ token canonical) · deliverable design/auth-evidence-001.md Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006","refs":["planning/task-093.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: TP-002 verified จาก wave gate check-093-wave1-gate-001 PASS (risk low — ตรวจครั้งเดียวที่ gate) + ความสอดคล้องข้าม task SA-001/BE-001/SEC-001/TP-002 ผ่าน","refs":["planning/task-093.md"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
