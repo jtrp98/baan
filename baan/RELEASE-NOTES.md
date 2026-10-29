@@ -2,6 +2,22 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.22.0 — 2026-10-29 · จัด model ต่อ tier ตามชนิดงานและความคุ้มค่า (ทุกค่าย)
+
+ที่มา: `docs/tier-selection-prompt.md` — ให้แต่ละค่ายเลือก model/effort ที่เบาที่สุดซึ่งทำงานระดับนั้นได้ดี แทนการจัดตัวให้ "ทัดเทียม" Opus · Intelligence Index เป็นข้อมูลประกอบ (AA v5.0 ณ 2026-10-29 ชุดเดียวทั้งตาราง) · ยังไม่ได้วัดคุณภาพ/โควตากับงาน BAAN จริง
+
+### ⚠ ต้องทำตอนอัปเกรด
+- **tier ที่เป็น `null` ใหม่: agy t0 · opencode t0/t1/t2** — สั่ง `--agent agy --tier t0` หรือ `--agent opencode --tier t0|t1|t2` ตรงๆ จะ error ทันที (ใช้ `--all` ข้ามให้เอง) · ใบงาน/แผนที่ผูก agent เหล่านี้กับ tier ดังกล่าวต้องเปลี่ยน agent หรือ tier
+- **fallback สั้นลง** — t0 เหลือ codex→claude · t1/t2 เหลือ codex→agy→claude (opencode ถูกข้าม)
+- **model เริ่มต้นเปลี่ยน** — ใครที่ override `tiers` เองใน config ของ workspace ไม่กระทบ · ที่ใช้ค่า package จะเห็นโควตา/เวลาเปลี่ยน (เช่น claude t2 เป็น Opus แทน Sonnet)
+
+### เปลี่ยน
+- **codex** — t1 `gpt-6.1-sol/high` (เดิม astra) · t2 sol/medium · t3 `gpt-6.1-terra/medium` · t4 luna/medium · t5 luna/low · t0 คง astra/max
+- **claude** — t0 `opus/xhigh` (เดิม max: ได้ +1 คะแนนแต่ช้ากว่า ~6 เท่า — max เป็น override รายงาน) · t2 `opus/medium` (เดิม sonnet/high: 48 vs 41) · t3 `sonnet/high` (เดิม medium: 41 vs 30) · t1/t4/t5 คงเดิม
+- **agy** — t0 `null` (argon-high คือเพดาน Gemini ใน `agy models` และใช้ที่ t1 แล้ว) · t1–t5 คงเดิม
+- **opencode (GLM)** — t0–t2 `null` (GLM-5.3 max ได้ 32 บน v5.0 ต่ำกว่า t1/t2 ค่ายอื่น 46–52) · t3 `glm-5.3-flash#high` · t4/t5 `glm-5.3-flash#low` (เดิม flash#max/#high — effort สูงสุดกับงานตามแบบ)
+- README tier ladder + หมายเหตุรายค่าย · tests ปรับตามผังใหม่ (140 เท่าเดิม)
+
 ## 0.21.1 — 2026-10-29 · DAG lint: งานที่ verified แล้วไม่ขวางงานที่พึ่ง
 
 ที่มา: re-gate แผน school-bot — SA-002/UX-002/UX-004 ตรวจผ่านแล้วแต่ `--lint-plan` ยังนับ gate ของมันว่าขวางงาน implement ที่พึ่ง 31 งาน

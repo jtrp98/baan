@@ -121,15 +121,13 @@
       ],
       "claude": {
         "model": "opus",
-        "effort": "max"
+        "effort": "xhigh"
       },
       "codex": {
         "model": "gpt-6-astra",
         "effort": "max"
       },
-      "agy": {
-        "model": "gemini-4-argon-high"
-      },
+      "agy": null,
       "opencode": null
     },
     "t1": {
@@ -144,7 +142,7 @@
         "effort": "high"
       },
       "codex": {
-        "model": "gpt-6-astra",
+        "model": "gpt-6.1-sol",
         "effort": "high"
       },
       "agy": {
@@ -160,19 +158,17 @@
         "claude"
       ],
       "claude": {
-        "model": "sonnet",
-        "effort": "high"
+        "model": "opus",
+        "effort": "medium"
       },
       "codex": {
         "model": "gpt-6.1-sol",
-        "effort": "high"
+        "effort": "medium"
       },
       "agy": {
         "model": "gemini-4-argon-medium"
       },
-      "opencode": {
-        "model": "zai-coding-plan/glm-5.3#max"
-      }
+      "opencode": null
     },
     "t3": {
       "_fallback": [
@@ -183,17 +179,17 @@
       ],
       "claude": {
         "model": "sonnet",
-        "effort": "medium"
+        "effort": "high"
       },
       "codex": {
-        "model": "gpt-6.1-sol",
-        "effort": "low"
+        "model": "gpt-6.1-terra",
+        "effort": "medium"
       },
       "agy": {
         "model": "gemini-3.8-flash-medium"
       },
       "opencode": {
-        "model": "zai-coding-plan/glm-5.3#high"
+        "model": "zai-coding-plan/glm-5.3-flash#high"
       }
     },
     "t4": {
@@ -209,13 +205,13 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "high"
+        "effort": "medium"
       },
       "agy": {
         "model": "gemini-3.8-flash-low"
       },
       "opencode": {
-        "model": "zai-coding-plan/glm-5.3-flash#max"
+        "model": "zai-coding-plan/glm-5.3-flash#low"
       }
     },
     "t5": {
@@ -231,13 +227,13 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "medium"
+        "effort": "low"
       },
       "agy": {
         "model": "gemini-3.8-flash-low"
       },
       "opencode": {
-        "model": "zai-coding-plan/glm-5.3-flash#high"
+        "model": "zai-coding-plan/glm-5.3-flash#low"
       }
     }
   }
