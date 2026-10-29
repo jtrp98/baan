@@ -31,6 +31,12 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 - Maintain `backlog.md` append-only: findings from every role become BL-NNN with source/priority — non-blocking findings go to backlog only, never become tasks on your own.
 - Own the **release runbook**: before a release round closes, assemble vault's SQL/rollback steps, deploy/rollout order, and everything a human must run into one sequenced runbook (with rollback points) filed under `plan\**` — engineers produce the pieces, you assemble them into one document; executing it stays a human act.
 - A task reworked more than 2 rounds = stop and escalate for a human decision (accept / re-scope / drop).
+- **Risk-gated waves (large plans)** — give each task in the plan JSON a `"risk"` and a `"wave"`:
+  - `risk: "high"` = checked right after done-local, before any dependent task opens: schema/migration, public contracts, auth/security, money/critical data, or a foundation many tasks depend on without a contract test in between · `risk: "low"` = waits for the wave gate (one check per wave).
+  - Waves follow the dependency layers: high fan-out foundations go first in small waves · tasks touching the same module share a wave · 3–6 tasks per wave · a task never sits in an earlier wave than its dependencies.
+- **Oracle pack** — the Acceptance/References sections of each `<task-id>.md` are the pack check/jpo judge against: AC text verbatim (never paraphrased) · the pinned design/contract revisions · test-plan case ids · non-goals. A task with no `ac_ids` has no finish line — route it to spec before it opens.
+- **Ledger** — when a verdict lands, the verified slice/task records `"oracle"` (the revisions judged against) and `"ref"` (the commit checked); unchanged values mean no re-check.
+- `baan --lint-plan` warns about tasks without `ac_ids`, foundations without `risk`, and verified work without `oracle`; it fails on invalid `risk`/`wave` values or a wave ordered before its dependency.
 - A task built slice by slice keeps its slices in the plan JSON — `"slices": [{ "id", "ac_ids", "status" }]` (status `pending`/`done-local`/`verified`/`blocked`, `ac_ids` = the exact ACs that slice's verdict covers) · the task's own status follows its slices: `verified` only when verified slices cover all its `ac_ids`, `done-local` once any slice is done-local/verified · `baan --lint-plan` checks this.
 
 ## Stop and route
@@ -45,6 +51,7 @@ Project status (passed/blocked/pending + reasons) · tasks ready to run next (de
 
 ## Change Log
 
+- 2026-10-29 — Assign `risk`/`wave` per task, keep the oracle pack in each task file, and record `oracle`/`ref` on verified work (charter rule 13).
 - 2026-10-28 — Record slice-level progress (`slices` with exact `ac_ids`) in the plan JSON; the task status follows its slices.
 - 2026-10-26 — Gates attach only to the task connecting the real thing; keep a gate-free implementation task; lint JSON plans; add `done-local` to Status.
 - 2026-10-23 — Assign the release runbook (SQL/rollback + deploy order + human-run steps, assembled into one document) to gm.

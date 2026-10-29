@@ -2,7 +2,7 @@
 // ผูกงาน implement 61/63 ไว้หลังประตูทางอ้อมแต่ validation เดิมผ่านหมด)
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanProgress, normalizeDagTasks, validateAndFixPlan } from "../src/plan.mjs";
+import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanProgress, lintPlanVerification, normalizeDagTasks, transitiveFanOut, validateAndFixPlan } from "../src/plan.mjs";
 import { plannerPrompt } from "../src/prompts.mjs";
 
 const cfg = {
@@ -44,7 +44,7 @@ test("ติดประตูครึ่งพอดี = ผ่าน · เ�
 
 test("normalize อ่านฟิลด์ของแผนโปรเจกต์และชื่อ role เดิม", () => {
   const [t] = normalizeDagTasks([{ id: "FE-006", owner: "fe", depends_on: ["BE-1"], gate_ids: ["G-UX"], status: "Pending", ac_ids: ["AC-1"] }]);
-  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], slices: [] });
+  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, oracle: false, slices: [] });
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
@@ -133,4 +133,65 @@ test("lintPlanFile แสดงความคืบหน้างาน implem
   const bad = run({ tasks: [be({ status: "verified", slices: [{ id: "s1", ac_ids: ["AC-1"], status: "verified" }] })] });
   assert.equal(bad.code, 1);
   assert.match(bad.out, /✗ BE-003: status verified แต่/);
+});
+
+// Regression: ตรวจตามความเสี่ยง — school-bot (2026-10-29) มี 35/110 task ไม่มี ac_ids รวมงานฐานรากที่มีงานพึ่ง
+// ทางอ้อม 79–89 งาน จึงตรึงเส้นชัยไม่ได้และตัดสินไม่ได้ว่าต้องตรวจทันทีหรือรอ wave gate
+const verify = (tasks) => lintPlanVerification(normalizeDagTasks(tasks));
+const chain = (over = {}) => [
+  { id: "SA", owner: "sa", depends_on: [], ...over.SA },
+  { id: "BE-1", owner: "be", depends_on: ["SA"], ac_ids: ["AC-1"], ...over["BE-1"] },
+  { id: "BE-2", owner: "be", depends_on: ["BE-1"], ac_ids: ["AC-2"], ...over["BE-2"] },
+  { id: "FE-1", owner: "fe", depends_on: ["BE-2"], ac_ids: ["AC-3"], ...over["FE-1"] },
+];
+
+test("fan-out นับงานที่พึ่งทั้งทางตรงและทางอ้อม ไม่นับซ้ำ", () => {
+  const f = transitiveFanOut(normalizeDagTasks([...chain(), { id: "QA", owner: "qa", depends_on: ["BE-1", "FE-1"] }]));
+  assert.deepEqual(Object.fromEntries(f), { SA: 4, "BE-1": 3, "BE-2": 2, "FE-1": 1, QA: 0 });
+});
+
+test("task ที่ยังไม่ verified และไม่มี ac_ids = warning บรรทัดเดียว เรียงตาม fan-out · verified แล้วไม่เตือน", () => {
+  const r = verify([...chain({ "FE-1": { ac_ids: [] } })]);
+  assert.deepEqual(r.errors, []);
+  assert.match(r.warnings.join("\n"), /ไม่มี ac_ids 2 งาน .*: SA\(3\), FE-1\(0\)/);
+  assert.doesNotMatch(verify(chain({ SA: { status: "verified", oracle: "DES-1 Rev2" } })).warnings.join(), /ไม่มี ac_ids/);
+});
+
+test("ฐานรากที่ยังไม่ระบุ risk = warning · ใส่ risk แล้วเงียบ · แผนเล็กกว่าเกณฑ์ไม่เตือน", () => {
+  const base = { SA: { ac_ids: ["AC-0"] } };
+  assert.match(verify(chain(base)).warnings.join(), /ฐานราก \(งานพึ่ง ≥ 3\) ยังไม่ระบุ risk 1 งาน .*SA\(3\)/);
+  assert.deepEqual(verify(chain({ SA: { ac_ids: ["AC-0"], risk: "High" } })).warnings, []);
+  assert.deepEqual(verify(chain(base).slice(0, 3)).warnings, [], "fan-out สูงสุด 2 < เกณฑ์ขั้นต่ำ 3");
+});
+
+test("risk/wave ค่าผิด หรือ wave ย้อน dependency = error · แผนเก่าไม่มีฟิลด์ = ไม่มี error ใหม่", () => {
+  assert.match(verify(chain({ SA: { risk: "medium" } })).errors.join(), /SA: risk ต้องเป็น high\/low/);
+  assert.match(verify(chain({ SA: { wave: 0 } })).errors.join(), /SA: wave ต้องเป็นจำนวนเต็มบวก/);
+  const back = verify(chain({ SA: { wave: 2 }, "BE-1": { wave: 1 } }));
+  assert.match(back.errors.join(), /BE-1: อยู่ wave 1 แต่พึ่งงานที่อยู่ wave หลังกว่า \(SA@2\)/);
+  assert.deepEqual(verify(chain({ SA: { wave: 1 }, "BE-1": { wave: 1 }, "BE-2": { wave: 2 } })).errors, []);
+  const legacy = verify(chain());
+  assert.deepEqual(legacy.errors, []);
+  assert.equal(legacy.used, false);
+});
+
+test("verified ที่ไม่มี oracle = warning รวมบรรทัดเดียว ทั้งระดับ slice และ task", () => {
+  const r = verify(chain({
+    "BE-1": { status: "verified" },
+    "BE-2": { slices: [{ id: "s1", ac_ids: ["AC-2"], status: "verified" }, { id: "s2", ac_ids: ["AC-2"], status: "verified", oracle: "DES-1 Rev2" }] },
+  }));
+  assert.match(r.warnings.join("\n"), /ไม่มี oracle .* 2 จุด .*: BE-1, BE-2\/s1$/m);
+});
+
+test("lintPlanFile พิมพ์สรุป risk/wave เมื่อแผนใช้ฟิลด์ และ warning ไม่กระทบ exit code", () => {
+  const run = (json) => {
+    const out = [];
+    return { code: lintPlanFile("plan.json", () => JSON.stringify(json), (m) => out.push(m)), out: out.join("\n") };
+  };
+  const used = run({ tasks: chain({ SA: { risk: "high", wave: 1 }, "BE-1": { risk: "low", wave: 2 }, "FE-1": { ac_ids: [] } }) });
+  assert.equal(used.code, 0);
+  assert.match(used.out, /ตรวจตามความเสี่ยง: high 1 \(ตรวจทันที\) · low 1 \(รอ wave gate\) · ยังไม่จัด 2 · wave 2/);
+  assert.match(used.out, /⚠ task ที่ยังไม่ verified และไม่มี ac_ids/);
+  assert.doesNotMatch(run({ tasks: chain() }).out, /ตรวจตามความเสี่ยง/);
+  assert.equal(run({ tasks: chain({ SA: { risk: "medium" } }) }).code, 1);
 });

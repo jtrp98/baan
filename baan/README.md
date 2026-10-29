@@ -220,6 +220,7 @@ baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG + คว�
 - **plan validation ก่อน spawn ใดๆ**: id ต้องเข้า pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (id คือชื่อไฟล์ จึงกัน path traversal), ตรวจ types ของ tasks/dependsOn/humanGates/docsOnly, self-dependency และ cycle
 - **DAG lint**: แผนสดจาก planner ถูกปฏิเสธเมื่อไม่มีงาน implement (และไม่มี `docsOnly`) หรือเมื่องาน implement เกินครึ่งติดประตูมนุษย์ · แผนจาก `--plan-file`/`--resume` เตือนอย่างเดียว (run เก่ายัง resume ได้) · `--lint-plan` อ่านได้ทั้งฟิลด์ของ baan (`role`/`dependsOn`/`gateIds`/`humanGate`) และของแผนโปรเจกต์ (`owner`/`depends_on`/`gate_ids`, ชื่อ role เดิม เช่น `fe`/`be` แปลงให้เอง) — งานที่มี gate ถือว่าติดประตู และงานที่พึ่งงานนั้นติดตามไปด้วย
 - **progress lint (ราย slice)**: task ที่ทำทีละ slice เก็บ `"slices": [{ "id", "ac_ids", "status" }]` — `--lint-plan` แสดงความคืบหน้างาน implement (verified/done-local/slice) · **error** เมื่อ task อ้าง `verified` แต่ slice ที่ verified ยังไม่ครอบ `ac_ids` ครบ, slice ที่ไม่ใช่ pending ไม่ระบุ AC หรืออ้าง AC นอก task · **warning** (ไม่กระทบ exit code) เมื่อ slices ไปไกลกว่าสถานะที่ลงไว้ หรือเอกสาร verified ≥ 5 งานแต่งาน implement ยังไม่มี done-local/verified เลย
+- **verification lint (ตรวจตามความเสี่ยง — charter ข้อ 13)**: ฟิลด์ optional ต่อ task `"risk": "high"|"low"` (high = ตรวจทันทีก่อนงานต่อยอด · low = รอ wave gate) · `"wave": <จำนวนเต็มบวก>` · `"oracle"` (revision ที่ใช้ตัดสิน — ลงที่ task หรือ slice ที่ verified คู่กับ `"ref"` commit ที่ตรวจ) — `--lint-plan` พิมพ์สรุป risk/wave เมื่อแผนใช้ฟิลด์เหล่านี้ · **error** เมื่อ `risk`/`wave` ค่าผิด หรือ task อยู่ wave ก่อน dependency · **warning** เมื่อ task ที่ยังไม่ verified ไม่มี `ac_ids` (ตรึง oracle ไม่ได้), task ฐานราก (งานพึ่งทางตรง+ทางอ้อม ≥ max(3, ¼ ของ task ทั้งหมด)) ยังไม่ระบุ `risk` หรืองานที่ verified ไม่มี `oracle` — เรียงตามจำนวนงานที่พึ่ง · แผนเก่าที่ไม่มีฟิลด์ไม่ตก
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
@@ -313,6 +314,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 ## Change Log
 
+- 2026-10-29 — ตรวจตามความเสี่ยง (charter ข้อ 13): oracle pack · `risk`/`wave` ต่อ task · ledger `oracle`+`ref` · verification lint ใน `--lint-plan`
 - 2026-10-28 — check มีขอบเขต + oracle ตรึงต่อ task · ติดเพดาน rework = ถามทันที · สถานะราย slice + progress lint ใน `--lint-plan`
 - 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: subagent ตรวจได้แบบมีเงื่อนไขความเป็นอิสระ (ตัวใหม่ + AC/spec เท่านั้น + หลักฐานจริง) ข้ามโมเดลเหลือเป็น escalation สำหรับงานวิกฤต/security/FAIL ซ้ำ
 
