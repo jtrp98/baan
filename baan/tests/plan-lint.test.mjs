@@ -30,6 +30,17 @@ test("งาน implement ทุกงานติดประตู (ตรง�
   assert.deepEqual(r.blocked, ["BE-1", "FE-1"], "ติดประตูทางอ้อมผ่านสาย dependency");
 });
 
+test("งานที่ verified แล้วไม่ส่งต่อ gate ให้งานที่พึ่ง · ยังไม่ verified = ขวางเหมือนเดิม (เคส school-bot SA-002)", () => {
+  const tasks = (status) => [
+    { id: "SA-002", owner: "sa", depends_on: [], gate_ids: ["G-GUEST"], status },
+    { id: "BE-1", owner: "be", depends_on: ["SA-002"] },
+  ];
+  assert.deepEqual(lint(tasks("verified")).blocked, []);
+  assert.deepEqual(lint(tasks("done-local")).blocked, ["BE-1"]);
+  const sliced = [{ id: "G", owner: "sa", gate_ids: ["G-1"], ac_ids: ["AC-1"], slices: [{ id: "s1", ac_ids: ["AC-1"], status: "verified" }] }, { id: "BE-1", owner: "be", depends_on: ["G"] }];
+  assert.deepEqual(lint(sliced).blocked, [], "verified ตาม slices นับด้วย");
+});
+
 test("ติดประตูครึ่งพอดี = ผ่าน · เกินครึ่ง = error แม้มีงานเริ่มได้ (เคส school-bot: 62/63)", () => {
   const ok = lint([task({ id: "S", role: "sys" }), task({ id: "F", role: "front", dependsOn: ["S"], humanGate: "UX sign-off" })]);
   assert.deepEqual(ok.errors, []);
