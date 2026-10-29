@@ -42,7 +42,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 
 | Task | Name | Owner | Phase | Depends | Status |
 |---|---|---|---|---|---|
-| [SA-001](SA-001.md) | Contracts/update | sa | P0 | — | pending |
+| [SA-001](SA-001.md) | Contracts/update | sa | P0 | — | **verified** (ใบงาน093 — [check PASS](../planning/check-093-SA-001-001.md) · [contract-review-sa-001](../design/contract-review-sa-001.md) Rev1) |
 | [BE-001](BE-001.md) | Legacy auth | be | P0 | — | pending |
 | [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
 | [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | pending |
