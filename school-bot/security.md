@@ -384,3 +384,13 @@ B QA triage (ไม่มี SEC ID): UUID duplicate Medium และ Origin/bin
 Current OPEN: Important6/Medium6/Minor3 · ไม่ใช่ risk acceptance · ไม่ปิด H5/TLS/production registration/full private build/DB/BFF CSRF
 
 - 2026-10-28 — append JPO092 WZnc4m; SEC001-016 CLOSED local scope
+
+## Security review pack ใบงาน093 — 2026-10-29
+
+[ตาราง threat/control ครบ 10 AC](design/security-review-093-001.md) · [หลักฐานและข้อรอคน](design/security-review-093-evidence-001.md) · [compliance/dependencies](design/security-review-093-compliance-001.md) — ตาม oracle SEC-001 ตรึง DES-001 Rev1 / DES-002 Rev3 / DES-004 Rev11 / DES-007 Rev3. ต่อจาก disposition/mitigation/review060 และ JPO092 โดยอ้าง SEC001 IDs เดิม; ไม่มี finding/risk acceptance ใหม่. Important6 ยังรอ fix+re-audit หรือคนรับ residual เป็นลายลักษณ์อักษร. SEC001-016/017 คง CLOSED เฉพาะ local logout ไม่ใช่ full AC-036-06 PASS.
+
+ตรวจ source เฉพาะจุดและอ่านผลเดิม ไม่มี test run ใหม่/DB/deploy. API csproj ปัจจุบันมี gRPC/Protobuf PackageReference แล้ว ต่างจากข้อเท็จจริงวันที่2026-10-23; ยังไม่มี CVE/license sign-off. Replay 15 นาทีอนุมัติ046แล้ว; signer/custody ของ License พักตาม047 ไม่ขอคำตอบซ้ำ. อ่าน PDPA เฉพาะส่วนจากแหล่งราชการ ยังไม่รับรอง compliance/GDPR applicability. รายละเอียด/ข้อจำกัด/ผู้ตอบ H1–H5 อยู่ใน pack ไม่เปลี่ยน plan status.
+
+### Change Log ใบงาน093
+
+- 2026-10-29 — jpo append ลิงก์ review pack/หลักฐาน/compliance; เก็บ findings/ผลเดิมทุกแถว ไม่แก้ source ไม่ปิด human gate.

@@ -1,4 +1,4 @@
-# school-bot — Design Index — Rev6
+# school-bot — Design Index — Rev7
 
 > หน่วยอ่าน = ไฟล์ · สารบัญล้วน · เขียนโดย system-analyst เท่านั้น · 1 แถว = 1 บรรทัด
 > วิธีอ่าน: อ่านไฟล์นี้ก่อน แล้วเปิดเฉพาะไฟล์ des-*.md / data-model.md ที่ packet/brief ระบุ — ห้าม ls ห้ามอ่านข้ามหมวด · ตาราง DES ด้านล่างคือรายชื่อไฟล์ contract ทั้งหมด
@@ -130,6 +130,7 @@ G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogou
 
 | ไฟล์ | เนื้อหา |
 |---|---|
+| [contract-review-sa-001.md](contract-review-sa-001.md) | Rev1 — SA-001 ใบงาน093: trace6AC แยก core/projects/release/auth; source/DDL static และ disposition ตาม036/037; พร้อมส่ง check ไม่ใช่ runtime/catalog acceptance |
 | [data-model.md](data-model.md) | คู่มือข้อมูล Rev8 — หน้าที่ตาราง/450 ฟิลด์ ตัวอย่าง และตารางเก่า; ตรง SQL Rev7: 32ตาราง/PK32 บน SchoolBot DB |
 | [data-dictionary/index.md](data-dictionary/index.md) | สารบัญ 32 ตาราง: ทุกฟิลด์ ชนิด/NULL หน้าที่ ตัวอย่าง และ FK จาก SQL |
 | [data-legacy-001.md](data-legacy-001.md) | ตารางเดิมที่ใช้ ฟิลด์เชื่อม ขอบเขตอ่าน/เขียน และหลักฐาน source |

@@ -1,4 +1,4 @@
-# TP-002 — แผน failure/race fixtures — Rev1
+# TP-002 — แผน failure/race fixtures — Rev2
 
 วันที่ 2026-10-24 · รันโดย นายช่าง solo (subagent role inspect) · สถานะเอกสารอยู่ที่ [index](index.md)
 อ้างอิง: [TP-002](../plan/TP-002.md) (bridge/API/clock fixtures · Acceptance "late callback/drain/transport/DB failure/lease boundary จำลองได้ ไม่สั่งหุ่น"), [TP-001 + Amendment002](tp-001.md), [ผลตรวจ060a](../design/gap-sync-review-001.md) และสัญญา DES-002/003/004/006 + guest-workspace/guest-import/guest-history/teacher-authority/robot-boundary Rev1. เอกสารนี้เป็น**แผนเตรียมเท่านั้น** ไม่มีการรัน fixture จริง ไม่ใช่ QA PASS
