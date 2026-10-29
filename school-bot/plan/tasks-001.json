@@ -3307,9 +3307,11 @@
           "ac_ids": [
             "AC-043-01"
           ],
-          "status": "done-local",
-          "evidence": "reports/baan/2026-10-29-04-53-52-sys-tier-t3-1agents-5Sn6E4; parent rerun dotnet test web/SchoolBot.slnx 4169/0 + CurriculumAuthorization 22/0",
-          "note": "2026-10-29 B authorization ส่วนกลาง vs โรงเรียนบน stub principal ตาม DES-012 Rev9 — ไม่รวม H5 (route BFF W / endpoint web-principal G / network)"
+          "status": "verified",
+          "oracle": "oracle pack BE-039 (ตรึง 2026-10-29): DES-012 Rev9 · TP001-060 — check-094-BE-039-001 PASS + jpo-094-BE-039-001 DONE",
+          "ref": "B f77659f + worktree 2026-10-29 (ยังไม่ commit — ห้าม role commit target)",
+          "evidence": "planning/check-094-BE-039-001.md; planning/jpo-094-BE-039-001.md; parent rerun 4169/0",
+          "note": "2026-10-29 B authorization ส่วนกลาง vs โรงเรียนบน stub principal — ไม่รวม H5 · backlog: SEC094-001 (Minor publish ผู้เขียนว่าง), อ่านหลักสูตรเมื่อ license ไม่ active"
         }
       ],
       "risk": "high",
@@ -4215,7 +4217,8 @@
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SEC-001 verified จาก check-093-SEC-001-001 PASS (AGY T2 ข้ามโมเดลกับ writer Codex T2) · deliverable design/security-review-093-001.md + evidence/compliance · ข้อรอคน H1/H2/H4/H5 ไปที่ Waiting on Human (H3 พักตามมติ047)","refs":["planning/task-093.md"]},
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: BE-001 verified จาก check-093-BE-001-003 PASS หลัง rework 2 รอบ (รอบ1 ตก 5 ข้อหลักฐาน · รอบ2 เหลือ token canonical) · deliverable design/auth-evidence-001.md Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006","refs":["planning/task-093.md"]},
     {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: TP-002 verified จาก wave gate check-093-wave1-gate-001 PASS (risk low — ตรวจครั้งเดียวที่ gate) + ความสอดคล้องข้าม task SA-001/BE-001/SEC-001/TP-002 ผ่าน","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)","refs":["planning/task-094.md"]}
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)","refs":["planning/task-094.md"]},
+    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5","refs":["planning/task-094.md"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
