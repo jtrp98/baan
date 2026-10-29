@@ -55,7 +55,7 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
 
 - คำสั่งนี้**แนบไฟล์ role + `CONVENTIONS.md` (กติกากลางทุก role ต้องถือ)** ให้อัตโนมัติ — คุณไม่ต้องเล่ากติกาซ้ำใน task
 - prompt ของ role ขึ้นต้นด้วยป้าย `[baan-role: <ID>]` — ถ้า**คุณ**เห็นป้ายนี้ในคำสั่งงานของตัวเอง แปลว่าคุณคือ role ไม่ใช่ นายช่าง: ทำตามบทบาทนั้น ไม่ต้องอ่าน charter นี้ต่อ
-- คำตอบของ role จะพิมพ์ออกมาทาง stdout และเก็บที่ `reports/` ของ package (โฟลเดอร์ต่อ run มีชื่อ role + suffix สุ่ม — เปิดหลาย role พร้อมกันได้ไม่ชนกัน)
+- คำตอบของ role จะพิมพ์ออกมาทาง stdout และเก็บที่ `<ราก workspace>/reports/baan/` (ใบงานชี้ไฟล์ในนั้นได้ตรงๆ — agy อ่านได้ ไม่ต้องคัดลอก) (โฟลเดอร์ต่อ run มีชื่อ role + suffix สุ่ม — เปิดหลาย role พร้อมกันได้ไม่ชนกัน)
 - **cwd เริ่มต้น = ไดเรกทอรีที่คุณเรียกคำสั่ง** — อยู่ที่ราก workspace แล้วจะให้ role ดู repo ไหน ส่ง `--cwd <path ของ target>` เสมอ
 - **วันที่ของงาน** แนบให้ role อัตโนมัติ (ค่าเริ่มต้น = วันที่ของเครื่อง) — ถ้าผู้ใช้บอกวันที่ไว้ ส่ง `--date YYYY-MM-DD` ทุกครั้ง role จะใช้ลง Change Log โดยไม่ต้องถาม
 - **อ่านผลจากบรรทัด `สรุป:` ท้ายสุด + exit code**: exit 0 = ทุกตัว `completed` (DONE/PASS) · exit 1 = มีตัวที่ `needs_*`/`fail`/`blocked`/`timeout`/`failed` → route ต่อตามหัวข้อ handoff ด้านล่าง
@@ -120,6 +120,18 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
     - **ตรึง oracle ต่อ task**: ใบงานของ check/jpo ระบุ AC ids + test-plan cases + revision ของ design/สัญญาที่ใช้ตัดสิน ณ วันเปิด task/slice · ห้ามสั่ง "ตรวจ boundary เพิ่มเติม" แบบไม่มีขอบ · finding ที่ทำให้ arch ออกกฎใหม่ = กฎนั้นผูกกับ task/slice **ถัดไป** ไม่เลื่อนเส้นชัยของ task เดิม (ขอบเขตเต็มอยู่ใน `roles/check.md` หัวข้อ "Bounded scope")
     - **ติดเพดาน rework (แก้ครบ 2 รอบแล้วยัง FAIL หรือ jpo ยังมี Critical/Important) = หยุดเปิดงานใหม่แล้วถามผู้ใช้ทันที** แม้อยู่ในโหมด "ทำจนหมดงานแล้วถามทีเดียว" — role ที่รันอยู่ปล่อยให้จบ แล้วถามพร้อมทางเลือก (รับ slice นี้แล้วย้าย finding ที่เหลือเข้า backlog · ตัดขอบเขต · แก้เพิ่มอีกรอบ · ทิ้ง) และข้อแนะนำ · ห้ามพักไว้ "ท้ายวง" เพราะงาน pending ที่เหลือเยอะทำให้ท้ายวงไม่มาถึง
     - **check/jpo ไม่กิน slot เกินครึ่ง** — ถ้า slot ส่วนใหญ่เป็นงานตรวจและ writer ว่าง ให้เปิด writer ก่อนเปิดงานตรวจใหม่
+13. **ตรวจตามความเสี่ยง (risk-gated waves)** — ค่าตรวจขึ้นกับความเสี่ยงของ task ไม่ใช่จำนวน task · ใช้กับแผนงานใหญ่ที่ gm แบ่ง `wave` และ `risk` ไว้ใน JSON:
+    - **oracle pack แทนการอ่าน docs เต็ม** — หัวข้อ Acceptance/References ในไฟล์ `<task-id>.md` ของ gm คือ pack ของ task: ข้อความ AC ตามต้นฉบับ (ห้ามถอดความ) · revision ของ design/สัญญาที่ตรึงไว้ · test-plan case ids · non-goals · ใบงาน check/jpo แนบ pack นี้ · task ที่ไม่มี `ac_ids` = ตรึงเส้นชัยไม่ได้ ส่ง `spec` ผูก AC ก่อนเปิดงาน
+    - **อ่าน docs ฉบับเต็มใหม่เฉพาะเมื่อ** revision ที่ pack อ้างเปลี่ยน · มี `NEEDS_REQUIREMENT_CHANGE`/`NEEDS_DESIGN_CHANGE` · pack ตอบความกำกวมไม่ได้ (แก้ pack ไม่เดา) · ตรวจปิดโปรเจกต์
+    - **`risk: high`** (schema/migration, สัญญาสาธารณะ, auth/security, ข้อมูลเงิน/ข้อมูลสำคัญ, ฐานรากที่งานพึ่งเยอะและไม่มี contract test กั้น) = check (+`jpo` ถ้าเป็นพื้นผิว security) ทันทีหลัง `done-local` **ก่อน**เปิดงานที่ต่อยอด
+    - **`risk: low`** = ลง `done-local` แล้วรอ **wave gate**: check ใบเดียวต่อ wave ครอบทุก task low ของ wave นั้น — เทียบ pack ของแต่ละ task + ความสอดคล้องข้าม task + integration/contract tests · verdict ยังลงราย task/slice
+    - **จังหวะ test** — เคสสร้างจาก AC ตอนทำ pack ก่อนเขียนโค้ด · โค้ด test เขียนพร้อม task · contract test เขียนตอน task ที่ผลิต interface เสร็จ **ก่อน**เปิดงานที่ใช้ interface นั้น
+    - **wave ถัดไปไม่ต้องรอ gate ทั้งก้อน (pipelining)** — เปิดงานที่ไม่พึ่ง output ที่ยังไม่ผ่านการตรวจได้เลย · ห้ามเปิดงานที่ต่อยอดจาก task `high` ที่ยังไม่ผ่าน · เพดาน slot ของงานตรวจตามข้อ 12 ยังใช้
+    - **สายเดี่ยว module เดียว เจ้าของเดียว** (A → B → C → D) — ตรวจอิสระที่แกนที่เสี่ยงที่สุดหนึ่งจุด + ทางออกของสาย (ก่อนงานนอกสายเริ่ม) ข้อต่อที่เหลือใช้ test อัตโนมัติ + contract test
+    - **ledger กันตรวจซ้ำ** — slice/task ที่ verified ลง `oracle` (revision ที่ใช้ตัดสิน) และ `ref` (commit ที่ตรวจ) ในไฟล์แผน · ทั้งสองค่าไม่เปลี่ยน = ไม่ต้องตรวจซ้ำ · `oracle` เปลี่ยน = ตรวจซ้ำเฉพาะ AC ที่ revision ใหม่กระทบ
+    - **task ล้มเหลว ตรวจซ้ำแค่ไหน** — fix อยู่ในตัว task และไม่แตะ interface ที่ใช้ร่วม = test ของ task + impacted tests (ไม่ตรวจ task ก่อนหน้าซ้ำ) · fix เปลี่ยน interface/สัญญา/schema = `baan --sweep` หาผู้ใช้งานทุกตัว + contract/integration tests · ต้นเหตุอยู่ task ก่อนหน้า = เปิด task ต้นเหตุใหม่ตาม oracle **เดิมของมัน** (AC ไม่ได้กำหนดไว้ = ช่องโหว่สัญญา ส่ง `arch`) · **full regression ด้วยเครื่อง (ไม่เปิดรอบตรวจเชิงตัดสินใหม่)** เมื่อ fix แตะของกลาง (auth, config, schema หลัก, build) · ก่อน release/merge เข้า main · ไม่มี coverage map ที่เชื่อถือได้ว่า test ไหนครอบไฟล์ไหน · fix สะสมตั้งแต่ 3 จุดใน wave เดียว · suite เต็มรันเสร็จในไม่กี่นาที = รันทั้งชุดทุกครั้ง สิ่งที่ต้องประหยัดคือรอบตรวจของ role
+    - **ห้ามข้าม** — test อัตโนมัติของทุก task · ตรวจ task high ก่อนงานต่อยอด · contract test ที่ทุกจุดส่งต่อ interface · ก่อน release: full regression + AC trace เทียบ**ต้นฉบับ** + security · **เลื่อนไปจบ wave/โปรเจกต์ได้**: ตรวจ requirement ของ task low · review คุณภาพโค้ด · non-functional (ยกเว้นเป็น AC หลัก)
+    - `baan --lint-plan` เตือน task ที่ไม่มี `ac_ids` และฐานรากที่ยังไม่ระบุ `risk` (เรียงตามจำนวนงานที่พึ่ง) · verified ที่ ledger ไม่ครบ (`oracle`/`ref`) · งานที่ลง done-local ทั้งที่ task `high` ที่มันพึ่งยังไม่ผ่าน · wave เกิน 6 task — และ error เมื่อ `risk`/`wave` ค่าผิดหรือ wave ย้อน dependency
 
 ## ลำดับงานแนะนำ
 
@@ -175,6 +187,10 @@ config ของ workspace (knowledge_roots + targets + defaults) เก็บ�
 ตัวอย่างรูปแบบ: `baan.example.json` ใน package · ดูค่าปัจจุบันด้วย `baan --list`
 
 ## Change Log
+
+- 2026-10-29 — ข้อ 13 เติมให้ครบตามผลวิเคราะห์: จังหวะ test (เคสจาก AC ก่อนโค้ด · contract test ก่อนผู้ใช้ interface เริ่ม) · pipelining ข้าม wave · เงื่อนไข full regression ครบ 4 ข้อ (ของกลาง · ก่อน release/merge · ไม่มี coverage map · fix ≥ 3 จุดใน wave) · lint เตือน ledger ไม่มี `ref`, งานต่อยอด task high ที่ยังไม่ผ่าน, wave เกิน 6 task
+
+- 2026-10-29 — เพิ่มกติกาข้อ 13 (ตรวจตามความเสี่ยง: oracle pack แทนอ่าน docs เต็ม · `risk: high` ตรวจทันที / `low` รอ wave gate · ledger `oracle`+`ref` กันตรวจซ้ำ · ขอบเขตตรวจซ้ำเมื่อ task ล้มเหลว) — ผลวิเคราะห์ workflow (`docs/workflow-verification-analysis.md` ใน repo BAAN): school-bot ใช้เวลาตรวจเท่าเวลาเขียนโค้ด, 35/110 task ไม่มี AC ผูกรวมฐานรากที่งานพึ่ง 79–89 งาน
 
 - 2026-10-28 — เพิ่มกติกาข้อ 12 (ตรึง oracle ต่อ task · ติดเพดาน rework = หยุดถามทันทีไม่พักท้ายวง · งานตรวจไม่กิน slot เกินครึ่ง) และให้ลง `done-local`/verdict ราย slice ในไฟล์แผนตอนปิด slice — ผลวิเคราะห์ school-bot: 91 ใบงานแต่ไม่มีงานโค้ด verified/done-local สักงาน, check gRPC logout สร้างเคสเองถึง 2222 เคสแล้วตกที่ header ซ้ำของ test server หลังแก้ 2 รอบ, เรื่องติดเพดานถูกพักท้ายวงตั้งแต่ 2026-10-26 และวันเดียวมี check 31 runs/267 นาทีเทียบ writer 26 runs
 

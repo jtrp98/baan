@@ -1,6 +1,6 @@
 {
   "name": "baan",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "🏗️ BAAN — นายช่างผู้คุมทีม AI 11 ตำแหน่งในไซต์งาน: แตกงาน เปิด session รายช่าง ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์",
   "type": "module",
   "bin": {

@@ -53,6 +53,13 @@ export function workspaceRootOf(explicitPath, startDir = process.cwd()) {
   return found ? path.dirname(found) : "";
 }
 
+// run dir อยู่ใต้ราก workspace เพราะสิทธิ์อ่านของ agy ผูกกับขอบเขต workspace (--add-dir โหมดอ่าน ·
+// read_file rule โหมดเขียน) — เดิมอยู่ใน package จน role ถัดไปอ่านคำตอบของ role ก่อนหน้าไม่ได้
+// (agy T3 โหมดเขียนล้มที่ 29 วิ ตอนอ่านโค้ดต้นแบบของ arch) · ไม่เจอ workspace = reports/ ของ package เหมือนเดิม
+export function reportsDirOf(workspaceRoot) {
+  return workspaceRoot ? path.join(workspaceRoot, "reports", "baan") : REPORTS_DIR;
+}
+
 export function loadWorkspace(configPath = null) {
   // ไม่พบ config = ใช้ default ในโค้ด (ไม่มี targets/knowledge) พร้อมแจ้งให้ผู้ใช้รู้ตอน --list
   let raw = {};

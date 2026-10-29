@@ -13,7 +13,7 @@
 - **จ่าย model ตามความยากงาน** — งานคิดหนักใช้ model แพง งานจำนวนมากใช้ model เบา ผ่านระบบ tier
 - **อ่านอย่างเดียวโดยดีฟอลต์** — ทุก session เริ่มแบบ read-only จะแก้ไฟล์ได้ต่อเมื่อสั่ง `--write` ชัดๆ
 
-คุณสมบัติ: **zero runtime dependency** (ต้องมีแค่ Node.js ≥ 18) · รัน local ทั้งหมด · รายงานของทุก run เก็บไว้ในเครื่อง (`reports/`)
+คุณสมบัติ: **zero runtime dependency** (ต้องมีแค่ Node.js ≥ 18) · รัน local ทั้งหมด · รายงานของทุก run เก็บไว้ในเครื่อง (`<ราก workspace>/reports/baan/`)
 
 ## เริ่มต้นใช้งาน
 
@@ -75,7 +75,7 @@ C:\src\AICode\baan\baan\            ← ตัว package (npm link แล้ว
   setup\agy\                ← profile baan-readonly ของ agy (agent.md + guard hook) — ติดตั้งครั้งเดียวต่อเครื่อง
   scripts\                  ← live-smoke.mjs (npm run smoke:live — ใช้โควตาจริง)
   tests\                    ← regression tests (npm test)
-  reports\                  ← ผลการรันทุกครั้ง
+  reports\                  ← ผลการรันเมื่อหา workspace ไม่เจอ (ปกติอยู่ที่ <ราก workspace>\reports\baan\)
 ```
 
 ## การสวมบท นายช่าง (โหมดหลัก)
@@ -135,7 +135,7 @@ baan-role --list              # ดูรายชื่อ agent + tier
 - **cwd เริ่มต้น = ไดเรกทอรีที่เรียก** · `--cwd` แบบ relative อิงจากที่เรียก
 - **สถานะงานจาก output state ท้ายคำตอบ** (CONVENTIONS §8) ไม่ใช่ exit code ของ CLI — บรรทัดผลของแต่ละ agent แสดง `OK`/`NEEDS_HUMAN`/`FAIL(exit=…)`/... · `report.json` มี `state`/`marker`/`fallback` ราย agent · **exit 0 เฉพาะเมื่อทุกตัว completed**
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
-- **runDir ไม่ชนกัน**: `reports/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
+- **runDir ไม่ชนกัน**: `<ราก workspace>/reports/baan/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
 - **ป้าย `[baan-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท นายช่าง ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
 - **auto commit ที่เก็บเอกสารหลังจบ run** — knowledge root ไหนเป็น git repo (มี `.git`) จะถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` เช่น `school-bot: add db/review-001.md, index.md +2 more` · ไฟล์ที่ commit ไม่ทับของ module อื่นที่ staged ค้างไว้ · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังเมื่อไหร่แจ้งเตือนแล้วไปต่อ ไม่ลากผล run ไปตายด้วย · เรียกด้วยมือได้ด้วย `baan --commit` (โค้ดอยู่ที่ `src/knowledge-commit.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ gm/plan ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `baan` และ `baan-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
@@ -220,6 +220,7 @@ baan --lint-plan <tasks.json> # ตรวจรูปร่าง DAG + คว�
 - **plan validation ก่อน spawn ใดๆ**: id ต้องเข้า pattern `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` (id คือชื่อไฟล์ จึงกัน path traversal), ตรวจ types ของ tasks/dependsOn/humanGates/docsOnly, self-dependency และ cycle
 - **DAG lint**: แผนสดจาก planner ถูกปฏิเสธเมื่อไม่มีงาน implement (และไม่มี `docsOnly`) หรือเมื่องาน implement เกินครึ่งติดประตูมนุษย์ · แผนจาก `--plan-file`/`--resume` เตือนอย่างเดียว (run เก่ายัง resume ได้) · `--lint-plan` อ่านได้ทั้งฟิลด์ของ baan (`role`/`dependsOn`/`gateIds`/`humanGate`) และของแผนโปรเจกต์ (`owner`/`depends_on`/`gate_ids`, ชื่อ role เดิม เช่น `fe`/`be` แปลงให้เอง) — งานที่มี gate ถือว่าติดประตู และงานที่พึ่งงานนั้นติดตามไปด้วย
 - **progress lint (ราย slice)**: task ที่ทำทีละ slice เก็บ `"slices": [{ "id", "ac_ids", "status" }]` — `--lint-plan` แสดงความคืบหน้างาน implement (verified/done-local/slice) · **error** เมื่อ task อ้าง `verified` แต่ slice ที่ verified ยังไม่ครอบ `ac_ids` ครบ, slice ที่ไม่ใช่ pending ไม่ระบุ AC หรืออ้าง AC นอก task · **warning** (ไม่กระทบ exit code) เมื่อ slices ไปไกลกว่าสถานะที่ลงไว้ หรือเอกสาร verified ≥ 5 งานแต่งาน implement ยังไม่มี done-local/verified เลย
+- **verification lint (ตรวจตามความเสี่ยง — charter ข้อ 13)**: ฟิลด์ optional ต่อ task `"risk": "high"|"low"` (high = ตรวจทันทีก่อนงานต่อยอด · low = รอ wave gate) · `"wave": <จำนวนเต็มบวก>` · `"oracle"` (revision ที่ใช้ตัดสิน — ลงที่ task หรือ slice ที่ verified คู่กับ `"ref"` commit ที่ตรวจ) — `--lint-plan` พิมพ์สรุป risk/wave เมื่อแผนใช้ฟิลด์เหล่านี้ · **error** เมื่อ `risk`/`wave` ค่าผิด หรือ task อยู่ wave ก่อน dependency · **warning** เมื่อ task ที่ยังไม่ verified ไม่มี `ac_ids` (ตรึง oracle ไม่ได้), task ฐานราก (งานพึ่งทางตรง+ทางอ้อม ≥ max(3, ¼ ของ task ทั้งหมด)) ยังไม่ระบุ `risk` หรืองานที่ verified ไม่มี `oracle` (เรียงตามจำนวนงานที่พึ่ง) · verified ที่มี `oracle` แต่ไม่มี `ref` · งานที่ลง done-local/verified ทั้งที่ task `high` ที่มันพึ่งยังไม่ verified (pipelining) · wave ที่มีเกิน 6 task · แผนเก่าที่ไม่มีฟิลด์ไม่ตก
 - **context ส่งต่อระหว่าง task**: แนบสถานะ + path ฉบับเต็มเสมอ และถ้าเนื้อหาถูกตัดที่ 6,000 ตัวอักษรจะบอกว่าถูกตัดกี่ตัวอักษร
 - regression tests: `npm test` (node:test ล้วน ไม่มี dependency เพิ่ม ไม่ยิง provider จริง)
 
@@ -286,7 +287,7 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
   - **agy ในโหมด headless อ่านไฟล์นอก cwd ไม่ได้** — นายช่างจึงส่ง `--add-dir <ราก workspace>` ให้ agy **เฉพาะโหมดอ่าน** (ค้นรากจาก baan.config.json ที่เดินขึ้นจาก cwd) · โหมด `--write` ไม่ส่ง เพราะ `--add-dir` ขยายขอบเขตการเขียนตามไปด้วย — งานเขียน (cwd = target repo) ที่ต้องอ่าน knowledge/repo อื่นให้ตั้ง allow-rule `read_file(<ราก workspace>)` ครั้งเดียวต่อเครื่องด้วย `node setup/agy/grant-read.mjs` (ให้แค่สิทธิ์อ่าน ตรวจแล้วว่าเขียนยังถูกปฏิเสธ — ดู `setup/agy/README.md`)
   - `-p` ของ claude ไม่มีคนกดอนุมัติ: tool ที่ไม่อยู่ใน `--allowedTools` ใช้ไม่ได้เลย — โหมด write จึงเปิด Edit/Write/Bash/PowerShell ให้ชัด
 - **ทดสอบตัวรันจริงทุกค่าย**: `npm run smoke:live -- [--tier t3] [--agents claude,codex,agy]` (ใช้โควตาจริง 2 session/ค่าย ไม่อยู่ใน `npm test`) — sandbox ปลอมเป็นรูป workspace จริง (มี `baan.config.json` ที่ราก + ไฟล์ลับนอก cwd) แยกต่อค่าย/โหมด ตรวจด้วยค่าที่เดาไม่ได้: อ่านไฟล์ใน cwd และนอก cwd (nonce) · คำสั่งอ่านอย่างเดียว (commit hash) · รันโค้ด (sha256) · read-only กันเขียนจริง (ตรวจบนดิสก์) · `--write` เขียนไฟล์ได้ · role ไม่รายงาน `DONE` เกินจริง
-- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `reports/<timestamp>-…-<สุ่ม>/`
+- ทุก run เก็บรายงาน (answer, stdout, stderr, exit code, ระยะเวลา) ไว้ใน `<ราก workspace>/reports/baan/<timestamp>-…-<สุ่ม>/` — อยู่ในขอบเขต workspace เพื่อให้ role ถัดไป (รวม agy ที่สิทธิ์อ่านผูกกับ workspace) อ่านคำตอบของ role ก่อนหน้าได้ · หา workspace ไม่เจอ = `reports/` ของ package
 - เกิน timeout (default 1800 วินาที/ตัว, t0 3600 วินาที) จะถูก kill ทั้ง process tree อัตโนมัติ · เป็น timeout ของ AI CLI job เท่านั้น
 
 ## สถานะการทดสอบ
@@ -313,6 +314,8 @@ tier ladder ปัจจุบัน (T1 = anchor ที่ Opus 5.5 high, ค�
 
 ## Change Log
 
+- 2026-10-29 — verification lint เตือนเพิ่ม: ledger ไม่มี `ref` · งานต่อยอด task high ที่ยังไม่ผ่าน · wave เกิน 6 task
+- 2026-10-29 — ตรวจตามความเสี่ยง (charter ข้อ 13): oracle pack · `risk`/`wave` ต่อ task · ledger `oracle`+`ref` · verification lint ใน `--lint-plan`
 - 2026-10-28 — check มีขอบเขต + oracle ตรึงต่อ task · ติดเพดาน rework = ถามทันที · สถานะราย slice + progress lint ใน `--lint-plan`
 - 2026-10-24 — ผ่อนกติกา check/jpo ในโหมด solo: subagent ตรวจได้แบบมีเงื่อนไขความเป็นอิสระ (ตัวใหม่ + AC/spec เท่านั้น + หลักฐานจริง) ข้ามโมเดลเหลือเป็น escalation สำหรับงานวิกฤต/security/FAIL ซ้ำ
 

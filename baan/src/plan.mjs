@@ -78,12 +78,86 @@ export function normalizeDagTasks(tasks) {
     gated: nonEmpty(t.gateIds ?? t.gate_ids) || nonEmpty(t.humanGate),
     status: typeof t.status === "string" ? t.status.trim().toLowerCase() : "",
     acIds: list(t.acIds ?? t.ac_ids),
+    // ค่าดิบเก็บไว้ให้ lint บอกค่าผิดได้ — ไม่มีฟิลด์ = null (แผนเก่า)
+    risk: typeof t.risk === "string" ? t.risk.trim().toLowerCase() : (t.risk ?? null),
+    wave: t.wave ?? null,
+    oracle: nonEmpty(t.oracle),
+    ref: nonEmpty(t.ref),
     slices: list(t.slices).map((s) => ({
       id: s?.id,
       acIds: list(s?.acIds ?? s?.ac_ids),
       status: typeof s?.status === "string" ? s.status.trim().toLowerCase() : "",
+      oracle: nonEmpty(s?.oracle),
+      ref: nonEmpty(s?.ref),
     })),
   }));
+}
+
+// จำนวนงานที่พึ่ง task นี้ทั้งทางตรงและทางอ้อม = ขนาดความเสียหายถ้า task นี้ผิดแล้วเจอช้า
+export function transitiveFanOut(tasks) {
+  const children = new Map(tasks.map((t) => [t.id, []]));
+  for (const t of tasks) for (const d of t.dependsOn) children.get(d)?.push(t.id);
+  const memo = new Map();
+  const reach = (id) => {
+    if (memo.has(id)) return memo.get(id);
+    memo.set(id, new Set()); // กันวนลูป — cycle ถูกรายงานแยกโดย findDependencyCycle
+    const all = new Set();
+    for (const c of children.get(id) ?? []) { all.add(c); for (const x of reach(c)) all.add(x); }
+    memo.set(id, all);
+    return all;
+  };
+  return new Map(tasks.map((t) => [t.id, reach(t.id).size]));
+}
+
+export const RISK_LEVELS = ["high", "low"];
+
+// lint การตรวจตามความเสี่ยง (risk-gated waves, charter ข้อ 13) — ที่มา: school-bot (2026-10-29) มี 35/110 task
+// ไม่มี ac_ids รวมงานฐานรากที่มีงานพึ่งทางอ้อม 79–89 งาน จึงตรึงเส้นชัยไม่ได้และตัดสินไม่ได้ว่าต้องตรวจทันทีหรือรอ gate
+// error เกิดเฉพาะเมื่อแผนใส่ risk/wave ค่าผิด แผนเก่าที่ไม่มีฟิลด์จึงไม่ตก
+export function lintPlanVerification(tasks) {
+  const errors = [];
+  const warnings = [];
+  const fanOut = transitiveFanOut(tasks);
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+  const isWave = (w) => Number.isInteger(w) && w > 0;
+  for (const t of tasks) {
+    if (t.risk !== null && !RISK_LEVELS.includes(t.risk)) errors.push(`${t.id}: risk ต้องเป็น ${RISK_LEVELS.join("/")} (ได้ ${JSON.stringify(t.risk)})`);
+    if (t.wave === null) continue;
+    if (!isWave(t.wave)) { errors.push(`${t.id}: wave ต้องเป็นจำนวนเต็มบวก (ได้ ${JSON.stringify(t.wave)})`); continue; }
+    const later = t.dependsOn.filter((d) => isWave(byId.get(d)?.wave) && byId.get(d).wave > t.wave);
+    if (later.length) errors.push(`${t.id}: อยู่ wave ${t.wave} แต่พึ่งงานที่อยู่ wave หลังกว่า (${later.map((d) => `${d}@${byId.get(d).wave}`).join(", ")})`);
+  }
+  const open = tasks.filter((t) => deriveTaskStatus(t) !== "verified");
+  const byFanOut = (a, b) => fanOut.get(b.id) - fanOut.get(a.id);
+  const listIds = (list) => list.slice(0, 10).map((t) => `${t.id}(${fanOut.get(t.id)})`).join(", ") + (list.length > 10 ? ` +${list.length - 10}` : "");
+  const noAc = open.filter((t) => !t.acIds.length).sort(byFanOut);
+  if (noAc.length) warnings.push(`task ที่ยังไม่ verified และไม่มี ac_ids ${noAc.length} งาน — ตรึง oracle ไม่ได้ ส่ง spec ผูก AC ก่อนเปิดงาน (เรียงตามจำนวนงานที่พึ่ง): ${listIds(noAc)}`);
+  const threshold = Math.max(3, Math.ceil(tasks.length / 4));
+  const foundations = tasks.filter((t) => fanOut.get(t.id) >= threshold).sort(byFanOut).map((t) => t.id);
+  const unrated = open.filter((t) => foundations.includes(t.id) && t.risk === null).sort(byFanOut);
+  if (unrated.length) warnings.push(`task ฐานราก (งานพึ่ง ≥ ${threshold}) ยังไม่ระบุ risk ${unrated.length} งาน — high = ตรวจทันทีก่อนงานต่อยอด · low = มี contract test กั้นแล้วรอ wave gate ได้: ${listIds(unrated)}`);
+  const labels = (list) => `${list.slice(0, 10).join(", ")}${list.length > 10 ? ` +${list.length - 10}` : ""}`;
+  const verifiedUnits = tasks.flatMap((t) => (t.slices.length
+    ? t.slices.map((s, i) => ({ ...s, label: `${t.id}/${s.id ?? `slice#${i + 1}`}` }))
+    : [{ ...t, label: t.id }])).filter((u) => u.status === "verified");
+  const noOracle = verifiedUnits.filter((u) => !u.oracle).map((u) => u.label);
+  if (noOracle.length) warnings.push(`verified แต่ไม่มี oracle (revision ที่ใช้ตัดสิน) ${noOracle.length} จุด — เมื่อเอกสารเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noOracle)}`);
+  // ไม่มี oracle ถูกเตือนบรรทัดบนแล้ว — บรรทัดนี้เฉพาะ ledger ที่มีครึ่งเดียว
+  const noRef = verifiedUnits.filter((u) => u.oracle && !u.ref).map((u) => u.label);
+  if (noRef.length) warnings.push(`verified มี oracle แต่ไม่มี ref (commit ที่ตรวจ) ${noRef.length} จุด — เมื่อโค้ดเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noRef)}`);
+  const unchecked = (id) => byId.get(id)?.risk === "high" && deriveTaskStatus(byId.get(id)) !== "verified";
+  const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
+  if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — ตรวจ task high ก่อน ไม่งั้นถ้ามันตกต้องรื้องานเหล่านี้ตาม: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
+  const waveSizes = new Map();
+  for (const t of tasks) if (isWave(t.wave)) waveSizes.set(t.wave, (waveSizes.get(t.wave) ?? 0) + 1);
+  // 6 = เพดานขนาด wave (3–6 task) ใน roles/gm.md — diff ทั้ง wave ใหญ่กว่านี้ผู้ตรวจ gate ใบเดียวเริ่มหลุด (recall ตกตามขนาดก้อน)
+  const bigWaves = [...waveSizes].filter(([, n]) => n > 6).sort(([a], [b]) => a - b);
+  if (bigWaves.length) warnings.push(`wave ที่มีเกิน 6 task: ${bigWaves.map(([w, n]) => `wave ${w} (${n})`).join(", ")} — แบ่ง wave ให้ check ใบเดียวต่อ gate ยังตรวจทั่วถึง`);
+  const riskCounts = { high: 0, low: 0, unrated: 0 };
+  for (const t of tasks) riskCounts[RISK_LEVELS.includes(t.risk) ? t.risk : "unrated"]++;
+  const waves = new Set(tasks.map((t) => t.wave).filter(isWave)).size;
+  const used = tasks.some((t) => t.risk !== null || t.wave !== null);
+  return { errors, warnings, fanOut, foundations, riskCounts, waves, used };
 }
 
 export const PLAN_STATUSES = ["pending", "done-local", "verified", "blocked"];
@@ -241,11 +315,13 @@ export function lintPlanFile(file, readFile, log = console.log) {
   const cycle = findDependencyCycle(tasks);
   const r = lintPlanDag(tasks, { docsOnly: json.docsOnly ?? json.docs_only });
   const p = lintPlanProgress(tasks);
-  const errors = [...(cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`] : []), ...r.errors, ...p.errors];
+  const v = lintPlanVerification(tasks);
+  const errors = [...(cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`] : []), ...r.errors, ...p.errors, ...v.errors];
   log(`DAG lint: ${file}`);
   log(`  tasks ${tasks.length} · implement ${r.impl.length} · ติดประตูมนุษย์ ${r.blocked.length} · เริ่มได้ทันที ${r.free.length}${r.free.length ? ` (${r.free.join(", ")})` : ""}`);
   log(`  ความคืบหน้างาน implement: verified ${p.implProgress.verified} · done-local ${p.implProgress.doneLocal} / ${p.implProgress.total}${p.slices.total ? ` · slice verified ${p.slices.verified}/${p.slices.total}` : ""}`);
-  for (const m of p.warnings) log(`  ⚠ ${m}`);
+  if (v.used) log(`  ตรวจตามความเสี่ยง: high ${v.riskCounts.high} (ตรวจทันที) · low ${v.riskCounts.low} (รอ wave gate) · ยังไม่จัด ${v.riskCounts.unrated} · wave ${v.waves}`);
+  for (const m of [...p.warnings, ...v.warnings]) log(`  ⚠ ${m}`);
   for (const m of errors) log(`  ✗ ${m}`);
   if (!errors.length) log("  ✓ ผ่าน");
   return errors.length ? 1 : 0;

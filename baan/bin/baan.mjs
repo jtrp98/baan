@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEAM_DIR, REPORTS_DIR, listRoles, loadAgentsConfig, loadWorkspace, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
+import { TEAM_DIR, listRoles, loadAgentsConfig, loadWorkspace, reportsDirOf, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
@@ -213,7 +213,7 @@ async function main() {
         plan = validateAndFixPlan(JSON.parse(readFileSync(opts.planFile, "utf8")), cfg, opts);
         opts.goal = plan.goal ?? opts.goal;
         const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-        runDir = path.join(REPORTS_DIR, `pipeline-${stamp}`);
+        runDir = path.join(reportsDirOf(opts.workspaceRoot), `pipeline-${stamp}`);
         mkdirSync(runDir, { recursive: true });
         writeManifest(runDir, opts);
         writeAtomic(path.join(runDir, "plan.json"), JSON.stringify({ goal: opts.goal, target: opts.target || null, ...plan }, null, 2));
@@ -241,7 +241,7 @@ async function main() {
   if (cfg.tiers[opts.plannerTier]?.[opts.agent] === null) { console.error(`planner ใช้ ${opts.agent} ไม่ได้ใน tier ${opts.plannerTier} (null)`); process.exit(2); }
 
   const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-  runDir = path.join(REPORTS_DIR, `pipeline-${stamp}`);
+  runDir = path.join(reportsDirOf(opts.workspaceRoot), `pipeline-${stamp}`);
   mkdirSync(runDir, { recursive: true });
   writeManifest(runDir, opts); // บันทึกบริบทก่อนเรียก provider ใดๆ — crash กลางทางก็ resume ได้ครบ
 

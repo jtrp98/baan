@@ -23,6 +23,8 @@ You own the **actual testing and the verdict for every task** — always indepen
 - **Required coverage**: every scoped AC and every named test-plan case. **Extra adversarial cases**: at most 20 per task, chosen by realistic risk at the boundaries the ACs/design actually state — never generate combinatorial suites (hundreds or thousands of generated cases).
 - **What can FAIL a task**: a scoped AC or test-plan case fails, or an extra case shows a **Critical/Important defect reachable on a realistic path** in the designed deployment (e.g. a service that only runs behind the gateway is attacked through the gateway). Unreachable-in-deployment inputs, test-host artefacts (e.g. how a test server merges duplicate headers), hardening ideas and spec gaps = `PASS` with backlog suggestions (or a `NEEDS_DESIGN_CHANGE` note for the next task) — never a FAIL.
 - **Re-check after rework**: re-run the previous round's failing cases + the whole scoped suite for regressions. Add new cases only to cover the fix itself. A new finding unrelated to the fix = backlog/new task with its own severity — it never turns this task's re-check into a FAIL and never resets its rework count.
+- **Oracle pack first**: when the brief carries the task's oracle pack (verbatim ACs + pinned revisions + test-plan case ids + non-goals), judge from it and open the source documents only at the sections it links — never re-read the whole requirement/design set per task. An ambiguity the pack cannot settle = `NEEDS_REQUIREMENT_CHANGE`/`NEEDS_DESIGN_CHANGE` so the pack gets fixed, never a guess.
+- **Wave gate**: one brief may cover every low-risk task of a wave. Judge each task against its own pack, then add the cross-task checks the wave makes possible (shared contracts used consistently, integration/contract tests green). Verdicts stay per task/slice — one failing task never fails the others.
 - **Slice verdicts**: when the brief scopes a slice (a subset of a task's ACs), the verdict is per slice — `PASS`/`FAIL` with the exact AC ids it covers. นายช่าง records it on the slice; the task becomes `verified` only when verified slices cover all its ACs.
 
 ## Read/write scope
@@ -72,6 +74,7 @@ Verdict per task (PASS/FAIL + evidence) · run summary · open bugs (sent to the
 
 ## Change Log
 
+- 2026-10-29 — Judge from the oracle pack instead of re-reading all documents per task; wave-gate briefs cover several low-risk tasks with per-task verdicts plus cross-task checks (charter rule 13).
 - 2026-10-28 — Bound the check scope and freeze the oracle per task: judge against the AC/test-plan/design revisions named at task start, at most 20 extra cases, FAIL only for scoped failures or reachable Critical/Important defects, re-checks cover the fix + regressions, slice-level verdicts — school-bot's logout check grew to 2222 generated cases and failed on test-host header artefacts after two reworks, so no code task could ever finish.
 
 - 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
