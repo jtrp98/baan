@@ -221,7 +221,9 @@ export function lintPlanDag(tasks, { docsOnly } = {}) {
     const t = byId.get(id);
     if (!t || seen.has(id)) return false;
     seen.add(id);
-    const r = t.gated || t.dependsOn.some((d) => isBlocked(d, seen));
+    // งานที่ verified แล้วผ่านประตูของมันมาแล้ว — ที่มา: school-bot (2026-10-29) SA-002/UX-002/UX-004 ตรวจผ่านแล้ว
+    // แต่ยังถูกนับว่าขวางงานที่พึ่ง 31 งาน
+    const r = deriveTaskStatus(t) !== "verified" && (t.gated || t.dependsOn.some((d) => isBlocked(d, seen)));
     blockedMemo.set(id, r);
     return r;
   };
