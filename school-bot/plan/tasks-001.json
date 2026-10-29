@@ -158,7 +158,8 @@
         "REQ-034",
         "REQ-036"
       ],
-      "close_evidence": "UX-001 ส่ง flows/prototype ตาม components/tokens/assets เดิม ครอบคลุม first-online/lease expired/denied/store failure/account switch/close guards ให้ผู้มีอำนาจ UX ที่ระบุตัวจริง sign-off พร้อม artifact revision และวันที่ ไม่มี agent เซ็นแทน"
+      "close_evidence": "UX-001 ส่ง flows/prototype ตาม components/tokens/assets เดิม ครอบคลุม first-online/lease expired/denied/store failure/account switch/close guards ให้ผู้มีอำนาจ UX ที่ระบุตัวจริง sign-off พร้อม artifact revision และวันที่ ไม่มี agent เซ็นแทน",
+      "closed": "2026-10-29 — ผู้ใช้ยืนยันปิดจาก sign-off ที่มีอยู่: UX-001 signed int-001 + expired-copy delta Q39–Q46 ตาม decisions-043"
     },
     {
       "id": "G-UX-PROJECT",
@@ -173,7 +174,8 @@
         "decisions-014",
         "decisions-015",
         "decisions-016"
-      ]
+      ],
+      "closed": "2026-10-29 — ผู้ใช้ยืนยันปิดจาก sign-off ที่มีอยู่: UX-002 signed int-003"
     },
     {
       "id": "G-UX-LABS",
@@ -185,7 +187,8 @@
         "REQ-026",
         "DES-006"
       ],
-      "close_evidence": "UX-003 ส่ง flows แยก sample/native, predicted/written/measured/stop-requested, failure/lost และ close ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE ที่พึ่งพา การ sign-off หน้าจอไม่ใช่รับรอง calibration หรืออนุญาต motion"
+      "close_evidence": "UX-003 ส่ง flows แยก sample/native, predicted/written/measured/stop-requested, failure/lost และ close ให้ผู้มีอำนาจ UX sign-off ระบุ artifact revision และวันที่ ก่อน FE ที่พึ่งพา การ sign-off หน้าจอไม่ใช่รับรอง calibration หรืออนุญาต motion",
+      "closed": "2026-10-29 — ผู้ใช้ยืนยันปิดจาก sign-off ที่มีอยู่: UX-003 signed int-002"
     },
     {
       "id": "G-UX-LEARN",
@@ -206,7 +209,8 @@
         "decisions-032",
         "decisions-033",
         "decisions-034"
-      ]
+      ],
+      "closed": "2026-10-29 — ผู้ใช้ยืนยันปิดจาก sign-off ที่มีอยู่: UX-004 signed int-004 · UX-006 ตาม decisions-041 · UX-005/007 ตาม decisions-043"
     },
     {
       "id": "G-PROJECT-DB",
@@ -215,7 +219,7 @@
         "DES-003",
         "REQ-033"
       ],
-      "close_evidence": "หลัง G-GUEST, SA-001/DBA-004 ส่ง ownership/revision/placement/constraints/document migration/rollback ให้ผู้มีอำนาจ schema/contract อนุมัติ มนุษย์ที่ได้รับอนุญาตรัน test SQL/rollback และส่ง catalog/transaction evidence ให้ DBA ตรวจครบก่อน BE-008 ไม่ถือการ review SQL เป็นผลรัน"
+      "close_evidence": "หลัง G-GUEST, SA-001/DBA-004 ส่ง ownership/revision/placement/constraints/document migration/rollback ให้ผู้มีอำนาจ schema/contract อนุมัติ มนุษย์ที่ได้รับอนุญาตรัน test SQL/rollback และส่ง catalog/transaction evidence ให้ DBA ตรวจครบก่อน QA-002 ตรวจรับบน DB จริง (BE-008/BE-025 ทำบน stub DB — re-gate 2026-10-29) ไม่ถือการ review SQL เป็นผลรัน"
     },
     {
       "id": "G-LEARN-DB",
@@ -972,9 +976,7 @@
         "BE-007",
         "BE-001"
       ],
-      "gate_ids": [
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Login/session ใน web",
       "outputs": [
@@ -1054,9 +1056,7 @@
         "SA-001",
         "BA-001"
       ],
-      "gate_ids": [
-        "G-GUEST"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เตรียม projects DDL/rollback",
       "outputs": [
@@ -1092,9 +1092,7 @@
         "BE-006",
         "DBA-004"
       ],
-      "gate_ids": [
-        "G-PROJECT-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำหลายโครงงาน Cloud API",
       "outputs": [
@@ -1129,9 +1127,7 @@
         "BE-007",
         "BA-001"
       ],
-      "gate_ids": [
-        "G-GUEST"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำหลายโครงงาน local/migration",
       "outputs": [
@@ -1334,9 +1330,7 @@
         "BE-007",
         "UX-001"
       ],
-      "gate_ids": [
-        "G-UX-ENTRY"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม License UI",
       "outputs": [
@@ -1369,9 +1363,7 @@
         "BE-006",
         "FE-001"
       ],
-      "gate_ids": [
-        "G-UX-ENTRY"
-      ],
+      "gate_ids": [],
       "effort_days": 1,
       "goal": "เชื่อม Login/Guest entry",
       "outputs": [
@@ -1402,9 +1394,7 @@
         "FE-002",
         "UX-002"
       ],
-      "gate_ids": [
-        "G-UX-PROJECT"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมรายการหลายโครงงาน",
       "outputs": [
@@ -1464,9 +1454,7 @@
         "FE-004",
         "BE-010"
       ],
-      "gate_ids": [
-        "G-UX-ENTRY"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "รักษา shell/ภาษา/close/sample",
       "outputs": [
@@ -1506,9 +1494,7 @@
         "BE-010",
         "UX-003"
       ],
-      "gate_ids": [
-        "G-UX-LABS"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Code Lab ตาม bounded DSL",
       "outputs": [
@@ -1537,9 +1523,7 @@
         "BE-010",
         "UX-003"
       ],
-      "gate_ids": [
-        "G-UX-LABS"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Block Lab พร้อม bounds",
       "outputs": [
@@ -1568,9 +1552,7 @@
         "BE-013",
         "UX-003"
       ],
-      "gate_ids": [
-        "G-UX-LABS"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม discovery/profile/probe",
       "outputs": [
@@ -1816,9 +1798,7 @@
         "BE-027",
         "BE-029"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ curriculum/submission API",
       "outputs": [
@@ -1848,9 +1828,7 @@
       "depends_on": [
         "BA-002"
       ],
-      "gate_ids": [
-        "G-LEARN"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "จัดเนื้อหา Block/Code จริง",
       "outputs": [
@@ -1876,9 +1854,7 @@
       "depends_on": [
         "BA-002"
       ],
-      "gate_ids": [
-        "G-LEARN"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "จัดเนื้อหา Arm/rubric",
       "outputs": [
@@ -1970,9 +1946,7 @@
         "BA-006",
         "UX-004"
       ],
-      "gate_ids": [
-        "G-UX-LEARN"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม Lessons สามโหมด",
       "outputs": [
@@ -2105,9 +2079,7 @@
         "BE-005",
         "DBA-006"
       ],
-      "gate_ids": [
-        "G-RELEASE-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ persistent release API",
       "outputs": [
@@ -2137,9 +2109,7 @@
         "BE-007",
         "SA-001"
       ],
-      "gate_ids": [
-        "G-RELEASE-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 1,
       "goal": "ทำ update check แบบ metadata-only และ PrepareUpdate/InstallPreparedUpdate แบบ explicit",
       "outputs": [
@@ -2175,9 +2145,7 @@
         "FE-012",
         "BE-019"
       ],
-      "gate_ids": [
-        "G-DELIVERY"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เตรียม Windows MSI ครบ engines",
       "outputs": [
@@ -2213,9 +2181,7 @@
         "BE-012",
         "BE-019"
       ],
-      "gate_ids": [
-        "G-DELIVERY"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เตรียม Universal macOS PKG",
       "outputs": [
@@ -2247,9 +2213,7 @@
         "BE-021",
         "SEC-001"
       ],
-      "gate_ids": [
-        "G-RELEASE-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เตรียม signing/notarization/assets",
       "outputs": [
@@ -2282,7 +2246,9 @@
         "FE-022",
         "FE-024"
       ],
-      "gate_ids": [],
+      "gate_ids": [
+        "G-AUTH"
+      ],
       "effort_days": 1,
       "goal": "เตรียม API deploy/restore",
       "outputs": [
@@ -2313,7 +2279,9 @@
         "FE-002",
         "TP-002"
       ],
-      "gate_ids": [],
+      "gate_ids": [
+        "G-AUTH"
+      ],
       "effort_days": 2,
       "goal": "ตรวจ DB/License/Login",
       "outputs": [
@@ -2371,7 +2339,10 @@
         "FE-005",
         "QA-001"
       ],
-      "gate_ids": [],
+      "gate_ids": [
+        "G-PROJECT-DB",
+        "G-GUEST"
+      ],
       "effort_days": 2,
       "goal": "ตรวจ projects/shell/i18n/sample",
       "outputs": [
@@ -2482,7 +2453,9 @@
         "FE-016",
         "QA-002"
       ],
-      "gate_ids": [],
+      "gate_ids": [
+        "G-LEARN"
+      ],
       "effort_days": 2,
       "goal": "ตรวจ curriculum/grading/progress",
       "outputs": [
@@ -2672,7 +2645,8 @@
         "BE-019"
       ],
       "gate_ids": [
-        "G-DELIVERY"
+        "G-DELIVERY",
+        "G-RELEASE-DB"
       ],
       "effort_days": 2,
       "goal": "ตรวจ performance/assets และแยก metadata-only check จาก explicit Prepare/Install/recovery",
@@ -2808,9 +2782,7 @@
       "depends_on": [
         "BE-009"
       ],
-      "gate_ids": [
-        "G-GUEST"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Guest export/ถังขยะ 30 วัน",
       "outputs": [
@@ -2842,10 +2814,7 @@
         "BE-008",
         "BE-009"
       ],
-      "gate_ids": [
-        "G-GUEST",
-        "G-PROJECT-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ explicit project import กันซ้ำ",
       "outputs": [
@@ -2878,10 +2847,7 @@
         "BE-016",
         "BE-017"
       ],
-      "gate_ids": [
-        "G-GUEST",
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Guest local history และตรวจใหม่",
       "outputs": [
@@ -2917,10 +2883,7 @@
         "DBA-005",
         "BE-039"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-CORE"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำหลักสูตรกลาง revision/publish",
       "outputs": [
@@ -2957,9 +2920,7 @@
       "depends_on": [
         "BE-027"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ Course Plan Sheet importer",
       "outputs": [
@@ -2989,9 +2950,7 @@
         "BE-027",
         "BE-006"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ CourseRun/Level/Activity รายห้อง",
       "outputs": [
@@ -3021,10 +2980,7 @@
       "depends_on": [
         "BE-027"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-CORE"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำคลังข้อสอบ revision/policy ส่วนกลาง",
       "outputs": [
@@ -3053,9 +3009,7 @@
         "BE-030",
         "BE-029"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ",
       "outputs": [
@@ -3085,10 +3039,7 @@
       "depends_on": [
         "BE-031"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ teacher override และซ่อมรายคน",
       "outputs": [
@@ -3118,9 +3069,7 @@
         "BE-031",
         "BE-016"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ ScoringPolicy snapshot/สูตรรวม",
       "outputs": [
@@ -3151,10 +3100,7 @@
         "BE-033",
         "BE-017"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำเสนอ/ยืนยันเลื่อน Level ทั้งห้อง",
       "outputs": [
@@ -3186,10 +3132,7 @@
         "DBA-007",
         "SA-004"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ GradeSlot/ScoreMapping ช่องเดิม",
       "outputs": [
@@ -3221,9 +3164,7 @@
         "BE-035",
         "BE-033"
       ],
-      "gate_ids": [
-        "G-LEARN-DB"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ preview snapshot/แปลงคะแนน",
       "outputs": [
@@ -3257,10 +3198,7 @@
         "DBA-007",
         "TP-003"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ grade writer/ชน/CAS/receipt",
       "outputs": [
@@ -3292,10 +3230,7 @@
         "BE-037",
         "BE-032"
       ],
-      "gate_ids": [
-        "G-LEARN-DB",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "ทำ export outbox/authz/replay/recovery",
       "outputs": [
@@ -3373,9 +3308,7 @@
         "BE-024",
         "UX-002"
       ],
-      "gate_ids": [
-        "G-UX-PROJECT"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม Guest export/ถังขยะ",
       "outputs": [
@@ -3410,10 +3343,7 @@
         "UX-002",
         "UX-004"
       ],
-      "gate_ids": [
-        "G-UX-PROJECT",
-        "G-UX-LEARN"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมเลือกนำเข้า project/history",
       "outputs": [
@@ -3453,10 +3383,7 @@
         "BE-028",
         "UX-005"
       ],
-      "gate_ids": [
-        "G-UX-LEARN",
-        "G-CORE"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม admin หลักสูตร/revision/นำเข้า",
       "outputs": [
@@ -3495,10 +3422,7 @@
         "BE-030",
         "UX-005"
       ],
-      "gate_ids": [
-        "G-UX-LEARN",
-        "G-CORE"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อม admin คลังข้อสอบ/policy",
       "outputs": [
@@ -3528,9 +3452,7 @@
         "FE-013",
         "UX-007"
       ],
-      "gate_ids": [
-        "G-UX-LEARN"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมข้อสอบ Desktop/ผล attempt",
       "outputs": [
@@ -3565,10 +3487,7 @@
         "BE-034",
         "UX-007"
       ],
-      "gate_ids": [
-        "G-UX-LEARN",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมเว็บครู CourseRun/policy/เลื่อน Level",
       "outputs": [
@@ -3613,10 +3532,7 @@
         "BE-035",
         "UX-006"
       ],
-      "gate_ids": [
-        "G-UX-LEARN",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมเว็บ admin โรงเรียน mapping",
       "outputs": [
@@ -3649,10 +3565,7 @@
         "BE-038",
         "UX-006"
       ],
-      "gate_ids": [
-        "G-UX-LEARN",
-        "G-AUTH"
-      ],
+      "gate_ids": [],
       "effort_days": 2,
       "goal": "เชื่อมเว็บครู preview/ชน/export status",
       "outputs": [
@@ -4279,7 +4192,8 @@
       "summary": "reconcile44/180; แตก36งานในscopeเดิม; คง17gates/8phases/74IDsเดิม/pendingทั้งหมด"
     },
     {"date":"2026-10-26","revision":2,"summary":"089: รับ owner mapping AC-030-04..08 ตามมติ037; BE-019 Host workflow, BE-020/021 package recovery, QA-010 validation; TP-001 sync186AC; คง frozen scope/IDs/status/DAG/dependencies/gates/owner/tier/effort","refs":["planning/traceability-089-001.md","requirement/req-030.md","requirement/decisions-037.md","requirement/decisions-038.md","test-plan/tp-001.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป","refs":["plan/index.md","planning/check-061-verdicts-001.md","planning/status-sync-062-001.json"]}
+    {"date":"2026-10-29","revision":2,"summary":"ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป","refs":["plan/index.md","planning/check-061-verdicts-001.md","planning/status-sync-062-001.json"]},
+    {"date":"2026-10-29","revision":2,"summary":"re-gate ตามข้อ 10 (ผู้ใช้อนุมัติ): ถอด gate จากงานที่ทำบน stub/fake ได้ 43 งาน · ผู้ถือใหม่ QA-001 G-AUTH, BE-023 G-AUTH (DES-012 channel production), QA-002 G-PROJECT-DB+G-GUEST, QA-004 G-LEARN, QA-010 G-RELEASE-DB · G-CORE/G-LEARN-DB/G-DELIVERY คงที่ DBA-003/QA-015-016/QA-008-010 · คง G-ROBOT-CONTRACT ที่ BE-010 (สัญญา breaking + สั่งเคลื่อนที่หุ่น) · ปิด G-UX-ENTRY/PROJECT/LABS/LEARN จาก sign-off ที่มีอยู่ · งาน verified คง gate_ids เป็นประวัติ (BAAN 0.21.1 ไม่นับว่าขวาง)","refs":["plan/gates-001.md","requirement/decisions-041.md","requirement/decisions-043.md"]}
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",
