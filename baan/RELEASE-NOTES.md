@@ -2,6 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.21.0 — 2026-10-29 · ตรวจตามความเสี่ยง (risk-gated waves) + run dir ย้ายเข้า workspace
+
+ที่มา: ผลวิเคราะห์ workflow (`docs/workflow-verification-analysis.md`) — school-bot ใช้เวลาตรวจ (451 นาที) เท่าเวลาเขียนโค้ด (453 นาที) · งานเอกสารกินเวลา agent 44% · 35/110 task ไม่มี AC ผูก รวมงานฐานรากที่มีงานพึ่งทางอ้อม 79–89 งาน · และ agy โหมดเขียนอ่านคำตอบ role ก่อนหน้าใน `reports/` ของ package ไม่ได้
+
+### ⚠ ต้องทำตอนอัปเกรด
+- **run dir ย้ายไปอยู่ที่ `<ราก workspace>/reports/baan/`** (เดิม `reports/` ของ package) — ใบงาน/prompt ที่อ้าง path reports ของ package ต้องเปลี่ยน (schoolbright ตรวจแล้ว ไม่มีที่อ้าง) · ถ้าราก workspace เป็น git repo ให้ใส่ `reports/` ใน .gitignore · หา workspace ไม่เจอ = ใช้ `reports/` ของ package เหมือนเดิม · `--resume` รับ path จึง resume run เก่าใน package ได้
+- **allow-rule `read_file(<baan>/reports)` ของ agy ไม่จำเป็นแล้ว** — `setup/agy/grant-read.mjs` ให้แค่ราก workspace (rule เดิมที่ตั้งไว้ไม่เป็นอันตราย ลบทิ้งได้)
+- **`--lint-plan` มี warning ใหม่** (ไม่กระทบ exit code) — แผนเก่าที่ไม่มีฟิลด์ใหม่จะเห็น warning เรื่อง `ac_ids`/`risk`/`oracle` แต่ไม่ตก
+
+### เพิ่ม
+- **charter ข้อ 13 "ตรวจตามความเสี่ยง"** — ค่าตรวจขึ้นกับความเสี่ยงของ task ไม่ใช่จำนวน task:
+  - **oracle pack** = หัวข้อ Acceptance/References ของ `<task-id>.md` (AC ตามต้นฉบับ + revision ที่ตรึง + TP case ids + non-goals) ใช้แทนการอ่าน docs เต็มทุก task · อ่านใหม่เฉพาะ revision เปลี่ยน / NEEDS_*_CHANGE / pack ตอบไม่ได้ / ตรวจปิดโปรเจกต์
+  - **`risk: high`** ตรวจทันทีก่อนเปิดงานต่อยอด · **`risk: low`** รอ **wave gate** (check ใบเดียวต่อ wave, verdict ยังราย task) · สายเดี่ยว module เดียวตรวจอิสระแค่แกนเสี่ยงสุด + ทางออกของสาย
+  - **ledger** `oracle` + `ref` บนงานที่ verified — ไม่เปลี่ยน = ไม่ตรวจซ้ำ
+  - **ขอบเขตตรวจซ้ำเมื่อ task ล้มเหลว** ตามต้นเหตุ (ในตัว task / interface ที่ใช้ร่วม → `baan --sweep` / task ก่อนหน้า → เปิดตาม oracle เดิมของมัน / ของกลาง → full regression ด้วยเครื่อง)
+  - full regression เมื่อ: แตะของกลาง · ก่อน release/merge · ไม่มี coverage map · fix ≥ 3 จุดใน wave
+  - pipelining: wave ถัดไปเปิดงานที่ input ตรวจแล้วได้เลย · ห้ามต่อยอด task high ที่ยังไม่ผ่าน
+  - จังหวะ test: เคสจาก AC ก่อนเขียนโค้ด · contract test ก่อนผู้ใช้ interface เริ่ม
+- **ฟิลด์ใหม่ในแผน JSON** (optional ทั้งหมด): `"risk": "high"|"low"`, `"wave": <จำนวนเต็มบวก>`, `"oracle"`, `"ref"` (ระดับ task หรือ slice)
+- **verification lint ใน `--lint-plan`** — สรุป high/low/wave เมื่อแผนใช้ฟิลด์ · **error** เมื่อ `risk`/`wave` ค่าผิดหรือ wave ย้อน dependency · **warning** เมื่อ task ยังไม่ verified ไม่มี `ac_ids`, ฐานรากไม่มี `risk` (เรียงตาม fan-out ทางตรง+ทางอ้อม), verified ไม่มี `oracle` หรือมีแต่ไม่มี `ref`, งานที่ลง done-local ทั้งที่ task high ที่พึ่งยังไม่ผ่าน, wave เกิน 6 task
+
+### เปลี่ยน
+- **run dir** สร้างใต้ `<ราก workspace>/reports/baan/` ทั้ง `baan` และ `baan-role` — role ถัดไป (รวม agy ที่สิทธิ์อ่านผูกกับ workspace) อ่านคำตอบของ role ก่อนหน้าได้โดยไม่ต้องขยายสิทธิ์
+- **role gm** กำหนด `risk`/`wave` ต่อ task, เก็บ oracle pack, ลง ledger, release runbook รวมการตรวจปิดโปรเจกต์ (full regression + E2E + AC trace เทียบต้นฉบับ + security) · **role plan** เสนอ risk/wave พร้อมเหตุผล · **role check** ตัดสินจาก pack และรับ wave gate หลาย task ในใบเดียว
+- tests 129 → 139
+
 ## 0.20.0 — 2026-10-28 · งานต้องจบได้: check มีขอบเขต + เส้นชัยตรึงต่อ task + ถามทันทีเมื่อติดเพดาน rework + สถานะราย slice
 
 ที่มา: วิเคราะห์ school-bot — 91 ใบงานแต่ไม่มีงานโค้ด verified/done-local สักงาน · check gRPC logout สร้างเคสเองถึง 2222 เคสแล้วตกที่ header ซ้ำของ test server หลังแก้ 2 รอบ · เรื่องติดเพดานถูกพักไว้ "ท้ายวง" ที่ไม่เคยมาถึง · วันเดียวมี check 31 runs/267 นาทีเทียบ writer 26 runs · คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local สักงาน
