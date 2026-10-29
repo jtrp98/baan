@@ -1,74 +1,66 @@
 # TP-002 — แผน failure/race fixtures — Rev2
 
-วันที่ 2026-10-24 · รันโดย นายช่าง solo (subagent role inspect) · สถานะเอกสารอยู่ที่ [index](index.md)
-อ้างอิง: [TP-002](../plan/TP-002.md) (bridge/API/clock fixtures · Acceptance "late callback/drain/transport/DB failure/lease boundary จำลองได้ ไม่สั่งหุ่น"), [TP-001 + Amendment002](tp-001.md), [ผลตรวจ060a](../design/gap-sync-review-001.md) และสัญญา DES-002/003/004/006 + guest-workspace/guest-import/guest-history/teacher-authority/robot-boundary Rev1. เอกสารนี้เป็น**แผนเตรียมเท่านั้น** ไม่มีการรัน fixture จริง ไม่ใช่ QA PASS
+วันที่ 2026-10-29 · inspect · สถานะเอกสารอยู่ที่ [index](index.md)
+อ้างอิง: [TP-002 Oracle pack](../plan/TP-002.md#acceptance) · [DES-001 Rev1](../design/des-001.md) · [TP-001](tp-001.md) เฉพาะ TP001-003/010/037/040/045/058/079. เอกสารนี้เป็นแผนเตรียม fixtures ไม่ใช่ harness ที่เขียนแล้วหรือผล QA
 
 ## หลักการกลาง
 
-- จำลองด้วย fake เท่านั้น: fake clock (wall+monotonic+anchor), fake engine transport (scripted JSON Lines), stub G proxy (drop/delay/replay), synthetic School DB fixture, test SchoolBot DB (ไม่ใช่ shared env)
-- **ห้าม**: set system clock ของเครื่องจริง · สั่งหุ่นจริงทุกชนิด (ไม่ HID/Serial จริง, ไม่ motion/upload/torque/stop ลง hardware — dry-run/fake bridge เท่านั้น) · เขียน production DB/PGGradeDB · ใช้ sample/preview/mock เป็นหลักฐาน native/Cloud/hardware
-- ค่าที่เป็นสมมติฐานในสัญญา (timer sweep 60 วินาที, poll 3000 ms/debounce 0; TTL 15 นาทีอนุมัติแล้วตาม decisions-046) ต้องติดป้าย (สมมติฐาน — ยังไม่ยืนยัน) ใน expected ของทุก run
+- จำลองด้วย fake เท่านั้น: fake clock (wall+monotonic+anchor), fake engine transport (scripted JSON Lines), stub G proxy (drop/delay/replay), synthetic School DB resolver, in-memory transactional fake repository (ไม่เชื่อม DB จริง)
+- **ห้าม**: set system clock ของเครื่องจริง · สั่งหุ่นจริงทุกชนิด (ไม่ HID/Serial จริง, ไม่ motion/upload/torque/stop ลง hardware — dry-run/fake bridge เท่านั้น) · เชื่อม/รัน SQL บน DB จริงทุกชนิด · ใช้ sample/preview/mock เป็นหลักฐาน native/Cloud/hardware
+- timer sweep 60 วินาทีและ poll 3000 ms/debounce 0 ต้องติดป้าย (สมมติฐาน — ยังไม่ยืนยัน) ใน expected; TTL 15 นาทีอนุมัติแล้วตาม decisions-046
 - ทุก fixture ระบุ build/commit hash + profile + evidence code ตาม TP-001; ผลทุกเคสเริ่ม NOT_RUN
 
-## FX-01 fake clock + monotonic rollback (offline window / TTL / replay window)
 
-| id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
+## ส่วนต่อ fixtures
+
+| รายละเอียด | กลุ่ม / ขอบเขต |
+| --- | --- |
+| [Clock](tp-002-fixture-clock-001.md) | FX-01a–e / FX-02a–d: 3 วัน, ย้ายเครื่อง, 30 วัน, rollback/restart |
+| [Bridge](tp-002-fixture-bridge-001.md) | FX-03a–e: late callback/timer, drain/stop, partial write/transport error |
+| [API](tp-002-fixture-api-001.md) | FX-04a–e / FX-05a–c: import lost response/DB failure, tenant/teacher authority |
+
+## Traceability ของ Oracle pack
+
+ครบ 6/6 AC มี setup/trigger/สิ่งที่วัดในส่วนต่อ; ทุก runtime actual=NOT_RUN. expected เป็นสิ่งที่ check ต้องวัด ไม่ใช่ผลรอบนี้
+
+| AC / reference | Fixture → TP case / ระดับ | Expected ที่ต้องวัด | Actual ของ deliverable / ข้อจำกัด |
 | --- | --- | --- | --- |
-| FX-01a | wall clock แช่และย้อน + monotonic เดินต่อ + anchor {server UTC ล่าสุด, wall, max effective} | License offline 3 วัน · TP001-003/004/010 · AC-034-03/04, AC-035-05 | exp=min(checked_at+259200,license_exp); ขอบ exp−1s/exp/exp+1s; ย้อน→CLOCK_UNTRUSTED ต้อง online; monotonic ไม่ลด high-water; เปิดซ้ำไม่เลื่อน exp; replay คืน exp เดิมไม่ใช่ online check ใหม่ |
-| FX-01b | server-side fake clock ขับ ReplayUntil (fixture ตั้ง TTL=900 วินาทีชัดเจน — สมมติฐาน) | create-license TTL replay · TP001-007 · AC-027-02/03 | ทดสอบที่ `ReplayUntil−1s` คืน key เดิม (ตรวจสิทธิ์+license ไม่ revoke); ที่/หลัง `ReplayUntil`→409 IDEMPOTENCY_EXPIRED+details.resource_id แม้ purge ยังไม่รัน (สัญญากำหนดเพียง ReplayUntil≤CompletedAt+900s จึงทดสอบรอบ ReplayUntil ไม่ใช่ offset จาก CompletedAt — แก้ตาม check 060f); retry ไม่ต่อ TTL; ResultCipher+ResultKeyId ล้างคู่กัน tombstone คง |
-| FX-01c | fake clock พ้น window 24 ชม. ของ idempotency ทั่วไป | import/recheck replay · TP001-028/030/078 · AC-041-04, AC-042-05 | พ้น window→409 IDEMPOTENCY_EXPIRED+resource_id; Host GET ยืนยันไม่ POST ใหม่; snapshot freeze ไม่อ่านเนื้อหาที่แก้ภายหลัง |
+| [AC-021-02 / BR-021-02](../requirement/req-021.md) · DES-001 Rev1 lifecycle | FX-03a/e → TP001-037, TP001-040 เฉพาะ stale generation / integration fake | หลัง stop ปล่อย callback/timer เก่าแล้ว next movement=0; drain/reap ก่อน stop | ครบในแผน; NOT_RUN; ไม่พิสูจน์ physical stop |
+| [AC-024-02 / BR-024-02](../requirement/req-024.md) · TP001-040 | FX-03d → TP001-040 / integration fake; TP001-045 / manual รอคน | error ระหว่างส่งท่าแสดงต่อผู้ใช้; ท่าเดิม dispatch=1 ไม่มี auto retry | ครบในแผน; NOT_RUN; fake ไม่ปิด TP001-045/E-HW |
+| [AC-034-03 / BR-034-03](../requirement/req-034.md) · DES-001 gate | FX-01a/d → TP001-003 / unit clock + integration fake | exp−1s เข้าได้; restart ไม่เลื่อน checked_at/exp | ครบในแผน; NOT_RUN; fake credential/clock |
+| [AC-034-04 / BR-034-04/05](../requirement/req-034.md) · DES-001 expiry | FX-01a/d + FX-03a → TP001-003 / unit + integration fake | exp/exp+1s+network fail ล็อกและแจ้งต่ออินเทอร์เน็ต; stale timer ไม่ dispatch | ครบในแผน; NOT_RUN; online/DB จริงยังไม่ตรวจ |
+| [AC-035-05 / BR-035-04/05](../requirement/req-035.md) · TP001-010 | FX-01e → TP001-010 / unit + integration fake | ย้าย A→B แล้ว A offline ใช้ก่อน E ได้ ที่/หลัง E ไม่ได้; E เดิมไม่เลื่อน | ครบในแผน; NOT_RUN; binding server เป็น stub |
+| [AC-039-05 / BR-039-02](../requirement/req-039.md) · TP001-058/079 | FX-05a/b/c → TP001-058, TP001-079 / domain + integration fake | นอก assignment/ต่างโรงเรียน/รู้ ID ไม่เห็นรายชื่อหรือผล; positive control อ่านได้; resolver ล่ม fail closed | ครบในแผน; NOT_RUN; roster/history resolver จริงรอ proof |
 
-วิธี: inject clock interface (wall กับ monotonic แยกคู่ + จุด persist anchor) ที่ host/API ใช้ — ห้ามเปลี่ยนเวลาเครื่องจริง; เก็บ log เวลาทุกการอ่านค่าเป็น E-TRACE
+## เกณฑ์สนับสนุนและเส้นแบ่ง
 
-## FX-02 trash 30 วัน: boundary · ปิดแอปข้ามอายุ · rollback · race
+- late callback/drain → FX-03a/e; transport/partial write → FX-03d; DB fail ก่อน commit → FX-04e; response หายหลัง commit → FX-04a. ต้องแยกสองจุดเพื่อไม่อ้างว่าหายหลัง commit คือ rollback
+- 3 วัน+clock rollback → FX-01a/d/e; clock 30 วัน+restart/race → FX-02a–d. FX-01b/c, FX-02 และ FX-04 เป็น fixtures สนับสนุนเดิม; ไม่เพิ่ม AC นอก pack เป็นเงื่อนไขตรวจรับ
+- TP001-045 ใช้ fake ซ้อม logic เท่านั้น; unplug/replug/stop latency/การเคลื่อนจริงอยู่ PF-HW ภายใต้ G-HW ไม่มีคำสั่งถึงหุ่นจาก fixtures นี้
+- export parity/coexistence/grade crash/worker lease อยู่ [TP-003](tp-003-grade-fixture-plan-001.md) ทั้งหมด; TP-002 ทดสอบ Project import/License clock ไม่เขียนคะแนน
 
-| id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
-| --- | --- | --- | --- |
-| FX-02a | fake wall ที่ deleted_at+29d23h59m59s / +30d / +30d+1s ขณะแอปเปิด | TP001-026 · AC-040-04/05/06 | now>=expires_at→TRASH_EXPIRED กู้ไม่ได้แม้ unlink ยังไม่สำเร็จ; ก่อนนั้น restore คืน UUID เดิม+counter ถัดไป; timer 60 วินาที (สมมติฐาน) + sweep ก่อนทุก operation |
-| FX-02b | ปิดแอป (ไม่มี process) → เลื่อน wall ข้าม expires_at → เปิดใหม่ | TP001-026 · AC-040-06 | ไม่มี background service; เวลานับจาก absolute expires_at; เปิดครั้งถัดไป sweep ก่อน list/restore/export; งานปกติ/ประวัติ/tombstone ไม่ถูกลบ |
-| FX-02c | ย้อน wall หลังลบ / VM snapshot | TP001-026 · BR-040-04 | ตรวจ rollback ตอน start/resume ก่อนเลื่อน anchor; ไม่น่าเชื่อถือ→CLOCK_UNTRUSTED หยุด restore+irreversible purge จน online ยืนยัน; ไม่ตั้ง deleted_at ใหม่ ไม่เพิ่มอายุ |
-| FX-02d | restore ∥ sweep พร้อมกัน; inject unlink fail | TP001-026 · AC-040-05/06 | ผลเดียวชนะตามขอบเวลา; unlink fail→STORE_UNAVAILABLE และ retry ได้ แต่ list ต้องไม่แสดงว่ากู้ได้ |
+## ข้อรอคนและข้อจำกัด
 
-วิธี: fake clock ของ FX-01 + fake local store (inject failpoint ที่ unlink/rename) · ห้ามใช้เวลาที่ UI ส่งเป็นความจริง (host สร้าง deleted_at/expires_at เอง)
+ไม่มีคำตอบจากคนที่ต้องใช้ก่อนส่งแผน fake ชุดนี้; ยังไม่มีการยอมรับความเสี่ยงหรือปิด gate
 
-## FX-03 late callback / drain-stop / idle lost (fake engine เท่านั้น)
+| Task / Reference | คำถาม / ผู้ตัดสิน | งานที่จะปลดล็อก / ทางจำลองก่อนนั้น |
+| --- | --- | --- |
+| QA หุ่น / TP001-045, G-HW | รุ่น/firmware/calibration/วิธี stop-unplug-emergency และอนุญาตทดสอบอะไรบ้าง? ผู้ใช้/ผู้รับรอง hardware | manual E-HW; ระหว่างรอใช้ FX-03 ไม่แทนผลจริง |
+| Authority runtime / TP001-058/079 | หลักฐาน resolver roster/status/move/term/tenant alias ที่เจ้าของรับรองอยู่ที่ใด? เจ้าของ School DB ผ่าน legacy/sys | ต่อข้อมูลจริง; ระหว่างรอ FX-05 scripted resolver ไม่เดา history |
+| API/DB integration / prerequisites ใน test-plan index | mapping/proto/error และหลักฐาน DB runtime พร้อมให้ check ใช้หรือยัง? arch/sys/G/Light และเจ้าของ DB | integration จริง; ระหว่างรอ boundary stub/transactional fake ไม่รัน SQL |
 
-| id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
-| --- | --- | --- | --- |
-| FX-03a | fake engine process หน่วง reply จนเลย stop; ปล่อย callback หลัง unmount/generation เปลี่ยน | TP001-037/040 · AC-021-01..04, AC-024-01..03 | cancel+drain ก่อนคำขอ stop (ลำดับใน trace); stop ซ้ำ join งานเดิมไม่สร้างคิวใหม่; รอ child reaped+stdout/stderr drained; callback ผลเก่าถูกทิ้งไม่เริ่ม movement ถัดไป; deadline host 5 วินาที |
-| FX-03b | partial write แล้ว cancel; stop request ล้มเหลว | TP001-037/039 · AC-021-03, AC-023-03 | ไม่รับประกันไม่มี movement; stop fail→error ไม่ยืนยันหยุดจริง; relock เฉพาะ stop request ส่งสำเร็จ; คง lost/unknown delivery ไม่ replay command |
-| FX-03c | discovery inject หาย 1 ผลขณะ idle; poll ทับขณะ busy/stopping | TP001-040 · AC-024-01 | poll 3000 ms/debounce 0 หนึ่งผลสำเร็จที่ไม่พบ target→DEVICE_NOT_FOUND/lost (สมมติฐาน); ไม่ซ้อน poll; busy/cancelled ไม่เปลี่ยน connected; lost invalidate uploaded session |
+## สิ่งส่งต่อให้ check
 
-วิธี: fake engine process/test bridge ตาม PF-HOST (spawn จริงเป็นโปรเซสจำลอง ส่ง JSON Lines ตามสคริปต์ delay/drop/dup/partial) — **ไม่เปิด HID/Serial จริง ไม่มีคำสั่งถึงหุ่นใด ๆ (dry-run เท่านั้น)**; cadence 3000 ms เป็นสมมติฐาน ไม่ใช้วัด stop latency
+ส่ง check สร้าง harness/tests ตามส่วนต่อ เลือก unit ก่อน integration. แต่ละ run บันทึก fixture ID/variation/TP case/AC, source+contract revision, profile, seed/hash, fault point, event order และ expected/actual แยกราย AC. เก็บ raw trace/JSON/stdout/stderr ใน reports ของ runner; knowledge เก็บสรุป+run-folder pointer
 
-## FX-04 lost response ตอน explicit import (receipt/tombstone)
+ใช้ข้อมูลสมมติทั้งหมด; redact token/key/secret ก่อนเก็บหลักฐาน; fake signing/identity ติดป้าย test-only. ค่า sweep 60 วินาทีและ poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ไม่ใช่เกณฑ์ physical SLA.
 
-| id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
-| --- | --- | --- | --- |
-| FX-04a | stub G/proxy กล response หลัง DB commit สำเร็จ (drop response post-commit) | TP001-028 · AC-041-04 | 201 เกิดหลัง durable commit เท่านั้น; response หาย→retry ด้วย RequestKey/snapshot เดิม ได้ผลเดิม ไม่เกิดสำเนาใหม่ |
-| FX-04b | crash host ก่อนเติมใบรับ/หลังเขียน pending; ลบไฟล์ใบรับ | TP001-028/078 · AC-041-04/05 | ใบรับเขียนก่อนส่ง (atomic); สูญหายยังคำนวณ key จาก UUID; server ไม่เชื่อ local receipt; state เติมจากผล server เท่านั้น |
-| FX-04c | แก้เนื้อหา/ชื่อ Guest หลัง freeze; 2 clients POST พร้อมกัน | TP001-028 · AC-041-04 | RequestHash ต่าง→409 IDEMPOTENCY_CONFLICT ไม่เปลี่ยน key อัตโนมัติ; unique (SchoolId,Principal,Operation,RequestKey) เหลือชุดเดียว |
-| FX-04d | ล้าง Guest workspace + trash sweep แล้ว retry; ล้าง ResultCipher | TP001-078 · AC-041-04 | tombstone กันซ้ำข้ามการล้าง; ไม่ purge จากการล้าง Guest/trash |
+## การตรวจเอกสาร 2026-10-29
 
-วิธี: stub G proxy (ควบคุม drop/delay/replay) + test SchoolBot DB ตรวจ rows before/after+audit (E-API); Project/Revision/Idempotency commit เป็น transaction เดียว
-
-## FX-05 cross-tenant / authority injection (GAP-06)
-
-| id | จำลอง | จุดตรวจ · cases/AC | Expected หลัก |
-| --- | --- | --- | --- |
-| FX-05a | synthetic School DB fixture: T/A/ห้อง1/เทอมX, U/B/ห้อง1/เทอมX, R ใน roster, S ย้ายออก (หลายแถว history), sId==sEmp ชน, SchoolID ทุก alias | TP001-058/079 · AC-038-05, AC-039-05 | เห็นเฉพาะ course-teacher∩roster∩term; ครูอีกคนในห้อง/PlanCourseIds ของ run ไม่เปิดสิทธิ์; ใช้ history ไม่ใช่ห้องปัจจุบันของ TUser; ไม่เดา Max(nHistoryId) |
-| FX-05b | spoof identity/tenant/forwarding headers; ใช้ ID ข้ามโรงเรียน/เทอม; ถอนสิทธิ์ระหว่าง read→commit | TP001-058/079 · AC-038-05, AC-039-05 | 403 SUBJECT_PERMISSION_REQUIRED หรือ 404; tenant ทุก join; re-check ก่อน commit ปฏิเสธ in-flight; ผลเดิมไม่เปลี่ยน |
-| FX-05c | inject School DB resolver ล่ม / ข้อมูลกำกวม | TP001-079 · AC-038-05 | แหล่งล่ม→503 AUTH_UNAVAILABLE; resolve ไม่ได้→fail closed 503 AUTH_NOT_CONFIGURED ไม่เปิดสิทธิ์จาก query |
-
-วิธี: stub School DB fixture (SQL sanitized + hash แนบทุก run) — **synthetic ติดป้าย test-only** จนได้ resolver roster/status/move/term + tenant alias proof จาก legacy/sys ตาม gap-sync-review §ผู้รับต่อ; สิทธิ์ไม่ยกจาก client/cType
-
-## การใช้ร่วมและขอบเขตที่ไม่ทำ
-
-- แผนที่ cases→fixtures: TP001-003/004/010→FX-01a · TP001-007→FX-01b · TP001-026→FX-01a(clock ร่วม)+FX-02 · TP001-028→FX-01c+FX-04a–c · TP001-078→FX-04d · TP001-037/039/040→FX-03 · TP001-058/079→FX-05 · PF-HOST fake clock+monotonic harness ใน Profiles ของ TP-001 อ้างชุดนี้
-- **ไม่มี fixture ของ GAP-07** (PrepareUpdate/InstallPreparedUpdate) จนกว่าผู้มีอำนาจเลือก disposition ตาม update-disposition-001; ไม่มี fixture สั่งหุ่นจริงตาม Acceptance ของ TP-002 ("ไม่สั่งหุ่น"); hardware/unplug/emergency-stop เป็นของ PF-HW ภายใต้ G-HW เท่านั้น
-- TTL 15 นาทีอนุมัติแล้วตาม decisions-046; ค่าที่ยังเป็นสมมติฐาน: timer sweep 60 วินาที, poll 3000 ms/debounce 0 — ถ้าสัญญาเปลี่ยน ให้ amend แผนนี้ก่อนรัน
+ตรวจ PowerShell แบบ static: AC rows 6/6, fixture rows 22/22, local file links 19/19; ทุกไฟล์ไม่เกิน 10 KiB. git diff --check ผ่าน (exit 0). ไม่รัน harness/tests/SQL/หุ่น; runtime NOT_RUN
 
 ## Change Log
+- 2026-10-29 — Rev2 ใบงาน093: เติม FX-01d/e, FX-03d/e, FX-04e และ setup/trigger/สิ่งที่วัด; traceability ครบ 6 AC/7 TP cases; แยกส่วนต่อควบคุมขนาด คง IDs เดิม; fake เท่านั้น ไม่เขียน tests/ไม่รัน DB หรือหุ่น
 - 2026-10-24 — Rev1: สร้างแผน failure/race fixtures ตามใบงาน060e (fake clock/monotonic, trash 30 วัน/rollback/ปิดแอป, late callback/drain-stop, lost response/receipt/tombstone, cross-tenant GAP-06); docs-only ไม่มีการรัน
 - 2026-10-24 — แก้ตาม check 060f (นายช่างสวมบท inspect): FX-01b ปรับเป็น fixture TTL=900s และทดสอบรอบ ReplayUntil (ไม่ใช่ offset จาก CompletedAt)
 
