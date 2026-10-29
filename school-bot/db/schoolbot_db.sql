@@ -1,7 +1,9 @@
 -- =============================================================================
 -- Migration: schoolbot_db.sql — ตาราง SchoolBot ทั้งหมด (32 ตาราง) ใน SchoolBot DB (Rev7 — PRIMARY KEY only)
 -- Target Database: SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot — ชื่อ DB เป็นสมมติฐาน), schema: public
--- Status: DRAFT — เขียนอย่างเดียว ยังไม่เคยรัน; คนเป็นผู้รันบนฐานทดสอบแล้วส่ง DBA-003 ตรวจ
+-- สถานะชุดส่งมอบ: รอคน review/รัน; ผู้ใช้ยืนยันเคยสร้างตารางตาม decisions-045 แต่ยังไม่ทราบ revision/hash/catalog
+-- ใช้สร้างใหม่เมื่อยืนยันว่าไม่มีทั้ง 32 ตารางเท่านั้น; ฐานเดิมให้ตรวจ catalog ตาม review-008.md ห้ามรันไฟล์นี้ซ้ำ
+-- การพบชื่อตารางเดิมทำให้ transaction ล้มทั้งหมด ไม่ข้ามด้วย IF NOT EXISTS และไม่ ALTER ข้อมูลเดิม
 -- Baseline: decisions-026, decisions-027, decisions-028 · ที่มา: DBA (agy) review-005 (2026-10-22)
 -- ตามคำสั่งผู้ใช้ 2026-10-26: คงเฉพาะ PRIMARY KEY 32 รายการ; ถอน UNIQUE 24, FOREIGN KEY 40 และ CHECK 80
 -- คง450คอลัมน์และ identity; CreateBy/CreateDate/UpdateBy/UpdateDate เป็น NULL DEFAULT NULL ทุกตาราง (คำสั่งผู้ใช้ 2026-10-26)
@@ -10,6 +12,10 @@
 -- ทั้งไฟล์รันใน transaction เดียว: ส่วนใดล้ม = rollback ทั้งหมด
 -- CreateBy/UpdateBy = integer NULL: sEmp (พนักงาน/ครู) หรือ sId (นักเรียน) ของผู้ทำ, NULL = ระบบทำเอง (decisions-028)
 -- =============================================================================
+
+-- Change Log:
+-- 2026-10-29 — ใบงาน094 DBA-002/004: คง physical Rev7; ให้ CREATE หยุดเมื่อพบตารางเดิมและแยกคำยืนยัน045จาก catalog
+-- runbook: review-008.md; catalog: schoolbot_catalog_review.sql; rollback: schoolbot_db_rollback.sql
 
 BEGIN;
 
@@ -21,7 +27,7 @@ BEGIN;
 
 
 -- 2. Table: SchoolBotLicense (DES-002) — Mutable (If-Match on revoke/unbind)
-CREATE TABLE IF NOT EXISTS public."SchoolBotLicense" (
+CREATE TABLE public."SchoolBotLicense" (
     "SchoolBotLicenseId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "SchoolName" varchar(200) NOT NULL,
     "KeyHash" varchar(64) NOT NULL,
@@ -41,7 +47,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLicense" (
 );
 
 -- 3. Table: SchoolBotLicenseBinding (DES-002) — Mutable (validate/detach)
-CREATE TABLE IF NOT EXISTS public."SchoolBotLicenseBinding" (
+CREATE TABLE public."SchoolBotLicenseBinding" (
     "SchoolBotLicenseBindingId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LicenseId" integer NOT NULL,
     "DeviceJkt" varchar(64) NOT NULL,
@@ -62,7 +68,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLicenseBinding" (
 
 
 -- 4. Table: SchoolBotRelease (DES-007) — Mutable (publish/withdraw with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotRelease" (
+CREATE TABLE public."SchoolBotRelease" (
     "SchoolBotReleaseId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "VersionText" varchar(32) NOT NULL,
     "Channel" varchar(16) NOT NULL,
@@ -83,7 +89,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRelease" (
 
 
 -- 5. Table: SchoolBotIdempotency (data-model.md)
-CREATE TABLE IF NOT EXISTS public."SchoolBotIdempotency" (
+CREATE TABLE public."SchoolBotIdempotency" (
     "SchoolBotIdempotencyId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "Principal" varchar(512) NOT NULL,
     "Operation" varchar(200) NOT NULL,
@@ -107,7 +113,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotIdempotency" (
 
 
 -- 6. Table: SchoolBotAuditEvent (data-model.md)
-CREATE TABLE IF NOT EXISTS public."SchoolBotAuditEvent" (
+CREATE TABLE public."SchoolBotAuditEvent" (
     "SchoolBotAuditEventId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "Actor" varchar(512) NOT NULL,
     "Event" varchar(64) NOT NULL,
@@ -132,7 +138,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAuditEvent" (
 -- #############################################################################
 
 -- 1. Table: SchoolBotSession (DES-004, DES-012) — Mutable (PUT /v2/auth/session with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotSession" (
+CREATE TABLE public."SchoolBotSession" (
     "SchoolBotSessionId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "Channel" varchar(16) NOT NULL DEFAULT 'desktop',
     "AccountId" integer NULL,
@@ -154,7 +160,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotSession" (
 );
 
 -- 2. Table: SchoolBotStaffRole (DES-012) — Mutable (DELETE /v2/admin/staff-roles/{id} with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotStaffRole" (
+CREATE TABLE public."SchoolBotStaffRole" (
     "SchoolBotStaffRoleId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "EmployeeId" integer NOT NULL,
     "Role" varchar(32) NOT NULL,
@@ -172,7 +178,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotStaffRole" (
 
 
 -- 3. Table: SchoolBotProject (DES-003) — Mutable (save/rename/delete with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotProject" (
+CREATE TABLE public."SchoolBotProject" (
     "SchoolBotProjectId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "OwnerKind" varchar(16) NOT NULL,
     "OwnerId" integer NOT NULL,
@@ -189,7 +195,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotProject" (
 );
 
 -- 4. Table: SchoolBotProjectRevision (DES-003) — Immutable snapshot
-CREATE TABLE IF NOT EXISTS public."SchoolBotProjectRevision" (
+CREATE TABLE public."SchoolBotProjectRevision" (
     "SchoolBotProjectRevisionId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "ProjectId" integer NOT NULL,
     "Revision" integer NOT NULL,
@@ -211,7 +217,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotProjectRevision" (
 -- #############################################################################
 
 -- 1. Table: SchoolBotLevel (DES-005, DES-011; Global only) — Mutable (If-Match when adding policy)
-CREATE TABLE IF NOT EXISTS public."SchoolBotLevel" (
+CREATE TABLE public."SchoolBotLevel" (
     "SchoolBotLevelId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LevelKey" uuid NOT NULL,
     "Code" varchar(64) NOT NULL,
@@ -227,7 +233,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevel" (
 );
 
 -- 2. Table: SchoolBotLevelPromotionPolicy (DES-011; Global only) — Immutable revision
-CREATE TABLE IF NOT EXISTS public."SchoolBotLevelPromotionPolicy" (
+CREATE TABLE public."SchoolBotLevelPromotionPolicy" (
     "SchoolBotLevelPromotionPolicyId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LevelId" integer NOT NULL,
     "Revision" integer NOT NULL,
@@ -243,7 +249,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLevelPromotionPolicy" (
 );
 
 -- 3. Table: SchoolBotCurriculum (DES-005 Rev4; Global only) — Mutable while draft (PUT content / POST publish with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotCurriculum" (
+CREATE TABLE public."SchoolBotCurriculum" (
     "SchoolBotCurriculumId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CurriculumKey" uuid NOT NULL,
     "Revision" integer NOT NULL,
@@ -264,7 +270,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCurriculum" (
 );
 
 -- 4. Table: SchoolBotLesson (DES-005 Rev4; Global only) — Replaced via parent Curriculum revision
-CREATE TABLE IF NOT EXISTS public."SchoolBotLesson" (
+CREATE TABLE public."SchoolBotLesson" (
     "SchoolBotLessonId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CurriculumId" integer NOT NULL,
     "LessonKey" uuid NOT NULL,
@@ -282,7 +288,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotLesson" (
 );
 
 -- 5. Table: SchoolBotMission (DES-005 Rev4; Global only) — Replaced via parent Curriculum revision
-CREATE TABLE IF NOT EXISTS public."SchoolBotMission" (
+CREATE TABLE public."SchoolBotMission" (
     "SchoolBotMissionId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LessonId" integer NOT NULL,
     "MissionKey" uuid NOT NULL,
@@ -300,7 +306,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotMission" (
 );
 
 -- 6. Table: SchoolBotCriteria (DES-005 Rev4; Global only) — Immutable per revision
-CREATE TABLE IF NOT EXISTS public."SchoolBotCriteria" (
+CREATE TABLE public."SchoolBotCriteria" (
     "SchoolBotCriteriaId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "MissionId" integer NOT NULL,
     "Revision" integer NOT NULL,
@@ -318,7 +324,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCriteria" (
 );
 
 -- 7. Table: SchoolBotActivity (DES-005 Rev4 / DES-010; Global only) — Replaced via parent Curriculum revision
-CREATE TABLE IF NOT EXISTS public."SchoolBotActivity" (
+CREATE TABLE public."SchoolBotActivity" (
     "SchoolBotActivityId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LessonId" integer NOT NULL,
     "ActivityKey" uuid NOT NULL,
@@ -338,7 +344,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotActivity" (
 );
 
 -- 8. Table: SchoolBotQuestionBank (DES-010; Global only) — Mutable while draft (POST publish with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotQuestionBank" (
+CREATE TABLE public."SchoolBotQuestionBank" (
     "SchoolBotQuestionBankId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "BankKey" uuid NOT NULL,
     "Revision" integer NOT NULL,
@@ -363,7 +369,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotQuestionBank" (
 -- #############################################################################
 
 -- 1. Table: SchoolBotCourseRun (DES-008, DES-010, DES-011) — Mutable (If-Match on policy update/lifecycle)
-CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRun" (
+CREATE TABLE public."SchoolBotCourseRun" (
     "SchoolBotCourseRunId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CurriculumId" integer NOT NULL,
     "ClassroomId" integer NOT NULL,
@@ -385,7 +391,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRun" (
 
 
 -- 2. Table: SchoolBotScoringPolicy (DES-010) — Immutable revision (CurriculumId removed as redundant with CourseRun.CurriculumId)
-CREATE TABLE IF NOT EXISTS public."SchoolBotScoringPolicy" (
+CREATE TABLE public."SchoolBotScoringPolicy" (
     "SchoolBotScoringPolicyId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "Revision" integer NOT NULL,
@@ -401,7 +407,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoringPolicy" (
 
 
 -- 3. Table: SchoolBotCourseRunActivity (DES-010) — Mutable (PUT override/window with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRunActivity" (
+CREATE TABLE public."SchoolBotCourseRunActivity" (
     "SchoolBotCourseRunActivityId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "ActivityId" integer NOT NULL,
@@ -418,7 +424,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotCourseRunActivity" (
 );
 
 -- 4. Table: SchoolBotSubmission (DES-005 Rev4) — Mutable (POST /submissions/{id}/assessments with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotSubmission" (
+CREATE TABLE public."SchoolBotSubmission" (
     "SchoolBotSubmissionId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "LearnerId" integer NOT NULL,
     "MissionId" integer NOT NULL,
@@ -438,7 +444,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotSubmission" (
 );
 
 -- 5. Table: SchoolBotGradingJob (DES-005) — Mutable (worker lease & state transition)
-CREATE TABLE IF NOT EXISTS public."SchoolBotGradingJob" (
+CREATE TABLE public."SchoolBotGradingJob" (
     "SchoolBotGradingJobId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "SubmissionId" integer NOT NULL,
     "State" varchar(16) NOT NULL,
@@ -457,7 +463,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotGradingJob" (
 );
 
 -- 6. Table: SchoolBotAssessment (DES-005 Rev4) — Immutable append-only
-CREATE TABLE IF NOT EXISTS public."SchoolBotAssessment" (
+CREATE TABLE public."SchoolBotAssessment" (
     "SchoolBotAssessmentId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "SubmissionId" integer NOT NULL,
     "Sequence" integer NOT NULL,
@@ -481,7 +487,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAssessment" (
 
 
 -- 7. Table: SchoolBotAttempt (DES-010) — Mutable while started (PUT answers / POST submit with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotAttempt" (
+CREATE TABLE public."SchoolBotAttempt" (
     "SchoolBotAttemptId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "ActivityId" integer NOT NULL,
@@ -505,7 +511,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotAttempt" (
 );
 
 -- 8. Table: SchoolBotRetakeGrant (DES-010) — Consumed under learner attempt lock
-CREATE TABLE IF NOT EXISTS public."SchoolBotRetakeGrant" (
+CREATE TABLE public."SchoolBotRetakeGrant" (
     "SchoolBotRetakeGrantId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "ActivityId" integer NOT NULL,
@@ -528,7 +534,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotRetakeGrant" (
 -- #############################################################################
 
 -- 1. Table: SchoolBotGradeSlot (DES-008) — Mutable (retire/ownership lifecycle)
-CREATE TABLE IF NOT EXISTS public."SchoolBotGradeSlot" (
+CREATE TABLE public."SchoolBotGradeSlot" (
     "SchoolBotGradeSlotId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "PlanCourseId" integer NOT NULL,
@@ -551,7 +557,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotGradeSlot" (
 
 
 -- 2. Table: SchoolBotScoreMapping (DES-008) — Mutable (PUT / POST retire with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotScoreMapping" (
+CREATE TABLE public."SchoolBotScoreMapping" (
     "SchoolBotScoreMappingId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "GradeSlotId" integer NOT NULL,
@@ -568,7 +574,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreMapping" (
 
 
 -- 3. Table: SchoolBotScorePreview (DES-009) — Mutable state (POST confirm / POST resolve with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreview" (
+CREATE TABLE public."SchoolBotScorePreview" (
     "SchoolBotScorePreviewId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "Principal" varchar(512) NOT NULL,
@@ -587,7 +593,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreview" (
 );
 
 -- 4. Table: SchoolBotScorePreviewItem (DES-009) — Immutable snapshot per preview
-CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreviewItem" (
+CREATE TABLE public."SchoolBotScorePreviewItem" (
     "SchoolBotScorePreviewItemId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "ScorePreviewId" integer NOT NULL,
     "LearnerId" integer NOT NULL,
@@ -604,7 +610,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScorePreviewItem" (
 );
 
 -- 5. Table: SchoolBotScoreExport (DES-009) — Mutable state (worker progression)
-CREATE TABLE IF NOT EXISTS public."SchoolBotScoreExport" (
+CREATE TABLE public."SchoolBotScoreExport" (
     "SchoolBotScoreExportId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "ScorePreviewId" integer NOT NULL,
     "ConfirmedBy" varchar(512) NOT NULL,
@@ -620,7 +626,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreExport" (
 );
 
 -- 6. Table: SchoolBotScoreOutbox (DES-009) — Mutable (worker lease & receipt reconciliation; ScorePreviewId removed as redundant)
-CREATE TABLE IF NOT EXISTS public."SchoolBotScoreOutbox" (
+CREATE TABLE public."SchoolBotScoreOutbox" (
     "SchoolBotScoreOutboxId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "ScoreExportId" integer NOT NULL,
     "ScorePreviewItemId" integer NOT NULL,
@@ -650,7 +656,7 @@ CREATE TABLE IF NOT EXISTS public."SchoolBotScoreOutbox" (
 -- #############################################################################
 
 -- 1. Table: SchoolBotLevelProposal (DES-011 Rev2) — Mutable (POST confirm / POST decline with If-Match)
-CREATE TABLE IF NOT EXISTS public."SchoolBotLevelProposal" (
+CREATE TABLE public."SchoolBotLevelProposal" (
     "SchoolBotLevelProposalId" integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 NO CYCLE) NOT NULL,
     "CourseRunId" integer NOT NULL,
     "TargetCurriculumId" integer NOT NULL,

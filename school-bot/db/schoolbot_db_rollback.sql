@@ -1,13 +1,72 @@
 -- =============================================================================
 -- Rollback: schoolbot_db_rollback.sql — ย้อนกลับ schoolbot_db.sql ทั้งหมด (Rev7 — 32 ตาราง, PRIMARY KEY only)
 -- Target Database: SchoolBot DB (host 10.0.0.128 port 9499, database SchoolBot — ชื่อ DB เป็นสมมติฐาน), schema: public
--- Status: DRAFT — เขียนอย่างเดียว ยังไม่เคยรัน; คนเป็นผู้รันบนฐานทดสอบแล้วส่ง DBA-003 ตรวจ
+-- สถานะ: รอคน review/รันเท่านั้น; ไม่มีผล rollback runtime
+-- ใช้เฉพาะการสร้างใหม่รอบเดียวที่มีหลักฐานก่อนสร้างว่าไม่มีทั้ง32ตาราง และยังไม่เปิด writer
+-- ห้ามใช้กับฐานที่สร้างไว้ตาม decisions-045 หรือฐานที่มีข้อมูล/ไม่ทราบ baseline
 -- Baseline: decisions-026, decisions-027, decisions-028 · ที่มา: DBA (agy) review-005 (2026-10-22)
 -- ทั้งไฟล์รันใน transaction เดียว: ส่วนใดล้ม = rollback ทั้งหมด
--- DESTRUCTIVE: DROP ตาราง SchoolBot* ทั้ง 32 ตารางและข้อมูลทั้งหมด (ลำดับย้อนกลับ 006 → 001); ตาราง legacy ไม่ได้รับผลกระทบ
+-- DESTRUCTIVE: DROP โครงสร้าง SchoolBot ทั้ง32ตาราง (006 → 001) ได้เฉพาะเมื่อว่างทั้งหมด
+-- แนวทาง DROP พร้อมข้อมูลของฉบับเดิมถูกแทนที่แล้ว: guard ด้านล่างหยุดทันทีเมื่อมีข้อมูล/ตารางขาด/ไม่มีสิทธิ์
+-- ไม่ใช้ CASCADE; ไม่ย้อนผลใน legacy DB; ถ้า guard หยุดให้คงตารางและส่งออกแบบวิธีกู้โดยไม่สูญข้อมูล
 -- =============================================================================
 
+-- Change Log:
+-- 2026-10-29 — ใบงาน094: เพิ่ม lock+ตรวจว่างครบ32ก่อน DROP; ไม่มีการรันหรือรับรองว่า rollback สำเร็จ
+
 BEGIN;
+
+SET LOCAL row_security = off;
+DO $rollback_guard$
+DECLARE
+    target_name text;
+    has_rows boolean;
+BEGIN
+    FOR target_name IN
+        SELECT unnest(ARRAY[
+        'SchoolBotActivity',
+        'SchoolBotAssessment',
+        'SchoolBotAttempt',
+        'SchoolBotAuditEvent',
+        'SchoolBotCourseRun',
+        'SchoolBotCourseRunActivity',
+        'SchoolBotCriteria',
+        'SchoolBotCurriculum',
+        'SchoolBotGradeSlot',
+        'SchoolBotGradingJob',
+        'SchoolBotIdempotency',
+        'SchoolBotLesson',
+        'SchoolBotLevel',
+        'SchoolBotLevelPromotionPolicy',
+        'SchoolBotLevelProposal',
+        'SchoolBotLicense',
+        'SchoolBotLicenseBinding',
+        'SchoolBotMission',
+        'SchoolBotProject',
+        'SchoolBotProjectRevision',
+        'SchoolBotQuestionBank',
+        'SchoolBotRelease',
+        'SchoolBotRetakeGrant',
+        'SchoolBotScoreExport',
+        'SchoolBotScoreMapping',
+        'SchoolBotScoreOutbox',
+        'SchoolBotScorePreview',
+        'SchoolBotScorePreviewItem',
+        'SchoolBotScoringPolicy',
+        'SchoolBotSession',
+        'SchoolBotStaffRole',
+        'SchoolBotSubmission'
+        ]::text[]) ORDER BY 1
+    LOOP
+        -- ล็อกค้างถึง COMMIT; กัน writer แทรกหลังตรวจว่าง และตารางขาดทำให้ abort
+        EXECUTE format('LOCK TABLE public.%I IN ACCESS EXCLUSIVE MODE', target_name);
+        EXECUTE format('SELECT EXISTS (SELECT 1 FROM public.%I)', target_name) INTO has_rows;
+        IF has_rows THEN
+            RAISE EXCEPTION 'หยุด rollback: ตาราง % มีข้อมูล; ต้องคงข้อมูลและส่งออกแบบวิธีกู้', target_name;
+        END IF;
+    END LOOP;
+END;
+$rollback_guard$;
 
 
 -- #############################################################################
