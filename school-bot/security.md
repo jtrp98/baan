@@ -394,3 +394,15 @@ Current OPEN: Important6/Medium6/Minor3 · ไม่ใช่ risk acceptance ·
 ### Change Log ใบงาน093
 
 - 2026-10-29 — jpo append ลิงก์ review pack/หลักฐาน/compliance; เก็บ findings/ผลเดิมทุกแถว ไม่แก้ source ไม่ปิด human gate.
+
+## BE-039 S2 ใบงาน094 — 2026-10-29
+
+[ผลตรวจ authorization หลักสูตร](planning/jpo-094-BE-039-001.md): Critical ใหม่ 0 / Important ใหม่ 0 / Minor ใหม่ 1 (SEC094-001: Service:95–104 อนุญาต publish เมื่อ authorPrincipalId ขาด) ปัจจุบัน helper มีผู้เรียกเฉพาะ tests ไม่มี curriculum HTTP/gRPC endpoint ใน B ที่ตรวจ จึงยังไม่เข้าถึงจาก client→G→B; เสนอ BE ปฏิเสธ author ขาดและโหลด canonical author ฝั่ง server เป็นรายการไม่ขวาง slice ไม่เปิด task เอง
+
+ตรวจ channel/role/fail-closed/error และข้อจำกัด tenant/session จริงจาก source; isolated reflection runner ใช้ xUnit Assert ได้ 43 ผ่าน/0 ไม่ผ่าน (เดิม22+อิสระ21 รวม reproduction ที่ยืนยัน defect ยังไม่แก้) native suite ไม่รับรอง: VSTest เชื่อม testhost ไม่ได้ หลักฐาน `reports/school-bot/normal-094/jpo-BE-039-evidence/` การตรวจนี้เสร็จเฉพาะ S2 ไม่ใช่ full AC/release
+
+Generated record ToString มี raw Token แต่ยังไม่มี log sink/caller บันทึกข้อระวังภายใต้ SEC001-010; ไม่มี store/การส่งข้อมูลใหม่ ไม่รับรอง PDPA/GDPR/CVE/licenses ทั้งระบบ SEC001-001/002/010/011/012/013 คงผลเดิม ไม่เปิดซ้ำ/ไม่ปิด Important เดิม/H5 และไม่มี risk acceptance ใหม่
+
+### Change Log ใบงาน094
+
+- 2026-10-29 — จป. append ผล BE-039 S2 และ SEC094-001; ไม่แก้ source/plan ไม่เปลี่ยน findings เก่า ส่งนายช่างและ BE
