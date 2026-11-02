@@ -1,6 +1,6 @@
 # ส่วนประกอบของ int-006-admin-states.md
 
-วันที่ 2026-10-26 · [กลับไฟล์ต้นทาง](int-006-admin-states.md) · ส่วนหนึ่งของร่าง UX ชุดเดิม ทุกส่วนอนุมัติแล้วตาม [decisions-043](../requirement/decisions-043.md) (ผู้ใช้ 2026-10-26)
+> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
 ## S4. Error → ทางแก้
 
@@ -16,9 +16,7 @@
 | 409 IDEMPOTENCY_CONFLICT / EXPIRED | คำขอเดิมเนื้อหาต่าง: “ข้อมูลคำขอไม่ตรงกัน — ตรวจรายการเดิมก่อน”; หมดอายุ: ใช้ S3 ไม่สั่งสร้างคำขอใหม่ทันที |
 | 413/415 | “ข้อมูลมีขนาดเกินหรือรูปแบบไม่รองรับ — ตรวจต้นทางก่อนลองใหม่”; แสดง limit เฉพาะที่สัญญานั้นระบุ |
 | 429 | “ทำรายการถี่เกินไป — รอตามเวลาที่ระบบแจ้ง”; ใช้ Retry-After ที่ตรวจแล้ว ไม่ retry mutation อัตโนมัติ |
-| 500/503 หรือ G envelope ที่ไม่มี domain code | “ระบบยังดำเนินการไม่ได้ — ลองโหลดใหม่หรือติดต่อผู้ดูแล”; ถ้าส่ง mutation แล้วใช้ S3 ไม่เดาผลจากข้อความ |
-
-หลักฐาน: `design/des-005.md:136`; `design/des-010.md:110–119`; `design/data-contract-rules.md:47–66`; `design/gateway-grpc-contract-001.md:101–120` แสดง request_id ที่ผ่านการกรองให้แจ้งผู้ดูแล ไม่โชว์ token/claims
+| 500/503 หรือ HTTP API Gateway (`sb-api-gateway`) envelope ที่ไม่มี domain code | “ระบบยังดำเนินการไม่ได้ — ลองโหลดใหม่หรือติดต่อผู้ดูแล”; ถ้าส่ง mutation แล้วใช้ S3 ไม่เดาผลจากข้อความ |
 
 ## S5. Auth, role และ tenant
 
@@ -30,15 +28,11 @@
 - 403 LICENSE_REQUIRED สำหรับ school_web: “โรงเรียนยังไม่มีสิทธิ์ใช้งานที่ใช้งานได้ — ติดต่อผู้ดูแลโรงเรียน”; ไม่บังคับ device binding บนเว็บหรือเพิ่ม License gate ให้ staff_admin เอง
 - 503 AUTH_NOT_CONFIGURED/AUTH_UNAVAILABLE: “ยังตรวจสอบสิทธิ์ไม่ได้ — ติดต่อผู้ดูแลหรือลองใหม่ภายหลัง”; ไม่ให้สิทธิ์ชั่วคราว
 
-เนื้อหากลาง SchoolId=null แยกจากโรงเรียนต้นสังกัดของ StaffRole ไม่เพิ่มตัวเลือก SchoolId เพื่อยกสิทธิ์ หลักฐาน: `design/des-012.md:49–78,87–95`; `design/des-005.md:20`
+เนื้อหากลาง SchoolId=null แยกจากโรงเรียนต้นสังกัดของ StaffRole ไม่เพิ่มตัวเลือก SchoolId เพื่อยกสิทธิ์ หลักฐาน: [des-012.md](../design/des-012.md); [des-005.md](../design/des-005.md)
 
-## S6. SchoolBright และ a11y
-
-อ้าง skill `C:/Users/jabja/.codex/plugins/cache/claude-cowork/anthropic-skills/1.0.0/skills/school-bright-design/SKILL.md:65–105,122–155,188–209,234–267,293–335`
+## S6. SchoolBright และ accessibility (a11y — การเข้าถึงสำหรับผู้ใช้ทุกกลุ่ม)
 
 ข้อเสนอส่วนนี้ใช้กับ admin ส่วนกลางใน school-bot; school_web ยึดกฎ repo ตาม [T4](int-006-admin-trace.md#t4-source-และข้อจำกัดหลักฐาน) โดยใช้ DESIGN/shared props เดิมสำหรับ component/font/spacing และ P9 สำหรับ loading ไม่บังคับค่าของ skill ข้าม repo
-
-
 
 ข้อเสนอ: Sidebar+Header, spacing ทวีคูณ 8px, radius12; TH Sarabun New body18/36 ตาราง16/32 หัว24/48 ตามกฎ line-height 2 เท่า ใช้ stack/component กลางที่เจ้าของ repo ยืนยัน ไม่เสนอ migration หรืออ้างตรวจ component แล้ว
 
@@ -50,9 +44,9 @@ Touch target ≥48×48px; focus เห็นชัดด้วย token เข�
 
 UI ไทยเป็นหลัก เปลี่ยนภาษาแล้วทั้งหน้า รวม aria/copy: “บันทึกฉบับร่าง / Save draft”, “ตรวจร่างและเผยแพร่ / Review and publish”, “ยังไม่ทราบผล / Outcome unknown” เป็นข้อความ i18n ไม่ใช่ field ใหม่
 
+## หลักฐาน
 
-## Change Log
-
-- 2026-10-26 — นายช่างแบ่งไฟล์เชิงกลจากเนื้อหา int เดิม ย้ายแต่ละ section ตรงตามต้นฉบับ ไม่เปลี่ยนกฎ ข้อเสนอ หรือคำถามเซ็น
-
-- 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม
+- `design/des-005.md:136`; `design/des-010.md:110–119`; `design/data-contract-rules.md:47–66`; `design/gateway-grpc-contract-001.md:101–120` แสดง request_id ที่ผ่านการกรองให้แจ้งผู้ดูแล ไม่โชว์ token/claims
+- `design/des-012.md:49–78,87–95`
+- `design/des-005.md:20`
+- อ้าง skill `C:/Users/jabja/.codex/plugins/cache/claude-cowork/anthropic-skills/1.0.0/skills/school-bright-design/SKILL.md:65–105,122–155,188–209,234–267,293–335`

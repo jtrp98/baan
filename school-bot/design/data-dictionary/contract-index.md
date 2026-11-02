@@ -17,8 +17,3 @@
 `ProjectContent` อธิบายใน [DES-003](../des-003.md) และ `CriteriaRules` ใน [DES-005](../des-005.md); `Manifest` ใน [DES-007](../des-007.md)
 
 Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md)
-
-## Change Log
-- 2026-10-23 — Rev2: sync032..034; physicalเดิม
-
-- 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

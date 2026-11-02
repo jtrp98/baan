@@ -1,8 +1,8 @@
 # ส่วนประกอบของ int-007-states.md
 
-วันที่ 2026-10-26 · [กลับไฟล์ต้นทาง](int-007-states.md) · ส่วนหนึ่งของร่าง UX ชุดเดิม ทุกส่วนอนุมัติแล้วตาม [decisions-043](../requirement/decisions-043.md) (ผู้ใช้ 2026-10-26)
+> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-## 3. ไม่ทราบผล mutation — Q43–Q46
+## 3. ไม่ทราบผล mutation — Q43 (บันทึก ส่ง กู้ผล และหมดเวลาข้อสอบ)–Q46 (เสนอ ยืนยัน และตั้งเกณฑ์เลื่อน Level)
 
 ใช้กับเริ่ม attempt, บันทึก/ส่งคำตอบ, ตั้งเวลา, เปิดซ่อม, น้ำหนัก, ประเมิน/confirm/decline Level และเกณฑ์ admin
 
@@ -12,9 +12,9 @@
 
 IDEMPOTENCY_CONFLICT ให้หยุดและตรวจรายการเดิม ไม่สร้าง key ใหม่เพื่อหลบ; IDEMPOTENCY_EXPIRED ใช้ resource_id เมื่อ server อนุญาตให้รู้ หากไม่มีทางอ่านผลให้คงสถานะไม่ทราบผลและติดต่อผู้ดูแล ไม่สรุปว่าไม่เคยบันทึก สำเร็จแล้วจึงใช้ข้อความยืนยันคงอยู่ในหน้า; toast เป็นข้อมูลเสริมเท่านั้น
 
-## delta042
+## ผลข้อสอบเมื่อหมดเวลา
 
-ฐาน042/BR-046-07/AC-046-07; copy/interaction อนุมัติ Q43 แล้วตาม decisions-043 รวม int-004 §8 delta; Q22–Q29 คงมติเดิม
+[มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)/[BR-046-07 (หมดเวลาปิด attempt ตรวจคำตอบที่ server บันทึกทัน)](../requirement/req-046.md)/[AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md); copy/interaction อนุมัติ Q43 แล้วตาม [มติ 043 (อนุมัติ UX-005/007 และยืนยัน runner)](../requirement/decisions-043.md) รวม int-004 §8 delta; Q22 (บทเรียนและตัวกรองโหมด)–Q29 (accessibility ของการเรียน) คงมติเดิม
 
 หมดเวลา: ล็อกแก้/บันทึก/ส่ง → “หมดเวลา — กำลังประมวลผลคำตอบที่บันทึกทันเวลา” → อ่านผล server ที่ยืนยันได้ ไม่อ้างว่าผู้เรียนกดส่ง
 
@@ -26,11 +26,9 @@ unknown/error: “ยังยืนยันผลเมื่อหมดเ�
 
 aria-live polite ประกาศหมดเวลา/ผลครั้งเดียว; ย้าย focus ไปสถานะเมื่อตัวควบคุมที่ใช้อยู่ถูกปิด; คง keyboard/contrast/reduced-motion เดิม EN: “Time expired — Processing saved answers” / “Expiry result not yet confirmed”
 
-## 4. SchoolBright / a11y
+## 4. SchoolBright / accessibility (a11y — การเข้าถึงสำหรับผู้ใช้ทุกกลุ่ม)
 
 Desktop และ admin ส่วนกลางใน school-bot ใช้กติกาของตน: TH Sarabun New เนื้อหา 16/32px หัวข้อ 24/48px; spacing ทวีคูณ 8px, radius 12px, target ≥48×48px เว็บใช้ sidebar/header เดิมและ cyan #09C6DD; Desktop app ใช้ orange #FF7A62 ไม่สร้าง shell หรือย้าย framework
-
-
 
 เฉพาะ web-system ยึด DESIGN/shared component เดิม: ฟอนต์จาก theme เดิม; หัวการ์ด/หัวส่วนใช้ text-xl font-bold เนื้อหา text-sm และหัวตาราง/label text-xs ตามบริบท ไม่ hardcode ค่าจาก skill; spacing ใช้ token โดย page wrapper ตาม P10 หาก PageShell/token ยังไม่ merge ให้ใช้รูปแบบเดิมที่ DESIGN ระบุ ไม่อ้างว่าตรวจสถานะ merge แล้ว ฟอร์ม/ตาราง/ปุ่มใช้ของกลางและ meaningful props ตาม P11 เช่น pending ของ Button ไม่ copy component หรือเปลี่ยน stack การอ้างนี้มาจากเอกสารกฎ ยังไม่ได้อ่าน implementation ของ component
 
@@ -43,12 +41,3 @@ Tab ตามลำดับงาน มี focus outline ชัดและไ
 ตารางมี caption/th scope; ชื่อคน/คำถาม/เหตุผลยาว wrap ไม่ตัดสาระ เฉพาะ ID ย่อได้เมื่อมีทางอ่านเต็ม ตารางเลื่อนด้วยคีย์บอร์ด เว็บ <640px เรียงแผงลง; 640–1024px ลดคอลัมน์ตกแต่ง ไม่ซ่อนคะแนน/เหตุผล
 
 ไม่มี animation ตกแต่ง เคารพ prefers-reduced-motion: web-system ใช้ shared Skeleton ที่หยุด shimmer ตามกฎ repo และให้ sb-reveal/แถบ progress เคารพ reduced-motion ตามของกลาง โดยคงสถานะที่อ่านได้; ยังไม่ได้ตรวจ implementation ส่วน Desktop/ส่วนกลางที่ใช้ Spinner คงข้อความสถานะและรูปคงที่เมื่อจำกัด motion ภาษาไทยเป็นหลัก สลับ EN ทั้งหน้า เช่น “กำลังบันทึกคำตอบ… / Saving answers…” และ “ยังยืนยันผลการส่งไม่ได้ / Submission not yet confirmed”; เนื้อหาใช้ Text locale ตามสัญญา
-
-
-## Change Log
-
-- 2026-10-26 — 077: delta042 รอ Q43
-
-- 2026-10-26 — นายช่างแบ่งไฟล์เชิงกลจากเนื้อหา int เดิม ย้ายแต่ละ section ตรงตามต้นฉบับ ไม่เปลี่ยนกฎ ข้อเสนอ หรือคำถามเซ็น
-
-- 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม

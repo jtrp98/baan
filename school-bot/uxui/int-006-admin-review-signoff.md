@@ -1,22 +1,18 @@
 # ส่วนประกอบของ int-006-admin-trace.md
 
-วันที่ 2026-10-26 · [กลับไฟล์ต้นทาง](int-006-admin-trace.md) · ส่วนหนึ่งของร่าง UX ชุดเดิม ทุกส่วนอนุมัติแล้วตาม [decisions-043](../requirement/decisions-043.md) (ผู้ใช้ 2026-10-26)
+> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
 ## T4. Source และข้อจำกัดหลักฐาน
 
-อ่าน `target/school-bot/app/frontend/src/App.tsx` ครบ 199 บรรทัด: `:1,199` ส่งต่อการแสดงผลให้ AppView; `:19–40,109–154` เป็น state/navigation ของ shell; `:96–106` ใช้ busy และแสดง JSON/ข้อความผล Cloud ไม่ใช่รูปแบบ error สำหรับ admin ที่เสนอ ไม่ได้อ่าน AppView หรือ component ที่ import จึงไม่อ้างพบหน้าจัดการจริงหรือยืนยัน reuse component
-
-อ่าน `target/sb-tech-upgrade-web-system/AGENTS.md` → `_docs/policy/project-policy.md` → `CLAUDE.md` → `DESIGN.md` และ `.claude/rules/loading.md` แล้ว: ลำดับคือคำสั่งผู้ใช้ > กฎ repo > workflow ระดับเครื่อง > skill ทั่วไป ข้อความ Spinner ในใบงาน063 เป็น brief ของผู้คุม ไม่ใช่คำสั่งผู้ใช้โดยตรง เว็บครู/Level/หน้าเกณฑ์ admin ที่อยู่ web-system จึงใช้ P9: Skeleton เฉพาะส่วนที่ยังโหลด, งานบันทึกใช้ปุ่ม disabled หรือ `.sb-progress-bar`; ไม่ใช้ Spinner หรือข้อความโหลดแทนโครงข้อมูล เคารพ reduced-motion และ shared component ตาม repo การแก้ให้ตรงกฎเดิมไม่ต้องขอ human approval ใหม่ ส่วน Desktop และ admin ส่วนกลางใน school-bot คงกติกาของตน ไม่ลาก P9 ข้าม repo; component/font/spacing ของ web-system ยึด DESIGN และ shared props เดิม ไม่ hardcode หรือเปลี่ยน stack อ่านเฉพาะเอกสารกฎ ยังไม่ได้อ่าน component หรือยืนยัน UI runtime
-
-Preconditions: `plan/evidence-002.md:7,14,16,19,21,39–40` (memory) ระบุ auth/H5/staff bootstrap/content evidence/runtime ที่ยังต้องพิสูจน์; ข้อความเก่าว่า UX ทั้งหมดยังไม่เซ็นไม่แทนมติ039–041 ล่าสุด ไม่มีการปิด gate/status ในชุดนี้
-
 ## T5. Sign-off table
 
-ทุกส่วนอนุมัติแล้วตามคำตอบจริง [decisions-043](../requirement/decisions-043.md); ผู้อนุมัติ: ผู้ใช้ วันที่ 2026-10-26
+ทุกส่วนอนุมัติแล้วตามคำตอบจริง [decisions-043 (อนุมัติ UX-005/007 และยืนยัน runner)](../requirement/decisions-043.md); ผู้อนุมัติ: ผู้ใช้ วันที่ 2026-10-26
+
+คำถามในตาราง: Q39 (สร้าง ตรวจ และเผยแพร่หลักสูตรพร้อม accessibility) · Q40 (พรีวิวนำเข้า Course Plan Sheet) · Q41 (คลังข้อสอบและ policy ราย revision) · Q42 (ตรวจผลคำขอเดิมและข้อมูลชน)
 
 | ส่วน | คำถาม | ผล | ผู้อนุมัติ | วันที่อนุมัติ |
 |---|---|---|---|---|
-| หลัก §1–§3; visual/a11y S6 | Q39 | อนุมัติตามร่าง | ผู้ใช้ | 2026-10-26 |
+| หลัก §1–§3; visual/accessibility (a11y — การเข้าถึงสำหรับผู้ใช้ทุกกลุ่ม) S6 | Q39 | อนุมัติตามร่าง | ผู้ใช้ | 2026-10-26 |
 | หลัก §4; import states | Q40 | อนุมัติตามร่าง | ผู้ใช้ | 2026-10-26 |
 | หลัก §5; bank/policy states | Q41 | อนุมัติตามร่าง | ผู้ใช้ | 2026-10-26 |
 | S1–S5; ทางออกเมื่อผลค้าง/ชน | Q42 | อนุมัติตามร่าง | ผู้ใช้ | 2026-10-26 |
@@ -28,11 +24,10 @@ Preconditions: `plan/evidence-002.md:7,14,16,19,21,39–40` (memory) ระบ�
 
 ## T6. ส่งต่อ
 
-ผู้คุมบันทึกไฟล์ใหม่ทั้งสามตามใบงาน โดยไม่เปลี่ยน index/status/sign-off เดิม ส่ง arch รับ T3 ก่อน front ส่วนที่พึ่งสัญญา และอ้างการอนุมัติ Q39–Q42 ตาม decisions-043 การเซ็น UX ไม่ปิด auth/H5/SQL/runtime/เนื้อหาราย revision
+ส่ง arch ตรวจช่องว่างสัญญาใน T3 ก่อน front เชื่อมส่วนที่พึ่งสัญญา การเซ็น UX ไม่ปิดเงื่อนไข auth/H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ)/SQL/runtime หรือการอนุมัติเนื้อหาราย revision
 
+## หลักฐาน
 
-## Change Log
-
-- 2026-10-26 — นายช่างแบ่งไฟล์เชิงกลจากเนื้อหา int เดิม ย้ายแต่ละ section ตรงตามต้นฉบับ ไม่เปลี่ยนกฎ ข้อเสนอ หรือคำถามเซ็น
-
-- 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม
+- อ่าน `target/school-bot/app/frontend/src/App.tsx` ครบ 199 บรรทัด: `:1,199` ส่งต่อการแสดงผลให้ AppView; `:19–40,109–154` เป็น state/navigation ของ shell; `:96–106` ใช้ busy และแสดง JSON/ข้อความผล Cloud ไม่ใช่รูปแบบ error สำหรับ admin ที่เสนอ ไม่ได้อ่าน AppView หรือ component ที่ import จึงไม่อ้างพบหน้าจัดการจริงหรือยืนยัน reuse component
+- อ่าน `target/sb-tech-upgrade-web-system/AGENTS.md` → `_docs/policy/project-policy.md` → `CLAUDE.md` → `DESIGN.md` และ `.claude/rules/loading.md` แล้ว: ลำดับคือคำสั่งผู้ใช้ > กฎ repo > workflow ระดับเครื่อง > skill ทั่วไป เว็บครู/Level/หน้าเกณฑ์ admin ที่อยู่ web-system จึงใช้ P9: Skeleton เฉพาะส่วนที่ยังโหลด, งานบันทึกใช้ปุ่ม disabled หรือ `.sb-progress-bar`; ไม่ใช้ Spinner หรือข้อความโหลดแทนโครงข้อมูล เคารพ reduced-motion และ shared component ตาม repo การแก้ให้ตรงกฎเดิมไม่ต้องขอ human approval ใหม่ ส่วน Desktop และ admin ส่วนกลางใน school-bot คงกติกาของตน ไม่ลาก P9 ข้าม repo; component/font/spacing ของ web-system ยึด DESIGN และ shared props เดิม ไม่ hardcode หรือเปลี่ยน stack อ่านเฉพาะเอกสารกฎ ยังไม่ได้อ่าน component หรือยืนยัน UI runtime
+- Preconditions: `plan/evidence-002.md:7,14,16,19,21,39–40` (memory) ระบุ auth/H5/staff bootstrap/content evidence/runtime ที่ยังต้องพิสูจน์; ข้อความเก่าว่า UX ทั้งหมดยังไม่เซ็นไม่แทน[มติ039 (sign-off UX-002 ครบ + UX-004 บางส่วน (Q14–Q25))](../requirement/decisions-039.md)–041 ล่าสุด ไม่มีการปิด gate/status ในชุดนี้

@@ -53,9 +53,3 @@
 
 
 Canonical เพิ่มเติม: [ผลเรียน](../learning-rules-032-034.md), [คะแนน](../grade-rules-032-034.md) รวม JSON effective_policy/windows/skipped_cells
-
-## Change Log
-- 2026-10-26 — Rev3 arch091: reconcileAttemptpolicy/windowsที่กำหนดแล้วและLevelSnapshotrefs/frozenpolicyตามDES011; ไม่เปลี่ยนphysicaljsonbfield/SQLหรืออนุมัติstored-datarewrite.
-- 2026-10-23 — Rev2: sync032..034; physicalเดิม
-
-- 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

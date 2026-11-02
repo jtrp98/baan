@@ -48,8 +48,3 @@
 ทุกแถวยังมีคอลัมน์มาตรฐานครบ ห้ามใช้ `SchoolId = 0` หรือค่าจำลองแทน global
 
 `ResourceId:K?` ชี้ resource หลักที่ endpoint คืนตาม `Operation`; `EntityType` = ชื่อตารางที่ `EntityId:K` อ้าง. Web ตรวจชนิด/`SchoolId` เพราะไม่ใช่ FK เดี่ยวข้ามตาราง. Local UUID/receipts ไม่เป็น DB PK; ไม่เพิ่ม `ClientId`/public UUID
-
-
-## Change Log
-
-- 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

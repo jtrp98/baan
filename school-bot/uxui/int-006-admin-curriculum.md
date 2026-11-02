@@ -1,10 +1,10 @@
 # int-006 — admin หลักสูตรและคลังข้อสอบ
 
-วันที่ 2026-10-26 · ใบงาน063 · UX-005
+> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ทุกการจัดวาง คำบนหน้าจอ และ interaction ในชุดนี้ **อนุมัติครบ Q39–Q42 แล้ว** (ผู้ใช้ 2026-10-26 · [decisions-043](../requirement/decisions-043.md)) — signed int artifact ส่วนกฎธุรกิจอ้างมติเดิม ไม่เสนอเปลี่ยนกฎ
+ทุกการจัดวาง คำบนหน้าจอ และ interaction ในชุดนี้ **อนุมัติครบ Q39 (สร้าง ตรวจ และเผยแพร่หลักสูตรพร้อม accessibility)–Q42 (ตรวจผลคำขอเดิมและข้อมูลชน) แล้ว** (ผู้ใช้ 2026-10-26 · [decisions-043 (อนุมัติ UX-005/007 และยืนยัน runner)](../requirement/decisions-043.md)) — signed int artifact ส่วนกฎธุรกิจอ้างมติเดิม ไม่เสนอเปลี่ยนกฎ
 
-อ่านร่วมกับ [state/a11y](int-006-admin-states.md) และ [trace/sign-off/ข้อจำกัด](int-006-admin-trace.md) ทั้งสามไฟล์เป็นร่างชุดเดียวกัน
+อ่านร่วมกับ [state/accessibility (a11y — การเข้าถึงสำหรับผู้ใช้ทุกกลุ่ม)](int-006-admin-states.md) และ [trace/sign-off/ข้อจำกัด](int-006-admin-trace.md) ไฟล์หลักและไฟล์ประกอบเป็น UX ชุดเดียวกัน
 
 ## 1. ผู้ใช้และขอบเขต
 
@@ -12,23 +12,19 @@
 - โรงเรียน: `school_web` ใน `target/sb-tech-upgrade-web-system`; admin โรงเรียนเลือก published revision เปิดใช้กับห้อง/เทอม ครูปรับเฉพาะเวลาสอบและช่วงเปิด–ปิด ไม่แก้เนื้อหากลาง
 - Desktop ใช้เรียน/ทดลอง ไม่มีหน้าจัดการหรือหน้าครู ครูบน Desktop ไม่สร้าง Submission/Attempt Cloud
 
-หลักฐาน: `requirement/req-043.md:13–17`; `design/des-005.md:14–20,86`; `design/des-012.md:63–68`; `requirement/decisions-032.md:13`; `requirement/decisions-034.md:16–18` พาธ v2 ในมติเก่าอ่านเป็น school-bot ตาม `requirement/index.md:126`
-
 ข้อเสนอ: เมนู admin มี “หลักสูตรกลาง” และ “คลังข้อสอบ” หัวรายละเอียดแสดงชื่อ/Level/ฉบับ/สถานะ/ที่มา หน้าแก้ไขแบ่ง “ข้อมูลหลักสูตร → บทเรียนและกิจกรรม → ตรวจร่าง” ไม่เพิ่มสถานะ approved ในข้อมูล; วงจรยัง draft → มนุษย์ตรวจ → published
 
 ## 2. สร้างและจัดบทเรียน — Q39
 
 ข้อเสนอ flow: สร้างฉบับร่าง → ใส่ชื่อ Level ชั้นแนะนำ วิชากลางและที่มา → จัด Lesson/Activity → “บันทึกฉบับร่าง” → เปิดตรวจเนื้อหาที่บันทึกแล้ว
 
-ฟอร์มใช้เฉพาะข้อมูล DES-005: curriculum_key/revision/level_id/title/source_ref/recommended_grades/subjects และ LessonInput/ActivityInput ไม่ใช้วิชาหรือช่องคะแนนของโรงเรียนแทนวิชากลาง
+ฟอร์มใช้เฉพาะข้อมูล [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md): curriculum_key/revision/level_id/title/source_ref/recommended_grades/subjects และ LessonInput/ActivityInput ไม่ใช้วิชาหรือช่องคะแนนของโรงเรียนแทนวิชากลาง
 
 รายการ Lesson แสดง **ลำดับ | ชื่อ | รหัสถาวร | กิจกรรม** รหัสอ่านอย่างเดียวแยกจากช่องลำดับ ปุ่ม “ขึ้น/ลง” ใช้ keyboard ได้ ไม่บังคับลาก ทุกกิจกรรมมีชนิดและโหมด: สื่อใช้ instruction; ภารกิจใช้ project พร้อม Block/Arm/Code; Quiz/Test ใช้ mode=null ไม่แปลงใบงานเป็นข้อสอบเอง
 
-ตัวอย่างประกอบเท่านั้น: LessonKey `7d0b04d8-3275-469c-a1aa-3a54e9daa105` ชื่อ “How AI Learns” ย้ายลำดับ 6 → 7 รหัสเดิมคงอยู่ เลข Unit ในชื่อแผนไม่ใช้สร้างรหัส อ้างรูปปัญหาจริงใน `design/source-review-003.md:20–21`
+ตัวอย่างประกอบเท่านั้น: LessonKey `7d0b04d8-3275-469c-a1aa-3a54e9daa105` ชื่อ “How AI Learns” ย้ายลำดับ 6 → 7 รหัสเดิมคงอยู่ เลข Unit ในชื่อแผนไม่ใช้สร้างรหัส อ้างรูปปัญหาจริงใน [source-review-003.md](../design/source-review-003.md)
 
 ก่อนบันทึก ตรวจรหัส/ลำดับซ้ำ ความสัมพันธ์กิจกรรมกับ mission และ mode; submit แล้วชี้จุดผิด ไม่ล้างข้อมูล การบันทึกสำเร็จต้องมาจากผล server แล้วเปิดอ่านฉบับนั้นใหม่ได้ ไม่ถือภาพ preview ใน browser เป็นหลักฐานบันทึก
-
-หลักฐาน: `design/des-005.md:23–48,73–86`; `design/data-contract-rules.md:18–20` การอ่านร่างกลับและแก้ metadata หลังสร้างยังมีช่องว่างตาม companion trace
 
 ## 3. ตรวจและเผยแพร่ revision — Q39
 
@@ -42,19 +38,17 @@
 
 ตัวอย่างประกอบ: เผยแพร่ฉบับ 4 แล้ว ห้องที่ใช้อยู่ฉบับ 3 ยังคงฉบับ 3 และผลเดิม ไม่มีปุ่มย้ายผู้เรียนทั้งหมดใน flow นี้
 
-หลักฐาน: `requirement/req-044.md:13–25`; `design/des-005.md:60,75–86`; `design/des-010.md:44` การอนุมัติ UX นี้ไม่ใช่การอนุมัติเนื้อหาราย revision (`requirement/decisions-038.md:22`)
-
-## 4. นำเข้า Course Plan Sheet — Q40
+## 4. นำเข้า Course Plan Sheet — Q40 (พรีวิวนำเข้า Course Plan Sheet)
 
 [รายละเอียดของส่วนนี้ย้ายไปไฟล์ประกอบ](int-006-admin-import-bank.md) โดยคงเนื้อหาเดิม
 
-## 5. คลังข้อสอบและ policy — Q41
+## 5. คลังข้อสอบและ policy — Q41 (คลังข้อสอบและ policy ราย revision)
 
 [รายละเอียดของส่วนนี้ย้ายไปไฟล์ประกอบ](int-006-admin-import-bank.md) โดยคงเนื้อหาเดิม
 
-## Change Log
+## หลักฐาน
 
-- 2026-10-26 — ร่าง UX-005 สำหรับ 12 AC; แยก state/trace เพื่อคุมขนาด ทุกข้อเสนอรอเซ็น ไม่เปลี่ยนกฎธุรกิจหรือสัญญา
-- 2026-10-26 — นายช่างแบ่ง section เชิงกลไปไฟล์ประกอบตามลิงก์ คงเลขหัวข้อ/เนื้อหาเดิมและการรอเซ็น
-
-- 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม
+- `requirement/req-043.md:13–17`; `design/des-005.md:14–20,86`; `design/des-012.md:63–68`; `requirement/decisions-032.md:13`; `requirement/decisions-034.md:16–18` พาธ v2 ในมติเก่าอ่านเป็น school-bot ตาม `requirement/index.md:126`
+- `design/source-review-003.md:20–21`
+- `design/des-005.md:23–48,73–86`; `design/data-contract-rules.md:18–20` การอ่านร่างกลับและแก้ metadata หลังสร้างยังมีช่องว่างตาม companion trace
+- `requirement/req-044.md:13–25`; `design/des-005.md:60,75–86`; `design/des-010.md:44` การอนุมัติ UX นี้ไม่ใช่การอนุมัติเนื้อหาราย revision (`requirement/decisions-038.md:22`)

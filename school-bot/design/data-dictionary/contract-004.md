@@ -19,8 +19,3 @@
   - **School DB (`JabjaiSchoolSingleDB`)**: อ่าน profile (`TUser`, `TEmployees`), สถานะโรงเรียน (`TCompany`), แผนการเรียน/สิทธิ์ครูรายวิชา (`TPlanCourse`, `TPlanCourseTeacher`, `TPlanCourseTerm`, `TPlanTermSubLevel2`), เทอม (`TTerm`) และรายชื่อนักเรียนในห้อง (`TStudentClassroomHistory`) — เนื่องจากอยู่คนละ DB กับ SchoolBot DB จึง**ไม่มี transaction เดียวครอบข้าม DB**; ทุก mutation ที่พึ่งข้อมูลจาก School DB ต้อง **re-check สิทธิ์ครู/roster/term ก่อน commit ใน SchoolBot DB**
   - **Logs DB**: ใช้ตามกรณีที่ระบุ
   - **PGGradeDB**: SchoolBot เขียนเฉพาะช่องเกรดที่เป็นเจ้าของตาม [des-009.md](../des-009.md) หลังผ่าน release gates ทั้งห้า (`G-PARITY`, `G-COEXIST`, `G-TARGET`, `G-AUTHZ`, และ `G-DB` ซึ่งหมายถึงการยืนยันบัญชี DB เดิมที่ใช้และเจ้าของระบบเกรดยอมให้ใช้ตาม [decisions-029.md](../../requirement/decisions-029.md)) โดยบังคับขอบเขตการเขียนเฉพาะช่องที่เป็นเจ้าของในโค้ด adapter
-
-
-## Change Log
-
-- 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime

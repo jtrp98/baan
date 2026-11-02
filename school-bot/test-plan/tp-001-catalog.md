@@ -1,0 +1,29 @@
+# TP-001 — สารบัญ TP001-001–TP001-016
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ใช้กับ [แผน TP-001](tp-001.md) AC หมายถึง Acceptance Criteria หรือเกณฑ์ตรวจรับ; ความหมาย AC อยู่ใน case ที่ลิงก์และ [ตาราง AC](traceability-001.md) ทุกผลจริงยัง NOT_RUN
+
+| ID | ตรวจอะไร | AC ที่ครอบ | ไฟล์ |
+|---|---|---|---|
+| TP001-001 | เปิดแอป เลือก Guest แล้ว Login แยกกันเข้า Block/Arm/Code | [AC-009-01 (เริ่มแอปโดยไม่เคยใส่ License แล้วเข้าใช้งาน Block Lab, Arm Lab และ Code…)](../requirement/req-009.md), [AC-009-02 (เลือก Guest หรือ Login โดยยังไม่มี License แล้วไม่สามารถข้ามข้อกำหนด…)](../requirement/req-009.md) | [รายละเอียด](tp-001-cases-license.md#tp001-001) |
+| TP001-002 | กรอก key ขณะ offline | [AC-028-04 (เมื่อลองเปิดใช้ด้วย License ไม่ถูกต้องและไม่เคยมีสิทธิ์ที่ใช้ได้…)](../requirement/req-028.md), [AC-034-01 (ครั้งแรกไม่มีอินเทอร์เน็ต เข้าโหมดหลักไม่ได้แม้กรอก Key แล้ว)](../requirement/req-034.md) | [รายละเอียด](tp-001-cases-license.md#tp001-002) |
+| TP001-003 | เปิดแอปซ้ำ offline ที่ T+3d-1s, exp-1s, exp, exp+1s | [AC-034-03 (ออฟไลน์ภายใน 3 วันจากตรวจสำเร็จล่าสุดใช้งานได้)](../requirement/req-034.md), [AC-034-04 (ครบ 3 วันและติดต่อเซิร์ฟเวอร์ไม่ได้…)](../requirement/req-034.md) | [รายละเอียด](tp-001-cases-license.md#tp001-003) |
+| TP001-004 | ตรวจออนไลน์ในสถานะ valid และหลัง expired offline | [AC-034-02 (ตรวจออนไลน์ได้ Active แล้วเข้าใช้งานได้และมีสิทธิ์ในเครื่อง)](../requirement/req-034.md), [AC-034-05 (ตรวจ Key เดิมออนไลน์ได้ Active อีกครั้ง แล้วต่อสิทธิ์ 3…)](../requirement/req-034.md), [AC-034-06 (ได้ผล Key ไม่ Active แล้วไม่ต่อสิทธิ์หรือใช้ค่าเดิมข้ามผลปฏิเสธเพื่อปลดล็อก)](../requirement/req-034.md) | [รายละเอียด](tp-001-cases-license.md#tp001-004) |
+| TP001-005 | activate A และ B พร้อมกัน ≥50 รอบ | [AC-028-01 (เปิดใช้ Key เดียวบนเครื่อง A ซ้ำได้)](../requirement/req-028.md), [AC-028-02 (Validate device ที่ยังไม่ activate ได้ DEVICE_NOT_ACTIVATED)](../requirement/req-028.md) | [รายละเอียด](tp-001-cases-license.md#tp001-005) |
+| TP001-006 | activate+validate ที่ E-1s, E, E+1s และหลัง revoke | [AC-028-03 (หลัง revoke หรือถึงเวลาหมดอายุ ทั้ง activate และ validate ถูกปฏิเสธว่า…)](../requirement/req-028.md) | [รายละเอียด](tp-001-cases-license-2.md#tp001-006) |
+| TP001-007 | POST/GET /v2/admin/licenses ตามแต่ละ fixture | [AC-027-01 (เมื่อระบบยืนยันตัวตนพนักงานที่ /v2/admin ยังไม่ถูกตั้งค่า (เดิมเรียก…)](../requirement/req-027.md), [AC-027-02 (ผู้เรียกที่มี staff session และ StaffRole ที่มีสิทธิ์…)](../requirement/req-027.md), [AC-027-03 (ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) เรียกรายการหลังสร้างแล้วเห็น…)](../requirement/req-027.md) | [รายละเอียด](tp-001-cases-license-2.md#tp001-007) |
+| TP001-008 | restart ทุก instance | [AC-027-04 (ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) สร้าง License แล้ว restart API…)](../requirement/req-027.md), [AC-036-03 (Restart บริการแล้ว Login บัญชีเดิมยังเรียกโครงงานที่บันทึกสำเร็จได้)](../requirement/req-036.md) | [รายละเอียด](tp-001-cases-license-2.md#tp001-008) |
+| TP001-009 | non-admin unbind | [AC-035-01 (ผู้ไม่มีสิทธิ์ผู้ดูแลขอปลดเครื่องแล้วถูกปฏิเสธ และการผูกเครื่องไม่เปลี่ยน)](../requirement/req-035.md), [AC-035-02 (ผู้ดูแลปลด A แล้ว B เปิดใช้ Key เดิมได้ทันที แม้ A…)](../requirement/req-035.md), [AC-035-03 (B ต้องเปิดใช้ Key ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ออฟไลน์ของ A แทน)](../requirement/req-035.md), [AC-035-04 (หลัง Key ผูกกับ B แล้ว A ตรวจออนไลน์ไม่ผ่านและไม่ได้สิทธิ์ออฟไลน์รอบใหม่)](../requirement/req-035.md) | [รายละเอียด](tp-001-cases-license-3.md#tp001-009) |
+| TP001-010 | A offline ที่ E-1s, E, E+1s | [AC-035-05 (A ที่ออฟไลน์ยังใช้ได้ก่อนสิทธิ์เดิมหมด แต่ครบกำหนดแล้วเข้าโหมดหลักไม่ได้)](../requirement/req-035.md) | [รายละเอียด](tp-001-cases-license-3.md#tp001-010) |
+| TP001-011 | ย่อ สลับเต็มจอ ปิดหน้าต่างจากปุ่มในแอป | [AC-009-03 (ใน Desktop ผู้ใช้ย่อ สลับเต็มจอ และขอปิดหน้าต่างจากแอปได้)](../requirement/req-009.md) | [รายละเอียด](tp-001-cases-desktop.md#tp001-011) |
+| TP001-012 | สลับ th→en→zh | [AC-010-01 (ผู้ใช้เปลี่ยนไทย/อังกฤษ/จีนได้โดยไม่ต่อเครือข่าย…)](../requirement/req-010.md), [AC-010-02 (หลังเปลี่ยนภาษา งานที่ยังไม่บันทึก ลำดับบล็อก…)](../requirement/req-010.md), [AC-010-03 (เมื่อ storage ใช้งานได้ เปิดแอปใหม่แล้วใช้ภาษาที่เลือกครั้งล่าสุด)](../requirement/req-010.md) | [รายละเอียด](tp-001-cases-desktop.md#tp001-012) |
+| TP001-013 | เลือก mode อื่น→ยกเลิก/ยืนยัน | [AC-012-01 (เมื่ออยู่ระหว่างทำงานใน mode แล้วเลือก mode อื่น มีคำยืนยัน)](../requirement/req-012.md), [AC-012-02 (เมื่อเลือก Save แล้วออกและจำลอง storage ล้มเหลว…)](../requirement/req-012.md), [AC-012-03 (เมื่อจำลอง close guard ล้มเหลว หน้าต่างยังเปิดและแสดงเหตุผลให้ผู้ใช้เห็น)](../requirement/req-012.md) | [รายละเอียด](tp-001-cases-desktop.md#tp001-013) |
+| TP001-014 | เปิดไม่มี preview | [AC-013-01 (เปิด browser โดยไม่มี preview=1 และไม่มี bridge แล้วพบข้อผิดพลาด native…)](../requirement/req-013.md), [AC-013-02 (ใน preview บันทึกงานได้ใน browser แต่ activate และตรวจอัปเดตไม่เรียก API…)](../requirement/req-013.md), [AC-013-03 (ทดลอง LearnMap, Teacher restart/reset/console และ USB…)](../requirement/req-013.md) | [รายละเอียด](tp-001-cases-desktop.md#tp001-014) |
+| TP001-015 | บันทึก/เปิดทุกงาน | [AC-011-01 (บันทึกอย่างน้อยสองงานต่อโหมด Block/Arm/Code ทั้ง Guest และ Login…)](../requirement/req-011.md), [AC-011-02 (บันทึกการแก้ไขงาน A แล้วเปิดใหม่ได้ค่าล่าสุดของ A โดยงาน B…)](../requirement/req-011.md) | [รายละเอียด](tp-001-cases-desktop.md#tp001-015) |
+| TP001-016 | บันทึก/เปิด | AC-011-01, AC-011-02 | [รายละเอียด](tp-001-cases-desktop-2.md#tp001-016) |
+
+
+## คำย่อ
+
+API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · BR = Business Rule หรือกฎธุรกิจ

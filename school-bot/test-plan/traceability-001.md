@@ -1,210 +1,35 @@
-# Traceability — 180 AC
+# Traceability — 187 AC
 
-[แผนทดสอบและ expected evidence](tp-001.md) · [ข้อมูลสำหรับเครื่อง](traceability-001.json)
+> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ตารางนี้และ raw/Joined JSON คง snapshot180 AC/77 cases. Coverage ปัจจุบัน 82 cases / 187 AC อ่าน TP Amendment003, [Amendment004](tp-001-amendment-004.md) และ [Amendment005](tp-001-amendment-005.md) (ส่วนต่อท้ายไฟล์นี้): AC-046-07 → TP001-081 ตาม decisions-042; ไม่เพิ่มแถวใน snapshot ไม่ใช่ QA PASS
+ตารางนี้เชื่อม Acceptance Criteria (AC: เกณฑ์ตรวจรับ) ทั้ง 187 ข้อกับ 82 cases ของ [TP-001 (แผนตรวจรับ SchoolBot)](tp-001.md) รวม case เพิ่มเติมและการปรับ mapping ปัจจุบันแล้ว ทุก Actual เป็น NOT_RUN จึงไม่ใช่ผลผ่านหรือความพร้อม transport
 
-ผู้คุม join implementation/validation จาก canonical plan/tasks-001.json (memory) revision2 โดยตรง ไม่เปลี่ยน owner หรือ status; ทุก Actual=NOT_RUN
+| ตาราง AC → case | จำนวน AC |
+|---|---:|
+| [AC-009-01 (เริ่มแอปโดยไม่เคยใส่ License แล้วเข้าใช้งาน Block Lab, Arm Lab และ Code…)–AC-016-03 (ปรับข้อต่อถี่ผ่าน test bridge แล้ว trace มีคำสั่งทำงานครั้งละหนึ่งรายการ)](traceability-001-desktop.md) | 25 |
+| [AC-017-01 (โหลดโครงงานถูกต้องที่มีสองท่าและกลุ่ม แล้วได้ชื่อ ค่า เวลา ลำดับ…)–AC-017-03 (บันทึกและเปิดใหม่แล้วไม่มีสถานะยืนยันว่าอัปโหลดตรงกับบอร์ดหรืออยู่ตรงท่า…)](traceability-001-desktop-2.md) | 3 |
+| [AC-018-01 (ให้สองท่าและสองรอบผ่าน test bridge แล้วพบการส่งตามลำดับเดิมครบสี่ท่า)–AC-025-03 (บันทึกแล้วเปิด source เดิมได้)](traceability-001-robot.md) | 25 |
+| [AC-026-01 (move_right(2) ตามด้วย repeat 2 ครั้งของ jump ให้ผลคำสั่ง move_right,…)–AC-026-04 (บันทึก workspace แล้วเปิดใหม่ได้บล็อก ค่า การเชื่อมต่อ และสถานะ enabled…)](traceability-001-robot-2.md) | 4 |
+| [AC-027-01 (เมื่อระบบยืนยันตัวตนพนักงานที่ /v2/admin ยังไม่ถูกตั้งค่า (เดิมเรียก…)–AC-032-01 (ติดตั้งแพ็กเกจเดียวบนเครื่องทดสอบ macOS 15+ ทั้ง Intel และ Apple Silicon…)](traceability-001-license.md) | 25 |
+| [AC-032-02 (บน macOS 15+ ทั้ง Intel และ Apple Silicon…)–AC-036-06 (เมื่อสั่งออกจากระบบของบัญชี Login…)](traceability-001-license-2.md) | 24 |
+| [AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง…)–AC-041-03 (หลังนำเข้าแต่ละโหมดสำเร็จ เปิดต้นฉบับใน Guest ได้เนื้อหาเดิม…)](traceability-001-learning.md) | 25 |
+| [AC-041-04 (นำเข้างานเดิมซ้ำในบัญชีเดิม รวม retry หลังคำตอบสูญหาย/เปิดแอปใหม่…)–AC-044-05 (ขอแก้ฉบับ publish แล้วฉบับเดิมไม่เปลี่ยน)](traceability-001-learning-2.md) | 17 |
+| [AC-045-01 (นำเข้าแถว D=TRUE แล้วเห็นเป็น draft…)–AC-048-04 (เฉลี่ยเท่ากับหรือต่ำกว่าเกณฑ์ไม่เสนอเลื่อน เทอมถัดไปอยู่ Level…)](traceability-001-quiz.md) | 20 |
+| [AC-049-01 (admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม)–AC-052-05 (ตรวจรายการส่งแล้วพบ audit ครบ BR-052-03)](traceability-001-grade.md) | 19 |
 
-> Precedence 2026-10-24: ขั้นตอน online coverage ใช้ [กลยุทธ์ร่วม Gateway→gRPC](index.md#กลยุทธ์ร่วม-transport--2026-10-24) และ TP Markdown ปัจจุบัน. 180 แถวคือ AC coverage ไม่ใช่ transport readiness/PASS; joined JSON มีเฉพาะ AC expected/IDs/owners/actual จึงคง schema/ข้อมูลเดิม ไม่เพิ่ม transport summary. tp-001.json เป็น raw snapshot รวม amendment เดิม ไม่ใช้ profiles เดิม override กลยุทธ์ปัจจุบัน
+## ความครบถ้วนและ owner
 
-| AC | Case IDs | Implementation / role | Validation | Actual |
-| --- | --- | --- | --- | --- |
-| [AC-009-01](../requirement/req-009.md) | TP001-001, TP001-077 | FE-001/front | QA-001/check | NOT_RUN |
-| [AC-009-02](../requirement/req-009.md) | TP001-001 | FE-001/front | QA-001/check | NOT_RUN |
-| [AC-009-03](../requirement/req-009.md) | TP001-011, TP001-077 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-010-01](../requirement/req-010.md) | TP001-012, TP001-077 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-010-02](../requirement/req-010.md) | TP001-012 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-010-03](../requirement/req-010.md) | TP001-012 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-011-01](../requirement/req-011.md) | TP001-015, TP001-016 | BE-008/sys | QA-002/check | NOT_RUN |
-| [AC-011-02](../requirement/req-011.md) | TP001-015, TP001-016, TP001-077 | BE-008/sys | QA-002/check | NOT_RUN |
-| [AC-011-03](../requirement/req-011.md) | TP001-017 | BE-008/sys | QA-002/check | NOT_RUN |
-| [AC-011-04](../requirement/req-011.md) | TP001-017 | BE-009/sys | QA-002/check | NOT_RUN |
-| [AC-012-01](../requirement/req-012.md) | TP001-013 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-012-02](../requirement/req-012.md) | TP001-013 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-012-03](../requirement/req-012.md) | TP001-013 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-013-01](../requirement/req-013.md) | TP001-014 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-013-02](../requirement/req-013.md) | TP001-014 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-013-03](../requirement/req-013.md) | TP001-014 | FE-005/front | QA-002/check | NOT_RUN |
-| [AC-014-01](../requirement/req-014.md) | TP001-031 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-014-02](../requirement/req-014.md) | TP001-031 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-014-03](../requirement/req-014.md) | TP001-031, TP001-045 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-015-01](../requirement/req-015.md) | TP001-032 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-015-02](../requirement/req-015.md) | TP001-032 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-015-03](../requirement/req-015.md) | TP001-032 | FE-008/front | QA-003/check | NOT_RUN |
-| [AC-016-01](../requirement/req-016.md) | TP001-033 | FE-009/front | QA-003/check | NOT_RUN |
-| [AC-016-02](../requirement/req-016.md) | TP001-033 | FE-009/front | QA-003/check | NOT_RUN |
-| [AC-016-03](../requirement/req-016.md) | TP001-033 | FE-009/front | QA-003/check | NOT_RUN |
-| [AC-017-01](../requirement/req-017.md) | TP001-018 | FE-004/front | QA-003/check | NOT_RUN |
-| [AC-017-02](../requirement/req-017.md) | TP001-018 | FE-004/front | QA-003/check | NOT_RUN |
-| [AC-017-03](../requirement/req-017.md) | TP001-018 | FE-004/front | QA-003/check | NOT_RUN |
-| [AC-018-01](../requirement/req-018.md) | TP001-034 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-018-02](../requirement/req-018.md) | TP001-034 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-018-03](../requirement/req-018.md) | TP001-034 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-019-01](../requirement/req-019.md) | TP001-035 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-019-02](../requirement/req-019.md) | TP001-035 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-019-03](../requirement/req-019.md) | TP001-035, TP001-045 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-020-01](../requirement/req-020.md) | TP001-036 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-020-02](../requirement/req-020.md) | TP001-036 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-020-03](../requirement/req-020.md) | TP001-036 | FE-011/front | QA-003/check | NOT_RUN |
-| [AC-021-01](../requirement/req-021.md) | TP001-037, TP001-045 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-021-02](../requirement/req-021.md) | TP001-037 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-021-03](../requirement/req-021.md) | TP001-037, TP001-045 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-021-04](../requirement/req-021.md) | TP001-037 | FE-010/front | QA-003/check | NOT_RUN |
-| [AC-022-01](../requirement/req-022.md) | TP001-038 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-022-02](../requirement/req-022.md) | TP001-038 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-022-03](../requirement/req-022.md) | TP001-038 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-023-01](../requirement/req-023.md) | TP001-039 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-023-02](../requirement/req-023.md) | TP001-039 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-023-03](../requirement/req-023.md) | TP001-039 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-024-01](../requirement/req-024.md) | TP001-040, TP001-045 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-024-02](../requirement/req-024.md) | TP001-040, TP001-045 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-024-03](../requirement/req-024.md) | TP001-040 | FE-012/front | QA-003/check | NOT_RUN |
-| [AC-025-01](../requirement/req-025.md) | TP001-019 | FE-006/front | QA-003/check | NOT_RUN |
-| [AC-025-02](../requirement/req-025.md) | TP001-019 | FE-006/front | QA-003/check | NOT_RUN |
-| [AC-025-03](../requirement/req-025.md) | TP001-019 | FE-004/front | QA-003/check | NOT_RUN |
-| [AC-026-01](../requirement/req-026.md) | TP001-020 | FE-007/front | QA-003/check | NOT_RUN |
-| [AC-026-02](../requirement/req-026.md) | TP001-020 | FE-007/front | QA-003/check | NOT_RUN |
-| [AC-026-03](../requirement/req-026.md) | TP001-020 | FE-007/front | QA-003/check | NOT_RUN |
-| [AC-026-04](../requirement/req-026.md) | TP001-020 | FE-004/front | QA-003/check | NOT_RUN |
-| [AC-027-01](../requirement/req-027.md) | TP001-007 | BE-003/sys | QA-001/check | NOT_RUN |
-| [AC-027-02](../requirement/req-027.md) | TP001-007 | BE-003/sys | QA-001/check | NOT_RUN |
-| [AC-027-03](../requirement/req-027.md) | TP001-007 | BE-003/sys | QA-001/check | NOT_RUN |
-| [AC-027-04](../requirement/req-027.md) | TP001-008 | BE-003/sys | QA-001/check | NOT_RUN |
-| [AC-028-01](../requirement/req-028.md) | TP001-005 | BE-004/sys | QA-001/check | NOT_RUN |
-| [AC-028-02](../requirement/req-028.md) | TP001-005 | BE-004/sys | QA-001/check | NOT_RUN |
-| [AC-028-03](../requirement/req-028.md) | TP001-006 | BE-004/sys | QA-001/check | NOT_RUN |
-| [AC-028-04](../requirement/req-028.md) | TP001-002 | FE-001/front | QA-001/check | NOT_RUN |
-| [AC-029-01](../requirement/req-029.md) | TP001-046 | BE-018/sys | QA-010/check | NOT_RUN |
-| [AC-029-02](../requirement/req-029.md) | TP001-046 | BE-018/sys | QA-010/check | NOT_RUN |
-| [AC-029-03](../requirement/req-029.md) | TP001-047 | BE-018/sys | QA-010/check | NOT_RUN |
-| [AC-030-01](../requirement/req-030.md) | TP001-047 | BE-019/sys | QA-010/check | NOT_RUN |
-| [AC-030-02](../requirement/req-030.md) | TP001-048 | BE-019/sys | QA-010/check | NOT_RUN |
-| [AC-030-03](../requirement/req-030.md) | TP001-048 | BE-019/sys | QA-010/check | NOT_RUN |
-| [AC-031-01](../requirement/req-031.md) | TP001-049 | BE-020/sys | QA-008/check | NOT_RUN |
-| [AC-031-02](../requirement/req-031.md) | TP001-049 | BE-020/sys | QA-008/check | NOT_RUN |
-| [AC-031-03](../requirement/req-031.md) | TP001-050 | BE-020/sys | QA-008/check | NOT_RUN |
-| [AC-031-04](../requirement/req-031.md) | TP001-050 | BE-020/sys | QA-008/check | NOT_RUN |
-| [AC-031-05](../requirement/req-031.md) | TP001-041, TP001-042 | BE-013/sys | QA-005/check, QA-008/check | NOT_RUN |
-| [AC-032-01](../requirement/req-032.md) | TP001-051 | BE-021/sys | QA-009/check | NOT_RUN |
-| [AC-032-02](../requirement/req-032.md) | TP001-043, TP001-044 | BE-021/sys | QA-006/check, QA-007/check, QA-009/check | NOT_RUN |
-| [AC-032-03](../requirement/req-032.md) | TP001-051 | BE-021/sys | QA-009/check | NOT_RUN |
-| [AC-033-01](../requirement/req-033.md) | TP001-052, TP001-053 | DBA-001/vault, DBA-003/vault | QA-001/check | NOT_RUN |
-| [AC-033-02](../requirement/req-033.md) | TP001-052, TP001-053 | DBA-001/vault, DBA-003/vault | QA-001/check | NOT_RUN |
-| [AC-033-03](../requirement/req-033.md) | TP001-052, TP001-053 | DBA-001/vault, DBA-003/vault | QA-001/check | NOT_RUN |
-| [AC-033-04](../requirement/req-033.md) | TP001-052, TP001-053 | DBA-001/vault, DBA-003/vault, DBA-007/vault | QA-001/check | NOT_RUN |
-| [AC-033-05](../requirement/req-033.md) | TP001-052, TP001-053 | DBA-001/vault, DBA-003/vault, DBA-007/vault | QA-001/check | NOT_RUN |
-| [AC-034-01](../requirement/req-034.md) | TP001-002 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-034-02](../requirement/req-034.md) | TP001-004 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-034-03](../requirement/req-034.md) | TP001-003 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-034-04](../requirement/req-034.md) | TP001-003 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-034-05](../requirement/req-034.md) | TP001-004 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-034-06](../requirement/req-034.md) | TP001-004 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-035-01](../requirement/req-035.md) | TP001-009 | BE-005/sys | QA-001/check | NOT_RUN |
-| [AC-035-02](../requirement/req-035.md) | TP001-009 | BE-005/sys | QA-001/check | NOT_RUN |
-| [AC-035-03](../requirement/req-035.md) | TP001-009 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-035-04](../requirement/req-035.md) | TP001-009 | BE-005/sys | QA-001/check | NOT_RUN |
-| [AC-035-05](../requirement/req-035.md) | TP001-010 | BE-007/sys | QA-001/check | NOT_RUN |
-| [AC-036-01](../requirement/req-036.md) | TP001-021 | BE-009/sys | QA-002/check | NOT_RUN |
-| [AC-036-02](../requirement/req-036.md) | TP001-022, TP001-023 | BE-008/sys | QA-001/check | NOT_RUN |
-| [AC-036-03](../requirement/req-036.md) | TP001-008 | BE-008/sys | QA-001/check | NOT_RUN |
-| [AC-036-04](../requirement/req-036.md) | TP001-022 | BE-008/sys | QA-001/check | NOT_RUN |
-| [AC-036-05](../requirement/req-036.md) | TP001-024 | BE-026/sys, BE-031/sys, FE-021/front | QA-001/check, QA-011/check, QA-013/check | NOT_RUN |
-| [AC-037-01](../requirement/req-037.md) | TP001-054 | FE-013/front | QA-004/check | NOT_RUN |
-| [AC-037-02](../requirement/req-037.md) | TP001-054 | BE-015/sys | QA-004/check | NOT_RUN |
-| [AC-037-03](../requirement/req-037.md) | TP001-054 | BE-015/sys | QA-004/check | NOT_RUN |
-| [AC-037-04](../requirement/req-037.md) | TP001-055 | BE-015/sys | QA-004/check | NOT_RUN |
-| [AC-037-05](../requirement/req-037.md) | TP001-055 | BE-027/sys | QA-004/check, QA-012/check | NOT_RUN |
-| [AC-037-06](../requirement/req-037.md) | TP001-055 | BE-027/sys | QA-004/check, QA-012/check | NOT_RUN |
-| [AC-038-01](../requirement/req-038.md) | TP001-056 | BE-016/sys | QA-004/check | NOT_RUN |
-| [AC-038-02](../requirement/req-038.md) | TP001-057 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-038-03](../requirement/req-038.md) | TP001-057 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-038-04](../requirement/req-038.md) | TP001-057 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-038-05](../requirement/req-038.md) | TP001-058 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-039-01](../requirement/req-039.md) | TP001-059 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-039-02](../requirement/req-039.md) | TP001-059 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-039-03](../requirement/req-039.md) | TP001-059 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-039-04](../requirement/req-039.md) | TP001-059 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-039-05](../requirement/req-039.md) | TP001-058 | BE-017/sys | QA-004/check | NOT_RUN |
-| [AC-040-01](../requirement/req-040.md) | TP001-025 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-040-02](../requirement/req-040.md) | TP001-025 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-040-03](../requirement/req-040.md) | TP001-025 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-040-04](../requirement/req-040.md) | TP001-026 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-040-05](../requirement/req-040.md) | TP001-026 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-040-06](../requirement/req-040.md) | TP001-026 | BE-024/sys, FE-017/front | QA-011/check | NOT_RUN |
-| [AC-041-01](../requirement/req-041.md) | TP001-027 | BE-025/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-041-02](../requirement/req-041.md) | TP001-027 | BE-025/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-041-03](../requirement/req-041.md) | TP001-027 | BE-025/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-041-04](../requirement/req-041.md) | TP001-028 | BE-025/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-041-05](../requirement/req-041.md) | TP001-028 | BE-025/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-01](../requirement/req-042.md) | TP001-029 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-02](../requirement/req-042.md) | TP001-029 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-03](../requirement/req-042.md) | TP001-029 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-04](../requirement/req-042.md) | TP001-030 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-05](../requirement/req-042.md) | TP001-030 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-042-06](../requirement/req-042.md) | TP001-030 | BE-026/sys, FE-018/front | QA-011/check | NOT_RUN |
-| [AC-043-01](../requirement/req-043.md) | TP001-060 | BE-027/sys, BE-039/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-043-02](../requirement/req-043.md) | TP001-060 | BE-029/sys, FE-022/front | QA-012/check | NOT_RUN |
-| [AC-043-03](../requirement/req-043.md) | TP001-060 | BE-029/sys, FE-022/front | QA-012/check | NOT_RUN |
-| [AC-043-04](../requirement/req-043.md) | TP001-060 | BE-029/sys, FE-022/front | QA-012/check | NOT_RUN |
-| [AC-044-01](../requirement/req-044.md) | TP001-061 | BE-027/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-044-02](../requirement/req-044.md) | TP001-061 | BE-027/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-044-03](../requirement/req-044.md) | TP001-061 | BE-027/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-044-04](../requirement/req-044.md) | TP001-061 | BE-027/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-044-05](../requirement/req-044.md) | TP001-061 | BE-027/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-045-01](../requirement/req-045.md) | TP001-062 | BE-028/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-045-02](../requirement/req-045.md) | TP001-062 | BE-028/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-045-03](../requirement/req-045.md) | TP001-062 | BE-028/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-045-04](../requirement/req-045.md) | TP001-062 | BE-028/sys, FE-019/front, UX-005/int | QA-012/check | NOT_RUN |
-| [AC-046-01](../requirement/req-046.md) | TP001-063 | BE-030/sys, FE-020/front, UX-005/int, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-046-02](../requirement/req-046.md) | TP001-063 | BE-031/sys, FE-021/front, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-046-03](../requirement/req-046.md) | TP001-064 | BE-031/sys, FE-021/front, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-046-04](../requirement/req-046.md) | TP001-064 | BE-030/sys, FE-020/front, FE-021/front, UX-005/int, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-046-05](../requirement/req-046.md) | TP001-063 | BE-032/sys, FE-022/front, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-046-06](../requirement/req-046.md) | TP001-065 | BE-032/sys, FE-022/front, UX-007/int | QA-013/check | NOT_RUN |
-| [AC-047-01](../requirement/req-047.md) | TP001-066 | BE-033/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-047-02](../requirement/req-047.md) | TP001-066 | BE-033/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-047-03](../requirement/req-047.md) | TP001-066 | BE-033/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-047-04](../requirement/req-047.md) | TP001-067 | BE-033/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-047-05](../requirement/req-047.md) | TP001-067 | BE-033/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-048-01](../requirement/req-048.md) | TP001-068 | BE-034/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-048-02](../requirement/req-048.md) | TP001-068 | BE-034/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-048-03](../requirement/req-048.md) | TP001-068 | BE-034/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-048-04](../requirement/req-048.md) | TP001-068 | BE-034/sys, FE-022/front, UX-007/int | QA-014/check | NOT_RUN |
-| [AC-049-01](../requirement/req-049.md) | TP001-069 | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-02](../requirement/req-049.md) | TP001-070 | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-03](../requirement/req-049.md) | TP001-069 | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-04](../requirement/req-049.md) | TP001-069 | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-05](../requirement/req-049.md) | TP001-070 | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-050-01](../requirement/req-050.md) | TP001-071 | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-050-02](../requirement/req-050.md) | TP001-072 | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-050-03](../requirement/req-050.md) | TP001-071 | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-050-04](../requirement/req-050.md) | TP001-071 | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-051-01](../requirement/req-051.md) | TP001-072 | BE-037/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-051-02](../requirement/req-051.md) | TP001-072 | BE-037/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-051-03](../requirement/req-051.md) | TP001-072 | BE-037/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-051-04](../requirement/req-051.md) | TP001-073 | BE-037/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-051-05](../requirement/req-051.md) | TP001-073 | BE-036/sys, BE-038/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check, QA-016/check | NOT_RUN |
-| [AC-052-01](../requirement/req-052.md) | TP001-074 | BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
-| [AC-052-02](../requirement/req-052.md) | TP001-074 | BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
-| [AC-052-03](../requirement/req-052.md) | TP001-075 | BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
-| [AC-052-04](../requirement/req-052.md) | TP001-075 | BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
-| [AC-052-05](../requirement/req-052.md) | TP001-076 | BE-037/sys, BE-038/sys, FE-024/front, UX-006/int, SA-004/arch, DBA-007/vault | QA-016/check | NOT_RUN |
+AC-041-04/05 เพิ่ม TP001-078 สำหรับ tombstone; [AC-038-05 (ครูตรวจ Arm ของนักเรียนนอกรายชื่อที่ได้รับมอบหมายหรือข้ามโรงเรียนไม่ได้…)](../requirement/req-038.md) และ [AC-039-05 (ครูขอดูรายชื่อหรือผลนักเรียนนอกที่ได้รับมอบหมาย…)](../requirement/req-039.md) เพิ่ม TP001-079 สำหรับ authority; [AC-030-04 (การเตรียมอัปเดตเริ่มเฉพาะเมื่อผู้ใช้สั่งเอง และตรวจ trust ครบ)](../requirement/req-030.md)–08 ใช้ TP001-080 โดย AC-030-04 มี TP001-048 ตรวจ metadata-only; [AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md) ใช้ TP001-081 สำหรับหมดเวลา; AC-036-06 ใช้ TP001-082 สำหรับ logout ตารางไฟล์ย่อยคง owner เดิม และผูก [BE-019 (Update check/Prepare/Install)](../plan/index.md)/[QA-010 (Update/assets QA)](../plan/index.md) ของการอัปเดตจาก plan/index.md
 
-## ส่วนต่อ Traceability หลัง snapshot 180/77 — Amendment005
+## ยังไม่ยืนยัน
 
-> ตารางหลักด้านบนคง 180 แถวตรงกับ `traceability-001.json` · AC ที่เพิ่มใน Amendment003 (AC-030-04..08 → TP001-080) และ Amendment004 (AC-046-07 → TP001-081) อ่านในไฟล์ amendment ของตน · รายการนี้เพิ่มเฉพาะ Amendment005 · coverage ปัจจุบัน 187 AC / 82 cases
+เอกสารต้นฉบับของ TP001-081 ไม่ระบุ implementation/validation task owner เพิ่ม จึงไม่เดาเจ้าของจาก case ข้างเคียง ให้ gm ยืนยัน mapping งานในแผน โดยไม่กระทบ expected ธุรกิจและ coverage ของ AC-046-07
 
-| AC | Case IDs | Implementation / role | Validation | Actual |
-| --- | --- | --- | --- | --- |
-| [AC-036-06](../requirement/req-036.md) | [TP001-082](tp-001-amendment-005.md) | BE-006/sys, BE-039/sys, FE-002/front | QA-001/check | NOT_RUN |
+## คำย่อ
 
-## Change Log
+AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · BR = Business Rule หรือกฎธุรกิจ
 
-- 2026-10-28 — Amendment005: เพิ่มส่วนต่อ traceability AC-036-06 → TP001-082 (BE-006/sys, BE-039/sys, FE-002/front → QA-001/check); คงตารางหลัก 180 แถวและ JSON snapshot 180/77 ทุก actual NOT_RUN
 
-- 2026-10-26 — ใบงาน078: เพิ่ม pointer Amendment004/AC-046-07; คง180แถว/77 case IDs/owners/actualและ JSONเดิม ไม่มี test execution
+## หลักฐาน
 
-- 2026-10-24 — ใบงาน052: เพิ่ม precedence ของ transport procedure; คง joined JSON/180 AC/77 case IDs/owners/actual เดิม ไม่รันทดสอบ
-
-- 2026-10-23 — นายช่างบันทึกและจัดรูปจากผล role ผ่าน Claude; ไม่มี runtime/test verdict หรือการปิด gate
+ตาราง 180 AC เดิม join owner จาก plan/tasks-001.json (memory) revision2; แถว logout ระบุ [BE-006 (Login/session)](../plan/index.md)/sys, [BE-039 (เชื่อม SchoolBot ผ่าน Gateway)](../plan/index.md)/sys, [FE-002 (Login UI)](../plan/index.md)/front → [QA-001 (License QA)](../plan/index.md)/check ไว้แล้ว ข้อมูลสำหรับเครื่อง traceability-001.json และ tp-001.json คง snapshot 180 AC/77 cases ไม่เปลี่ยนในงานนี้

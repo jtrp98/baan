@@ -41,8 +41,3 @@ CreateBy/CreateDate/UpdateBy/UpdateDate ทุกตารางรับ NULL �
 `K` เป็น JSON integer; create ไม่รับ PK จาก client และคืน `K` หลัง commit เท่านั้น ห้าม wrap/reuse เมื่อเต็ม; `CurrentRevision`, `Revision`, `Sequence`, `BindingEpoch` เป็น `N` ไม่ใช่ row ID
 
 Default reads ตัด `IsDelete=true`; unique keys ที่ระบุไม่ถูกคืนให้ใช้ใหม่เมื่อ soft delete เว้นแต่ระบุ “live” ห้าม cascade hard delete ผลเรียน/ประวัติ/receipt; Immutable rows ไม่แก้ business fields หลังสร้าง
-
-
-## Change Log
-
-- 2026-10-23 — นายช่างบันทึกคำอธิบายจาก arch ตามใบงาน 009 เทียบกับ SQL/แบบเดิม; ไม่เปลี่ยน schema หรือยืนยันผล runtime
