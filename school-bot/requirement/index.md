@@ -148,4 +148,5 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 | [decisions-048.md](decisions-048.md) | ปิดผลสามงานที่กำลังรันแล้วหยุดก่อน ไม่เปิดงานชุดถัดไป; เก็บข้อค้างไว้รอบหน้า |
 | [decisions-049.md](decisions-049.md) | อนุมัติแก้รอบ 3 แบบแคบหนึ่งรอบ: B gRPC raw wire boundary และ Gateway log/channel boundary พร้อม check/JPO ซ้ำด้วย oracle เดิม; ไม่ใช่ risk acceptance |
 | [decisions-050.md](decisions-050.md) | เส้น HTTP ของ SchoolBot ใน Gateway ใช้ controller ตาม convention เดิมของ Gateway แทน minimal endpoint/middleware; transport G→B gRPC/BFF คงเดิม; ต้องผ่าน arch ก่อน sys |
+| [decisions-051.md](decisions-051.md) | อนุมัติทาง A: commit Project+Revision เป็นหน่วยเดียว (`CommitProjectAsync`) และเปิด rework 3 ของ BE-002 F2; ไม่มีข้อมูล file store เดิมต้องนำเข้า |
 

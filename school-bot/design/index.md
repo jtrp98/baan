@@ -67,7 +67,7 @@ G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogou
 | DES-001 | Desktop host และ IPC (Rev1) | PROPOSED — รอ breaking review | [des-001.md](des-001.md) |
 | DES-002 | License และ device binding (Rev3) | PROPOSED — รอ schema/security review | [des-002.md](des-002.md) |
 | DES-003 | หลายโครงงาน Local/Cloud (Rev4) | PROPOSED — รอ schema/migration review | [des-003.md](des-003.md) |
-| DES-004 | Identity และ school authorization (Rev11) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
+| DES-004 | Identity และ school authorization (Rev12) | PROPOSED — ทาง A ยืนยันแล้ว; รอ credential compatibility ([หลักฐาน](auth-evidence-001.md)) | [des-004.md](des-004.md) |
 | DES-005 | หลักสูตร ภารกิจ และผลประเมิน (Rev8) | PROPOSED — ทาง A ยืนยันแล้ว; รอ numeric rubric/evaluator | [des-005.md](des-005.md) |
 | DES-006 | หุ่นจริง Windows/macOS (Rev2) | PROPOSED — รอ platform/hardware proof | [des-006.md](des-006.md) |
 | DES-007 | Release และ trusted update (Rev3) | PROPOSED — รอ schema/trust approval | [des-007.md](des-007.md) |
@@ -139,7 +139,7 @@ G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogou
 | [data-dictionary/contract-index.md](data-dictionary/contract-index.md) | สัญญา Rev5 เดิม แบ่งส่วนโดยคงชนิด/enum/JSON/กฎครบ |
 | [data-json-001.md](data-json-001.md) | อธิบาย JSON: Text, กิจกรรม, ข้อสอบ/คำตอบ, นโยบาย, น้ำหนัก และ snapshot |
 | [data-relations-001.md](data-relations-001.md) | แผนภาพเส้นทางข้อมูล: เนื้อหา → งาน/ข้อสอบ → ส่งคะแนนเดิม |
-| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev8 — baseline CONFIRMED เดิม; create-license TTL 15 นาทีผู้ใช้อนุมัติตาม decisions-046, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
+| [data-contract-rules.md](data-contract-rules.md) | Invariants/กติกาข้อมูล Rev11 — baseline CONFIRMED เดิม; create-license TTL 15 นาทีผู้ใช้อนุมัติตาม decisions-046, ไม่มี schema delta; UpdateDate/tenant/re-check เดิม |
 | [schema-notes.md](schema-notes.md) | หมายเหตุ schema Rev7 — PK32/UQ0/FK0/CHECK0; relationships/validation เป็นกฎ application |
 | [risks.md](risks.md) | สิ่งที่ต้องยืนยันก่อน implementation และประตูมนุษย์ (Rev5 · PROPOSED) |
 | [hardware-survey-001.md](hardware-survey-001.md) | ผลสำรวจ hardware/OS (Rev1 · EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น) |
@@ -192,8 +192,8 @@ G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogou
 | ไฟล์ / Rev | เนื้อหา / สถานะ |
 |---|---|
 | [license-admin-security-001.md](license-admin-security-001.md) Rev1 | PROPOSED — License role/error/replay TTL/cleanup ต่อ DES-002 |
-| [project-api-001.md](project-api-001.md) Rev1 | PROPOSED — API/ETag/immutable revision ต่อ DES-003 |
-| [project-commit-proposal-001.md](project-commit-proposal-001.md) | PROPOSED — รอผู้ใช้อนุมัติ: commit Project+Revision เป็นหน่วยเดียว (ต้นเหตุ F2 ของ BE-002) |
+| [project-api-001.md](project-api-001.md) Rev2 | PROPOSED — API/ETag/immutable revision ต่อ DES-003; Rev2 เพิ่ม `CommitProjectAsync` ตามมติ051 |
+| [project-commit-proposal-001.md](project-commit-proposal-001.md) | อนุมัติทาง A ตาม[มติ051](../requirement/decisions-051.md): commit Project+Revision เป็นหน่วยเดียว (ต้นเหตุ F2 ของ BE-002) — delta ลง project-api-001 Rev2/DES-004 Rev12/rules Rev11 แล้ว |
 | [local-project-boundary-001.md](local-project-boundary-001.md) Rev1 | Archclarificationก่อนGo rework1: revision/errors/sharedOSlocks/anchoredFS/strictJSON/migrationreceipt; [specREQ026ชัดแล้ว](../planning/spec-090-draft-fuel-001.md): fuelRun-only/draftผ่านstructuralเก็บได้; archDESsentenceรอalign |
 | [guest-workspace-001.md](guest-workspace-001.md) Rev1 | PROPOSED — นโยบาย Guest ยืนยันแล้ว; รายละเอียดเวลา/trash/export รอ implementation proof |
 | [guest-import-001.md](guest-import-001.md) Rev1 | PROPOSED — explicit Project import/receipt/dedup ใช้ schema เดิม |

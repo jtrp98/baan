@@ -1,6 +1,6 @@
 # ข้อเสนอแบบ — บันทึก Project + Revision เป็นหน่วย commit เดียว (แก้ต้นเหตุ F2 ของ BE-002)
 
-สถานะ: **PROPOSED — รอผู้ใช้อนุมัติ** · เจ้าของแบบ: arch · วันที่ 2026-11-02 · ที่มา: [ใบงาน094](../planning/task-094.md) หลัง [check-094-wave2-gate-003](../planning/check-094-wave2-gate-003.md) FAIL ครบ rework 2/2 · run `2026-11-02-02-47-24-arch-tier-t1-1agents-lbzv8b` (Codex T1, read-only, ไม่รัน test ใหม่)
+สถานะ: **อนุมัติทาง A** ตาม[มติ051](../requirement/decisions-051.md) (2026-11-02) — delta ลงแบบแล้ว · เจ้าของแบบ: arch · วันที่ 2026-11-02 · ที่มา: [ใบงาน094](../planning/task-094.md) หลัง [check-094-wave2-gate-003](../planning/check-094-wave2-gate-003.md) FAIL ครบ rework 2/2 · run `2026-11-02-02-47-24-arch-tier-t1-1agents-lbzv8b` (Codex T1, read-only, ไม่รัน test ใหม่)
 
 ## ต้นเหตุ (ตรวจกับโค้ด as-built)
 
@@ -69,3 +69,4 @@
 ## Change Log
 
 - 2026-11-02 — สร้างจาก handoff ของ arch run lbzv8b (นายช่าง สกัดเนื้อหา)
+- 2026-11-02 — ผู้ใช้อนุมัติทาง A (มติ051) · delta บันทึกจาก arch run G4xiP6 (agy T1 — Codex ติดโควตา)

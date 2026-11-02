@@ -1,4 +1,4 @@
-# กฎข้อมูลและ HTTP contract ร่วม — Rev10
+# กฎข้อมูลและ HTTP contract ร่วม — Rev11
 
 แยกจาก logical data contract ของ SA เพื่อคุมขนาดเอกสาร ชนิด `K`, `I`, `U`, `N`, `Tn` และตารางอ้าง [data-model.md](data-model.md) (Rev5 — ตรงกับ [db/schoolbot_db.sql](../db/schoolbot_db.sql) และ [db/review-005.md](../db/review-005.md) ตามมติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md))
 
@@ -12,7 +12,7 @@ application/repository ต้องใช้ transaction-scoped lock บน stab
 
 lock ของ finalized proposal และ successor ใช้ namespace/key ของ CourseRun ต้นทางร่วมกัน ไม่ล็อกเฉพาะ proposal ID. คง predicates เดิม: active run = `Lifecycle IN ('planned','active','closing') AND IsDelete=false`; successor ของ run = `PreviousRunId IS NOT NULL AND IsDelete=false`; finalized proposal = `State IN ('promoted','retained','max_level') AND IsDelete=false`; successor ของ proposal = `SuccessorRunId IS NOT NULL AND IsDelete=false`. GradeSlot ownership ใช้ `RetiredAt=null` โดยไม่กรอง `IsDelete`; active mapping ใช้ `RetiredAt=null AND IsDelete=false`. กฎห้ามหลบประวัติด้วย retire/soft-delete/hard-delete ยังคงแยกจาก predicates เหล่านี้
 
-การบังคับทดแทนด้วย application/repository locks: **NOT_IMPLEMENTED — ไม่มี runtime evidence**; domain mutation/idempotency/audit ยังต้อง atomic ใน SchoolBot DB transaction เดียว ไม่เปลี่ยน replay window/tombstone/nonce/ownership/promotion semantics
+การบังคับทดแทนด้วย application/repository locks: **NOT_IMPLEMENTED — ไม่มี runtime evidence**; domain mutation/idempotency/audit ยังต้อง atomic ใน SchoolBot DB transaction เดียว ไม่เปลี่ยน replay window/tombstone/nonce/ownership/promotion semantics. สำหรับคู่ข้อมูลแม่–ลูกและ pointer ที่ต้องสอดคล้องกันเสมอ (เช่น `SchoolBotProject` คู่กับ `SchoolBotProjectRevision` และ `CurrentRevision` ตาม [decisions-051](../requirement/decisions-051.md) / [project-api-001](project-api-001.md) Rev2) ต้องบันทึกผ่านหน่วย commit ร่วมของ backing store/DB transaction (`CommitProjectAsync`): **ห้ามเผยแพร่แถว `SchoolBotProject` หรือเลื่อน `CurrentRevision` ลง store หรือ in-memory cache ก่อนที่แถว `SchoolBotProjectRevision` เป้าหมายจะ commit สำเร็จพร้อมกัน และห้ามใช้การเขียนแยกสองขั้นแล้วตามด้วยโค้ดชดเชย/ลบย้อนหลัง (compensation write/rollback in catch) เป็นหลักประกัน atomicity**; หากล้มเหลวก่อนจุด commit ต้องคงสถานะเดิมทั้งใน store และ cache และหากผลของจุด commit ไม่ทราบแน่ชัดต้อง invalidate/reload cache จากสถานะ authoritative ของ store
 
 | กลุ่ม | กฎ |
 |---|---|
@@ -21,7 +21,7 @@ lock ของ finalized proposal และ successor ใช้ namespace/key �
 | Identity/Session | `TokenHash` unique (`RULE_UNIQUE_SchoolBotSession_TokenHash`); `Channel` ∈ `desktop\|school_web\|staff_admin` (ค่าเริ่ม `'desktop'`); `Channel=desktop` ⇔ `DeviceJkt` not null และ `AccountId` not null; `Channel IN ('school_web','staff_admin')` ⇒ `DeviceJkt=null`; `ProfileKind/ProfileId` null พร้อมกันก่อน bind (หรือกรณี legacy admin ที่ไม่มี employee row); **Desktop (`Channel=desktop`) bind ได้ทั้ง `student` และ `employee` (ใช้เรียน/ลองเท่านั้น ไม่มีเมนูครู/ส่งคะแนนใน Desktop ตาม decisions-025/026)**; expiry/revocation ตาม DES-004 และ DES-012 |
 | StaffRole | live unique `(SchoolId,EmployeeId,Role)` เมื่อ `IsDelete=false` (กฎ live role ผ่าน transaction lock บน `(SchoolId,EmployeeId,Role)`); `ValidUntil>ValidFrom` เมื่อมีค่า; `SchoolId` คือโรงเรียนต้นสังกัดของบัญชีพนักงาน |
 | TeacherGrant | (ทางสำรองตาม DES-004 — ยังไม่ได้ตัดสินให้สร้างใน `db/schoolbot_db.sql` ตาม decisions-026 และ db/review-005) หากเปิดใช้ในอนาคต: live unique `(SchoolId,TeacherId,LearnerId,Mode)` เมื่อ `IsDelete=false`; `CanAssess` ต้อง `CanView`; ผู้ให้/ผู้รับอยู่โรงเรียนเดียวกัน; `ValidUntil>ValidFrom` |
-| Project | เจ้าของ (`student` หรือ `employee`)/`Mode` เปลี่ยนไม่ได้; unique `(ProjectId,Revision)` (`RULE_UNIQUE_SchoolBotProjectRevision_ProjectId_Revision`); `CurrentRevision` ชี้ `(ProjectId,Revision)` จริง (`LOGICAL_SchoolBotProject_CurrentRevision` ในเชิงตรรกะ (ไม่มี FK ใน SQL)); revision immutable |
+| Project | เจ้าของ (`student` หรือ `employee`)/`Mode` เปลี่ยนไม่ได้; unique `(ProjectId,Revision)` (`RULE_UNIQUE_SchoolBotProjectRevision_ProjectId_Revision`); `CurrentRevision` ชี้ `(ProjectId,Revision)` จริงใน `SchoolId` เดียวกัน (`LOGICAL_SchoolBotProject_CurrentRevision` ในเชิงตรรกะ (ไม่มี FK ใน SQL)); revision immutable; การสร้างหรือบันทึกงาน (`CommitProjectAsync` ตาม [decisions-051](../requirement/decisions-051.md)) ต้อง commit `SchoolBotProject` และ `SchoolBotProjectRevision` เป็นหน่วยเดียวกัน ห้ามเผยแพร่ Project หรือเลื่อน `CurrentRevision` ก่อน Revision commit สำเร็จ และห้ามใช้ compensation write แทนการ commit ร่วม |
 | Level / PromotionPolicy | global (`SchoolId=null`); `LevelKey`, `Code`, `Ordinal` unique (`RULE_UNIQUE_SchoolBotLevel_*`); `LevelPromotionPolicy` unique `(LevelId,Revision)` (`RULE_UNIQUE_SchoolBotLevelPromotionPolicy_Level_Revision`), `Threshold` ช่วง `0..100`, Level ใหม่ต้องมี revision 1 = `70`; immutable ต่อ revision |
 | Curriculum | global (`SchoolId=null`); ถอน `Curriculum.Mode`; unique `(CurriculumKey,Revision)` (`RULE_UNIQUE_SchoolBotCurriculum_Key_Revision`); อ้าง `LevelId`; published content และ children immutable; publish ต้องผ่าน four-eyes (ผู้สร้างอนุมัติเองไม่ได้ ตาม decisions-025) |
 | Lesson/Mission/Activity | global (`SchoolId=null`); unique `(CurriculumId,LessonKey)`, `(CurriculumId,Ordinal)`, `(LessonId,MissionKey)`, `(LessonId,Ordinal)`, `(LessonId,ActivityKey)`, `(LessonId,Ordinal)` ของ Activity; `Activity.Type=project` ⇔ `Mode` not null (`instruction\|quiz\|test` ใช้ `Mode=null`) |
@@ -82,6 +82,8 @@ List: `limit` 1–100 ค่าเริ่ม 50, `cursor` opaque; คืน `{
 Control body ≤64 KiB; project/submission/curriculum/question-bank body ≤2 MiB และ project document ≤1 MiB; response ≤2 MiB ต้องรักษาขอบเขตที่ client/G/B; gRPC message limits และ mapping ยัง design pending ไม่เท่ากับขนาด JSON โดยอัตโนมัติ และไม่ยก limit ของ engine ตาม HTTP.
 
 ## Change Log
+
+- 2026-11-02 — Rev11: ใบงาน094 ออก delta ตาม [decisions-051](../requirement/decisions-051.md) และ [project-commit-proposal-001](project-commit-proposal-001.md) (ทาง A): กำหนดกฎห้ามเผยแพร่ `SchoolBotProject` หรือเลื่อน `CurrentRevision` ก่อน `SchoolBotProjectRevision` commit สำเร็จในหน่วยเดียวกัน (`CommitProjectAsync`) และห้ามใช้ compensation write เป็นหลักประกัน atomicity; ไม่แก้ schema/AC/TP
 
 - 2026-10-26 — ตั้ง CreateBy/CreateDate/UpdateBy/UpdateDate เป็น nullable DEFAULT NULL ทุกตาราง
 
