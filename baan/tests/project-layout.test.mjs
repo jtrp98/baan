@@ -180,8 +180,10 @@ test("platform/os: module ไม่ระบุใช้ของ project · ค
     const quiz = scanProjects(root)[0].modules.find((m) => m.module === "quiz");
     assert.deepEqual([quiz.platform, quiz.os], ["desktop", ["windows", "mac"]]);
     const dirs = uxKnowledgeDirs(TEAM_DIR, quiz.platform, quiz.os).map((d) => path.relative(path.join(TEAM_DIR, "ux-knowledge"), d).split(path.sep).join("/"));
-    assert.deepEqual(dirs, ["common", "desktop", "desktop/apple"], "ไม่มี desktop/windows จริง ก็ไม่ใส่");
+    assert.deepEqual(dirs, ["common", "desktop", "desktop/windows", "desktop/apple"]);
     assert.deepEqual(uxKnowledgeDirs(TEAM_DIR, "", []).length, 1, "ไม่ระบุแพลตฟอร์ม = common อย่างเดียว");
+    const web = uxKnowledgeDirs(TEAM_DIR, "web", ["mac"]).map((d) => path.basename(d));
+    assert.deepEqual(web, ["common", "web"], "web ไม่แยก os");
     const r = lintKnowledge(root);
     assert.ok(r.errors.some((e) => /schoolbright-web\/school-bot: os "mac" ใช้กับ platform web ไม่ได้/.test(e)));
     write(root, "school-bot/INDEX.md", "---\nplatform: tv\n---\n# school-bot\n");
