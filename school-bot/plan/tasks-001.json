@@ -540,8 +540,8 @@
             "AC-033-05"
           ],
           "status": "blocked",
-          "evidence": "planning/check-094-wave2-gate-001.md (FAIL F1/F2) · check-094-wave2-gate-002.md (F1 ผ่าน, F2 ยังตก) · rework 2/2 run 2026-10-29-05-57-38-sys-tier-t3-1agents-bW5baP ล้มกลางทางเพราะ DNS ของเครื่อง (agy/codex resolve ไม่ได้)",
-          "note": "2026-10-29 worktree B ตอนนี้ test ตก 1 (CommitFailure_ProjectRevisionFails_LeavesNoHalfProjectAfterRestart) จากการแก้ค้างครึ่งทาง — ห้าม revert ด้วย git ใน target · รันซ้ำ rework 2/2 เมื่อเครือข่ายกลับ (ไม่นับเป็นรอบใหม่เพราะรันไม่จบ)"
+          "evidence": "planning/check-094-wave2-gate-001.md (FAIL F1/F2) · check-094-wave2-gate-002.md (F1 ผ่าน, F2 ยังตก) · check-094-wave2-gate-003.md (rework 2/2 รันซ้ำ 2026-11-02: FAIL — F2 ยังเหลือ half-project เมื่อมี Project เดิม)",
+          "note": "2026-11-02 ครบเพดาน rework 2/2 — รอผู้ใช้ตัดสินทางไปต่อ · B test 4180/0 หลัง rework (ไม่มี test ค้างตกแล้ว)"
         }
       ]
     },
