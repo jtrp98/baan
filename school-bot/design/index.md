@@ -34,7 +34,7 @@ local logout มี implementation และผลตรวจเฉพาะ lo
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
-| [des-004.md](des-004.md) | 12 | DES-004: ตัวตน, session และสิทธิ์แยกตามช่องทาง | PROPOSED — รอ identity/directory และ integration proof |
+| [des-004.md](des-004.md) | 13 | DES-004: ตัวตน, session และสิทธิ์แยกตามช่องทาง | PROPOSED — ยืนยันอายุ Desktop 8 ชั่วโมงหลัง bind แล้ว; รอ identity/directory และ integration proof |
 | [des-012.md](des-012.md) | 9 | DES-012: แลก token เว็บและ authorization ข้ามระบบ | PROPOSED — ยืนยัน topology/admin policy แล้ว; รอ mapping/implementation/H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ) |
 
 Data Transfer Object (DTO), decoder, trusted completion, private introspection และส่วนย่อยของ DES อยู่ใน [สารบัญ Transport/Login](index-transport-login.md)
@@ -75,4 +75,4 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 - Source baseline ที่ index เดิมอ้าง: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/SchoolBot.Api/Program.cs:43`, `engines/zide/src/transport.cpp:7` ใต้ `C:/src/schoolbright/target/school-bot`; งานนี้อ่านเฉพาะเอกสารที่อนุญาต ไม่ยืนยัน code/schema ปัจจุบันเพิ่ม
 - รายงาน local logout ล่าสุด 2026-10-28 (memory: planning/jpo-092-logout-r4-001.md) รับรองเฉพาะขอบเขตที่รายงาน; auth-flow-handoff-001 และ qa/round-001 (memory) แยก local component/logout ออกจาก integration
-- [มติ 051 (commit Project + Revision ในหน่วยเดียว)](../requirement/decisions-051.md) ลงสัญญาใน DES-004 Rev12, Project API Rev2 และกฎข้อมูล Rev11 แล้ว
+- สัญญาปัจจุบัน DES-004 Rev13 คงขอบเขต persistence ตาม [มติ 051 (commit Project + Revision ในหน่วยเดียว)](../requirement/decisions-051.md) ร่วมกับ Project API Rev2 และกฎข้อมูล Rev11 และนับอายุ Desktop session จากเวลา bind ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md)

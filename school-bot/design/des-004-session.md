@@ -1,6 +1,6 @@
 # DES-004 — Session, profile binding และ HTTP API
 
-> Rev 12 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 13 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [DES-004 (ตัวตนและสิทธิ์)](des-004.md) กำหนด token/session และ HTTP semantics ฝั่ง client ของ Gateway
 
@@ -38,5 +38,5 @@ Lifecycle, logout และ error อ่าน [ส่วนอายุ session
 
 ## หลักฐาน
 
-- สัญญาเดิม [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev12; auth-evidence-001 (memory) ระบุ port web Trim username/password, mobile เทียบตรงตัว ทั้งคู่ไม่ lowercase และยังไม่ทราบ collation นี่เป็นพฤติกรรมที่บันทึกไว้ ไม่ใช่นโยบายให้ adapter Trim password
+- [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev13; auth-evidence-001 (memory) ระบุ port web Trim username/password, mobile เทียบตรงตัว ทั้งคู่ไม่ lowercase และยังไม่ทราบ collation นี่เป็นพฤติกรรมที่บันทึกไว้ ไม่ใช่นโยบายให้ adapter Trim password
 - รูปแบบ error กลางอยู่ใน [กฎข้อมูลและ HTTP](data-contract-rules.md); TeacherGrant ถูกถอนจาก `db/schoolbot_db.sql` ตาม db/review-005 (memory)

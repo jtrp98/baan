@@ -1,6 +1,6 @@
 # DES-004 — อายุ session, logout และ failure
 
-> Rev 12 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 13 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [DES-004 (ตัวตนและสิทธิ์)](des-004.md) ใช้ [SessionView และชนิด Data Transfer Object (DTO)](des-004-session.md); profile ในข้อความ/DTO เดิมใช้สัญลักษณ์ `P`
 
@@ -8,7 +8,7 @@
 
 Desktop session lifecycle: `guest → authenticating → authenticated_unbound → authenticated → expired|signed_out`
 
-`POST /v2/auth/login` ให้ unbound desktop session อายุ 5 นาที (`ProfileKind/ProfileId=null`, `CreateBy/UpdateBy=null`); ใช้ได้เฉพาะ `session`/`me`/`logout`. การ `PUT /v2/auth/session` เพื่อ bind ต้องเลือก `P` (`student` หรือ `employee`) ที่อยู่ใน `memberships` ที่ re-check ใหม่จาก School DB และ `school_id` ตรงกับ session; สำเร็จแล้วตั้ง `ExpiresAt = CreateDate + 8 ชั่วโมง`, `UpdateBy = ProfileId`, `UpdateDate = clock_timestamp()`; `kind/id` เปลี่ยนอีกไม่ได้ (`409 SESSION_ALREADY_BOUND`); bind ซ้ำ `P` เดิมคืนค่าเดิมหลังตรวจสิทธิ์/`If-Match` โดยไม่ต่ออายุ; เปลี่ยนโรงเรียนหรือเปลี่ยนโปรไฟล์ต้อง login ใหม่ (ส่วน `school_web` และ `staff_admin` ออก session ที่ resolve ตัวตนพร้อมใช้งานตั้งแต่ตอนแลกตาม [DES-012 (auth ข้ามระบบ)](des-012.md))
+`POST /v2/auth/login` ให้ unbound desktop session อายุ 5 นาที (`ProfileKind/ProfileId=null`, `CreateBy/UpdateBy=null`); ใช้ได้เฉพาะ `session`/`me`/`logout`. การ `PUT /v2/auth/session` เพื่อ bind ต้องเลือก `P` (`student` หรือ `employee`) ที่อยู่ใน `memberships` ที่ re-check ใหม่จาก School DB และ `school_id` ตรงกับ session; สำเร็จแล้วตั้ง `ExpiresAt = เวลาที่ bind สำเร็จ + 8 ชั่วโมง` ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md), `UpdateBy = ProfileId`, `UpdateDate = clock_timestamp()`; `kind/id` เปลี่ยนอีกไม่ได้ (`409 SESSION_ALREADY_BOUND`); bind ซ้ำ `P` เดิมคืนค่าเดิมหลังตรวจสิทธิ์/`If-Match` โดยไม่ต่ออายุ; เปลี่ยนโรงเรียนหรือเปลี่ยนโปรไฟล์ต้อง login ใหม่ (ส่วน `school_web` และ `staff_admin` ออก session ที่ resolve ตัวตนพร้อมใช้งานตั้งแต่ตอนแลกตาม [DES-012 (auth ข้ามระบบ)](des-012.md))
 
 `GET /auth/session` คืน `ETag` (จาก `UpdateDate`); `PUT /auth/session` ใช้ `If-Match`/`Idempotency-Key` ตามกฎกลาง (`UpdateDate` เป็น concurrency token ตาม [มติ 030 (ใช้ UpdateDate เป็น concurrency token)](../requirement/decisions-030.md)); `SchoolBotSession` + `SchoolBotIdempotency` + `SchoolBotAuditEvent` commit ใน **SchoolBot DB** เดียว. `login` และ `web-sessions` ไม่ใช้ idempotency/cache raw response; timeout ให้ขอใหม่ session ที่ไม่ได้รับจะหมดอายุเอง. `logout` ไม่ต้อง `If-Match`/`Idempotency-Key`/License: revoke+audit ใน SchoolBot DB transaction เดียว คืน 204 แม้ token หาย/หมดอายุ/ถูกถอน; DB ล่มคืน 503 ไม่อ้างว่า revoke สำเร็จ
 
@@ -22,5 +22,6 @@ Logout บน Desktop ใช้ robot drain/close guard เดิม; ล้า�
 
 ## หลักฐาน
 
-- [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev12 และ [มติ 030 (ใช้ UpdateDate ตรวจ concurrency)](../requirement/decisions-030.md)
+- [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev13 และ [มติ 030 (ใช้ UpdateDate ตรวจ concurrency)](../requirement/decisions-030.md)
+- ผู้ใช้ยืนยันในแชตวันที่ 2026-11-02 ว่าอายุ Desktop session นับจากเวลาที่ bind สำเร็จ ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md)
 - [กฎข้อมูลและ HTTP](data-contract-rules.md) กำหนด error envelope และกฎร่วม

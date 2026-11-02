@@ -1,6 +1,6 @@
 # DES-012 — Authorization, admin API และ browser session
 
-> Rev 9 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 9 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (อ้างมติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [DES-012 (auth ข้ามระบบ)](des-012.md) ตรวจสิทธิ์ทุก request และตรวจจาก School DB กับ SchoolBot DB ซ้ำก่อน commit
 
@@ -28,16 +28,12 @@
 
 Cross-Origin Resource Sharing (CORS) คงกฎไม่ส่ง `Access-Control-Allow-*`; Origin นอก allow-list → `403 ORIGIN_NOT_ALLOWED` เป้าหมาย web-system เก็บ token ใน memory (Zustand); admin web เก็บใน `__Host-sb-admin` HttpOnly cookie การใช้ cookie เพื่อ mutation ต้องตรวจ Origin และ Cross-Site Request Forgery (CSRF) ก่อน
 
-อายุ absolute: school_web 30 นาที; staff_admin 8 ชั่วโมง ทั้งสองไม่เกิน SourceTokenExpiresAt เมื่อมีค่า Desktop มีข้อความขัดกันเรื่องจุดเริ่มนับเวลา 8 ชั่วโมงตามหัวข้อ “ยังไม่ยืนยัน”
-
-## ยังไม่ยืนยัน
-
-ต้นฉบับ [DES-012 (auth ข้ามระบบ)](des-012.md) ระบุ desktop “8 ชม. หลัง bind” ขณะที่ [DES-004 (ตัวตนและสิทธิ์)](des-004.md) ระบุ `ExpiresAt = CreateDate + 8 ชั่วโมง` เมื่อ bind ทั้งสองข้อความถูกเก็บไว้ที่นี่เพื่อให้เจ้าของสัญญายืนยันว่าจุดเริ่มนับเวลาใดถูกต้อง งานเรียบเรียงไม่เปลี่ยนสูตรหรืออายุ session; ต้องให้ arch และเจ้าของ requirement ยืนยันความหมายก่อนแก้สัญญา
+อายุ absolute: school_web 30 นาที; staff_admin 8 ชั่วโมง ทั้งสองไม่เกิน SourceTokenExpiresAt เมื่อมีค่า Desktop มีอายุ 8 ชั่วโมงหลัง bind สำเร็จ (`ExpiresAt = เวลาที่ bind สำเร็จ + 8 ชั่วโมง`) ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md) และ [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev13; bind ซ้ำ profile เดิมไม่ต่ออายุตาม [Lifecycle](des-004-lifecycle.md)
 
 ## หลักฐาน
 
 - เงื่อนไข baseline ครู: `TplanCourseTeacher(SchoolId,PlanCourseId,SEmp)` ที่ `IsActive & !CDel` ร่วม `TEmployees` โรงเรียนตรงและ `CDel null|'0'`; `TplanCourse` ต้อง `CourseStatus=1 & IsActive & !CDel`, `TplanCourseTerm` ต้อง `IsActive & !CDel & NTerm` ตรง; ห้อง join `TplanTermSubLevel2` ด้วย PlanId ที่ `IsActive & !CDel` ร่วม `TtermSubLevel2` ที่ `!CDel & NWorkingStatus=1` เงื่อนไขเหล่านี้เป็นผลอ่าน source เดิม ไม่แทน roster authority
 - หลักฐานครูจาก academic: `TeacherRepository.cs:24–32,111–122` ตรวจครูรายวิชา/แผน/เทอม; `PlanCourseRepository.cs:194–215` join ห้องผ่าน PlanId แต่ query นี้ไม่กรองครูและ SchoolId ทุก alias จึงไม่ใช่ authorization ที่คัดลอกใช้ได้ทันที
 - [มติ 035 (กลุ่ม admin และ super admin)](../requirement/decisions-035.md) ปิดเฉพาะ policy; technical proof, implementation และ H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ) คงค้าง
-- [DES-012 (auth ข้ามระบบ)](des-012.md) Rev9 เดิม §6 และ [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev12 เดิม State/invariants ระบุจุดเริ่มนับ Desktop ต่างกัน ไม่มีการยืนยันใหม่ในงานนี้
+- ผู้ใช้ยืนยันในแชตวันที่ 2026-11-02 ว่า Desktop session มีอายุ 8 ชั่วโมงหลัง bind สำเร็จ ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md); [DES-004 (ตัวตนและสิทธิ์)](des-004.md) Rev13 ใช้จุดเริ่มนับนี้ร่วมกับ DES-012 Rev9
 - กฎผลเรียนร่วมอยู่ใน [learning-rules-032-034.md](learning-rules-032-034.md)
