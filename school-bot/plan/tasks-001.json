@@ -527,7 +527,9 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "oracle pack BE-002 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-008/022/023/052/053 + Amendment002 + invariant 1–6 (มติ051) — check-094-wave2-gate-004 PASS บน stub (memory/file store); ต่อ DB จริง = DBA-003/G-CORE",
+      "ref": "target school-bot uncommitted — sha256 ที่ reports/school-bot/normal-094/check-wave2-r3-gate/source-sha256.txt",
       "risk": "low",
       "wave": 2,
       "slices": [
@@ -539,9 +541,9 @@
             "AC-036-03",
             "AC-033-05"
           ],
-          "status": "blocked",
-          "evidence": "planning/check-094-wave2-gate-001.md (FAIL F1/F2) · check-094-wave2-gate-002.md (F1 ผ่าน, F2 ยังตก) · check-094-wave2-gate-003.md (rework 2/2 รันซ้ำ 2026-11-02: FAIL — F2 ยังเหลือ half-project เมื่อมี Project เดิม)",
-          "note": "2026-11-02 ครบเพดาน rework 2/2 — รอผู้ใช้ตัดสินทางไปต่อ · B test 4180/0 หลัง rework (ไม่มี test ค้างตกแล้ว)"
+          "status": "verified",
+          "evidence": "planning/check-094-wave2-gate-001.md (FAIL F1/F2) · -002 (F1 ผ่าน, F2 ตก) · -003 (rework 2/2 FAIL) · check-094-wave2-gate-004.md (rework 3 ตามมติ051: PASS)",
+          "note": "2026-11-02 verified หลัง rework 3 (มติ051 ทาง A) · slice S1 พิสูจน์บน stub (memory/file store) — การต่อ DB จริงรอ DBA-003/G-CORE", "oracle": "oracle pack BE-002 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-008/022/023/052/053 + Amendment002 + invariant 1–6 ของ project-commit-proposal-001 (มติ051)", "ref": "target school-bot uncommitted — sha256 ที่ reports/school-bot/normal-094/check-wave2-r3-gate/source-sha256.txt"
         }
       ]
     },

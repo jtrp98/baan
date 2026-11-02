@@ -63,3 +63,11 @@ BL-002..004 คงประวัติ/เจ้าของ/security triage �
 - 2026-10-28 — เพิ่ม BL-005
 - 2026-10-28 — BL-005 ข้อ (1) เสร็จ: [Amendment005](test-plan/tp-001-amendment-005.md) เพิ่ม TP001-082 ครอบ AC-036-06 (82 cases / 187 AC, actual NOT_RUN) · ข้อ (2) sweep เอกสาร gateway ยังค้าง
 - 2026-10-28 — BL-005 ข้อ (2) เสร็จ — **BL-005 ปิด**: arch Codex T1 run oJUppA เสนอ amend 6 ไฟล์ บันทึกตรงตัวแล้ว: gateway-integration Rev5, gRPC contract Rev2, logout slice Rev1 (ใส่เลขครั้งแรก), negative boundary Rev2 (แยก directadapter ฝั่ง B จาก G entry), controller entry Rev2, design/index Rev6 (เขียนสถานะปัจจุบัน เอา pointer ชั่วคราวและ Change Log ออกตามกติกา index) · sweep หลังแก้: hit ที่เหลือเป็นประวัติ/amendment หรืออ้าง Gateway Rev3 ในฐานะมติ transport ที่ยังถูก
+
+### BL-006 — ข้อเสนอจาก check BE-002 rework 3 (นอก oracle ของ slice S1)
+
+- วันที่: 2026-11-02 · ที่มา: [check-094-wave2-gate-004](planning/check-094-wave2-gate-004.md) (check run yneac0) · ผู้บันทึก: นายช่าง
+- รายละเอียด: (1) `FileSchoolBotBackingStore` ไม่อ่านรูปแบบสองไฟล์เดิม (`projects.json`/`project_revisions.json`) — ปัจจุบันไม่มีข้อมูลเดิมตาม[มติ051](requirement/decisions-051.md) แต่ต้องกำหนดก่อนเปิดใช้ File store ที่ใด (2) Project/Revision โหลดจาก snapshot สองครั้ง — หลาย instance อาจได้คนละรุ่น (กลุ่ม lost-update หลาย instance เดิม) (3) ไม่มี flush ลง disk ก่อน replace — kill/ไฟดับยังไม่พิสูจน์ (4) ETag อิง ticks ของ UpdateDate — สอง update ใน tick เดียวได้ ETag ซ้ำ (5) เคส extra เดิมยังตก: TwoInstancesDoNotLoseAcknowledgedLicense · SessionProfileCannotAuthorizeAnotherProfile (6) memory store ส่วน License/Session ยังใช้ `Clear()` แล้วเติมทีละรายการ
+- ขอบเขต: ไม่เปิด task ใหม่ · ข้อ 2/3/5 เป็นเงื่อนไขก่อนต่อ DB จริง/production (DBA-003/G-CORE) · ข้อ 4 ส่ง arch พิจารณาตอนแก้สัญญา ETag ครั้งถัดไป
+
+- 2026-11-02 — เพิ่ม BL-006

@@ -48,7 +48,7 @@ Status: `pending` · `done-local` (โค้ด+test ผ่านในเคร
 | [DBA-001](DBA-001.md) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
 | [DBA-002](DBA-002.md) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | **verified** (ใบงาน094 — [check PASS](../planning/check-094-DBA-002-004-001.md) static · รัน SQL/catalog C0–C5 = คน → DBA-003) |
 | [DBA-003](DBA-003.md) | Core evidence | dba | P1 | DBA-002 | pending |
-| [BE-002](BE-002.md) | DB integration | be | P1 | DBA-002 (stub DB; ต่อ DB จริงหลัง DBA-003) | pending |
+| [BE-002](BE-002.md) | DB integration | be | P1 | DBA-002 (stub DB; ต่อ DB จริงหลัง DBA-003) | **verified** (ใบงาน094 rework 3 ตาม[มติ051](../requirement/decisions-051.md) — [check PASS](../planning/check-094-wave2-gate-004.md) บน stub · ต่อ DB จริง = DBA-003/G-CORE) |
 | [BA-001](BA-001.md) | Guest policy | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
 | [BA-002](BA-002.md) | Learning criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
 | [BA-003](BA-003.md) | Robot criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
