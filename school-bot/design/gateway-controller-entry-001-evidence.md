@@ -31,3 +31,5 @@
 รหัสอ้างอิงที่ปรากฏในบันทึกเดิม: BL-005.
 
 ที่มาคำชี้แจง entry อ้าง [มติ 049 (เงื่อนไขความปลอดภัยของ logout)](../requirement/decisions-049.md) และ [มติ 050 (ใช้ controller convention ของ Gateway)](../requirement/decisions-050.md).
+
+ผลตรวจ local ภายหลังอ้าง JPO092 (memory: planning/jpo-092-logout-r4-001.md) ไม่ใช่ production/H5 acceptance.

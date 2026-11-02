@@ -18,8 +18,6 @@
 
 Source root: C:/src/schoolbright/target/school-bot-v2; ชื่อ .cpp ที่ย่ออยู่ engines/zide/src/; อ่านตาม allowlist
 
-## เป้าเอกสารและข้อแตกต่าง
-
 ## Official evidence ตรวจ 2026-10-21
 
 - Go 1.25 ต้อง macOS 12+ ตาม [release notes](https://go.dev/doc/go1.25#darwin); [Go minimum requirements](https://go.dev/wiki/MinimumRequirements) ระบุ Go 1.21+ ต้อง Windows 10+ ทั้งสองเป็น floor ของ Go ไม่ลด deployment target 15.0 ของโครงการ

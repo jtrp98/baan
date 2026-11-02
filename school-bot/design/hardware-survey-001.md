@@ -16,8 +16,6 @@
 
 ชื่อ zide/VID/PID/commands ไม่ยืนยันยี่ห้อ รุ่นหุ่น board revision firmware หรือ servo จึงยังเสนอรุ่นสินค้าหรือรับรองรุ่นไม่ได้
 
-## เทียบเอกสารเดิม
-
 ## ข้อเสนอ SA: matrix สำรวจจริง
 
 หนึ่งแถวต่อรุ่น+board+firmware+transport+OS build/arch ไม่รวมผลข้าม tuple ตารางนี้เป็นแบบเก็บข้อมูล

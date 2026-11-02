@@ -8,8 +8,6 @@
 
 ต่อจาก [DES-006](des-006.md); GAP-08/AC-024-01. สถานะอยู่ที่ [index](index.md)
 
-## ขอบเขต payload
-
 ## Stop และ drain
 
 ### Idle discovery — AC-024-01
