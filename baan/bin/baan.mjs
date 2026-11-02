@@ -118,7 +118,7 @@ async function main() {
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;
   if (!opts.explicit.has("timeoutSec")) opts.timeoutSec = ws.defaults.timeout_sec;
   opts.maxParallel = opts.maxParallel || ws.defaults.max_parallel;
-  // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง Change Log ด้วยวันที่รันจริง
+  // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง changelog ด้วยวันที่รันจริง
   opts.date = opts.date || localDate();
   if (!Number.isInteger(opts.maxParallel) || opts.maxParallel < 1 || opts.maxParallel > 64) { console.error(`--max-parallel ต้องเป็นจำนวนเต็ม 1–64 (ได้: ${opts.maxParallel})`); process.exit(2); }
 

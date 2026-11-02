@@ -46,16 +46,8 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 
 - Never touch `requirement\`/`design\`/`check\`/code — read-only there.
 - Never write the Status column yourself (except new rows = `pending`) · never decide for the business — open an OQ to spec/user.
-- Existing files = amend + Change Log · IDs never renumbered.
+- Existing files = edit to today's truth + one line in the module changelog (CONVENTIONS §3) · IDs never renumbered.
 
 ## Handoff
 
 Project status (passed/blocked/pending + reasons) · tasks ready to run next (dependency order) · everything waiting on a human (from Waiting on Human) · backlog additions — then stop, with exactly **one output state**: `DONE` or `NEEDS_HUMAN`.
-
-## Change Log
-
-- 2026-10-29 — Open later-wave tasks whose inputs are checked (pipelining) · contract tests before consumers open · the release runbook carries the project-closing check · lint now also flags missing `ref`, work on unchecked `high` tasks, waves over 6.
-- 2026-10-29 — Assign `risk`/`wave` per task, keep the oracle pack in each task file, and record `oracle`/`ref` on verified work (charter rule 13).
-- 2026-10-28 — Record slice-level progress (`slices` with exact `ac_ids`) in the plan JSON; the task status follows its slices.
-- 2026-10-26 — Gates attach only to the task connecting the real thing; keep a gate-free implementation task; lint JSON plans; add `done-local` to Status.
-- 2026-10-23 — Assign the release runbook (SQL/rollback + deploy order + human-run steps, assembled into one document) to gm.

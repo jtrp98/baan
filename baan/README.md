@@ -179,7 +179,7 @@ baan-role --all --role jpo --tier t1 --task "รีวิวความปล�
 - **check แยกจาก dev** — dev ไม่เขียน unit test โค้ดตัวเอง (เข้าข้างตัวเอง) check เขียนจาก AC + test plan และห้ามแก้โค้ด production เพื่อให้ test ผ่าน
 - **Artifact ต้องเซ็นก่อนใช้** — int draft ของ `int` ใช้ implement ไม่ได้จนกว่าผู้ใช้เซ็น; sign-off เป็นการกระทำของคนเสมอ
 - **vault ห้ามรัน SQL ทุกกรณี** — เขียน script พร้อม rollback plan ให้คนรันเท่านั้น
-- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และทุกเอกสารเดินแนว append-only + change log — ยกเว้น index ที่เป็นสถานะปัจจุบัน (เขียนทับ ไม่มี Change Log/Precedence) · ไม่ทำ snapshot/archive เพราะ knowledge อยู่ใน git · ผลดิบของ role อยู่ที่ `reports/` ไม่คัดลอกเข้า knowledge
+- ทุก role ระบุ "ขอบเขตที่ต้องส่งต่อ" ชัดเจน และเอกสาร knowledge ทุกไฟล์เป็นความจริงวันนี้ เขียนให้ dev ที่ไม่เคยรัน BAAN อ่านรู้เรื่อง (แก้ทับ ไม่ต่อท้ายด้วย Override/Precedence) · ประวัติอยู่ที่ `changelog/YYYY-MM.md` ของ module ไม่ใช่ Change Log ท้ายไฟล์ · ไม่ทำ snapshot/archive เพราะ knowledge อยู่ใน git · ผลดิบของ role อยู่ที่ `reports/` ไม่คัดลอกเข้า knowledge
 - **เพิ่ม/ลดตำแหน่งได้อิสระ** — แค่เพิ่ม/ลบไฟล์ `.md` ใน `roles/` ระบบหาอัตโนมัติ (ดูรายชื่อด้วย `--list`)
 
 ตัวอย่าง flow งานเต็มรูปแบบ: `plan` วางแผน → `gm` เรียกทีมตามแผน → `spec` เขียน REQ/AC → `int` ร่าง UX รอผู้ใช้เซ็น → `arch` ออกแบบ DES/สัญญา → `vault` รีวิม schema + เขียน SQL (คนรัน) → `front`/`sys` implement ตาม signed artifact → `inspect` วางแผนทดสอบ → `check` เขียน unit test อิสระ + รายงานรอบ → `jpo` รีวิวก่อนขึ้น production

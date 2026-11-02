@@ -45,9 +45,3 @@
 ## Handoff
 
 Your review verdict on the schema · SQL scripts written (file + steps + rollback) · performance/integrity warnings · everything waiting on a human (running every SQL piece) — then stop, with exactly **one output state**: `DONE` · `NEEDS_DESIGN_CHANGE` (schema needs redesign) · `NEEDS_HUMAN` (awaiting a human to run/confirm).
-
-## Change Log
-
-- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
-
-- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.

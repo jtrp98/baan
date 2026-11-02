@@ -8,7 +8,7 @@ Read the index of the category you're pointed to first (`requirement\index.md`, 
 
 **An index is current state only**: when something changes, overwrite the cell/sentence in place so the index states today's truth — no `## Change Log` in index files, and no "Precedence/Amendment" paragraphs stacked above older text to override it (a reader must never have to work out which paragraph wins). The history of an index is `git log`.
 
-**A knowledge index is written for people who never ran BAAN**: full sentences (what is done, what waits on whom, which risks are open) — no run shorthand such as `Localoverlay63pass26fail1skip`. Run detail (queue, per-slice PASS/FAIL, rework rounds) belongs in the memory `status.md`.
+**A knowledge index follows §3 like every knowledge file**: what is done, what waits on whom, which risks are open — no run shorthand such as `Localoverlay63pass26fail1skip`. Run detail (queue, per-slice PASS/FAIL, rework rounds) belongs in the memory `status.md`.
 
 **Two stores, same module folders**: *knowledge* holds what other people need to know or decide from today (requirements/decisions, design/contracts/DBML/SQL, signed uxui, test plans, open questions, backlog, security findings, `plan\index.md`); *memory* (the workspace's `memory_root`, when configured) holds what the AI team needs to continue and the evidence that work was done or checked (task sheets, gm's per-task cards, queues, plan JSON, check rounds, evidence/validation files, `status.md`). Test before writing any file: does someone who doesn't run BAAN need it? No = memory. Knowledge cites memory as **text, not links** (`check-092 PASS 2026-10-29 (memory)`) because people who clone knowledge don't have memory. No `memory_root` configured = everything stays in knowledge as before.
 
@@ -18,9 +18,23 @@ When a named data model/index splits a contract across linked dictionaries or ap
 
 Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
 
-## 3. Amend, don't regenerate
+## 3. Knowledge files: today's truth, written for a developer
 
-An existing file = edit only the changed spots (`Edit`), never `Write` over the whole file · add a dated `## Change Log` line every time (except index files — §1) · **never copy a file into `archive\`, `archive.md` or a "before-xxx" snapshot before editing** — knowledge is a git repository, so the previous version is a commit; cite it when a reader needs it (snapshot only when the knowledge root has no git repository) · append-only files (backlog, security findings) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
+The reader of every knowledge file is **a developer on the team who never ran BAAN**. They must understand a file in one read, without opening other files to decode it.
+
+**Writing**
+- Lead with what the thing is and what is decided now; details after. Full sentences.
+- Every ID carries its meaning the first time it appears in a file — `มติ 051 (บันทึก Project + Revision เป็นหน่วยเดียว)`, never a bare `[051]` or `ตาม 046`; link it when the target is in knowledge.
+- Explain each abbreviation at first use. No single-letter names (`G`, `B`) and no BAAN run vocabulary (wave, slice, rework round, oracle, `F2`/`S1`, check-round ids) — run detail belongs in memory.
+- No process notes the reader doesn't need (why numbering starts at 009, "this is not an approval" disclaimers) unless they change what the reader may rely on.
+- Evidence (`path:line`, run folders, memory citations) goes in a closing `## หลักฐาน` section, not inside the sentences; unconfirmed claims are handled per §5.
+
+**Changing**
+- An edit leaves the whole file stating today's truth: rewrite or delete superseded text where it stands. **Never append "Override RevN", "Amendment" or "Precedence" sections** — a reader must never work out which paragraph wins. `Edit` the parts that change; rewrite a whole file only when the task is to restructure it, and then drop nothing silently.
+- One header line under the title, overwritten on every change: `> Rev 12 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 051 — บันทึก Project + Revision เป็นหน่วยเดียว)`. Bump the Rev when the contract's meaning changes (check pins revisions), not for wording fixes; index files carry no Rev.
+- **History lives in the module's `changelog\YYYY-MM.md`** (one file per month, append-only), one line per change: `YYYY-MM-DD · <file> · Rev N · แก้โดย <role> · ขอโดย <who> · <what changed, one sentence>`. Knowledge files get **no `## Change Log` section**; an old one stays until the file is restructured, but never gets new lines. Read the changelog only when the task is about history. Memory files keep no change log at all — git holds their history.
+- **Decisions**: each keeps its own record `requirement\decisions-NNN.md`; `requirement\decisions.md` lists the decisions in force today, grouped by topic, one line each (meaning + link). A replaced decision = update its line there and state in the old record which decision replaced it.
+- **Never copy a file into `archive\`, `archive.md` or a "before-xxx" snapshot before editing** — the previous version is a git commit; cite it when a reader needs it (snapshot only when the knowledge root has no git repository) · append-only files (backlog, security findings, changelog) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
 
 ## 4. Dates come from the user
 
@@ -28,7 +42,7 @@ If the prompt has a **"วันที่ของงาน" (date of work)** he
 
 ## 5. Facts and assumptions stay separated
 
-A number/fact with no source gets tagged `(สมมติฐาน — ยังไม่ยืนยัน)` until a human confirms · **the real thing beats memory** — if your recollection contradicts a file/the actual code, the file wins, and always verify the as-built code before citing it.
+A number/fact with no source gets tagged `(สมมติฐาน — ยังไม่ยืนยัน)` until a human confirms — in knowledge, also list it with what would confirm it under a closing `## ยังไม่ยืนยัน` section · **the real thing beats memory** — if your recollection contradicts a file/the actual code, the file wins, and always verify the as-built code before citing it.
 
 ## 6. Git boundaries and knowledge commits
 
@@ -67,26 +81,9 @@ Plan Status values: `pending` · `done-local` (code done and its automated tests
 
 ## 11. Language
 
-**Every answer and every document you produce is in Thai.** Technical terms, code, commands, and IDs stay in English — unless the target project's own convention says otherwise.
+**Every answer and every document you produce is in Thai.** Technical terms, code, commands, and IDs stay in English — use the English term whenever a Thai rendering would be less clear to a developer; never force a translation · unless the target project's own convention says otherwise.
 
 ## 12. Readable data documentation
 
 When data/schema documentation is in scope, a list of table names, field names/types, or shorthand alone is not a complete handoff. `arch` owns the readable canonical model: table purpose/row meaning, field meaning and rules, nested JSON/enums, and legacy table/field mappings with evidence. `vault` reconciles physical SQL and supplies deltas; `inspect`/`check` verify the scoped contract. Split large documents with exact linked paths and keep unknowns explicit. Clarifying wording does not itself require schema approval, new ACs, or database execution.
 Relational data-model work also includes a full, readable DBML artifact kept in sync by `arch`; add a focused legacy integration view when needed. `vault` reviews SQL parity, and `inspect`/`check` verify scoped coverage, parser evidence and physical/logical relationship distinctions. Link the artifacts and guide from the model/index. Diagram annotations and colors do not change schema approval or authorize database execution.
-
-
-## Change Log
-
-- 2026-11-02 — Split memory (task sheets, cards, queues, plan JSON, check rounds, evidence, run status) from knowledge (contracts + human-readable state) via `memory_root`; knowledge cites memory as text; knowledge indexes are written for people.
-
-- 2026-10-28 — Rework cap reached = ask the human immediately (no end-of-round parking); finish line frozen per task; slice-level statuses with exact AC coverage.
-
-- 2026-10-26 — Indexes are current state only (no Change Log, no Precedence layers); no archive/snapshot copies (git holds history); raw run output stays in `reports\`.
-
-- 2026-10-26 — Gates block only work that needs their answer (stub/fake work proceeds); add the `done-local` plan status.
-
-- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
-
-- 2026-10-23 — Permit configured knowledge commits and require the controller to commit after its final document writes.
-
-- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.
