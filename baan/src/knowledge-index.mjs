@@ -179,12 +179,12 @@ function walkMarkdown(dir, out = []) {
 export function brokenLinks(file, text = readText(file)) {
   const body = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
   const bad = [];
-  for (const m of body.matchAll(/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) {
-    const target = m[1].split("#")[0];
-    if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
+  for (const m of body.matchAll(/\]\((<[^>\r\n]+>|[^)\s]+)(?:\s+"[^"]*")?\)/g)) {
+    const target = m[1].replace(/^<|>$/g, "").split("#")[0];
+    if (!target || (/^[a-z][a-z0-9+.-]*:/i.test(target) && !/^[a-z]:[\\/]/i.test(target))) continue;
     let p;
     try { p = decodeURIComponent(target); } catch { p = target; }
-    if (!existsSync(path.resolve(path.dirname(file), p))) bad.push(m[1]);
+    if (!existsSync(path.resolve(path.dirname(file), p.replace(/:\d+(?::\d+)?$/, "")))) bad.push(m[1]);
   }
   return bad;
 }

@@ -33,6 +33,16 @@ function fixture() {
   return root;
 }
 
+test("brokenLinks: ลิงก์ไฟล์ในวงเล็บแหลม มีช่องว่างและเลขบรรทัด ตรวจไฟล์จริงได้", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-links-"));
+  try {
+    write(root, "source file.md", "# source\n");
+    const file = path.join(root, "index.md");
+    const source = path.join(root, "source file.md").replaceAll("\\", "/");
+    assert.deepEqual(brokenLinks(file, `[a](<${source}:12>) [b](<source file.md:12:3>) [c](<missing file.md:9>) [d](https://example.com:443/a)`), ["<missing file.md:9>"]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test("readFrontMatter: key: value และ [a, b] เป็นรายการ · ไม่มีหัวไฟล์ = {}", () => {
   assert.deepEqual(readFrontMatter("---\nstatus: draft\ndepends_on: [a, b/c]\nempty: []\n---\n# x"), { status: "draft", depends_on: ["a", "b/c"], empty: [] });
   assert.deepEqual(readFrontMatter("# ไม่มีหัวไฟล์"), {});
