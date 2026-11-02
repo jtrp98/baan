@@ -44,11 +44,3 @@ You own **structural planning** — turning a goal/requirement into a plan the t
 ## Handoff
 
 The plan: task list (ID · owner · phase · Depends · effort · risk · wave) · sequencing notes (parallel points / blocks waiting on human gates) · assumptions · risks — then stop, with exactly **one output state**: `DONE` or `NEEDS_REQUIREMENT_CHANGE`.
-
-## Change Log
-
-- 2026-10-29 — Propose a verification risk (`high`/`low`) and a wave per task (charter rule 13).
-- 2026-10-26 — Sweep by script (`baan --sweep`): no search/replace tasks; owner follow-ups only for meaning changes, one per owner.
-- 2026-10-26 — Require a gate-free walking-skeleton implementation task in the first wave and time-box document tasks to the current slice.
-- 2026-10-24 — Require related-artifact sweep tasks when a change touches something other documents reference.
-- 2026-10-23 — Require same-repository implement tasks to serialize unless write paths are provably disjoint.

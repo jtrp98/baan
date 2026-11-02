@@ -1,11 +1,11 @@
 // Regression: config ของ workspace อยู่นอก package (กัน update version ทับ config)
-// แผนปัจจุบัน: <ราก workspace>\baan.config.json · แผนเก่า mycelium\mycelium.json ยังรองรับ
+// อยู่ที่ <ราก workspace>\baan.config.json
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { REPORTS_DIR, findWorkspaceConfig, loadWorkspace, reportsDirOf, resolveWorkspaceConfig, workspaceRootOf } from "../src/config.mjs";
+import { REPORTS_DIR, findWorkspaceConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveWorkspaceConfig, workspaceRootOf } from "../src/config.mjs";
 
 const realConfig = { main_root: "C:/src", knowledge_roots: [{ name: "k", path: "C:/k", targets: [] }], defaults: { agent: "codex" } };
 
@@ -29,24 +29,6 @@ test("ตัวใกล้สุดชนะ (workspace ซ้อนกัน�
     writeFileSync(path.join(nested, "baan.config.json"), JSON.stringify(realConfig), "utf8");
     assert.equal(findWorkspaceConfig(path.join(nested, "repo")), path.join(nested, "baan.config.json"));
     assert.equal(findWorkspaceConfig(root), path.join(root, "baan.config.json"));
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test("แผนเก่า mycelium\\mycelium.json ยังถูกพบ และชื่อใหม่กว่าชนะเสมอ", () => {
-  const root = mkdtempSync(path.join(tmpdir(), "baan-test-"));
-  try {
-    const legacyDir = path.join(root, "mycelium");
-    mkdirSync(legacyDir);
-    writeFileSync(path.join(legacyDir, "mycelium.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(legacyDir, "mycelium.json"));
-
-    // ชื่อเก่าแบบแยกไฟล์ (mycelium.config.json) ชนะแผนเก่าสุด
-    writeFileSync(path.join(root, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(root, "mycelium.config.json"));
-
-    // ชื่อปัจจุบัน (baan.config.json) ชนะทุกชื่อเก่า
-    writeFileSync(path.join(root, "baan.config.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(root, "baan.config.json"));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -118,4 +100,41 @@ test("run dir อยู่ใต้ราก workspace (reports/baan) ที่ 
     assert.ok(!path.relative(root, dir).startsWith(".."), "ต้องอยู่ในขอบเขต workspace");
   } finally { rmSync(root, { recursive: true, force: true }); }
   assert.equal(reportsDirOf(""), REPORTS_DIR);
+});
+
+// memory_root แยกความจำของทีม (ใบงาน/ผลตรวจ/หลักฐาน) ออกจาก knowledge ที่คนอื่นใช้ร่วม — ไม่ตั้ง = แบบเดิม
+test("memoryRootOf: ไม่ตั้ง/ไม่ใช่ข้อความ = ว่าง (พฤติกรรมเดิม) · ตั้งแล้วคืน path", () => {
+  assert.equal(memoryRootOf({ name: "k", path: "C:/k" }), "");
+  assert.equal(memoryRootOf({ name: "k", path: "C:/k", memory_root: 42 }), "");
+  assert.equal(memoryRootOf({ name: "k", path: "C:/k", memory_root: " C:/ws/memory " }), "C:/ws/memory");
+  assert.equal(memoryRootOf(undefined), "");
+});
+
+test("memoryRootIssues: เตือนเมื่อไม่มีจริง/ไม่ใช่ git/อยู่ใน knowledge/อยู่นอก workspace", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-test-"));
+  try {
+    const knowledge = path.join(root, "knowledge");
+    const memory = path.join(root, "memory");
+    mkdirSync(knowledge, { recursive: true });
+    const kr = { name: "k", path: knowledge, memory_root: memory };
+
+    assert.deepEqual(memoryRootIssues({ name: "k", path: knowledge }, root), [], "ไม่ตั้ง = ไม่มีอะไรให้เตือน");
+    assert.match(memoryRootIssues(kr, root).join(), /ไม่มีจริง/);
+
+    mkdirSync(memory);
+    assert.match(memoryRootIssues(kr, root).join(), /ไม่ใช่ git repo/);
+
+    mkdirSync(path.join(memory, ".git"));
+    assert.deepEqual(memoryRootIssues(kr, root), [], "อยู่ใต้ workspace + เป็น git repo + แยกจาก knowledge = ใช้ได้");
+
+    const nested = path.join(knowledge, "_memory");
+    mkdirSync(path.join(nested, ".git"), { recursive: true });
+    assert.match(memoryRootIssues({ ...kr, memory_root: nested }, root).join(), /ภายใน knowledge root/);
+
+    const other = mkdtempSync(path.join(tmpdir(), "baan-outside-"));
+    try {
+      mkdirSync(path.join(other, ".git"));
+      assert.match(memoryRootIssues({ ...kr, memory_root: other }, root).join(), /นอกราก workspace/);
+    } finally { rmSync(other, { recursive: true, force: true }); }
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

@@ -46,29 +46,6 @@ test("init ซ้ำ: config ที่ผู้ใช้แก้เองไม
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test("init ย้าย config แผนเก่า mycelium\\mycelium.json มาเป็น baan.config.json ให้เอง", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "baan-init-"));
-  try {
-    const legacyDir = path.join(dir, "mycelium");
-    mkdirSync(legacyDir);
-    writeFileSync(path.join(legacyDir, "mycelium.json"), '{ "main_root": "config เก่าของ workspace" }', "utf8");
-    const res = performInit(dir, TEAM_DIR, () => {});
-    assert.equal(res.config, "migrated");
-    assert.equal(readFileSync(path.join(dir, "baan.config.json"), "utf8"), '{ "main_root": "config เก่าของ workspace" }');
-    assert.equal(existsSync(legacyDir), false, "ไฟล์เก่าและโฟลเดอร์ว่างถูกเก็บออก");
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("init ย้าย config ชื่อเก่า mycelium.config.json มาเป็น baan.config.json ให้เอง", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "baan-init-"));
-  try {
-    writeFileSync(path.join(dir, "mycelium.config.json"), '{ "main_root": "config ชื่อเก่า" }', "utf8");
-    const res = performInit(dir, TEAM_DIR, () => {});
-    assert.equal(res.config, "migrated");
-    assert.equal(readFileSync(path.join(dir, "baan.config.json"), "utf8"), '{ "main_root": "config ชื่อเก่า" }');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
 test("init ห้ามทับ CLAUDE.md ของผู้ใช้เอง — ข้ามพร้อมเตือน", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "baan-init-"));
   try {

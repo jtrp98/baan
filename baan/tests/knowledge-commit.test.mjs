@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { classifyChange, commitKnowledgeRoot, parsePorcelain, planCommits } from "../src/knowledge-commit.mjs";
+import { classifyChange, commitKnowledge, commitKnowledgeRoot, parsePorcelain, planCommits } from "../src/knowledge-commit.mjs";
 
 test("parsePorcelain: แกะรูปแบบ -z ครบ และ rename กิน path เดิมหนึ่งช่อง", () => {
   const raw = ["?? school-bot/a.md", "M  school-bot/b.md", "R  school-bot/new.md", "school-bot/old.md", " D school-bot/c.md"].join("\0") + "\0";
@@ -179,4 +179,30 @@ test("commitKnowledgeRoot: ไม่มีการเปลี่ยนแป�
     assert.deepEqual(res.commits, []);
     assert.equal(git(["rev-list", "--count", "HEAD"]).status, 128, "ยังไม่มี commit แรกใน repo เลย");
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledge: ตั้ง memory_root = commit ทั้ง knowledge และ memory แยก repo · ไม่ตั้ง = knowledge อย่างเดียวแบบเดิม", () => {
+  const k = makeRepo();
+  const m = makeRepo();
+  try {
+    mkdirSync(path.join(k.dir, "school-bot"), { recursive: true });
+    writeFileSync(path.join(k.dir, "school-bot", "req-001.md"), "# req\n", "utf8");
+    mkdirSync(path.join(m.dir, "school-bot", "tasks"), { recursive: true });
+    writeFileSync(path.join(m.dir, "school-bot", "tasks", "task-001.md"), "# task\n", "utf8");
+
+    const logs = [];
+    const commits = commitKnowledge({ knowledge_roots: [{ name: "kr", path: k.dir, memory_root: m.dir }] }, (s) => logs.push(s));
+    assert.deepEqual(commits, ["school-bot: add req-001.md", "school-bot: add task-001.md"]);
+    assert.equal(k.git(["log", "--format=%s"]).stdout.trim(), "school-bot: add req-001.md");
+    assert.equal(m.git(["log", "--format=%s"]).stdout.trim(), "school-bot: add task-001.md");
+    assert.ok(logs.some((s) => s.startsWith("kr-memory: ")), "log ต้องบอกได้ว่า commit ลง memory");
+
+    writeFileSync(path.join(k.dir, "school-bot", "req-002.md"), "# req2\n", "utf8");
+    writeFileSync(path.join(m.dir, "school-bot", "tasks", "task-002.md"), "# task2\n", "utf8");
+    assert.deepEqual(commitKnowledge({ knowledge_roots: [{ name: "kr", path: k.dir }] }), ["school-bot: add req-002.md"]);
+    assert.notEqual(m.git(["status", "--porcelain"]).stdout.trim(), "", "ไม่ตั้ง memory_root = ไม่แตะ repo อื่น");
+  } finally {
+    rmSync(k.dir, { recursive: true, force: true });
+    rmSync(m.dir, { recursive: true, force: true });
+  }
 });

@@ -21,8 +21,8 @@ export const OWNER_BY_CATEGORY = {
 const OWNER_BY_ROOT_FILE = { "backlog.md": "gm", "security.md": "jpo" };
 const CONTROLLER = "นายช่าง";
 
-// archive/ เป็นประวัติ — แก้ย้อนหลังไม่ได้ จึงไม่ใช่ผู้อ้างอิงที่ต้องตามแก้ ส่วนที่เหลือเป็นของ build/เครื่องมือ
-const SKIP_DIRS = new Set([".git", "node_modules", "archive", "bin", "obj", "dist", "build", "reports", ".vs", ".idea"]);
+// archive/ และ changelog/ เป็นประวัติ — แก้ย้อนหลังไม่ได้ จึงไม่ใช่ผู้อ้างอิงที่ต้องตามแก้ ส่วนที่เหลือเป็นของ build/เครื่องมือ
+const SKIP_DIRS = new Set([".git", "node_modules", "archive", "changelog", "bin", "obj", "dist", "build", "reports", ".vs", ".idea"]);
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 
 export function ownerOf(relPath, kind) {
@@ -81,12 +81,12 @@ export function sweep(roots, terms) {
 export function formatSweep(hits, terms) {
   const out = [`related-impact sweep: ${terms.map((t) => JSON.stringify(t)).join(", ")}`];
   if (!hits.length) {
-    out.push("ไม่มีผู้อ้างอิง — บันทึกในใบงานว่าตรวจแล้วไม่มี (ข้าม archive/)");
+    out.push("ไม่มีผู้อ้างอิง — บันทึกในใบงานว่าตรวจแล้วไม่มี (ข้าม archive/ และ changelog/)");
     return out.join("\n");
   }
   const byOwner = new Map();
   for (const h of hits) byOwner.set(h.owner, [...(byOwner.get(h.owner) ?? []), h]);
-  out.push(`พบ ${hits.length} ไฟล์ · ${hits.reduce((n, h) => n + h.lines.length, 0)} บรรทัด (ข้าม archive/)`, "", "| เจ้าของ | ไฟล์ | บรรทัด |", "|---|---|---|");
+  out.push(`พบ ${hits.length} ไฟล์ · ${hits.reduce((n, h) => n + h.lines.length, 0)} บรรทัด (ข้าม archive/ และ changelog/)`, "", "| เจ้าของ | ไฟล์ | บรรทัด |", "|---|---|---|");
   for (const h of hits) out.push(`| ${h.owner} | ${h.file.replaceAll("\\", "/")} | ${h.lines.join(", ")} |`);
   out.push("", `ต่อเจ้าของ: ${[...byOwner].map(([o, hs]) => `${o} ${hs.length} ไฟล์`).join(" · ")}`);
   return out.join("\n");

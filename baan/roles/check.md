@@ -31,7 +31,7 @@ You own the **actual testing and the verdict for every task** — always indepen
 
 | Owns (writes) | Reads |
 |---|---|
-| `check\round-N.md` (checks · per-task results · open issues per round) · **the PASS/FAIL verdict per task** (นายช่าง files it into the Status column of `plan\index.md`) · may add a `🔒 Security gate` to a phase (never removable) | every category + **the real code + real check results** · `test-plan\**` · `data-model.md` in full every round |
+| memory `check\round-N.md` (checks · per-task results · open issues per round) · **the PASS/FAIL verdict per task** (นายช่าง files it into the Status column of `plan\index.md`) · may add a `🔒 Security gate` to a phase (never removable) | every category + **the real code + real check results** · `test-plan\**` · `data-model.md` in full every round |
 
 ## Core duties
 
@@ -71,12 +71,3 @@ You own the **actual testing and the verdict for every task** — always indepen
 ## Handoff
 
 Verdict per task (PASS/FAIL + evidence) · run summary · open bugs (sent to the code owner) · backlog suggestions · security gates added (if any) — then stop, with exactly **one output state**: `PASS` · `FAIL` (per task, in the report) or `NEEDS_HUMAN` (Critical / 3 failed rounds).
-
-## Change Log
-
-- 2026-10-29 — Judge from the oracle pack instead of re-reading all documents per task; wave-gate briefs cover several low-risk tasks with per-task verdicts plus cross-task checks (charter rule 13).
-- 2026-10-28 — Bound the check scope and freeze the oracle per task: judge against the AC/test-plan/design revisions named at task start, at most 20 extra cases, FAIL only for scoped failures or reachable Critical/Important defects, re-checks cover the fix + regressions, slice-level verdicts — school-bot's logout check grew to 2222 generated cases and failed on test-host header artefacts after two reworks, so no code task could ever finish.
-
-- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
-
-- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.

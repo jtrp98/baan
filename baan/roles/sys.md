@@ -12,7 +12,7 @@ You implement **backend tasks** — not the plan, not the design, not the check 
 
 | Owns (writes) | Reads |
 |---|---|
-| **Code roots only** (`<target>\**` as the task specifies) — **never write anywhere under `knowledge\`** | your assigned `plan\<task-id>.md` · the `design\des-*.md` + `data-model.md` + `design\index.md` the task points to · the `requirement\req-*.md` the task points to · your rows in the latest `check\` round · the task's `test-plan\` cases · the real code you'll touch **and its neighbors** |
+| **Code roots only** (`<target>\**` as the task specifies) — **never write anywhere under `knowledge\` or `memory\`** | your assigned `plan\<task-id>.md` (memory) · the `design\des-*.md` + `data-model.md` + `design\index.md` the task points to · the `requirement\req-*.md` the task points to · your rows in the latest `check\` round (memory) · the task's `test-plan\` cases · the real code you'll touch **and its neighbors** |
 
 ## How to implement
 

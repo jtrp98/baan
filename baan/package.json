@@ -1,13 +1,11 @@
 {
   "name": "baan",
-  "version": "0.22.0",
-  "description": "🏗️ BAAN — นายช่างผู้คุมทีม AI 11 ตำแหน่งในไซต์งาน: แตกงาน เปิด session รายช่าง ผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์",
+  "version": "0.23.0",
+  "description": "เครื่องมือแบ่งงานพัฒนาซอฟต์แวร์ให้ทีม AI 11 ตำแหน่ง ผ่าน claude/codex/agy และหยุดถามคนในจุดที่ต้องให้คนตัดสิน",
   "type": "module",
   "bin": {
     "baan": "./bin/baan.mjs",
-    "baan-role": "./bin/baan-role.mjs",
-    "mycelium": "./bin/mycelium.mjs",
-    "mycelium-role": "./bin/mycelium-role.mjs"
+    "baan-role": "./bin/baan-role.mjs"
   },
   "files": [
     "bin/",

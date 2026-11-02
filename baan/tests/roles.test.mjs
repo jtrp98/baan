@@ -119,3 +119,27 @@ test("charter + CONVENTIONS: ติดเพดาน rework = ถามทั�
   assert.match(conv, /\*\*The finish line is frozen per task\*\*/);
   assert.match(conv, /records `slices` \(id \+ exact `ac_ids` \+ status\)/);
 });
+
+// Regression: knowledge ของ school-bot (2026-11-02) อ่านไม่รู้เรื่อง — กติกา "แก้เฉพาะจุด + Change Log ทุกครั้ง"
+// ทำให้เอกสารซ้อนเป็นชั้น "Override RevN" และ ID ไม่มีความหมาย · Change Log ในไฟล์ที่แนบ prompt เปลือง context ทุก role
+test("ไฟล์ที่แนบเข้า prompt (CONVENTIONS, charter, roles) ไม่มี Change Log — ประวัติอยู่ที่ RELEASE-NOTES/git", () => {
+  for (const f of ["CONVENTIONS.md", "BAAN.md", ...roles.map((r) => `roles/${r.name}.md`)]) {
+    assert.doesNotMatch(read(f), /^## Change Log/m, `${f} ยังมี ## Change Log`);
+  }
+});
+
+test("CONVENTIONS §3: knowledge เขียนให้ dev อ่าน · แก้ทับไม่ต่อ Override · changelog แยกไฟล์รายเดือน · สรุปมติที่ใช้อยู่", () => {
+  const conv = read("CONVENTIONS.md");
+  for (const must of [
+    "a developer on the team who never ran BAAN",
+    "Every ID carries its meaning the first time it appears",
+    'Never append "Override RevN"',
+    "`changelog\\YYYY-MM.md`",
+    "Knowledge files get **no `## Change Log` section**",
+    "`requirement\\decisions.md` lists the decisions in force today",
+    "closing `## หลักฐาน` section",
+  ]) assert.ok(conv.includes(must), `CONVENTIONS.md ขาด: ${must}`);
+  for (const f of ["roles/arch.md", "roles/spec.md", "roles/gm.md"]) {
+    assert.match(read(f), /module changelog \(CONVENTIONS §3\)|module changelog —/, `${f} ต้องชี้ไป changelog ตาม §3`);
+  }
+});

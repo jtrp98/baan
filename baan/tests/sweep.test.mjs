@@ -27,11 +27,12 @@ test("ownerOf: หมวดใต้ module → role เจ้าของ · �
   assert.equal(ownerOf("src/a.cs", "target"), "front/sys");
 });
 
-test("sweep (ไม่ใช่ git repo): เจอทุกบรรทัด ข้าม archive/ โฟลเดอร์ซ่อน และไฟล์ binary", () => {
+test("sweep (ไม่ใช่ git repo): เจอทุกบรรทัด ข้าม archive/ changelog/ โฟลเดอร์ซ่อน และไฟล์ binary", () => {
   const dir = tree({
     "mod/index.md": "สถานะ 15 verified\nอื่นๆ\nย้ำ 15 verified",
     "mod/requirement/req-001.md": "186 AC",
     "mod/design/archive/old.md": "15 verified",
+    "mod/changelog/2026-11.md": "2026-11-02 · index.md · แก้ 15 verified เป็น 16 verified",
     "mod/.cache/x.md": "15 verified",
     "mod/plan/blob.bin": Buffer.from([0, 1, 2, ...Buffer.from("15 verified")]),
     "mod/plan/index.md": "ไม่เกี่ยว",

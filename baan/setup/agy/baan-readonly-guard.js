@@ -33,7 +33,7 @@ process.stdin.on('end', () => {
   }
 });
 
-function isMyceliumReadonlySession(parsed) {
+function isBaanReadonlySession(parsed) {
   const transcriptPath = String(parsed.transcriptPath || '').replace(/\\/g, '/');
   if (!transcriptPath.includes('antigravity-cli')) {
     return false;
@@ -169,7 +169,7 @@ function checkReadonlyCommand(cmd, cwd) {
 }
 
 function handle(parsed) {
-  if (!isMyceliumReadonlySession(parsed)) {
+  if (!isBaanReadonlySession(parsed)) {
     console.log(JSON.stringify({ decision: 'allow' }));
     return;
   }

@@ -18,7 +18,7 @@ export function readConventions() {
 }
 
 // role รันแบบ non-interactive จึงถามวันที่จากผู้ใช้ตาม CONVENTIONS §4 ไม่ได้ —
-// ไม่ใส่วันที่ใน prompt = role ต้องหยุดด้วย NEEDS_HUMAN หรือเดาวันที่ลง Change Log เอง
+// ไม่ใส่วันที่ใน prompt = role ต้องหยุดด้วย NEEDS_HUMAN หรือเดาวันที่ลง changelog เอง
 // ค่าเริ่มต้นคือวันที่ตามนาฬิกาเครื่องแบบ local (ไม่ใช่ UTC — ช่วงเช้าในไทย UTC ยังเป็นเมื่อวาน)
 export function localDate(d = new Date()) {
   const pad = (n) => String(n).padStart(2, "0");
@@ -33,7 +33,7 @@ export function parseWorkDate(s) {
 }
 
 function dateSection(date) {
-  return `## วันที่ของงาน (date of work): ${date}\nUse this date for the Change Log and every dated entry (the controller already specified it per CONVENTIONS §4 — do not ask the user again).`;
+  return `## วันที่ของงาน (date of work): ${date}\nUse this date for the header line, the changelog and every dated entry (the controller already specified it per CONVENTIONS §4 — do not ask the user again).`;
 }
 
 // งานที่ไม่ผูก role (baan-role ไม่ส่ง --role) ก็ยังต้องมีป้าย — ไม่งั้น session ใน workspace จะสวมบท นายช่าง

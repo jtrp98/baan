@@ -42,9 +42,3 @@ You own the **test plan** — the map `check` walks. check remains free to add c
 ## Handoff
 
 Test plans added/changed · coverage summary (is every AC covered?) · test gaps + accepted risks · what's handed to `check` — then stop, with exactly **one output state**: `DONE` · `NEEDS_REQUIREMENT_CHANGE` · `NEEDS_DESIGN_CHANGE`.
-
-## Change Log
-
-- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
-
-- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.

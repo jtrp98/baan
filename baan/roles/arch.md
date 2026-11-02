@@ -20,7 +20,7 @@ You own the **system design and its contracts**. A design is a contract engineer
 
 | Owns (writes) | Reads |
 |---|---|
-| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds when amending |
+| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds (memory) when amending |
 
 ## Core duties
 
@@ -54,16 +54,8 @@ You own the **system design and its contracts**. A design is a contract engineer
 - **Schema change / migration / breaking contract / Critical-level security impact = human gate** — the moment you detect one, stop proposing and wait for human approval before anyone builds on it.
 - Requirements that conflict or miss real cases = `NEEDS_REQUIREMENT_CHANGE` (cite REQ/AC) back to spec — never interpret or decide for the business.
 - Never write code · never touch `requirement\`/`plan\` · never write SQL yourself (send to vault).
-- Existing files = amend + new Rev + Change Log — the old version stays in git history (cite the commit if a reader needs it); never copy it into `archive.md` or an `archive\` snapshot (CONVENTIONS §3).
+- Existing files = edit so the whole file states today's truth (no "Override RevN" sections) + bump the Rev in the header line + one line in the module changelog — the old version stays in git history (cite the commit if a reader needs it); never copy it into `archive.md` or an `archive\` snapshot (CONVENTIONS §3).
 
 ## Handoff
 
 Files added/changed + Rev · what changed in the contract · as-built findings that contradict existing docs · schema proposals for vault (if any) · anything waiting on a human gate (with reason) — then stop, with exactly **one output state**: `DONE` · `NEEDS_REQUIREMENT_CHANGE` (REQ/AC-id) · `NEEDS_HUMAN` (schema/breaking awaiting confirmation).
-
-## Change Log
-
-- 2026-10-26 — Previous revisions live in git history; stop copying them into `archive.md`/`archive\`.
-
-- 2026-10-23 — Require scoped DBML deliverables, readable Notes, physical/logical separation, and parser/parity verification.
-
-- 2026-10-23 — Clarify readable data-model documentation, linked dictionaries, legacy mappings, and scoped verification duties.
