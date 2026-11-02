@@ -1,0 +1,21 @@
+# สารบัญ Desktop, Project, License และ Release
+
+[กลับสารบัญ design](index.md) · สัญญาหลักและสถานะอยู่ในสารบัญหลัก ส่วนตารางนี้เป็นสัญญาย่อยและหลักฐานประกอบ
+
+| เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
+|---|---|---|---|
+| [project-api-001.md](project-api-001.md) | 2 | HTTP Project API, ETag, immutable revision และ CommitProjectAsync | PROPOSED — หน่วย commit ยืนยันตามมติผู้ใช้แล้ว |
+| [local-project-boundary-001.md](local-project-boundary-001.md) | 1 | Local revision/errors, OS locks, anchored filesystem, strict JSON และ migration receipt | คำชี้แจงสัญญา — ประโยค fuel ใน DES ยังรอ align กับ requirement |
+| [guest-workspace-001.md](guest-workspace-001.md) | 1 | พื้นที่ร่วม Guest ถังขยะและไฟล์ส่งออก | PROPOSED — นโยบายยืนยันแล้ว; เวลา/trash/export รอ proof |
+| [guest-import-001.md](guest-import-001.md) | 1 | Explicit Project import, receipt และ deduplication | PROPOSED — ใช้ schema เดิม |
+| [guest-history-001.md](guest-history-001.md) | 1 | Local history, provenance และตรวจผลใหม่ก่อนเข้า Cloud | PROPOSED — employee ไม่สร้างผลเรียน Cloud |
+| [robot-boundary-001.md](robot-boundary-001.md) | 1 | Robot payload และ idle/drain-stop | PROPOSED — poll 3000ms/debounce0 ยังเป็นสมมติฐาน |
+| [license-admin-security-001.md](license-admin-security-001.md) | 1 | License admin roles/errors และ replay/cleanup | PROPOSED — replay create-license 15 นาทีอนุมัติแล้ว |
+| [release-trust-001.md](release-trust-001.md) | 1 | Manifest signer/publisher pin และ registry | PROPOSED — รอ custody และตรวจ security ซ้ำ |
+| [update-disposition-001.md](update-disposition-001.md) | 1 | ทางเลือกขอบเขต check กับ PrepareUpdate/InstallPreparedUpdate | HISTORICAL — ผู้ใช้เลือก workflow explicit และตรวจรับ AC แล้ว |
+| [credential-matrix-001.md](credential-matrix-001.md) | 2 | Process/account/สิทธิ์ที่แต่ละงานต้องใช้ | DRAFT EVIDENCE PACK — actual grants/account names ยังไม่ยืนยัน |
+| [signing-custody-001.md](signing-custody-001.md) | 2 | ผู้ถือ/ที่เก็บ/sign/rotate/revoke/backup ของกุญแจ | DRAFT EVIDENCE PACK — รอเจ้าของเติม; ผู้ใช้พักคำถาม custody |
+| [hardware-survey-001.md](hardware-survey-001.md) | 1 | หลักฐานและแผนสำรวจอุปกรณ์/OS | EVIDENCE/PROPOSAL — รอ physical evidence และตรวจรับรุ่น |
+| [os-compatibility-001.md](os-compatibility-001.md) | 2 | หลักฐาน compatibility และข้อเสนอ OS เดิม | EVIDENCE — target ใช้มติ Windows11 ปัจจุบัน; runtime ยังรอ |
+| [windows10-compatibility-001.md](windows10-compatibility-001.md) | 1 | ผลสำรวจ Windows 10 ก่อนเปลี่ยน target | HISTORICAL — Windows10 ไม่อยู่ในเป้าหมายปัจจุบัน |
+| [source-review-001.md](source-review-001.md) | ไม่ระบุ | As-built Block/Arm/Code และเส้นทางบทเรียน/สร้างงาน | EVIDENCE — ไม่ใช่ test verdict/release proof |

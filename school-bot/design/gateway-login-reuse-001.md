@@ -1,50 +1,46 @@
-# Gateway Login reuse — Rev4
+# Gateway Login reuse — ใช้ authentication เดิมร่วมกับ SchoolBot
 
-> Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน receipt (memory: planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration.
+> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-สถานะอยู่ที่ [index](index.md). ขอบเขต: auth seam เท่านั้น; ไม่มี schema delta.
+สัญญานี้กำหนดให้ API Gateway รับผิดชอบ credential/challenge และ SchoolBot รับผิดชอบ session, directory และ authorization ใช้ Login HTTP เดิมของ Gateway แยกจาก client HTTP → Gateway → gRPC SchoolBot service ตาม [Gateway integration](gateway-integration-001.md) ไม่มี schema delta
 
-## ข้อเท็จจริงและแหล่งหลักฐาน
+## ใช้ Login ตามผู้ใช้และช่องทาง
 
-รับ source evidence ของ sys จาก response (memory: planning/gateway-login-response-001.json) และ review (memory: planning/gateway-login-review-001.md); ไม่อ้างตรวจ runtime. G/W หมายถึง target/sb-api-gateway และ target/sb-tech-upgrade-web-system. ผู้คุมยืนยัน Git (memory: planning/gateway-login-source-check-001.json): G HEAD 9a03c9428a47150aa960e61ca91eedad6d0196af status/diff ว่าง; W HEAD 7ae35eb4ed3123783afa04e70181eb3576503e45 status ว่าง.
-
-G AuthService.cs:177 ให้ temporaryToken AccessLevel0 เมื่อ device ยังไม่ verified; WebAuthController.cs:265 คืน200ได้ทั้ง token และ challenge. WebLoginService.cs:206,272 ใช้ identity keys ต่างกันระหว่าง WorkStatus กับ token จึงยังเทียบ AccountId/SId/NSystemId/sEmp ไม่ได้. Login มี side effects เช่น attempts/lock; ไม่ใช่ pure verifier. refresh ใน ServiceMobile/AuthController.cs เป็น comment ไม่ใช่ active route.
-
-## ข้อเสนอ reuse ตาม actor
-
-| Actor | ใช้ของเดิม | สิ่งที่ยังต้องพิสูจน์ |
+| ผู้ใช้ | เส้นทางเดิม | สิ่งที่ต้องพิสูจน์ |
 |---|---|---|
-| Desktop student | /api/auth/login เป็น candidate | IMEI/device lifecycle, full-auth และ student/AccountId mapping |
-| Desktop teacher | /api/auth/web/login เป็น candidate หลัก; ไม่ fallback mobile | first-password/2FA/contact continuation, account/profile mapping |
-| school_web | W login/BFF→G web login | private web-principal + C exchange +035 + active License |
-| staff_admin | G web login เมื่อพิสูจน์พนักงานได้ | C exchange + active SchoolBotStaffRole + admin BFF/bootstrap |
+| Desktop student | /api/auth/login เป็น candidate | IMEI (รหัสประจำเครื่องโทรศัพท์)/device lifecycle, full authentication และ student/AccountId mapping |
+| Desktop teacher | /api/auth/web/login พร้อม native continuation | first-password/2FA/contact และ account/profile mapping; ไม่ fallback mobile |
+| school_web | web-system Login/BFF → Gateway web login | private web-principal, token exchange, admin กลุ่มฝั่ง server และ License active |
+| staff_admin | Gateway web login เมื่อพิสูจน์พนักงานได้ | token exchange, active SchoolBotStaffRole และ admin BFF/bootstrap |
 
-## สัญญา adapter
+Two-Factor Authentication (2FA) และ contact continuation ต้องจบตาม flow เดิม คงข้อกำหนด [Desktop adapter](desktop-login-adapter-001.md) เรื่อง cType/pre-auth routing, effective bounds, decoder และ admission สำหรับ Desktop รายละเอียด payload อยู่ใน [Request และ bounds](desktop-login-adapter-requests.md)
 
-Gateway รับผิดชอบ credential/challenge ตาม DTO เดิม; B รับผิดชอบ SchoolBot session/directory/authorization. ห้ามสร้าง verifier ใหม่ คัดลอก password hash หรือเพิ่มบัญชี/mapping DB ชดเชย. Local IAuthService/IWebLoginService ไม่ใช่ remote RPC contract.
+## เงื่อนไขออก session
 
-ออก201 SchoolBot session ได้หลังตรวจ full authentication จาก upstream ที่เชื่อถือได้ พร้อม identity/tenant ที่พิสูจน์แล้วและเงื่อนไข DES-004/012 เท่านั้น. HTTP200, temporaryToken, AccessLevel0, forceResetPassword หรือ challenge ที่ยังไม่จบ ห้ามออกแม้ unbound session. ห้าม fake IMEI/แทนด้วย DeviceJkt และห้ามข้าม first-password/2FA/contact.
+SchoolBot ไม่สร้าง verifier ใหม่ ไม่คัดลอก password hash และไม่เพิ่มบัญชี/mapping DB ชดเชย Local IAuthService/IWebLoginService ไม่ใช่สัญญาเรียก procedure ระหว่าง process (Remote Procedure Call: RPC)
 
-Desktop /v2/auth/login เดิมยังไม่มี IMEI/continuation contract; ห้ามแอบเพิ่ม field/endpoint หรือรับ web token เป็น desktop sessionเอง. ส่วนที่ adapter ยังไม่พร้อมใช้503 AUTH_NOT_CONFIGURED; ขณะเรียก dependency ล่มใช้503 AUTH_UNAVAILABLE. Gateway challenge คงอยู่ใน flow เดิม ไม่แปลงเป็น loginสำเร็จหรือผิดรหัส. เมื่อ adapter พร้อมต้อง map invalid input→400 INVALID_INPUT, credentialผิด→401 UNAUTHORIZED, rate limit→429 RATE_LIMITED พร้อม Retry-After ตามสัญญากลาง; ไม่ส่ง raw upstream errors/secrets. ห้าม retry login/challenge mutation อัตโนมัติ.
+ออก 201 ได้หลัง full authentication จาก upstream ที่เชื่อถือได้ พร้อม identity/tenant และเงื่อนไข [DES-004 (ตัวตน/สิทธิ์)](des-004.md) / [DES-012 (auth ข้ามระบบ)](des-012.md) ครบ HTTP 200, temporaryToken, AccessLevel0, forceResetPassword และ challenge ที่ยังไม่จบ ห้ามออกแม้ unbound session ห้าม fake International Mobile Equipment Identity (IMEI) หรือใช้ DeviceJkt แทน และห้ามข้าม first-password/2FA/contact
 
-Input bounds ต่างกัน: DES-004 username256/password1024; mobile100/20; web100/100. ต้องระบุ validation/normalization และ continuation wire contract ก่อนเปิด Desktop adapter; ห้าม truncate หรือเปลี่ยน password เพื่อให้ผ่าน upstream.
+Desktop /v2/auth/login ยังไม่มี IMEI/continuation contract ห้ามเพิ่ม field/endpoint หรือรับ web token เป็น desktop sessionเอง adapter ไม่พร้อม → 503 AUTH_NOT_CONFIGURED; dependency ล่ม → 503 AUTH_UNAVAILABLE; input ผิด → 400 INVALID_INPUT; credential ผิด → 401 UNAUTHORIZED; rate limit → 429 RATE_LIMITED พร้อม Retry-After ไม่ส่ง raw errors/secrets และไม่ retry login/challenge mutation อัตโนมัติ challenge คงเป็น challenge ไม่แปลงเป็นสำเร็จหรือผิดรหัส
 
-คง opaque SchoolBotSession/Channel/profile binding/revocation/audit; desktop ต้อง License+DeviceJkt, school_web ต้อง LicenseและDeviceJkt=null, staff_admin ตรวจ StaffRoleและDeviceJkt=null. คงอายุเดิมและสิทธิ์สดก่อนcommit. Gateway JWT ไม่แทนสิ่งเหล่านี้; parse-legacy-token/handoff ไม่แทน private introspection. มติ035ยังใช้กลุ่มฝั่งserverและsuperadminเดิมเฉพาะschool_web ไม่ให้staff_adminเอง.
+[DES-004 (ตัวตนและสิทธิ์)](des-004.md) มีเพดาน username256/password1024; mobile100/20; web100/100 ต้องใช้ effective validation/normalization ของ adapter ไม่ truncate หรือเปลี่ยน password ให้ผ่าน upstream
 
-## ทางเลือกและหลักฐานค้าง
+## ขอบเขต session และสิทธิ์
 
-เลือก reuse pipeline เพราะมี lock/challenge เดิม; ปัด verifier ซ้ำ/ผสม hash สองเส้นเพราะทำ behavior แตกต่าง. เลือก web candidate สำหรับครูเพื่อคง challenges. ไม่สรุป student entrypoint จนมี device contract. G→B ใช้ gRPC ตาม [Gateway Rev3](gateway-integration-001.md); ไม่ใช้ HTTP relay เป็น service transport. Login HTTP เดิมของ G คงเดิม; RPC/HTTP mapping และ trusted JWT tenant/opaque session ยัง design pending.
+คง opaque SchoolBotSession, Channel, profile binding, revocation และ audit; desktop ต้อง License+DeviceJkt; school_web ต้อง License และ DeviceJkt=null; staff_admin ต้อง StaffRole และ DeviceJkt=null อายุ session และการตรวจสิทธิ์สดก่อน commit คงเดิม Gateway JWT ไม่แทน SchoolBot session; parse-legacy-token/handoff ไม่แทน private introspection
 
-G/sys ต้องให้ completion/continuation DTO, device lifecycle, token trust และ bounds mapping; legacy/vault ให้ TR-AUTH-02-rest/03..06 โดยเฉพาะ identity/tenant/status; G/Light+B ให้ H5 transport/private exposure/TLS/secret-owner และ opaque-token isolation; admin owner ให้ staff bootstrap/BFF/CSRF. ระหว่างนี้ fail closed เฉพาะส่วนที่หลักฐานขาด ไม่เปิดคำถาม035ใหม่.
+[มติ 035 (ตรวจกลุ่ม admin ฝั่ง server และคง super admin)](../requirement/decisions-035.md) ให้ school_admin เฉพาะ school_web ไม่ให้ staff_admin อัตโนมัติ
 
-## Override Rev2 — ผลรับ033และขอบเขต034
+## เหตุผลและสิ่งที่ยังขาด
 
-[desktop-login-adapter-001.md](desktop-login-adapter-001.md) มี precedence เหนือ candidate/readiness และ bounds เดิมเฉพาะ Desktop: เลือก teacher web continuation, student mobile ยังไม่มี Desktop completion ที่พิสูจน์ได้; ไม่ fallback หรือ fake IMEI. ไม่ต้องตรวจ password/hash ซ้ำใน B แต่ต้องตรวจ directory และ authorization ต่อ.
+reuse pipeline เพราะมี attempts/lock/challenge อยู่แล้ว ปัด verifier ซ้ำหรือผสม hash สองเส้น เลือก web continuation สำหรับครูเพื่อคง challenges ไม่สรุป student entrypoint จนมี device contract Gateway→SchoolBot ใช้ gRPC ไม่ใช้ HTTP relay; HTTP Login/JSON decoder คงเดิม
 
-ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ `design/desktop-auth-review-packet-001.md` (memory).
+internal web decoder ทำและทดสอบตรงได้ตาม [Gateway outcome component](gateway-outcome-component-001.md) แต่ไม่เท่ากับ Login ครบทั้งระบบ การต่อ public Login ยังต้องมี production caller/dependency และ trusted identity/device/transport จริง ไม่ถือ scaffolding หรือ constant503 เป็น feature
 
-## Change Log
-- 2026-10-24 — Rev4: แก้คำสั่ง transport ที่ยังอ่านเป็นตัวเลือก; Login HTTP/decoder คงเดิม
-- 2026-10-24 — Rev3: ใบงาน049 แยก Login reuse เดิมจาก G→B gRPC; คง adapter/admission และประวัติ
-- 2026-10-23 — Rev2: ใบงาน034 รับ033 กำหนด outcome/admission และรายงาน complete-slice gap โดยไม่เปลี่ยน schema/035
-- 2026-10-23 — Rev1: ใบงาน032 รับหลักฐาน031 เลือก reuse แบบมีเงื่อนไข; ไม่เขียน source/SQL ไม่ทดสอบหรือปิด gate
+เจ้าของ Gateway/sys ส่ง completion/continuation Data Transfer Object (DTO), device lifecycle, token trust, bounds และ routing binding; legacy/vault พิสูจน์ตัวตรวจ TAdmin, identity/tenant/status, collation/hash/student login; Gateway/Light กับ SchoolBot พิสูจน์ private exposure/TLS/secret-owner/opaque isolation ตาม H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ); admin owner พิสูจน์ staff bootstrap/BFF/CSRF ส่วนที่หลักฐานขาด fail closed ไม่เปิดคำถามนโยบายมติ 035 ซ้ำ
+
+## หลักฐาน
+
+- gateway-login-response-001, gateway-login-review-001 และ gateway-login-source-check-001 (memory): Gateway HEAD `9a03c9428a47150aa960e61ca91eedad6d0196af`, web-system HEAD `7ae35eb4ed3123783afa04e70181eb3576503e45`; working tree ว่าง ณ การตรวจเดิม ไม่อ้างสถานะ Git ปัจจุบัน
+- Gateway `AuthService.cs:177` ให้ temporaryToken AccessLevel0 เมื่อ device ไม่ verified; `WebAuthController.cs:265` คืน 200 ทั้ง token/challenge; `WebLoginService.cs:206,272` ใช้ identity keys ต่างกัน; `ServiceMobile/AuthController.cs` refresh เป็น comment ไม่ใช่ route
+- auth-flow-handoff-001 (memory) บันทึกผล local component/logout ไม่ยืนยัน Login ครบหรือ Gateway integration; desktop-auth-review-packet-001 (memory) ระบุหลักฐานที่ยังขาด งานนี้ไม่ตรวจ source/runtime ซ้ำ
