@@ -3,7 +3,7 @@
 > Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (แตกจาก brand.md ของ sketchbook ให้อ่านได้ทีละไฟล์)
 > ใช้ที่: D1 (`CodeEditorA2`) · D4 (`TerminalA2`)
 
-ย้ายมาจาก brand.md §11.16–§11.19 ของ sketchbook (2026-11-02) เพราะเป็นพฤติกรรมเฉพาะ module ไม่ใช่ของทุกหน้า · ข้อเท็จจริงของต้นแบบ: sketchbook `knowledge/arduino-cloud-editor-syntax.md` (AS1–AS7) · component ช่องพิมพ์ทั่วไป: [shared/brand/components/input.md](../../../shared/brand/components/input.md)
+ย้ายมาจาก brand.md §11.16–§11.19 ของ sketchbook (2026-11-02) เพราะเป็นพฤติกรรมเฉพาะ module ไม่ใช่ของทุกหน้า · ข้อเท็จจริงของต้นแบบ: [arduino-cloud-editor-syntax.md](arduino-cloud-editor-syntax.md) (AS1–AS7) · component ช่องพิมพ์ทั่วไป: [shared/brand/components/input.md](../../../shared/brand/components/input.md)
 
 ## Output (terminal) · Proposed (แนวทาง A ใน sketchbook `projects/school-bot/ci-proposal.md` ค1)
 
