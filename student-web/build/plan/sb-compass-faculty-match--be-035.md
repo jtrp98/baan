@@ -1,0 +1,43 @@
+# BE-035 — Profile-only mode (no program)
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+โหมด `program_id IS NULL` — แสดงเฉพาะระดับมิติ RIASEC ของตัวเอง (แถวเดิมเขียน 8 แกน — ปัจจุบันคือ 6 มิติ RIASEC) `match_percent` เป็น NULL ไม่มี quest ห้ามแสดง % หลอก ๆ (`## DES-025 — RIASEC Fit Rules` §8) — เด็กที่อยากดูโปรไฟล์ตัวเองเฉย ๆ ต้องไม่ถูกป้อนตัวเลขที่ไม่มีความหมาย — ค่าว่างที่ตั้งใจต่างจากค่าศูนย์
+
+## References
+
+REQ-012, AC-012.3, DES-025, DEC-025
+
+## Scope
+
+payload ของโหมดนี้ต้องชี้ชัดว่าเป็นการดูโปรไฟล์ ไม่ใช่ผลจับคู่ — match_percent ส่งเป็น NULL ไม่ใช่ 0
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+สูตร studentLevel · ผลโหมดมีสาขา · สคีมา
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-012.3 (ฐานโหมด): โหมดดูโปรไฟล์คืนระดับทุกมิติที่มีค่าของเด็กโดยไม่มี % และไม่มีการเสนอ quest — ไม่มีทางได้ % ปลอมจากโหมดนี้
+
+## Dependencies
+
+BE-029
+
+## Handoff
+
+ตรวจ AC-012.3 (ฐานโหมด) ด้วยการเรียก endpoint ในกรณีไม่ผูกสาขา แล้วตรวจ payload (มิติครบ, match_percent NULL, ไม่มี quest) — เก็บผลเป็นหลักฐาน
+โหมดย่อยของ endpoint อ่าน — revert ได้ปลอดภัย
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

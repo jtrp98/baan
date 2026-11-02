@@ -1,0 +1,47 @@
+# BE-012 — Gate the three debug endpoints with compass_admin_ops
+
+> module: student-web/sb-compass
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+กั้น debug endpoints ทั้ง 3 ตัว (`debug/scores`, `debug/my-stat`, `debug/national-stats`) ด้วย feature key `compass_admin_ops` ตามข้อเสนอของ `system-analyst` ที่ผู้ใช้ยืนยันปิด OQ-17 (2026-09-01) — `debug/my-stat` คืนข้อมูลอันดับ/ระดับชั้นซึ่งเป็นเนื้อหา Premium โดยไม่ผ่านการเช็ค → ทางอ้อมข้าม REQ-013 และ `debug/national-stats` คืนสถิติทั้งเครือข่ายให้นักเรียนที่ล็อกอินทุกคน — การเช็คเดิมมีแค่ `ud == null` (ล็อกอินหรือยัง) ไม่ใช่การเช็คสิทธิ์ (OQ-17; กลไก DES-016)
+
+## References
+
+REQ-013, AC-013.1, DES-016
+
+## Scope
+
+กั้นครบทั้ง 3 ตัวด้วย `compass_admin_ops` (ไม่ถอดออก ไม่คงไว้แบบเดิม) — การปิด OQ-17 คือการตัดสิน "จะกั้นแบบไหน"
+การยืนยันว่า implement ครบจริงเป็นของ `security` ตอน audit Module B
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ห้ามถอด debug endpoints ออก (มติ OQ-17 คือกั้น ไม่ใช่ลบ); ห้ามใช้ `compass_premium` แทน `compass_admin_ops`;
+พฤติกรรมเนื้อหาของทั้งสาม endpoint ไม่เปลี่ยน — เพิ่มการกั้นหน้าเข้าเท่านั้น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-013.1: debug endpoints ทั้ง 3 ตรวจสิทธิ์ฝั่งเซิร์ฟเวอร์ด้วย `compass_admin_ops` ก่อนคืนข้อมูลเสมอ
+
+## Dependencies
+
+BE-004
+
+## Handoff
+
+ตรวจ AC-013.1 ต่อ endpoint ทั้งสามด้วยบัญชีที่มี/ไม่มี `compass_admin_ops` — บันทึก status code (ไม่มีสิทธิ์ต้องไม่ได้ข้อมูล);
+ยืนยันว่า `debug/national-stats` ไม่คืนสถิติเครือข่ายให้บัญชีนักเรียนอีกต่อไป
+ถอดการกั้นได้เดี่ยวต่อ endpoint แต่ต้องไม่ทำให้เกิดช่องข้าม REQ-013 ค้างช่วงถอด — ถอดควรทำครบทั้งสามพร้อมกัน;
+ไม่มี payload/schema เดิมถูกเปลี่ยน
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`
