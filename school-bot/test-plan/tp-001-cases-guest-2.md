@@ -36,12 +36,12 @@ AC: [AC-040-04 (สั่งลบงานแล้วงานออกจา�
 
 ผลจริง: NOT_RUN
 
-## ยังไม่ยืนยัน
-
-timer sweep 60 วินาทีขณะแอปเปิดยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยัน cadence ก่อน runtime โดยอายุ absolute 30 วันและ sweep ก่อน operation คงเดิม
-
-
 
 ## คำย่อ
 
 AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · REQ = Requirement หรือข้อกำหนด · DES = Design หรือสัญญาออกแบบ · BR = Business Rule หรือกฎธุรกิจ · UTC = Coordinated Universal Time · OS = Operating System
+
+
+## ยังไม่ยืนยัน
+
+timer sweep 60 วินาทีขณะแอปเปิดยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยัน cadence ก่อน runtime โดยอายุ absolute 30 วันและ sweep ก่อน operation คงเดิม

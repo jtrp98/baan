@@ -34,5 +34,5 @@ Front ใช้ส่วนที่เซ็นแล้วและตรว�
 
 ## หลักฐาน
 
-- ผลตรวจเอกสารฐานร่าง: check073 PASS 2026-10-26 (memory: planning/check-073-ux-final-001.md)
-- ผลตรวจข้อความหมดเวลาและการปิดข้อพบเอกสาร: check080 และ check082 2026-10-26 (memory: planning/check-080-expired-delta-001.md; planning/check-082-expired-spot-001.md)
+- ผลตรวจเอกสารฐานร่าง: check073 PASS (memory: planning/check-073-ux-final-001.md)
+- ผลตรวจข้อความหมดเวลาและการปิดข้อพบเอกสาร: check080 และ check082 (memory: planning/check-080-expired-delta-001.md; planning/check-082-expired-spot-001.md)

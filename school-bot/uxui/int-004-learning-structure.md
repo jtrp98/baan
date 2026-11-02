@@ -4,7 +4,6 @@
 
 [กลับint-004-learning](int-004-learning.md) · ส่วนหนึ่งของ UX ชุดเดียวกับตาราง Sign-off ในไฟล์ทางเข้า
 
-## 1. ภาพรวม: โครง Course → Lesson → Activity (ข้อเสนอ)
 
 - ทางเข้า: ปุ่ม "บทเรียน" บน Home shell **แยกจากปุ่มสาม Labs** ([มติ 003 (โครงสร้างผลิตภัณฑ์ 3 โหมด)](../requirement/decisions-003.md), [BR-037-01 (บทเรียนใช้ Course → Lesson → Activity ตาม REQ-043)](../requirement/req-037.md)) — Q22 (บทเรียนและตัวกรองโหมด)
 - โหมดอยู่ที่ Activity ไม่ใช่ Course: Lesson เดียวมีภารกิจได้หลายโหมด ([BR-043-04 (Mode อยู่ที่ Activity ภารกิจ)](../requirement/req-043.md)) — ทุกภารกิจมี chip โหมดกำกับเสมอ ([AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง Mode ได้ แม้อยู่ใน Course/Lesson เดียวกัน)](../requirement/req-037.md))

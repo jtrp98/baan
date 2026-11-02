@@ -4,7 +4,6 @@
 
 [กลับเอกสารหลัก](int-007-trace.md)
 
-## 1. Trace ครบ 16 AC
 
 ฐานเดิม 15 AC; เพิ่ม [AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md) ตาม[มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md) ไม่ใช่หลักฐานตรวจรับระบบเพิ่มเติม
 
@@ -25,4 +24,4 @@ Retry/error/opaque ETag ใช้ [data-contract-rules.md](../design/data-contra
 
 ## หลักฐาน
 
-- ตาม `:62–84`
+- `design/des-010.md:62–84`

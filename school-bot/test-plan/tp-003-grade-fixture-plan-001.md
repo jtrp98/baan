@@ -35,14 +35,16 @@
 6. Runtime prerequisites ตาม test-plan/index ยังค้าง; ค่าสมมติฐาน (อายุ preview 15 นาที, lease/sweep cadence) ต้องยืนยันก่อนรัน; แก้แผนนี้ก่อนเมื่อสัญญาเปลี่ยน
 7. ไม่มี fixture ใดเขียน PGGradeDB/School DB/SchoolBot DB production หรือเรียก service score-record เดิม; preview non-production ไม่ใช่สิทธิ์เปิด confirm/apply
 
-## ยังไม่ยืนยัน
-
-อายุ preview 15 นาที และ outbox lease/sweep cadence ยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime ให้ระบุค่าสมมติฐานใน expected ของผลรันแต่ละชุด
 
 ## คำย่อ
 
 API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · REQ = Requirement หรือข้อกำหนด · DES = Design หรือสัญญาออกแบบ · CAS = Compare-and-Swap
 
+
+
+## ยังไม่ยืนยัน
+
+อายุ preview 15 นาที และ outbox lease/sweep cadence ยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime ให้ระบุค่าสมมติฐานใน expected ของผลรันแต่ละชุด
 
 ## หลักฐาน
 

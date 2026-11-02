@@ -20,7 +20,7 @@
 
 ฟอร์มใช้เฉพาะข้อมูล [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md): curriculum_key/revision/level_id/title/source_ref/recommended_grades/subjects และ LessonInput/ActivityInput ไม่ใช้วิชาหรือช่องคะแนนของโรงเรียนแทนวิชากลาง
 
-รายการ Lesson แสดง **ลำดับ | ชื่อ | รหัสถาวร | กิจกรรม** รหัสอ่านอย่างเดียวแยกจากช่องลำดับ ปุ่ม “ขึ้น/ลง” ใช้ keyboard ได้ ไม่บังคับลาก ทุกกิจกรรมมีชนิดและโหมด: สื่อใช้ instruction; ภารกิจใช้ project พร้อม Block/Arm/Code; Quiz/Test ใช้ mode=null ไม่แปลงใบงานเป็นข้อสอบเอง
+รายการ Lesson แสดง **ลำดับ | ชื่อ | รหัสถาวร | กิจกรรม** รหัสอ่านอย่างเดียวแยกจากช่องลำดับ ปุ่ม “ขึ้น/ลง” ใช้ keyboard ได้ ไม่บังคับลาก ทุกกิจกรรมมีชนิดและโหมด: สื่อใช้ instruction; ภารกิจใช้ project พร้อม Block/Arm/Code; Quiz/Test ใช้ mode=null ไม่แปลงเอกสารฝึกเป็นข้อสอบเอง
 
 ตัวอย่างประกอบเท่านั้น: LessonKey `7d0b04d8-3275-469c-a1aa-3a54e9daa105` ชื่อ “How AI Learns” ย้ายลำดับ 6 → 7 รหัสเดิมคงอยู่ เลข Unit ในชื่อแผนไม่ใช้สร้างรหัส อ้างรูปปัญหาจริงใน [source-review-003.md](../design/source-review-003.md)
 

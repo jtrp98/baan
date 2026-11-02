@@ -4,7 +4,6 @@
 
 [กลับเอกสารหลัก](int-006-admin-trace.md)
 
-## T2. ส่วนที่เชื่อมกับงานเซ็นแล้ว
 
 - Desktop: [int-004-learning.md](../uxui/int-004-learning.md) คงผู้เรียนบน revision เดิม ไม่มีปุ่มจัดลำดับของนักเรียน; Q22 (บทเรียนและตัวกรองโหมด)–Q29 (accessibility ของการเรียน) เซ็นแล้วตาม [decisions-040.md (sign-off UX-004 ครบ (Q26–Q29))](../requirement/decisions-040.md)
 - เว็บโรงเรียน: [int-005-mapping.md](../uxui/int-005-mapping.md) แยก admin mapping กับครูส่งคะแนน ไม่เพิ่มปุ่มส่งคะแนนใน admin ส่วนกลาง; Q30 (หน้า mapping รายช่องคะแนน)–Q38 (ขอบเขตประวัติครูและ admin) เซ็นแล้วตาม [decisions-041.md (sign-off UX-006 ครบ (Q30–Q38))](../requirement/decisions-041.md)
@@ -35,7 +34,7 @@
 
 ## หลักฐาน
 
-- รายการต่อไปนี้ตรง `plan/tasks-001.json:3772–3812` (memory) ทั้ง 12 AC ไม่ขยายเป็นทุก AC ของ REQ-043–046; dependencies BA-002/SA-002 ไม่ถูกเปลี่ยน `plan/UX-005.md:7–15` (memory) กำหนดใช้ JSON
+- รายการต่อไปนี้ตรง `plan/tasks-001.json:3772–3812` (memory) ทั้ง 12 AC ไม่ขยายเป็นทุก AC ของ [REQ-043 (หลักสูตรกลางแบบ Level และ Activity)](../requirement/req-043.md)–046; dependencies BA-002/SA-002 ไม่ถูกเปลี่ยน `plan/UX-005.md:7–15` (memory) กำหนดใช้ JSON
 - `requirement/req-044.md:21–25`
 - `requirement/req-045.md:21–24`
 - `requirement/req-043.md:21`

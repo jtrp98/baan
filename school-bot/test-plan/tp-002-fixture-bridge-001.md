@@ -18,11 +18,12 @@
 
 [การเตรียม การกระตุ้นเหตุการณ์ และสิ่งที่วัด](tp-002-fixture-bridge-001-setup.md)
 
-## ยังไม่ยืนยัน
-
-poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ให้ arch/เจ้าของสัญญายืนยันก่อน runtime และไม่ใช้เป็น stop latency
-
 
 ## คำย่อ
 
 AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · HID = Human Interface Device
+
+
+## ยังไม่ยืนยัน
+
+poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ให้ arch/เจ้าของสัญญายืนยันก่อน runtime และไม่ใช้เป็น stop latency

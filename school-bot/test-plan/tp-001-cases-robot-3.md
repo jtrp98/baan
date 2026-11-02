@@ -20,9 +20,6 @@ AC: [AC-024-01 (จำลองอุปกรณ์หายจาก discovery
 
 ผลจริง: NOT_RUN
 
-## ยังไม่ยืนยัน
-
-poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime; cadence ไม่ใช่ stop latency หรือ hardware SLA
 
 <a id="tp001-041"></a>
 
@@ -109,3 +106,8 @@ AC: [AC-014-03 (ใช้ test device ที่ไม่ตอบ probe แล�
 ## คำย่อ
 
 AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · DES = Design หรือสัญญาออกแบบ · HID = Human Interface Device · SLA = Service Level Agreement
+
+
+## ยังไม่ยืนยัน
+
+poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime; cadence ไม่ใช่ stop latency หรือ hardware SLA

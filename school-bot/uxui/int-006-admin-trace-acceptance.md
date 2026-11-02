@@ -4,7 +4,6 @@
 
 [กลับเอกสารหลัก](int-006-admin-trace.md)
 
-## T1. ขอบเขตและหลักฐานตรวจรับที่เสนอ
 
 ตารางนี้ครอบคลุมเกณฑ์ตรวจรับ 12 ข้อตามงาน UX-005 (admin หลักสูตรและคลังข้อสอบ) ไม่ขยายเป็นทุกเกณฑ์ของ [REQ-043 (หลักสูตรกลางแบบ Level และ Activity)](../requirement/req-043.md)–046 และคง dependencies ด้านข้อกำหนดและสัญญาเดิม
 
@@ -25,4 +24,4 @@ Actual ทุกแถว: มีร่างและการตรวจเ�
 | [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้)](../requirement/req-046.md) | หลัก §5 | ตรวจ policy จำนวนครั้ง/เฉลย/เวลา/สุ่มของแต่ละ Activity จากค่าจริง ไม่อนุมานจากชื่อ |
 | [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot และเกณฑ์เดิม ผลเดิมไม่เปลี่ยน)](../requirement/req-046.md) | หลัก §5 / S3 | bank revision ใหม่ไม่แก้ snapshot/เกณฑ์/ผล attempt เก่า; เปิดประวัติด้วยสิทธิ์ตามสัญญาฝั่งผู้เรียน/ครู ไม่สร้างหน้ารวมประวัตินักเรียนใน admin เอง |
 
-ฐาน AC: [req-044.md](../requirement/req-044.md); [req-045.md](../requirement/req-045.md); [req-043.md](../requirement/req-043.md); [req-046.md](../requirement/req-046.md) กฎร่วมเชื่อม [BR-043-01 (SchoolBright ส่วนกลางสร้าง/แก้หลักสูตร โรงเรียนเลือกใช้แต่แก้เนื้อหาไม่ได้)](../requirement/req-043.md), [BR-043-05 (หน้าสร้าง/แก้/อนุมัติ/publish หลักสูตรกลางอยู่ในหน้า admin (Next.js ใน school-bot/web))](../requirement/req-043.md), [BR-044-01 (Lesson มีรหัสถาวรแยกจากลำดับ)](../requirement/req-044.md)..05, [BR-045-01 (นำเข้าเป็น draft ตาม REQ-044)](../requirement/req-045.md)..05, [BR-046-01 (Quiz/Test ใช้กลไกเดียว policy จำนวนครั้ง/เฉลย/เวลา/สุ่มต่างกัน ไม่ผูกตายตัวกับชื่อ)](../requirement/req-046.md)..06 ตามร่างหลัก
+ฐาน AC: [req-044.md](../requirement/req-044.md); [req-045.md](../requirement/req-045.md); [req-043.md](../requirement/req-043.md); [req-046.md](../requirement/req-046.md) กฎร่วมเชื่อม [BR-043-01 (SchoolBright ส่วนกลางสร้าง/แก้หลักสูตร โรงเรียนเลือกใช้แต่แก้เนื้อหาไม่ได้)](../requirement/req-043.md), [BR-043-05 (หน้าสร้าง/แก้/อนุมัติ/publish หลักสูตรกลางอยู่ในหน้า admin (Next.js ใน school-bot/web))](../requirement/req-043.md), [BR-044-01 (Lesson มีรหัสถาวรแยกจากลำดับ)](../requirement/req-044.md) ถึง [BR-044-05 (การอนุมัติ publish ต้องเป็น staff คนที่สอง ผู้สร้างอนุมัติเองไม่ได้ ตาม [decisions-025])](../requirement/req-044.md), [BR-045-01 (นำเข้าเป็น draft ตาม REQ-044)](../requirement/req-045.md) ถึง [BR-045-05 (นำเข้าทุกแถวเป็น draft)](../requirement/req-045.md), [BR-046-01 (Quiz/Test ใช้กลไกเดียว policy จำนวนครั้ง/เฉลย/เวลา/สุ่มต่างกัน ไม่ผูกตายตัวกับชื่อ)](../requirement/req-046.md) ถึง [BR-046-06 (Test ใช้คะแนนสูงสุดครั้งจริง/ซ่อม ไม่มีเพดาน)](../requirement/req-046.md) ตามร่างหลัก

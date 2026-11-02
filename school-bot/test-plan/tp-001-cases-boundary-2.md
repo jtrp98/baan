@@ -9,9 +9,13 @@ PF (Test Profile) คือสภาพแวดล้อมตรวจ แล�
 ## TP001-080 — สั่งเตรียม→ตรวจ trust
 
 AC: [AC-030-04 (การเตรียมอัปเดตเริ่มเฉพาะเมื่อผู้ใช้สั่งเอง และตรวจ trust ครบ)](../requirement/req-030.md)..08 (ผู้ใช้ตรวจรับแล้วตาม [มติ 037 (ตรวจรับ AC-030-04..08 + UX Q5/Q9 + เกณฑ์ performance)](../requirement/decisions-037.md)) · References: [DES-007 (Release และ trusted update)](../design/des-007.md) Rev3, release-trust-001, update-disposition-001, [BR-030-04 (การเตรียม/ติดตั้งอัปเดตเป็นคำสั่งแยกที่ผู้ใช้สั่งเอง (explicit intent) —…)](../requirement/req-030.md)..06 · Level: integration · Profiles: PF-HOST, PF-API, PF-UI-WIN
+
 เงื่อนไขก่อนตรวจ: stub release registry + manifest ลงนาม (stub CI registry); artifact ถูกแก้หลัง staging (TOCTOU); release หมดอายุ/ถูก withdraw/เก่ากว่า; มีงานค้าง+หุ่น busy; inject install fail กลางทาง; ผู้ใช้ยกเลิก/ปิดแอประหว่างเตรียม
+
 ขั้นตอน: สั่งเตรียม→ตรวจ trust; สั่งติดตั้ง→ตรวจ staging ซ้ำ/stop guard/ยืนยัน restart; ยกเลิก/ปิดกลางทาง; บังคับ fail ตอนติดตั้ง
+
 ผลที่คาด: เตรียมผ่านเฉพาะ trust ครบ (hash ตรง manifest จาก registry + publisher pin) ไม่ผ่าน→ไม่มี artifact ใน staging + เหตุผลปฏิเสธ (AC-030-04) · staging ผิด/เปลี่ยน/หมดอายุ/withdraw/downgrade→ปฏิเสธไม่ติดตั้ง ([AC-030-05 (artifact ใน staging ถูกตรวจความสมบูรณ์ซ้ำ (กัน TOCTOU) ตอนสั่งติดตั้ง —…)](../requirement/req-030.md)) · ติดตั้งต้องขอหยุดงานค้าง/หุ่นก่อน + ผู้ใช้ยืนยันก่อน restart ([AC-030-06 (การติดตั้งต้องขอหยุดงานค้าง/หุ่น (stop เป็นเพียงคำขอ)…)](../requirement/req-030.md)) · fail กลางทาง→ใช้เวอร์ชันเดิมต่อได้ + รายงานสาเหตุ ไม่เหลือครึ่งติดตั้ง ([AC-030-07 (การติดตั้งล้มเหลวกลางทาง เครื่องกลับมาใช้งานเวอร์ชันเดิมได้…)](../requirement/req-030.md)) · ยกเลิก/ปิด→ไม่ติดตั้ง + staging ล้างหรือตรวจซ้ำครั้งถัดไป ([AC-030-08 (ผู้ใช้ยกเลิกหรือปิดแอประหว่างเตรียม/ก่อนติดตั้ง…)](../requirement/req-030.md))
+
 หลักฐานที่ต้องเก็บ: E-API + trace ไฟล์/registry + spy process · Actual: NOT_RUN
 
 <a id="tp001-081"></a>

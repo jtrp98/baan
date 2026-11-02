@@ -4,7 +4,6 @@
 
 [กลับint-005-mapping](int-005-mapping.md) · ส่วนหนึ่งของ UX ชุดเดียวกับตาราง Sign-off ในไฟล์ทางเข้า
 
-## 4. Audit trail — มุมมองครู/admin
 
 อ้างอิง: [BR-052-03 (audit อ้างต้นทางและ revision, mapping ที่ใช้, ปลายทาง, เดิม/ใหม่, ผู้ยืนยัน, เวลา, การแก้ชน และผลส่ง)](../requirement/req-052.md) · [AC-052-05 (ตรวจรายการส่งแล้วพบ audit ครบ BR-052-03)](../requirement/req-052.md) · [DES-009 (Preview ยืนยัน และส่งคะแนนกลับ SchoolBright)](../design/des-009.md) (AuditEvent/PgtgradeAuditLog) · [DES-008 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](../design/des-008.md) (audit การจัด mapping)
 

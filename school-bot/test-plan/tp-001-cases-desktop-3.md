@@ -18,7 +18,7 @@ AC: [AC-025-01 (รันชุด move_right, jump, move_left ที่ถู�
 
 หลักฐานที่ต้องเก็บ: E-TRACE
 
-ผลจริง: NOT_RUN 
+ผลจริง: NOT_RUN
 
 บันทึก/โหลดไม่เพิ่มเงื่อนไข bytes
 

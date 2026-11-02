@@ -28,11 +28,12 @@
 
 [การเตรียม การกระตุ้นเหตุการณ์ และสิ่งที่วัด](tp-002-fixture-api-001-setup.md)
 
-## ยังไม่ยืนยัน
-
-resolver roster/status/move/term และ tenant alias proof จาก legacy/sys ยังต้องมีหลักฐานจริงก่อนเชื่อมระบบ; fixture scripted ไม่กำหนดกฎ history ใหม่
-
 
 ## คำย่อ
 
 API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ
+
+
+## ยังไม่ยืนยัน
+
+resolver roster/status/move/term และ tenant alias proof จาก legacy/sys ยังต้องมีหลักฐานจริงก่อนเชื่อมระบบ; fixture scripted ไม่กำหนดกฎ history ใหม่

@@ -17,7 +17,7 @@
 | success | trace คำสั่งตามลำดับ เช่น move_right → jump → jump ([AC-026-01 (move_right(2) ตามด้วย repeat 2 ครั้งของ jump ให้ผลคำสั่ง move_right, jump, jump ตามลำดับ)](../requirement/req-026.md)) + ภาพเดินในฉากจำลอง |
 | บันทึก/เปิด | workspace schema 1 คืนบล็อก/ค่า/การเชื่อมเดิม · schema ผิด → "ไฟล์ไม่ตรงกับโปรแกรมนี้" ([AC-026-04 (บันทึก workspace แล้วเปิดใหม่ได้บล็อก ค่า การเชื่อมต่อ และสถานะ enabled เดิม รวม draft หลายลำดับหรือที่เกิน fuel/จำนวนคำสั่งสำหรับรัน หากผ่าน structural validation)](../requirement/req-026.md)) |
 
-## 5. กติกา preview/mock (REQ-013 — ใช้ร่วมทุก Lab)
+## 5. กติกา preview/mock ([REQ-013 (ขอบเขต sample/preview/mock)](../requirement/req-013.md) — ใช้ร่วมทุก Lab)
 
 - browser ไม่มี native bridge และไม่มี `preview=1` → หน้า error "ต้องเปิดจากแอป SchoolBot เท่านั้น (ไม่พบ native bridge)" ไม่แสดงผลสำเร็จจำลอง ([AC-013-01 (เปิด browser โดยไม่มี `preview=1` และไม่มี bridge แล้วพบข้อผิดพลาด native bridge แทนผลสำเร็จจำลอง)](../requirement/req-013.md), [BR-013-01 (Browser ที่ไม่มี native bridge ต้องไม่เปลี่ยนเป็น preview อัตโนมัติ)](../requirement/req-013.md))
 - ใน preview: บันทึกงานใน browser ได้ แต่ activate/ตรวจอัปเดตไม่ยิง API จริง ([AC-013-02 (ใน preview บันทึกงานได้ใน browser แต่ activate และตรวจอัปเดตไม่เรียก API จริง)](../requirement/req-013.md)) · Teacher restart/console/USB ตัวอย่าง ไม่มีคำสั่งไปอุปกรณ์ ไม่มีไฟล์จริง ไม่มีผลประเมินถาวร ([AC-013-03 (ทดลอง LearnMap, Teacher restart/reset/console และ USB ตัวอย่างแล้วไม่มีคำสั่งไปอุปกรณ์ ไม่มีไฟล์ USB ที่ถูกคัดลอกจริง และไม่มีผลประเมินถาวร)](../requirement/req-013.md))

@@ -12,6 +12,9 @@
 
 IDEMPOTENCY_CONFLICT ให้หยุดและตรวจรายการเดิม ไม่สร้าง key ใหม่เพื่อหลบ; IDEMPOTENCY_EXPIRED ใช้ resource_id เมื่อ server อนุญาตให้รู้ หากไม่มีทางอ่านผลให้คงสถานะไม่ทราบผลและติดต่อผู้ดูแล ไม่สรุปว่าไม่เคยบันทึก สำเร็จแล้วจึงใช้ข้อความยืนยันคงอยู่ในหน้า; toast เป็นข้อมูลเสริมเท่านั้น
 
+<a id="delta042"></a>
+<a id="expired-result"></a>
+
 ## ผลข้อสอบเมื่อหมดเวลา
 
 [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)/[BR-046-07 (หมดเวลาปิด attempt ตรวจคำตอบที่ server บันทึกทัน)](../requirement/req-046.md)/[AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md); copy/interaction อนุมัติ Q43 แล้วตาม [มติ 043 (อนุมัติ UX-005/007 และยืนยัน runner)](../requirement/decisions-043.md) รวม int-004 §8 delta; Q22 (บทเรียนและตัวกรองโหมด)–Q29 (accessibility ของการเรียน) คงมติเดิม

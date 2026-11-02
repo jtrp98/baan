@@ -36,9 +36,6 @@ AC: [AC-033-01 (ตรวจหลักฐาน catalog ของ DB ที่
 
 ผลจริง: NOT_RUN
 
-## ยังไม่ยืนยัน
-
-TP001-052 ระบุ 32 ตาราง/450 ฟิลด์/PK32 และ UQ0/FK0/CHECK0 พร้อมขั้นตอนยืนยันว่าไม่มี UNIQUE/FK/CHECK แต่ข้อความสรุปเดิมเรื่อง BL-001 ระบุ schema-notes Rev5 เป็น PK32/UQ24/CHECK80/FK40/unique index13 และบอกว่าตรง fixture เดิมของ TP001-052/053 จึงไม่แก้ case เก็บทั้งสองข้อความโดยไม่เลือกเกณฑ์แทน ต้องให้ arch/vault ยืนยัน revision และเกณฑ์ของ AC-033-01–05 ก่อนตรวจจริง
 
 <a id="tp001-053"></a>
 
@@ -61,3 +58,8 @@ AC: AC-033-01, AC-033-02, AC-033-03, AC-033-04, AC-033-05 · References: BR-033,
 ## คำย่อ
 
 AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · DES = Design หรือสัญญาออกแบบ · BR = Business Rule หรือกฎธุรกิจ · DBML = Database Markup Language · FK = Foreign Key · PK = Primary Key
+
+
+## ยังไม่ยืนยัน
+
+TP001-052 ระบุ 32 ตาราง/450 ฟิลด์/PK32 และ UQ0/FK0/CHECK0 พร้อมขั้นตอนยืนยันว่าไม่มี UNIQUE/FK/CHECK แต่ข้อความสรุปเดิมเรื่อง BL-001 ระบุ schema-notes Rev5 เป็น PK32/UQ24/CHECK80/FK40/unique index13 และบอกว่าตรง fixture เดิมของ TP001-052/053 จึงไม่แก้ case เก็บทั้งสองข้อความโดยไม่เลือกเกณฑ์แทน ต้องให้ arch/vault ยืนยัน revision และเกณฑ์ของ AC-033-01–05 ก่อนตรวจจริง

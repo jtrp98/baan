@@ -48,13 +48,15 @@
 API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · DES = Design หรือสัญญาออกแบบ · IPC = Inter-Process Communication · HID = Human Interface Device · SLA = Service Level Agreement
 
 
-## หลักฐาน
-
-ผลตรวจเอกสารเดิม 2026-10-29 ด้วย PowerShell แบบ static: AC rows 6/6, fixture rows 22/22, local file links 19/19; ทุกไฟล์ไม่เกิน 10 KiB. git diff --check ผ่าน (exit 0). ไม่รัน harness/tests/SQL/หุ่น; runtime NOT_RUN
 
 ## ยังไม่ยืนยัน
 
 timer sweep 60 วินาทีและ poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime และระบุค่าสมมติฐานใน expected; ไม่ใช่เกณฑ์ physical SLA
+
+## หลักฐาน
+
+ผลตรวจเอกสารเดิม 2026-10-29 ด้วย PowerShell แบบ static: AC rows 6/6, fixture rows 22/22, local file links 19/19; ทุกไฟล์ไม่เกิน 10 KiB. git diff --check ผ่าน (exit 0). ไม่รัน harness/tests/SQL/หุ่น; runtime NOT_RUN
+
 
 ## หลักฐานอ้างอิง
 

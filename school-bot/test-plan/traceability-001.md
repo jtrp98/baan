@@ -21,14 +21,16 @@
 
 AC-041-04/05 เพิ่ม TP001-078 สำหรับ tombstone; [AC-038-05 (ครูตรวจ Arm ของนักเรียนนอกรายชื่อที่ได้รับมอบหมายหรือข้ามโรงเรียนไม่ได้…)](../requirement/req-038.md) และ [AC-039-05 (ครูขอดูรายชื่อหรือผลนักเรียนนอกที่ได้รับมอบหมาย…)](../requirement/req-039.md) เพิ่ม TP001-079 สำหรับ authority; [AC-030-04 (การเตรียมอัปเดตเริ่มเฉพาะเมื่อผู้ใช้สั่งเอง และตรวจ trust ครบ)](../requirement/req-030.md)–08 ใช้ TP001-080 โดย AC-030-04 มี TP001-048 ตรวจ metadata-only; [AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md) ใช้ TP001-081 สำหรับหมดเวลา; AC-036-06 ใช้ TP001-082 สำหรับ logout ตารางไฟล์ย่อยคง owner เดิม และผูก [BE-019 (Update check/Prepare/Install)](../plan/index.md)/[QA-010 (Update/assets QA)](../plan/index.md) ของการอัปเดตจาก plan/index.md
 
-## ยังไม่ยืนยัน
-
-เอกสารต้นฉบับของ TP001-081 ไม่ระบุ implementation/validation task owner เพิ่ม จึงไม่เดาเจ้าของจาก case ข้างเคียง ให้ gm ยืนยัน mapping งานในแผน โดยไม่กระทบ expected ธุรกิจและ coverage ของ AC-046-07
 
 ## คำย่อ
 
 AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · BR = Business Rule หรือกฎธุรกิจ
 
+
+
+## ยังไม่ยืนยัน
+
+เอกสารต้นฉบับของ TP001-081 ไม่ระบุ implementation/validation task owner เพิ่ม จึงไม่เดาเจ้าของจาก case ข้างเคียง ให้ gm ยืนยัน mapping งานในแผน โดยไม่กระทบ expected ธุรกิจและ coverage ของ AC-046-07
 
 ## หลักฐาน
 

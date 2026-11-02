@@ -4,9 +4,8 @@
 
 [กลับint-001-entry](int-001-entry.md) · ส่วนหนึ่งของ UX ชุดเดียวกับตาราง Sign-off ในไฟล์ทางเข้า
 
-## 4. E2 — เลือก Guest หรือ Login + Login flow
 
-อ้างอิง: [BR-009-02 (Guest/Local และ Login/Cloud ต่างต้องมี License)](../requirement/req-009.md) · [BR-036-01 (Guest ไม่ต้องมีบัญชี แต่ต้องมี License ตาม REQ-009/034)](../requirement/req-036.md)..04 · [AC-009-02 (เลือก Guest หรือ Login โดยยังไม่มี License แล้วไม่สามารถข้ามข้อกำหนด License เพื่อเข้าใช้โหมดหลักได้)](../requirement/req-009.md) · [AC-036-01 (Guest ที่มี License บันทึกและเปิดหลายงานทั้งสามโหมดในเครื่องได้โดยไม่ต้อง Login)](../requirement/req-036.md)..04 · pack-guest G1 (Guest ใช้พื้นที่ร่วมโดยไม่มี PIN)/G2 (ไม่ล้างงาน Guest อัตโนมัติ)/G6 (บังคับ License ทั้ง Guest และ Login) · [มติ035 (แหล่งสิทธิ์แอดมินโรงเรียน)](../requirement/decisions-035.md) (auth ผ่านระบบบัญชีเดิมและ HTTP API Gateway (`sb-api-gateway`) — target)
+อ้างอิง: [BR-009-02 (Guest/Local และ Login/Cloud ต่างต้องมี License)](../requirement/req-009.md) · [BR-036-01 (Guest ไม่ต้องมีบัญชี แต่ต้องมี License ตาม REQ-009/034)](../requirement/req-036.md) ถึง [BR-036-04 (เลือกนำเข้า Guest ตาม REQ-041/042 ไม่ auto-upload)](../requirement/req-036.md) · [AC-009-02 (เลือก Guest หรือ Login โดยยังไม่มี License แล้วไม่สามารถข้ามข้อกำหนด License เพื่อเข้าใช้โหมดหลักได้)](../requirement/req-009.md) · [AC-036-01 (Guest ที่มี License บันทึกและเปิดหลายงานทั้งสามโหมดในเครื่องได้โดยไม่ต้อง Login)](../requirement/req-036.md) ถึง [AC-036-04 (บันทึก Cloud ไม่สำเร็จแล้วแจ้งความล้มเหลว ไม่แสดงว่า Cloud บันทึกสำเร็จหรือผูกงานกับบัญชีอื่น)](../requirement/req-036.md) · pack-guest G1 (Guest ใช้พื้นที่ร่วมโดยไม่มี PIN)/G2 (ไม่ล้างงาน Guest อัตโนมัติ)/G6 (บังคับ License ทั้ง Guest และ Login) · [มติ035 (แหล่งสิทธิ์แอดมินโรงเรียน)](../requirement/decisions-035.md) (auth ผ่านระบบบัญชีเดิมและ HTTP API Gateway (`sb-api-gateway`) — target)
 
 หน้าจอ: สองการ์ดใหญ่ (แสดงทุกครั้งที่เปิดแอป — ข้อเสนอ Q5 (แสดงตัวเลือก Guest/Login ทุกครั้ง))
 - **การ์ด Guest**: ปุ่ม "เริ่มใช้แบบผู้เยี่ยมชม (Guest)" + คำอธิบาย "งานทั้งหมดเก็บในเครื่องนี้และทุกคนที่ใช้เครื่องนี้เปิดดูได้ ไม่มีรหัสลับ" — ไม่มีช่อง PIN ใด ๆ (G1) ไม่มีการล้างงานอัตโนมัติ (G2) · คำ "ไม่มีรหัสลับ" ตั้งใจให้ครูเห็นก่อนกด
@@ -26,7 +25,7 @@ Login states:
 
 ## 5. ตาราง mapping ผลตรวจ → สถานะ → คำ copy (จาก DES-002 "Local state/errors")
 
-| ผลตรวจ | พฤติกรรมแอป | คำ copy ไทย (ข้อเสนอ — รอเซ็น Q2 (ข้อความไทยและ accessibility ของ Entry/Labs)) | ปุ่ม |
+| ผลตรวจ | พฤติกรรมแอป | คำ copy ไทย (ตาม Q2 (ข้อความไทยและ accessibility ของ Entry/Labs)) | ปุ่ม |
 |---|---|---|---|
 | 409 DEVICE_LIMIT | อยู่ E1 ไม่ unlock | "Key นี้ผูกกับเครื่องอื่นอยู่ (DEVICE_LIMIT) — ให้ผู้ดูแลปลดเครื่องเดิมก่อนจึงย้ายมาเครื่องนี้ได้" | กรอก Key ใหม่ / "ติดต่อผู้ดูแล" |
 | 403 DEVICE_NOT_ACTIVATED / DEVICE_PROOF_INVALID | ไม่ unlock/renew → recovery | "เครื่องนี้ยังไม่ได้เปิดใช้งาน หรือไม่สามารถพิสูจน์ตัวเครื่องได้" | "เปิดใช้งานใหม่" |

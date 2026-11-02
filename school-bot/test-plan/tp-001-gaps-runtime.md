@@ -17,14 +17,16 @@ TP001-025–030/078 ต้องพิสูจน์ runtime ตามสัญ
 
 ส่ง check สร้าง tests ตามระดับและ profile ที่กำหนด เลือก unit ก่อน integration เมื่อ prerequisite ยังไม่มีให้รายงานว่าติดเงื่อนไข โดยไม่แก้ expected เอง แยกหลักฐาน native/Cloud/hardware/installer และ SQL catalog runtime ออกจาก mock/static
 
-## ยังไม่ยืนยัน
-
-poll 3000 ms/debounce 0 และ trash sweep timer 60 วินาทียังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime ไม่ใช่เกณฑ์ความปลอดภัยเชิงกายภาพ ข้อขัดแย้งจำนวน constraint ของ TP001-052 เก็บทั้งสองข้อความใน [case แบบข้อมูล](tp-001-cases-release-model-2.md#tp001-052) ให้ arch/vault ตัดสินเกณฑ์ revision ที่ใช้
 
 ## คำย่อ
 
 API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · DES = Design หรือสัญญาออกแบบ · BR = Business Rule หรือกฎธุรกิจ · SLA = Service Level Agreement · OS = Operating System
 
+
+
+## ยังไม่ยืนยัน
+
+poll 3000 ms/debounce 0 และ trash sweep timer 60 วินาทียังเป็นสมมติฐาน ต้องให้ arch/เจ้าของสัญญายืนยันก่อน runtime ไม่ใช่เกณฑ์ความปลอดภัยเชิงกายภาพ ข้อขัดแย้งจำนวน constraint ของ TP001-052 เก็บทั้งสองข้อความใน [case แบบข้อมูล](tp-001-cases-release-model-2.md#tp001-052) ให้ arch/vault ตัดสินเกณฑ์ revision ที่ใช้
 
 ## หลักฐาน
 

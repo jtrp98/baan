@@ -4,7 +4,6 @@
 
 [กลับint-005-mapping](int-005-mapping.md) · ส่วนหนึ่งของ UX ชุดเดียวกับตาราง Sign-off ในไฟล์ทางเข้า
 
-## 1. ภาพรวมหน้าและสิทธิ์ (ข้อเสนอ)
 
 สามหน้าในเว็บโรงเรียน (Desktop ไม่มีส่วนใดของงานนี้):
 1) **"จัด mapping คะแนน"** (admin โรงเรียน) — ถือครองช่อง (GradeSlot) + ผูกกิจกรรม→ช่อง ([DES-008 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](../design/des-008.md))
@@ -19,7 +18,7 @@
 
 เงื่อนไขเปิดใช้ทั้งสองหน้า: License ของโรงเรียน active (BR-049-07 · 403 LICENSE_REQUIRED)
 
-## 2. หน้าจัด mapping (admin โรงเรียน) — DES-008 · REQ-049
+## 2. หน้าจัด mapping (admin โรงเรียน) — DES-008 · [REQ-049 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](../requirement/req-049.md)
 
 ### 2.1 โครงหน้า (ข้อเสนอ — Q30 (หน้า mapping รายช่องคะแนน))
 

@@ -29,11 +29,12 @@
 
 [การเตรียม การกระตุ้นเหตุการณ์ และสิ่งที่วัด](tp-002-fixture-clock-001-setup.md)
 
-## ยังไม่ยืนยัน
-
-trash sweep timer 60 วินาทีและ poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ให้ arch/เจ้าของสัญญายืนยันก่อน runtime; TTL License 15 นาทีได้รับอนุมัติตามมติ 046 แล้ว
-
 
 ## คำย่อ
 
 API = Application Programming Interface · AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · REQ = Requirement หรือข้อกำหนด · BR = Business Rule หรือกฎธุรกิจ · TTL = Time to Live หรืออายุที่ใช้งานได้ · UTC = Coordinated Universal Time
+
+
+## ยังไม่ยืนยัน
+
+trash sweep timer 60 วินาทีและ poll 3000 ms/debounce 0 ยังเป็นสมมติฐาน ให้ arch/เจ้าของสัญญายืนยันก่อน runtime; TTL License 15 นาทีได้รับอนุมัติตามมติ 046 แล้ว

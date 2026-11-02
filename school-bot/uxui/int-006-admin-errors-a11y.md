@@ -32,7 +32,7 @@
 
 ## S6. SchoolBright และ accessibility (a11y — การเข้าถึงสำหรับผู้ใช้ทุกกลุ่ม)
 
-ข้อเสนอส่วนนี้ใช้กับ admin ส่วนกลางใน school-bot; school_web ยึดกฎ repo ตาม [T4](int-006-admin-trace.md#t4-source-และข้อจำกัดหลักฐาน) โดยใช้ DESIGN/shared props เดิมสำหรับ component/font/spacing และ P9 สำหรับ loading ไม่บังคับค่าของ skill ข้าม repo
+ข้อเสนอส่วนนี้ใช้กับ admin ส่วนกลางใน school-bot; school_web ยึดกฎ repo ตาม [T4](int-006-admin-review-signoff.md#source-limitations) โดยใช้ DESIGN/shared props เดิมสำหรับ component/font/spacing และ P9 สำหรับ loading ไม่บังคับค่าของ skill ข้าม repo
 
 ข้อเสนอ: Sidebar+Header, spacing ทวีคูณ 8px, radius12; TH Sarabun New body18/36 ตาราง16/32 หัว24/48 ตามกฎ line-height 2 เท่า ใช้ stack/component กลางที่เจ้าของ repo ยืนยัน ไม่เสนอ migration หรืออ้างตรวจ component แล้ว
 

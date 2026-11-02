@@ -4,12 +4,11 @@
 
 [กลับเอกสารหลัก](int-007-trace.md)
 
-## 3. ข้อจำกัดที่ส่ง arch ไม่ผลักให้ผู้เซ็นตัดสินเทคนิค
 
 1. Resume: AttemptView ไม่มี answers และไม่มีรายการค้นหา attempt ค้างใน [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](../design/des-010.md) แม้ข้อมูล Answers มีใน dictionary contract-002 จึงร่างการกลับเข้าครั้งเดิมเมื่อทราบ ID ได้ แต่ยังรับรองการกู้คำตอบ/ค้นหาหลังเปิดแอปใหม่ไม่ได้ ให้ arch ระบุวิธีตามสัญญาก่อน front ทำส่วนนี้
-2. Policy/revision/history: snapshot เก็บไว้ตาม DES-010 และ learning-rules แต่ AttemptView ไม่คืน effective_policy, bank_revision, evaluator_version หรือประวัติทุกครั้ง จึงยังทำรายละเอียดย้อนหลังครบ AC-046-03, AC-046-04 จาก response นี้อย่างเดียวไม่ได้ ห้ามเติม field หรือ endpoint ใน UX เอง
-3. หมดเวลา: business ตอบ A ตามมติ 042/AC-046-07 แล้ว; ใช้สัญญาผลข้อสอบเมื่อหมดเวลาตาม [des-010.md](../design/des-010.md) และ [learning-ux-contract-gaps-001.md](../design/learning-ux-contract-gaps-001.md); technical proof ยัง OPEN: clock/deadline, save/submit/expiry race, idempotent finalization, crash/retry/recovery, read ระหว่าง finalize และ reveal mapping รอ arch/sys ตรึงและพิสูจน์ ไม่รับรอง runtime
-4. Aggregate/Level: ProgressView ที่ [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md) มีผลที่เลือก แต่ไม่มี aggregate snapshot/breakdown; ProposalView ที่ [DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](../design/des-011.md) ไม่คืน roster/source refs/policy revision ทั้งชุด แม้ server เก็บ snapshot ตาม :30 จึงห้ามนำผลสดมาประกอบอ้างเป็น snapshot เดียวกัน ส่วนรายละเอียดที่ยังอ่านไม่ได้รอ arch ระบุช่องทางในขอบเขตเดิม
+2. Policy/revision/history: snapshot เก็บไว้ตาม DES-010 และ learning-rules แต่ AttemptView ไม่คืน effective_policy, bank_revision, evaluator_version หรือประวัติทุกครั้ง จึงยังทำรายละเอียดย้อนหลังครบ [AC-046-03 (รายการที่กำหนดสุ่มข้อ แสดงประวัติชุดและลำดับข้อที่ผู้เรียนได้รับจริงได้)](../requirement/req-046.md), [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot และเกณฑ์เดิม ผลเดิมไม่เปลี่ยน)](../requirement/req-046.md) จาก response นี้อย่างเดียวไม่ได้ ห้ามเติม field หรือ endpoint ใน UX เอง
+3. หมดเวลา: business ตอบ A ตาม[มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)/[AC-046-07 (Test 10 ข้อละ 1)](../requirement/req-046.md) แล้ว; ใช้สัญญาผลข้อสอบเมื่อหมดเวลาตาม [des-010.md](../design/des-010.md) และ [learning-ux-contract-gaps-001.md](../design/learning-ux-contract-gaps-001.md); technical proof ยัง OPEN: clock/deadline, save/submit/expiry race, idempotent finalization, crash/retry/recovery, read ระหว่าง finalize และ reveal mapping รอ arch/sys ตรึงและพิสูจน์ ไม่รับรอง runtime
+4. Aggregate/Level: ProgressView ที่ [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md) มีผลที่เลือก แต่ไม่มี aggregate snapshot/breakdown; ProposalView ที่ [DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](../design/des-011.md) ไม่คืน roster/source refs/policy revision ทั้งชุด แม้สัญญาระบุว่า server เก็บ snapshot จึงห้ามนำผลสดมาประกอบอ้างเป็น snapshot เดียวกัน ส่วนรายละเอียดที่ยังอ่านไม่ได้รอ arch ระบุช่องทางในขอบเขตเดิม
 5. Authority/term resolver และการหาทรัพยากรหลัง unknown ที่ไม่มี ID ยังต้องพิสูจน์; ใช้ fail closed ไม่สร้างทางค้นหาหรือสิทธิ์เพิ่มเอง ตาม teacher-authority และ DES-011
 
 ## 4. หลักฐาน source และ preconditions
@@ -17,6 +16,8 @@
 ค่าคอนทราสต์เป็นผลคำนวณจาก token เท่านั้น ยังไม่มีหลักฐานตรวจ UI/runtime
 
 ## หลักฐาน
+
+- `design/des-011.md:30`
 
 - ฐานพาธอ้างอิงทุกบรรทัดในเอกสารนี้: `C:/src/schoolbright/knowledge/school-bot/` ตรวจจากไฟล์จริง ไม่คัดเลขบรรทัดจากความจำ
 - requirement/req-046.md:24

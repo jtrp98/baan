@@ -2,7 +2,7 @@
 
 > แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-> ฐานอ้างอิง: [REQ-013 (ขอบเขต sample/preview/mock)](../requirement/req-013.md) · [REQ-014 (ค้นหาและเชื่อมต่อหุ่น)](../requirement/req-014.md)..024 · [REQ-025 (Code Lab: เขียนและรันโปรแกรม)](../requirement/req-025.md) · [REQ-026 (สร้างและทดลองโปรแกรมบล็อก)](../requirement/req-026.md) · [DES-006 (หุ่นจริง Windows/macOS)](../design/des-006.md) Rev1
+> ฐานอ้างอิง: [REQ-013 (ขอบเขต sample/preview/mock)](../requirement/req-013.md) · [REQ-014 (ค้นหาและเชื่อมต่อหุ่น)](../requirement/req-014.md) ถึง [REQ-024 (การเชื่อมต่อขาดและคำสั่งล้มเหลว)](../requirement/req-024.md) · [REQ-025 (Code Lab: เขียนและรันโปรแกรม)](../requirement/req-025.md) · [REQ-026 (สร้างและทดลองโปรแกรมบล็อก)](../requirement/req-026.md) · [DES-006 (หุ่นจริง Windows/macOS)](../design/des-006.md) Rev1
 > ออกแบบต่อยอดจาก component เดิมที่มีจริง: `RobotMode/NativeConnectScreen/NativeReconnectOverlay/NativeWorkspace/ArmSimulator/BlockMode/CodeLabMode` (frontend จริงอยู่ `target/school-bot/app/frontend/src`)
 
 ## เนื้อหาแยกตามงาน
