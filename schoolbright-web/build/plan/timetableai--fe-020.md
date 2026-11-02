@@ -1,0 +1,43 @@
+# FE-020 — Frontend request hygiene on the 7 routes (RV-7, RV-13, RV-14, RV-15) + missing 403 tests
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+**(1) RV-15** — write ที่ถือ HTTP 200 ทุกตัวว่าบันทึกแล้ว (`timetable/set-all` ที่ `manage-teaching-schedule/page.tsx` ~727-736, `teacher-group/set-times` ที่ `TeacherGroupsTab.tsx` ~551-558 และ ~812) ต้องอ่าน body `status` — 200 + `status !== 1` = ล้ม (toast/rollback ทางเดิม ไม่เปิด success modal หรือสรุปสำเร็จ) ตาม DES-002 (HTTP 200 เสมอ ผลธุรกิจอยู่ใน `status`) · **(2) RV-7** — rollback ของ `persistGroupTeachers` และของ `set-times` modal ต้องไม่คืน snapshot ทั้งก้อนทับผลของ request ที่สำเร็จทีหลัง (serialize ต่อกลุ่ม หรือ rollback เฉพาะเมื่อ response เป็นของ request ล่าสุด) และย้าย side effect ออกจาก updater ของ `setTeacherGroups` · **(3) RV-13** — `handleGroupModalSave` ของ `subject-settings/[year]` เรียก `loadSubjectSettings()` ใน `catch` ให้ UI ตรงกับ server หลัง delete สำเร็จแต่ set ล้ม · **(4) RV-14** — เลิก `readJsonOrNotify` ท้องถิ่นที่บังชื่อ import ในบล็อก restore (ใช้ helper ร่วมด้วย id `restore-schedule-data`) · **(5)** เพิ่ม test 403 ที่ยังขาดของ loader/write ใน `subject-settings/[year]`, `settings/[year]`, `create-class-period/[year]` และ loader ของ generation hook (`use-timetable-generation.ts`) — `review.md` RV-7/RV-13/RV-14/RV-15 (non-blocking, มีมาก่อน — `qa.md` ส่ง RV-15 ให้ `project-manager`) · อยู่นอกถ้อยคำ AC-063 (และนอก AC-066..AC-072) แต่ RV-15 แสดง "สำเร็จ" ขณะที่ backend รายงานล้ม (เสี่ยงข้อมูล) และ RV-7/RV-13 ทำให้ UI ไม่ตรงกับ server · test 403 ที่ขาดทำให้ regression ของ AC-063 บนพื้นที่เหล่านี้พึ่งการอ่านโค้ดอย่างเดียว · **รวมเป็น task เดียว** เพราะ owner, ชนิดหลักฐาน (vitest + อ่านโค้ด), rollback (revert ไฟล์ frontend) เหมือนกัน ไม่มีสัญญาใหม่ และแต่ละข้อเล็กเกินจะแยก · **แยกจาก FE-019** เพื่อไม่ถ่วงชุด (a)–(d) ที่ต้องออกพร้อมกัน · หลัง FE-018/FE-019 เพราะแก้ไฟล์เดียวกัน (`manage-teaching-schedule/page.tsx`, `subject-settings/[year]`, `settings/[year]`, `create-class-period`)
+
+## References
+
+REQ-021, AC-063, DES-018, DEC-018
+
+## Scope
+
+ไม่มี copy ใหม่ · ไม่มี endpoint/สัญญาใหม่ — การแทนที่แบบ atomic ของ RV-13 ต้องมี backend replace endpoint จึงอยู่นอก task (Unresolved Open Questions → `system-analyst` ถ้าต้องการ) · ไม่แตะกติกาการบล็อกของ FE-019 และกติกา 401 ของ FE-018 (401 ยังไม่มี toast) · ไม่ลบ `CreateClassPeriodForm` (RV-9 — Unresolved Open Questions) · ประตู `security` + `breaking-contract` สะท้อน DES-018 — task ไม่เพิ่ม breaking · **ไม่มี AC ใหม่ (ตรวจแล้ว 2026-10-02):** AC-066..AC-072 ที่ BA เพิ่มไม่มีข้อใดครอบ task นี้ — AC-067..AC-070 ว่าด้วย *load* ที่จำเป็นต่อ Generate/Save ไม่ใช่ผลของ *write* (RV-15), การ rollback ซ้อน (RV-7) หรือ reload หลัง delete+set (RV-13) · Traceability จึงคงเป็น **AC-063 เท่านั้น** (test 403 ของ loader/write = ส่วน "403 แสดงเป็นความล้มเหลวที่ผู้ใช้เห็น") · **AC-062 ไม่ใช้** — เป็นการตัดสิน 403 ของ backend ที่ task frontend ที่ mock 403 พิสูจน์ไม่ได้ · RV-15/RV-7/RV-13 ยังไม่มีถ้อยคำ AC — อ้าง DES-002 (`status` ใน body) และ AC-063 "ไม่มีจุดใดแสดงสำเร็จ" ในเชิงเจตนาเท่านั้น (ถ้าต้องมี AC แยก → `business-analyst` ก่อนรอบ QA — Unresolved Open Questions) · test 403 ของ loader ใน generation hook และ `setting/get` ของ `settings/[year]` ซ้อนกับ AC-067 ที่ FE-019 เป็นเจ้าของ — ที่นี่เป็น regression ไม่ใช่หลักฐานของ AC-067 · AC-066 = regression (401 ยังไม่มี toast — รัน test ของ FE-018 ซ้ำ) · worktree frontend ยังไม่ commit — ยืนยันบรรทัดก่อนแก้
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+`timetableFetch`/`authHeaders.ts`/`backendProxy.ts` · กติกาการบล็อกของ FE-019 · กติกา 401 ของ FE-018 · backend · การมีอยู่ของ `CreateClassPeriodForm`
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-063: write `timetable/set-all` และ `set-times` (modal + wizard) ที่ได้ 200 + `status !== 1` → ไม่แสดงสำเร็จ (ไม่มี success modal/สรุปสำเร็จ) + toast/rollback · แก้กลุ่มครูสองครั้งติดกันที่ request แรกล้มหลัง request สองสำเร็จ → UI ตรงกับ server · ไม่มี POST ซ้ำภายใต้ StrictMode · `subject-settings` delete สำเร็จแต่ set ล้ม → หน้ารีโหลดสถานะจาก server · บล็อก restore ใช้ helper ร่วม (ไม่มีการบังชื่อ) · loader/write ของ `subject-settings/[year]`, `settings/[year]`, `create-class-period/[year]` และ generation hook ที่ได้ 403 → ความล้มเหลวที่ผู้ใช้เห็น พร้อม test
+
+## Dependencies
+
+FE-018, FE-019
+
+## Handoff
+
+ตรวจ AC-063 ด้วย vitest: (1) mock 200 `{status:-1}` ของ `set-all`/`set-times` → ไม่มี success modal/สรุป + toast/rollback (2) สองการแก้ซ้อน (request 1 ล้มหลัง request 2 สำเร็จ) → state = ผลของ request 2 และนับ POST = 1 ต่อการกดภายใต้ StrictMode (3) delete OK + set 500 → `loadSubjectSettings` ถูกเรียก (4) 403 ของ loader/write ทุกจุดในสี่พื้นที่ข้างบน → toast/Alert · รัน S10-A, `timetable-session-expired.test.tsx` และ test ของ FE-018/FE-019 ซ้ำผ่าน · grep ไม่พบ `readJsonOrNotify` ท้องถิ่น · typecheck/lint (ไฟล์ที่แตะ)/build ผ่าน — เก็บผลรันเป็นหลักฐาน
+revert ได้อิสระ — กลับพฤติกรรม as-built (ไม่ใช่ regression ของ AC-063) · ไม่มีสัญญา/ข้อมูลเปลี่ยน
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`
