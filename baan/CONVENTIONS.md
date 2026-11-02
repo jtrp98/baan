@@ -16,7 +16,7 @@ When a named data model/index splits a contract across linked dictionaries or ap
 
 ## 2. Write only what you own
 
-Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
+Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself · the module's `changelog\` is shared: whoever writes a knowledge file appends its own line there (§3) and never edits other lines.
 
 ## 3. Knowledge files: today's truth, written for a developer
 

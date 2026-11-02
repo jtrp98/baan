@@ -138,6 +138,7 @@ test("CONVENTIONS §3: knowledge เขียนให้ dev อ่าน · �
     "Knowledge files get **no `## Change Log` section**",
     "`requirement\\decisions.md` lists the decisions in force today",
     "closing `## หลักฐาน` section",
+    "the module's `changelog\\` is shared",
   ]) assert.ok(conv.includes(must), `CONVENTIONS.md ขาด: ${must}`);
   for (const f of ["roles/arch.md", "roles/spec.md", "roles/gm.md"]) {
     assert.match(read(f), /module changelog \(CONVENTIONS §3\)|module changelog —/, `${f} ต้องชี้ไป changelog ตาม §3`);
