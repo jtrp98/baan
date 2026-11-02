@@ -1,5 +1,7 @@
 # อ่านฟิลด์ JSON ใน data model
 
+> แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
 [กลับคู่มือ](data-model.md) · [ตารางทั้งหมด](data-dictionary/index.md) · [นิยามชนิดข้อมูลเต็ม](data-dictionary/contract-index.md)
 
 `jsonb` หมายถึงหนึ่งช่องในตารางเก็บข้อมูลหลายฟิลด์ด้านใน ตัวอย่างต่อไปนี้เป็นข้อมูลสมมติเพื่ออธิบายรูปแบบเดิม ไม่ใช่ข้อมูลที่นำเข้าฐานแล้ว และไม่ใช่ API request ครบชุด
@@ -68,7 +70,7 @@
 | `quiz_counts` | ให้นับ Quiz เป็นคะแนนหรือไม่; false บังคับน้ำหนัก Quiz เป็น 0 |
 | `activity_weights[].activity_id` | รหัส SchoolBotActivity ที่มีน้ำหนักในนโยบายคะแนนรวม |
 | `activity_weights[].weight_bps` | น้ำหนักเป็นจำนวนเต็ม: 10000 = 100%, 2500 = 25% ไม่ใช่ 2500 คะแนน |
-| `formula_version` | weighted-normalized-v1 ตาม034; NULL ใช้เฉพาะร่างก่อนเปิดรอบ |
+| `formula_version` | weighted-normalized-v1 ตาม [มติ 034 (สูตรรวมหลักสูตรและขอบเขตครูปรับข้อสอบ)](../requirement/decisions-034.md); NULL ใช้เฉพาะร่างก่อนเปิดรอบ |
 | `Sources[].activity_id` | รหัสกิจกรรมต้นทางของ mapping ช่องนี้ |
 | `Sources[].indicator_key` | UUID ตัวชี้วัดที่เลือก; NULL เมื่อไม่แยกตัวชี้วัด |
 | `Sources[].weight_bps` | น้ำหนักของแหล่งผลนั้นใน mapping; 10000 = 100% |
@@ -90,8 +92,3 @@
 ## นิยามเพิ่มเติม
 
 [ผลเรียน](learning-rules-032-034.md) นิยาม effective_policy/windows และ audit ผูก run; [คะแนน](grade-rules-032-034.md) นิยาม Sources หนึ่งรายการ, skipped_cells และ lock จาก snapshot
-
-## Change Log
-- 2026-10-23 — Rev2: sync032..034; SQL เดิม
-
-- 2026-10-23 — นายช่างขยายคำอธิบาย JSON จาก data-model Rev5 และ DES-005/009/010/011 ตามคำติผู้ใช้ โดยคงรูปแบบข้อมูลเดิม

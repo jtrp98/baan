@@ -28,3 +28,20 @@
 | [export-proof-pack-001.md](export-proof-pack-001.md) | 2 | ชุดหลักฐาน export: coverage, สิทธิ์, recovery และการตรวจข้อมูลก่อนเข้า knowledge | โครงชุดหลักฐาน; ยังไม่ใช่ผลรับรอง runtime |
 | [export-proof-pack-001-recovery.md](export-proof-pack-001-recovery.md) | 2 | Gate, recovery และหลักฐาน | ใช้ร่วมโครงชุดหลักฐาน; ยังไม่ใช่ผลรับรอง runtime |
 | [source-review-001.md](source-review-001.md) | ไม่ระบุ | As-built Block/Arm/Code และเส้นทางบทเรียน/สร้างงาน | EVIDENCE — ไม่ใช่ test verdict/release proof |
+| [des-001-host.md](des-001-host.md) | 1 | กำหนดเงื่อนไข Desktop host, bridge, engine และวงจรงาน | ใช้ร่วมสัญญา DES-001 Rev 1; สถานะตามสารบัญหลัก |
+| [des-001-acceptance.md](des-001-acceptance.md) | 1 | กำหนดเกณฑ์ตรวจ Desktop host และ IPC | ใช้ร่วมสัญญา DES-001 Rev 1; สถานะตามสารบัญหลัก |
+| [des-001-references.md](des-001-references.md) | 1 | รวมข้อกำหนดและมติของ Desktop host และ IPC | ใช้ร่วมสัญญา DES-001 Rev 1; สถานะตามสารบัญหลัก |
+| [des-002-device-proof.md](des-002-device-proof.md) | 3 | กำหนดการเก็บ key, ตัวตนอุปกรณ์, API และ device proof | ใช้ร่วมสัญญา DES-002 Rev 3; สถานะตามสารบัญหลัก |
+| [des-002-entitlement.md](des-002-entitlement.md) | 3 | กำหนดการบันทึกเป็นหน่วยเดียว การลองซ้ำ และ signed entitlement | ใช้ร่วมสัญญา DES-002 Rev 3; สถานะตามสารบัญหลัก |
+| [des-002-recovery.md](des-002-recovery.md) | 3 | กำหนดสถานะในเครื่อง ข้อผิดพลาด การกู้คืน และเกณฑ์ตรวจ License | ใช้ร่วมสัญญา DES-002 Rev 3; สถานะตามสารบัญหลัก |
+| [des-002-references.md](des-002-references.md) | 3 | รวมข้อกำหนดและมติของ License และ device binding | ใช้ร่วมสัญญา DES-002 Rev 3; สถานะตามสารบัญหลัก |
+| [des-003-document.md](des-003-document.md) | 4 | กำหนดเงื่อนไขโครงงาน เอกสาร v2, API และ bridge | ใช้ร่วมสัญญา DES-003 Rev 4; สถานะตามสารบัญหลัก |
+| [des-003-persistence.md](des-003-persistence.md) | 4 | กำหนดสถานะ การแก้ข้อมูลชน การกู้คืน และการย้ายข้อมูลโครงงาน | ใช้ร่วมสัญญา DES-003 Rev 4; สถานะตามสารบัญหลัก |
+| [des-003-acceptance.md](des-003-acceptance.md) | 4 | อธิบายทางเลือกและเกณฑ์ตรวจโครงงาน Local/Cloud | ใช้ร่วมสัญญา DES-003 Rev 4; สถานะตามสารบัญหลัก |
+| [des-003-references.md](des-003-references.md) | 4 | รวมข้อกำหนดและมติของโครงงาน Local/Cloud | ใช้ร่วมสัญญา DES-003 Rev 4; สถานะตามสารบัญหลัก |
+| [des-006-platform.md](des-006-platform.md) | 2 | กำหนดเงื่อนไข platform boundary, profile และการรับรองหุ่นจริง | ใช้ร่วมสัญญา DES-006 Rev 2; สถานะตามสารบัญหลัก |
+| [des-006-commands.md](des-006-commands.md) | 2 | กำหนดคำสั่ง ผลลัพธ์ วงจรงาน ความล้มเหลว และ release guard ของหุ่นจริง | ใช้ร่วมสัญญา DES-006 Rev 2; สถานะตามสารบัญหลัก |
+| [des-006-references.md](des-006-references.md) | 2 | รวมข้อกำหนดและมติของหุ่นจริง Windows/macOS | ใช้ร่วมสัญญา DES-006 Rev 2; สถานะตามสารบัญหลัก |
+| [des-007-manifest.md](des-007-manifest.md) | 3 | กำหนดเงื่อนไข release manifest, API และขั้นตอนของ host | ใช้ร่วมสัญญา DES-007 Rev 3; สถานะตามสารบัญหลัก |
+| [des-007-recovery.md](des-007-recovery.md) | 3 | กำหนดข้อผิดพลาด การกู้คืน ความเข้ากันได้ และเกณฑ์ตรวจ trusted update | ใช้ร่วมสัญญา DES-007 Rev 3; สถานะตามสารบัญหลัก |
+| [des-007-references.md](des-007-references.md) | 3 | รวมข้อกำหนดและมติของ release และ trusted update | ใช้ร่วมสัญญา DES-007 Rev 3; สถานะตามสารบัญหลัก |

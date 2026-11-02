@@ -1,6 +1,6 @@
 # Desktop login adapter — ขอบเขตและ admission
 
-> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 สัญญานี้กำหนด Data Transfer Object (DTO) ภายใน การแปลผล authentication และเงื่อนไขก่อนออก SchoolBot session ครูใช้ native continuation ผ่าน SchoolBot adapter ไป Gateway web flow เดิม นักเรียนยังไม่มี Desktop completion ที่พิสูจน์ได้ สัญญานี้ไม่เพิ่ม public endpoint หรือ schema
 
@@ -24,7 +24,7 @@ cType ที่ได้หลัง authentication เลือก route ย้
 
 ## Admission และขอบเขต public API
 
-pending/challenge → terminal_candidate → trusted token + directory admission → fully_authenticated → commit opaque unbound session 5 นาที → bind profile fully_authenticated เป็นสถานะภายใน ไม่ใช่ public access token ก่อน admission ครบห้ามสร้างแม้ unbound session bind คง `CreateDate+8 ชั่วโมง` ตาม [DES-004 (ตัวตนและสิทธิ์)](des-004.md) ไม่ต่ออายุจาก retry
+pending/challenge → terminal_candidate → trusted token + directory admission → fully_authenticated → commit opaque unbound session 5 นาที → bind profile fully_authenticated เป็นสถานะภายใน ไม่ใช่ public access token ก่อน admission ครบห้ามสร้างแม้ unbound session เมื่อ bind สำเร็จตั้ง `ExpiresAt = เวลาที่ bind สำเร็จ + 8 ชั่วโมง` ตาม [DES-004 (ตัวตนและสิทธิ์) Rev 13](des-004-lifecycle.md) ไม่ต่ออายุจาก retry
 
 Public `/v2/auth/login` ยังใช้ DTO เดิม ห้ามเพิ่ม actor/step/flow_token หรือ continuation routes จาก DTO ภายใน ต้องพิสูจน์ attempt binding กับ school/account/License/current binding/DeviceJkt, stage, expiry, replay และ cancellation ก่อนส่ง pending กลับ host ไม่สร้าง store/ticket format ชดเชยโดยไม่มีฐานรองรับ รายการหลักฐานอยู่ใน desktop-auth-review-packet-001 (memory)
 
@@ -33,6 +33,8 @@ Public `/v2/auth/login` ยังใช้ DTO เดิม ห้ามเพ�
 ปัด browser handback เพราะไม่มี callback/redemption binding ไม่สร้าง verifier/hash ใหม่ ไม่ fake IMEI (รหัสประจำเครื่องโทรศัพท์) หรือใช้ installation ID/DeviceJkt แทน นักเรียนใช้ mobile ได้เฉพาะเมื่อเจ้าของพิสูจน์ Desktop device lifecycle
 
 ## หลักฐาน
+
+- ตรวจ source ซ้ำ 2026-11-02: `C:/src/schoolbright/target/school-bot/web/src/SchoolBot.Domain/Identity/SchoolBotSessionRecord.cs:3–20` มี `ExpiresAt` และ `CreateDate` แยกกัน; record ไม่พิสูจน์การคำนวณอายุเมื่อ bind ข้อกำหนดนี้ใช้ [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md) และ DES-004 Rev 13
 
 - desktop-login-evidence-001 และ desktop-login-wire-evidence-001 (memory) เป็น source evidence เดิมของ Gateway; desktop-login-owner-question-001 (memory) ยืนยันการใช้ cType แยกนักเรียน/ครู
 - Gateway `TusersRepository.cs:103` มี FindAuthUserDetail และ `WebLoginService.cs:64` มี employee lookup ยังไม่พิสูจน์ private routing seam

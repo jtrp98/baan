@@ -1,6 +1,6 @@
 # DES-008 — Mapping หลักสูตรกับช่องคะแนน SchoolBright — การตรวจข้อมูล โรงเรียน และสิทธิ์
 
-> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 6 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 044 — SQL constraints เหลือเฉพาะ Primary Key)
 
 ส่วนต่อของ [DES-008 — Mapping หลักสูตรกับช่องคะแนน SchoolBright](des-008.md)
 
@@ -8,7 +8,7 @@
 
 ตรวจ school_admin หรือสิทธิ์ครูรายวิชาตาม [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md) ทั้ง ณ request และ re-check ซ้ำก่อน commit ใน SchoolBot DB
 ครูอ่านได้เฉพาะวิชาที่ตนสอน ไม่รวมสิทธิ์ครูคนหนึ่งไปยังวิชาอื่น
-ชั้น application ต้องตรวจว่า `CourseRun`, `GradeSlot` และ `ScoreMapping` อยู่ `SchoolId` เดียวกับ session และ `GradeSlot.CourseRunId == ScoreMapping.CourseRunId`
+ไม่มี SQL FOREIGN KEY บังคับความสัมพันธ์ ชั้น application ต้องตรวจการมีอยู่และความสัมพันธ์ของ `CourseRun`, `GradeSlot` และ `ScoreMapping` รวมทั้ง `SchoolId` เดียวกับ session และ `GradeSlot.CourseRunId == ScoreMapping.CourseRunId` ใน SchoolBot DB transaction เดียวกับการเขียน ตาม [มติ 044 (SQL constraints เหลือเฉพาะ Primary Key)](../requirement/decisions-044.md)
 plan_course_id ของ GradeSlot ต้องอยู่ใน PlanCourseIds ของ CourseRun
 source ต้องเป็น published Activity ใน curriculum revision ของ run และ indicator ต้องถูกประกาศอยู่บน Activity นั้น
 source ต้องมีผลตัวเลขที่นิยามได้ ไม่แปลง passed เป็น 100 เอง; quiz ที่ ScoringPolicy ไม่นับคะแนนเป็น source ไม่ได้ ([DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)); ค่าหายไม่ถือเป็นศูนย์

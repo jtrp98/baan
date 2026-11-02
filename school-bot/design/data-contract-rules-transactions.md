@@ -1,0 +1,11 @@
+# การล็อกและการ commit ข้อมูลร่วม
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+[กลับเอกสารหลัก](data-contract-rules.md)
+
+application/repository ต้องใช้ transaction-scoped lock บน stable key ที่ serialize ทุก writer ของ logical scope เดียวกันข้าม process รวมกรณียังไม่มีแถว: ล็อกก่อนอ่านตรวจซ้ำและถือจน commit/rollback. ทุกเส้นทาง create/update/restore/เปลี่ยนสถานะต้องใช้ protocol เดียวกัน; key มี namespace/canonical encoding และแยก global (`SchoolId=null`) จาก tenant; หลาย locks ใช้ลำดับเดียวกัน. select-before-insert, row lock ของแถวที่ยังไม่มี และ `If-Match` เพียงอย่างเดียวไม่ป้องกัน create race
+
+lock ของ finalized proposal และ successor ใช้ namespace/key ของ CourseRun ต้นทางร่วมกัน ไม่ล็อกเฉพาะ proposal ID. คง predicates เดิม: active run = `Lifecycle IN ('planned','active','closing') AND IsDelete=false`; successor ของ run = `PreviousRunId IS NOT NULL AND IsDelete=false`; finalized proposal = `State IN ('promoted','retained','max_level') AND IsDelete=false`; successor ของ proposal = `SuccessorRunId IS NOT NULL AND IsDelete=false`. GradeSlot ownership ใช้ `RetiredAt=null` โดยไม่กรอง `IsDelete`; active mapping ใช้ `RetiredAt=null AND IsDelete=false`. กฎห้ามหลบประวัติด้วย retire/soft-delete/hard-delete ยังคงแยกจาก predicates เหล่านี้
+
+การบังคับทดแทนด้วย application/repository locks: **NOT_IMPLEMENTED — ไม่มี runtime evidence**; domain mutation/idempotency/audit ยังต้อง atomic ใน SchoolBot DB transaction เดียว ไม่เปลี่ยน replay window/tombstone/nonce/ownership/promotion semantics. สำหรับคู่ข้อมูลแม่–ลูกและ pointer ที่ต้องสอดคล้องกันเสมอ (เช่น `SchoolBotProject` คู่กับ `SchoolBotProjectRevision` และ `CurrentRevision` ตาม [decisions-051](../requirement/decisions-051.md) / [project-api-001](project-api-001.md) Rev2) ต้องบันทึกผ่านหน่วย commit ร่วมของ backing store/DB transaction (`CommitProjectAsync`): **ห้ามเผยแพร่แถว `SchoolBotProject` หรือเลื่อน `CurrentRevision` ลง store หรือ in-memory cache ก่อนที่แถว `SchoolBotProjectRevision` เป้าหมายจะ commit สำเร็จพร้อมกัน และห้ามใช้การเขียนแยกสองขั้นแล้วตามด้วยโค้ดชดเชย/ลบย้อนหลัง (compensation write/rollback in catch) เป็นหลักประกัน atomicity**; หากล้มเหลวก่อนจุด commit ต้องคงสถานะเดิมทั้งใน store และ cache และหากผลของจุด commit ไม่ทราบแน่ชัดต้อง invalidate/reload cache จากสถานะ authoritative ของ store

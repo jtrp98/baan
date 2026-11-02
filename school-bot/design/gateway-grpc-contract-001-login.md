@@ -1,6 +1,6 @@
 # Gateway–SchoolBot gRPC contract — Login routing และ admission
 
-> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 3 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) อธิบาย Login routing และ admission.
 
@@ -20,12 +20,14 @@ sys056 พบ web lookup เลือก SId ล่าสุด, mobile เล�
 
 เสนอ diagnostic codes ภายในใหม่: `AUTH_PROFILE_MISSING`, `AUTH_ACCOUNT_CARDINALITY`, `AUTH_PROFILE_CARDINALITY`. ทั้งหมดห้ามออก session; outward คง 503 AUTH_NOT_CONFIGURED สำหรับ linkage ที่ยังไม่ยืนยัน ไม่เผยจำนวนบัญชี/profile. missing/deleted account หรือ credential ผิด→401 UNAUTHORIZED; unknown category→503 AUTH_NOT_CONFIGURED. การเปิด codes ใหม่เป็น public API ต้องให้ owner รับรองก่อน ไม่แก้ rules Rev7 เอง.
 
-กฎ admission และอายุ session ของต้นฉบับที่ยังต้องตรวจความสอดคล้องอยู่ในหัวข้อยังไม่ยืนยันท้ายเอกสาร.
+กฎ admission ข้างต้นใช้ร่วมกับอายุ session ในหัวข้อถัดไป โดย Desktop session นับอายุจากเวลา bind สำเร็จตามมติ 052.
 
 Login RPC ระบุเฉพาะ successful terminal contract; public pending/continuation ยังไม่ถูกตรึง จึงยังไม่พร้อมเปิด Login end-to-end. ห้ามแปลง pending เป็น 401/201 เพื่อปิดช่องว่างนี้.
 
-## ยังไม่ยืนยัน
+## อายุ session
 
-HTTP200 จาก HTTP API Gateway อาจเป็น pending; token+pending หรือ malformed outcome→503 AUTH_UNAVAILABLE. คง password-change→2FA→contact และ mobile device/password-reset ทุกขั้นก่อน fully_authenticated. หลัง admission ครบจึงออก unbound Desktop session5 นาที แล้ว bind ตาม membership สด อายุหลัง bind=CreateDate+8 ชม. ไม่ยืดจาก retry. Web exchange คง 30 นาที/Staff8 ชม. จำกัดด้วย source expiry เมื่อมี; ข้อยกเว้น exp=null ของเว็บไม่ขยายไป Desktop.
+HTTP200 จาก HTTP API Gateway อาจเป็น pending; token+pending หรือ malformed outcome→503 AUTH_UNAVAILABLE. คง password-change→2FA→contact และ mobile device/password-reset ทุกขั้นก่อน fully_authenticated. หลัง admission ครบจึงออก unbound Desktop session5 นาที แล้ว bind ตาม membership สด เมื่อ bind สำเร็จตั้ง `ExpiresAt = เวลาที่ bind สำเร็จ + 8 ชั่วโมง` ตาม [DES-004 (ตัวตนและสิทธิ์) Rev 13](des-004-lifecycle.md). ไม่ยืดจาก retry. Web exchange คง 30 นาที/Staff8 ชม. จำกัดด้วย source expiry เมื่อมี; ข้อยกเว้น exp=null ของเว็บไม่ขยายไป Desktop.
 
-ข้อความอายุหลัง bind ข้างต้นคงถ้อยคำเชิงสัญญาของ Rev2 ส่วน [มติ 052 (อายุ Desktop session นับจากเวลา bind สำเร็จ)](../requirement/decisions-052.md) ระบุเวลา bind เป็นจุดเริ่มต้น ต้องให้เจ้าของสัญญาจัดการการแก้ความหมายแยกจากงานจัดรูปแบบนี้.
+## หลักฐาน
+
+- ตรวจ source ซ้ำ 2026-11-02: `C:/src/schoolbright/target/school-bot/web/src/SchoolBot.Domain/Identity/SchoolBotSessionRecord.cs:3–20` มี `ExpiresAt` และ `CreateDate` แยกกัน; โครงสร้าง record ไม่ได้พิสูจน์การคำนวณอายุเมื่อ bind ข้อกำหนด 8 ชั่วโมงหลัง bind ใช้ [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../requirement/decisions-052.md) และ DES-004 Rev 13

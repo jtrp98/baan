@@ -1,6 +1,6 @@
 # Desktop login adapter — Outcome decoder และ wire facts
 
-> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [Desktop adapter](desktop-login-adapter-001.md) ใช้ [Gateway outcome component](gateway-outcome-component-001.md) สำหรับ callable web decoder/parser/normalized outcomes โดยไม่เพิ่ม public completion หรือ session admission ใหม่
 
@@ -24,7 +24,7 @@ Mobile terminal_candidate ต้อง token ไม่ว่าง, temporaryTok
 
 Web200 ต้องตรงหนึ่ง branch ของ controller Gateway: requirePasswordChange=true+changeToken; next=two-factor+challengeToken/expiresAt; next=contact+challengeToken/expiresAt; หรือ token+requirePasswordChange=false โดยไม่มี pending discriminant. token ปน next/changeToken หรือ unknown next ไม่ผ่าน. send success ไม่ใช่ terminal. verify อาจไป contact ต่อ; ไม่หยุดหลัง รหัสใช้ครั้งเดียว (OTP) ครั้งแรก.
 
-pending/challenge → terminal_candidate → trusted token + directory admission ตามรายการ admission ใน desktop-auth-review-packet-001 (memory) → fully_authenticated → commit opaque unbound session5นาที → bind profile. fully_authenticated เป็นสถานะภายใน ไม่ใช่ public access token. bind คง CreateDate+8ชั่วโมงตาม [DES-004 (ตัวตนและสิทธิ์)](des-004.md) ไม่ต่ออายุจาก retry. ก่อนครบ admission ห้ามสร้างแม้ unbound session.
+pending/challenge → terminal_candidate → trusted token + directory admission ตามรายการ admission ใน desktop-auth-review-packet-001 (memory) → fully_authenticated → commit opaque unbound session5นาที → bind profile. fully_authenticated เป็นสถานะภายใน ไม่ใช่ public access token. เมื่อ bind สำเร็จตั้ง `ExpiresAt = เวลาที่ bind สำเร็จ + 8 ชั่วโมง` ตาม [DES-004 (ตัวตนและสิทธิ์) Rev 13](des-004-lifecycle.md) ไม่ต่ออายุจาก retry. ก่อนครบ admission ห้ามสร้างแม้ unbound session.
 
 ## Wire facts และ correlation
 

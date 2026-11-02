@@ -1,6 +1,6 @@
 # Desktop login adapter — Request และ effective bounds
 
-> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [Desktop adapter (admission และ route)](desktop-login-adapter-001.md) เป็นคำสั่งภายใน adapter ไม่ใช่ body หรือ public API ใหม่
 

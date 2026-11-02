@@ -1,6 +1,6 @@
 # Desktop login adapter — Error mapper, timeout และ retry
 
-> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
 
 ส่วนต่อของ [Desktop adapter](desktop-login-adapter-001.md) ใช้ v2 envelope จาก [กฎข้อมูลและ HTTP](data-contract-rules.md): `error.code/message/request_id/details` SchoolBot สร้าง/ตรวจ request_id เอง ไม่คัดลอก error upstream ทั้งก้อน และใช้ no-store ทุก auth response
 
