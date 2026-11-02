@@ -1,53 +1,34 @@
-# ชุดส่งต่อเจ้าของ — Owner Packet 001
-วันที่ 2026-10-26 · gm · ใบงาน065 · อ้าง คิวปัจจุบัน (memory: plan/queue-006.md)
+# ชุดส่งต่อเจ้าของระบบ — Owner Packet 001
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย gm · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
 
 ## วัตถุประสงค์และผู้ส่ง
-พร้อมให้ผู้ใช้ส่งถึง G owner/Light/infra/B owner/BFF owners และเจ้าของ Master/School/PGGradeDB. ผู้ใช้เป็นผู้ส่งจริง; packet นี้ไม่ยืนยันว่ามีการติดต่อหรือได้รับ approval. ทบทวนสัญญาปัจจุบันและคืนหลักฐานในงานเดิม SA-001/BE-001/BE-039/SEC-001/DBA-002/DBA-007 ไม่เพิ่ม scope.
 
-แนบ [gRPC Rev1 §7](../design/gateway-grpc-contract-001.md), [Gateway Rev4](../design/gateway-integration-001.md), H5 questionnaire (memory: planning/h5-questionnaire-001.md), routing/linkage evidence002 (memory: planning/routing-linkage-evidence-002.json), DB request (memory: db/db-safe-evidence-001.md) และ DB cover (memory: db/db-safe-evidence-cover-001.md). เป็นเอกสารพร้อม review ไม่ขอให้เจ้าของเตรียม questionnaire ใหม่.
+Backend for Frontend (BFF) คือส่วน server ของเว็บที่เรียก Gateway แทน browser; infrastructure คือผู้ดูแลเครือข่ายและการตั้งค่าระบบ
+พร้อมให้ผู้ใช้ส่งถึง เจ้าของ HTTP API Gateway (`sb-api-gateway`)/Light/infra/เจ้าของ SchoolBot gRPC service/BFF owners และเจ้าของ Master/School/PGGradeDB. ผู้ใช้เป็นผู้ส่งจริง; packet นี้ไม่ยืนยันว่ามีการติดต่อหรือได้รับ approval. ทบทวนสัญญาปัจจุบันและคืนหลักฐานในงานเดิม [SA-001 (ทบทวนสัญญาระบบและการอัปเดต)](index-foundation.md)/[BE-001 (ตรวจความเข้ากันได้ของบัญชีเดิม)](index-foundation.md)/[BE-039 (ทำ web-principal/BFF/session และ staff bootstrap)](extension/index.md)/[SEC-001 (ทบทวนขอบเขตความเชื่อถือและความปลอดภัย)](index-foundation.md)/[DBA-002 (เตรียม DDL ฐานข้อมูลหลัก)](index-foundation.md)/[DBA-007 (เตรียม cross-DB/export runtime evidence pack)](extension/index.md) ไม่เพิ่ม scope.
 
-## 1. Owner approval และคำตอบ H5
-ตอบกลับในหัวข้อเดิมของ questionnaire เพื่อไม่สร้างคำถามซ้ำ:
+แนบ [gRPC contract](../design/gateway-grpc-contract-001.md) Rev1 §7 และ [Gateway integration](../design/gateway-integration-001.md) Rev4 ตามฐานที่ packet เดิมอ้าง พร้อม questionnaire, routing/linkage evidence และ DB request/cover ที่ระบุท้ายไฟล์ เป็นเอกสารพร้อม review ไม่ขอให้เจ้าของเตรียม questionnaire ใหม่
 
-| ผู้รับ | ข้อที่ต้องตอบ/รับรอง | หลักฐานขั้นต่ำ |
-|---|---|---|
-| G owner + B owner | H5 §4.1: รับรอง opaque-session pipeline/tenant authority ตาม contract §7.1 หรือระบุข้อขัดแย้ง | route/pipeline revision, strip/allowlist/duplicate authority header rules, แผน negative cases JWT/opaque/spoof/cross-school/logout |
-| Light + G owner | H5 §4.3: ผู้ review/CODEOWNERS และ disposition ของ protected paths, mapper/deadline/retry/limits | review ref; exact manifest/policy/SbRateLimit/Swagger/maintenance/revocation, fixtures 204/401/403/412/428/B503/G502/504/503/malformed trailers |
-| infra + G/B | H5 §1–3/4.2: public/private separation, no-loop, TLS/peer และ env/rate-limit ownership | process×purpose×key-name×owner×status; วิธี derive/validate trusted source metadata และผู้รับผิดชอบ negative tests |
-| web-system/admin BFF owners + G/B | H5 §6: repo/route allowlist, credential filtering, Origin/CSRF/session | manifest/review ref; web-system ใช้ GATEWAY_API_URL; admin owner ระบุชื่อ key; ไม่ catch-all/private route; cookie แปลง Bearer ฝั่ง server |
-| G/sys/legacy/vault + B owner | contract §7.4–5: selector/cardinality/linkage และ continuation/attempt/device-proof | ผูก authenticated account กับ profile/tenant ตลอด attempt; deleted/null/sentinel/duplicate/cross-school disposition และ completion stages; ไม่เดา AccountId=ProfileId |
-| ผู้ใช้ธุรกิจ + B owner/sys; vault/ผู้รัน/ผู้ตรวจซ้ำ | H5 §5: แต่งตั้ง staff_admin และวิธี bootstrap | ผู้ถือข้อมูลบัญชีผ่านช่องทางปลอดภัย, mapping proof, procedure/reviewer/runner/second checker และ audit/GET verification plan; school_admin ไม่เท่ากับ staff_admin |
+## สิ่งที่เจ้าของต้องตอบ
 
-Transport client→HTTP G→gRPC B, cType category และ035 ตัดสินแล้ว ไม่ถามเลือกใหม่. ขอ technical proof ที่ยังขาด; G HTTP Login เดิมแยกจาก service transport. เจ้าของที่ไม่รับรองส่งเหตุผลให้ arch ผ่านนายช่าง ไม่แก้สัญญาหรือปิด gate เอง.
+[คำขอรับรองและรูปแบบหลักฐาน](owner-packet-001-requests.md) มีตารางผู้รับทั้ง 6 กลุ่ม ลำดับ DB evidence ข้อกำหนดปกปิดข้อมูล และรูปแบบ response ขั้นต่ำ ใช้หัวข้อเดิมของ questionnaire ไม่สร้างคำถามซ้ำ
 
-## 2. DB evidence — แยกจาก approval
-ผู้ใช้ forward cover เดิม; เจ้าของ Master/School DB คืน EV-01..03 schema metadata ของ TUser/TEmployees/TEmpSalaries ก่อน แล้ว EV-04 linkage counts/EV-05 hash-format category counts; EV-06 student aggregate เป็น optional. คงนิยามและลำดับจาก DB request ไม่สร้าง SQL ใหม่ใน packet.
-
-ขอเฉพาะ schema/aggregate ที่ผ่านการตรวจ literal และ PII; กลุ่ม <5 รวม other ใช้กลุ่มไม่ทับซ้อนและ complementary suppression. ห้าม raw dump, row IDs, username, hash/prefix/suffix จริง. ระบุ EV-ID, schema/version reference, วันที่ที่เจ้าของแจ้ง, coverage/สิ่งที่ยังไม่ทราบ และผู้ตรวจการปกปิดข้อมูล.
-
-เจ้าของ School/PGGradeDB + infra ตอบ SEC001-002/G-DB เรื่องบัญชีเดิมในรูป alias/status/ขอบเขตสิทธิ์อ่านเขียนต่อ process และมีบัญชีแคบกว่าอยู่แล้วหรือไม่; ไม่ขอชื่อบัญชีจริง/connection string ไม่ขอ GRANT/สร้าง role. สิทธิ์เขียนกับ durable receipt และ parity/coexistence/target/authz ต้องพิสูจน์ภายหลังด้วย runtime pack DBA-007; เจ้าของตอบยินยอมอย่างเดียวไม่ใช่ผลทดสอบ.
-
-## 3. รูปแบบ response ขั้นต่ำ
-แต่ละแถวส่ง `หัวข้อ/Task | owner role | ผู้ตอบ | วันที่ที่ผู้ตอบระบุ | รับรอง/ไม่รับรอง/รอหลักฐาน | artifact revision/ref | เงื่อนไขค้าง/ผู้รับต่อ`. Env ใช้ `ยังไม่ตั้ง/ตั้งแล้ว/ยังไม่ยืนยัน`; ไม่ใช้ต้องระบุเหตุผล/ผู้รับรอง. แยกคำรับรองกับผล runtime: ยังไม่รันให้เขียน NOT_RUN พร้อม evidence ที่รอ ห้ามใช้ตั้งแล้วแทนผ่านแล้ว.
-
-ขอเฉพาะชื่อ config/env key, ชนิด identity, alias และสถานะ. ไม่ส่ง secret/token/password/private key/certificate material/host-origin-listener ค่าจริง/บัญชีจริงใน knowledge. ค่าจริงเจ้าของจัดการผ่านช่องทางองค์กร. DB ผู้ดูแลเป็นผู้รันและตรวจผลก่อนส่ง; agent ไม่รัน SQL/ไม่ login แทน.
-
-## 4. ลำดับเปิดงานและหลักฐานภายหลัง
-1. ผู้ใช้ส่ง packet/DB cover; รับคำตอบ G/Light/infra/BFF และ EV ตามลำดับข้างต้น. service-route คงปิดระหว่างรอ.
-2. arch/sys reconcile คำตอบกับ contract เดิมผ่านผู้คุม; ตรึง DTO/trailer/manifest และ Login prerequisites ตาม operation. B เป็นเจ้าของ .proto แล้ว sync G หลัง owner รับรอง พร้อม parser/codegen/hash.
-3. เปิด implementation เฉพาะส่วน dependency/gates ครบตาม queue-006; ผู้ใช้เซ็น UX-005/007 Q39–Q46 รวม delta042 แล้วตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; UX signed 7/7. Owner approval และ technical proof คงแยกตามเดิม
+## ลำดับเปิดงานและหลักฐานภายหลัง
+1. ผู้ใช้ส่ง packet/DB cover; รับคำตอบ HTTP API Gateway/Light/infrastructure/BFF และ EV ตามลำดับข้างต้น. service-route คงปิดระหว่างรอ.
+2. arch/sys reconcile คำตอบกับ contract เดิมผ่านผู้คุม; ตรึง DTO/trailer/manifest และ Login prerequisites ตาม operation. SchoolBot gRPC service เป็นเจ้าของ .proto แล้ว sync HTTP API Gateway หลัง owner รับรอง พร้อม parser/codegen/hash.
+3. เปิด implementation เฉพาะส่วนที่ dependency และเงื่อนไขอนุมัติครบ; ผู้ใช้เซ็น [UX-005 (เตรียม UX admin หลักสูตร/คลังข้อสอบ)](extension/index.md)/007 Q39–Q46 รวม delta042 แล้วตาม [มติ 043 (อนุมัติ UX และยืนยัน runner)](../requirement/decisions-043.md) วันที่ 2026-10-26; UX signed 7/7. Owner approval และ technical proof คงแยกตามเดิม
 4. Runtime ภายหลัง: HTTP↔RPC mapping, private reachability/no-loop/wrong-peer, spoof/tenant, deadline/cancel/retry/limits/BFF security และ SQL/rollback/catalog/grade proof บน environment ที่คนอนุญาต. 4032 local tests ใช้แทน integration ไม่ได้.
 5. Bootstrap ตาม procedure ที่ review แล้วโดยมนุษย์และผู้ตรวจซ้ำ; shared/production SQL/deploy ต้องมีคำสั่งเจาะจงภายหลัง. Login end-to-end คงปิดถ้า linkage/continuation/device-proof ไม่ครบ. gm รวม release runbook เมื่อหลักฐาน/ชิ้นส่วนครบ.
 
-## ข้อมูลรับเพิ่มเติม
-[receipt071](../design/learning-ux-contract-gaps-001.md): LUX-01..07 draft/approval, Sheet, bank draft, attempt, expired/time, aggregate/proposal, G→B ยัง OPEN ทางเทคนิค. [042](../requirement/decisions-042.md): ผู้ใช้เลือก A แล้ว มี precedence เหนือ proposal072; ตรวจ saved answers ทันเวลาอัตโนมัติ ข้อว่าง0 เต็มทั้งชุด ไม่รับย้อนหลัง นับครั้ง/ซ่อมตาม policy เดิม. ไม่ถามซ้ำ ไม่ใช่ UX sign-off. ปัจจุบัน44REQ/186AC/81TP ตาม [AC07](../requirement/req-046.md)/[Amendment004](../test-plan/tp-001-amendment-004.md); snapshot180/77คงเดิม. H5 เดิมคงค้างตาม §1.
+## การเรียนและข้อสอบ
+[ช่องว่างสัญญา Learning/UX](../design/learning-ux-contract-gaps-001.md): LUX-01..07 draft/approval, Sheet, bank draft, attempt, expired/time, aggregate/proposal, HTTP API Gateway ไป SchoolBot gRPC service ยัง OPEN ทางเทคนิค. [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md): ผู้ใช้เลือก A แล้ว ใช้แทนข้อเสนอ 072; ตรวจ saved answers ทันเวลาอัตโนมัติ ข้อว่างได้ 0 คะแนน เต็มทั้งชุด ไม่รับย้อนหลัง นับครั้ง/ซ่อมตาม policy เดิม. ไม่ถามซ้ำ ไม่ใช่ UX sign-off. เอกสารต้นฉบับอ้าง 44 REQ/186 AC/81 TP ตาม [AC-046-07 (ตรวจข้อสอบหมดเวลา)](../requirement/req-046.md)/[ส่วนเพิ่มแผนทดสอบข้อสอบหมดเวลา](../test-plan/tp-001-amendment-004.md); ฐานหลักฐานเดิม 180 AC/77 กรณีทดสอบยังคงเดิม. H5 เดิมคงค้างตามไฟล์คำขอรับรอง.
 
-## Change Log
-- 2026-10-26 — ใบงาน089: เปลี่ยน current queue pointers เป็น006ตาม related-impact sweep; คงคำขอหลักฐาน/เจ้าของ/ประตูเดิม ไม่มีการส่งข้อความหรือรับรองแทนผู้ใช้.
-- 2026-10-26 — 079: sync042/186AC/81TP และคิวเอกสาร; ไม่เพิ่มowner approval/H5/gate closure.
-- 2026-10-26 — 074: เพิ่ม pointers/แก้คิว UX; ไม่เพิ่ม approval.
-- 2026-10-26 — ใบงาน065: รวมชุด owner review พร้อมส่ง; แยก approval/DB evidence/UX sign-off/runtime. ไม่มี approval, H5/G-CORE closure หรือคำอนุญาตรันระบบเกิดจากการสร้าง packet.
-- 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
-- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม check082 (memory: planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure
 
-- 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม
+## หลักฐาน
+
+- เอกสารเดิมจัดทำ 2026-10-26 โดย gm งาน 065; คิวที่อ้าง plan/queue-006.md (memory)
+- H5 questionnaire: planning/h5-questionnaire-001.md (memory); routing/linkage: planning/routing-linkage-evidence-002.json (memory); DB request และ cover: db/db-safe-evidence-001.md และ db/db-safe-evidence-cover-001.md (memory)
+- ผล local tests 4032 ไม่แทน integration; เอกสาร Learning เดิมรับข้อมูล 071 และใช้มติ 042 แทนข้อเสนอ 072
+
+- Packet เดิมอ้างฐาน 44 REQ/186 AC/81 TP; จำนวนปัจจุบันดู [แผนหลัก](index.md) โดยไม่เปลี่ยนเกณฑ์ที่ตรึงไว้ ป้าย AC07 ในต้นฉบับหมายถึง AC-046-07 (ผลข้อสอบหมดเวลา) ไม่ใช่ ID ใหม่

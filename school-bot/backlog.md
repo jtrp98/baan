@@ -1,73 +1,24 @@
 # SchoolBot — Backlog
 
+> แก้ล่าสุด 2026-11-02 · แก้โดย gm · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
 ## กติกา
 
-Append-only เพิ่ม BL-NNN พร้อมวันที่ ที่มา ความสำคัญ ผลกระทบต่อ AC และผู้เสนอ ห้ามแก้แถวเก่าหรือ renumber Findings ที่ไม่บล็อก AC เก็บที่นี่ ไม่เปิด task หรือเพิ่ม frozen release scope เอง การย้ายเข้า plan ต้องมีคำสั่งผู้ใช้เมื่อกระทบ scope
+เพิ่ม BL-NNN แบบ append-only พร้อมวันที่ ที่มา ความสำคัญ ผลกระทบต่อ AC (เกณฑ์ตรวจรับ) และผู้เสนอ ห้ามเปลี่ยนความหมายของรายการเดิมหรือเปลี่ยนเลข ID ข้อค้นพบที่ไม่บล็อก AC เก็บที่นี่ ไม่เปิดงานหรือเพิ่มขอบเขตเผยแพร่เอง การย้ายเข้าแผนเมื่อกระทบขอบเขตต้องเป็นคำสั่งผู้ใช้
 
-## รายการ
+## สรุปสถานะวันนี้
 
-ยังไม่มี BL entry จากการรับแผนนี้ ไม่สร้าง speculative feature เพื่อเติม backlog ประเด็น DES-007/BE-019 เป็น contract coverage precondition ของ SA-001/G-RELEASE-DB จึงติดตามในแผน ส่วน human decisions เดิมติดตาม Waiting on Human โดยไม่สร้าง backlog ซ้ำ
+| ID | เรื่อง | ที่มา | ลำดับ | สถานะวันนี้ |
+|---|---|---|---|---|
+| [BL-001](backlog-documentation.md#bl-001) | คำอธิบายและยอด constraints | vault: V012-09 (ข้อแนะนำด้านเอกสาร) | advisory | ติดตามตรวจยอดก่อน implementation ไม่บล็อก AC จากตัวเลขเพียงอย่างเดียว |
+| [BL-002](backlog-security.md#bl-002) | tenant/key และ active ใน HTTP API Gateway (`sb-api-gateway`) | arch: auth/security review | รอเจ้าของ security triage | นอก scope; SchoolBot ต้องกรอง SchoolId/fail-closed และรอ runtime proof |
+| [BL-003](backlog-security.md#bl-003) | SchoolId ของตารางเชื่อมชั้นเรียนใน `sb-tech-upgrade-academic` | arch: auth/security review | รอเจ้าของ security triage | นอก scope; SchoolBot ต้องกรองทุก join และรอ runtime proof |
+| [BL-004](backlog-legacy.md#bl-004) | IsAdmin และช่องโหว่ legacy `sb-web-academic-dev-1` | sys/arch: legacy auth/security review | รอเจ้าของ security triage | แหล่ง is_admin ตอบแล้วตามมติ 035; ข้อค้นพบ legacy และ technical proof ยังค้าง |
+| [BL-005](backlog-documentation.md#bl-005) | ทดสอบ logout และปรับเอกสาร Gateway เป็น controller | งาน logout/ทบทวน Gateway | ไม่ระบุในต้นฉบับ | ปิดแล้ว 2026-10-28; test actual ยัง NOT_RUN |
+| [BL-006](backlog-persistence.md#bl-006) | ความคงทนและ concurrency ของ Project/License/Session | check: ตรวจงาน [BE-002](plan/index-foundation.md) (เชื่อมฐานข้อมูล) | ไม่ระบุในต้นฉบับ | ข้อ 2/3/5 รอก่อนต่อ DB จริง/production; ข้อ 4 ส่ง arch ตอนแก้ ETag ครั้งถัดไป |
 
-### BL-001 — แก้คำอธิบายและตรวจยอด constraints ในเอกสาร
+รายละเอียดแบ่งตามหัวข้อในลิงก์ตาราง ทุก ID คงเดิม ไม่มีการเพิ่มรายการในการเรียบเรียงนี้ ประเด็น [DES-007 (Release และ trusted update)](design/des-007.md)/[BE-019](plan/index-delivery.md) (ตรวจอัปเดตและ Prepare/Install) เป็นเงื่อนไข coverage ของ [SA-001](plan/index-foundation.md) (ทบทวนสัญญาระบบ) และ G-RELEASE-DB (อนุมัติฐานเผยแพร่) จึงติดตามใน [แผน](plan/index.md) ส่วนคำตอบจากคนติดตาม Waiting on Human ไม่สร้าง backlog ซ้ำ
 
-- วันที่: 2026-10-23
-- ที่มา: vault review-006 advisory V012-09 (`db/review-006.md` (memory)) และข้อจำกัดที่บันทึกใน `planning/arch-review-001.md` (memory); ผู้เสนอ: vault; ผู้บันทึก: gm
-- ความสำคัญ: advisory ไม่บล็อก AC จากตัวเลขเอกสารเพียงอย่างเดียว
-- งานติดตาม: arch แก้คำอธิบาย `schema-notes.md`; vault ตรวจยอดและเพิ่มคำชี้แจงใน `db/review-005.md` (memory) โดยรักษาประวัติเดิม อ้างผลนับปัจจุบันจาก review-006: 32 ตาราง/450 ฟิลด์/40 FK/24 UQ/80 CHECK/13 unique indexes/0 non-unique indexes พร้อมตรวจความตรงกันอีกครั้งตอนทบทวนสัญญาก่อน implementation
-- ขอบเขต: งานเอกสารและตรวจยอดเท่านั้น ไม่เพิ่ม task หรือ frozen release feature ไม่เปลี่ยนสถานะตรวจรับหรือปิด gates และ finding นี้ไม่อนุญาตให้รัน SQL
+## หลักฐาน
 
-### BL-002 — ช่องโหว่การกรอง tenant/key และสถานะ active ใน port `sb-api-gateway` (G) นอกขอบเขต SchoolBot
-
-- วันที่: 2026-10-23
-- ที่มา: `design/auth-evidence-001.md` (memory) (§1 M6, §5 IG5) และ `planning/security-disposition-001.md` (memory); ผู้เสนอ: arch; ผู้บันทึก: gm
-- ความสำคัญ: ยังไม่ผ่าน security triage ของเจ้าของระบบ (gm ไม่กำหนด severity, ไม่รับความเสี่ยงแทน jpo/เจ้าของระบบ และไม่ตัดสินแทน check/jpo ว่าจะบล็อก AC หรือไม่; ฝั่ง SchoolBot กำหนดเป็น contract-required ให้กรอง `SchoolId` และ fail-closed ใน adapter ของตัวเอง ซึ่งยังเป็น pending implementation/runtime proof)
-- เจ้าของระบบ/ผู้รับ: เจ้าของ `sb-api-gateway` (G)
-- รายละเอียด: (1) การตรวจสถานะนักเรียนบน mobile (`TstudentClassroomHistoriesRepository.cs:35-43`, `AuthService.cs:210-238`) ค้นด้วย `NTerm`+`CDel` โดยไม่ผูก `SId`/`SchoolId` และข้ามการตรวจเมื่อเป็น null (2) การตรวจพนักงานพ้นสภาพฝั่ง web (`WebLoginService.cs:206-217`) ค้น `TEmployees` ด้วย `sEmp==TUser.sID` (ใช้ `sID` ใน `WorkStatus` ต่างจาก `nSystemID` ที่ใช้ในจุดตรวจ identity โดยยังไม่ฟันธงว่า key ผิดเนื่องจากต้นฉบับเองใช้ต่างกันและยังรอพิสูจน์ data relation) และ `TempSalary` โดยไม่กรอง `SchoolId` พร้อมใช้ `FirstOrDefault` โดยไม่เรียงลำดับ (3) mobile login ไม่ตรวจ `TCompany` active และ `WorkStatus`
-- ขอบเขต: อยู่นอก release scope ของ SchoolBot ไม่เปิด task ใหม่ในแผน SchoolBot ส่วนการป้องกันฝั่ง SchoolBot (ห้ามลอก query ที่ไม่กรอง `SchoolId`, ปฏิเสธ `purpose`/`aud` ใน `web-principal`, และไม่ใส่ชื่อ header `JabjaiWebKey-*` ใน log ตาม SEC001-001/013) route เข้างานเดิม `BE-039` และ `BE-006`
-
-### BL-003 — การดึงห้องของวิชาใน `sb-tech-upgrade-academic` (A) ไม่กรอง `SchoolId` ของตารางเชื่อมชั้นเรียน
-
-- วันที่: 2026-10-23
-- ที่มา: `design/auth-evidence-001.md` (memory) (§1 GAP-006, §5 IG5) และ `planning/security-disposition-001.md` (memory); ผู้เสนอ: arch; ผู้บันทึก: gm
-- ความสำคัญ: ยังไม่ผ่าน security triage ของเจ้าของระบบ (gm ไม่กำหนด severity, ไม่รับความเสี่ยงแทน jpo/เจ้าของระบบ และไม่ตัดสินแทน check/jpo ว่าจะบล็อก AC หรือไม่; ฝั่ง SchoolBot กำหนดเป็นเพียงสัญญา contract-required ให้กรอง `SchoolId` ทุก join ตาม `data-contract-rules.md` และ `DES-012` ซึ่งยังเป็น pending implementation/runtime proof)
-- เจ้าของระบบ/ผู้รับ: เจ้าของ `sb-tech-upgrade-academic` (A)
-- รายละเอียด: `PlanCourseRepository.cs:194-215` ตอน join ห้องของวิชาไม่กรอง `SchoolId` ของ `ptsl2`/`tsl2` (`TplanTermSubLevel2`/`TTermSubLevel2`)
-- ขอบเขต: งานแก้ของ repo A นอกขอบเขต SchoolBot ไม่เพิ่ม task ในแผน SchoolBot ส่วน query ฝั่ง SchoolBot ที่ตรวจสิทธิ์ครูรายวิชา/ห้องเรียนให้บังคับ `SchoolId` ทุกตารางในงานเดิม (`BE-002`, `BE-006`, `BE-017`, `BE-029`, `BE-034`, `BE-038`)
-
-### BL-004 — ความต่างของ `IsAdmin` ระหว่าง session กับ JWT handoff และช่องโหว่ใน legacy `sb-web-academic-dev-1` นอกขอบเขต SchoolBot
-
-- วันที่: 2026-10-23
-- ที่มา: `planning/legacy-auth-review-002.md` (memory) (TR-AUTH-02/03/06) และ `planning/security-disposition-001.md` (memory); ผู้เสนอ: sys/arch; ผู้บันทึก: gm
-- ความสำคัญ: ยังไม่ผ่าน security triage ของเจ้าของระบบ (gm ไม่กำหนด severity หรือรับความเสี่ยงแทน jpo/เจ้าของระบบ; ไม่เพิ่ม scope/task ใน SchoolBot)
-- เจ้าของระบบ/ผู้รับ: เจ้าของระบบเว็บเดิม `sb-web-academic-dev-1` ร่วมกับเจ้าของ `sb-api-gateway` (G)
-- รายละเอียด: (1) `Default.aspx.cs:193-222` คำนวณ `IsAdmin=true` จากกลุ่มสิทธิ์ `'แอดมิน/ผู้บริหาร'` ใส่เฉพาะ server Session token แต่ `bypassgarde.aspx.cs:55-64` ออก JWT handoff โดยตั้ง `IsAdmin = (UserID==0 && AdminID!=null) ? 1 : 0` ทำให้แอดมินโรงเรียนปกติได้ `IsAdmin=0` ใน JWT ต่างจาก session (2) `BypassSuperAdmin.aspx.cs:19-36,62-63` รับพารามิเตอร์ `q` ที่ถอดรหัสจาก `BusinessLogic.GetTokenInfo` (`CommonLogic/BusinessLogic.cs:2418-2438`) ซึ่งฝัง `id`/`username`/`password` ของ `TAdmin` ลงใน payload และยืนยันตัวตนด้วยการถือ `q` โดยไม่ตรวจรหัสผ่านซ้ำ (3) `Default.aspx.cs:156-160,276-282` ค้น `TEmployees`/`TEmpSalaries` โดยไม่กรอง `SchoolId`, ใช้ key ขัดกันระหว่าง `nSystemID` กับ `sID` ใน `WorkStatus`, และคืน `StackTrace` ออกทาง response เมื่อเกิด exception
-- ขอบเขต: เก็บเป็นรายการนอกขอบเขตให้เจ้าของระบบ legacy พิจารณา ห้ามลอกพฤติกรรมเหล่านี้เข้า SchoolBot ส่วนการตกลงแหล่ง `is_admin` สำหรับ `GET /api/school-bot/auth/web-principal` และการป้องกันฝั่ง SchoolBot ติดตามในงานเดิม `SA-001` และ `BE-039` (G-AUTH)
-
-## Change Log
-
-- 2026-10-21 — PM รับจาก Planner; MYCELIUM บันทึกตาม adoption/render contract
-- 2026-10-23 — เพิ่ม BL-001 จาก V012-09 แบบ append-only ส่ง arch/vault แก้คำอธิบายและตรวจยอด โดยคง release scope และสถานะเดิม
-- 2026-10-23 — เพิ่ม BL-002..004 จากผลตรวจ auth/legacy/security ของ arch และ sys สำหรับข้อบกพร่องใน G, A และ legacy web นอกขอบเขต SchoolBot (ติดป้ายยังไม่ผ่าน security triage ของเจ้าของระบบ ไม่เปิด task ใหม่ ส่วนงานในขอบเขต route เข้า task เดิม)
-- 2026-10-24 — ใบงาน051: เพิ่มคำชี้แจงปัจจุบันต่อท้าย; ไม่แก้ BL เดิม/เพิ่มรายการ.
-
-## คำชี้แจงต่อท้าย — precedence051 (2026-10-24)
-
-BL-002..004 คงประวัติ/เจ้าของ/security triage เดิม. เฉพาะข้อความ BL-004 ว่ารอตกลงแหล่ง is_admin ถูก supersede โดย035 ที่ตอบแล้ว; ไม่เปิดคำถามธุรกิจซ้ำ. งานเดิม SA-001/BE-006/BE-039 อ่าน queue-003 (memory) และ [Gateway Rev3](design/gateway-integration-001.md): client→HTTP G→gRPC B; ไม่มีHTTP relay/direct public B. ค้างimplementation/trust/tenant/H5/Light; รอบนี้docs-only ไม่เพิ่มscope/BL/task.
-
-### BL-005 — test case สำหรับ AC-036-06 (logout) และ sweep เอกสาร gateway ตามมติ050
-
-- วันที่: 2026-10-28 · ที่มา: ใบงาน092 (memory: planning/task-092.md), spec run 5OJQP0, arch run vMHqG4 · ผู้บันทึก: นายช่าง
-- รายละเอียด: (1) AC-036-06 เพิ่มแล้วแต่ test-plan ยังครอบ 186 AC/81 cases — ต้องให้ `inspect` เพิ่ม case/traceability (TP-001 amendment ถัดไป) ก่อน slice logout จะเป็น verified ได้ (2) เอกสาร gateway-integration-001 / gateway-grpc-contract-001 §3/§5 / gateway-logout-slice-001 / negative-boundary (`directadapter`) / design index ยังพูดถึง minimal endpoint/middleware — ตอนนี้ใช้ pointer precedence ไป [gateway-controller-entry-001](design/gateway-controller-entry-001.md); ต้อง arch amend ตามรายการบรรทัดใน arch E
-- ขอบเขต: ไม่เพิ่ม feature/scope · งานเอกสารของ inspect/arch
-
-- 2026-10-28 — เพิ่ม BL-005
-- 2026-10-28 — BL-005 ข้อ (1) เสร็จ: [Amendment005](test-plan/tp-001-amendment-005.md) เพิ่ม TP001-082 ครอบ AC-036-06 (82 cases / 187 AC, actual NOT_RUN) · ข้อ (2) sweep เอกสาร gateway ยังค้าง
-- 2026-10-28 — BL-005 ข้อ (2) เสร็จ — **BL-005 ปิด**: arch Codex T1 run oJUppA เสนอ amend 6 ไฟล์ บันทึกตรงตัวแล้ว: gateway-integration Rev5, gRPC contract Rev2, logout slice Rev1 (ใส่เลขครั้งแรก), negative boundary Rev2 (แยก directadapter ฝั่ง B จาก G entry), controller entry Rev2, design/index Rev6 (เขียนสถานะปัจจุบัน เอา pointer ชั่วคราวและ Change Log ออกตามกติกา index) · sweep หลังแก้: hit ที่เหลือเป็นประวัติ/amendment หรืออ้าง Gateway Rev3 ในฐานะมติ transport ที่ยังถูก
-
-### BL-006 — ข้อเสนอจาก check BE-002 rework 3 (นอก oracle ของ slice S1)
-
-- วันที่: 2026-11-02 · ที่มา: check-094-wave2-gate-004 (memory) (check run yneac0) · ผู้บันทึก: นายช่าง
-- รายละเอียด: (1) `FileSchoolBotBackingStore` ไม่อ่านรูปแบบสองไฟล์เดิม (`projects.json`/`project_revisions.json`) — ปัจจุบันไม่มีข้อมูลเดิมตาม[มติ051](requirement/decisions-051.md) แต่ต้องกำหนดก่อนเปิดใช้ File store ที่ใด (2) Project/Revision โหลดจาก snapshot สองครั้ง — หลาย instance อาจได้คนละรุ่น (กลุ่ม lost-update หลาย instance เดิม) (3) ไม่มี flush ลง disk ก่อน replace — kill/ไฟดับยังไม่พิสูจน์ (4) ETag อิง ticks ของ UpdateDate — สอง update ใน tick เดียวได้ ETag ซ้ำ (5) เคส extra เดิมยังตก: TwoInstancesDoNotLoseAcknowledgedLicense · SessionProfileCannotAuthorizeAnotherProfile (6) memory store ส่วน License/Session ยังใช้ `Clear()` แล้วเติมทีละรายการ
-- ขอบเขต: ไม่เปิด task ใหม่ · ข้อ 2/3/5 เป็นเงื่อนไขก่อนต่อ DB จริง/production (DBA-003/G-CORE) · ข้อ 4 ส่ง arch พิจารณาตอนแก้สัญญา ETag ครั้งถัดไป
-
-- 2026-11-02 — เพิ่ม BL-006
+รายละเอียดที่มาของแต่ละข้ออยู่ท้ายไฟล์ย่อย ข้อความเดิมว่าไม่มี BL เป็นข้อความเมื่อรับแผนครั้งแรก ถูกแทนด้วยทะเบียนหกข้อข้างต้น

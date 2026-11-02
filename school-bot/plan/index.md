@@ -1,24 +1,27 @@
-# SchoolBot — Canonical Plan
+# SchoolBot — แผนงานปัจจุบัน
 
-> สถานะปัจจุบันของแผน — เขียนทับให้เป็นความจริงวันนี้ ไม่มี Change Log (ประวัติดู `git log` ของไฟล์นี้) · เจ้าของ: gm
+> แก้ล่าสุด 2026-11-02 · แก้โดย gm · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
 ## Release Scope
 
-Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกตามคำสั่งผู้ใช้ 2026-10-28 — พฤติกรรมเดิม ไม่ใช่ feature ใหม่) / 82 TP cases (TP001-082 ครอบ AC-036-06 ตาม [Amendment005](../test-plan/tp-001-amendment-005.md)) ตาม [มติ042](../requirement/decisions-042.md) และ [scope](scope-001.md) — ไม่เพิ่ม/ลด feature เว้นผู้ใช้สั่ง · 110 tasks (74 งานเดิม + [36 งานส่วนต่อ](extension/index.md)) · 8 phases / 17 gates · ข้อมูลต่อ task อยู่ที่ `plan/tasks-001.json` (memory)
+ขอบเขตถูกตรึงไว้ที่ระบบเต็ม 44 REQ (ข้อกำหนด) / 187 AC (เกณฑ์ตรวจรับ) / 82 กรณีทดสอบ TP001-082 รวม [AC-036-06 (logout และความล้มเหลวอย่างปลอดภัย)](../requirement/req-036.md) ตาม [กรณีทดสอบ logout](../test-plan/tp-001-amendment-005.md) เป็นพฤติกรรมเดิมตามคำสั่งผู้ใช้ 2026-10-28
+
+แผนมี 110 งาน ได้แก่ 74 งานด้านล่างและ [36 งานส่วนต่อ](extension/index.md) รวม 8 ระยะ/17 เงื่อนไขอนุมัติ การเพิ่มหรือลดขอบเขตต้องเป็นคำสั่งผู้ใช้ ดู [ขอบเขตแผน](scope-001.md) และ [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)
 
 ## Waiting on Human
 
-คิวปัจจุบัน: Queue 007 (memory: plan/queue-007.md) — GMตรวจ63tasksมี21localready/5partial/37waiting · กำลังทำต่อ 091 (memory: planning/task-091.md) หลัง090 · ชุดส่งต่อเจ้าของ: [owner-packet-001](owner-packet-001.md)
+- ผู้ใช้ส่ง [ชุดส่งต่อเจ้าของระบบ](owner-packet-001.md) ให้เจ้าของ HTTP API Gateway (`sb-api-gateway`), Light, infrastructure, SchoolBot gRPC service และ Backend for Frontend (BFF) เพื่อคืนผล review implementation และ H5 (เงื่อนไข route/env/network/trust) การพัฒนา Gateway ได้รับอนุญาตตาม [มติ 046 (Gateway dev และระยะเวลา replay ของ License)](../requirement/decisions-046.md) แล้ว ไม่ขออนุญาตซ้ำ
+- เจ้าของ Gateway/infrastructure ตอบ H1; เจ้าของ DB/infrastructure ตอบ H2 เรื่อง privileges และ `license_admin`; ผู้ถือ certificate ตอบ H4 เรื่อง pins/custody; เจ้าหน้าที่คุ้มครองข้อมูล (DPO) ตอบ H5
+- ผู้ดูแล Master DB ส่ง TR-AUTH-03/04 (หลักฐานบัญชีเดิม); เจ้าของ legacy ตอบ TR-AUTH-06 (หลักฐานระบบเดิม); เจ้าของรายชื่อผู้เรียนยืนยัน GAP-AUTH-006 (ช่องว่าง roster) ข้อรอนี้ผูกกับ QA ของจริง ไม่ขวางงานบน stub
+- ผู้ใช้ส่ง DB cover ให้เจ้าของ DB แล้วให้เจ้าของคืน EV-01..03 (schema metadata), EV-04/05 (linkage และ hash-format counts) ตามลำดับ ส่วน EV-06 (student aggregate) เป็นทางเลือก ยังไม่มีหลักฐานว่าส่งหรือได้รับแล้ว
+- ผู้ใช้หรือทีมอุปกรณ์ตอบ spec Q3 เรื่องรุ่นหุ่น firmware, calibration และ stop/unplug/emergency พร้อมคำสั่งอนุญาตทดสอบหุ่นจริง ซึ่งยังไม่ได้รับอนุญาตตาม [มติ 038 (ผู้อนุมัติและเกณฑ์ตรวจรับ)](../requirement/decisions-038.md)
+- ผู้ใช้ระบุผู้ถือ certificate และช่องทางแจกจ่าย พร้อมหลักฐาน security/SQL/runtime ตาม [เงื่อนไขอนุมัติ](gates-001.md)
 
-- **G/Light/infra/B/BFF**: ผู้ใช้อนุญาตGatewaydevแล้วตาม046; implementation review/H5ยังรอหลักฐาน — fullLogin NOT_READY; logout transport local slice **ผ่านครบ**: B rework3 check PASS (memory: planning/check-092-grpc-r3-001.md) 2234/0 + G controller r4 ตาม[มติ050](../requirement/decisions-050.md) + JPO092 (memory: planning/jpo-092-logout-r4-001.md) SEC001-016 CLOSED local — ลงใน JSON เป็น slice `done-local` ของ BE-006/BE-039 ผูก AC-036-06 แล้ว (ครอบเฉพาะส่วน local) — `verified` รอ full Login/H5/production · production/H5/fullLogin ยังปิด · ไม่ถามอนุญาตdevซ้ำ
-- **pilot SB-W1 (ใบงาน093) ปิดแล้ว — 4 task verified**; ข้อรอคนที่เปิด: H1 (G/infra) · H2 (DB+infra privileges, license_admin) · H4 (cert/pins/custody) · H5 (DPO) · TR-AUTH-03/04 (DBA Master) · TR-AUTH-06 (legacy) · GAP-AUTH-006 (roster) — ป้อน gate ที่ QA ไม่ขวาง SB-W2 บน stub (ผลวัด+ตาราง (memory: planning/pilot-093-metrics-001.md))
-- **ผู้ใช้**: forward DB cover (memory: db/db-safe-evidence-cover-001.md) ให้เจ้าของ DB → เจ้าของ DB ส่ง EV-01..03 → 04/05 → 06 (optional) · ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว
-- **UX เซ็นแล้ว**: ผู้ใช้อนุมัติ UX-005/007 และ expired-copy delta Q39–Q46 ตาม [decisions-043](../requirement/decisions-043.md) วันที่ 2026-10-26; ไม่อยู่ในรายการรอคนแล้ว
-- **ยังเปิด**: spec Q3 (รุ่นหุ่น/firmware/calibration/stop-unplug-emergency) · ผู้ถือ cert/ช่องทางแจกจ่าย · gates security/SQL/runtime · ทดสอบหุ่นจริงยังไม่อนุญาต (decisions-038)
-- **ตอบแล้ว ห้ามถามซ้ำ**: Guest/Level/ข้อสอบ/สูตร/mapping/Learner A, แบบ H4, พาธ legacy `C:\src\schoolbright\target\sb-web-academic` (clone ใหม่ 2026-10-26 branch `release/beta` อยู่ใน workspace ให้ agy โหมดเขียนอ่านได้ · 13 ไฟล์ใน legacy-source-check-001 (memory) hash ตรงกับพาธเดิม `C:\src\sb-web-academic-dev-1` ทุกไฟล์ — evidence เก่าที่อ้างพาธเดิมยังใช้ได้), SchoolBot = 1 service ผ่าน `sb-api-gateway`, gRPC/035/cType, expired attempt = A (มติ042)
+[UX-005 (เตรียม UX admin หลักสูตร/คลังข้อสอบ)](extension/index.md)/007 (UX ผู้ดูแลหลักสูตร/ข้อสอบและการสอบ/เลื่อน Level) รวมข้อความหมดเวลา Q39–Q46 ได้รับอนุมัติตาม [มติ 043 (อนุมัติ UX และยืนยัน runner)](../requirement/decisions-043.md) วันที่ 2026-10-26 แล้ว
+
+Guest, Level, ข้อสอบ, สูตร, mapping, Learner แบบ A, แบบ H4 และพาธ legacy ตอบแล้ว เช่นเดียวกับ SchoolBot เป็นหนึ่ง service ผ่าน Gateway, gRPC/035/cType และ expired attempt แบบ A ตามมติ 042 จึงไม่ถามซ้ำ
 
 ## Phases
-
 
 | Phase | ขอบเขต | Tasks | Effort* |
 |---|---|---:|---:|
@@ -31,89 +34,32 @@ Frozen: ระบบเต็ม 44 REQ / 187 AC (AC-036-06 logout ผูกต�
 | P6 | Packages/acceptance | 11 | 21 |
 | P7 | ส่งมอบ | 2 | 2 |
 
-*207 person-days (สมมติฐาน — ยังไม่ยืนยัน) ไม่ใช่ deadline; phase ไม่ใช่ barrier ใช้ DAG/คิว (memory: plan/dispatch-001.md)
+ระยะไม่ใช่เงื่อนไขที่ต้องเสร็จพร้อมกันทั้งหมด งานเปิดตาม dependency ของตน Effort รวม 207 person-days ไม่ใช่กำหนดส่ง ดูข้อที่ยังไม่ยืนยัน
 
 ## Tasks
 
-ตารางนี้คือ 74 งานเดิม · อีก 36 งานอยู่ที่ [extension/index.md](extension/index.md) (รวม 110) · Owner ใช้ชื่อ role เดิม (sa/be/fe/…) resolve ผ่าน role_aliases ใน `plan/tasks-001.json` (memory) · dependencies ในตารางย่อ — gate preconditions อยู่ในไฟล์ต่อ task และ JSON
+ตาราง Task | Name | Owner | Phase | Depends | Status ทั้ง 74 งานแยกเพื่อให้อ่านจบในแต่ละไฟล์:
 
-ตรวจตามความเสี่ยง (BAAN ข้อ 13): `risk`/`wave` อยู่ใน `plan/tasks-001.json` (memory) — slice DB→License→Login→Projects แบ่ง 5 wave · `high` ตรวจทันทีก่อนงานต่อยอด · `low` รอ wave gate · สรุปด้วย `baan --lint-plan`
+- [งานฐานระบบและหน้าจอเริ่มต้น](index-foundation.md): 38 งาน ตั้งแต่ [SA-001](index-foundation.md) (ทบทวนสัญญาระบบและการอัปเดต) ถึง [FE-007](index-foundation.md) (ทำ Block Lab)
+- [งานการเรียนและส่งมอบ](index-delivery.md): 36 งาน ตั้งแต่ [FE-008](index-delivery.md) (เชื่อมต่อและ profile หุ่น) ถึง [PM-002](index-delivery.md) (รวบรวมหลักฐานส่งมอบ)
+- [งานส่วนต่อ](extension/index.md): อีก 36 งานของขอบเขตเดิม
 
-Status: `pending` · `done-local` (โค้ด+test ผ่านในเครื่อง นายช่างลงหลังรัน test ซ้ำ ไม่ปิด gate) · `verified`/`blocked` (มาจาก verdict ของ check ผ่าน นายช่าง เท่านั้น)
+Owner ใช้ role เดิม: sa = arch, ba = spec, be = sys, fe = front, dba = vault, tp = inspect, qa = check, sec = jpo, ux = int, pm = gm ค่า Depends คงเดิม แสดง dependency แบบย่อ เงื่อนไขอนุมัติเต็มอยู่ในข้อมูลแต่ละงาน
 
-| Task | Name | Owner | Phase | Depends | Status |
-|---|---|---|---|---|---|
-| SA-001 (memory) | Contracts/update | sa | P0 | — | **verified** (ใบงาน093 — check PASS (memory: planning/check-093-SA-001-001.md) · contract-review-sa-001 (memory) Rev1) |
-| BE-001 (memory) | Legacy auth | be | P0 | — | **verified** (ใบงาน093 — check PASS รอบ 3 (memory: planning/check-093-BE-001-003.md) · auth-evidence-001 (memory) Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006) |
-| DBA-001 (memory) | Physical map | dba | P0 | — | **verified** (ใบงาน061 — check PASS static + parser 10.3.1 evidence) |
-| DBA-002 (memory) | Core DDL | dba | P0 | DBA-001, SA-001, BE-001 | **verified** (ใบงาน094 — check PASS (memory: planning/check-094-DBA-002-004-001.md) static · รัน SQL/catalog C0–C5 = คน → DBA-003) |
-| DBA-003 (memory) | Core evidence | dba | P1 | DBA-002 | pending |
-| BE-002 (memory) | DB integration | be | P1 | DBA-002 (stub DB; ต่อ DB จริงหลัง DBA-003) | **verified** (ใบงาน094 rework 3 ตาม[มติ051](../requirement/decisions-051.md) — check PASS (memory: planning/check-094-wave2-gate-004.md) บน stub · ต่อ DB จริง = DBA-003/G-CORE) |
-| BA-001 (memory) | Guest policy | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
-| BA-002 (memory) | Learning criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
-| BA-003 (memory) | Robot criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-038) |
-| BA-004 (memory) | Delivery criteria | ba | P0 | — | **verified** (ใบงาน061 ตาม check-060 + decisions-037/038) |
-| UX-001 (memory) | Entry UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-001 + check-060 PASS) |
-| UX-002 (memory) | Projects UX | ux | P3 | BA-001 | **verified** (ใบงาน061 — signed int-003 + check PASS รอบ 3) |
-| UX-003 (memory) | Labs UX | ux | P0 | — | **verified** (ใบงาน061 — signed int-002 + check-060 PASS) |
-| UX-004 (memory) | Learning UX | ux | P5 | BA-002 | **verified** (ใบงาน061 — signed int-004 ครบ + check PASS รอบ 7) |
-| TP-001 (memory) | AC matrix | tp | P0 | — | **verified** (ใบงาน061 — Amendment002/003 + check-060 PASS) |
-| TP-002 (memory) | Failure fixtures | tp | P1 | TP-001 | **verified** (ใบงาน093 — wave gate PASS (memory: planning/check-093-wave1-gate-001.md) · tp-002-fixture-*) |
-| SEC-001 (memory) | Trust review | sec | P0 | — | **verified** (ใบงาน093 — check PASS (memory: planning/check-093-SEC-001-001.md) · security-review-093-001 (memory) · ข้อรอคน H1/H2/H4/H5) |
-| BE-003 (memory) | Admin License | be | P2 | BE-002, SEC-001, BE-039 | pending |
-| BE-004 (memory) | Signed lease | be | P2 | BE-003 | pending |
-| BE-005 (memory) | Key transfer | be | P2 | BE-004 | pending |
-| BE-006 (memory) | Login/session | be | P3 | BE-007, BE-001 | **done-local** (slice gRPC logout AC-036-06 local — check092 (memory: planning/check-092-grpc-r3-001.md)/jpo092 (memory: planning/jpo-092-logout-r4-001.md); full Login ยังค้าง) |
-| BE-007 (memory) | Host entitlement | be | P2 | BE-005, SEC-001 | pending |
-| DBA-004 (memory) | Projects DDL | dba | P3 | DBA-001, SA-001, BA-001 | **verified** (ใบงาน094 — check PASS (memory: planning/check-094-DBA-002-004-001.md) static · SQL จริง = G-PROJECT-DB ที่ QA-002) |
-| BE-008 (memory) | Cloud projects | be | P3 | BE-006, DBA-004 | pending |
-| BE-009 (memory) | Local projects | be | P3 | BE-007, BA-001 | pending |
-| BE-010 (memory) | Host/IPC | be | P3 | BE-007, SA-003 | pending |
-| SA-003 (memory) | Robot contracts | sa | P0 | — | pending |
-| BE-011 (memory) | Darwin HID | be | P4 | BE-010 | pending |
-| BE-012 (memory) | Darwin Serial | be | P4 | BE-010 | pending |
-| BE-013 (memory) | Engine bounds | be | P4 | BE-010 | pending |
-| BE-014 (memory) | Stop/read/torque | be | P4 | BE-013 | pending |
-| FE-001 (memory) | License UI | fe | P2 | BE-007, UX-001 | pending |
-| FE-002 (memory) | Login UI | fe | P3 | BE-006, FE-001 | pending |
-| FE-003 (memory) | Projects UI | fe | P3 | BE-008, BE-009, FE-002, UX-002 | pending |
-| FE-004 (memory) | Mode adapters | fe | P3 | FE-003 | pending |
-| FE-005 (memory) | Shell/i18n | fe | P3 | FE-004, BE-010 | pending |
-| FE-006 (memory) | Code Lab | fe | P4 | FE-004, BE-010, UX-003 | pending |
-| FE-007 (memory) | Block Lab | fe | P4 | FE-004, BE-010, UX-003 | pending |
-| FE-008 (memory) | Connect/profile | fe | P4 | BE-013, UX-003 | pending |
-| FE-009 (memory) | Pose queue | fe | P4 | FE-008, FE-004 | pending |
-| FE-010 (memory) | Sequence/stop | fe | P4 | FE-009, BE-014 | pending |
-| FE-011 (memory) | Board workflow | fe | P4 | FE-010 | pending |
-| FE-012 (memory) | Servo/lost | fe | P4 | FE-010 | pending |
-| SA-002 (memory) | Learning contracts | sa | P5 | BA-001, BA-002, BE-001 | **verified** (ใบงาน061 — check PASS: สัญญาสามโหมด/Level/ข้อสอบ/ส่งคะแนน sync มติครบ) |
-| DBA-005 (memory) | Learning DDL | dba | P5 | SA-002, DBA-001 | pending |
-| BE-015 (memory) | Learning API | be | P5 | BE-008, DBA-005, BA-005, BA-006, BE-027, BE-029 | pending |
-| BA-005 (memory) | Block/Code content | ba | P5 | BA-002 | pending |
-| BA-006 (memory) | Arm content | ba | P5 | BA-002 | pending |
-| BE-016 (memory) | Auto grading | be | P5 | BE-015, BA-005 | pending |
-| BE-017 (memory) | Teacher API | be | P5 | BE-015, BA-006 | pending |
-| FE-013 (memory) | Lessons UI | fe | P5 | BE-015, BA-005, BA-006, UX-004 | pending |
-| FE-014 (memory) | Auto result UI | fe | P5 | FE-013, FE-006, FE-007, BE-016 | pending |
-| FE-015 (memory) | Teacher UI | fe | P5 | FE-013, FE-011, FE-012, BE-017 | pending |
-| FE-016 (memory) | Progress UI | fe | P5 | FE-014, FE-015 | pending |
-| DBA-006 (memory) | Release DDL | dba | P3 | DBA-001, SA-001, SEC-001 | pending |
-| BE-018 (memory) | Release API | be | P3 | BE-005, DBA-006 | pending |
-| BE-019 (memory) | Update check/Prepare/Install | be | P4 | BE-018, BE-007, SA-001 | pending |
-| BE-020 (memory) | Windows MSI | be | P6 | FE-005, FE-016, FE-012, BE-019 | pending |
-| BE-021 (memory) | macOS PKG | be | P6 | FE-005, FE-016, FE-012, BE-011, BE-012, BE-019 | pending |
-| BE-022 (memory) | Signing/assets | be | P6 | BE-020, BE-021, SEC-001 | pending |
-| BE-023 (memory) | API deploy pack | be | P6 | BE-018, BE-017, BE-038, BE-039, FE-019, FE-020, FE-022, FE-024 | pending |
-| QA-001 (memory) | License QA | qa | P3 | BE-005, BE-006, BE-007, FE-001, FE-002, TP-002 | pending |
-| QA-002 (memory) | Projects QA | qa | P4 | FE-005, QA-001 | pending |
-| QA-003 (memory) | Labs QA | qa | P4 | FE-006, FE-007, FE-011, FE-012, BE-011, BE-012, TP-002 | pending |
-| QA-004 (memory) | Learning QA | qa | P5 | FE-016, QA-002 | pending |
-| QA-005 (memory) | Windows robot QA | qa | P6 | FE-011, FE-012, BE-014, TP-002, BA-003 | pending |
-| QA-006 (memory) | Intel robot QA | qa | P6 | QA-003, BA-003 | pending |
-| QA-007 (memory) | ARM robot QA | qa | P6 | QA-003, BA-003 | pending |
-| QA-008 (memory) | Windows install QA | qa | P6 | BE-022, QA-004, QA-005 | pending |
-| QA-009 (memory) | macOS install QA | qa | P6 | BE-022, QA-004, QA-006, QA-007 | pending |
-| QA-010 (memory) | Update/assets QA | qa | P6 | QA-008, QA-009, BE-019 | pending |
-| SEC-002 (memory) | RC Security | sec | P6 | QA-001, QA-004, BE-022, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
-| PM-001 (memory) | Release readiness | pm | P7 | QA-010, SEC-002, BE-023, QA-011, QA-012, QA-013, QA-014, QA-015, QA-016 | pending |
-| PM-002 (memory) | Release receipts | pm | P7 | PM-001 | pending |
+`pending` คือรอทำ; `done-local` คือโค้ดและ automated tests ผ่านในเครื่องหลังนายช่างทดสอบซ้ำ ยังไม่ปิดเงื่อนไขอนุมัติ; `verified` และ `blocked` มาจาก check ผ่านนายช่างเท่านั้น
+
+งานความเสี่ยงสูงตรวจทันที ก่อนงานต่อยอด งานความเสี่ยงต่ำตรวจรับเป็นกลุ่มตาม dependency รายละเอียดบริหารงานอยู่ใน memory
+
+## ยังไม่ยืนยัน
+
+ประมาณการ 207 person-days เป็นสมมติฐาน ยังไม่ได้ยืนยันเป็นกำหนดส่ง
+
+## หลักฐาน
+
+- [หลักฐานสถานะงาน](index-evidence.md) แยกจากตาราง โดยคงผลเดิม
+- plan/tasks-001.json (memory) กำหนด risk/wave ของ DB, License, Login และ Projects เป็น 5 กลุ่ม และการตรวจแผนโดยเครื่องมือผู้คุม; plan/dispatch-001.md (memory) เก็บลำดับ dependency
+- plan/queue-007.md (memory): ตรวจ 63 งาน พบพร้อมในเครื่อง 21 งาน พร้อมบางส่วน 5 งาน และรอ 37 งาน; planning/task-091.md (memory) ต่อจาก 090
+- Logout ผ่านเฉพาะ local ตาม SchoolBot gRPC และ Gateway controller ตาม [มติ 050 (ใช้ controller convention ของ Gateway)](../requirement/decisions-050.md); planning/check-092-grpc-r3-001.md (memory) 2234 ผ่าน/0 ตก และ planning/jpo-092-logout-r4-001.md (memory) ปิด SEC001-016 เฉพาะ local; full Login/H5/production ยังไม่พร้อม [BE-006 (ทำ Login และ session)](index-foundation.md)/[BE-039 (ทำ web-principal/BFF/session และ staff bootstrap)](extension/index.md) ลงส่วน local ใน JSON แล้ว รอ full integration ก่อน verified
+- การตรวจนำร่อง SB-W1 จบแล้ว 4 งาน verified; planning/pilot-093-metrics-001.md (memory) เก็บผลวัด; SB-W2 ทำบน stub ได้
+- DB cover: db/db-safe-evidence-cover-001.md (memory)
+- Legacy clone 2026-10-26 branch release/beta: `C:/src/schoolbright/target/sb-web-academic`; 13 ไฟล์ใน legacy-source-check-001 (memory) hash ตรงกับ `C:/src/sb-web-academic-dev-1` จึงยังใช้หลักฐานเก่าได้

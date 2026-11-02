@@ -1,25 +1,29 @@
-# SchoolBot — โครง Release Runbook
+# SchoolBot — โครง release runbook
 
-วันที่2026-10-23 · เจ้าของgm/PM-001 · เป็นโครงเตรียมหลักฐาน ยังไม่พร้อมใช้รันจริง ไม่มีSQL/deployapprovalจากrunนี้
+> แก้ล่าสุด 2026-11-02 · แก้โดย gm · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-| ลำดับ | สิ่งที่ต้องพร้อม/ผู้เตรียม | จุดหยุดและrollback |
+เอกสารนี้เป็นโครงเตรียมหลักฐานของ [PM-001](index-delivery.md) (ตรวจความพร้อมเผยแพร่) ยังไม่พร้อมใช้รันจริง และไม่มีการอนุมัติ SQL/deploy จากการจัดทำเอกสาร
+
+| ลำดับ | สิ่งที่ต้องพร้อมและผู้เตรียม | จุดหยุดและ rollback |
 |---|---|---|
-| 1 | check/jpoส่ง180AC/verdict,RC hashes,security retest/riskacceptance; gmตรวจG-QA/G-SEC | ขาดหลักฐานหยุด ไม่ประกาศreadiness |
-| 2 | vault DBA-002/004/005/006/007รวมrevision/hashของdb/schoolbot_db.sqlและschoolbot_db_rollback.sql,ผลtest/catalog/restore,backup target; sysระบุcompatibility/workerstop | ยังไม่มีhuman execution receipts; ห้ามกรอกผลสมมติ |
-| 3 | sys BE-023/039+เจ้าของinfraเตรียมroute/env/network/web-principal/secret refs,รายชื่อstaff_adminจากคน,rollout/health/rollback commandsจริง | H5/identityไม่พร้อมหยุด ไม่เปิดadminหรือexport |
-| 4 | gmรวมทุกคำสั่งจริงจากvault/sysพร้อมผู้รัน/environment/backup/rollbackpointsให้คนอนุมัติG-RELEASEเฉพาะRC | ยังไม่มีartifactครบ ห้ามขอpermissionรวม/คนต้องเห็นrunbookก่อน |
-| 5 | มนุษย์backupและหยุดwriter/workerตามแผนที่อนุมัติแล้ว จากนั้นรันSchoolBot DB SQLตามvault | catalog/constraintsไม่ตรงหยุด; ใช้rollback/restoreที่vaultตรวจพร้อมผลกระทบข้อมูล ห้ามรันdropกับข้อมูลจริงโดยเดา |
-| 6 | มนุษย์rolloutAPI/worker, gateway introspection/BFF/Next.js admin/web-systemตามcompatibility orderที่sysระบุ | health/auth/license/four-eyes/v1ปิดไม่ผ่าน rollbackapp/configตามsys; ตัดสินDBrestoreโดยคน |
-| 7 | คนยืนยันexport subconditionsครบก่อนเปิดgrade write; ไม่GRANT/เปลี่ยนschemaSchool/PGGradeDB | ปัญหาexportหยุดworker/กันwrite ตรวจdurable receipts/reconcile owned cells ไม่ล้างคะแนนครู |
-| 8 | คนpublishsignedDesktop/assetsตามRC/hashและapproveddelivery; smokeOS/hardwareตามสิทธิ์จริง | ถอนการแจก/ย้อนappตามsignedplan คงGuest/Clouddata ไม่ลบประวัติ |
-| 9 | PM-002รวบรวมdeployment/publication/SQL/smoke/ผู้ตรวจรับ receiptsที่เกิดจริง | ขาดreceiptหรือผู้ใช้ไม่ยอมรับยังไม่released |
+| 1 | check/jpo ส่ง AC และผลตัดสิน, Release Candidate (RC) hashes, security retest/การรับความเสี่ยง; gm ตรวจ G-QA (เงื่อนไขตรวจรับ) และ G-SEC (เงื่อนไขความปลอดภัย) | ขาดหลักฐานให้หยุด ไม่ประกาศความพร้อม |
+| 2 | vault รวม revision/hash ของ SQL และ rollback จาก [DBA-002 (เตรียม DDL ฐานข้อมูลหลัก)](index-foundation.md)/004/005/006/007 (งานฐานข้อมูลหลัก/โครงงาน/การเรียน/เผยแพร่/ข้ามฐาน), ผล test/catalog/restore และ backup target; sys ระบุ compatibility และการหยุด worker | ยังไม่มี human execution receipts ห้ามกรอกผลสมมติ |
+| 3 | sys จาก [BE-023](index-delivery.md) (ชุด deploy API)/[BE-039](extension/index.md) (web-principal/BFF/session และ staff bootstrap) กับเจ้าของ infrastructure เตรียม route/env/network/web-principal/secret refs, รายชื่อ staff_admin จากคน และคำสั่ง rollout/health/rollback จริง รวม SchoolBot gRPC service กับ HTTP→RPC mapping ของ HTTP API Gateway (`sb-api-gateway`) | H5 (เงื่อนไข route/env/network/trust)/identity ไม่พร้อมให้หยุด ไม่เปิด admin หรือ export |
+| 4 | gm รวมคำสั่งจริงจาก vault/sys พร้อมผู้รัน environment, backup และ rollback points ให้คนอนุมัติ G-RELEASE (เงื่อนไขเผยแพร่) เฉพาะ RC | ยังไม่มี artifact ครบ ห้ามขออนุญาตรวม คนต้องเห็น runbook ก่อน |
+| 5 | มนุษย์ backup และหยุด writer/worker ตามแผนที่อนุมัติ จากนั้นรัน SchoolBot DB SQL ตาม vault | catalog/constraints ไม่ตรงให้หยุด ใช้ rollback/restore ที่ vault ตรวจพร้อมผลกระทบข้อมูล ห้ามเดาคำสั่ง drop กับข้อมูลจริง |
+| 6 | มนุษย์ rollout API/worker, Gateway introspection/BFF/Next.js admin/web-system และ SchoolBot gRPC service ตาม compatibility order ที่ sys ระบุ พร้อม health/rollback ของ Gateway และ service | health/auth/license/four-eyes/การปิด v1 ไม่ผ่านให้ rollback app/config ตาม sys คนตัดสิน DB restore |
+| 7 | คนยืนยันเงื่อนไขย่อยของ export ครบก่อนเปิด grade write ไม่ GRANT หรือเปลี่ยน schema School/PGGradeDB | export มีปัญหาให้หยุด worker/กัน write ตรวจ durable receipts และ reconcile owned cells ไม่ล้างคะแนนครู |
+| 8 | คนเผยแพร่ signed Desktop/assets ตาม RC/hash และ approved delivery; smoke OS/hardware ตามสิทธิ์จริง | ถอนการแจก/ย้อน app ตาม signed plan คง Guest/Cloud data ไม่ลบประวัติ |
+| 9 | [PM-002](index-delivery.md) (รวบรวมหลักฐานส่งมอบ) เก็บ deployment/publication/SQL/smoke และ receipts ผู้ตรวจรับที่เกิดจริง | ขาด receipt หรือผู้ใช้ไม่ยอมรับ ยังไม่ released |
 
-คำสั่งลำดับdeployย่อยและrollbackที่รันได้ต้องมาจากengineersก่อนปิดPM-001 ไม่แต่งคำสั่ง/ผู้รัน/วันอนุมัติแทนคน. SchoolBot DBแยก4DBlegacy; ใช้บัญชีเดิมSchool/PGGradeDB; sourceoftruthล่าสุดตามevidence-002.md/decisions-025..034. การประกอบrunbookไม่อนุญาตexecute.
+คำสั่ง deploy ย่อยและ rollback ที่รันได้ต้องมาจาก engineers ก่อนปิด PM-001 ไม่แต่งคำสั่ง ผู้รัน หรือวันอนุมัติแทนคน ฐาน SchoolBot แยกจากสี่ฐาน legacy และใช้บัญชี School/PGGradeDB เดิม การประกอบ runbook ไม่อนุญาตให้ execute
 
-## Precedence 051 — 2026-10-24
+sys ต้องเตรียมลำดับ rollout จริงก่อนคนอนุมัติ ไม่เดาลำดับหรือใช้ direct public SchoolBot service/HTTP relay fallback ส่วน HTTP Login เดิมของ Gateway แยกขอบเขต H5/Light/trust/tenant และ Gateway/gRPC/DB runtime ยังต้องมีหลักฐาน
 
-ลำดับ3/6 ต้องรวม B gRPC service และ HTTP→RPC mapping ของ G พร้อม compatibility/health/rollback ของแต่ละฝั่งตาม [Gateway Rev3](../design/gateway-integration-001.md). sys เตรียมลำดับ rollout จริงก่อนคนอนุมัติ; ห้ามเดาลำดับหรือใช้ direct public B/HTTP relay fallback. Login HTTP เดิมของ G แยกขอบเขต. H5/Light/trust/tenant และ Gateway/gRPC/DB runtime ยังต้องมีหลักฐาน; 4032 local tests ไม่แทน. รอบนี้แก้โครงเอกสาร ไม่ execute.
+## หลักฐาน
 
-## Change Log
-- 2026-10-24 — ใบงาน051: sync transport ในrunbook; คงจุดหยุด/rollback/ผู้อนุมัติเดิม.
-- 2026-10-23 — ตั้งโครงrunbookตามหน้าที่gm; SQL/rollout/backup/restore/คนรันยังรอartifact
+- โครงเดิมจัดทำ 2026-10-23; SQL: db/schoolbot_db.sql และ db/schoolbot_db_rollback.sql (memory)
+- แหล่งสัญญาเดิม evidence-002.md (memory), มติ 025..034 ใน [ทะเบียนมติ](../requirement/decisions.md) และ [Gateway integration](../design/gateway-integration-001.md) Rev3; ผล local tests 4032 ไม่แทน integration
+- งานนี้จัดรูปแบบ ไม่ execute
+
+- ต้นฉบับขั้นตอน 1 อ้างฐาน 180 AC จำนวนปัจจุบันใช้ [แผนหลัก](index.md) และเกณฑ์ที่ตรึงไว้ของงานนั้น ไม่เปลี่ยนเกณฑ์ตรวจรับด้วยการจัดรูปแบบ
