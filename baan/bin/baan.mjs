@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEAM_DIR, listRoles, loadAgentsConfig, loadWorkspace, reportsDirOf, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
+import { TEAM_DIR, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
@@ -58,6 +58,9 @@ function printWorkspace(ws) {
   console.log(`main_root : ${ws.main_root || "(ไม่ได้ตั้ง)"}`);
   for (const kr of ws.knowledge_roots) {
     console.log(`knowledge : ${kr.name} → ${kr.path}`);
+    const mem = memoryRootOf(kr);
+    const issues = memoryRootIssues(kr, ws.source ? path.dirname(ws.source) : "");
+    console.log(`   memory : ${mem || "(ไม่ได้ตั้ง memory_root — ใบงาน/ผลตรวจลง knowledge แบบเดิม)"}${issues.length ? `  ⚠ ${issues.join(" · ")}` : ""}`);
     for (const tg of kr.targets ?? []) console.log(`   target : ${tg.name} → ${tg.path}${existsSync(tg.path) ? "" : "  (path ไม่มีจริง!)"}`);
   }
   const d = ws.defaults;
@@ -148,6 +151,9 @@ async function main() {
     projectCtx = [
       `- โปรเจกต์เป้าหมาย (code): ${hit.target.name} — ${hit.target.path}`,
       `- ที่เก็บเอกสาร (knowledge): ${hit.knowledgeRoot.name} — ${hit.knowledgeRoot.path}`,
+      ...(memoryRootOf(hit.knowledgeRoot)
+        ? [`- ความจำของทีม (memory — ใบงาน คิว ผลตรวจรายรอบ หลักฐาน): ${memoryRootOf(hit.knowledgeRoot)} (โครงโฟลเดอร์ module เดียวกับ knowledge)`]
+        : []),
       "- role ที่ทำงานเกี่ยวกับโค้ดให้อ่าน/แก้ในโปรเจกต์เป้าหมาย · role ที่ผลิตเอกสารให้อิงโครงสร้างของที่เก็บเอกสาร (ถ้า task ระบุ)",
     ].join("\n");
     opts.cwd = path.resolve(hit.target.path);

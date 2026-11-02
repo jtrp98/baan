@@ -24,7 +24,7 @@ Users rarely say what they actually need — they say what they think they want.
 
 | Owns (writes) | Reads |
 |---|---|
-| `requirement\**` (index + scope + req-NNN) · `open-questions\**` · module `index.md` (the only role allowed to create a new module folder — confirm the name with the user first) | user answers · latest `check\`/`design\` rounds when amending · `backlog.md` |
+| `requirement\**` (index + scope + req-NNN) · `open-questions\**` · module `index.md` (the only role allowed to create a new module folder — confirm the name with the user first) | user answers · latest `check\` rounds (memory) / `design\` when amending · `backlog.md` |
 
 ## Size up the input before you start
 

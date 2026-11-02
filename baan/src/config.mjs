@@ -80,6 +80,32 @@ export function loadWorkspace(configPath = null) {
   };
 }
 
+// memory_root = ความจำของ BAAN (ใบงาน คิว ผลตรวจรายรอบ หลักฐาน) แยกจาก knowledge ที่คนอื่นใช้ร่วม —
+// knowledge ที่ปนของพวกนี้ใช้ร่วมกันไม่ได้ (school-bot: 255 จาก 707 ไฟล์เป็นใบงาน/หลักฐาน)
+// ไม่ตั้ง = เขียนลง knowledge แบบเดิม ให้ workspace ที่ตั้งไว้ก่อนหน้านี้ไม่ต้องแก้อะไร
+export function memoryRootOf(kr) {
+  return typeof kr?.memory_root === "string" ? kr.memory_root.trim() : "";
+}
+
+const isInside = (parent, child) => {
+  const rel = path.relative(path.resolve(parent), path.resolve(child));
+  return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+};
+
+// ข้อผิดที่ทำให้ memory ใช้งานไม่ได้จริง — คืนเป็นข้อความเตือน ไม่ throw เพราะ run ยังเดินได้ (แค่ไม่ได้แยก)
+export function memoryRootIssues(kr, workspaceRoot, exists = existsSync) {
+  const mem = memoryRootOf(kr);
+  if (!mem) return [];
+  const issues = [];
+  if (!exists(mem)) issues.push("path ไม่มีจริง");
+  else if (!exists(path.join(mem, ".git"))) issues.push("ไม่ใช่ git repo — auto commit จะข้าม ประวัติที่ใช้ resume จะไม่ถูกเก็บ");
+  // อยู่ใน knowledge = git ของ knowledge เห็นทั้งก้อน แยกไม่จริง
+  if (kr.path && isInside(kr.path, mem)) issues.push("อยู่ภายใน knowledge root — ต้องเป็นโฟลเดอร์แยก");
+  // สิทธิ์อ่านของ agy ผูกกับขอบเขต workspace (ดู reportsDirOf) — อยู่นอกแล้ว role ถัดไปอ่านใบงาน/ผลตรวจไม่ได้
+  if (workspaceRoot && !isInside(workspaceRoot, mem)) issues.push(`อยู่นอกราก workspace (${workspaceRoot}) — agy จะอ่านไม่ได้`);
+  return issues;
+}
+
 // รับได้ทั้งชื่อตรงและชื่อ knowledge root เป็น prefix เช่น schoolbright-knowledge/sb-api-gateway
 export function resolveTarget(ws, name) {
   for (const kr of ws.knowledge_roots) {

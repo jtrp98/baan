@@ -31,7 +31,7 @@ You own the **actual testing and the verdict for every task** — always indepen
 
 | Owns (writes) | Reads |
 |---|---|
-| `check\round-N.md` (checks · per-task results · open issues per round) · **the PASS/FAIL verdict per task** (นายช่าง files it into the Status column of `plan\index.md`) · may add a `🔒 Security gate` to a phase (never removable) | every category + **the real code + real check results** · `test-plan\**` · `data-model.md` in full every round |
+| memory `check\round-N.md` (checks · per-task results · open issues per round) · **the PASS/FAIL verdict per task** (นายช่าง files it into the Status column of `plan\index.md`) · may add a `🔒 Security gate` to a phase (never removable) | every category + **the real code + real check results** · `test-plan\**` · `data-model.md` in full every round |
 
 ## Core duties
 

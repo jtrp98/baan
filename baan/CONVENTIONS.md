@@ -8,11 +8,15 @@ Read the index of the category you're pointed to first (`requirement\index.md`, 
 
 **An index is current state only**: when something changes, overwrite the cell/sentence in place so the index states today's truth — no `## Change Log` in index files, and no "Precedence/Amendment" paragraphs stacked above older text to override it (a reader must never have to work out which paragraph wins). The history of an index is `git log`.
 
+**A knowledge index is written for people who never ran BAAN**: full sentences (what is done, what waits on whom, which risks are open) — no run shorthand such as `Localoverlay63pass26fail1skip`. Run detail (queue, per-slice PASS/FAIL, rework rounds) belongs in the memory `status.md`.
+
+**Two stores, same module folders**: *knowledge* holds what other people need to know or decide from today (requirements/decisions, design/contracts/DBML/SQL, signed uxui, test plans, open questions, backlog, security findings, `plan\index.md`); *memory* (the workspace's `memory_root`, when configured) holds what the AI team needs to continue and the evidence that work was done or checked (task sheets, gm's per-task cards, queues, plan JSON, check rounds, evidence/validation files, `status.md`). Test before writing any file: does someone who doesn't run BAAN need it? No = memory. Knowledge cites memory as **text, not links** (`check-092 PASS 2026-10-29 (memory)`) because people who clone knowledge don't have memory. No `memory_root` configured = everything stays in knowledge as before.
+
 When a named data model/index splits a contract across linked dictionaries or appendices, following those exact links for the assigned scope is allowed. This does not authorize directory hunting or unrelated categories.
 
 ## 2. Write only what you own
 
-Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
+Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
 
 ## 3. Amend, don't regenerate
 
@@ -30,9 +34,9 @@ A number/fact with no source gets tagged `(สมมติฐาน — ยั�
 
 Source/target repositories: `status/log/diff/show` are readable; state-changing git belongs to the user unless explicitly authorized.
 
-**Configured knowledge exception:** the built-in `commitKnowledge` workflow and `baan --commit --config <workspace-config>` may stage/commit document changes only inside configured `knowledge_roots` that have their own Git repository. This exception is part of the requested knowledge auto-commit workflow; it does not authorize source/target commits, push, branch changes, history rewriting, or arbitrary git operations. Keep the existing per-module grouping and report failures.
+**Configured knowledge exception:** the built-in `commitKnowledge` workflow and `baan --commit --config <workspace-config>` may stage/commit document changes only inside configured `knowledge_roots` (and their configured `memory_root`) that have their own Git repository. This exception is part of the requested knowledge auto-commit workflow; it does not authorize source/target commits, push, branch changes, history rewriting, or arbitrary git operations. Keep the existing per-module grouping and report failures.
 
-**Raw run output stays in the runner's `reports\`** — answer files, response/patch JSON, stdout/stderr and test result files (e.g. `.trx`) are never copied into knowledge; knowledge holds the distilled result (the document change itself, a test summary with command + pass/fail counts) plus the run folder name as the evidence pointer.
+**Raw run output stays in the runner's `reports\`** — answer files, response/patch JSON, stdout/stderr and test result files (e.g. `.trx`) are never copied into knowledge or memory; they hold the distilled result (the document change itself, a test summary with command + pass/fail counts) plus the run folder name as the evidence pointer.
 
 The controller must run the final knowledge commit **after saving all role outputs and its own knowledge edits**, including workflows where it writes the documents after a read-only role exits. A role-run completion hook cannot commit files that have not been written yet. Do not clear/replace `knowledge_roots` to bypass this workflow.
 
@@ -72,6 +76,8 @@ Relational data-model work also includes a full, readable DBML artifact kept in 
 
 
 ## Change Log
+
+- 2026-11-02 — Split memory (task sheets, cards, queues, plan JSON, check rounds, evidence, run status) from knowledge (contracts + human-readable state) via `memory_root`; knowledge cites memory as text; knowledge indexes are written for people.
 
 - 2026-10-28 — Rework cap reached = ask the human immediately (no end-of-round parking); finish line frozen per task; slice-level statuses with exact AC coverage.
 

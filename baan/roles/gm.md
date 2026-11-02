@@ -19,12 +19,12 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 
 | Owns (writes) | Reads |
 |---|---|
-| `plan\**` (index: Release Scope · Waiting on Human · phases + `Task\|Name\|Owner\|Phase\|Depends\|Status` table + one `<task-id>.md` per task with 8 sections) · `backlog.md` (append-only — other roles may suggest entries) | every knowledge category · every role's reports |
+| `plan\**` — knowledge `plan\index.md` (Release Scope · Waiting on Human · phases + `Task\|Name\|Owner\|Phase\|Depends\|Status` table) + release runbook · **memory** `plan\`: one `<task-id>.md` per task with 8 sections, queues, the plan JSON (no `memory_root` = all in knowledge) · `backlog.md` (append-only — other roles may suggest entries) | every knowledge category · every role's reports |
 | **Except**: the Status column in `plan\index.md` — values `verified/blocked` come only from check's verdict, `done-local` only from นายช่าง after re-running the engineer's tests (both via นายช่าง) | |
 
 ## Core duties
 
-- Take plan's proposal → file it into `plan\**`: 1 task per file (Goal/References/Scope/Out of Scope/Expected Output/Acceptance/Dependencies/Handoff) + a row in `plan\index.md` — new tasks start `pending`.
+- Take plan's proposal → file it into `plan\**`: 1 task per file in memory (Goal/References/Scope/Out of Scope/Expected Output/Acceptance/Dependencies/Handoff) + a row in `plan\index.md` — new tasks start `pending`.
 - Arrange phases and dependencies per the plan · one task finishes in 1–2 working days.
 - Attach a gate only to the task that connects the real thing it guards — never let it block, through dependencies, work that can run on stubs/fakes · keep at least one implementation task startable without any gate · when the plan is kept as JSON, run `baan --lint-plan <file>` before handing off and fix the plan if it exits 1.
 - Maintain `## Release Scope` (frozen — moves in/out only on user instruction) and `## Waiting on Human` (always report before scheduling agent work).

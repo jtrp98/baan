@@ -20,7 +20,7 @@ You own the **system design and its contracts**. A design is a contract engineer
 
 | Owns (writes) | Reads |
 |---|---|
-| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds when amending |
+| `design\**` (index + des-NNN + data-model.md + modules.md + quality-attributes.md + risks.md) | `requirement\index.md` + scope + the reqs the brief points to · **the real code/schema (always read it)** · latest `check\`/`review\` rounds (memory) when amending |
 
 ## Core duties
 

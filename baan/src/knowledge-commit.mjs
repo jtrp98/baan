@@ -5,6 +5,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { memoryRootOf } from "./config.mjs";
 
 export function gitIn(root, args) {
   const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", windowsHide: true });
@@ -88,8 +89,10 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
 export function commitKnowledge(ws, log = () => {}) {
   const all = [];
   for (const kr of ws.knowledge_roots ?? []) {
-    const r = commitKnowledgeRoot(kr, log);
-    all.push(...r.commits);
+    all.push(...commitKnowledgeRoot(kr, log).commits);
+    const mem = memoryRootOf(kr);
+    // ชื่อ "<root>-memory" ใช้กับไฟล์ระดับรากของ memory และให้ log บอกได้ว่า commit ลง repo ไหน
+    if (mem) all.push(...commitKnowledgeRoot({ name: `${kr.name}-memory`, path: mem }, log).commits);
   }
   return all;
 }

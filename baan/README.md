@@ -46,7 +46,8 @@ AI session ใดก็ได้ (claude/codex/agy/ZCode/...)
 โครงสร้างข้อมูลของ workspace หนึ่งๆ (config อยู่**นอก package** เพื่อให้ update version ไม่ทับ config ของคุณ):
 
 - `<ราก workspace>\baan.config.json` — config ของ workspace นั้น (เช่น `C:\src\schoolbright\baan.config.json` · ตัวอย่างรูปแบบเต็ม: `baan.example.json`)
-- **ที่เก็บเอกสาร** — `knowledge_roots` เช่น `C:\src\schoolbright\knowledge` (requirement/design/review แยกโฟลเดอร์รายโปรเจกต์)
+- **ที่เก็บเอกสาร** — `knowledge_roots` เช่น `C:\src\schoolbright\knowledge` (requirement/design/review แยกโฟลเดอร์รายโปรเจกต์) — เอกสารกลางที่คนอื่นใช้ร่วม
+- **ความจำของทีม** — `memory_root` ของแต่ละ knowledge root เช่น `C:\src\schoolbright\memory` (ใบงาน คิว การ์ด task แผน JSON รอบตรวจ หลักฐาน `status.md` · โครงโฟลเดอร์ module เดียวกับ knowledge) — git repo แยก อยู่ใต้ราก workspace (agy อ่านได้) · ไม่ตั้ง = ทุกอย่างลง knowledge แบบเดิม · `baan --list` เตือนถ้า path ไม่มีจริง ไม่ใช่ git อยู่ใน knowledge หรืออยู่นอก workspace
 - **ที่เก็บ code** — `targets` เช่น `C:\src\schoolbright\target\*` (repo ที่ทีมจะแตะ)
 
 ตัว baan เดินหา config ขึ้นจากไดเรกทอรีที่เรียกอัตโนมัติ (หรือระบุ `--config <file>` / env `BAAN_CONFIG`) · โหมดอัตโนมัติอ้าง target ผ่าน `--target <ชื่อ>`
@@ -137,7 +138,7 @@ baan-role --list              # ดูรายชื่อ agent + tier
 - **fallback เมื่อติดโควตา** ตาม `_fallback` ของ tier — ทำเฉพาะเมื่อสั่ง agent เดียวพร้อม `--tier` (`--all` ไม่สลับ) · ตัวสำรองใช้ model/effort ของ tier (ไม่ใช้ `--model`/`--effort` ที่ระบุให้ตัวแรก) · ปิดด้วย `--no-fallback`
 - **runDir ไม่ชนกัน**: `<ราก workspace>/reports/baan/<timestamp>-<role>-tier-<t>-<n>agents-<สุ่ม>/` — เปิดหลาย role ขนานกันในวินาทีเดียวได้
 - **ป้าย `[baan-role: <ID>]`** บรรทัดแรกของ prompt ทุก role (งานไม่ผูก role = `adhoc`) + ประโยคข้อยกเว้นเดียวกับใน CLAUDE.md/AGENTS.md ที่ `--init` สร้าง — role ที่รันใน workspace จึงไม่สวมบท นายช่าง ซ้อนตามไฟล์ที่ CLI โหลดเอง (ข้อความอยู่ที่ `src/role-guard.mjs`)
-- **auto commit ที่เก็บเอกสารหลังจบ run** — knowledge root ไหนเป็น git repo (มี `.git`) จะถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` เช่น `school-bot: add db/review-001.md, index.md +2 more` · ไฟล์ที่ commit ไม่ทับของ module อื่นที่ staged ค้างไว้ · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังเมื่อไหร่แจ้งเตือนแล้วไปต่อ ไม่ลากผล run ไปตายด้วย · เรียกด้วยมือได้ด้วย `baan --commit` (โค้ดอยู่ที่ `src/knowledge-commit.mjs`)
+- **auto commit ที่เก็บเอกสารหลังจบ run** — knowledge root ไหนเป็น git repo (มี `.git`) จะถูก commit ให้อัตโนมัติตอนจบ run ของทั้ง `baan` และ `baan-role` · แยก commit ต่อ module (โฟลเดอร์ย่อยแรกใต้ knowledge) ข้อความอังกฤษสั้นรูปแบบ `module: add|update|remove <ไฟล์> [+N more]` เช่น `school-bot: add db/review-001.md, index.md +2 more` · ไฟล์ที่ commit ไม่ทับของ module อื่นที่ staged ค้างไว้ · ไม่ใช่ git repo = ข้ามเงียบๆ · git พังเมื่อไหร่แจ้งเตือนแล้วไปต่อ ไม่ลากผล run ไปตายด้วย · ตั้ง `memory_root` ไว้ = commit memory repo ด้วยแบบเดียวกัน (log ขึ้นต้น `<ชื่อ root>-memory:`) · เรียกด้วยมือได้ด้วย `baan --commit` (โค้ดอยู่ที่ `src/knowledge-commit.mjs`)
 - **วันที่ของงาน** ใส่ใน prompt ทุก role (และ gm/plan ในโหมดอัตโนมัติ) — ค่าเริ่มต้น = วันที่ local ของเครื่อง · override ด้วย `--date YYYY-MM-DD` (ทั้ง `baan` และ `baan-role`) · resume ใช้วันที่ของวันที่รันจริง ไม่คืนจาก run เดิม
 
 ### เมื่อเอกสาร knowledge ยังไม่ถูก commit

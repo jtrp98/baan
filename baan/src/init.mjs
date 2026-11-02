@@ -23,7 +23,7 @@ function stubContent(charterPath) {
 **ขั้นแรกทันที: อ่าน charter นี้แล้วถือปฏิบัติตลอด session** — \`${charterPath}\`
 
 - เปิด session ราย role ด้วยคำสั่ง \`baan-role\` (ใช้ได้จากทุกที่) · โหมดอัตโนมัติทั้งก้อน: \`baan --target <ชื่อ> --goal "..."\`
-- config ของ workspace นี้ (targets/knowledge/defaults): \`./baan.config.json\`
+- config ของ workspace นี้ (targets/knowledge/memory/defaults): \`./baan.config.json\`
 `;
 }
 
@@ -49,7 +49,7 @@ export function performInit(targetDir, teamDir, log = console.log) {
   } else {
     writeFileSync(newCfg, readFileSync(path.join(teamDir, "baan.example.json"), "utf8"), "utf8");
     results.config = "written";
-    log(`สร้าง config จากตัวอย่าง: ${newCfg} — แก้ path ให้ตรงเครื่องนี้ (targets/knowledge)`);
+    log(`สร้าง config จากตัวอย่าง: ${newCfg} — แก้ path ให้ตรงเครื่องนี้ (targets/knowledge/memory) แล้ว git init โฟลเดอร์ memory`);
   }
 
   const charterPath = path.join(teamDir, "BAAN.md");

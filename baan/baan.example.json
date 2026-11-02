@@ -4,6 +4,7 @@
     {
       "name": "ชื่อที่เก็บเอกสาร เช่น schoolbright-knowledge",
       "path": "C:/src/<workspace>/knowledge",
+      "memory_root": "C:/src/<workspace>/memory",
       "targets": [
         { "name": "ชื่อโปรเจกต์ (ใช้กับ --target)", "path": "C:/src/<workspace>/target/<repo>" }
       ]

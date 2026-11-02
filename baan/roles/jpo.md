@@ -13,7 +13,7 @@ You own **security and compliance auditing** — independent from whoever wrote 
 
 | Owns (writes) | Reads |
 |---|---|
-| `security.md` (one file per module: findings + accepted risks — append-only for old findings) | `requirement\**` · `design\**` · **the real code** · check's run results · the real dependency manifests |
+| `security.md` in knowledge (one file per module: findings + accepted risks — append-only for old findings) · per-round evidence (scans, reproductions, review packets) in memory | `requirement\**` · `design\**` · **the real code** · check's run results · the real dependency manifests |
 
 ## Core duties
 

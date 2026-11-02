@@ -2,6 +2,24 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## Unreleased — แยกความจำของทีม (memory) ออกจากเอกสารกลาง (knowledge)
+
+ที่มา: knowledge school-bot 255 จาก 707 ไฟล์เป็นใบงาน/หลักฐานรายรอบใน `planning/` (ไม่มีในกติกาเดิม) · index เขียนเป็นตัวย่อของ run · เปิดให้ designer/dev คนอื่นใช้ร่วมไม่ได้ · กติกาเดิม "ทุก output ลง knowledge" ทำให้ย้ายออกแล้วจะถูกสร้างกลับ
+
+### ⚠ ต้องทำตอนอัปเกรด
+- **ไม่ทำอะไร = ทำงานแบบเดิม** (ทุกอย่างลง knowledge) — ฟีเจอร์นี้เปิดเมื่อใส่ `memory_root` เท่านั้น
+- จะเปิดใช้: สร้างโฟลเดอร์ใต้ราก workspace (เช่น `C:\src\schoolbright\memory`) + `git init` → ใส่ `"memory_root"` ใน knowledge root ของ `baan.config.json` → `baan --list` ต้องไม่มี ⚠ → ย้ายใบงาน/รอบตรวจ/หลักฐานเดิมออกจาก knowledge (ไม่ย้ายก็ได้ แต่ของใหม่จะลง memory ของเก่าค้างใน knowledge)
+
+### เพิ่ม
+- **`memory_root`** ต่อ knowledge root ใน config + `memoryRootOf` / `memoryRootIssues` (`src/config.mjs`) · `baan --list` แสดง memory พร้อมเตือน: path ไม่มี · ไม่ใช่ git · อยู่ใน knowledge · อยู่นอกราก workspace (agy อ่านไม่ได้)
+- **auto commit memory** — `commitKnowledge` commit memory repo ด้วย จัดกลุ่มต่อ module แบบเดียวกัน (log `<root>-memory:`)
+- brief ของ `--target` บอก role ว่า memory อยู่ไหน
+
+### เปลี่ยน (กติกา)
+- **charter + CONVENTIONS**: สองที่เก็บ — knowledge = สิ่งที่คนอื่นต้องรู้/ใช้ตัดสินใจ · memory = ใบงาน การ์ด task คิว แผน JSON รอบตรวจ หลักฐาน `status.md` · ถามก่อนเขียนทุกไฟล์ "คนที่ไม่ได้รัน BAAN ต้องใช้ไหม" · knowledge อ้าง memory เป็นข้อความไม่ใช่ลิงก์ · index ของ knowledge เขียนให้คนอ่าน (ห้ามตัวย่อของ run) · `--sweep` ไม่ค้น memory
+- **roles**: `check` เขียน `check\round-N.md` ลง memory · `gm` การ์ด task/คิว/JSON ลง memory ส่วน `plan\index.md` + runbook อยู่ knowledge · `sys` ห้ามเขียน memory · `arch`/`spec` อ่านรอบ check จาก memory · `jpo` findings อยู่ knowledge หลักฐานรายรอบลง memory
+- tests 140 → 143
+
 ## 0.22.0 — 2026-10-29 · จัด model ต่อ tier ตามชนิดงานและความคุ้มค่า (ทุกค่าย)
 
 ที่มา: `docs/tier-selection-prompt.md` — ให้แต่ละค่ายเลือก model/effort ที่เบาที่สุดซึ่งทำงานระดับนั้นได้ดี แทนการจัดตัวให้ "ทัดเทียม" Opus · Intelligence Index เป็นข้อมูลประกอบ (AA v5.0 ณ 2026-10-29 ชุดเดียวทั้งตาราง) · ยังไม่ได้วัดคุณภาพ/โควตากับงาน BAAN จริง
