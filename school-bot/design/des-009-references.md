@@ -1,0 +1,37 @@
+# DES-009 — Preview ยืนยัน และส่งคะแนนกลับ SchoolBright — เอกสารอ้างอิง
+
+> Rev 4 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ส่วนต่อของ [DES-009 — Preview ยืนยัน และส่งคะแนนกลับ SchoolBright](des-009.md) รวมข้อกำหนดและมติที่สัญญานี้อ้าง แต่ละรายการระบุความหมายจากชื่อเรื่องต้นทาง
+
+- [REQ-050 (Preview และยืนยันส่งคะแนนกิจกรรม)](../requirement/req-050.md)
+- [REQ-051 (คะแนนชนและการคุ้มครองคะแนนครู)](../requirement/req-051.md)
+- [REQ-052 (สิทธิ์ การส่งซ้ำ และ audit คะแนน)](../requirement/req-052.md)
+- [มติ 021 (การส่งคะแนนเข้าระบบเกรด SchoolBright)](../requirement/decisions-021.md)
+- [มติ 022 (ที่อยู่ของหน้าจอ Admin / ครู / Desktop)](../requirement/decisions-022.md)
+- [มติ 023 (writer คะแนน, ปัดเศษ, นำเข้า Sheet และเจ้าของ mapping)](../requirement/decisions-023.md)
+- [มติ 024 (เกณฑ์เลื่อน Level และ policy Quiz/Test)](../requirement/decisions-024.md)
+- [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../requirement/decisions-025.md)
+- [มติ 026 (อนุมัติ amendment-proposal-001/002 เป็น baseline ใหม่)](../requirement/decisions-026.md)
+- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../requirement/decisions-027.md)
+- [มติ 028 (ชนิดคอลัมน์ CreateBy/UpdateBy)](../requirement/decisions-028.md)
+- [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../requirement/decisions-029.md)
+- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md)
+- [BR-050-01 (SchoolBot เชื่อมและบันทึกช่องย่อยต่อกิจกรรมตาม mapping โดยไม่เพิ่ม/แก้โครงสร้าง PGGradeDB)](../requirement/req-050.md)
+- [BR-051-01 (ช่องที่ SchoolBot ดูแลถูกครูแก้หลังรอบก่อน หรือปลายทางเปลี่ยนหลัง preview ให้หยุดส่งและแสดงรายการชน)](../requirement/req-051.md)
+- [BR-052-01 (ตรวจสิทธิ์ครูรายวิชา/ห้อง/โรงเรียน/เทอมและล็อกที่ server ขณะบันทึก; ไม่มีสิทธิ์หรือล็อกแล้วห้ามเขียน)](../requirement/req-052.md)
+- [DES-008 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](des-008.md)
+- [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)
+- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
+
+- [BR-050-02 (ก่อนส่งแสดงผู้เรียน กิจกรรม โรงเรียน/เทอม วิชา ช่องปลายทาง และค่าเดิม → ค่าใหม่)](../requirement/req-050.md)
+- [BR-050-03 (คะแนนส่งแต่ละช่อง = earned/max กิจกรรม × max ช่อง แล้วปัดจำนวนเต็ม half-up; preview แสดงต้นทาง/คะแนนเต็ม/ค่าก่อนและหลังปัดรายช่อง (decisions-033))](../requirement/req-050.md)
+- [BR-050-04 (ส่งเมื่อครูกดยืนยัน preview นั้นเท่านั้น; ถ้าข้อมูลที่ยืนยันเปลี่ยนต้องแสดงใหม่ก่อนยืนยัน)](../requirement/req-050.md)
+- [BR-050-05 (ปัดแบบ half-up — x.5 ขึ้นไปปัดขึ้น ต่ำกว่าปัดลง (7.5 → 8, 7.4 → 7) ตาม decisions-023)](../requirement/req-050.md)
+- [BR-051-02 (ครูเลือกทับ/คงค่าได้รายคนเฉพาะช่อง SchoolBot ที่ชน; แสดงค่าปัจจุบันและค่าที่เสนอให้ยืนยันอีกครั้ง)](../requirement/req-051.md)
+- [BR-051-03 (ห้ามทับช่องที่ครูกรอกเองนอกช่อง SchoolBot, PgtgradeEdit override และผลพิเศษ เช่น รอผล/ขาดสอบ; ห้ามแปลงเป็นศูนย์)](../requirement/req-051.md)
+- [BR-051-04 (การเลือกทับไม่ข้ามข้อห้าม BR-051-03; ข้อมูลเปลี่ยนอีกก่อนบันทึกต้องตรวจชนใหม่)](../requirement/req-051.md)
+- [BR-052-02 (ส่งซ้ำไม่บวกหรือสร้างผลซ้ำ; ผลล้มเหลว/บางส่วนต้องแยกจากสำเร็จและติดตามรายคน/ช่องได้)](../requirement/req-052.md)
+- [BR-052-03 (audit อ้างต้นทางและ revision, mapping ที่ใช้, ปลายทาง, เดิม/ใหม่, ผู้ยืนยัน, เวลา, การแก้ชน และผลส่ง)](../requirement/req-052.md)
+- [BR-052-04 (แก้เฉพาะช่อง SchoolBot; ผลรวม/เกรดจากคะแนนใหม่ต้องตรงกฎคำนวณเดิม โดยรักษา override/ผลพิเศษ)](../requirement/req-052.md)
+- [BR-052-05 (backend ที่เขียนคะแนนอยู่ฝั่ง SchoolBot ไม่เรียก service score-record เดิม; ต้องพิสูจน์ parity ผลรวม/เกรดกับหน้า score-record และรายงานเดิมก่อนเปิดใช้ ตาม decisions-023)](../requirement/req-052.md)
