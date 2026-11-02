@@ -25,7 +25,7 @@ test("timeout ที่เลือกต้องเป็น integer ในข
   for (const value of [1, 86400]) assert.equal(resolveTimeout({ timeoutSec: value }), value);
 });
 
-test("role ใช้ shared discovery จาก invocation/--cwd, legacy และ env โดยไม่เปลี่ยน agent/cwd/write", () => {
+test("role ใช้ shared discovery จาก invocation/--cwd และ env โดยไม่เปลี่ยน agent/cwd/write", () => {
   const root = mkdtempSync(path.join(tmpdir(), "baan-timeout-"));
   const savedEnv = process.env.BAAN_CONFIG;
   delete process.env.BAAN_CONFIG;
@@ -35,8 +35,8 @@ test("role ใช้ shared discovery จาก invocation/--cwd, legacy แล�
     assert.equal(resolveRoleTimeout(opts, cfg), 1800);
     writeFileSync(path.join(root, "baan.config.json"), JSON.stringify({ defaults: { timeout_sec: 2100, agent: "agy" } }));
     const nested = path.join(root, "nested");
-    mkdirSync(path.join(nested, "mycelium"), { recursive: true });
-    const legacy = path.join(nested, "mycelium", "mycelium.json");
+    mkdirSync(nested, { recursive: true });
+    const legacy = path.join(nested, "baan.config.json");
     writeFileSync(legacy, JSON.stringify({ defaults: { timeout_sec: 2200 } }));
     assert.equal(resolveRoleTimeout(opts, cfg), 2100);
     const moved = parseRoleArgs(["--cwd", "nested"], root);

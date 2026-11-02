@@ -16,24 +16,18 @@ export function loadAgentsConfig() {
 // ไม่งั้นการ update version/clone package ใหม่จะทับ config ของ workspace ทุกครั้ง
 // หา `baan.config.json` ที่ราก workspace (เช่น C:\src\schoolbright\baan.config.json)
 // โดยเดินขึ้นจากจุดที่เรียก — ตัวใกล้สุดชนะ (workspace ซ้อนกันได้)
-// ชื่อเก่าทั้งสองแบบ (mycelium.config.json และ mycelium/mycelium.json) ยังถูกพบได้
-// เพราะ workspace ที่ตั้งไว้ก่อนการเปลี่ยนชื่อ project ยังใช้ชื่อเหล่านั้นอยู่
 export function findWorkspaceConfig(startDir) {
   let dir = path.resolve(startDir);
   for (;;) {
     const flat = path.join(dir, "baan.config.json");
     if (existsSync(flat)) return flat;
-    const prev = path.join(dir, "mycelium.config.json");
-    if (existsSync(prev)) return prev;
-    const legacy = path.join(dir, "mycelium", "mycelium.json");
-    if (existsSync(legacy)) return legacy;
     const parent = path.dirname(dir);
     if (parent === dir) return null;
     dir = parent;
   }
 }
 
-// ลำดับ: --config ที่ส่งมา > env BAAN_CONFIG > env MYCELIUM_CONFIG (ชื่อเก่า) > discovery จากไดเรกทอรีที่เรียก
+// ลำดับ: --config ที่ส่งมา > env BAAN_CONFIG > discovery จากไดเรกทอรีที่เรียก
 export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
   const check = (p, label) => {
     const resolved = path.resolve(p);
@@ -42,7 +36,6 @@ export function resolveWorkspaceConfig(explicitPath, startDir = process.cwd()) {
   };
   if (explicitPath) return check(explicitPath, "--config");
   if (process.env.BAAN_CONFIG) return check(process.env.BAAN_CONFIG, "BAAN_CONFIG");
-  if (process.env.MYCELIUM_CONFIG) return check(process.env.MYCELIUM_CONFIG, "MYCELIUM_CONFIG (ชื่อเก่า)");
   return findWorkspaceConfig(startDir);
 }
 

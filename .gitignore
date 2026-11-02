@@ -1,10 +1,12 @@
-# ข้อมูล run ของเครื่อง (answer/stderr/report ทุกครั้งที่สั่งงาน) — เก็บในเครื่องอย่างเดียว
+# ผลการรันของเครื่อง
 baan/reports/
-
-# ไฟล์นำทาง AI session ของ repo นี้ — ใช้ local อย่างเดียว ไม่อัพขึ้น git
-/CLAUDE.md
-/AGENTS.md
-
 node_modules/
 *.tgz
 *.tmp-*
+
+# ไฟล์ส่วนตัวของคนที่ทำงานใน repo นี้ (ไม่ใช่ส่วนของ package)
+/CLAUDE.md
+/AGENTS.md
+/planning/
+/docs/
+/demo-notes.md

@@ -1,11 +1,21 @@
-# 🏗️ BAAN
+# BAAN
 
-บ้านของ **BAAN (นายช่าง)** — local npm package "ผู้คุมทีม AI 11 ตำแหน่ง" ธีมไซต์งานก่อสร้าง: แตกงาน เปิด session รายช่างผ่าน claude/codex/agy ส่งต่อ context และหยุดถามคนที่ประตูมนุษย์
+BAAN เป็นเครื่องมือ command line ที่แบ่งงานพัฒนาซอฟต์แวร์ให้ AI หลายตัวทำตามตำแหน่ง เช่น คนเขียน requirement, คนออกแบบ, คนเขียนโค้ด, คนตรวจ แทนที่จะให้ AI ตัวเดียวทำทุกอย่าง แต่ละตำแหน่งรันผ่าน AI CLI ที่มีอยู่ในเครื่อง (claude, codex หรือ agy) และระบบจะหยุดถามคนเมื่อถึงเรื่องที่ต้องให้คนตัดสิน เช่น รัน SQL หรือเซ็น UX
 
-> ชื่อเดิมของ project คือ MYCELIUM (เปลี่ยนชื่อ + ธีมก่อสร้าง 2026-10-22) · คำสั่งเก่า `mycelium` / `mycelium-role` ยังใช้ได้เป็น alias
+ตัว package อยู่ในโฟลเดอร์ [`baan/`](baan/)
 
-## อ่านต่อ
+## ติดตั้ง
 
-- **คู่มือการใช้งานเต็ม**: [`baan/README.md`](baan/README.md) — BAAN คืออะไร · เริ่มต้นใช้งาน · ทีม 11 ตำแหน่ง · tier ladder · ทุกคำสั่ง
-- ติดตั้งแบบย่อ: `cd baan && npm link` แล้วใช้คำสั่ง `baan` / `baan-role` ได้จากทุกโปรเจกต์
-- ประวัติแต่ละรุ่น: `baan/RELEASE-NOTES.md` · charter ของทีม: `baan/BAAN.md`
+ต้องมี Node.js 18 ขึ้นไป และ AI CLI อย่างน้อยหนึ่งตัวที่ login แล้ว
+
+```bash
+cd baan
+npm link
+```
+
+หลังจากนี้ใช้คำสั่ง `baan` และ `baan-role` ได้จากทุกโฟลเดอร์
+
+## เอกสาร
+
+- [baan/README.md](baan/README.md) วิธีใช้งานทั้งหมด
+- [baan/RELEASE-NOTES.md](baan/RELEASE-NOTES.md) สิ่งที่เปลี่ยนในแต่ละรุ่น

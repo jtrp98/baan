@@ -1,5 +1,5 @@
 // Regression: config ของ workspace อยู่นอก package (กัน update version ทับ config)
-// แผนปัจจุบัน: <ราก workspace>\baan.config.json · แผนเก่า mycelium\mycelium.json ยังรองรับ
+// อยู่ที่ <ราก workspace>\baan.config.json
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -29,24 +29,6 @@ test("ตัวใกล้สุดชนะ (workspace ซ้อนกัน�
     writeFileSync(path.join(nested, "baan.config.json"), JSON.stringify(realConfig), "utf8");
     assert.equal(findWorkspaceConfig(path.join(nested, "repo")), path.join(nested, "baan.config.json"));
     assert.equal(findWorkspaceConfig(root), path.join(root, "baan.config.json"));
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test("แผนเก่า mycelium\\mycelium.json ยังถูกพบ และชื่อใหม่กว่าชนะเสมอ", () => {
-  const root = mkdtempSync(path.join(tmpdir(), "baan-test-"));
-  try {
-    const legacyDir = path.join(root, "mycelium");
-    mkdirSync(legacyDir);
-    writeFileSync(path.join(legacyDir, "mycelium.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(legacyDir, "mycelium.json"));
-
-    // ชื่อเก่าแบบแยกไฟล์ (mycelium.config.json) ชนะแผนเก่าสุด
-    writeFileSync(path.join(root, "mycelium.config.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(root, "mycelium.config.json"));
-
-    // ชื่อปัจจุบัน (baan.config.json) ชนะทุกชื่อเก่า
-    writeFileSync(path.join(root, "baan.config.json"), JSON.stringify(realConfig), "utf8");
-    assert.equal(findWorkspaceConfig(path.join(root, "a", "b")), path.join(root, "baan.config.json"));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
