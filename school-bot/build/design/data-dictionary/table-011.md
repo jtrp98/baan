@@ -40,4 +40,4 @@
 
 ## หลักฐาน
 
-[schoolbot_db.sql](C:/src/schoolbright/knowledge/school-bot/db/schoolbot_db.sql:230) — ตารางและฟิลด์จริงในร่าง SQL; [สัญญาเดิม](contract-index.md) และแบบ DES ที่สารบัญ [design](../index.md) ระบุ
+[schoolbot_db.sql](C:/src/schoolbright/knowledge/school-bot/build/db/schoolbot_db.sql:230) — ตารางและฟิลด์จริงในร่าง SQL; [สัญญาเดิม](contract-index.md) และแบบ DES ที่สารบัญ [design](../index.md) ระบุ
