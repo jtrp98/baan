@@ -54,7 +54,7 @@ Note ของตารางมีหน้าที่ “หนึ่งแ�
 
 ## ขอบเขต
 
-แบบเต็มตรง SQL ที่คงเฉพาะ PRIMARY KEY; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์เดิมดู dictionary; integration ใช้อธิบายเท่านั้น **ห้ามนำภาพ integration ไปสร้าง SQL/migration** ไม่เพิ่มตารางในฐานเดิมหรือสร้าง FK ข้าม DB การเขียนคะแนนจริงยังขึ้นกับสัญญาและหลักฐานใน DES-009
+แบบเต็มตรง SQL ที่คงเฉพาะ PRIMARY KEY; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์เดิมดู dictionary; integration ใช้อธิบายเท่านั้น **ห้ามนำภาพ integration ไปสร้าง SQL/migration** ไม่เพิ่มตารางในฐานเดิมหรือสร้าง FK ข้าม DB การเขียนคะแนนจริงยังขึ้นกับสัญญาและหลักฐานใน [DES-009 (Preview ยืนยัน และส่งคะแนนกลับ SchoolBright)](des-009.md)
 
 ตรวจด้วย `@dbml/core 10.3.1` โหมด `dbmlv2` ซึ่งรองรับ [กลุ่มสี Note และ inactive ref](https://dbml.dbdiagram.io/syntax/enrichment-visualization/) ตัว parser แบบ legacy บางตัวไม่รองรับ syntax visualization ใหม่
 

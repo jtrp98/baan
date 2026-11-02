@@ -2,11 +2,11 @@
 
 > Rev 3 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-## ข้อเท็จจริง
+## ข้อเท็จจริงจากหลักฐานเดิม
 
-source ที่ระบุท้ายไฟล์ แยก Lessons/CodeLab/Blocks/Robot; source ที่ระบุท้ายไฟล์ render คนละ entry ส่วน source ที่ระบุท้ายไฟล์ ใช้สอง engine ไม่ใช่สอง product modes
+Frontend แยกหน้า Lessons, CodeLab, Blocks และ Robot ออกจากกัน โดย AppView render คนละ entry ส่วน engine manager ใช้สอง engine ไม่ใช่สอง product modes ข้อเท็จจริงนี้อ้างหลักฐานเดิมท้ายไฟล์
 
-## ข้อเสนอ SA
+## ขอบเขตและสัญญาตามแบบ
 
 | Product/หน้า | View ปัจจุบัน | Host/store mode | Engine |
 |---|---|---|---|
@@ -39,7 +39,9 @@ Go Host: LicenseGate / Session / Projects / Robot lifecycle / Updates
 | Infrastructure | repositories ของ 4 DB เดิม, legacy credential/profile adapters, session store, signer และ grader; ไม่แก้ Academic generated entities |
 | Platform | Windows/Darwin transport และ credential adapters; ไม่แตก business rules ตาม OS |
 
-มติ decisions-010/011: API ทั้งหมดรวม Login อยู่ `C:/src/schoolbright/target/school-bot/web` (C# API → Application → Domain; Infrastructure ผ่าน ports). Desktop→HTTPS ไปยัง HTTP API Gateway→SchoolBot gRPC service; browser→same-origin BFF→HTTP API Gateway (`sb-api-gateway`)→SchoolBot gRPC service. SchoolBot gRPC service อยู่ใน school-bot/web รับผิดชอบ session/directory/authorization; reuse HTTP Login เดิมของ HTTP API Gateway (`sb-api-gateway`) ตาม DES-004/012 ไม่สร้าง verifier ซ้ำ. ไม่อ่าน DB จาก client. RPC mapping/trusted JWT tenant กับ opaque session ยัง design pending ตาม [Gateway Rev3](gateway-integration-001.md); ไม่เปลี่ยน engine IPC/local hardware
+[มติ 010 (ใช้ข้อมูล Login/User ที่มีอยู่แล้ว)](../requirement/decisions-010.md) และ [มติ 011 (ใช้ฐานข้อมูลเดิมทั้ง 4 ตัวร่วมกับ SchoolBot)](../requirement/decisions-011.md) กำหนดให้ API ทั้งหมดรวม Login อยู่ที่ `C:/src/schoolbright/target/school-bot/web` โดยแยก C# API, Application และ Domain ส่วน Infrastructure เชื่อมผ่าน ports Desktop เรียก HTTPS ไปยัง HTTP API Gateway (`sb-api-gateway`) แล้วส่ง gRPC ต่อให้ SchoolBot gRPC service ส่วน browser ผ่าน same-origin BFF (Backend for Frontend) ก่อนเข้า Gateway
+
+SchoolBot gRPC service ใน `school-bot/web` รับผิดชอบ session, directory และ authorization ใช้ HTTP Login เดิมของ Gateway ตาม [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](des-004.md) และ [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md) โดยไม่สร้าง verifier ซ้ำ Client ไม่อ่าน DB โดยตรง การกำหนด RPC (Remote Procedure Call) และ mapping ระหว่าง trusted JWT (JSON Web Token) tenant กับ opaque session ยังรอการออกแบบตาม [Gateway Rev3](gateway-integration-001.md) ส่วน IPC (Inter-Process Communication) ของ engine และ local hardware คงเดิม
 
 Login ไม่ activate License; License ไม่สร้างบัญชีหรือสิทธิ์ครู Offline entitlement เปิด local runtime ได้ แต่ไม่ใช้แทน user token ของ Cloud
 
@@ -52,3 +54,5 @@ Sample อยู่ใน namespace และ execution path แยก ไม่
 - `app/frontend/src/app/appData.tsx:17`
 - `AppView.tsx:247`
 - `app/internal/engine/manager.go:43`
+
+หลักฐาน source ข้างต้นคงจากฉบับก่อน งานเรียบเรียงนี้ไม่ได้เปิดตรวจ implementation เพิ่ม

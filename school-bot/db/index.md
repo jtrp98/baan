@@ -2,22 +2,29 @@
 
 > แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-> หน่วยอ่าน = ไฟล์ · สารบัญล้วน · convention เฉพาะโปรเจกต์ (SQL ของ vault + บันทึก review) · 1 แถว = 1 บรรทัด
-> วิธีอ่าน: อ่านไฟล์นี้ก่อน แล้วเปิดเฉพาะไฟล์ที่ task/brief ระบุ — ห้าม ls ห้ามอ่านข้ามหมวด · **ผู้ใช้ยืนยันรัน schoolbot_db.sql สร้างตารางแล้วตาม [บันทึก045](../requirement/decisions-045.md); ยังไม่ตรวจ catalog/revision/API integration — การรัน SQL เพิ่มเติมเป็นประตูมนุษย์เสมอ**
+สารบัญนี้รวมร่าง SQL และทะเบียนข้อมูลส่วนบุคคล ผู้ใช้ยืนยันสร้างฐานข้อมูลและตารางแล้วตาม [มติ 045 (ยืนยันสร้างฐานข้อมูลและตาราง)](../requirement/decisions-045.md) แต่ยังไม่ตรวจ catalog, revision และ API integration การรัน SQL เพิ่มเติมต้องได้รับอนุญาตจากมนุษย์
 
 ## ไฟล์ปัจจุบัน
 
 | ไฟล์ | เนื้อหา | สถานะ |
 |---|---|---|
-| ผลรีวิวรายรอบของ vault (`review-001..008*`), หลักฐาน connection / db-safe และ `proposal-learnerkind` (ตัดสินแล้วตาม decisions-032) | ย้ายไป memory `db/` เมื่อ 2026-11-02 — ข้อสรุปที่ยังใช้อยู่ในตารางนี้และใน design | ประวัติ (memory) |
-| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PRIMARY KEY 32 รายการ/UQ0/FK 0/CHECK 0; audit fields4ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | physical Rev7; ใบงาน094 ให้ CREATE หยุดเมื่อตารางมีอยู่ ใช้เฉพาะฐานใหม่ — ผู้ใช้ยืนยันสร้างตารางแล้ว แต่ revision/catalog จริงยังไม่ตรวจ ([045](../requirement/decisions-045.md)) |
-| `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | รอคน review/รัน — physical Rev7; เพิ่ม guard ล็อก+ตรวจว่างครบ32ก่อน DROP (094); ไม่มีผล rollback |
-| `schoolbot_catalog_review.sql` | C0–C5: inventory/คอลัมน์/PK/constraints/indexes จาก snapshot read-only เดียว เพื่อ AC-033-01..05 | เตรียมแล้ว 2026-10-29 — รอมนุษย์ review/รันบนฐานที่ API ทดสอบใช้ |
-| `pii-inventory-001.md` | ตารางจำแนก PII รายคอลัมน์ 32 ตาราง + ตารางข้อมูลเด็ก 9 ตาราง + flag F1–F7 ส่ง jpo — ตอบ SEC001-010 | สร้างแล้ว — รอ jpo พิจารณา |
+| ผลตรวจโครงสร้างและทางเลือกของ vault | ข้อสรุปปัจจุบันอยู่ในตารางนี้และเอกสาร design; แหล่งประวัติอยู่ในหลักฐานท้ายไฟล์ | ประวัติ |
+| `schoolbot_db.sql` | DDL รวมไฟล์เดียวของ SchoolBot DB 10.0.0.128:9499 (32 ตาราง, standalone indexes 0; PRIMARY KEY 32 รายการ, UNIQUE 0, FK 0, CHECK 0; audit fields 4 ตัว nullable DEFAULT NULL; backing indexes เฉพาะ PK) | physical Rev7; CREATE ต้องหยุดเมื่อตารางมีอยู่ ใช้เฉพาะฐานใหม่ — ผู้ใช้ยืนยันสร้างตารางแล้ว แต่ revision/catalog จริงยังไม่ตรวจ ([มติ 045 (ผู้ใช้ยืนยันสร้างฐานข้อมูลและตารางแล้ว)](../requirement/decisions-045.md)) |
+| `schoolbot_db_rollback.sql` | rollback ของ `schoolbot_db.sql` | รอคน review/รัน — physical Rev7; เพิ่ม guard ที่ล็อกและตรวจว่าทั้ง 32 ตารางว่างก่อน DROP; ไม่มีผล rollback |
+| `schoolbot_catalog_review.sql` | C0–C5: inventory/คอลัมน์/PK/constraints/indexes จาก snapshot read-only เดียว เพื่อ [AC-033-01 (ชื่อและฟิลด์ข้อมูล SchoolBot)](../requirement/req-033.md)..05 | เตรียมแล้ว 2026-10-29 — รอมนุษย์ review/รันบนฐานที่ API ทดสอบใช้ |
+| [pii-inventory-001.md](pii-inventory-001.md) | ทะเบียน PII รายคอลัมน์ของ 32 ตารางสำหรับ [SEC001-010 (ทะเบียนข้อมูลผู้เยาว์ การเก็บรักษา และ masking)](../security.md) พร้อม [รายการคอลัมน์](pii-inventory-001-columns.md) และ [ข้อพิจารณาให้ jpo](pii-inventory-001-considerations.md); จำนวนตารางข้อมูลเด็กเดิมขัดกันตามรายการท้ายไฟล์ | สร้างแล้ว — รอ jpo พิจารณา |
 
 ## หมายเหตุ
 
-- ไม่แตะ School DB และ PGGradeDB — ใช้บัญชี DB เดิมตาม [decisions-029](../requirement/decisions-029.md)
+- ไม่แตะ School DB และ PGGradeDB — ใช้บัญชี DB เดิมตาม [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../requirement/decisions-029.md)
 - ผู้เขียน SQL = `vault` (DBA) · นายช่าง/SA ส่งมอบและตรวจ · ห้าม role ใดรัน SQL เอง (ประตูมนุษย์)
 
-Back-links: `..\index.md`
+[กลับสารบัญโมดูล](../index.md)
+
+## ยังไม่ยืนยัน
+
+แถว inventory เดิมในสารบัญระบุข้อมูลเด็ก 9 ตารางและข้อพิจารณา F1–F7 แต่ตัว inventory ระบุอย่างน้อย 13 ตาราง (ตรง 8 และทางอ้อม 5) พร้อมข้อพิจารณา F1–F8 ต้องให้ vault และ jpo ยืนยันการปรับสารบัญให้ตรงกัน งานนี้เก็บทั้งสองข้อความโดยไม่เลือกยอดแทน
+
+## หลักฐาน
+
+- ผล review-001..008, connection/db-safe และ proposal-learnerkind ย้ายไป db/ (memory) เมื่อ 2026-11-02; ทางเลือก LearnerId ตัดสินตาม [มติ 032 (ผลทดลองของครูและการล็อก mapping คะแนน)](../requirement/decisions-032.md)

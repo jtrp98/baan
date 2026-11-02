@@ -1,6 +1,30 @@
-# Source References — school-bot
+# แหล่งอ้างอิงข้อกำหนด SchoolBot
 
-พาธด้านล่างอ้างจาก source repository:
+> แก้ล่าสุด 2026-11-02 · แก้โดย spec · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้รวมตำแหน่ง source และมติที่ใช้กลั่นข้อกำหนด พร้อมทางเข้าอ่านสัญญา transport แยกจากหลักฐานความสามารถฐานเดิม ตำแหน่ง source เก็บตามช่วงที่ตรวจและไม่ยืนยันว่าการเชื่อมระบบปัจจุบันพร้อมใช้งาน
+
+
+คำย่อในเอกสาร: OS = Operating System หรือระบบปฏิบัติการ; API = Application Programming Interface หรือส่วนเชื่อมต่อบริการ
+## ข้อกำหนดและขอบเขต
+
+อ่านกฎธุรกิจและเกณฑ์ตรวจรับจาก [สารบัญ requirement](index.md) และอ่านขอบเขตวันนี้จาก [scope.md](scope.md) รายการความสามารถฐานเดิมอยู่ใน [scope-baseline-001.md](scope-baseline-001.md)
+
+## มติประกอบแหล่งอ้างอิง
+
+ผู้ใช้ในแชต 2026-10-21 ยืนยัน [มติ 001 (จากคำตอบผู้ใช้)](decisions-001.md), [มติ 014 (Guest พื้นที่ร่วม การนำงานและประวัติเข้าบัญชี)](decisions-014.md), [มติ 015 (ถังขยะ Guest ผู้ร่างหลักสูตร และขอบเขตครู)](decisions-015.md), [มติ 016 (ผู้อนุมัติภาพรวมและการจัดทำข้อเสนอหุ่น/OS)](decisions-016.md) และ [มติ 019 (Windows 11 25H2 x64)](decisions-019.md) ส่วน [มติ 017 (ให้รองรับ Windows 10 x64 และทบทวนขั้นต่ำ)](decisions-017.md) และ [มติ 018 (ทดสอบแพ็กเกจเดิมก่อนปรับ Setup)](decisions-018.md) เป็นประวัติที่ถูกแทนแล้ว ไม่ใช้กำหนดเป้าหมาย OS วันนี้
+
+## สัญญา transport
+
+เส้นทาง client ใช้ HTTP API Gateway (`sb-api-gateway`) แล้วเรียก SchoolBot gRPC service รายละเอียดอ่าน Gateway integration (เส้นทางและ controller) และ [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](../design/des-012.md) ข้อความ API จากฐานเดิมใช้เป็นหลักฐานช่วงตรวจ ส่วนสัญญาที่ลิงก์กำหนดเส้นทาง transport ที่ใช้วันนี้
+
+## ยังไม่ยืนยัน
+
+รายการแหล่งอ้างอิงไม่ใช่ผล audit หรือหลักฐานว่าการเชื่อมระบบพร้อม ต้องใช้หลักฐานตรวจระบบที่รันจริงเพื่อยืนยันความสามารถปัจจุบัน
+
+## หลักฐาน
+
+พาธต่อไปนี้อ้างจาก source repository ของ SchoolBot ตามช่วงตรวจเดิม งานนี้ไม่ได้ตรวจโค้ดหรือ schema ปัจจุบันซ้ำ
 
 - `README.md:3`, `README.md:84`, `README.md:97`, `README.md:199` — PoC, ความสามารถและข้อจำกัด
 - `app/README.md:41`, `app/README.md:49` — ภาษา, DSL และหนึ่ง slot ต่อ mode
@@ -13,26 +37,7 @@
 - `engines/zide/docs/API.md:147` — ความหมายการส่งคำสั่งและข้อจำกัดฮาร์ดแวร์
 - `docs/API.md:9`, `web/README.md:29` — API และ Memory Store
 - `docs/INSTALLERS.md:3`, `docs/INSTALLERS.md:125` — แพ็กเกจและข้อจำกัดการแจกจ่าย
-- หลักฐาน source เฉพาะเรื่องอยู่ในแต่ละ REQ
-- [มติผู้ใช้](decisions-001.md) — คำตอบที่ยืนยันในแชต
 
-
-## มติที่ใช้ amend ปัจจุบัน
-
-ผู้ยืนยัน: ผู้ใช้ในแชต 2026-10-21; [Guest](decisions-014.md), [ถังขยะ/เนื้อหา/ครู](decisions-015.md), [ผู้อนุมัติ/ทีมเสนอหุ่น](decisions-016.md), [OS](decisions-019.md); decisions-017/018 เป็นประวัติ
-
-หลักฐาน source ข้างต้นคงช่วงตรวจเดิม ไม่ใช่การ audit ใหม่; รายการเต็มที่ย้ายจาก scope อยู่ [scope-baseline-001.md](scope-baseline-001.md)
-
-## อ้างอิง transport ปัจจุบัน
-
-[Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev9](../design/des-012.md) มี precedence เฉพาะ transport เหนือข้อความ API เดิม: client→HTTP G→gRPC B. รายการ source และมติข้างต้นคงตามช่วงตรวจเดิม ไม่ใช่หลักฐานว่า integration พร้อม.
-
-## Change Log
-
-- 2026-10-24 — ใบงาน053: เพิ่มจุดอ่าน transport ปัจจุบัน โดยคง source evidence และมติเดิม verbatim
-
-- 2026-10-22 — เพิ่มมติปัจจุบันและอ้างหลักฐานเดิมที่แยกจาก scope
-
-- 2026-10-21 — เพิ่มหลักฐานข้าม repository ของบัญชี/4 DB เดิมใน [source-review-002.md](../design/source-review-002.md); พาธใน review นั้นอ้าง academic root ไม่ใช่ school-bot-v2
-
-- 2026-10-21 — ย้าย References จาก scope.md แบบคงเนื้อหาเดิมเพื่อลดขนาดไฟล์
+- หลักฐาน source เฉพาะเรื่องอยู่ในแต่ละ REQ (Requirement หรือข้อกำหนด)
+- source-review-002 (หลักฐานบัญชีและฐานข้อมูลเดิมสี่ฐาน) อ้างพาธจาก Academic repository
+- ตำแหน่งอ้างอิง transport เดิมตรึง Gateway integration Rev3 และ [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](../design/des-012.md) Rev9 ปัจจุบันไฟล์ Gateway integration ระบุ Rev5 ส่วน [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](../design/des-012.md) ยังคง Rev9 การเรียบเรียงนี้ไม่แก้ Rev ของสัญญาเหล่านั้น

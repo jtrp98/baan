@@ -6,40 +6,23 @@
 
 ## ขอบเขตและหลักฐาน
 
-ครบ **32 ตาราง** ตาม [data-model.md](data-model.md) Rev8, [db/schoolbot_db.sql](../db/schoolbot_db.sql) และผลการตัดทอนใน หลักฐานท้ายไฟล์ ภายใต้มติ [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md) (ตาราง `SchoolBotTeacherGrant` เป็นทางสำรองตาม [des-004.md](des-004.md) ที่ยังไม่ได้ตัดสินให้สร้าง จึงไม่รวมใน 32 ตารางของ SQL และ DBML).
+ครบ **32 ตาราง** ตาม [data-model.md](data-model.md) Rev8, [db/schoolbot_db.sql](../db/schoolbot_db.sql) และผลตรวจการตัดทอนที่ระบุท้ายไฟล์ ภายใต้[มติ 026 (อนุมัติแบบข้อมูลที่ปรับใหม่)](../requirement/decisions-026.md) ถึง [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md) (ตาราง `SchoolBotTeacherGrant` เป็นทางสำรองตาม [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](des-004.md) ที่ยังไม่ได้ตัดสินให้สร้าง จึงไม่รวมใน 32 ตารางของ SQL และ DBML).
 
 คงไว้ในไฟล์ [schoolbot.dbml](schoolbot.dbml) ไฟล์เดียวเพื่อให้คัดลอกหรือนำเข้าไปเปิดใน [dbdiagram.io](https://dbdiagram.io) ได้ครบทั้ง 32 ตาราง (PRIMARY KEY 32 รายการ; ไม่มี FOREIGN KEY) ทันทีโดยไม่ต้องรวมไฟล์เอง.
 
-มติ [decisions-012.md](../requirement/decisions-012.md) ใช้ PK/FK domain `int4`; Cloud keys ออกโดย server (`GENERATED ALWAYS AS IDENTITY`). `ResourceId`/`EntityId` เป็น `int4` ส่วน `SchoolBotScoreOutbox.ReceiptId` เป็น `int8` (`bigint`) อ้าง `PGTGradeAuditLog.GradeAuditLogId` แบบ logical. UUID คงเฉพาะ `RequestKey`/`RequestId`, `OperationKey`, logical keys (`*Key`) และ embedded IDs.
+[มติ 012 (PK int4 และไฟล์ DBML)](../requirement/decisions-012.md) ใช้ PK/FK domain `int4`; Cloud keys ออกโดย server (`GENERATED ALWAYS AS IDENTITY`). `ResourceId`/`EntityId` เป็น `int4` ส่วน `SchoolBotScoreOutbox.ReceiptId` เป็น `int8` (`bigint`) อ้าง `PGTGradeAuditLog.GradeAuditLogId` แบบ logical. UUID คงเฉพาะ `RequestKey`/`RequestId`, `OperationKey`, logical keys (`*Key`) และ embedded IDs.
 
-ตาม [decisions-028.md](../requirement/decisions-028.md) คอลัมน์ `CreateBy` และ `UpdateBy` ของทุกตารางเป็น `integer NULL` (`int4 null` — เก็บ `sEmp` ของพนักงาน/ครู หรือ `sId` ของนักเรียน; `NULL` = ระบบทำเอง). ตาม [decisions-030.md](../requirement/decisions-030.md) ถอนคอลัมน์ `Version` ออกจากทุกตารางและถอน `PreviousVersion`/`NewVersion` ออกจาก `SchoolBotAuditEvent` โดยใช้ `UpdateDate` (ที่ server ตั้งด้วย `clock_timestamp()`) เป็น optimistic concurrency token (`ETag`/`If-Match` แบบ opaque string).
+ตาม [มติ 028 (ชนิดคอลัมน์ CreateBy/UpdateBy)](../requirement/decisions-028.md) คอลัมน์ `CreateBy` และ `UpdateBy` ของทุกตารางเป็น `integer NULL` (`int4 null` — เก็บ `sEmp` ของพนักงาน/ครู หรือ `sId` ของนักเรียน; `NULL` = ระบบทำเอง). ตาม [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md) ถอนคอลัมน์ `Version` ออกจากทุกตารางและถอน `PreviousVersion`/`NewVersion` ออกจาก `SchoolBotAuditEvent` โดยใช้ `UpdateDate` (ที่ server ตั้งด้วย `clock_timestamp()`) เป็น optimistic concurrency token (`ETag`/`If-Match` แบบ opaque string).
 
-ยืนยันชนิดข้อมูล legacy จาก source: Academic source ที่ระบุท้ายไฟล์; School source ที่ระบุท้ายไฟล์, source ที่ระบุท้ายไฟล์, `TPlanCourse`, `TPlanCourseTeacher`, `TTerm`; PGGradeDB `Pgtgrade.cs`, `PgtgradeDetail.cs`, `Pgtassessment.cs`, `PgtgradeAuditLog.cs` (ดูรายละเอียดใน [source-review-002.md](source-review-002.md) และ หลักฐานท้ายไฟล์).
+ชนิดข้อมูล legacy อ้างผลอ่าน source ของ Academic, School และ PGGradeDB ตาม [ผลตรวจ source](source-review-002.md) และหลักฐานท้ายไฟล์
 
-ร่าง SQL ปัจจุบันคง PRIMARY KEY 32 รายการ; UNIQUE/FK/CHECK เป็น 0. ความสัมพันธ์ ความไม่ซ้ำ และเงื่อนไขข้อมูลเดิมเป็นกฎเชิงตรรกะของ application; งานนี้ไม่เพิ่มหรือพิสูจน์ implementation ทดแทน (NOT_IMPLEMENTED). ชนิดข้อมูลและ identity เดิมคงอยู่; CreateBy/CreateDate/UpdateBy/UpdateDate รับ NULL และ DEFAULT NULL ทุกตาราง; ฟิลด์อื่นคง nullability/default เดิม; ยังไม่ได้รันฐานจริง
+ชนิดข้อมูล identity, nullability/default และสถานะการบังคับกฎยึด [ฐานสัญญาปัจจุบัน](data-model.md) คอลัมน์อื่นยังคงเงื่อนไขเดิม รายละเอียดข้อจำกัด SQL อยู่ด้านล่าง
 
 CreateBy/CreateDate/UpdateBy/UpdateDate ทุกตารางรับ NULL และ DEFAULT NULL ตามคำสั่งผู้ใช้ 2026-10-26; application เป็นผู้กำหนดค่าจาก server เมื่อเขียนข้อมูล
 
-## Placement และ integrity
+## ตำแหน่งและความถูกต้องของข้อมูล
 
-ตามมติ [decisions-027.md](../requirement/decisions-027.md) และ [decisions-029.md](../requirement/decisions-029.md):
-- วางทุกตารางของ SchoolBot (**32 ตาราง**) ใน **SchoolBot DB** (host `10.0.0.128` port `9499`, ชื่อ DB `SchoolBot` เป็นสมมติฐาน, schema `public`) เพื่อ commit domain + `SchoolBotIdempotency` + `SchoolBotAuditEvent` แบบ atomic ในฐานข้อมูลเดียว ([db/schoolbot_db.sql](../db/schoolbot_db.sql) ไม่สร้าง database role หรือกำหนดสิทธิ์ฐานข้อมูล).
-- การเชื่อมต่อกับ 4 ฐานข้อมูลเดิมของ SchoolBright (Master, School, Logs, PGGradeDB) ใช้ connection แยกด้วย **บัญชี DB เดิม** ของระบบ โดย**ไม่รัน GRANT/REVOKE หรือสร้าง role ใหม่**ใน School DB หรือ PGGradeDB ([decisions-029.md](../requirement/decisions-029.md)).
-- เนื่องจากตาราง SchoolBot อยู่คนละฐานข้อมูลกับ School DB จึง**ไม่มี transaction เดียวครอบข้าม DB**: การตรวจสิทธิ์ครูรายวิชา/ผู้ดูแลโรงเรียน, รายชื่อนักเรียนในห้อง (roster) และสถานะภาคเรียน (term) จาก School DB ต้องอ่านผ่าน connection แยกและ **re-check ก่อน commit** ใน SchoolBot DB ทุกครั้ง (ส่วนการตรวจ `SchoolBotLicense` และ `SchoolBotStaffRole` อยู่ใน SchoolBot DB เดียวกัน).
-
-ขอบเขต `SchoolId` และการอ้างอิง FK ตาม หลักฐานท้ายไฟล์:
-1. **Global เท่านั้น (`SchoolId IS NULL` — 8 ตาราง)**: `SchoolBotLevel`, `SchoolBotLevelPromotionPolicy`, `SchoolBotCurriculum`, `SchoolBotLesson`, `SchoolBotMission`, `SchoolBotCriteria`, `SchoolBotActivity`, `SchoolBotQuestionBank`
-2. **Mixed Global/Tenant (`SchoolId IS NULL OR SchoolId > 0` — 3 ตาราง)**: `SchoolBotRelease`, `SchoolBotIdempotency`, `SchoolBotAuditEvent` — Release และ Idempotency คงกฎไม่ซ้ำผ่าน application/repository transaction locks แยก global/tenant ตาม data-contract-rules.md; AuditEvent คง append-only ไม่มี partial unique index บังคับกฎดังกล่าว.
-3. **Tenant เท่านั้น (`SchoolId > 0` — 21 ตาราง)**: ตารางอื่นทั้งหมด.
-4. **การตัดทอน Index, Composite FK และคอลัมน์ซ้ำซ้อน (หลักฐานท้ายไฟล์)**:
-   - ถอน standalone indexes ทั้ง unique/non-unique ออกทั้งหมด (0 ตัว); คงเฉพาะ backing indexes ของ PK
-   - ถอน FOREIGN KEY ทั้ง 40 เส้นและ UNIQUE/CHECK ทั้งหมด; relationships เดิมเป็น logical references ใน dictionary และภาพ integration ไม่ใช่ SQL constraints
-   - ตัดคอลัมน์ `SchoolBotScoringPolicy.CurriculumId` (อ่านจาก `CourseRun.CurriculumId` แทน) และ `SchoolBotScoreOutbox.ScorePreviewId`
-   - ตัด `UQ_SchoolBotAssessment_Submission_Sequence` และ `UQ_SchoolBotAttempt_Learner_Seq` (ใช้ row/learner lock ก่อนจัดสรร `Sequence` แทน)
-
-current pointers ทั้ง 4 คู่ยังมีคอลัมน์เดิม แต่ไม่มี FK/DEFERRABLE เพิ่มผ่าน DO block; application ต้องตรวจความถูกต้องเอง
-
-`Owner`/`Profile` เป็น polymorphic; ใช้ `SchoolId`+`kind`+legacy ID ตรวจใน trusted adapter ห้าม FK ไปสองตารางพร้อมกัน. ใน schema ปัจจุบัน `LearnerId` รับเฉพาะ `student` (`sId`) เพื่อกัน `sEmp` ของครูชนกับ `sId` นักเรียน (ดูข้อเสนอทางเลือกใน หลักฐานท้ายไฟล์).
+อ่าน [ตำแหน่งฐานข้อมูลและขอบเขตการอ้างอิง](schema-notes-placement.md) สำหรับการแยก connection, re-check ก่อน commit, ตาราง global/tenant, คอลัมน์ที่ถอน และ profile แบบ polymorphic
 
 ## ข้อจำกัดของร่าง SQL ปัจจุบัน
 
@@ -53,13 +36,17 @@ current pointers ทั้ง 4 คู่ยังมีคอลัมน์เ
 
 ## สถานะการอนุมัติและสิ่งที่ยังรอ
 
-- **อนุมัติแล้ว**: Logical/physical baseline 32 ตารางบน SchoolBot DB (`10.0.0.128:9499`), `CreateBy`/`UpdateBy` เป็น `integer NULL`, การไม่แตะ School DB/PGGradeDB ด้วย GRANT และการใช้ `UpdateDate` แทน `Version` ตาม [decisions-026.md](../requirement/decisions-026.md)..[decisions-030.md](../requirement/decisions-030.md) และ หลักฐานท้ายไฟล์.
-- **ตัดสินแล้ว**: ผู้ใช้เลือกทาง A สำหรับการป้องกัน `LearnerId` ครู/นักเรียนชนกัน ตาม [มติ 032 (ผลทดลองของครูและการล็อก mapping คะแนน)](../requirement/decisions-032.md); การปรับ authorization ยังเป็นงานที่ต้องทำ
+- **อนุมัติแล้ว**: Logical/physical baseline 32 ตารางบน SchoolBot DB (`10.0.0.128:9499`), `CreateBy`/`UpdateBy` เป็น `integer NULL`, การไม่แตะ School DB/PGGradeDB ด้วย GRANT และการใช้ `UpdateDate` แทน `Version` ตาม [มติ 026 (อนุมัติแบบข้อมูลที่ปรับใหม่)](../requirement/decisions-026.md) ถึง [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md) และผลตรวจที่ระบุท้ายไฟล์
+- **ตัดสินแล้ว**: ผู้ใช้เลือกทาง A สำหรับการป้องกัน `LearnerId` ครู/นักเรียนชนกัน ตาม [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md); การปรับ authorization ยังเป็นงานที่ต้องทำ
 - **ยังไม่อนุมัติ / รอประตูมนุษย์**:
-  - การรัน `db/schoolbot_db.sql` บนฐานทดสอบโดยมนุษย์และส่งผลให้ `DBA-003` ตรวจ
+  - การรัน `db/schoolbot_db.sql` บนฐานทดสอบโดยมนุษย์และส่งผลให้ [DBA-003 (Core evidence — ตรวจหลักฐานฐานข้อมูล)](../plan/index.md) ตรวจ
 
-  - การเปิดเขียนคะแนนลง PGGradeDB (รอผ่าน release gates ทั้งห้า `G-PARITY`, `G-COEXIST`, `G-TARGET`, `G-AUTHZ`, `G-DB` ของ [des-009.md](des-009.md))
+  - การเปิดเขียนคะแนนลง PGGradeDB (รอผ่าน release gates ทั้งห้า `G-PARITY`, `G-COEXIST`, `G-TARGET`, `G-AUTHZ`, `G-DB` ของ [DES-009 (Preview ยืนยัน และส่งคะแนนกลับ SchoolBright)](des-009.md))
   - การเปิด endpoint `web-principal` ใน gateway และ config `H5`
+
+## ยังไม่ยืนยัน
+
+ชื่อ database `SchoolBot` เป็นชื่อในแบบเดิม ต้องยืนยันด้วย configuration หรือ catalog จริง
 
 ## หลักฐาน
 
@@ -69,3 +56,8 @@ current pointers ทั้ง 4 คู่ยังมีคอลัมน์เ
 - `TmasterDbuser.cs:8`
 - `Tuser.cs:8,142`
 - `Temployee.cs:8,92`
+
+- Academic: `TmasterDbuser.cs:8`
+- School: `Tuser.cs:8,142`, `Temployee.cs:8,92`, `TPlanCourse`, `TPlanCourseTeacher`, `TTerm`
+- PGGradeDB: `Pgtgrade.cs`, `PgtgradeDetail.cs`, `Pgtassessment.cs`, `PgtgradeAuditLog.cs`
+- [BL-001 (ปรับยอด declaration ให้ตรง SQL และผลตรวจ)](../backlog.md): อ้างในประวัติ Rev5; งานเรียบเรียงนี้ไม่เปลี่ยนยอด
