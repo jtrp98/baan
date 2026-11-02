@@ -46,7 +46,7 @@ Users rarely say what they actually need — they say what they think they want.
 ## Stop and route
 
 - Never design, pick a stack, write code, or touch `plan\` — route to the owning role.
-- Existing files = edit the changed parts so the file states today's truth + header line + one line in the module changelog (CONVENTIONS §3). Never regenerate.
+- Existing files = edit the changed parts so the file states today's truth + header line + one entry in the module changelog (CONVENTIONS §3). Never regenerate.
 - Keep `requirement\decisions.md` (the decisions in force today) current whenever a decision is recorded or replaced.
 - Size budget: req ≤ 4 KB · oq ≤ 4 KB · scope ≤ 12 KB — a requirement that doesn't fit is two releases.
 

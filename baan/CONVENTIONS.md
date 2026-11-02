@@ -16,7 +16,7 @@ When a named data model/index splits a contract across linked dictionaries or ap
 
 ## 2. Write only what you own
 
-Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself · the module's `changelog\` is shared: whoever writes a knowledge file appends its own line there (§3) and never edits other lines.
+Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself · the module's `changelog\` is shared: whoever writes a knowledge file appends its own entry there (§3) and never edits other entries.
 
 ## 3. Knowledge files: today's truth, written for a developer
 
@@ -32,7 +32,13 @@ The reader of every knowledge file is **a developer on the team who never ran BA
 **Changing**
 - An edit leaves the whole file stating today's truth: rewrite or delete superseded text where it stands. **Never append "Override RevN", "Amendment" or "Precedence" sections** — a reader must never work out which paragraph wins. `Edit` the parts that change; rewrite a whole file only when the task is to restructure it, and then drop nothing silently.
 - One header line under the title, overwritten on every change: `> Rev 12 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 051 — บันทึก Project + Revision เป็นหน่วยเดียว)`. Bump the Rev when the contract's meaning changes (check pins revisions), not for wording fixes; index files carry no Rev.
-- **History lives in the module's `changelog\YYYY-MM.md`** (one file per month, append-only), one line per change: `YYYY-MM-DD · <file> · Rev N · แก้โดย <role> · ขอโดย <who> · <what changed, one sentence>`. Knowledge files get **no `## Change Log` section**; an old one stays until the file is restructured, but never gets new lines. Read the changelog only when the task is about history. Memory files keep no change log at all — git holds their history.
+- **History lives in the module's `changelog\YYYY-MM.md`** (one file per month, append-only — add at the end, never edit older entries), written for the same developer reader. Under a `## YYYY-MM-DD` heading (add it when the day's first entry arrives), one entry per change that alters meaning:
+  ```
+  ### [design/des-004-lifecycle.md](../design/des-004-lifecycle.md) — Rev 12 → 13
+  อายุ Desktop session 8 ชั่วโมงนับจากเวลาที่ bind สำเร็จ (เดิม: นับจาก CreateDate)
+  แก้โดย arch · ขอโดย ผู้ใช้ · ตามมติ 052 (อายุ Desktop session นับจากเวลา bind)
+  ```
+  Say **what was true before and what is true now** in full sentences, as long as the change needs — "updated per decision 052" alone tells the reader nothing. New file = `— ไฟล์ใหม่` and what it records; no Rev = `— ไม่มี Rev`. Changes that keep the meaning (restructuring, wording, links) go in **one entry per batch**: `### จัดรูปแบบ (ความหมายไม่เปลี่ยน)` + the files and what was done, so they never bury real changes. Knowledge files get **no `## Change Log` section**; when restructuring a file that still has one, move its entries into the changelog of their month first (text as written, under their dates) — never only delete them. Read the changelog only when the task is about history. Memory files keep no change log at all — git holds their history.
 - **Decisions**: each keeps its own record `requirement\decisions-NNN.md`; `requirement\decisions.md` lists the decisions in force today, grouped by topic, one line each (meaning + link). A replaced decision = update its line there and state in the old record which decision replaced it.
 - **Never copy a file into `archive\`, `archive.md` or a "before-xxx" snapshot before editing** — the previous version is a git commit; cite it when a reader needs it (snapshot only when the knowledge root has no git repository) · append-only files (backlog, security findings, changelog) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
 

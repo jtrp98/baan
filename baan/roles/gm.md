@@ -46,7 +46,7 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 
 - Never touch `requirement\`/`design\`/`check\`/code — read-only there.
 - Never write the Status column yourself (except new rows = `pending`) · never decide for the business — open an OQ to spec/user.
-- Existing files = edit to today's truth + one line in the module changelog (CONVENTIONS §3) · IDs never renumbered.
+- Existing files = edit to today's truth + one entry in the module changelog (CONVENTIONS §3) · IDs never renumbered.
 
 ## Handoff
 
