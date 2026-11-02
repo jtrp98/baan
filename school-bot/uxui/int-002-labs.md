@@ -2,6 +2,9 @@
 
 > แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
+ข้อกำหนดที่ใช้ในไฟล์นี้: [REQ-015 (โปรไฟล์หุ่นหกข้อต่อ)](../requirement/req-015.md) · [REQ-016 (ส่งท่าและปรับข้อต่อ)](../requirement/req-016.md) · [REQ-022 (อ่านค่าตำแหน่ง servo)](../requirement/req-022.md) · [REQ-023 (ปลดและล็อกแรงบิด)](../requirement/req-023.md) · [REQ-018 (เล่นลำดับจากแอป)](../requirement/req-018.md) · [REQ-019 (อัปโหลดท่าไปบอร์ด)](../requirement/req-019.md) · [REQ-020 (เล่นชุดท่าบนบอร์ด)](../requirement/req-020.md) · [REQ-021 (ขอหยุดหุ่นและยกเลิกงานค้าง)](../requirement/req-021.md) · [REQ-017 (ข้อมูลท่า ลำดับ และกลุ่ม)](../requirement/req-017.md)
+เอกสารนี้เป็นทางเข้าสำหรับการสร้างและทดลองงาน Arm, Block และ Code รวมการเชื่อมต่อหุ่น การขอหยุด และสถานะผิดปกติ รายละเอียดแยกตามงาน และผลอนุมัติเดิมอยู่ในตาราง §7
+
 > ฐานอ้างอิง: [REQ-013 (ขอบเขต sample/preview/mock)](../requirement/req-013.md) · [REQ-014 (ค้นหาและเชื่อมต่อหุ่น)](../requirement/req-014.md) ถึง [REQ-024 (การเชื่อมต่อขาดและคำสั่งล้มเหลว)](../requirement/req-024.md) · [REQ-025 (Code Lab: เขียนและรันโปรแกรม)](../requirement/req-025.md) · [REQ-026 (สร้างและทดลองโปรแกรมบล็อก)](../requirement/req-026.md) · [DES-006 (หุ่นจริง Windows/macOS)](../design/des-006.md) Rev1
 > ออกแบบต่อยอดจาก component เดิมที่มีจริง: `RobotMode/NativeConnectScreen/NativeReconnectOverlay/NativeWorkspace/ArmSimulator/BlockMode/CodeLabMode` (frontend จริงอยู่ `target/school-bot/app/frontend/src`)
 

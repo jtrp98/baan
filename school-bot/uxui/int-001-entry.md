@@ -2,6 +2,9 @@
 
 > แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
+ข้อกำหนดที่ใช้ในไฟล์นี้: [AC-021-04 (ออกจาก workspace ที่เชื่อมต่อแล้วส่งคำขอหยุดแม้ไม่มีงานค้าง)](../requirement/req-021.md)
+เอกสารนี้เป็นทางเข้าสำหรับลำดับเปิดแอป ตรวจ License เลือก Guest/Login เข้า Home shell และปิดแอป โดยรายละเอียดแต่ละสถานะอยู่ในไฟล์ย่อยและผลอนุมัติเดิมอยู่ในตาราง §9
+
 > ฐานอ้างอิง: [REQ-009 (Desktop และการใช้งานออฟไลน์)](../requirement/req-009.md) · [REQ-012 (ออกจากงานและปิดหน้าต่าง)](../requirement/req-012.md) · [REQ-028 (Activate, validate และจำกัดอุปกรณ์)](../requirement/req-028.md) · [REQ-034 (ตรวจ License ออนไลน์และสิทธิ์ออฟไลน์ 3 วัน)](../requirement/req-034.md) · [REQ-036 (Guest Local และ Login Cloud)](../requirement/req-036.md) · [DES-002 (License และ device binding)](../design/des-002.md) Rev3 · [pack-guest-001 (ชุดมติพื้นที่ Guest การนำเข้าและการตรวจใหม่)](../requirement/pack-guest-001.md) (G1 (Guest ใช้พื้นที่ร่วมโดยไม่มี PIN)/G2 (ไม่ล้างงาน Guest อัตโนมัติ)/G6 (บังคับ License ทั้ง Guest และ Login)) · [มติ 004 (License และมาตรฐานชื่อข้อมูล)](../requirement/decisions-004.md), [มติ 005 (License ออฟไลน์ 3 วัน)](../requirement/decisions-005.md), [มติ 014 ( Guest พื้นที่ร่วม การนำงานและประวัติเข้าบัญชี)](../requirement/decisions-014.md), [มติ 019 ( Windows 11 ตามข้อเสนอแรก)](../requirement/decisions-019.md), [มติ 035 (แหล่งสิทธิ์แอดมินโรงเรียน)](../requirement/decisions-035.md)
 > หลักการสำคัญ: เขียนตาม **target contract** (auth ผ่าน HTTP API Gateway (`sb-api-gateway`) → ระบบบัญชีเดิม ตามมติ 035) ไม่ใช่ as-built (ปัจจุบัน fullLogin NOT_READY, auth เหลือ HTTP logout/decoder local)
 
