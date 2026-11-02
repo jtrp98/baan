@@ -1,24 +1,45 @@
-# Release Notes — 🏗️ BAAN
+# Release Notes — BAAN
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## Unreleased — แยกความจำของทีม (memory) ออกจากเอกสารกลาง (knowledge)
+## 0.23.0 — 2026-11-02 · แยก memory ออกจาก knowledge, กติกาเอกสารที่คนอ่านรู้เรื่อง, README ใหม่
 
-ที่มา: knowledge school-bot 255 จาก 707 ไฟล์เป็นใบงาน/หลักฐานรายรอบใน `planning/` (ไม่มีในกติกาเดิม) · index เขียนเป็นตัวย่อของ run · เปิดให้ designer/dev คนอื่นใช้ร่วมไม่ได้ · กติกาเดิม "ทุก output ลง knowledge" ทำให้ย้ายออกแล้วจะถูกสร้างกลับ
+ที่มา: เอกสารใน knowledge ของ school-bot ใช้ร่วมกับคนอื่นไม่ได้ ไฟล์ 255 จาก 707 เป็นใบงานและหลักฐานของทีม AI ส่วนเอกสารที่เหลือซ้อนเป็นชั้น "Override RevN", อ้าง ID โดยไม่บอกความหมาย และมี Change Log ในทุกไฟล์ ต้นเหตุคือกติกาเดิมสั่งให้ทุก output ลง knowledge และให้ "แก้เฉพาะจุด + เพิ่ม Change Log ทุกครั้ง"
 
 ### ⚠ ต้องทำตอนอัปเกรด
-- **ไม่ทำอะไร = ทำงานแบบเดิม** (ทุกอย่างลง knowledge) — ฟีเจอร์นี้เปิดเมื่อใส่ `memory_root` เท่านั้น
-- จะเปิดใช้: สร้างโฟลเดอร์ใต้ราก workspace (เช่น `C:\src\schoolbright\memory`) + `git init` → ใส่ `"memory_root"` ใน knowledge root ของ `baan.config.json` → `baan --list` ต้องไม่มี ⚠ → ย้ายใบงาน/รอบตรวจ/หลักฐานเดิมออกจาก knowledge (ไม่ย้ายก็ได้ แต่ของใหม่จะลง memory ของเก่าค้างใน knowledge)
+
+- **คำสั่ง `mycelium` และ `mycelium-role` ถูกลบ** ใช้ `baan` และ `baan-role` แทน หลังอัปเดตให้รัน `npm link` ใหม่ในโฟลเดอร์ `baan/` เพื่อล้างลิงก์ของคำสั่งเก่า
+- **BAAN ไม่หา config ชื่อเก่าแล้ว** (`mycelium.config.json`, `mycelium/mycelium.json`, env `MYCELIUM_CONFIG`) และ `baan --init` ไม่ย้ายให้ ถ้ายังใช้ชื่อเก่าอยู่ ให้เปลี่ยนชื่อไฟล์เป็น `baan.config.json` เอง
+- **กติกาเอกสาร knowledge เปลี่ยน** เอกสารที่ role เขียนหลังอัปเกรดจะไม่มี `## Change Log` ท้ายไฟล์ ประวัติไปอยู่ที่ `changelog/YYYY-MM.md` ของแต่ละ module แทน ของเดิมไม่ต้องแก้ทันที แต่จะถูกเรียบเรียงใหม่เมื่อมีงานแตะไฟล์นั้น
+- **memory_root ไม่ตั้งก็ทำงานแบบเดิม** (ทุกอย่างลง knowledge) ถ้าจะใช้ ให้สร้างโฟลเดอร์ใต้ราก workspace (เช่น `C:\src\schoolbright\memory`) แล้ว `git init`, ใส่ `"memory_root"` ใน knowledge root ของ `baan.config.json`, รัน `baan --list` ให้ไม่มีคำเตือน แล้วย้ายใบงาน ผลตรวจรายรอบ และหลักฐานเดิมออกจาก knowledge
 
 ### เพิ่ม
-- **`memory_root`** ต่อ knowledge root ใน config + `memoryRootOf` / `memoryRootIssues` (`src/config.mjs`) · `baan --list` แสดง memory พร้อมเตือน: path ไม่มี · ไม่ใช่ git · อยู่ใน knowledge · อยู่นอกราก workspace (agy อ่านไม่ได้)
-- **auto commit memory** — `commitKnowledge` commit memory repo ด้วย จัดกลุ่มต่อ module แบบเดียวกัน (log `<root>-memory:`)
-- brief ของ `--target` บอก role ว่า memory อยู่ไหน
 
-### เปลี่ยน (กติกา)
-- **charter + CONVENTIONS**: สองที่เก็บ — knowledge = สิ่งที่คนอื่นต้องรู้/ใช้ตัดสินใจ · memory = ใบงาน การ์ด task คิว แผน JSON รอบตรวจ หลักฐาน `status.md` · ถามก่อนเขียนทุกไฟล์ "คนที่ไม่ได้รัน BAAN ต้องใช้ไหม" · knowledge อ้าง memory เป็นข้อความไม่ใช่ลิงก์ · index ของ knowledge เขียนให้คนอ่าน (ห้ามตัวย่อของ run) · `--sweep` ไม่ค้น memory
-- **roles**: `check` เขียน `check\round-N.md` ลง memory · `gm` การ์ด task/คิว/JSON ลง memory ส่วน `plan\index.md` + runbook อยู่ knowledge · `sys` ห้ามเขียน memory · `arch`/`spec` อ่านรอบ check จาก memory · `jpo` findings อยู่ knowledge หลักฐานรายรอบลง memory
-- tests 140 → 143
+- `memory_root` ต่อ knowledge root ใน config สำหรับเก็บสิ่งที่ทีม AI ใช้ทำงานต่อ (ใบงาน, การ์ด task, คิว, แผน JSON, ผลตรวจรายรอบ, หลักฐาน, `status.md`) แยกจากเอกสารที่คนอ่าน `baan --list` เตือนถ้า path ไม่มี, ไม่ใช่ git repo, อยู่ใน knowledge หรืออยู่นอก workspace (agy อ่านไม่ได้)
+- auto commit ครอบ memory repo ด้วย แยก commit ตาม module เหมือน knowledge (log ขึ้นต้น `<root>-memory:`)
+- `baan --sweep` ข้ามโฟลเดอร์ `changelog/` เพราะเป็นประวัติ ไม่ใช่จุดที่ต้องตามแก้
+
+### เปลี่ยน
+
+- **CONVENTIONS หัวข้อ 3 เขียนใหม่** ผู้อ่านเอกสาร knowledge คือ dev ในทีมที่ไม่เคยรัน BAAN
+  - ID ต้องบอกความหมายตอนอ้างครั้งแรก และตัวย่อต้องอธิบาย ไม่ใช้ศัพท์ของ run (wave, slice, oracle) ใน knowledge
+  - แก้ไฟล์ให้ทั้งไฟล์เป็นข้อมูลปัจจุบัน ห้ามต่อท้ายด้วย "Override RevN" หรือ "Precedence"
+  - หัวไฟล์มีบรรทัดเดียวบอก Rev, วันที่แก้ล่าสุด, ใครแก้, ใครขอ ส่วนประวัติเต็มอยู่ใน `changelog/YYYY-MM.md`
+  - `path:line` ไปไว้หัวข้อ `## หลักฐาน` ท้ายไฟล์ สมมติฐานไปไว้ `## ยังไม่ยืนยัน`
+  - `requirement/decisions.md` สรุปมติที่ใช้อยู่ตอนนี้
+  - ใช้ศัพท์อังกฤษได้ถ้าชัดกว่าคำไทย
+- **knowledge กับ memory แยกกัน** ก่อนเขียนไฟล์ role ต้องถามว่า "คนที่ไม่ได้รัน BAAN ต้องใช้ไฟล์นี้ไหม" knowledge อ้างของใน memory เป็นข้อความ ไม่ใช่ลิงก์ `check` เขียนผลตรวจลง memory, `gm` เก็บการ์ด task และ JSON ใน memory ส่วน `plan/index.md` อยู่ knowledge
+- ตัด Change Log ออกจาก CONVENTIONS, BAAN.md และไฟล์ role ทุกไฟล์ เพราะไฟล์พวกนี้ถูกแนบเข้า prompt ทุกครั้ง
+- README ราก repo และ `baan/README.md` เขียนใหม่ให้คนใหม่อ่านรู้เรื่อง (จาก 66 KB เหลือราว 22 KB)
+
+### ลบ
+
+- คำสั่ง `mycelium`, `mycelium-role` และทุกอย่างที่เกี่ยวกับชื่อเดิม (ดูหมวด ⚠)
+- `demo-notes.md` และ `docs/` ออกจาก git
+
+ชื่อ role แบบเก่า (`be`, `fe`, `qa` ฯลฯ) ยังใช้ได้ในแผนเดิม
+
+tests 140 → 142
 
 ## 0.22.0 — 2026-10-29 · จัด model ต่อ tier ตามชนิดงานและความคุ้มค่า (ทุกค่าย)
 
