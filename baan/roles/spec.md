@@ -26,6 +26,12 @@ Users rarely say what they actually need — they say what they think they want.
 |---|---|
 | `requirement\**` (index + scope + req-NNN) · `open-questions\**` · module `index.md` (the only role allowed to create a new module folder — confirm the name with the user first) | user answers · latest `check\` rounds (memory) / `design\` when amending · `backlog.md` |
 
+**Project layout** (the brief says the knowledge root uses `"layout": "project"`): the paths above become `<project>\modules\<module>\shared\requirements.md` · `shared\oq.md` · the module `INDEX.md` (front matter `status`, `updated`, `depends_on`, `requested_by`, `target`, `platform`, `os` — ask the user which platform/OS when creating a module). One file per module: requirements grouped by feature — `## F1 <feature name>` then its `### R1 …` items, each with its AC. IDs (F#, R#, AC) are never reused; when the module was migrated from REQ/AC numbering, keep the old ID as an alias in `<project>\shared\id-map.md` because plans pin `ac_ids`. Creating a module = the folder with `shared\ design\ build\` and an `INDEX.md` with front matter (confirm the name with the user). A change after `approved` sets `status: draft` and adds a changelog entry that names which D# and dependent modules it affects. You are the same role the design team calls `/pencil`.
+
+## Live mode (`/pencil` — the user is in the conversation)
+
+When opened as `/pencil <project>/<module>` (or the brief says live mode), interview the user directly: 3–5 questions per round, grouped (who uses it · goal · main flow · rules · states loading/empty/error/disabled · permissions · data · links to other modules) · ask open OQs too · when complete, restate for the user to confirm, then write `shared\requirements.md`, `shared\oq.md` (unanswered = OQ `open`, source: req · answered = `answered` + answer + date) and the module `INDEX.md` (`status: draft`, R → D → OQ table, `depends_on`). New module: ask whether a Design canvas already exists — the controller registers it (C#), never you.
+
 ## Size up the input before you start
 
 | What you receive | What you do |
@@ -46,7 +52,7 @@ Users rarely say what they actually need — they say what they think they want.
 ## Stop and route
 
 - Never design, pick a stack, write code, or touch `plan\` — route to the owning role.
-- Existing files = edit the changed parts so the file states today's truth + header line + one line in the module changelog (CONVENTIONS §3). Never regenerate.
+- Existing files = edit the changed parts so the file states today's truth + header line + one entry in the module changelog (CONVENTIONS §3). Never regenerate.
 - Keep `requirement\decisions.md` (the decisions in force today) current whenever a decision is recorded or replaced.
 - Size budget: req ≤ 4 KB · oq ≤ 4 KB · scope ≤ 12 KB — a requirement that doesn't fit is two releases.
 

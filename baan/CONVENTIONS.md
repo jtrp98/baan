@@ -16,7 +16,7 @@ When a named data model/index splits a contract across linked dictionaries or ap
 
 ## 2. Write only what you own
 
-Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself.
+Each role writes only the files/folders it owns (the table in the role file) — **engineers write only in code roots and never write anywhere under `knowledge\` or `memory\`** · if you think you must edit someone else's file = stop and route it back, don't edit it yourself · the module's `changelog\` is shared: whoever writes a knowledge file appends its own entry there (§3) and never edits other entries.
 
 ## 3. Knowledge files: today's truth, written for a developer
 
@@ -32,7 +32,13 @@ The reader of every knowledge file is **a developer on the team who never ran BA
 **Changing**
 - An edit leaves the whole file stating today's truth: rewrite or delete superseded text where it stands. **Never append "Override RevN", "Amendment" or "Precedence" sections** — a reader must never work out which paragraph wins. `Edit` the parts that change; rewrite a whole file only when the task is to restructure it, and then drop nothing silently.
 - One header line under the title, overwritten on every change: `> Rev 12 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 051 — บันทึก Project + Revision เป็นหน่วยเดียว)`. Bump the Rev when the contract's meaning changes (check pins revisions), not for wording fixes; index files carry no Rev.
-- **History lives in the module's `changelog\YYYY-MM.md`** (one file per month, append-only), one line per change: `YYYY-MM-DD · <file> · Rev N · แก้โดย <role> · ขอโดย <who> · <what changed, one sentence>`. Knowledge files get **no `## Change Log` section**; an old one stays until the file is restructured, but never gets new lines. Read the changelog only when the task is about history. Memory files keep no change log at all — git holds their history.
+- **History lives in the module's `changelog\YYYY-MM.md`** (one file per month, append-only — add at the end, never edit older entries), written for the same developer reader. Under a `## YYYY-MM-DD` heading (add it when the day's first entry arrives), one entry per change that alters meaning:
+  ```
+  ### [design/des-004-lifecycle.md](../design/des-004-lifecycle.md) — Rev 12 → 13
+  อายุ Desktop session 8 ชั่วโมงนับจากเวลาที่ bind สำเร็จ (เดิม: นับจาก CreateDate)
+  แก้โดย arch · ขอโดย ผู้ใช้ · ตามมติ 052 (อายุ Desktop session นับจากเวลา bind)
+  ```
+  Say **what was true before and what is true now** in full sentences, as long as the change needs — "updated per decision 052" alone tells the reader nothing. New file = `— ไฟล์ใหม่` and what it records; no Rev = `— ไม่มี Rev`. Changes that keep the meaning (restructuring, wording, links) go in **one entry per batch**: `### จัดรูปแบบ (ความหมายไม่เปลี่ยน)` + the files and what was done, so they never bury real changes. Knowledge files get **no `## Change Log` section**; when restructuring a file that still has one, move its entries into the changelog of their month first (text as written, under their dates) — never only delete them. Read the changelog only when the task is about history. Memory files keep no change log at all — git holds their history.
 - **Decisions**: each keeps its own record `requirement\decisions-NNN.md`; `requirement\decisions.md` lists the decisions in force today, grouped by topic, one line each (meaning + link). A replaced decision = update its line there and state in the old record which decision replaced it.
 - **Never copy a file into `archive\`, `archive.md` or a "before-xxx" snapshot before editing** — the previous version is a git commit; cite it when a reader needs it (snapshot only when the knowledge root has no git repository) · append-only files (backlog, security findings, changelog) never have old rows edited · **IDs are never renumbered** (REQ-NNN, AC-NNN, DES-NNN, OQ-NNN, BL-NNN, TP-NNN, UX-NNN).
 
@@ -87,3 +93,16 @@ Plan Status values: `pending` · `done-local` (code done and its automated tests
 
 When data/schema documentation is in scope, a list of table names, field names/types, or shorthand alone is not a complete handoff. `arch` owns the readable canonical model: table purpose/row meaning, field meaning and rules, nested JSON/enums, and legacy table/field mappings with evidence. `vault` reconciles physical SQL and supplies deltas; `inspect`/`check` verify the scoped contract. Split large documents with exact linked paths and keep unknowns explicit. Clarifying wording does not itself require schema approval, new ACs, or database execution.
 Relational data-model work also includes a full, readable DBML artifact kept in sync by `arch`; add a focused legacy integration view when needed. `vault` reviews SQL parity, and `inspect`/`check` verify scoped coverage, parser evidence and physical/logical relationship distinctions. Link the artifacts and guide from the model/index. Diagram annotations and colors do not change schema approval or authorize database execution.
+
+## 13. Project layout (`"layout": "project"` on the knowledge root)
+
+When the brief says the knowledge root uses the project layout, these replace the module-folder paths above:
+
+- **Tree:** `<project>\{shared,design,build}\` for what the whole project uses · `<project>\modules\<module>\{shared,design,build}\` for one module · `<project>\INDEX.md` · `<project>\modules\<module>\INDEX.md`. Features are `## F<n>` headings in `shared\requirements.md` (split into `features\F<n>-<slug>\` only when one file can no longer be read in one go).
+- **The slot says who writes:** `build\` = build-team roles (each still only its own files, §2) · `design\` = design-team roles (`survey`, `ui`, `review`) · `shared\` = the owner named in the file's `owner:` line; anyone else proposes a change through an OQ in `shared\oq.md` and never edits it.
+- **Module INDEX front matter is the single source** for `status`, `updated`, `depends_on` (`quiz` = same project, `school-bot/quiz` = another project), `requested_by` (project that asked for this module), `target`, and `platform` (`web` · `desktop` · `mobile`) + `os` (`mac`/`windows` for desktop · `ios`/`android` for mobile; web has none) — design roles read `ux-knowledge/common/` plus only that platform's folder (module without them inherits the project INDEX). Never hand-edit the module table in `<project>\INDEX.md` — `baan --index` rebuilds it (also after every run), including rows for modules in other projects that request or depend on this one. Modules live with the project whose code they ship in; the requesting project sees them through that row — never copy documents across projects.
+- **Write scope of a run** = the modules in `--module`; everything else is read-only. Cross-module material goes to `<project>\shared\` (decisions, contracts both sides read) or `<project>\build\` (cross-module DES/contract). Plans: one per project in `<project>\build\plan\`, every task with `"module"`.
+- **Design-round exception to the memory rule:** feasibility and review rounds of the design team stay in knowledge (`design\feasibility.md`, `design\review.md`, older rounds in `design\archive\`) because people read that history; build-team check rounds still go to memory.
+- **IDs per module:** F# (feature) · R# (requirement + its AC) · D# (design) · OQ# · C# (canvas) — next number always, never reused. IDs from before a migration stay findable through `<project>\shared\id-map.md`.
+- **Files must be readable in one read** (agents truncate long files and silently lose the end — the original `brand.md` lost every component spec this way). Past ~2 pages, split by topic and leave an index; write current values only (no "was X" annotations, no strike-through) — history is the changelog and git.
+- `baan --lint-knowledge` must show no ✗ before closing work (broken relative links, unknown `depends_on`/`requested_by`, stale module table); ⚠ lists files still outside the team slots.

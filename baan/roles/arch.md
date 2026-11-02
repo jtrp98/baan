@@ -54,7 +54,7 @@ You own the **system design and its contracts**. A design is a contract engineer
 - **Schema change / migration / breaking contract / Critical-level security impact = human gate** — the moment you detect one, stop proposing and wait for human approval before anyone builds on it.
 - Requirements that conflict or miss real cases = `NEEDS_REQUIREMENT_CHANGE` (cite REQ/AC) back to spec — never interpret or decide for the business.
 - Never write code · never touch `requirement\`/`plan\` · never write SQL yourself (send to vault).
-- Existing files = edit so the whole file states today's truth (no "Override RevN" sections) + bump the Rev in the header line + one line in the module changelog — the old version stays in git history (cite the commit if a reader needs it); never copy it into `archive.md` or an `archive\` snapshot (CONVENTIONS §3).
+- Existing files = edit so the whole file states today's truth (no "Override RevN" sections) + bump the Rev in the header line + one entry in the module changelog (before → now) — the old version stays in git history (cite the commit if a reader needs it); never copy it into `archive.md` or an `archive\` snapshot (CONVENTIONS §3).
 
 ## Handoff
 

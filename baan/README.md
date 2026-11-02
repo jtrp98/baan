@@ -21,22 +21,22 @@ cd baan/baan
 npm link
 ```
 
-จากนั้นไปที่โฟลเดอร์ workspace ของคุณ แล้วสร้าง config
+จากนั้นตั้ง workspace ด้วยคำสั่งเดียว — ทั้งทีมสร้างและทีมออกแบบไม่ต้อง clone อะไรเพิ่มเอง
 
 ```bash
-cd C:\src\myworkspace
 baan --init
-baan --list
 ```
 
-`baan --init` สร้างไฟล์ 3 ไฟล์
+`--init` ถามโฟลเดอร์ workspace และ git URL ของ knowledge (กับ memory ถ้าใช้) แล้ว clone ให้ จากนั้นเขียน config ที่ path ตรงเครื่องนี้ (สคริปต์ส่งเป็น flag แทนได้: `baan --init --workspace C:\src\myworkspace --knowledge-git <url> [--memory-git <url>]`) · รันซ้ำได้ ไม่ทับไฟล์ของคุณเอง ใช้อัปเดตของทีมออกแบบหลัง `git pull` baan
 
-| ไฟล์ | ใช้ทำอะไร |
+| สิ่งที่ `--init` วางให้ | ใช้ทำอะไร |
 |---|---|
-| `baan.config.json` | path ของ repo โค้ด, ที่เก็บเอกสาร และค่า default ของ workspace นี้ (ดูตัวอย่างเต็มใน [baan.example.json](baan.example.json)) |
+| `knowledge\`, `memory\` | clone จาก git URL ที่ตอบ (ข้ามได้) |
+| `baan.config.json` | path ของ repo โค้ด, ที่เก็บเอกสาร และค่า default ของ workspace นี้ · clone knowledge ให้แล้ว = ตั้ง `"layout": "project"` และ path ให้เลย · ไม่ clone = ก๊อปจาก [baan.example.json](baan.example.json) ให้แก้เอง |
 | `CLAUDE.md`, `AGENTS.md` | บอก AI session ที่เปิดในโฟลเดอร์นี้ให้ทำหน้าที่คุมงาน (ถ้ามีไฟล์ของคุณเองอยู่แล้ว จะไม่เขียนทับ) |
+| `.claude\agents\` survey · ui · review · `.claude\commands\pencil.md` · `.claude\skills\` | ของทีมออกแบบสำหรับ Claude — ชี้ไป role ตัวจริงใน package จึงไม่ตกรุ่น |
 
-แก้ path ใน `baan.config.json` ให้ตรงเครื่อง แล้วรัน `baan --list` เพื่อตรวจว่าเห็นทุกอย่างครบ
+รัน `baan --list` เพื่อตรวจว่าเห็นทุกอย่างครบ แล้วเพิ่ม `targets` (repo โค้ด) ใน config เมื่อต้องใช้
 
 ## โครงสร้าง workspace
 
@@ -53,6 +53,19 @@ C:\src\myworkspace\
 
 - `knowledge` และ `memory` ควรเป็น git repo แยกกัน BAAN จะ commit ให้อัตโนมัติตอนจบงาน
 - ถ้าไม่ตั้ง `memory_root` ทุกอย่างจะลง `knowledge`
+- ตั้ง `"layout": "project"` ที่ knowledge root = จัดเอกสารเป็น project > module และแยกช่อง `shared\` (กลาง) · `design\` (ทีมออกแบบ) · `build\` (ทีมสร้าง) ทุกระดับ:
+
+```
+knowledge\
+  school-bot\                project
+    INDEX.md                 ตาราง module (baan --index สร้างจากหัวไฟล์ของแต่ละ module)
+    shared\  design\  build\ ของที่ใช้ทั้ง project (brand, มติ, แผน, db …)
+    modules\quiz\            module
+      INDEX.md               หัวไฟล์: status · updated · depends_on · requested_by · target · platform · os
+      shared\  design\  build\
+```
+
+  module อยู่กับ project ที่โค้ดของมันถูกส่งมอบ (หน้าครูของ SchoolBot ที่อยู่ในเว็บ = `schoolbright-web\modules\school-bot` + `requested_by: school-bot`) · ตาราง INDEX ของทั้งสอง project แสดงแถวของกันและกันให้เอง ไม่ต้องคัดลอกเอกสาร · ไม่ตั้ง layout = โครงเดิม
 - ทั้ง `baan` และ `baan-role` หา `baan.config.json` โดยไล่ขึ้นจากโฟลเดอร์ที่เรียก ถ้าต้องการระบุเองใช้ `--config <file>` หรือ env `BAAN_CONFIG`
 
 ## วิธีใช้
@@ -79,6 +92,7 @@ session นั้นจะอ่านเอกสารเดิม แบ่�
 ```bash
 baan --target school-bot --goal "แก้บั๊ก login ค้าง" --dry-run   # ดูแผนก่อน ยังไม่รัน
 baan --target school-bot --goal "แก้บั๊ก login ค้าง"
+baan --module school-bot/quiz --goal "เพิ่มหน้าเลือก Level"        # layout project: ทีละ module (ข้าม module: school-bot/quiz+app-shell)
 baan --resume <runDir>                                          # ต่อ run ที่ค้าง
 ```
 
@@ -92,7 +106,7 @@ baan --resume <runDir>                                          # ต่อ run 
 | `gm` | ผู้จัดการหน้างาน | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run — คุ้มกัน scope creep (เฉพาะงานใหญ่) | t2 |
 | `spec` | ผู้เขียนข้อกำหนด | เค้นความต้องการจริงออกจากผู้ใช้ แปลงเป็น REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 |
 | `arch` | สถาปนิก | ออกแบบ DES และสัญญา API แบบเรียบง่าย ตรวจกับโค้ดจริง (as-built) เสมอ | t1 |
-| `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น และดูแล design system | t2 |
+| `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น สำหรับ module ที่ไม่มีทีมออกแบบ | t2 |
 | `front` | ช่างหน้างาน | implement ตาม UX ที่เซ็นแล้วเป๊ะ และสัญญา backend ตัวจริง — ไม่เพิ่มของที่ไม่ได้ขอ | เลือกราย task (t2–t5) |
 | `sys` | ช่างระบบ | implement ตามสัญญาเป๊ะ — validation ครบทุกขาเข้า และ error contract สมบูรณ์ | เลือกราย task (t2–t5) |
 | `vault` | ผู้ดูแลห้องนิรภัย | ออกแบบ schema กันบั๊กและเขียน SQL พร้อม rollback — แต่ห้ามรันเองเด็ดขาด | t2 |
@@ -100,7 +114,17 @@ baan --resume <runDir>                                          # ต่อ run 
 | `check` | ผู้ตรวจงานอิสระ | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task — ทำหน้าที่ศัตรูของโค้ด | t2 |
 | `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR ตามพื้นผิวจริง แล้วประกาศ blocker ตามความเสี่ยงจริง | t2 |
 
-ลำดับงานเต็มรูปแบบ: `plan` วางแผน, `gm` เรียกทีมตามแผน, `spec` เขียน requirement, `int` ร่าง UX ให้คุณเซ็น, `arch` ออกแบบ, `vault` เขียน SQL ให้คุณรัน, `front`/`sys` เขียนโค้ด, `inspect` วางแผนทดสอบ, `check` เขียนเทสและตัดสิน PASS/FAIL, `jpo` ตรวจ security ก่อนขึ้น production
+ทีมออกแบบ — คุยกับคุณสดใน session ที่เปิดใน workspace (ทำงานบน Claude Design) นายช่างเรียกเป็น subagent ไม่ผ่าน `baan-role`:
+
+| ID | ชื่อ | หน้าที่ | tier |
+|---|---|---|---|
+| `survey` | ช่างสำรวจ | สำรวจ requirement ของ module ก่อนลงแบบ ว่าทำเป็น UI ได้ไหม ชี้ช่องโหว่ ความขัดแย้ง และ edge case | interactive |
+| `ui` | ช่างเขียนแบบ | ออกแบบหน้าจอของ module บน canvas ของ Claude Design โดยดึง component จาก Design System และดูแล design system ของ project | interactive |
+| `review` | ผู้ตรวจแบบ | ตรวจแบบก่อนส่งช่าง (usability · WCAG AA · ใช้ Design System ครบ) ทำ handoff และตรวจหน้าจอที่สร้างแล้วเทียบแบบ | interactive |
+
+เค้น requirement แบบคุยสดใช้ `/pencil <project>/<module>` (= `spec`) · ชื่อเดิม ruler/crayon/highlighter/pencil ยังใช้ได้ · ความรู้ UX ทั่วไป (HIG, heuristics, UI 58 กฎ) อยู่ใน [ux-knowledge/](ux-knowledge/) · ทางเดินงานออกแบบ (`draft → approved → designed → reviewed → built`) อยู่ใน [BAAN.md](BAAN.md)
+
+ลำดับงานเต็มรูปแบบ: `plan` วางแผน, `gm` เรียกทีมตามแผน, `spec` เขียน requirement, `survey`/`ui`/`review` ออกแบบและส่ง handoff (หรือ `int` ร่าง UX ให้คุณเซ็น สำหรับ module ที่ไม่มีทีมออกแบบ), `arch` ออกแบบ, `vault` เขียน SQL ให้คุณรัน, `front`/`sys` เขียนโค้ด, `inspect` วางแผนทดสอบ, `check` เขียนเทสและตัดสิน PASS/FAIL, `jpo` ตรวจ security ก่อนขึ้น production
 
 งานเล็กไม่ต้องใช้ทั้งทีม `plan` และ `gm` เข้ามาเฉพาะงานใหญ่ที่ต้องมี backlog ต่อเนื่อง
 
@@ -112,9 +136,11 @@ baan --resume <runDir>                                          # ต่อ run 
 
 | คำสั่ง | ทำอะไร |
 |---|---|
-| `baan --init` | ตั้งค่า workspace ครั้งแรก |
-| `baan --list` | ดู config, repo, ตำแหน่ง และ tier ทั้งหมด |
-| `baan --goal "..." [--target <ชื่อ>]` | รันโหมดอัตโนมัติ (เพิ่ม `--dry-run` เพื่อดูแผนอย่างเดียว) |
+| `baan --init` | ตั้งค่า workspace (clone knowledge · config · ของทีมออกแบบ) · รันซ้ำเพื่ออัปเดต |
+| `baan --list` | ดู config, repo, project/module, ตำแหน่ง และ tier ทั้งหมด |
+| `baan --goal "..." [--target <ชื่อ>] [--module <project>/<module>]` | รันโหมดอัตโนมัติ (เพิ่ม `--dry-run` เพื่อดูแผนอย่างเดียว) |
+| `baan --index` | สร้างตาราง module ใน `<project>/INDEX.md` ใหม่จากหัวไฟล์ของแต่ละ module (จบ run แล้วทำให้เอง) |
+| `baan --lint-knowledge` | ตรวจ knowledge แบบ project: ลิงก์เสีย · `depends_on`/`requested_by` ที่ไม่มีจริง · ตารางไม่ตรง · ไฟล์นอกช่อง shared/design/build |
 | `baan --plan-file <file>` | รันแผนที่แก้เอง |
 | `baan --resume <runDir>` | ต่อ run ที่ค้าง ข้ามงานที่เสร็จแล้ว และใช้ target เดิม |
 | `baan --sweep "<ค่าเดิม>"` | หาทุกไฟล์ที่อ้างค่าเดิม แยกตามเจ้าของไฟล์ ใช้ก่อนเปลี่ยนชื่อหรือค่าที่ถูกอ้างหลายที่ |

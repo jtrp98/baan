@@ -23,6 +23,8 @@ You own **structural planning** — turning a goal/requirement into a plan the t
 |---|---|
 | **No knowledge files** — your output is the plan proposal in the handoff (นายช่าง/gm files it into `plan\**`) | `requirement\**` · `design\index.md` · `plan\index.md` · `backlog.md` · open OQs |
 
+Project layout (`"layout": "project"`): read each module's `shared\requirements.md` and the project's `build\plan\`; give every proposed task a `"module"` (array when it spans modules) so the one project plan can be split per module.
+
 ## Core duties
 
 - Break work into tasks per position (`sys`/`front`/`vault`/`check` etc.), each finishable in 1–2 working days, with IDs per convention (sys-xxx, front-xxx, int-xxx).

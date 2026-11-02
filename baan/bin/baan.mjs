@@ -6,7 +6,8 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEAM_DIR, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
+import { TEAM_DIR, isInteractiveRole, layoutOf, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveModules, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
+import { lintKnowledge, qualify, scanProjects, updateIndexes, uxKnowledgeDirs } from "../src/knowledge-index.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
@@ -19,7 +20,7 @@ import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, target: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, index: false, lintKnowledge: false, knowledgeGit: "", memoryGit: "", workspace: "", target: "", module: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -34,6 +35,12 @@ function parseArgs(argv) {
       case "--list": opts.list = true; break;
       case "--init": opts.init = true; break;
       case "--commit": opts.commit = true; break;
+      case "--index": opts.index = true; break;
+      case "--lint-knowledge": opts.lintKnowledge = true; break;
+      case "--knowledge-git": opts.knowledgeGit = argv[++i] ?? ""; break;
+      case "--memory-git": opts.memoryGit = argv[++i] ?? ""; break;
+      case "--workspace": opts.workspace = argv[++i] ?? ""; break;
+      case "--module": opts.module = argv[++i] ?? ""; opts.explicit.add("module"); break;
       case "--target": opts.target = argv[++i] ?? ""; opts.explicit.add("target"); break;
       case "--agent": opts.agent = argv[++i] ?? ""; opts.explicit.add("agent"); break;
       case "--planner-tier": opts.plannerTier = argv[++i] ?? ""; opts.explicit.add("plannerTier"); break;
@@ -46,7 +53,7 @@ function parseArgs(argv) {
         try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
         opts.explicit.add("date"); break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init] [--commit] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]] [--commit] [--index] [--lint-knowledge] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] [--module <project>/<module>[+<module>...]] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
         process.exit(2);
     }
   }
@@ -62,6 +69,9 @@ function printWorkspace(ws) {
     const issues = memoryRootIssues(kr, ws.source ? path.dirname(ws.source) : "");
     console.log(`   memory : ${mem || "(ไม่ได้ตั้ง memory_root — ใบงาน/ผลตรวจลง knowledge แบบเดิม)"}${issues.length ? `  ⚠ ${issues.join(" · ")}` : ""}`);
     for (const tg of kr.targets ?? []) console.log(`   target : ${tg.name} → ${tg.path}${existsSync(tg.path) ? "" : "  (path ไม่มีจริง!)"}`);
+    if (layoutOf(kr) === "project") {
+      for (const p of scanProjects(kr.path)) console.log(`  project : ${p.name} — ${p.modules.map((m) => `${m.module}${m.status ? ` (${m.status})` : ""}`).join(", ") || "(ยังไม่มี module)"}`);
+    }
   }
   const d = ws.defaults;
   console.log(`defaults : agent=${d.agent} · planner_tier=${d.planner_tier} · timeout=${d.timeout_sec}s · max_parallel=${d.max_parallel}`);
@@ -84,8 +94,33 @@ export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, p
   return { r, agent, answerFile };
 }
 
+// ขอบเขตของ run ราย module: เขียนได้เฉพาะ module ที่ระบุ · อ่าน shared ของ project และ module ที่พึ่ง
+export function moduleContext(mods) {
+  const write = mods.map((m) => `${m.project.name}/${m.module} — ${m.dir}`);
+  const projects = [...new Map(mods.map((m) => [m.project.name, m.project])).values()];
+  const deps = [...new Set(mods.flatMap((m) => m.dependsOn.map((d) => qualify(d, m.project.name))))]
+    .filter((d) => !mods.some((m) => `${m.project.name}/${m.module}` === d));
+  const kr = mods[0].knowledgeRoot;
+  return [
+    `- งานนี้ทำใน module: ${mods.map((m) => `${m.project.name}/${m.module}`).join(" + ")}${mods.length > 1 ? " (ข้าม module)" : ""}`,
+    `- เขียนได้เฉพาะ: ${write.join(" · ")} (ช่อง shared/ design/ build/ ตาม role) · ของระดับ project เขียนที่ <project>/shared/ หรือ <project>/build/ เมื่อเป็นของข้าม module`,
+    `- อ่านได้: ${projects.map((p) => path.join(p.dir, "shared")).join(" · ")}${deps.length ? ` · module ที่พึ่ง (อ่านอย่างเดียว): ${deps.join(", ")}` : ""}`,
+    "- ต้องแก้ module อื่นนอกจากนี้ = ห้ามแก้เอง เปิด OQ ที่ <project>/shared/oq.md แล้วรายงานกลับ",
+    `- ความรู้ UX ตามแพลตฟอร์ม (${mods.map((m) => `${m.module}: ${[m.platform || "ไม่ระบุ", ...m.os].join("/")}`).join(" · ")}): ${[...new Set(mods.flatMap((m) => uxKnowledgeDirs(TEAM_DIR, m.platform, m.os)))].join(" · ")}`,
+    `- แผนของ project: ${projects.map((p) => path.join(p.dir, "build", "plan")).join(" · ")} — หยิบเฉพาะ task ที่ช่อง module ตรงกับงานนี้`,
+    ...(memoryRootOf(kr) ? [`- memory ของ module: ${mods.map((m) => path.join(memoryRootOf(kr), m.project.name, m.module)).join(" · ")}${mods.length > 1 ? ` · ของข้าม module: ${path.join(memoryRootOf(kr), mods[0].project.name, "_cross")}` : ""}`] : []),
+  ].join("\n");
+}
+
 // เก็บกวาด knowledge repo หลังจบ run — git พัง/ไม่มีสิทธิ์ต้องไม่ลากผล run ไปตายด้วย
 function autoCommitKnowledge(ws) {
+  for (const kr of ws.knowledge_roots) {
+    if (layoutOf(kr) !== "project") continue;
+    try {
+      const changed = updateIndexes(kr.path);
+      if (changed.length) console.log(`📚 knowledge: สร้างตาราง module ใหม่ ${changed.length} ไฟล์`);
+    } catch (e) { console.warn(`⚠ สร้างตาราง module ไม่สำเร็จ (ไม่กระทบผล run): ${e.message}`); }
+  }
   try {
     const commits = commitKnowledge(ws, (m) => console.log(`📚 knowledge: ${m}`));
     if (commits.length) console.log(`📚 knowledge: auto commit ${commits.length} รายการ`);
@@ -110,7 +145,8 @@ async function main() {
     process.exit(2);
   }
   const cfg = loadAgentsConfig();
-  cfg.roleNames = listRoles().map((r) => r.name);
+  // role ของทีมออกแบบคุยกับผู้ใช้สด — planner/execute ใช้ไม่ได้ (นายช่างเรียกใน session)
+  cfg.roleNames = listRoles().filter((r) => !isInteractiveRole(r)).map((r) => r.name);
   // รากของ workspace (จาก config เดียวกับที่โหลดไป) — ให้ runner ส่ง --add-dir ให้ agy โหมดอ่าน อ่าน knowledge/ นอก cwd ได้
   opts.workspaceRoot = workspaceRootOf(opts.config || null);
 
@@ -158,6 +194,17 @@ async function main() {
     ].join("\n");
     opts.cwd = path.resolve(hit.target.path);
   }
+  if (opts.module) {
+    let mods;
+    try { mods = resolveModules(ws, opts.module); } catch (e) { console.error(e.message); process.exit(2); }
+    projectCtx = [projectCtx, moduleContext(mods)].filter(Boolean).join("\n");
+    // --target ที่ระบุเองชนะ · ไม่ระบุ = target ของ module แรกที่มี
+    const tg = mods.find((m) => m.target)?.target;
+    if (!opts.target && !opts.explicit.has("cwd") && tg) {
+      if (!existsSync(tg.path)) { console.error(`path ของ target ไม่มีจริง: ${tg.path}`); process.exit(2); }
+      opts.cwd = path.resolve(tg.path);
+    }
+  }
   opts.cwd = opts.cwd ? path.resolve(opts.cwd) : TEAM_DIR;
   if (opts.resume && !opts.explicit.has("cwd") && !opts.target && !readManifest(runDir)?.cwd) {
     console.warn(`⚠ resume โดยไม่มี --cwd/--target และ run เดิมไม่มี manifest — จะทำงานที่ ${opts.cwd} (โฟลเดอร์ package) ซึ่งอาจไม่ใช่โปรเจกต์เป้าหมายของ run เดิม`);
@@ -168,9 +215,21 @@ async function main() {
 
   // --init: ติดตั้งลง workspace ครั้งเดียว — config + CLAUDE.md/AGENTS.md ให้ session สวมบทเอง
   if (opts.init) {
-    console.log(`ติดตั้ง นายช่าง ลง workspace นี้: ${process.cwd()}`);
-    performInit(process.cwd(), TEAM_DIR);
-    console.log(`\nเสร็จแล้ว — เปิด AI session ที่ ${process.cwd()} ได้เลย มันจะสวมบท นายช่าง เอง ไม่ต้องพิมพ์คำสั่งสวมบทอีก`);
+    // คนใหม่ clone แค่ baan แล้วรันคำสั่งนี้ — ถามที่ขาดเมื่อมีคนพิมพ์ตอบได้ (สคริปต์/CI ส่ง flag แทน)
+    if (process.stdin.isTTY && !opts.knowledgeGit && !existsSync(path.join(opts.workspace || process.cwd(), "baan.config.json"))) {
+      const { createInterface } = await import("node:readline/promises");
+      const rl = createInterface({ input: process.stdin, output: process.stdout });
+      try {
+        opts.workspace = (await rl.question(`โฟลเดอร์ workspace [${opts.workspace || process.cwd()}]: `)).trim() || opts.workspace;
+        opts.knowledgeGit = (await rl.question("git URL ของ knowledge (Enter = ข้าม แล้วแก้ config เอง): ")).trim();
+        if (opts.knowledgeGit) opts.memoryGit = (await rl.question("git URL ของ memory (Enter = ไม่ใช้): ")).trim();
+      } finally { rl.close(); }
+    }
+    const dir = path.resolve(opts.workspace || process.cwd());
+    console.log(`ติดตั้ง นายช่าง ลง workspace นี้: ${dir}`);
+    try { performInit(dir, TEAM_DIR, console.log, { knowledgeGit: opts.knowledgeGit, memoryGit: opts.memoryGit }); }
+    catch (e) { console.error(e.message); process.exit(1); }
+    console.log(`\nเสร็จแล้ว — เปิด AI session ที่ ${dir} ได้เลย มันจะสวมบท นายช่าง เอง ไม่ต้องพิมพ์คำสั่งสวมบทอีก`);
     return;
   }
 
@@ -197,6 +256,28 @@ async function main() {
         ];
     if (!roots.length) { console.error("ไม่มีที่ให้ค้น — ตั้ง knowledge_roots ใน workspace config หรือใช้ --sweep-in <dir>"); process.exit(2); }
     console.log(formatSweep(sweep(roots, terms), terms));
+    return;
+  }
+
+  if (opts.index || opts.lintKnowledge) {
+    const roots = ws.knowledge_roots.filter((kr) => layoutOf(kr) === "project");
+    if (!roots.length) { console.error('ไม่มี knowledge root ที่ตั้ง "layout": "project" ใน baan.config.json'); process.exit(2); }
+    let errors = 0;
+    for (const kr of roots) {
+      if (opts.index) {
+        const changed = updateIndexes(kr.path);
+        console.log(`${kr.name}: ${changed.length ? `เขียนตาราง module ใหม่ ${changed.length} ไฟล์\n${changed.map((f) => `  ${f}`).join("\n")}` : "ตาราง module ตรงกับหัวไฟล์ของ module แล้ว"}`);
+      }
+      if (opts.lintKnowledge) {
+        const r = lintKnowledge(kr.path);
+        console.log(`${kr.name}: project ${r.projects.length} · module ${r.projects.reduce((n, p) => n + p.modules.length, 0)}`);
+        for (const w of r.warnings) console.log(`  ⚠ ${w}`);
+        for (const e of r.errors) console.log(`  ✗ ${e}`);
+        if (!r.errors.length) console.log("  ✓ ผ่าน");
+        errors += r.errors.length;
+      }
+    }
+    process.exitCode = errors ? 1 : 0;
     return;
   }
 

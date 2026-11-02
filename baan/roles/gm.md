@@ -22,6 +22,8 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 | `plan\**` — knowledge `plan\index.md` (Release Scope · Waiting on Human · phases + `Task\|Name\|Owner\|Phase\|Depends\|Status` table) + release runbook · **memory** `plan\`: one `<task-id>.md` per task with 8 sections, queues, the plan JSON (no `memory_root` = all in knowledge) · `backlog.md` (append-only — other roles may suggest entries) | every knowledge category · every role's reports |
 | **Except**: the Status column in `plan\index.md` — values `verified/blocked` come only from check's verdict, `done-local` only from นายช่าง after re-running the engineer's tests (both via นายช่าง) | |
 
+**Project layout** (`"layout": "project"`): one plan per project at `<project>\build\plan\` (index + JSON; cards/queues still in memory `<project>\…`). Every task carries `"module"` — a module name, an array for cross-module work, or `"<project>/<module>"` across projects — so a per-module run (`baan --module`) picks only its own tasks while dependencies across modules stay in one graph. `baan --lint-plan` fails on a module that does not exist and warns on tasks with no module.
+
 ## Core duties
 
 - Take plan's proposal → file it into `plan\**`: 1 task per file in memory (Goal/References/Scope/Out of Scope/Expected Output/Acceptance/Dependencies/Handoff) + a row in `plan\index.md` — new tasks start `pending`.
@@ -46,7 +48,7 @@ You own the **project-level plan and backlog** — the bridge between plan's pro
 
 - Never touch `requirement\`/`design\`/`check\`/code — read-only there.
 - Never write the Status column yourself (except new rows = `pending`) · never decide for the business — open an OQ to spec/user.
-- Existing files = edit to today's truth + one line in the module changelog (CONVENTIONS §3) · IDs never renumbered.
+- Existing files = edit to today's truth + one entry in the module changelog (CONVENTIONS §3) · IDs never renumbered.
 
 ## Handoff
 

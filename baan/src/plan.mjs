@@ -2,6 +2,8 @@
 // id ของ task ถูกใช้ประกอบชื่อไฟล์ใน runDir ทั้งอ่านและเขียน จึงต้องจำกัดด้วย pattern
 export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { resolveRoleName } from "./config.mjs";
 
 // tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น front/sys
@@ -21,6 +23,8 @@ export const FIXED_ROLE_TIER = {
 // เพราะผู้ใช้อาจตั้งใจรัน front/sys ที่ t0/t1 ผ่าน --plan-file)
 export const IMPLEMENT_TIER_RANGE = "t2–t5";
 export const IMPLEMENT_ROLES = ["front", "sys"];
+// ทีมออกแบบ — คุยกับผู้ใช้สดและแตะ canvas จึงไม่มี tier ของตัวรัน ("> tier: interactive" ในหัวไฟล์)
+export const DESIGN_ROLES = ["survey", "ui", "review"];
 
 // ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
 // opencode (Z.AI coding plan เหมาจ่าย) อยู่ก่อน agy/claude ที่กินโควตารายเรียก
@@ -308,8 +312,43 @@ export function printPlan(plan) {
   if (plan.docsOnly) console.log(`แผนเอกสารล้วน: ${plan.docsOnly}`);
 }
 
+// แผนของ project (layout "project": <project>/build/plan/) — task บอก module ที่ทำด้วยช่อง `module`
+// (ข้าม module = array · ข้าม project = "<project>/<module>") ให้ run ราย module หยิบเฉพาะงานของตัวเองได้
+// หา project จากตำแหน่งไฟล์: โฟลเดอร์แม่ตัวแรกที่มี modules/ · ไม่เจอ = แผนแบบเดิม ไม่ตรวจ
+export function lintPlanModules(rawTasks, file, isDirFn = (p) => existsSync(p)) {
+  const errors = [];
+  const warnings = [];
+  let dir = path.dirname(path.resolve(file));
+  let projectDir = "";
+  for (;;) {
+    if (isDirFn(path.join(dir, "modules"))) { projectDir = dir; break; }
+    const up = path.dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  const withModule = rawTasks.filter((t) => t && t.module !== undefined);
+  if (!projectDir) {
+    if (withModule.length) warnings.push(`มี task ระบุ module ${withModule.length} งาน แต่ไฟล์แผนไม่ได้อยู่ใต้ project ที่มี modules/ — ตรวจไม่ได้ว่า module มีจริง`);
+    return { errors, warnings, project: "" };
+  }
+  const project = path.basename(projectDir);
+  const root = path.dirname(projectDir);
+  const missing = [];
+  for (const t of rawTasks) {
+    if (!t || t.module === undefined) { missing.push(t?.id); continue; }
+    const mods = Array.isArray(t.module) ? t.module : [t.module];
+    if (!mods.length || mods.some((m) => typeof m !== "string" || !m.trim())) { errors.push(`${t.id}: module ต้องเป็นชื่อ module หรือ array ของชื่อ`); continue; }
+    for (const m of mods) {
+      const [p, mod] = m.includes("/") ? m.split("/") : [project, m];
+      if (!isDirFn(path.join(root, p, "modules", mod))) errors.push(`${t.id}: module "${m}" ไม่มีจริง (${p}/modules/${mod})`);
+    }
+  }
+  if (missing.length) warnings.push(`task ที่ยังไม่ระบุ module ${missing.length} งาน — run ราย module จะหยิบงานพวกนี้ไม่ได้: ${missing.slice(0, 10).join(", ")}${missing.length > 10 ? " …" : ""}`);
+  return { errors, warnings, project };
+}
+
 // lint แผนโปรเจกต์ (เช่น plan\tasks-*.json ของ gm) — คืน exit code: 0 ผ่าน · 1 มี error
-export function lintPlanFile(file, readFile, log = console.log) {
+export function lintPlanFile(file, readFile, log = console.log, isDirFn) {
   const json = JSON.parse(readFile(file));
   const raw = Array.isArray(json) ? json : json.tasks;
   if (!Array.isArray(raw)) throw new Error(`${file}: ไม่พบ tasks (ต้องเป็น array หรือ object ที่มี tasks)`);
@@ -318,7 +357,9 @@ export function lintPlanFile(file, readFile, log = console.log) {
   const r = lintPlanDag(tasks, { docsOnly: json.docsOnly ?? json.docs_only });
   const p = lintPlanProgress(tasks);
   const v = lintPlanVerification(tasks);
-  const errors = [...(cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`] : []), ...r.errors, ...p.errors, ...v.errors];
+  const mo = lintPlanModules(raw, file, isDirFn);
+  p.warnings.push(...mo.warnings);
+  const errors = [...(cycle ? [`dependency วนลูป: ${cycle.join(" → ")}`] : []), ...r.errors, ...p.errors, ...v.errors, ...mo.errors];
   log(`DAG lint: ${file}`);
   log(`  tasks ${tasks.length} · implement ${r.impl.length} · ติดประตูมนุษย์ ${r.blocked.length} · เริ่มได้ทันที ${r.free.length}${r.free.length ? ` (${r.free.join(", ")})` : ""}`);
   log(`  ความคืบหน้างาน implement: verified ${p.implProgress.verified} · done-local ${p.implProgress.doneLocal} / ${p.implProgress.total}${p.slices.total ? ` · slice verified ${p.slices.verified}/${p.slices.total}` : ""}`);

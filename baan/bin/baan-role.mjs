@@ -3,7 +3,7 @@
 // ตัวรัน/args/stdin/timeout อยู่ที่ src/runner.mjs · สถานะงาน/fallback อยู่ที่ src/role-session.mjs ใช้กติกาเดียวกับ baan
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { ROLES_DIR, listRoles, loadAgentsConfig, loadWorkspace, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
+import { ROLES_DIR, isInteractiveRole, listRoles, loadAgentsConfig, loadWorkspace, parseRoleHeader, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
@@ -97,6 +97,10 @@ async function main() {
     const roleFile = path.join(ROLES_DIR, `${opts.role}.md`);
     if (!existsSync(roleFile)) {
       console.error(`ไม่พบ role: ${opts.role} (ไม่มีไฟล์ ${roleFile} — ดูรายชื่อทั้งหมดด้วย --list)`);
+      process.exit(2);
+    }
+    if (isInteractiveRole(parseRoleHeader(readFileSync(roleFile, "utf8"), opts.role))) {
+      console.error(`role ${opts.role} เป็นของทีมออกแบบ — ต้องคุยกับผู้ใช้สดและแตะ canvas บน Claude Design จึงรันแบบ non-interactive ไม่ได้\nเปิด Claude ใน workspace แล้วให้ นายช่าง เรียก ${opts.role} เป็น subagent ใน session (หรือพิมพ์ /${opts.role === "spec" ? "pencil" : opts.role})`);
       process.exit(2);
     }
     if (opts.roleAlias) console.log(`(--role ${opts.roleAlias} = ชื่อเดิมของ ${opts.role} — ใช้ชื่อสั้นได้เลยครั้งหน้า)`);

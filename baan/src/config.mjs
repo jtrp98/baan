@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { DEFAULT_TIMEOUT_SEC } from "./timeout.mjs";
+import { parseModuleSpec, scanProjects } from "./knowledge-index.mjs";
 
 export const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); // รากของ package
 export const ROLES_DIR = path.join(TEAM_DIR, "roles");
@@ -109,6 +110,40 @@ export function resolveTarget(ws, name) {
   return null;
 }
 
+// "project" = <project>/modules/<module>/ + ช่อง shared/design/build · ไม่ตั้ง = โฟลเดอร์ระดับบนคือ module แบบเดิม
+export function layoutOf(kr) {
+  return kr?.layout === "project" ? "project" : "module";
+}
+
+// --module school-bot/quiz+app-shell → module จริงใน knowledge root ที่ตั้ง layout "project"
+// target ของ module มาจากหัวไฟล์ INDEX ของ module (`target:`) ไม่มีก็ใช้ของ project
+export function resolveModules(ws, spec) {
+  const wanted = parseModuleSpec(spec);
+  const roots = ws.knowledge_roots.filter((kr) => layoutOf(kr) === "project");
+  if (!roots.length) throw new Error('--module ใช้ได้กับ knowledge root ที่ตั้ง "layout": "project" ใน baan.config.json เท่านั้น');
+  const scanned = roots.map((kr) => ({ kr, projects: scanProjects(kr.path) }));
+  const out = [];
+  const missing = [];
+  for (const w of wanted) {
+    let hit = null;
+    for (const { kr, projects } of scanned) {
+      const p = projects.find((x) => x.name === w.project);
+      const m = p?.modules.find((x) => x.module === w.module);
+      if (m) {
+        const targetName = m.target || p.header.target || "";
+        hit = { ...m, knowledgeRoot: kr, project: p, target: (kr.targets ?? []).find((t) => t.name === targetName) ?? null, targetName };
+        break;
+      }
+    }
+    if (hit) out.push(hit); else missing.push(`${w.project}/${w.module}`);
+  }
+  if (missing.length) {
+    const all = scanned.flatMap(({ projects }) => projects.flatMap((p) => p.modules.map((m) => `${p.name}/${m.module}`)));
+    throw new Error(`ไม่พบ module: ${missing.join(", ")}\nที่มี: ${all.join(", ") || "(ไม่มี)"}`);
+  }
+  return out;
+}
+
 // ID role เดิมทั้งสองรุ่น (ชื่อยาวก่อน 0.8.0 และชื่อย่อ ba/sa/fe ก่อนเปลี่ยนธีมงานก่อสร้าง) —
 // ยังรับได้ทั้งหมด เพราะแผนเก่า (plan.json ใน run ที่จะ resume), --plan-file ที่เขียนไว้
 // และคำสั่งใน session/สคริปต์ของผู้ใช้ยังอ้างชื่อเหล่านี้อยู่
@@ -133,7 +168,18 @@ export const LEGACY_ROLE_ALIASES = {
   qa: "check",
   sec: "jpo",
   security: "jpo",
+  // ชื่อเดิมของทีมออกแบบใน sketchbook — ทีมยังพิมพ์ชื่อเหล่านี้อยู่
+  ruler: "survey",
+  crayon: "ui",
+  highlighter: "review",
+  pencil: "spec",
 };
+
+// role ที่ต้องคุยกับผู้ใช้สดและแตะ canvas บน Claude Design — นายช่างเรียกใน session (subagent)
+// ไม่ผ่าน baan-role / planner เพราะโหมด non-interactive ถามผู้ใช้และ publish canvas ไม่ได้
+export function isInteractiveRole(role) {
+  return role?.tier === "interactive";
+}
 
 export function resolveRoleName(name) {
   return Object.hasOwn(LEGACY_ROLE_ALIASES, name ?? "") ? LEGACY_ROLE_ALIASES[name] : name;

@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { LEGACY_ROLE_ALIASES, listRoles, resolveRoleName } from "../src/config.mjs";
-import { FIXED_ROLE_TIER, IMPLEMENT_TIER_RANGE } from "../src/plan.mjs";
+import { DESIGN_ROLES, FIXED_ROLE_TIER, IMPLEMENT_TIER_RANGE } from "../src/plan.mjs";
 import { roleDirective } from "../src/prompts.mjs";
 import { parseRoleArgs } from "../src/role-session.mjs";
 
@@ -15,15 +15,15 @@ const IMPLEMENT_ROLES = ["front", "sys"];
 const roles = listRoles();
 const byName = new Map(roles.map((r) => [r.name, r]));
 
-test("ทีมมีครบ 11 role ตาม ID สั้น — ทุก role ที่มี tier คงที่ต้องมีไฟล์จริง", () => {
-  assert.deepEqual([...byName.keys()].sort(), [...Object.keys(FIXED_ROLE_TIER), ...IMPLEMENT_ROLES].sort());
+test("ทีมสร้าง 11 role + ทีมออกแบบ 3 role ตาม ID สั้น — ทุก role ที่มี tier คงที่ต้องมีไฟล์จริง", () => {
+  assert.deepEqual([...byName.keys()].sort(), [...Object.keys(FIXED_ROLE_TIER), ...IMPLEMENT_ROLES, ...DESIGN_ROLES].sort());
 });
 
 test("หัวไฟล์ role ทุกไฟล์มีชื่อแสดง / หน้าที่ / tier และ tier ตรงกับ FIXED_ROLE_TIER", () => {
   for (const r of roles) {
     assert.ok(r.title && r.title !== r.name, `${r.name}: ไม่มี "# บทบาท:"`);
     assert.ok(r.summary, `${r.name}: ไม่มี "> หน้าที่:"`);
-    const expected = FIXED_ROLE_TIER[r.name] ?? IMPLEMENT_TIER_RANGE;
+    const expected = FIXED_ROLE_TIER[r.name] ?? (DESIGN_ROLES.includes(r.name) ? "interactive" : IMPLEMENT_TIER_RANGE);
     assert.equal(r.tier, expected, `${r.name}: บรรทัด "> tier:" ต้องเป็น ${expected}`);
   }
 });
@@ -64,6 +64,7 @@ for (const file of ["BAAN.md", "README.md"]) {
       assert.equal(row.title, r.title, `${file} ${id}: ชื่อไม่ตรงหัวไฟล์`);
       assert.equal(row.summary, r.summary, `${file} ${id}: หน้าที่ไม่ตรงหัวไฟล์`);
       if (FIXED_ROLE_TIER[id]) assert.equal(row.tier, FIXED_ROLE_TIER[id], `${file} ${id}: tier`);
+      else if (DESIGN_ROLES.includes(id)) assert.equal(row.tier, "interactive", `${file} ${id}: ทีมออกแบบต้องเป็น interactive`);
       else assert.ok(row.tier.includes(IMPLEMENT_TIER_RANGE), `${file} ${id}: tier ต้องบอกช่วง ${IMPLEMENT_TIER_RANGE}`);
     }
   });
@@ -138,8 +139,12 @@ test("CONVENTIONS §3: knowledge เขียนให้ dev อ่าน · �
     "Knowledge files get **no `## Change Log` section**",
     "`requirement\\decisions.md` lists the decisions in force today",
     "closing `## หลักฐาน` section",
+    "the module's `changelog\\` is shared",
+    "what was true before and what is true now",
+    "move its entries into the changelog of their month first",
+    "### จัดรูปแบบ (ความหมายไม่เปลี่ยน)",
   ]) assert.ok(conv.includes(must), `CONVENTIONS.md ขาด: ${must}`);
   for (const f of ["roles/arch.md", "roles/spec.md", "roles/gm.md"]) {
-    assert.match(read(f), /module changelog \(CONVENTIONS §3\)|module changelog —/, `${f} ต้องชี้ไป changelog ตาม §3`);
+    assert.match(read(f), /module changelog \(CONVENTIONS §3\)|module changelog \(before → now\) —/, `${f} ต้องชี้ไป changelog ตาม §3`);
   }
 });
