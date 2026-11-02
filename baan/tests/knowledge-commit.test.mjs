@@ -93,6 +93,35 @@ test("commitKnowledgeRoot: commit จริงต่อ module ข้อคว�
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test("commitKnowledgeRoot: project กับ module ลูกแยก commit แม้มีไฟล์ staged ไว้ก่อน", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const files = ["school-bot/shared/context.md", "school-bot/modules/quiz/shared/requirements.md", "school-bot/modules/arm-lab/shared/requirements.md"];
+    for (const file of files) {
+      mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
+      writeFileSync(path.join(dir, file), "# baseline\n");
+    }
+    assert.equal(git(["add", "--all"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    for (const file of files) writeFileSync(path.join(dir, file), "# updated\n");
+    assert.equal(git(["add", "--", files[2]]).status, 0);
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir, layout: "project" }, m => logs.push(m));
+    assert.equal(res.commits.length, 3, logs.join("\n"));
+    assert(!logs.some(m => m.startsWith("⚠")), logs.join("\n"));
+    assert.equal(git(["status", "--porcelain"]).stdout, "");
+    const expected = {
+      "school-bot: update context.md": files[0],
+      "school-bot/quiz: update requirements.md": files[1],
+      "school-bot/arm-lab: update requirements.md": files[2],
+    };
+    for (const sha of git(["rev-list", "-3", "HEAD"]).stdout.trim().split("\n")) {
+      const subject = git(["show", "-s", "--format=%s", sha]).stdout.trim();
+      assert.equal(git(["show", "--format=", "--name-only", sha]).stdout.trim(), expected[subject]);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test("commitKnowledgeRoot: ของที่ผู้ใช้ staged ไว้ล่วงหน้าก็ถูกเก็บเข้า commit ของ module นั้น", () => {
   const { dir, git } = makeRepo();
   try {

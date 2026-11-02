@@ -82,7 +82,7 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
   for (const p of plans) {
     // add เฉพาะขอบเขตของกลุ่มนี้ก่อน commit ด้วย pathspec เดียวกัน — ของที่ผู้ใช้ staged
     // ไว้ในกลุ่มอื่นจะไม่ถูกกลืนเข้า commit นี้ (กลุ่มไฟล์ระดับรากต้องระบุชื่อไฟล์เพราะไม่มีโฟลเดอร์ครอบ)
-    const scope = p.scope ? [p.scope] : p.paths;
+    const scope = kr.layout === "project" ? p.paths : p.scope ? [p.scope] : p.paths;
     const add = gitIn(kr.path, ["add", "-A", "--", ...scope]);
     const commit = add.ok ? gitIn(kr.path, ["commit", "-m", p.message, "--", ...scope]) : add;
     if (!commit.ok) {
