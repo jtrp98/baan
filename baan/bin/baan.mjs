@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { TEAM_DIR, isInteractiveRole, layoutOf, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveModules, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
-import { lintKnowledge, qualify, scanProjects, updateIndexes } from "../src/knowledge-index.mjs";
+import { lintKnowledge, qualify, scanProjects, updateIndexes, uxKnowledgeDirs } from "../src/knowledge-index.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
@@ -106,6 +106,7 @@ export function moduleContext(mods) {
     `- เขียนได้เฉพาะ: ${write.join(" · ")} (ช่อง shared/ design/ build/ ตาม role) · ของระดับ project เขียนที่ <project>/shared/ หรือ <project>/build/ เมื่อเป็นของข้าม module`,
     `- อ่านได้: ${projects.map((p) => path.join(p.dir, "shared")).join(" · ")}${deps.length ? ` · module ที่พึ่ง (อ่านอย่างเดียว): ${deps.join(", ")}` : ""}`,
     "- ต้องแก้ module อื่นนอกจากนี้ = ห้ามแก้เอง เปิด OQ ที่ <project>/shared/oq.md แล้วรายงานกลับ",
+    `- ความรู้ UX ตามแพลตฟอร์ม (${mods.map((m) => `${m.module}: ${[m.platform || "ไม่ระบุ", ...m.os].join("/")}`).join(" · ")}): ${[...new Set(mods.flatMap((m) => uxKnowledgeDirs(TEAM_DIR, m.platform, m.os)))].join(" · ")}`,
     `- แผนของ project: ${projects.map((p) => path.join(p.dir, "build", "plan")).join(" · ")} — หยิบเฉพาะ task ที่ช่อง module ตรงกับงานนี้`,
     ...(memoryRootOf(kr) ? [`- memory ของ module: ${mods.map((m) => path.join(memoryRootOf(kr), m.project.name, m.module)).join(" · ")}${mods.length > 1 ? ` · ของข้าม module: ${path.join(memoryRootOf(kr), mods[0].project.name, "_cross")}` : ""}`] : []),
   ].join("\n");

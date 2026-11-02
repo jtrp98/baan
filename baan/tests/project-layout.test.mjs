@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { applyModuleTable, brokenLinks, lintKnowledge, parseModuleSpec, readFrontMatter, scanProjects, updateIndexes } from "../src/knowledge-index.mjs";
+import { applyModuleTable, brokenLinks, lintKnowledge, parseModuleSpec, readFrontMatter, scanProjects, updateIndexes, uxKnowledgeDirs } from "../src/knowledge-index.mjs";
 import { LEGACY_ROLE_ALIASES, layoutOf, resolveModules } from "../src/config.mjs";
 import { planCommits } from "../src/knowledge-commit.mjs";
 import { lintPlanModules } from "../src/plan.mjs";
@@ -171,6 +171,26 @@ test("lintPlanModules: แผนใต้ <project>/build/plan ตรวจช�
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test("platform/os: module ไม่ระบุใช้ของ project · ความรู้ UX = common + หมวดของแพลตฟอร์มที่มีจริง · ค่าผิด = error · ไม่ระบุ = เตือน", () => {
+  const root = fixture();
+  try {
+    write(root, "school-bot/INDEX.md", "---\ntarget: school-bot\nplatform: desktop\nos: [windows, mac]\n---\n# school-bot\n");
+    write(root, "schoolbright-web/modules/school-bot/INDEX.md", "---\nstatus: draft\nrequested_by: school-bot\nplatform: web\nos: [mac]\n---\n# หน้าครู\n");
+    updateIndexes(root);
+    const quiz = scanProjects(root)[0].modules.find((m) => m.module === "quiz");
+    assert.deepEqual([quiz.platform, quiz.os], ["desktop", ["windows", "mac"]]);
+    const dirs = uxKnowledgeDirs(TEAM_DIR, quiz.platform, quiz.os).map((d) => path.relative(path.join(TEAM_DIR, "ux-knowledge"), d).split(path.sep).join("/"));
+    assert.deepEqual(dirs, ["common", "desktop", "desktop/apple"], "ไม่มี desktop/windows จริง ก็ไม่ใส่");
+    assert.deepEqual(uxKnowledgeDirs(TEAM_DIR, "", []).length, 1, "ไม่ระบุแพลตฟอร์ม = common อย่างเดียว");
+    const r = lintKnowledge(root);
+    assert.ok(r.errors.some((e) => /schoolbright-web\/school-bot: os "mac" ใช้กับ platform web ไม่ได้/.test(e)));
+    write(root, "school-bot/INDEX.md", "---\nplatform: tv\n---\n# school-bot\n");
+    assert.ok(lintKnowledge(root).errors.some((e) => /platform "tv" ไม่รู้จัก/.test(e)));
+    write(root, "school-bot/INDEX.md", "# school-bot\n");
+    assert.ok(lintKnowledge(root).warnings.some((w) => /school-bot\/quiz: ยังไม่ระบุ platform/.test(w)));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test("alias ชื่อเดิมของทีมออกแบบ: ruler/crayon/highlighter/pencil", () => {
   assert.equal(LEGACY_ROLE_ALIASES.ruler, "survey");
   assert.equal(LEGACY_ROLE_ALIASES.crayon, "ui");
@@ -190,14 +210,15 @@ test("init: วาง agent survey/ui/review + /pencil + skill ของที�
     assert.ok(existsSync(path.join(dir, ".claude", "commands", "pencil.md")));
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", "references", "rules.md")));
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed")));
-    assert.ok(res.design.length >= 6);
+    assert.ok(res.design.length >= 5);
     // ของผู้ใช้เอง (ไม่มี marker) ห้ามทับ · ของ baan ทับได้
     writeFileSync(path.join(dir, ".claude", "agents", "ui.md"), "ของผู้ใช้\n", "utf8");
-    rmSync(path.join(dir, ".claude", "skills", "hallmark", ".baan-managed"));
+    rmSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed"));
     const again = performInit(dir, TEAM_DIR, () => {});
     assert.equal(readFileSync(path.join(dir, ".claude", "agents", "ui.md"), "utf8"), "ของผู้ใช้\n");
     assert.ok(again.skipped.some((f) => f.endsWith(`agents${path.sep}ui.md`)));
-    assert.ok(again.skipped.some((f) => f.endsWith(`skills${path.sep}hallmark`)));
+    assert.ok(again.skipped.some((f) => f.endsWith(`skills${path.sep}web-design-guidelines`)));
+    assert.ok(again.design.some((f) => f.endsWith(`agents${path.sep}survey.md`)), "ของ baan เขียนใหม่ได้");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

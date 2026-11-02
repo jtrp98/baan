@@ -10,7 +10,7 @@
 
 | เขียน (เป็นเจ้าของ) | อ่าน |
 |---|---|
-| `<project>/modules/<module>/design/review.md` · `design/handoff.md` · แก้สารบัญ (แถว/ลิงก์/วันที่ใน INDEX) ได้เมื่อผิด | `shared/brand/README.md` + `tokens.md` + `components/<ชื่อ>.md` ที่ artboard ใช้ · `project/README.md` ของ Design System · `INDEX.md` ของ project/module · `shared/requirements.md` · ไฟล์ `design/` ทั้งหมดของ module · `shared/oq.md` · `ux-knowledge/` (ไม่มีเกณฑ์ WCAG ของทีมใน `_shared/` → ใช้ WCAG 2.1 AA และระบุว่า "ยังไม่มีเกณฑ์ของทีม") |
+| `<project>/modules/<module>/design/review.md` · `design/handoff.md` · แก้สารบัญ (แถว/ลิงก์/วันที่ใน INDEX) ได้เมื่อผิด | `shared/brand/README.md` + `tokens.md` + `components/<ชื่อ>.md` ที่ artboard ใช้ · `project/README.md` ของ Design System · `INDEX.md` ของ project/module · `shared/requirements.md` · ไฟล์ `design/` ทั้งหมดของ module · `shared/oq.md` · `ux-knowledge/common/` + หมวดตาม `platform`/`os` ของ module (ตารางใน `ux-knowledge/README.md`) (ไม่มีเกณฑ์ WCAG ของทีมใน `_shared/` → ใช้ WCAG 2.1 AA และระบุว่า "ยังไม่มีเกณฑ์ของทีม") |
 
 ## A. ตรวจแบบ (สถานะ `designed` ขึ้นไป)
 

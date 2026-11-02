@@ -9,7 +9,7 @@
 
 | เขียน (เป็นเจ้าของ) | อ่าน |
 |---|---|
-| `<project>/modules/<module>/design/feasibility.md` (แตกเป็น `design/feasibility/R<n>.md` เมื่อยาว) · เปิด OQ ใหม่ใน `shared/oq.md` ของ module | `INDEX.md` ของ project และ module · `shared/requirements.md` · `shared/oq.md` · feasibility รอบก่อน · module ใน `depends_on` · `ux-knowledge/` ของ package (usability-heuristics, hig → hig-macos-bars/hig-foundations เมื่อเป็นแอปบน Mac หรือเรื่องแถบ/เมนู/หน้าต่าง, universal-design, ui-design-58-rules) · `<project>/shared/brand/README.md` |
+| `<project>/modules/<module>/design/feasibility.md` (แตกเป็น `design/feasibility/R<n>.md` เมื่อยาว) · เปิด OQ ใหม่ใน `shared/oq.md` ของ module | `INDEX.md` ของ project และ module · `shared/requirements.md` · `shared/oq.md` · feasibility รอบก่อน · module ใน `depends_on` · `ux-knowledge/common/` ของ package + หมวดตาม `platform`/`os` ของ module (ตารางใน `ux-knowledge/README.md` เช่น desktop + mac → `desktop/apple/`) · `<project>/shared/brand/README.md` |
 
 **ห้ามแก้ `shared/requirements.md` เด็ดขาด** — เป็นของ `spec`
 

@@ -81,7 +81,7 @@ knowledge root ที่ตั้ง layout นี้จัดเป็น **pro
   design/                      ทีมออกแบบ: ของที่ใช้ทั้ง project
   build/                       ทีมสร้าง: plan/ (แผนเดียวของ project) · db/ · security · des/contract ข้าม module
   modules/<module>/
-    INDEX.md                   หัวไฟล์: status · updated · depends_on · requested_by · target
+    INDEX.md                   หัวไฟล์: status · updated · depends_on · requested_by · target · platform · os
     shared/                    requirements.md (## F1 … > R# + AC) · oq.md
     design/                    D# · feasibility · review · handoff · archive/
     build/                     des · test-plan · int (เฉพาะ module ที่ไม่มีทีมออกแบบ)

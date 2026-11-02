@@ -55,12 +55,26 @@ function firstHeading(text) {
 
 const asList = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 
+// ความรู้ UX ของ package แยกตามแพลตฟอร์ม — role อ่านแค่หมวดของ module ไม่ใช่ HIG ของ Mac ตอนทำเว็บ
+export const PLATFORM_OS = { web: {}, desktop: { mac: "apple", windows: "windows" }, mobile: { ios: "ios", android: "android" } };
+
+export function uxKnowledgeDirs(teamDir, platform, os = []) {
+  const base = path.join(teamDir, "ux-knowledge");
+  const dirs = [path.join(base, "common")];
+  if (PLATFORM_OS[platform]) {
+    dirs.push(path.join(base, platform));
+    for (const o of os) if (PLATFORM_OS[platform][o]) dirs.push(path.join(base, platform, PLATFORM_OS[platform][o]));
+  }
+  return [...new Set(dirs)].filter(isDir);
+}
+
 // project = โฟลเดอร์ระดับบนที่มี modules/ · ขึ้นต้นด้วย _ หรือ . = ของกลาง ไม่ใช่ project
 export function scanProjects(root) {
   if (!isDir(root)) return [];
   return readdirSync(root).filter((n) => !/^[_.]/.test(n) && isDir(path.join(root, n, "modules"))).sort().map((name) => {
     const dir = path.join(root, name);
     const idx = indexFileOf(dir);
+    const header = idx ? readFrontMatter(readText(idx)) : {};
     const modules = readdirSync(path.join(dir, "modules")).filter((m) => !/^[_.]/.test(m) && isDir(path.join(dir, "modules", m))).sort().map((m) => {
       const mdir = path.join(dir, "modules", m);
       const file = indexFileOf(mdir);
@@ -71,9 +85,11 @@ export function scanProjects(root) {
         summary: fm.summary || firstHeading(text),
         status: fm.status || "", updated: fm.updated || "",
         dependsOn: asList(fm.depends_on), requestedBy: asList(fm.requested_by), target: fm.target || "",
+        // ไม่ระบุที่ module = ใช้ของ project (project ส่วนใหญ่มีแพลตฟอร์มเดียว)
+        platform: fm.platform || header.platform || "", os: asList(fm.os ?? header.os),
       };
     });
-    return { name, dir, indexFile: idx, header: idx ? readFrontMatter(readText(idx)) : {}, modules };
+    return { name, dir, indexFile: idx, header, modules };
   });
 }
 
@@ -194,6 +210,13 @@ export function lintKnowledge(root) {
       }
       for (const r of m.requestedBy) {
         if (!projectNames.has(r)) errors.push(`${p.name}/${m.module}: requested_by "${r}" ไม่มี project นี้`);
+      }
+      if (!m.platform) warnings.push(`${p.name}/${m.module}: ยังไม่ระบุ platform (web · desktop · mobile) — ทีมออกแบบจะอ่านแค่ความรู้ UX กลาง`);
+      else if (!PLATFORM_OS[m.platform]) errors.push(`${p.name}/${m.module}: platform "${m.platform}" ไม่รู้จัก — ใช้ ${Object.keys(PLATFORM_OS).join(" · ")}`);
+      else {
+        for (const o of m.os) {
+          if (!PLATFORM_OS[m.platform][o]) errors.push(`${p.name}/${m.module}: os "${o}" ใช้กับ platform ${m.platform} ไม่ได้${Object.keys(PLATFORM_OS[m.platform]).length ? ` — ใช้ ${Object.keys(PLATFORM_OS[m.platform]).join(" · ")}` : " (web ไม่แยก os)"}`);
+        }
       }
     }
     const idx = p.indexFile ? readText(p.indexFile) : "";

@@ -7,7 +7,7 @@ used_by: Designer (ออกแบบ), Reviewer (ตรวจ), Feasibility (�
 # 58 กฎ UI ที่ใช้ได้จริง (UI1–UI58)
 
 บทความจัด 58 ข้อเป็น 8 หมวด ("Elegance Formula"): Empathy · Layout · Essentialism · Guidance · Aesthetics · Novelty · Consistency · Engagement ตัวบทความเป็นหลักกว้าง ๆ แทบไม่มีตัวเลข ไฟล์นี้เติม**เกณฑ์ที่วัดได้**จากมาตรฐาน/งานวิจัยที่ค้นเพิ่ม ใช้ตรวจเป็นรายข้อ เช่น "UI29: ข้อความรอง contrast 3.8:1"
-ใช้คู่กับ `usability-heuristics.md`, `hig*.md`, `universal-design.md`, `wcag-aa.md` ค่าหน้าตาของโปรเจกต์ใช้ตาม `<project>/shared/brand/` ใน knowledge ของ workspace ข้อที่ขัดกัน brand ชนะเรื่องค่า ไฟล์นี้ชนะเรื่องเหตุผล/ข้อห้าม
+ใช้คู่กับ `usability-heuristics.md`, `universal-design.md` (หมวดเดียวกัน) · หมวดตามแพลตฟอร์มของ module (เช่น `../desktop/apple/hig*.md` เมื่อเป็นแอปบน Mac) · เกณฑ์ WCAG ของทีมใน `_shared/` ของ knowledge (ถ้ามี) ค่าหน้าตาของโปรเจกต์ใช้ตาม `<project>/shared/brand/` ใน knowledge ของ workspace ข้อที่ขัดกัน brand ชนะเรื่องค่า ไฟล์นี้ชนะเรื่องเหตุผล/ข้อห้าม
 
 ## ระดับหลักฐาน (ใช้ตัดสินว่าข้อไหนตีตกได้)
 - **A** มาตรฐานหรือผลวิจัยที่อ้างได้ (WCAG, NN/g, งานวิจัยทบทวนโดยผู้เชี่ยวชาญ) → ใช้เป็นเกณฑ์ผ่าน/ไม่ผ่านได้

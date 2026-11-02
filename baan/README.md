@@ -61,7 +61,7 @@ knowledge\
     INDEX.md                 ตาราง module (baan --index สร้างจากหัวไฟล์ของแต่ละ module)
     shared\  design\  build\ ของที่ใช้ทั้ง project (brand, มติ, แผน, db …)
     modules\quiz\            module
-      INDEX.md               หัวไฟล์: status · updated · depends_on · requested_by · target
+      INDEX.md               หัวไฟล์: status · updated · depends_on · requested_by · target · platform · os
       shared\  design\  build\
 ```
 

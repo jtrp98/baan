@@ -14,7 +14,7 @@ HIG คือ design system ของ Apple ที่ทีมใช้เป็
 | `hig-macos-bars.md` | menu bar, toolbar, title/window, bottom bar, sidebar, split view, panel, tab view, sheet, ปุ่มบน Mac | HM1–HM30 |
 | `hig-foundations.md` | ตัวเลขขั้นต่ำ (ขนาดตัวอักษร/ควบคุม) text styles ของ macOS, สี, Liquid Glass/materials, layout, ปุ่ม, คีย์บอร์ด, ทางเลือกนอกจาก gesture | HF1–HF16 |
 
-ใช้คู่กับ `usability-heuristics.md` (H1–H10) และ `universal-design.md` (UD1–UD7)
+ใช้คู่กับ `../../common/usability-heuristics.md` (H1–H10) และ `../../common/universal-design.md` (UD1–UD7)
 
 ## หลักการตัดสินเมื่อไม่มีกฎเฉพาะ (แนวคิดของ HIG ฉบับ Liquid Glass)
 - **ชั้นเนื้อหากับชั้นควบคุมแยกกัน** ตัวควบคุมและ navigation (toolbar, sidebar, tab bar) ลอยเหนือเนื้อหาและปล่อยให้เนื้อหาโผล่ผ่าน เนื้อหาคือพระเอก

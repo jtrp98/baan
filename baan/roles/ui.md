@@ -9,7 +9,7 @@
 
 | เขียน (เป็นเจ้าของ) | อ่าน |
 |---|---|
-| `<project>/modules/<module>/design/D<n>-<ชื่อ>.md` · ตาราง Design และ Canvas ใน `INDEX.md` ของ module · **`<project>/shared/brand/**`** (owner = design) · artboard บน canvas ของ module | `<project>/shared/brand/README.md` แล้วเปิดเฉพาะ `tokens.md` + `components/<ชื่อ>.md` ที่หน้านี้ใช้ · `project/README.md` ของ Design System (ลิงก์ใน brand/README.md) · `shared/requirements.md` · `design/feasibility.md` · `shared/oq.md` · `ux-knowledge/` ของ package · โค้ด component ใน target (อ่านอย่างเดียว เพื่อเสนอของที่สร้างได้จริง) |
+| `<project>/modules/<module>/design/D<n>-<ชื่อ>.md` · ตาราง Design และ Canvas ใน `INDEX.md` ของ module · **`<project>/shared/brand/**`** (owner = design) · artboard บน canvas ของ module | `<project>/shared/brand/README.md` แล้วเปิดเฉพาะ `tokens.md` + `components/<ชื่อ>.md` ที่หน้านี้ใช้ · `project/README.md` ของ Design System (ลิงก์ใน brand/README.md) · `shared/requirements.md` · `design/feasibility.md` · `shared/oq.md` · `ux-knowledge/common/` ของ package + หมวดตาม `platform`/`os` ของ module (ตารางใน `ux-knowledge/README.md`) · โค้ด component ใน target (อ่านอย่างเดียว เพื่อเสนอของที่สร้างได้จริง) |
 
 **อ่านให้น้อยที่สุดที่งานต้องใช้** — ไม่เปิดไฟล์ทั้งโฟลเดอร์ · ไฟล์ใหญ่ใช้ Grep หาจุดก่อน
 

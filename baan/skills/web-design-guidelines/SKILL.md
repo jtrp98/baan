@@ -22,7 +22,7 @@ Review files for compliance with the rules in [`references/rules.md`](references
 The rules target web apps (React/Next.js). Apply them to canvas HTML and web pages only:
 
 - Skip as "not applicable": Hydration Safety, Performance items about frameworks/lists, `Intl.*`/locale items when the artifact is static, and English-only copy rules (Title Case, Chicago style, active voice, `&` for "and", numerals) for Thai copy.
-- For Thai copy use the team's rules instead: `<project>/shared/brand/voice.md` in the workspace knowledge and `ux-knowledge/ui-design-58-rules.md` in the baan package (UI24 Thai typography).
+- For Thai copy use the team's rules instead: `<project>/shared/brand/voice.md` in the workspace knowledge and `ux-knowledge/common/ui-design-58-rules.md` in the baan package (UI24 Thai typography).
 - Results are one input to the `review` role. Contrast, touch target size and brand tokens still come from the baan `ux-knowledge/` and `<project>/shared/brand/`; this skill does not check them.
 - If a rule conflicts with the project's brand or `ux-knowledge/`, report it as a finding and name the conflict. Do not pick silently.
 
