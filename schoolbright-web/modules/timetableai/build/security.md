@@ -141,4 +141,4 @@
 - 2026-10-09 — บันทึกคำตัดสินของ jtrp98 (วันที่ผู้ใช้ระบุ: 09/10/2026): 1C/2C พัก production deploy และทำ dev ต่อ; 3A ให้แก้ dependency ของ SEC-03 พร้อมทดสอบและ re-audit · SEC-01..SEC-03 ยังเปิด; ไม่มีการรับความเสี่ยง production หรืออนุมัติ deploy/migration ในคำตอบนี้
 - 2026-10-09 — Security audit รอบ DES-018 และ DES-022 ตามคำสั่งผู้ใช้: ตรวจ SEC-01 (`Token_Secret`), BE-006 (shared resolver), BE-007 (`MenuPermissions/Get` exception), BE-008 (school predicate), R32 (cross-environment secret), BL-004 (package advisories); บันทึก SEC-01..SEC-03; ยืนยัน Clean บน BE-006/BE-007/BE-008/BR-73
 
-Back-links: `../../../build/plan/INDEX.md` · `..\index.md`
+Back-links: `../../../build/plan/INDEX.md` · `../INDEX.md`

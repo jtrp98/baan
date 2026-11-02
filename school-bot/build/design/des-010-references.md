@@ -1,0 +1,46 @@
+# DES-010 — Question Bank, Attempt และนโยบายคะแนน — เอกสารอ้างอิง
+
+> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ส่วนต่อของ [DES-010 — Question Bank, Attempt และนโยบายคะแนน](des-010.md) รวมข้อกำหนดและมติที่สัญญานี้อ้าง แต่ละรายการระบุความหมายจากชื่อเรื่องต้นทาง
+
+- [REQ-046 (Quiz/Test และคลังข้อสอบแบบ revision)](../../modules/quiz/shared/requirements/req-046.md)
+- [REQ-047 (การนับคะแนน Quiz รายหลักสูตร)](../../modules/quiz/shared/requirements/req-047.md)
+- [REQ-043 (หลักสูตรกลางแบบ Level และ Activity)](../../modules/quiz/shared/requirements/req-043.md)
+- [REQ-044 (รหัสบทเรียนและ revision หลักสูตร)](../../modules/quiz/shared/requirements/req-044.md)
+- [มติ 020 (หลักสูตรแบบ Level, quiz/test และการส่งคะแนนกลับ SchoolBright)](../../shared/decisions/decisions-020.md)
+- [มติ 021 (การส่งคะแนนเข้าระบบเกรด SchoolBright)](../../shared/decisions/decisions-021.md)
+- [มติ 022 (ที่อยู่ของหน้าจอ Admin / ครู / Desktop)](../../shared/decisions/decisions-022.md)
+- [มติ 023 (writer คะแนน, ปัดเศษ, นำเข้า Sheet และเจ้าของ mapping)](../../shared/decisions/decisions-023.md)
+- [มติ 024 (เกณฑ์เลื่อน Level และ policy Quiz/Test)](../../shared/decisions/decisions-024.md)
+- [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../../shared/decisions/decisions-025.md)
+- [มติ 026 (อนุมัติ amendment-proposal-001/002 เป็น baseline ใหม่)](../../shared/decisions/decisions-026.md)
+- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../../shared/decisions/decisions-027.md)
+- [มติ 028 (ชนิดคอลัมน์ CreateBy/UpdateBy)](../../shared/decisions/decisions-028.md)
+- [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../../shared/decisions/decisions-029.md)
+- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../../shared/decisions/decisions-030.md)
+- [BR-046-01 (Quiz/Test ใช้กลไกเดียว policy จำนวนครั้ง/เฉลย/เวลา/สุ่มต่างกัน ไม่ผูกตายตัวกับชื่อ)](../../modules/quiz/shared/requirements/req-046.md)
+- [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้)](../../modules/quiz/shared/requirements/req-046.md)
+- [BR-047-01 (ครูตั้งการนับ Quiz/น้ำหนักรายหลักสูตร; น้ำหนักแต่ละกิจกรรม/Quiz/Test รวม 100% ตาม decisions-034)](../../modules/quiz/shared/requirements/req-047.md)
+- [AC-047-01 (ครูตั้ง A ให้นับ Quiz และ B ไม่นับ แล้วเห็นค่ารายหลักสูตร; แต่ละชุดน้ำหนักบันทึกใช้ได้เมื่อรวม 100% เท่านั้น)](../../modules/quiz/shared/requirements/req-047.md)
+- [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](des-005.md)
+- [DES-008 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](des-008.md)
+- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
+
+- [BR-046-02 (คลังข้อสอบมี revision; แก้ข้อ/เฉลยไม่เปลี่ยนฉบับเก่า)](../../modules/quiz/shared/requirements/req-046.md)
+- [BR-046-03 (แต่ละการทำเก็บ snapshot ข้อที่ได้รับ ลำดับ เกณฑ์ตรวจ และ policy ที่ใช้)](../../modules/quiz/shared/requirements/req-046.md)
+- [BR-046-04 (ส่วนกลางตั้ง policy; ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด จำนวนครั้ง/สุ่ม/เวลาเฉลยคงส่วนกลาง (decisions-034))](../../modules/quiz/shared/requirements/req-046.md)
+- [BR-046-05 (Quiz เริ่มไม่จำกัดครั้ง/เฉลยทันที/คะแนนสูงสุด/ไม่จับเวลาหรือสุ่ม; Test 1 ครั้ง/จับเวลา/สุ่ม/เฉลยหลังปิด เปิดซ่อมรายคนได้; ปรนัย/ถูก–ผิด (decisions-024))](../../modules/quiz/shared/requirements/req-046.md)
+- [AC-046-02 (Quiz/Test ที่ไม่ปรับค่าใช้ BR-046-05; เมื่อใช้ policy ที่กำหนด ระบบจำกัดครั้ง/เวลาและเปิดเฉลยตรงค่า)](../../modules/quiz/shared/requirements/req-046.md)
+- [AC-046-03 (รายการที่กำหนดสุ่มข้อ แสดงประวัติชุดและลำดับข้อที่ผู้เรียนได้รับจริงได้)](../../modules/quiz/shared/requirements/req-046.md)
+- [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot และเกณฑ์เดิม ผลเดิมไม่เปลี่ยน)](../../modules/quiz/shared/requirements/req-046.md)
+- [BR-047-02 (Quiz ไม่นับมีน้ำหนัก 0 แต่ดูผลได้; ค่าเริ่ม Quiz ใช้คะแนนสูงสุด Test ซ่อมใช้คะแนนสูงสุดไม่มีเพดาน (decisions-024/025))](../../modules/quiz/shared/requirements/req-047.md)
+- [BR-047-03 (การนับคะแนนหลักสูตรไม่กำหนดหมวดเกรดปลายทางอัตโนมัติ; ใช้ mapping ตาม REQ-049)](../../modules/quiz/shared/requirements/req-047.md)
+- [BR-047-04 (คะแนนรวม 0–100 = SUM((earned_i/max_i) × weight_i) โดย weight เป็นเปอร์เซ็นต์รวม 100; เปลี่ยนน้ำหนักใช้เฉพาะ CourseRun ใหม่ รอบเดิมคงค่า/ผลเดิม (decisions-034); งานขาดตอนเลื่อน Level ใช้ 0 ตาม REQ-048 แยกจาก export ตาม REQ-050/051)](../../modules/quiz/shared/requirements/req-047.md)
+- [AC-047-02 (Quiz ของ B มีผลให้ดูและน้ำหนัก 0; เปลี่ยนคะแนน Quiz อย่างเดียวแล้วคะแนนรวม B ไม่เปลี่ยน)](../../modules/quiz/shared/requirements/req-047.md)
+- [AC-047-03 (ครูกำหนดสัดส่วน A แล้วเรียกดูสัดส่วนที่บันทึกได้ โดยไม่เปลี่ยน B)](../../modules/quiz/shared/requirements/req-047.md)
+- [AC-047-04 (กิจกรรม 8/10 น้ำหนัก 20%, Quiz 6/10 น้ำหนัก 30%, Test 18/20 น้ำหนัก 50% ได้รวม 79/100 และแสดงส่วน 16+18+45 (ตัวเลขทดสอบจากสูตร ไม่ใช่ค่าเริ่ม))](../../modules/quiz/shared/requirements/req-047.md)
+- [DES-009 (Preview ยืนยัน และส่งคะแนนกลับ SchoolBright)](des-009.md)
+- [DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](des-011.md)
+
+- [OQ-014 (สูตรรวมรายกิจกรรมและการแปลงคะแนน)](../../shared/open-questions/oq-014.md) เป็นคำถามที่เอกสารเดิมอ้าง; ใช้ข้อสรุปตามมติที่ระบุในเนื้อหาสัญญา.

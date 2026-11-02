@@ -1,3 +1,6 @@
+---
+owner: spec
+---
 # Tokens: School Bot Studio
 
 > Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (แตกจาก brand.md ของ sketchbook ให้อ่านได้ทีละไฟล์)

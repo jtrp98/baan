@@ -1,0 +1,57 @@
+---
+owner: spec
+---
+﻿# SchoolBot — ขอบเขตระบบ
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย spec · ขอโดย ผู้ใช้ (ปิดข้อมูลล้าสมัยและเรียบเรียงตามกติกาใหม่)
+
+## Overview
+
+SchoolBot มี Block / Arm / Code สำหรับเรียนและควบคุมหุ่น บทเรียนแยกจากพื้นที่สร้างงาน ตาม [มติ 002 (ระบบเต็ม)](decisions/decisions-002.md) และ [มติ 003 (สามโหมด)](decisions/decisions-003.md)
+
+## Target Users
+
+นักเรียน/ครูเป็นผู้ใช้หลัก ครูตรวจตามรายชื่อที่ผู้ดูแลกำหนด ตาม [มติ 015 (ขอบเขตครู)](decisions/decisions-015.md) ผู้ดูแลย้าย License ผู้ใช้อนุมัติบทเรียนตาม [มติ 038 (ผู้อนุมัติและ rubric)](decisions/decisions-038.md)
+
+## Release Scope
+
+มี 44 REQ (Requirement: ข้อกำหนด) / 187 AC (Acceptance Criteria: เกณฑ์ตรวจรับ) สถานะอยู่ที่ [ทะเบียน](requirements-index.md) เท่านั้น
+
+- มีบทเรียน ภารกิจ ผลเรียน ความคืบหน้าและหน้าครู Code/Block ตรวจอัตโนมัติ Arm ครูตรวจ rubric ดาว 1/2/3 และตารางคู่ผ่าน–ไม่ผ่านอนุมัติแล้ว ดาวไม่ใช่เงื่อนไขเลื่อน Level (ระดับการเรียน) ค่าหุ่นจริงยังรอยืนยัน เนื้อหารอผู้ใช้อนุมัติทีละ revision ตามมติ 038
+- Guest ใช้พื้นที่ร่วมของ OS account เก็บจนสั่งลบ ส่งออกได้ ถังขยะกู้ได้ 30 วันแล้วลบถาวรอัตโนมัติ งานปกติไม่ถูกลบ หลัง Login เลือกนำเข้าเอง คงต้นฉบับและกันซ้ำ ประวัติเรียนเลือกย้ายได้แต่ต้องตรวจใหม่ Arm รอครู Guest ไม่ใช่ตัวตนนักเรียน ตาม [REQ-040 (พื้นที่ Guest)](../modules/my-work/shared/requirements/req-040.md), [REQ-041 (นำเข้าโครงงาน)](../modules/my-work/shared/requirements/req-041.md), [REQ-042 (ย้ายประวัติ)](../modules/my-work/shared/requirements/req-042.md)
+- ครูทดลองในเครื่องและเก็บโครงงาน Cloud ได้ แต่ส่งงานหรือสร้างรอบประเมิน Cloud ไม่ได้ ตาม [มติ 033 (ครูทดลอง)](decisions/decisions-033.md)
+- License บังคับ Guest/Login ครั้งแรกออนไลน์ สิทธิ์ออฟไลน์ 3 วัน หนึ่ง Key ต่อเครื่อง ผู้ดูแลย้ายทันที สิทธิ์เดิมคงถึงกำหนด ตาม [REQ-034 (สิทธิ์ออฟไลน์)](../modules/app-shell/shared/requirements/req-034.md), [REQ-035 (ย้าย Key)](../modules/app-shell/shared/requirements/req-035.md)
+- ใช้บัญชีเดิมและข้อมูล Master, School, Logs, PGGradeDB ตาราง SchoolBot อยู่ฐานข้อมูลแยก ไม่สร้าง SchoolBotUser ใช้ int4 กับรหัสหลัก/อ้างอิงและฟิลด์มาตรฐาน ตาม [มติ 011 (สี่ฐานเดิม)](decisions/decisions-011.md), [มติ 012 (ชนิดรหัส)](decisions/decisions-012.md), [มติ 027 (ฐาน SchoolBot)](decisions/decisions-027.md)
+- Desktop login ได้ session ชั่วคราว 5 นาทีเพื่อเลือกตัวตน (bind) หลัง bind สำเร็จให้ `ExpiresAt = เวลาที่ bind + 8 ชั่วโมง` ตาม [มติ 052 (อายุ Desktop session)](decisions/decisions-052.md)
+- หลักสูตรมี Level/Activity (กิจกรรม), revision, Course Plan Sheet และ Quiz/Test ครูปรับเฉพาะเวลาสอบ/ช่วงเปิด–ปิด จำนวนครั้ง/สุ่ม/เวลาเฉลยคงส่วนกลาง ซ่อมรายคนใช้คะแนนสูงสุดไม่มีเพดาน ตาม [มติ 034 (สูตรคะแนนและสิทธิ์ครู)](decisions/decisions-034.md)
+- รวมหลักสูตร = `SUM((earned/max) × weight)` น้ำหนักรวม 100% Quiz ไม่นับ = 0 เปลี่ยนใช้กับ CourseRun (รอบหลักสูตร) ใหม่ เลื่อน Level นับทุกคนในรายชื่อ งานขาด = 0 แยกจากส่งคะแนน ตามมติ 034 และ [REQ-048 (เลื่อนทั้งห้อง)](../modules/quiz/shared/requirements/req-048.md)
+- กิจกรรมหนึ่งจับคู่ได้หลายช่องข้ามวิชา ช่องหนึ่งรับกิจกรรมเดียว ใช้ช่องเดิม ส่งแล้วล็อกการจับคู่ เปลี่ยนใช้ชุดใหม่ ไม่ย้าย/ล้างคะแนนเดิม ตาม [มติ 032 (จับคู่คะแนน)](decisions/decisions-032.md)
+- ครูยืนยันก่อนส่งคะแนน แต่ละช่อง = `earned/max × target max` ปัด half-up เป็นจำนวนเต็ม ไม่มีผลให้ข้าม คงเดิมและส่งภายหลังได้ คะแนนชนให้ครูเลือกทับ/คงเดิมรายคน ไม่เปลี่ยนโครงสร้างเกรด ตาม [มติ 021 (เขียนช่องย่อย)](decisions/decisions-021.md) และมติ 032/034
+- Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon ต้องตรวจรับกับหุ่นจริง ตาม [มติ 019 (แพลตฟอร์ม)](decisions/decisions-019.md)
+
+[แผนปัจจุบัน](../build/plan/index.md) มี 110 งาน: ตรวจผ่านแล้ว 22 · โค้ดเสร็จและเทสต์ผ่านในเครื่อง 2 · รอทำ 86 รวม 8 ระยะ/17 gates ยังไม่ส่งมอบครบ
+
+## Constraints
+
+- แอป → HTTP API Gateway → gRPC SchoolBot service เว็บผ่าน same-origin Backend for Frontend (BFF) ไม่มี HTTP relay หรือ direct public SchoolBot service; Login เดิมของ API Gateway แยกจาก transport ของ SchoolBot service ตาม Gateway integration Rev5 full Login/การเชื่อมจริงรอหลักฐาน
+- 300 MB / เปิด 5 วินาที / 30 FPS เป็นเกณฑ์ตรวจรับการส่งมอบตาม [มติ 037 (เกณฑ์ส่งมอบ)](decisions/decisions-037.md) ข้อ 4 ยังไม่ได้วัดจริง ใช้วิธี cold/warm start และสเปกเครื่องอ้างอิงใน [เกณฑ์ส่งมอบ](pack-delivery-001.md)
+- มติ 038 ยังไม่อนุญาตทดสอบอุปกรณ์จริง ใช้ dry-run/fake bridge จนมีคำสั่งเป็นลายลักษณ์อักษร รุ่นหุ่น/board/firmware/calibration และ stop/unplug/emergency รอผู้ใช้หรือทีมอุปกรณ์ยืนยัน
+- ภาพเคลื่อนไหวเป็นค่าคาดการณ์ OS write สำเร็จไม่ยืนยันหุ่นเคลื่อนจบ หยุดจริง หรือเก็บท่าถูกต้อง cancel process ไม่หยุดชุดท่าบนบอร์ด ต้องขอ stop แยก เมื่อสื่อสารขาดอาจส่งไม่ถึง
+- ข้อจำกัด native, Memory Store, บัญชี, License, update และตัวติดตั้ง ดู [ความสามารถฐานเดิม](scope-baseline-001.md) เป็นฐานเดิม ไม่ใช่การตัด scope
+- งานที่เริ่มตรวจด้วย DES-004 (ตัวตนและสิทธิ์) Rev12 คงเกณฑ์ Rev12 แม้มติ 052 กำหนดให้ arch แก้แบบเป็น Rev13
+
+## Declined
+
+ตัด Windows 10 ตามมติ 019 ฐานเดิมยังไม่มีไม่เท่ากับตัด scope รายการภายหลังอยู่ backlog
+
+## References
+
+[มติ](decisions/INDEX.md) · [แหล่งอ้างอิง](source-references.md) · [เนื้อหา](pack-content-inventory-001.md) · [หุ่น](pack-hardware-001.md)
+
+## หลักฐาน
+
+แหล่ง: `requirements-index.md`, `../build/plan/index.md`, `../build/design/gateway-integration-001.md` Rev5 และผู้ใช้ 2026-11-02 ฐานเดิมตรวจ 2026-10-21 ไม่ได้ทดสอบระบบในงานนี้
+
+## ยังไม่ยืนยัน
+
+ผู้ใช้ต้องระบุผู้ตรวจรับรายแพลตฟอร์ม ผู้ถือ cert และช่องทางแจกจ่าย กลุ่มผู้ดูแล release เพิ่มเติม (สมมติฐาน — ยังไม่ยืนยัน) รอผู้ใช้กำหนดสิทธิ์

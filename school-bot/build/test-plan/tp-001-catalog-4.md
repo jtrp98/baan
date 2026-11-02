@@ -1,0 +1,18 @@
+# TP-001 — สารบัญ TP001-049–TP001-064
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ใช้กับ [แผน TP-001](tp-001.md) AC หมายถึง Acceptance Criteria หรือเกณฑ์ตรวจรับ; ความหมาย AC อยู่ใน case ที่ลิงก์และ [ตาราง AC](traceability-001.md) ทุกผลจริงยัง NOT_RUN
+
+| ID | ตรวจอะไร | AC ที่ครอบ | ไฟล์ |
+|---|---|---|---|
+| TP001-049 | ติดตั้ง MSI | [AC-031-01 (บน Windows 11 25H2 x64 บัญชีทดสอบสะอาดที่มี WebView2 ติดตั้ง MSI…)](../../modules/app-shell/shared/requirements/req-031.md), [AC-031-02 (เมื่อไม่มี WebView2 มีขั้นตอนขอให้ติดตั้ง)](../../modules/app-shell/shared/requirements/req-031.md) | [รายละเอียด](tp-001-cases-release-model.md#tp001-049) |
+| TP001-050 | repair | [AC-031-03 (ใน installation ทดสอบ ลบไฟล์ engine แล้ว repair คืนได้)](../../modules/app-shell/shared/requirements/req-031.md), [AC-031-04 (แพ็กเกจเวอร์ชันใหม่อัปเกรด installation ทดสอบได้ และแพ็กเกจเก่ากว่าไม่…)](../../modules/app-shell/shared/requirements/req-031.md) | [รายละเอียด](tp-001-cases-release-model.md#tp001-050) |
+| TP001-051 | ติดตั้ง | [AC-032-01 (ติดตั้งแพ็กเกจเดียวบนเครื่องทดสอบ macOS 15+ ทั้ง Intel และ Apple Silicon…)](../../modules/app-shell/shared/requirements/req-032.md), [AC-032-03 (ถอนแอปจาก Applications แล้วข้อมูลโครงงานใน Application Support ยังคงอยู่)](../../modules/app-shell/shared/requirements/req-032.md) | [รายละเอียด](tp-001-cases-release-model-2.md#tp001-051) |
+| TP001-052 | เทียบชื่อ/PK/ฟิลด์ร่วมหกตัว/ชนิดทุกตาราง และยืนยันไม่มี UNIQUE/FK | [AC-033-01 (ตรวจหลักฐาน catalog ของ DB ที่ระบบทดสอบใช้งานแล้วพบชื่อตาราง License…)](../../modules/app-shell/shared/requirements/req-033.md), [AC-033-02 (ตรวจ catalog ของ DB เดียวกันแล้วพบ SchoolBotLicenseId เป็น Primary Key…)](../../modules/app-shell/shared/requirements/req-033.md), [AC-033-03 (ตรวจ catalog ของ DB เดียวกันแล้วพบฟิลด์มาตรฐานครบทั้งหกชื่อ…)](../../modules/app-shell/shared/requirements/req-033.md), [AC-033-04 (ตรวจ catalog ของ DB ที่ระบบทดสอบใช้งานแล้วทุกตารางข้อมูลของผลิตภัณฑ์ใช้…)](../../modules/app-shell/shared/requirements/req-033.md), [AC-033-05 (จาก catalog เดียวกัน PK ของตาราง SchoolBot ใหม่เป็น int4…)](../../modules/app-shell/shared/requirements/req-033.md) | [รายละเอียด](tp-001-cases-release-model-2.md#tp001-052) |
+| TP001-053 | ตรวจ catalog ตาม AC | AC-033-01, AC-033-02, AC-033-03, AC-033-04, AC-033-05 | [รายละเอียด](tp-001-cases-release-model-2.md#tp001-053) |
+| TP001-054 | เลือก Activity แต่ละ mode | [AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-02 (เปิด Lesson แล้วเห็นเป้าหมาย คำแนะนำ และรายการ Activity…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-03 (งานและผลภารกิจอ้าง Activity, Mode, Lesson และ revision ที่เรียนถูกต้อง…)](../../modules/quiz/shared/requirements/req-037.md) | [รายละเอียด](tp-001-cases-learning.md#tp001-054) |
+| TP001-055 | เปิด/ปิดบทเรียน | [AC-037-04 (เพียงเปิดหรือกดปิดบทเรียนไม่สร้างผลผ่านจริงโดยไม่มีการประเมินตาม REQ-038)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-05 (เมื่อยังไม่มีหลักฐานอนุมัติเนื้อหาและเกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-06 (กิจกรรมภารกิจจริงทุกโหมดอ้างกลับไปยังเนื้อหา ภารกิจ เกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md) | [รายละเอียด](tp-001-cases-learning.md#tp001-055) |
+| TP001-056 | ส่งภารกิจ | [AC-038-01 (Code/Block ที่มีเกณฑ์ภารกิจกำหนดแล้วได้รับผลอัตโนมัติตรงกับตัวอย่างผ่านแ…)](../../modules/quiz/shared/requirements/req-038.md) | [รายละเอียด](tp-001-cases-learning.md#tp001-056) |
+
+[case ลำดับถัดไปในช่วงเดียวกัน](tp-001-catalog-4-continued.md)
