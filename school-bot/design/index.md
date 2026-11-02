@@ -193,6 +193,7 @@ G รับ local logout ด้วย SchoolBotAuthController → SchoolBotLogou
 |---|---|
 | [license-admin-security-001.md](license-admin-security-001.md) Rev1 | PROPOSED — License role/error/replay TTL/cleanup ต่อ DES-002 |
 | [project-api-001.md](project-api-001.md) Rev1 | PROPOSED — API/ETag/immutable revision ต่อ DES-003 |
+| [project-commit-proposal-001.md](project-commit-proposal-001.md) | PROPOSED — รอผู้ใช้อนุมัติ: commit Project+Revision เป็นหน่วยเดียว (ต้นเหตุ F2 ของ BE-002) |
 | [local-project-boundary-001.md](local-project-boundary-001.md) Rev1 | Archclarificationก่อนGo rework1: revision/errors/sharedOSlocks/anchoredFS/strictJSON/migrationreceipt; [specREQ026ชัดแล้ว](../planning/spec-090-draft-fuel-001.md): fuelRun-only/draftผ่านstructuralเก็บได้; archDESsentenceรอalign |
 | [guest-workspace-001.md](guest-workspace-001.md) Rev1 | PROPOSED — นโยบาย Guest ยืนยันแล้ว; รายละเอียดเวลา/trash/export รอ implementation proof |
 | [guest-import-001.md](guest-import-001.md) Rev1 | PROPOSED — explicit Project import/receipt/dedup ใช้ schema เดิม |
