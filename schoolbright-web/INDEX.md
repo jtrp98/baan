@@ -1,5 +1,6 @@
 ---
 platform: web
+target: sb-tech-upgrade-web-system
 ---
 # schoolbright-web
 
