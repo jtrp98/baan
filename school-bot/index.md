@@ -1,35 +1,56 @@
-# school-bot — Module Index
+# SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น
 
-> สารบัญ + สถานะปัจจุบันของโมดูล — เขียนทับให้เป็นความจริงวันนี้ ไม่มี Change Log (ประวัติดู `git log` ของไฟล์นี้)
-> วิธีอ่าน: อ่าน index ของหมวดที่ต้องการก่อน แล้วเปิดเฉพาะไฟล์ที่ระบุ
-> ที่นี่คือ**เอกสารกลาง** (สัญญา + สถานะที่คนอ่านได้) · ใบงาน คิว ผลตรวจรายรอบ และหลักฐานของทีม AI อยู่ใน memory repo ของเครื่องที่รัน BAAN (`memory/school-bot/` — สถานะ run: `status.md`) ข้อความที่ลงท้าย "(memory)" คือการอ้างไฟล์ในนั้น
+> แก้ล่าสุด 2026-11-02 · แก้โดย spec · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่)
 
-## สถานะปัจจุบัน (2026-11-02)
+SchoolBot เป็นระบบสำหรับนักเรียนและครูในโรงเรียน มีบทเรียนและพื้นที่สร้างงาน Block (โปรแกรมบล็อก), Arm (แขนกล) และ Code (เขียนโปรแกรม) พร้อมโครงงาน การประเมินผล และการส่งคะแนนกลับ SchoolBright
 
-- **แผน**: 110 งาน — ตรวจผ่านแล้ว (verified) 22 · โค้ดเสร็จและ test ผ่านในเครื่องแต่ยังไม่ต่อระบบจริง (done-local) 2 คือ BE-006, BE-039 · รอทำ 86 · 8 phase / 17 gate · ขอบเขต 44 REQ / 187 AC / 82 test case — ดู [plan/index.md](plan/index.md)
-- **กำลังทำ**: wave 2 — BE-002 ตรวจผ่านแล้วหลังแก้ 3 รอบ ตาม[มติ051](requirement/decisions-051.md) (บันทึก Project + Revision เป็นหน่วยเดียว) · BE-039 (logout) ยังเป็น done-local
-- **ทำงานได้แล้วในเครื่อง (ยังไม่ขึ้น production)**: logout ผ่าน Gateway → gRPC ผ่านการตรวจทั้ง check และ security (SEC-001..016 ปิดเฉพาะ local) · Auth และตรรกะคะแนน (Math) ผ่าน test · **ยังไม่เปิด**: gRPC บน production, Login เต็มรูปแบบ, การต่อฐานข้อมูลจริงกับ API, H5
-- รายละเอียดของ run (คิว, ผล PASS/FAIL ราย slice, รอบ rework, งานที่รอ check) อยู่ใน memory `status.md`
-- **ฐานข้อมูล**: ผู้ใช้รัน `schoolbot_db.sql` แล้ว ([บันทึก045](requirement/decisions-045.md)) · เชื่อมต่อจริงสำเร็จ: PostgreSQL 15.19 มีตาราง `SchoolBot*` 32 ตาราง · ยังไม่ตรวจว่า schema ตรงกับแบบทุกจุด และยังไม่ได้ต่อกับ API
-- **transport**: [Gateway Rev5](design/gateway-integration-001.md) + [gRPC contract Rev2](design/gateway-grpc-contract-001.md) + [controller entry Rev2](design/gateway-controller-entry-001.md) — client→HTTP Gateway (controller ตาม[มติ050](requirement/decisions-050.md))→gRPC SchoolBot · ผู้ใช้อนุญาต dev บน branch ที่เตรียมไว้ตาม [046](requirement/decisions-046.md); local logout มี implementation + JPO092 แล้ว ส่วน Login อื่น/H5/production/runtime ยังต้องพิสูจน์
-- **License**: create-license replay 15 นาทีอนุมัติแล้วตาม [046](requirement/decisions-046.md); ผู้ใช้พักเรื่อง signer/custody ตาม [047](requirement/decisions-047.md) เก็บค้างก่อนใช้กุญแจจริง งานส่วนที่ไม่พึ่งกุญแจเดินต่อได้
-- **UX**: เซ็นครบ 7/7 ชุดตาม [decisions-043](requirement/decisions-043.md); UX-005 Q39–Q42 และ UX-007 Q43–Q46 รวม delta042 อนุมัติแล้ว
-- **สัญญาที่ UX ต้องใช้**: [ช่องว่าง 7 กลุ่ม](design/learning-ux-contract-gaps-001.md) — สัญญาฝั่ง local พร้อมแล้ว · เรื่อง approval, ที่เก็บ provenance และหลักฐานจากเจ้าของระบบยังเปิด · มติ [decisions-042](requirement/decisions-042.md) (ตอบ A: หมดเวลาตรวจคำตอบที่บันทึกทันอัตโนมัติ) ห้ามถามซ้ำ
-- **รอคน**: ดู [plan/index.md § Waiting on Human](plan/index.md#waiting-on-human)
-- **กติกา runner จากผู้ใช้**: t0–t2 ใช้ Codex · t3–t5 ใช้ AGY · ไม่ fallback ข้าม runner
+## สถานะปัจจุบัน
 
-## Documents
+แผนมีข้อกำหนด 44 รายการ เกณฑ์ตรวจรับ 187 ข้อ และทดสอบ 82 กรณี มี 110 งานใน 8 ระยะ และเงื่อนไขก่อนดำเนินงาน 17 จุด: ตรวจผ่านแล้ว 22 งาน โค้ดและการทดสอบผ่านในเครื่อง 2 งาน และรอทำ 86 งาน ดู [แผนและสถานะงาน](plan/index.md)
 
-| ไฟล์ | เนื้อหา | สถานะ |
-|---|---|---|
-| `requirement\index.md` | สารบัญ requirement — ตาราง REQ + สถานะ + AC + decisions registry | 44 REQ (REQ-009..052) / 187 AC — DRAFT · decisions-001..051 |
-| `requirement\scope.md` | เนื้อหา module-level: Overview · Target Users · Release Scope · Constraints · Declined · References | พร้อม |
-| `design\index.md` | สารบัญ design — feasibility + ตาราง DES + ไฟล์สัญญา | data-model Rev8 / rules Rev11 / DBML Rev7 (32 ตาราง); constraints เหลือเฉพาะ PK32 ตามใบงาน086 (memory); DES-001..012 PROPOSED |
-| `plan\index.md` | release scope, Waiting on Human, phases, ตาราง Tasks + [extension](plan/extension/index.md) | 110 tasks: 22 verified / 2 done-local / 86 pending |
-| `open-questions\index.md` | สารบัญ OQ ทั้งหมด | 12 OQ (OQ-006..017): 3 PARTIAL / 9 CLOSED |
-| [test-plan/index.md](test-plan/index.md) | สารบัญ test plan | 82 cases / 187 AC ([Amendment005](test-plan/tp-001-amendment-005.md) เพิ่ม TP001-082 ครอบ AC-036-06); traceability/joined JSON ยังเป็นชุด 180/77; actual ทุกเคส NOT_RUN |
-| [uxui/index.md](uxui/index.md) | สารบัญ/เอกสาร UX/UI | เซ็นครบ 7/7 รวม delta042 (decisions-043) |
-| [security.md](security.md) | ผลตรวจความปลอดภัย | ยังเปิด: Important 6 / Medium 6 / Minor 3 · SEC-001..016 ปิดแล้วเฉพาะ local · finding จากรอบตรวจ Gateway รอบ 2 ยังเปิด 16 ข้อ |
-| [backlog.md](backlog.md) | งานที่ทำทีหลัง (append-only) | BL-001..006 |
-| `db\` | SQL DDL/rollback (`schoolbot_db.sql`, `schoolbot_db_rollback.sql`) + `pii-inventory-001.md` — ผลรีวิวรายรอบของ vault อยู่ใน memory | ร่าง Rev7 · ผู้ใช้รัน DDL แล้วและนับได้ 32 ตาราง · ยังไม่ตรวจ schema parity, transaction และการต่อ API |
-| `design\source-review-001..005.md` | หลักฐาน as-built จากการตรวจ source จริง | 001 บทเรียน/3 โหมด · 002 account/profile/tenant · 003 Course Plan Sheet · 004 PGGradeDB · 005 score writer นอก workspace (BLOCKED) |
+- การบันทึกโครงงานและฉบับของโครงงานเป็นหน่วยเดียวตรวจผ่านแล้ว ตาม [มติ 051 (บันทึก Project และ Revision พร้อมกัน)](requirement/decisions-051.md)
+- การออกจากระบบผ่าน API Gateway และบริการ SchoolBot ผ่านการตรวจการทำงานและความปลอดภัยในเครื่องแล้ว การยืนยันตัวตนและตรรกะคำนวณคะแนนผ่านการทดสอบ แต่ Login เต็มรูปแบบ การเชื่อมฐานข้อมูลจริงกับ API และการเปิดบริการบน production ยังไม่พร้อม
+- ผู้ใช้รัน SQL สร้างฐานข้อมูลแล้ว มีผลเชื่อมต่อ PostgreSQL 15.19 พบตาราง SchoolBot 32 ตาราง ยังต้องตรวจความตรงกันของโครงสร้างฐานข้อมูลกับแบบและการเชื่อม API
+- แอปเรียก API Gateway ผ่าน HTTP แล้ว Gateway เรียก SchoolBot ผ่าน gRPC (Remote Procedure Call) เว็บผ่าน BFF (Backend for Frontend) บน origin เดียวกัน Gateway ใช้ controller ตาม [มติ 050 (ใช้รูปแบบ controller เดิมของ Gateway)](requirement/decisions-050.md) ผลในเครื่องยังไม่ยืนยันการทำงานบนระบบจริง
+- ผู้ใช้อนุญาตพัฒนา Gateway และกู้ License Key เดิมจากคำขอสร้างซ้ำได้ภายใน 15 นาทีตาม [มติ 046 (พัฒนา Gateway และกำหนดช่วงกู้ Key)](requirement/decisions-046.md) ส่วนที่เก็บกุญแจเซ็นและผู้ดูแลยังพักไว้ตาม [มติ 047 (พักเรื่องกุญแจเซ็น License)](requirement/decisions-047.md)
+- UX/UI (ประสบการณ์ผู้ใช้และหน้าจอ) อนุมัติครบ 7 ชุด รวมหน้าจอข้อสอบเมื่อหมดเวลาตาม [มติ 043 (อนุมัติหน้าจอหลักสูตร ข้อสอบ และหน้าครู)](requirement/decisions-043.md) สัญญาในเครื่องพร้อมแล้ว แต่หลักฐานอนุมัติ ที่มาข้อมูล และหลักฐานเจ้าของระบบยังค้าง
+
+## สิ่งที่รอผู้รับผิดชอบ
+
+| ผู้รับผิดชอบ | สิ่งที่ยังรอ |
+|---|---|
+| ผู้ใช้และเจ้าของฐานข้อมูล | รอผู้ใช้ส่งคำถามหลักฐานให้เจ้าของฐานข้อมูล ยังไม่มีหลักฐานว่าส่งหรือได้รับคำตอบแล้ว |
+| เจ้าของ Gateway และโครงสร้างพื้นฐาน | หลักฐานการเชื่อมบริการจริง เครือข่ายและการยืนยันตัวตนครบเส้นทาง |
+| เจ้าของฐานข้อมูล Master และระบบเดิม | หลักฐานสิทธิ์และการยืนยันตัวตน รวมแหล่งรายชื่อนักเรียนที่ครูดูแล |
+| ผู้ใช้และทีมอุปกรณ์ | รุ่นหุ่น บอร์ด firmware การปรับเทียบ และเกณฑ์หยุดเมื่อถอดสายหรือเกิดเหตุฉุกเฉิน; ยังไม่อนุญาตทดสอบหุ่นจริง |
+| ผู้ใช้และผู้รับผิดชอบส่งมอบ | ผู้ถือใบรับรองลงนามแอปและช่องทางแจกจ่าย; เรื่องกุญแจเซ็น License พักไว้ก่อนใช้กุญแจจริง |
+| ผู้รับผิดชอบคุ้มครองข้อมูลส่วนบุคคล | ข้อพิจารณาด้านข้อมูลส่วนบุคคลที่ระบุในแผน |
+
+ดูรายละเอียดที่ [รายการรอผู้รับผิดชอบในแผน](plan/index.md#waiting-on-human)
+
+## ความเสี่ยงที่ยังเปิด
+
+- ความปลอดภัยยังมีระดับ Important 6 ข้อ, Medium 6 ข้อ และ Minor 3 ข้อ; ผลตรวจ Gateway ครั้งที่สองยังเปิด 16 ข้อ ผลปิดประเด็นของ logout ใช้ได้เฉพาะในเครื่อง
+- ฐานข้อมูลยังไม่ยืนยันความตรงกับแบบ การทำงานแบบ transaction และการเชื่อม API
+- ชุดทดสอบมี 82 กรณีครอบคลุมเกณฑ์ตรวจรับ 187 ข้อ แต่ข้อมูลเชื่อมโยงเกณฑ์กับกรณีทดสอบยังเป็นชุด 180 ข้อ/77 กรณี และผล actual ทุกกรณียังเป็น NOT_RUN
+- การอ่านโค้ดส่วนเขียนคะแนนเดิมยังติดข้อจำกัด เพราะแหล่งโค้ดอยู่นอก workspace
+
+## เอกสารของโมดูล
+
+| เอกสาร | เนื้อหา |
+|---|---|
+| [ข้อกำหนด](requirement/index.md) | ข้อกำหนดรายเรื่อง กฎธุรกิจ และเกณฑ์ตรวจรับ |
+| [ขอบเขต](requirement/scope.md) | ผู้ใช้ เป้าหมาย ข้อจำกัด และสิ่งที่ไม่รองรับ |
+| [มติที่ใช้อยู่](requirement/decisions.md) | ข้อตกลงจากผู้ใช้และมติที่ถูกแทน |
+| [แบบระบบ](design/index.md) | สัญญาบริการ แบบข้อมูล และผลตรวจโค้ดต้นทาง |
+| [แผน](plan/index.md) | ขอบเขตส่งมอบ งาน สถานะ และสิ่งที่รอผู้รับผิดชอบ |
+| [คำถามค้าง](open-questions/index.md) | คำถามธุรกิจ 12 เรื่อง: ตอบบางส่วน 3 เรื่อง และปิดแล้ว 9 เรื่อง |
+| [แผนทดสอบ](test-plan/index.md) | กรณีทดสอบและการเชื่อมกับเกณฑ์ตรวจรับ |
+| [หน้าจอและประสบการณ์ใช้งาน](uxui/index.md) | แบบหน้าจอและหลักฐานอนุมัติ |
+| [ความปลอดภัย](security.md) | ประเด็นความปลอดภัยและความเสี่ยงที่ยังเปิด |
+| [งานภายหลัง](backlog.md) | รายการงานที่ทำภายหลัง |
+| [SQL สร้างตาราง](db/schoolbot_db.sql), [SQL ย้อนกลับ](db/schoolbot_db_rollback.sql), [ข้อมูลส่วนบุคคล](db/pii-inventory-001.md) | โครงสร้างฐานข้อมูล การย้อนกลับ และรายการข้อมูลส่วนบุคคล |
+
+## หลักฐาน
+
+สถานะอ้างหน้าแรกเดิมและ [แผนปัจจุบัน](plan/index.md) สัญญาอ่านที่ [Gateway integration Rev5](design/gateway-integration-001.md), [สัญญา gRPC Rev2](design/gateway-grpc-contract-001.md) และ [controller entry Rev2](design/gateway-controller-entry-001.md)

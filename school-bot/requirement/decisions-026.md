@@ -1,4 +1,5 @@
 # มติอนุมัติ amendment-proposal-001/002 เป็น baseline ใหม่
+> ถูกแทนด้วย มติ 044 (เฉพาะข้อบังคับฐานข้อมูล คง PRIMARY KEY และถอน UNIQUE/FOREIGN KEY/CHECK) — [มติ 044](decisions-044.md)
 
 ## คำตอบผู้ใช้ — 2026-10-22
 
