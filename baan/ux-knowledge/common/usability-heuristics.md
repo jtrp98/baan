@@ -14,7 +14,7 @@ used_by: Designer (ออกแบบ), Reviewer (ตรวจ), Feasibility (�
 | H2 | Match System & Real World | ใช้คำ/ไอคอนที่ผู้ใช้คุ้นเคย | ไอคอนตะกร้า, ถังขยะ, คำว่า "บันทึก" ไม่ใช้ศัพท์เทคนิค |
 | H3 | User Control & Freedom | ย้อน/ยกเลิก/ออกได้ง่าย | Undo/Redo, ปุ่ม Cancel, ปิด popup ได้ |
 | H4 | Consistency & Standards | pattern เหมือนกันทั้งระบบ | ปุ่ม/สีเหมือนกัน, navigation อยู่ที่เดิม |
-| H5 | Error Prevention | กันผิดก่อนเกิด | disable Submit จนกรอกครบ, confirm ก่อนลบ, validate |
+| H5 | Error Prevention | กันผิดก่อนเกิด | กดส่งได้เสมอ ถ้ายังไม่ครบบอกว่าช่องไหนขาดแล้วพา focus ไปช่องนั้น (ไม่ปิดปุ่มเงียบ ๆ — ผู้ใช้ไม่รู้ว่าขาดอะไร และปุ่มที่ปิดมักจางจนอ่านไม่ออก/กด Tab ไปไม่ถึง) · ต้องปิดจริงใช้ `aria-disabled` + บอกเหตุผลข้างปุ่ม · ปิดได้ช่วงกำลังส่งกันกดซ้ำ · confirm ก่อนลบ · validate |
 | H6 | Recognition over Recall | แสดงตัวเลือก ไม่ให้จำ | autocomplete, recently viewed, label ชัด |
 | H7 | Flexibility & Efficiency | มือใหม่ง่าย มือเก่าเร็ว | keyboard shortcut, filter, quick action |
 | H8 | Aesthetic & Minimalist | สะอาด โฟกัส | whitespace, visual hierarchy, เน้น CTA หลัก |
