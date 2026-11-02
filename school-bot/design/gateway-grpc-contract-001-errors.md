@@ -1,20 +1,8 @@
-# Gateway–SchoolBot gRPC contract — 5. Error mapping
+# Gateway–SchoolBot gRPC contract — Error mapping
 
 > Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) ส่วนนี้อธิบาย5. Error mapping อ่านต่อเนื่องตามลำดับในไฟล์ทางเข้า.
-
-แยก keys ตาม evidence002:
-- AccountId คือ Master Tusers.SId; SchoolId คือ NCompany ที่ตรวจแล้ว.
-- student candidate: School Tusers.SId+SchoolId จาก master SId; ต้องตรวจ active และ cardinality ไม่ใช่ถือ ID เท่ากันว่า join ผ่าน.
-- employee candidate: Temployees.SEmp+SchoolId จาก NSystemId; web WorkStatus ใช้ SId, token ใช้ NSystemId??SId, 2FA ใช้ NSystemId>1 มิฉะนั้น SId. ทั้งสามไม่เท่ากันโดยอัตโนมัติ.
-- เสนอ canonical employee linkage จาก server mapping ที่พิสูจน์แล้วเท่านั้น; ไม่ยอมรับ SId fallback เพียงเพราะมีค่า. ต้อง reconcile account/profile ที่ status/token/2FA ใช้ให้ตรงกัน; sentinel/null/หลาย profile ยังรอ sb-api-gateway/legacy/vault พิสูจน์. ไม่มี schema proposal ในรอบนี้.
-
-เสนอ diagnostic codes ภายในใหม่: `AUTH_PROFILE_MISSING`, `AUTH_ACCOUNT_CARDINALITY`, `AUTH_PROFILE_CARDINALITY`. ทั้งหมดห้ามออก session; outward คง503 AUTH_NOT_CONFIGURED สำหรับ linkage ที่ยังไม่ยืนยัน ไม่เผยจำนวนบัญชี/profile. missing/deleted account หรือ credential ผิด→401 UNAUTHORIZED; unknown category→503 AUTH_NOT_CONFIGURED. การเปิด codes ใหม่เป็น public API ต้องให้ owner รับรองก่อน ไม่แก้ rules Rev7 เอง.
-
-กฎ admission และอายุ session ของต้นฉบับที่ยังต้องตรวจความสอดคล้องอยู่ในหัวข้อยังไม่ยืนยันท้ายเอกสาร.
-
-Login RPC ระบุเฉพาะ successful terminal contract; public pending/continuation ยังไม่ถูกตรึง จึงยังไม่พร้อมเปิด Login end-to-end. ห้ามแปลง pending เป็น401/201 เพื่อปิดช่องว่างนี้.
+ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) อธิบาย Error mapping.
 
 ## 5. Error mapping
 
@@ -38,3 +26,7 @@ HTTP API Gateway ยอมรับเฉพาะ trailer จาก authenticat
 | Unavailable + AUTH_NOT_CONFIGURED/AUTH_UNAVAILABLE/SERVICE_UNAVAILABLE/ADMIN_NOT_CONFIGURED | 503 |
 
 405/415/JSON validation เกิดที่ HTTP adapter ก่อน RPC; ใช้ v2 codes เดิม. Retry-After รับเฉพาะจำนวนที่ผ่าน validation. ไม่มี trailer หรือคู่ status/code ขัดกัน ห้ามเดา semantic code จาก message.
+
+แยก HTTP API Gateway failures: connection/protocol/invalid SchoolBot gRPC service reply→502; deadline ก่อนรับผล→504; maintenance/service disabled/config ไม่พร้อม/circuit open→503. ใช้ HTTP API Gateway envelope `{code:<HTTP integer>,message,messageTh,requestId,results:null}` แบบ sanitized. กรณี Unavailable ไม่มี SchoolBot gRPC service trailer ต้องมี local evidence แยก circuit/config จาก upstream failure; ยังต้องปรับ mapper เพราะ HTTP API Gateway ปัจจุบันให้ 503 ทั้งหมด. DeadlineExceeded ปัจจุบัน 408 ต้องปรับเฉพาะ Q หลัง Light (ผู้ทบทวน implementation ของ Gateway) review.
+
+SchoolBot gRPC service เรียก introspection timeout/ล้มเหลว→SchoolBot gRPC service trailer AUTH_UNAVAILABLE→503 ไม่ใช่ 504 ถ้า SchoolBot gRPC service ตอบได้ก่อน outer deadline. หาก HTTP API Gateway หมดเวลาก่อนรับ SchoolBot gRPC service ให้ 504 และผล mutation ไม่ทราบ. Client disconnect ส่ง cancellation และไม่พยายามเขียน response ใหม่; ไม่แปลงเป็น success. ปิด exception detail ทั้ง Development บน Q และ redact logs ไม่ให้ข้อความ/StackTrace ของ upstream รั่ว.

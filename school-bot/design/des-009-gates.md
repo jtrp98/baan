@@ -4,12 +4,6 @@
 
 ส่วนต่อของ [DES-009 — Preview ยืนยัน และส่งคะแนนกลับ SchoolBright](des-009.md)
 
-## อ้างอิง
-
-- [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../requirement/decisions-029.md)
-- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
-- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../requirement/decisions-027.md)
-
 ## เงื่อนไขก่อนเปิดส่งคะแนน
 
 Release gates — export (confirm → apply) เปิดได้เมื่อผ่านทุกข้อและมนุษย์ลงนาม; ก่อนนั้น confirm ตอบ 503 ตามรหัสของ gate ที่ค้าง:
@@ -23,7 +17,7 @@ Preview (อ่านอย่างเดียว) เปิดก่อน ga
 ## ขอบเขตและ Placement
 
 Public API และ worker อยู่ school-bot/web
-หน้าครู preview/ยืนยัน/แก้ชนอยู่ `sb-tech-upgrade-web-system` โฟลเดอร์ school-bot ซึ่งยังต้องยืนยัน เรียกผ่าน Backend for Frontend (BFF) ด้วย session channel `school_web` ตาม DES-012
+หน้าครู preview/ยืนยัน/แก้ชนอยู่ `sb-tech-upgrade-web-system` โฟลเดอร์ school-bot ซึ่งยังต้องยืนยัน เรียกผ่าน Backend for Frontend (BFF) ด้วย session channel `school_web` ตาม [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
 **SchoolBot DB (`10.0.0.128:9499` ตาม [decisions-027](../requirement/decisions-027.md))** เก็บ `SchoolBotScorePreview`, `SchoolBotScorePreviewItem`, `SchoolBotScoreExport`, `SchoolBotScoreOutbox` (ตัดคอลัมน์ `ScorePreviewId` ที่ซ้ำซ้อนออกตาม, `SchoolBotIdempotency` และ `SchoolBotAuditEvent`
 **School DB** และ **PGGradeDB** ต่อผ่าน connection แยกด้วย**บัญชี DB เดิม** ([decisions-029](../requirement/decisions-029.md)); PGGradeDB ใช้ schema เดิมเท่านั้น ไม่เพิ่มตาราง คอลัมน์ trigger หรือ function ใน PGGradeDB
 

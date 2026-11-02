@@ -1,33 +1,38 @@
-# Gateway–SchoolBot gRPC contract — 6. Deadline, limits และ private exposure
+# Gateway–SchoolBot gRPC contract — หลักฐาน source และ local logout
 
 > Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) ส่วนนี้อธิบาย6. Deadline, limits และ private exposure อ่านต่อเนื่องตามลำดับในไฟล์ทางเข้า.
+ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) อธิบายหลักฐาน source และ local logout.
 
 ## เอกสารอ้างอิง
 
-[DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
+[DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md) · [BL-005 (ข้อ 2: ผูกเอกสาร logout กับ controller as-built)](gateway-controller-entry-001.md)
 
-แยก HTTP API Gateway failures: connection/protocol/invalid SchoolBot gRPC service reply→502; deadline ก่อนรับผล→504; maintenance/service disabled/config ไม่พร้อม/circuit open→503. ใช้ HTTP API Gateway envelope `{code:<HTTP integer>,message,messageTh,requestId,results:null}` แบบ sanitized. กรณี Unavailable ไม่มี SchoolBot gRPC service trailer ต้องมี local evidence แยก circuit/config จาก upstream failure; ยังต้องปรับ mapper เพราะ HTTP API Gateway ปัจจุบันให้503ทั้งหมด. DeadlineExceeded ปัจจุบัน408 ต้องปรับเฉพาะ Q หลัง Light review.
+## หลักฐาน
 
-SchoolBot gRPC service เรียก introspection timeout/ล้มเหลว→SchoolBot gRPC service trailer AUTH_UNAVAILABLE→503 ไม่ใช่504 ถ้า SchoolBot gRPC service ตอบได้ก่อน outer deadline. หาก HTTP API Gateway หมดเวลาก่อนรับ SchoolBot gRPC service ให้504 และผล mutation ไม่ทราบ. Client disconnect ส่ง cancellation และไม่พยายามเขียน response ใหม่; ไม่แปลงเป็น success. ปิด exception detail ทั้ง Development บน Q และ redact logs ไม่ให้ข้อความ/StackTrace ของ upstream รั่ว.
+เอกสารนี้เรียบเรียงหลักฐานที่บันทึกไว้เดิม ไม่ได้ตรวจ source/runtime ซ้ำ.
 
-## 6. Deadline, limits และ private exposure
+สัญญาเสนอสำหรับ client HTTP→HTTP API Gateway→SchoolBot gRPC service ตาม [Gateway Rev3](gateway-integration-001.md); browser ผ่าน Backend for Frontend (BFF). อ่านร่วม [DES-012](des-012.md), [HTTP rules Rev7](data-contract-rules.md), [Desktop adapter Rev4](desktop-login-adapter-001.md). ไม่เปลี่ยน schema, session lifetime หรือ[มติ 035 (แหล่งสิทธิ์แอดมินโรงเรียน)](../requirement/decisions-035.md); ไม่ต้องมี DBML delta. เอกสารนี้ไม่อนุญาต implementation และไม่รับรอง integration.
 
-ตัวเลขต่อไปเป็นข้อเสนอ ไม่ใช่ deployed SLA:
+พาธหลักฐานอ้างจาก `target/`: Gateway คือ `sb-api-gateway` และ SchoolBot service คือ `school-bot`.
 
-| Class | Total deadline | Retry |
-|---|---|---|
-| Query: GetSession/GetMe | 5s | Unavailable ที่ไม่มี domain trailer สูงสุดอีก2ครั้ง 100/300ms ภายใน deadlineเดิม |
-| Mutation: Logout/BindProfile/RevokeSessions | 15s | ไม่ auto-retry แม้มี Idempotency-Key |
-| Auth: Login/ExchangeWebSession | 15s | ไม่ auto-retry |
-| SchoolBot gRPC service→HTTP API Gateway credential/continuation | ไม่เกิน10s และเวลาที่เหลือ | ไม่ retry |
-| SchoolBot gRPC service→private HTTP API Gateway introspection | ไม่เกิน3s และเวลาที่เหลือ | ไม่ retry |
+ข้อเท็จจริงที่ตรวจ source ซ้ำ:
+- `sb-api-gateway/AGENTS.md:29,35–37`: REST→gRPC, tenant จาก JWT, error ผ่าน middleware และ protected paths ต้อง Light (ผู้ทบทวน implementation ของ Gateway) review.
+- `sb-api-gateway/src/ApiGateway.Infrastructure/Extensions/InfrastructureServiceExtensions.cs:597–676`: metadata/deadline/circuit breaker/retry; default deadline 5s, receive limit 16MiB, มี insecure channel เมื่อ scheme เป็น http/dns. ไม่ใช่หลักฐาน TLS/config ที่ deploy.
+- `sb-api-gateway/src/ApiGateway.Infrastructure/Common/Grpc/GatewayCallMetadataInterceptor.cs:64–77,100–107`: ส่ง PostalCode/Sid/IsAdmin จาก principal และไม่ทับ metadata ที่มีอยู่แล้ว; Sid ไม่ใช่ canonical AccountId/ProfileId.
+- `sb-api-gateway/src/ApiGateway.Infrastructure/Common/Grpc/IdempotentRetryInterceptor.cs:28–30,51–75`: GET/HEAD retry Unavailable อีก 2 ครั้ง ระยะ 100/300ms ภายใน deadline เดิม.
+- `sb-api-gateway/src/ApiGateway.API/ControlPlane/ControlPlaneEnforcementMiddleware.cs:29–48,66–76`: revocation/maintenance ใช้ HTTP API Gateway envelope; maintenance 503 + Retry-After 300.
+- `sb-api-gateway/src/ApiGateway.API/Middleware/ExceptionHandlingMiddleware.cs:90–123,157–166`: อ่าน sb-error-bin แต่คืน HTTP API Gateway envelope; Unavailable→503, DeadlineExceeded/Cancelled→408; Development อาจส่ง exception.ToString ที่บรรทัด 100. จึงยังไม่ตรงเป้าหมาย 502/504 และ v2 envelope ของ SchoolBot gRPC service.
+- `school-bot/web/src/SchoolBot.Api/Program.cs:45–48,94–129`: ลงทะเบียน logout/store และ HTTP routes; ช่วงที่ตรวจยังไม่มี login/exchange/gRPC wiring. ไม่อ้าง inventory ทั้ง repo.
+- `school-bot/web/src/SchoolBot.Api/LogoutEndpoint.cs:9–33,38–45`: token ผิดรูปแบบ→204; storage failure→503 AUTH_UNAVAILABLE; unexpected→500 INTERNAL_ERROR.
+- `school-bot/web/src/SchoolBot.Application/LogoutService.cs:9–26`: ตรวจ opaque token 43 ตัว, hash แล้วเรียก store พร้อม cancellation. `SchoolBot.Infrastructure/Persistence/PostgresSessionLogoutStore.cs:19–30,32–72,74–82`: revoke+audit transaction เดียว; active session เท่านั้น; DB timeout 5s และ sanitize provider errors. ใช้ application/store เดิมได้โดยไม่ย้าย SQL ไป HTTP API Gateway.
 
-ส่ง absolute deadline/cancellation ถึง application/store; child deadline=min(class cap,parent remaining). HTTP API Gateway interceptor เดิมผูก RequestAborted เฉพาะเมื่อ caller ไม่มี token จึงต้อง linked cancellation เมื่อมี token อยู่แล้ว. ControlPlane override ห้ามขยายเกิน class cap นี้โดยเงียบ. Query retry ต้องตรวจทั้ง RPC class และ HTTP verb; domain AUTH_UNAVAILABLE ไม่ retry เพียงเพราะเป็น Unavailable. ไม่อ้าง rollback เมื่อ timeout หลัง commit.
+หลักฐานรับต่อ ไม่ใช่ผลตรวจ login source ซ้ำ: sys055 (memory: planning/routing-linkage-evidence-001.json), sys056 (memory: planning/routing-linkage-evidence-002.json). HTTP logout/4032 local tests ไม่พิสูจน์ Gateway/gRPC/DB integration.
 
-HTTP control body64KiB, large document body2MiB/project document1MiB, response2MiB ตาม rules. เสนอ protobuf send/receive cap4MiB ทั้ง sb-api-gateway/SchoolBot gRPC service และตรวจ DTO/JSON limits ซ้ำ; overhead/proof body ไม่เพิ่มเพดาน HTTP. จำกัด metadataรวม16KiBแยกจาก message; credential อยู่ใน DTO สำหรับ exchange. ก่อนเปิดใช้ต้องตรวจขนาด worst-case serialized protobuf/JSON; ไม่สืบทอด16MiBของ HTTP API Gateway เป็นสิทธิ์เพิ่ม payload. Request oversized→413; responseเกินหรือเสีย→502; ไม่ใช้ compression ข้าม limit.
+ข้อนี้เป็นข้อยกเว้นต่อ sb-api-gateway/AGENTS.md:35 ที่ยังไม่ได้รับรอง ไม่ใช่การประกาศว่ากฎทั้งสอง reconcile แล้ว. ก่อนรับรอง ให้ service-route ยังไม่เปิดใช้งาน. AllowAnonymous อย่างเดียวไม่เพียงพอ เพราะ authentication middleware อาจอ่าน Bearer แล้ว.
 
-Private web-principal ยังคง `GET /api/school-bot/auth/web-principal` ที่ HTTP API Gateway ตาม DES-012 §2 ไม่ใช่ RPC ของ SchoolBot gRPC service และไม่เพิ่ม public alias. Request มี service-peer authentication แยกจาก legacy credential; scheme JabjaiWebLegacy เท่านั้น, reject purpose/aud legacy-handoff. Response200 `{school_id:int32,user_id:int32|null,admin_id:string≤64|null,is_admin:bool,user_type:string≤16|null,expires_at:UTC|null}`; exp=null เฉพาะนโยบายเว็บเดิม. invalid credential401, mappingไม่พร้อม503 AUTH_NOT_CONFIGURED, dependencyล้มเหลว503 AUTH_UNAVAILABLE; SchoolBot gRPC service normalize โดยไม่ parse message.
+หลักฐาน sb-api-gateway/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:38–58; SchoolBotLogoutRegistration.cs:120–133; SchoolBotLogoutService.cs:40–173,185–223. Client ของ logout ใช้ CreateChannel/CreateGeneratedClient ตาม SchoolBotSessionGrpcClient.cs:17–102; คำว่า named gRPC client ใน review packet ไม่ใช่ข้ออ้างว่า logout ใช้ global client registration.
 
-Private route/listener ต้องรับเฉพาะ SchoolBot gRPC service workload และ public ingress/BFF ต้องเข้าไม่ถึง แม้ชื่อ path ถูกต้อง; SchoolBot gRPC service upstream ห้ามชี้กลับ Q. HTTP API Gateway private lookup ห้ามเรียก SchoolBot gRPC service exchange วนกลับ. ตำแหน่ง listener/network/TLS/identity และ rate limits **รอ H5**; no-store และไม่ log credential ทุก hop.
+หลักฐาน local logout ภายหลังอ้าง JPO092 (memory: planning/jpo-092-logout-r4-001.md). DTO/field numbers, error pairs, metadata/trailer limits, deadline/retry และ transport คงเดิม ไม่เลือก global mapper หรือ middleware entry เพราะ[มติ 050 (ใช้ controller convention ของ Gateway)](../requirement/decisions-050.md) กำหนด controller และ service ทำ mapping อยู่แล้ว.
+
+รหัสอ้างอิงที่ปรากฏในบันทึกเดิม: BL-005.

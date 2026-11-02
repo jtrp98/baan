@@ -1,16 +1,12 @@
-# Gateway logout — local gRPC slice — Replies/errors
+# Gateway logout — local gRPC สำหรับ dev/in-process — Replies, acceptance และหลักฐาน
 
 > Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ส่วนต่อของ [Gateway logout — local gRPC slice](gateway-logout-slice-001.md) ส่วนนี้อธิบายReplies/errors อ่านต่อเนื่องตามลำดับในไฟล์ทางเข้า.
+ส่วนต่อของ [Gateway logout — local gRPC สำหรับ dev/in-process](gateway-logout-slice-001.md) อธิบาย Replies, acceptance และหลักฐาน.
 
-- SchoolBot gRPC service order: verified service peer → metadata/Origin → token canonical validation → source/work limiter → LogoutService → existing store. ITrustedGatewayPeerVerifier reads transport context; production default denies all. No trust from x-caller/header/DTO, no TrustAll/IsDevelopment/test-header bypass. Fake verifier only in test assembly
-- HTTP API Gateway must verify SchoolBot gRPC service transport identity before trusting domain trailers. No route registration in production and no outbound call if configuration/trust adapter absent
-- One Authorization Bearer of exact baseline format supplies token; missing/duplicate/malformed/JWT becomes absent. No trim-to-repair and no token from body. Body≤64KiB, body identity ignored
-- Fresh metadata allowlist: nonempty UUID-D x-request-id, x-caller=api-gateway; optional validated traceparent/x-lang/origin. No Cookie/Jabjai credential/tenant/user/admin assertions/XFF or repeated authorization. Strip spoofed single identity headers; duplicate authority headers reject without RPC. SchoolBot gRPC service validates metadata again
-- Origin present with no configured allowlist denies; no CORS headers. Fake synthetic allowlist belongs harness
-- No License/ETag/If-Match/Idempotency precondition, JWT fallback, direct HTTP SchoolBot gRPC service fallback or mutation retry
-- Keep local source limiter30/60seconds and concurrency8/queue0; peer captured before forwarded headers. Distributed source propagation remains H5, no new trusted source metadata invented
+## เอกสารอ้างอิง
+
+[BL-005 (ข้อ 2: ผูกเอกสาร logout กับ controller as-built)](gateway-controller-entry-001.md)
 
 ## Replies/errors
 
@@ -44,8 +40,12 @@ HTTP API Gateway transport/protocol/invalid reply→502; outer deadline→504; d
 
 ## Remaining live prerequisites
 
-Light implementation review; H5 listener/TLS/peer/private ingress/source-rate-limit/Origin/BFF-CSRF; real DB atomicity/schema parity; distributed limiter/maintenance/circuit/fullpipeline log redaction/reachability and real Gateway↔SchoolBot gRPC service evidence. Packet is not their closure. signer/custody stays deferred047
+Light (ผู้ทบทวน implementation ของ Gateway) implementation review; H5 (เงื่อนไข listener/TLS/peer/private ingress และ trust ระหว่างระบบ) listener/TLS/peer/private ingress/source-rate-limit/Origin/Backend for Frontend (BFF)-CSRF; real DB atomicity/schema parity; distributed limiter/maintenance/circuit/fullpipeline log redaction/reachability and real Gateway↔SchoolBot gRPC service evidence. Packet is not their closure. signer/custody stays พักตาม [มติ 047 (พักคำถาม signing custody)](../requirement/decisions-047.md)
 
 ## หลักฐาน
 
 เอกสารนี้เรียบเรียงหลักฐานที่บันทึกไว้เดิม ไม่ได้ตรวจ source/runtime ซ้ำ.
+
+หลักฐาน sb-api-gateway/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58; SchoolBotLogoutRegistration.cs:97–163; SchoolBotSessionGrpcClient.cs:17–102. ข้อความ “สถานะเริ่มต้นก่อนตรวจเป็นยังไม่ได้รัน ผลภายหลังอยู่ในหลักฐาน integration” เป็นประวัติเริ่มต้นของ packet; ผลตรวจภายหลังอ้าง JPO092 (memory: planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md).
+
+รหัสอ้างอิงที่ปรากฏในบันทึกเดิม: BL-005.

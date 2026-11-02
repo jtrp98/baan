@@ -6,21 +6,10 @@
 
 ชนิดข้อมูลที่ใช้: `A` = actor string ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [มติ 024 (เกณฑ์เลื่อน Level และ policy Quiz/Test)](../requirement/decisions-024.md)
-- [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../requirement/decisions-025.md)
-- [มติ 026 (อนุมัติ amendment-proposal-001/002 เป็น baseline ใหม่)](../requirement/decisions-026.md)
-- [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
-- [มติ 023 (writer คะแนน, ปัดเศษ, นำเข้า Sheet และเจ้าของ mapping)](../requirement/decisions-023.md)
-- [[BR-050-05 (ปัดแบบ half-up — x.5 ขึ้นไปปัดขึ้น ต่ำกว่าปัดลง (7.5 → 8, 7.4 → 7) ตาม [decisions-023])](../requirement/req-050.md) (ปัดแบบ half-up — x.5 ขึ้นไปปัดขึ้น ต่ำกว่าปัดลง (7.5 → 8, 7.4 → 7) ตาม [decisions-023])](../requirement/req-050.md)
-- [DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](des-011.md)
-- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md)
-
 ## สูตรคะแนนช่องและการป้องกัน LearnerId ชนกัน
 
 ทุก source มี earned/max จาก authoritative assessment/attempt และ policy revision ที่แน่นอน; max > 0, 0 <= earned <= max
-quiz ใช้คะแนนสูงสุดของ attempt ที่ submit แล้วตามค่าเริ่ม (decisions-024)
+quiz ใช้คะแนนสูงสุดของ attempt ที่ submit แล้วตามค่าเริ่ม ([มติ 024 (เกณฑ์เลื่อน Level และ policy Quiz/Test)](../requirement/decisions-024.md))
 ผลการสอบซ่อม Test ใช้คะแนนสูงสุดระหว่างครั้งจริงกับครั้งซ่อม ไม่มีเพดาน (ยืนยันตาม [decisions-025](../requirement/decisions-025.md) และ [decisions-026](../requirement/decisions-026.md))
 
 **การป้องกัน `LearnerId` ของครูชนกับนักเรียน (`sEmp == sId`)**:
@@ -31,9 +20,9 @@ normalized = earned/max ของ source เดียว
 raw_target = earned/max × target_max
 integer_target = floor(raw_target + 0.5)
 
-คำนวณด้วย decimal ไม่ใช่ binary float ปัด half-up ตามมติ decisions-023 / BR-050-05: x.5 ขึ้นไปปัดขึ้น ต่ำกว่า x.5 ปัดลง (7.5 → 8, 7.4 → 7) ปัดครั้งเดียวต่อช่องจาก source เดียวตาม decisions-032 และ [มติ 033 (ช่องคะแนนเดิม การแปลงคะแนนเต็ม และผลประเมินที่ยังไม่มี)](../requirement/decisions-033.md); ทุกช่องคำนวณจาก earned/max เดิม ไม่ใช้ผลปัดของอีกช่อง
+คำนวณด้วย decimal ไม่ใช่ binary float ปัด half-up ตามมติ [มติ 023 (writer คะแนน, ปัดเศษ, นำเข้า Sheet และเจ้าของ mapping)](../requirement/decisions-023.md) / [BR-050-05 (ปัดแบบ half-up — x.5 ขึ้นไปปัดขึ้น ต่ำกว่าปัดลง (7.5 → 8, 7.4 → 7) ตาม decisions-023)](../requirement/req-050.md): x.5 ขึ้นไปปัดขึ้น ต่ำกว่า x.5 ปัดลง (7.5 → 8, 7.4 → 7) ปัดครั้งเดียวต่อช่องจาก source เดียวตาม decisions-032 และ [มติ 033 (ช่องคะแนนเดิม การแปลงคะแนนเต็ม และผลประเมินที่ยังไม่มี)](../requirement/decisions-033.md); ทุกช่องคำนวณจาก earned/max เดิม ไม่ใช้ผลปัดของอีกช่อง
 
-หาก integer_target เกิน target_max ให้ปฏิเสธ ไม่ clamp ไม่เปลี่ยนคะแนนเต็มปลายทางเอง missing/ungraded/error ไม่กลายเป็นศูนย์ (ต่างจาก DES-011 ที่นับ 0 เฉพาะการเลื่อน Level) quiz ที่ policy ไม่นับคะแนนส่งออกไม่ได้
+หาก integer_target เกิน target_max ให้ปฏิเสธ ไม่ clamp ไม่เปลี่ยนคะแนนเต็มปลายทางเอง missing/ungraded/error ไม่กลายเป็นศูนย์ (ต่างจาก [DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](des-011.md) ที่นับ 0 เฉพาะการเลื่อน Level) quiz ที่ policy ไม่นับคะแนนส่งออกไม่ได้
 
 ## Snapshot และการยืนยัน
 

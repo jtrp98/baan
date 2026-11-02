@@ -2,20 +2,34 @@
 
 > Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-| Key / การใช้ | ผู้ถือ / ที่เก็บ | ใครสั่งใช้ได้ | Rotation / revoke | Backup / หลักฐานที่ขาด |
-|---|---|---|---|---|
-| Entitlement ES256 | เจ้าของ infra/release ยังไม่ระบุ; เสนอ KMS sign-only หรือ signer แยก process/identity ห้ามไฟล์ key บน API host | SchoolBot gRPC service identity ที่อนุญาต; signer ตรวจ typ/aud/kid/license expiry และ exp≤min(now+259200,license_expires_at) เอง | root-signed keyset มี version/expiry; revoke kid แล้ว online recovery; เก็บ verifier เก่าจน lease สุดท้ายหมด | ชื่อผู้ถือ/service/store, policy, restore access ยังไม่ทราบ; audit ทุก sign และ test exp>3วัน/revoke kid ต้องมี |
-| Release manifest ES256 | owner ยังไม่ระบุ; signer นอก API host | ตรวจ immutable CI registry ด้วยตนเองตาม DES-007 ก่อน sign; release_publisher ไม่มีสิทธิ์เขียน registry | root-signed rotation; withdraw registry entry/release ไม่อนุญาต sign/install ใหม่ | แยกจาก entitlement; ต้องมี access audit, recovery/backup owner, การ revoke หลัง incident |
-| Windows Authenticode | ผู้ถือ OS cert ยังไม่ระบุ; protected CI/token ที่องค์กรเลือก | pipeline identity ที่มีสิทธิ์ sign artifact หลังตรวจ build | host pin subject+thumbprint; เปลี่ยน pin ผ่าน trusted rollout ก่อน cert เก่าหมดอายุ/ถอน | ต้องเติม subject/thumbprint สาธารณะและ owner; เก็บ recovery material เข้ารหัสตามวิธีที่เจ้าของรับรอง |
-| Apple Developer ID Application/Installer | ผู้ถือ account/cert ยังไม่ระบุ; protected CI/token | pipeline sign/notarize app/engines/PKG | host pin Apple Team ID; ตรวจ Developer ID/notarization ไม่รับ Team ID จาก manifest | ต้องเติม Team ID, ผู้ดูแล account/notarization และ restore/revoke procedure; ไม่มี secret ใน proof pack |
-| Public trust-root/keyset signing | ผู้ถือ root ยังไม่ระบุ; เสนอแยกสิทธิ์จาก online signer | เฉพาะผู้ดูแล rotation ที่ระบุจริง | version/expiry/revoked kid; client ไม่เชื่อ key จาก URL ใน token | ต้องระบุ custodian/backup/กู้กรณี root สูญหาย; offline root/HSM/dual control เป็นทางเลือกไม่ใช่มติใหม่ |
-| Idempotency envelope สำหรับ create-license | owner ยังไม่ระบุ; encryption service/KMS นอก DB และ API host | เฉพาะ operation/Principal เดิมที่ผ่าน authz และยังไม่ถึง ReplayUntil | rotation ตาม ResultKeyId; หลัง TTL ทำให้ ciphertext เก่าถอดไม่ได้พร้อมล้าง ResultCipher/ResultKeyId | ต้องพิสูจน์ backup residual ไม่เกิน TTL; key ที่ใช้ร่วมระยะยาวไม่พอ ต้องมี expiry ของ material ต่อช่วง/ผลตอบและห้าม restore material ที่หมดอายุ |
-| Device P-256 / License key | OS credential store ของเครื่อง; ไม่ใช่ server signing key | Desktop host เท่านั้น; renderer ไม่ได้รับ private key | unbind/epoch/revoke ตาม DES-002 | shared OS user/cloned VM/rollback เป็นข้อจำกัดเดิม; วิธี custody ที่องค์กรใช้ยังต้องยืนยัน |
-| Content bundle key (conditional) | ยังไม่มีผู้ถือ/ที่เก็บที่ยืนยัน | ใช้เมื่อเลือก implement signed published bundle ใน DES-005 เท่านั้น | แยก key/rotation จากสอง signer หลัก | ไม่สร้าง key เพียงเพราะมีแถวนี้; รอ scoped contract เดิม |
+## ส่วนต่อของสัญญา
 
-## วิธีอ่าน
+- [Matrix การถือและใช้ key](signing-custody-001-matrix.md)
 
-อ่านส่วนต่อด้านล่างตามลำดับ สัญญาและหลักฐานคง Rev เดียวกัน ทุกตารางและเงื่อนไขเดิมอยู่ในส่วนต่อ.
+## เอกสารอ้างอิง
 
-1. [รายละเอียดสัญญา](signing-custody-001-contract.md)
-2. [หลักฐาน](signing-custody-001-validation.md)
+[SEC001-006 (ผู้ถือและสิทธิ์ใช้ signing keys)](signing-custody-001.md) · [SEC001-003 (ความเชื่อถือ signer และ artifact registry)](release-trust-001.md) · [SEC001-009 (อายุข้อมูลลับที่เก็บเพื่อ replay License key)](license-admin-security-001.md) · [DES-002 (License และ device binding)](des-002.md) · [DES-007 (Release และ trusted update)](des-007.md)
+
+## เงื่อนไข custody
+
+ทุกแถวต้องเติม **ผู้รับผิดชอบจริง, store/service identifier, identities ที่ sign/decrypt ได้, ผู้ rotate/revoke, รอบ/trigger, ผู้เข้าถึง backup และ evidence_ref** ก่อนใช้เป็นหลักฐาน custody. ไม่กำหนดชื่อบุคคลแทนเจ้าของ. ไม่มีหลักฐาน runtime ว่า KMS/CI/token/backup isolation นี้มีแล้ว
+
+SEC001-003 เลือก registry-gated signer เพื่อคง server-assigned release_id; ทาง manifest ลงนามใน CI ทั้งก้อนต้องปรับ API flow จึงไม่เลือกในรอบนี้. Release publisher รายบุคคล+audit ไม่ทดแทน OS publisher pin. CI required reviewer/four-eyes หรือ hardware token มีผลเรื่องผู้ควบคุม signing; เจ้าของ release/infra ต้องระบุของที่มีและผู้มีอำนาจตัดสิน residual ตามเงื่อนไข jpo ไม่ขยาย H6/รับความเสี่ยงเอง
+
+Time to Live (TTL หรืออายุข้อมูล) create-license 15 นาที (ผู้ใช้อนุมัติตาม [มติ 046 (Gateway dev และ replay License 15 นาที)](../requirement/decisions-046.md)) ไม่ใช่การพิสูจน์ว่า backup ถูกทำลายแล้ว. ถ้า infrastructure ยังบังคับ ciphertext expiry ไม่ได้ให้บันทึก evidence gap ไว้ใน SEC001-009 ห้ามอ้างว่าการ purge live DB อย่างเดียวปิด finding; ไม่เปลี่ยน replay เป็น key:null โดยไม่มี human gate ของ breaking contract
+
+Proof ที่ต้องแนบ: key inventory เฉพาะ metadata, sign/decrypt policy, negative tests (caller ผิด/exp เกิน/registry ไม่ตรง/publisher อื่น), access audit ที่ตรวจข้อมูลก่อนนำเข้า knowledge ตาม [export proof pack](export-proof-pack-001.md), rotation+revoke rehearsal และ backup/restore-expiry test. เติมเกณฑ์ตาม mitigation เดิมดังนี้:
+
+ทุกผลตรวจผูก environment, expected/actual และ evidence_ref; เจ้าของรับรองข้อเท็จจริงตามหน้าที่เดิม. งานนี้ไม่มีการสร้าง key/sign artifact หรือ re-audit
+
+
+## หลักฐาน
+
+เอกสารนี้เรียบเรียงหลักฐานที่บันทึกไว้เดิม ไม่ได้ตรวจ source/runtime ซ้ำ.
+
+ร่าง SEC001-006/SEC001-003/SEC001-009; อ่าน [DES-002](des-002.md), [DES-007](des-007.md), mitigation ล่าสุด (memory: planning/security-mitigation-001.md). สถานะที่ [index](index.md); ตารางไม่บรรจุ key/certificate ส่วน private
+
+- **Entitlement signer rate limit:** ระบุ policy/config, caller/identity, limit/window และจุดบังคับจริง พร้อมผลทดสอบต่ำกว่า/เกิน limit/กลับมาใช้ได้ตาม policy และ audit ว่าคำขอที่ถูกจำกัดไม่เกิด sign; ไม่กำหนดตัวเลขใหม่. ข้อเท็จจริง as-built: `C:/src/schoolbright/target/school-bot/web/src/SchoolBot.Api/Program.cs:49–62,101–105` มี rate limit ของ HTTP license endpoints ยังไม่พิสูจน์ rate limit ที่ entitlement signer
+- **ไม่พบ private key:** แนบผลสแกน repo/payload/CI/log แยกครบสี่พื้นที่ ระบุ source revision, artifact/run, เครื่องมือ/version/rules, ขอบเขต/ข้อยกเว้น และเวลาตรวจ. ห้ามแนบค่า key/snippet; ส่วนที่ไม่ได้สแกนเป็น evidence gap ไม่ใช่ผลว่าไม่พบ และสรุปเฉพาะขอบเขตที่ตรวจจริง
+- **สิทธิ์ custody จริง:** เทียบบุคคล/service identity ที่เขียน registry กับผู้ publish, ผู้สั่ง sign/ผู้ลงนาม และผู้เข้าถึง recovery material รวม restore/decrypt/สิทธิ์ผ่านกลุ่มหรือ role. แนบ access policy/audit และ negative test ว่า publisher/API เขียน registry เองไม่ได้; ระบุสิทธิ์ซ้อน/ข้อจำกัดให้เจ้าของ release/infra และ jpo ตรวจตาม gate เดิม ไม่สรุปการแยกสิทธิ์จากชื่อตำแหน่ง และไม่เพิ่ม four-eyes
+

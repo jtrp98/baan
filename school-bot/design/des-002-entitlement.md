@@ -6,10 +6,6 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `S` = SchoolId; `U` = UUID; `N` = integer ≥1 ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [มติ 046 (Gateway dev และระยะเวลา replay ของ License)](../requirement/decisions-046.md)
-
 ## การบันทึกเป็นหน่วยเดียวและการลองซ้ำ
 
 Transaction ล็อก License และตรวจ key hash, expiry, revoke, current binding, idempotency แล้วจึงเปลี่ยน binding/ออกสิทธิ์/เขียน audit/result พร้อมกัน Signer หรือ commit ล้มเหลวไม่ส่งผลสำเร็จ
@@ -20,7 +16,7 @@ Transaction ล็อก License และตรวจ key hash, expiry, revoke,
 - Unbind เพิ่ม BindingEpoch, detach เครื่องเก่า และเปิดให้เครื่องใหม่ activate ทันที ไม่รอ 3 วัน
 - Fingerprint ที่เคย detached ห้าม activate กลับเอง แม้ช่วงยังไม่มีเครื่องใหม่; ผู้ดูแลระบุ `next_device_jkt` จึงอนุญาตตัวนั้นได้ หากระบุแล้วรับเฉพาะตัวนั้นจน activate
 - Retry เดิมคืนผลเดิมและ expiry เดิม ไม่ถือเป็น online check ใหม่; ตรวจ authorization/current binding ก่อน replay entitlement เสมอ
-- Create key replay ตาม [license admin security](license-admin-security-001.md): TTL 15 นาที (ผู้ใช้อนุมัติตาม decisions-046), ตรวจ ReplayUntil ตอนอ่านและล้าง ResultCipher/ResultKeyId เมื่อหมดอายุ; คง tombstone และไม่ลบหลังอ่านครั้งแรก
+- Create key replay ตาม [license admin security](license-admin-security-001.md): TTL 15 นาที (ผู้ใช้อนุมัติตาม [มติ 046 (Gateway dev และระยะเวลา replay ของ License)](../requirement/decisions-046.md)), ตรวจ ReplayUntil ตอนอ่านและล้าง ResultCipher/ResultKeyId เมื่อหมดอายุ; คง tombstone และไม่ลบหลังอ่านครั้งแรก
 - Timeout/5xx retry key เดิม; 429 รอ Retry-After; 4xx ไม่ retry อัตโนมัติ; idempotency payload ต่าง → 409
 
 ## Signed entitlement

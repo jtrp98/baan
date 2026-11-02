@@ -6,12 +6,6 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `U` = UUID; `H` = SHA-256 hex 64 ตัว; `P` = profile ที่ระบุโรงเรียน kind และ id ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [REQ-041 (เลือกนำเข้าโครงงาน Guest)](../requirement/req-041.md)
-- [OQ-007 (หน่วยของโครงงานและการใช้เครื่องร่วมกัน)](../open-questions/oq-007.md)
-- [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
-
 ## สถานะ การแก้ข้อมูลชน และการกู้คืน
 
 `clean → dirty → saving → clean|conflict|save_failed`
@@ -36,7 +30,7 @@ Cloud create/copy retry ต้องใช้ Idempotency-Key:U และ payloa
 
 Legacy Code คงจุดโหลด UI ที่นับ UTF-16 code units ≤16384 และขนาดไฟล์รวม ≤1 MiB; ไม่เพิ่มเงื่อนไข source UTF-8 bytes ที่โหลด/บันทึกแทน REQ. เพดาน source 16384 bytes ตรวจตอนรันใน engine; source หลายไบต์อาจโหลดได้แต่รันถูกปฏิเสธ ต้องแสดงข้อผิดพลาดโดยไม่ทิ้งต้นฉบับ. Blockly adapter แปลงเฉพาะสาม block types ที่อ่านพบ; unsupported content คืน MIGRATION_UNSUPPORTED ไม่ทิ้งเงียบ
 
-Guest→Login ใช้ explicit selection+copy เป็น Cloud ID ใหม่หลังแสดงบัญชี/โรงเรียนปลายทางตาม REQ-041; Guest policy ยืนยันแล้ว ไม่รอ OQ-007 ซ้ำ. การเลือกประวัติเป็นอีก operation ตาม [guest-history-001.md](guest-history-001.md); ครูนำเข้า Project ได้ แต่ห้ามสร้าง Submission/Attempt Cloud ตาม decisions-032
+Guest→Login ใช้ explicit selection+copy เป็น Cloud ID ใหม่หลังแสดงบัญชี/โรงเรียนปลายทางตาม [REQ-041 (เลือกนำเข้าโครงงาน Guest)](../requirement/req-041.md); Guest policy ยืนยันแล้ว ไม่รอ [OQ-007 (หน่วยของโครงงานและการใช้เครื่องร่วมกัน)](../open-questions/oq-007.md) ซ้ำ. การเลือกประวัติเป็นอีก operation ตาม [guest-history-001.md](guest-history-001.md); ครูนำเข้า Project ได้ แต่ห้ามสร้าง Submission/Attempt Cloud ตาม [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
 
 Import ไม่ส่ง Cloud project_id; Host เก็บ receipt ก่อนส่งและเติม cloud K หลัง durable response. รูปแบบ, identity, การกู้หลัง restart/คำตอบหาย และ server tombstone ตาม [guest-import-001.md](guest-import-001.md); ไม่เพิ่ม ClientId column
 

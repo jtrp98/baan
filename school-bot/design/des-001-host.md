@@ -4,14 +4,9 @@
 
 ส่วนต่อของ [DES-001 — Desktop host และ IPC](des-001.md)
 
-## อ้างอิง
-
-- [DES-002 (License และ device binding)](des-002.md)
-- [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md)
-
 ## ผู้ใช้และเงื่อนไขก่อนเริ่ม
 
-Guest/Login เปิด Lab/Lessons, run, save, navigate หรือ close; host ต้องตรวจ entitlement ตาม DES-002 ก่อนเริ่มงานหลัก ไม่เชื่อสถานะ unlocked จาก React
+Guest/Login เปิด Lab/Lessons, run, save, navigate หรือ close; host ต้องตรวจ entitlement ตาม [DES-002 (License และ device binding)](des-002.md) ก่อนเริ่มงานหลัก ไม่เชื่อสถานะ unlocked จาก React
 
 ## ข้อเสนอ bridge และการเลือก engine
 
@@ -39,7 +34,7 @@ Host preflight errors อยู่นอก engine envelope: `LICENSE_REQUIRED`,
 - ตรวจ gate ตอนเข้าหน้า ก่อน dispatch และเมื่อครบ expiry; timer เก่าไม่สร้างคำสั่งใหม่หลังสิทธิ์หมด
 - สิทธิ์หมดระหว่างหุ่นทำงาน: ปิด admission → invalidate generation → cancel/drain → stop เป้าหมายเดิม
 - `CancelRun`, Stop, close guards, credential recovery และการเก็บ recovery snapshot ของงานที่เปิดอยู่ยังใช้ได้ขณะ locked; ไม่เปิดโหมดหรือเริ่มงานใหม่
-- Recovery snapshot ไม่ถือเป็น Cloud save สำเร็จ; policy เก็บข้าม session ตาม DES-003
+- Recovery snapshot ไม่ถือเป็น Cloud save สำเร็จ; policy เก็บข้าม session ตาม [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md)
 - ตั้ง stopping ที่ host ก่อน cancel เพื่อกันคำสั่งอื่นแทรกระหว่าง drain/stop; concurrent stop ใช้ operation เดียว
 - Navigate/close รอ guard; save-then-leave รอ persistence สำเร็จ Error คงหน้าต่างและแสดงเหตุผล
 - UI generation, session epoch และ project ID ต้องตรงก่อน callback แก้ state; cleanup ยกเลิก subscriptions/timers

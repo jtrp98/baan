@@ -4,17 +4,11 @@
 
 ส่วนต่อของ [DES-005 — หลักสูตร ภารกิจ และผลประเมิน](des-005.md)
 
-## อ้างอิง
-
-- [REQ-040 (พื้นที่ร่วมและถังขยะ Guest)](../requirement/req-040.md)
-- [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
-- [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](des-004.md)
-
 ## การใช้ออฟไลน์ Guest และข้อผิดพลาด
 
 เสนอ signed published content bundle สำหรับ local lessons; local Code/Block result ระบุ `authority:"local"` ไม่เป็น Cloud assessment จน server ตรวจ snapshot ใหม่
 
-การนำเข้าโครงงานและตรวจผลใหม่ของ Guest ใช้ REQ-040, [REQ-041 (เลือกนำเข้าโครงงาน Guest)](../requirement/req-041.md), [REQ-042 (ประวัติเรียน Guest และตรวจผลใหม่)](../requirement/req-042.md): [workspace/trash/export](guest-workspace-001.md), [Project import/receipt](guest-import-001.md), [local history/recheck/provenance](guest-history-001.md). Login/import Project ไม่สร้างผลเรียน; history recheck ใช้ snapshot ที่เลือก, idempotency และผล server/ครูใหม่ ไม่รับ local score. SubmissionView มี origin ที่ derive จาก audit ตาม guest-history; ไม่เพิ่มคอลัมน์. Employee ห้ามส่งงานรวม Guest history ตาม decisions-032
+การนำเข้าโครงงานและตรวจผลใหม่ของ Guest ใช้ [REQ-040 (พื้นที่ร่วมและถังขยะ Guest)](../requirement/req-040.md), [REQ-041 (เลือกนำเข้าโครงงาน Guest)](../requirement/req-041.md), [REQ-042 (ประวัติเรียน Guest และตรวจผลใหม่)](../requirement/req-042.md): [workspace/trash/export](guest-workspace-001.md), [Project import/receipt](guest-import-001.md), [local history/recheck/provenance](guest-history-001.md). Login/import Project ไม่สร้างผลเรียน; history recheck ใช้ snapshot ที่เลือก, idempotency และผล server/ครูใหม่ ไม่รับ local score. SubmissionView มี origin ที่ derive จาก audit ตาม guest-history; ไม่เพิ่มคอลัมน์. Employee ห้ามส่งงานรวม Guest history ตาม [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
 
 ครูอ่าน/ตรวจ Arm ใช้ authority ตารางเดียวใน [DES-004 §Authority](des-004-permissions.md#authority-เดียวของรายชื่อนักเรียนที่ได้รับมอบหมาย): course-teacher ∩ roster ∩ term บน School DB ตรวจ tenant ทุก join และ re-check ก่อน commit; ไม่สร้าง TeacherGrant หรือให้ครูทั้งโรงเรียนจากชื่อเมนู. Unknown roster/status/time resolver ต้อง fail closed ไม่ใช้ผล local มาทดแทน
 

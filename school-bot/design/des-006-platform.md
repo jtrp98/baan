@@ -6,15 +6,9 @@
 
 ชนิดข้อมูลที่ใช้: `D` = UTC instant; `H` = SHA-256 hex 64 ตัว; `Tn` = ข้อความยาวไม่เกิน n ตัวอักษร ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [DES-001 (Desktop host และ Inter-Process Communication (IPC))](des-001.md)
-- [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md)
-- [OQ-008 (ขอบเขตหุ่นและการยอมรับความปลอดภัย)](../open-questions/oq-008.md)
-
 ## ผู้ใช้และเงื่อนไขก่อนเริ่ม
 
-ผู้ใช้เลือกอุปกรณ์และ profile ที่ผู้ดูแลตรวจแล้ว สั่ง connect/move/read/play/upload/stop; ต้องมี License เว้น stop/recovery ตาม DES-001
+ผู้ใช้เลือกอุปกรณ์และ profile ที่ผู้ดูแลตรวจแล้ว สั่ง connect/move/read/play/upload/stop; ต้องมี License เว้น stop/recovery ตาม [DES-001 (Desktop host และ Inter-Process Communication (IPC))](des-001.md)
 
 ค้นพบไม่เท่ากับ connected; ต้อง probe จริงโดยไม่ส่ง movement ห้ามใช้ sample connection หรือเพียงยืนยัน checkbox แทน calibration
 
@@ -35,11 +29,11 @@ UI device shape คง `{transport:"hid"|"serial",path,name}` โดย path เ
 
 ## Profile และการรับรอง
 
-Profile `{name,servos:[{id,pwmMin,pwmMax}]}` มีหกตัว, ID 0–254 ไม่ซ้ำ, PWM 500–2500, endpoints ไม่เท่ากันและกลับทิศได้ UI ranges ตาม DES-003
+Profile `{name,servos:[{id,pwmMin,pwmMax}]}` มีหกตัว, ID 0–254 ไม่ซ้ำ, PWM 500–2500, endpoints ไม่เท่ากันและกลับทิศได้ UI ranges ตาม [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md)
 
 เสนอ local signed acceptance record:
 `{schema:1,profile_hash:H,model:T128,board_identity:T256,platform:Platform,approved_by:T200,approved_at:D,evidence_ref:T2048,valid_until:D}`
-ผู้รับผิดชอบจริงต้องยืนยันข้อมูลก่อนออก signature ผ่าน admin process ที่มี authority; ไม่มี agent สร้างผลรับรองเอง เกณฑ์/อายุ validity รอ OQ-008
+ผู้รับผิดชอบจริงต้องยืนยันข้อมูลก่อนออก signature ผ่าน admin process ที่มี authority; ไม่มี agent สร้างผลรับรองเอง เกณฑ์/อายุ validity รอ [OQ-008 (ขอบเขตหุ่นและการยอมรับความปลอดภัย)](../open-questions/oq-008.md)
 
 แก้ profile/เปลี่ยนอุปกรณ์ทำให้ confirmation เดิมใช้ไม่ได้ เปิด project ไม่ restore connection หรือ acceptance ให้หุ่นอื่น ไม่มี calibrated HOME/BOX/POSE0 จนมี record ที่ตรงกัน
 

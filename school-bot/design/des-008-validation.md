@@ -4,20 +4,14 @@
 
 ส่วนต่อของ [DES-008 — Mapping หลักสูตรกับช่องคะแนน SchoolBright](des-008.md)
 
-## อ้างอิง
-
-- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
-- [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)
-- [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
-
 ## การตรวจข้อมูล โรงเรียน และสิทธิ์
 
-ตรวจ school_admin หรือสิทธิ์ครูรายวิชาตาม DES-012 ทั้ง ณ request และ re-check ซ้ำก่อน commit ใน SchoolBot DB
+ตรวจ school_admin หรือสิทธิ์ครูรายวิชาตาม [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md) ทั้ง ณ request และ re-check ซ้ำก่อน commit ใน SchoolBot DB
 ครูอ่านได้เฉพาะวิชาที่ตนสอน ไม่รวมสิทธิ์ครูคนหนึ่งไปยังวิชาอื่น
 ชั้น application ต้องตรวจว่า `CourseRun`, `GradeSlot` และ `ScoreMapping` อยู่ `SchoolId` เดียวกับ session และ `GradeSlot.CourseRunId == ScoreMapping.CourseRunId`
 plan_course_id ของ GradeSlot ต้องอยู่ใน PlanCourseIds ของ CourseRun
 source ต้องเป็น published Activity ใน curriculum revision ของ run และ indicator ต้องถูกประกาศอยู่บน Activity นั้น
-source ต้องมีผลตัวเลขที่นิยามได้ ไม่แปลง passed เป็น 100 เอง; quiz ที่ ScoringPolicy ไม่นับคะแนนเป็น source ไม่ได้ (DES-010); ค่าหายไม่ถือเป็นศูนย์
+source ต้องมีผลตัวเลขที่นิยามได้ ไม่แปลง passed เป็น 100 เอง; quiz ที่ ScoringPolicy ไม่นับคะแนนเป็น source ไม่ได้ ([DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)); ค่าหายไม่ถือเป็นศูนย์
 mapping/slot ที่ confirm ส่งแล้ว immutable รวม soft-delete/retire; pending/partial และชุดใหม่ใช้ [กฎล็อกประวัติ](grade-rules-032-034.md); ก่อน confirm การแก้ที่อนุญาตทำให้ preview เก่าใช้ไม่ได้
 
 ## ข้อผิดพลาด
@@ -35,7 +29,7 @@ details ใช้รูปเดิมเท่านั้น; resource_id ช�
 
 ## ทางเลือกและการตรวจ
 
-เลือก explicit many-to-many และ GradeSlot ownership ใน SchoolBot DB; ปัดตก FK จากหลักสูตรกลางไป Pgtassessment, ปัดตกสร้างช่องอัตโนมัติจากชื่อ/เลขลำดับ, ปัดตกตั้ง quiz→คะแนนเก็บ/test→สอบเป็นกฎตายตัว, ปัดตกให้ครูรายวิชาแก้ mapping และปัดตกหลาย source ต่อช่องอย่างถาวรตาม decisions-032
+เลือก explicit many-to-many และ GradeSlot ownership ใน SchoolBot DB; ปัดตก FK จากหลักสูตรกลางไป Pgtassessment, ปัดตกสร้างช่องอัตโนมัติจากชื่อ/เลขลำดับ, ปัดตกตั้ง quiz→คะแนนเก็บ/test→สอบเป็นกฎตายตัว, ปัดตกให้ครูรายวิชาแก้ mapping และปัดตกหลาย source ต่อช่องอย่างถาวรตาม [มติ 032 (ผลทดลองของครูและ cardinality/การล็อก mapping คะแนน)](../requirement/decisions-032.md)
 พิสูจน์หนึ่งคาบส่งหลายวิชา, slot ซ้ำ, context ไม่ตรง, indicator ไม่อยู่ Activity, เปลี่ยน revision แล้วไม่ remap อัตโนมัติ, ครูพยายามสร้าง/แก้ mapping → 403 SCHOOL_ADMIN_REQUIRED, ครูอ่านวิชาที่ไม่ได้สอน → 403, admin โรงเรียนอื่น → 404/SCHOOL_MISMATCH, ส่งสอง source → 409 MAPPING_SOURCE_COUNT_INVALID, session channel desktop → 403, และไม่มี PGGradeDB mutation จากการบันทึก mapping
 
 อ่าน canonical [กฎคะแนน](grade-rules-032-034.md)

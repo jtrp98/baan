@@ -4,11 +4,6 @@
 
 ส่วนต่อของ [DES-006 — หุ่นจริง Windows/macOS](des-006.md)
 
-## อ้างอิง
-
-- [OQ-008 (ขอบเขตหุ่นและการยอมรับความปลอดภัย)](../open-questions/oq-008.md)
-- [AC-032-02 (บน macOS 15+ ทั้ง Intel และ Apple Silicon กับหุ่นรุ่นที่ผ่านการยืนยันแล้ว เชื่อมต่อและส่งคำสั่งควบคุมหุ่นผ่าน native transport ได้จริง โดยไม่ใช้ผลจำลองแทนการส่งคำสั่ง)](../requirement/req-032.md)
-
 ## คำสั่งและผลลัพธ์
 
 คง engine protocol 1.0; action payload เพิ่ม transport `hid/device` หรือ `serial/port/baud`; read_ms 1–1500
@@ -48,4 +43,4 @@ TRANSPORT_ERROR/DEVICE_TIMEOUT/ENGINE_TIMEOUT → lost/unknown delivery ไม�
 
 เลือกต่อ C++ platform adapter; ปัดตก rewrite engine, simulator-only Mac, skip CHECK_FW และ timer-confirmed stop
 
-Dry-run/fake bridge ตรวจ [AC-014 (เกณฑ์ตรวจรับเรื่องค้นหาและเชื่อมต่อหุ่น)](../requirement/req-014.md), [AC-015 (เกณฑ์ตรวจรับเรื่องโปรไฟล์หุ่นหกข้อต่อ)](../requirement/req-015.md), [AC-016 (เกณฑ์ตรวจรับเรื่องส่งท่าและปรับข้อต่อ)](../requirement/req-016.md), [AC-017 (เกณฑ์ตรวจรับเรื่องข้อมูลท่า ลำดับ และกลุ่ม)](../requirement/req-017.md), [AC-018 (เกณฑ์ตรวจรับเรื่องเล่นลำดับจากแอป)](../requirement/req-018.md), [AC-019 (เกณฑ์ตรวจรับเรื่องอัปโหลดท่าไปบอร์ด)](../requirement/req-019.md), [AC-020 (เกณฑ์ตรวจรับเรื่องเล่นชุดท่าบนบอร์ด)](../requirement/req-020.md), [AC-021 (เกณฑ์ตรวจรับเรื่องขอหยุดหุ่นและยกเลิกงานค้าง)](../requirement/req-021.md), [AC-022 (เกณฑ์ตรวจรับเรื่องอ่านค่าตำแหน่ง servo)](../requirement/req-022.md), [AC-023 (เกณฑ์ตรวจรับเรื่องปลดและล็อกแรงบิด)](../requirement/req-023.md), [AC-024 (เกณฑ์ตรวจรับเรื่องการเชื่อมต่อขาดและคำสั่งล้มเหลว)](../requirement/req-024.md) ได้เฉพาะ logic ต้องตรวจจริงบน Windows/Mac ทั้ง HID/Serial ที่ประกาศรองรับ: calibration, unplug/replug, partial download, stale serial reply, stop latency และ emergency-stop provisions รุ่น/เกณฑ์/ผู้รับรองรอ OQ-008 ห้ามส่งมอบ Mac simulator แทน AC-032-02
+Dry-run/fake bridge ตรวจ [AC-014 (เกณฑ์ตรวจรับเรื่องค้นหาและเชื่อมต่อหุ่น)](../requirement/req-014.md), [AC-015 (เกณฑ์ตรวจรับเรื่องโปรไฟล์หุ่นหกข้อต่อ)](../requirement/req-015.md), [AC-016 (เกณฑ์ตรวจรับเรื่องส่งท่าและปรับข้อต่อ)](../requirement/req-016.md), [AC-017 (เกณฑ์ตรวจรับเรื่องข้อมูลท่า ลำดับ และกลุ่ม)](../requirement/req-017.md), [AC-018 (เกณฑ์ตรวจรับเรื่องเล่นลำดับจากแอป)](../requirement/req-018.md), [AC-019 (เกณฑ์ตรวจรับเรื่องอัปโหลดท่าไปบอร์ด)](../requirement/req-019.md), [AC-020 (เกณฑ์ตรวจรับเรื่องเล่นชุดท่าบนบอร์ด)](../requirement/req-020.md), [AC-021 (เกณฑ์ตรวจรับเรื่องขอหยุดหุ่นและยกเลิกงานค้าง)](../requirement/req-021.md), [AC-022 (เกณฑ์ตรวจรับเรื่องอ่านค่าตำแหน่ง servo)](../requirement/req-022.md), [AC-023 (เกณฑ์ตรวจรับเรื่องปลดและล็อกแรงบิด)](../requirement/req-023.md), [AC-024 (เกณฑ์ตรวจรับเรื่องการเชื่อมต่อขาดและคำสั่งล้มเหลว)](../requirement/req-024.md) ได้เฉพาะ logic ต้องตรวจจริงบน Windows/Mac ทั้ง HID/Serial ที่ประกาศรองรับ: calibration, unplug/replug, partial download, stale serial reply, stop latency และ emergency-stop provisions รุ่น/เกณฑ์/ผู้รับรองรอ [OQ-008 (ขอบเขตหุ่นและการยอมรับความปลอดภัย)](../open-questions/oq-008.md) ห้ามส่งมอบ Mac simulator แทน [AC-032-02 (บน macOS 15+ ทั้ง Intel และ Apple Silicon กับหุ่นรุ่นที่ผ่านการยืนยันแล้ว เชื่อมต่อและส่งคำสั่งควบคุมหุ่นผ่าน native transport ได้จริง โดยไม่ใช้ผลจำลองแทนการส่งคำสั่ง)](../requirement/req-032.md)

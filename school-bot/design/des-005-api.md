@@ -6,10 +6,6 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `I` = signed int32 ของระบบเดิม; `U` = UUID; `N` = integer ≥1; `D` = UTC instant; `Tn` = ข้อความยาวไม่เกิน n ตัวอักษร; `P` = profile ที่ระบุโรงเรียน kind และ id; `A` = actor string ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../requirement/decisions-025.md)
-
 ## API `/v2`
 
 | Endpoint | ช่องทาง / สิทธิ์ | Input | Result |
@@ -27,7 +23,7 @@
 
 `LessonInput={lesson_key:U,ordinal:N,title:Text,objective:Text,instructions:Text,missions:MissionInput[],activities:ActivityInput[]}`
 `MissionInput={mission_key:U,ordinal:N,title:Text,instructions:Text,method:AssessmentMethod,criteria:{revision:N,rules:CriteriaRules,source_ref:T2048,approved_by:A?,approved_at:D?}}`
-ตอน publish server ตรวจสิทธิ์ `content_approver` และบังคับกฎ four-eyes (ผู้อนุมัติต้องไม่ใช่ผู้สร้าง/ผู้แก้ร่างของ revision นั้นตาม decisions-025) ไม่ยอมรับชื่อผู้อนุมัติที่ client อ้างเอง และบันทึก `approval_ref` ใน audit `Reason`
+ตอน publish server ตรวจสิทธิ์ `content_approver` และบังคับกฎ four-eyes (ผู้อนุมัติต้องไม่ใช่ผู้สร้าง/ผู้แก้ร่างของ revision นั้นตาม [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../requirement/decisions-025.md)) ไม่ยอมรับชื่อผู้อนุมัติที่ client อ้างเอง และบันทึก `approval_ref` ใน audit `Reason`
 
 `learner_id:I = student.SId`; `assessor_id:I? = employee.SEmp` ใช้ `SchoolId` ของ session/resource ประกอบ `P` ตาม data-model; `/learners/{id}` รับ `I` ภายใต้ school ที่ตรวจแล้ว; IDs ของ SchoolBot เป็น `K`
 

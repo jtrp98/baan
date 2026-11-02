@@ -6,16 +6,10 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `I` = signed int32 ของระบบเดิม; `B` = boolean; `D` = UTC instant; `H` = SHA-256 hex 64 ตัว; `Tn` = ข้อความยาวไม่เกิน n ตัวอักษร ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
-- [AC-052-02 (สิทธิ์/ล็อกเปลี่ยนหลัง preview แล้วการยืนยันเดิมเขียนคะแนนไม่ได้)](../requirement/req-052.md)
-- [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../requirement/decisions-029.md)
-
 ## HTTP
 
-ใช้ SchoolBot session channel `school_web` (DES-012)
-ผู้ preview/confirm/resolve = ครูรายวิชาของทุก plan_course ในชุดที่เลือก ตรวจจาก School DB ตาม DES-012 ณ create, re-check ณ confirm และ re-check ณ worker apply (AC-052-02) พร้อมตรวจ `SchoolBotLicense` active ใน SchoolBot DB
+ใช้ SchoolBot session channel `school_web` ([DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md))
+ผู้ preview/confirm/resolve = ครูรายวิชาของทุก plan_course ในชุดที่เลือก ตรวจจาก School DB ตาม DES-012 ณ create, re-check ณ confirm และ re-check ณ worker apply ([AC-052-02 (สิทธิ์/ล็อกเปลี่ยนหลัง preview แล้วการยืนยันเดิมเขียนคะแนนไม่ได้)](../requirement/req-052.md)) พร้อมตรวจ `SchoolBotLicense` active ใน SchoolBot DB
 school_admin ไม่ preview/confirm ได้ แต่อ่าน GET score-exports ของโรงเรียนได้ ทุก mutation ใช้ Idempotency-Key/X-Request-Id
 
 POST /v2/score-previews
@@ -63,7 +57,7 @@ GET /v2/score-exports/{id}
 GET /v2/score-exports/{id}/items (query: limit,cursor)
 200 {items:[{preview_item_id:K,learner_id:I,state:queued|applied|skipped|conflict|blocked|unknown,reason_code:T64|null,receipt_id:T32|null}],next_cursor}
 
-## การรักษาช่องครูและผลพิเศษ (บังคับในโค้ดตาม decisions-029)
+## การรักษาช่องครูและผลพิเศษ (บังคับในโค้ดตาม [มติ 029 (ไม่แตะ School DB / PGGradeDB ด้วย GRANT)](../requirement/decisions-029.md))
 
 เนื่องจากใช้บัญชี DB เดิมต่อ PGGradeDB โค้ด adapter ต้องบังคับอย่างเคร่งครัด:
 - ระบุช่องด้วยคู่ AssessmentId + ScoreIdentifier ภายใต้ grade context ต้องพบตรงกันหนึ่งรายการและตรงกับ `SchoolBotGradeSlot` ที่ active; duplicate/ambiguous ให้หยุด ห้ามเลือก array index จาก Ordinal

@@ -1,21 +1,12 @@
-# Gateway SchoolBot entry — controller + module-owned channel — ยังไม่ยืนยัน
+# Gateway SchoolBot entry — controller + module-owned channel — หลักฐานและข้อที่ยังไม่ยืนยัน
 
 > Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ส่วนต่อของ [Gateway SchoolBot entry — controller + module-owned channel](gateway-controller-entry-001.md) ส่วนนี้อธิบายยังไม่ยืนยัน อ่านต่อเนื่องตามลำดับในไฟล์ทางเข้า.
+ส่วนต่อของ [Gateway SchoolBot entry — controller + module-owned channel](gateway-controller-entry-001.md) อธิบายหลักฐานและข้อที่ยังไม่ยืนยัน.
 
 ## เอกสารอ้างอิง
 
 [SEC001-016 (ความปลอดภัยของ local logout และ log redaction)](gateway-controller-entry-001.md) · [BL-005 (ข้อ 2: ผูกเอกสาร logout กับ controller as-built)](gateway-controller-entry-001.md)
-
-ตารางเทียบ assertion ระหว่าง entry เดิมกับ controller โดยผู้ตรวจอิสระเป็นผู้ประเมินการยอมรับ:
-
-| assertion | เดิม | ตามแบบใหม่ |
-|---|---|---|
-| shared-channel-factory-not-mutated | channel ดิบเข้า constructor แล้วต้องไม่ถูก mutate | channel สร้างผ่าน CreateChannel; constructor ไม่ mutate · channel ดิบถูก reject ใน construction-* |
-| bound-arbitrary/scope/event3/marker-scope ×3 levels | log ผ่าน `Bound(ch)` | `Bound(ch)` ต้องเป็น sanitizing factory และกรองทุกระดับ |
-| construction-standard/warm (+logs-) | ดิบผ่านได้ถ้า LogsClean หรือ rejected | ทุก shape ที่ไม่ผ่าน factory = rejected RPC0 (นิพจน์เดิมรองรับ) |
-| middleware-unsafe-generated-fallback-failclosed | middleware ไม่ fallback | controller/service ไม่ fallback ไป generated client ดิบ → 503 RPC0 (ชื่อคงเดิม) |
 
 ## ยังไม่ยืนยัน
 
@@ -35,6 +26,8 @@
 - `RouteConventionTests` บังคับเฉพาะ namespace `ApiGateway.API.Controllers.<System>.<Feature>`
 
 - SchoolBot gRPC service (target/school-bot): 0 changes · check-092-grpc-r3 (memory: planning/check-092-grpc-r3-001.md) ไม่กระทบ
-- บันทึกก่อนการตรวจอิสระระบุ SEC001-016 ว่ายังเปิดอยู่ (จน JPO อิสระ) · H5/Light review/production registration/TLS/peer จริง/BFF CSRF · G-AUTH
+- บันทึกก่อนการตรวจอิสระระบุ SEC001-016 ว่ายังเปิดอยู่ (จน JPO อิสระ) · H5 (เงื่อนไข listener/TLS/peer/private ingress และ trust ระหว่างระบบ)/Light (ผู้ทบทวน implementation ของ Gateway) review/production registration/TLS/peer จริง/Backend for Frontend (BFF) CSRF · G-AUTH
 
 รหัสอ้างอิงที่ปรากฏในบันทึกเดิม: BL-005.
+
+ที่มาคำชี้แจง entry อ้าง [มติ 049 (เงื่อนไขความปลอดภัยของ logout)](../requirement/decisions-049.md) และ [มติ 050 (ใช้ controller convention ของ Gateway)](../requirement/decisions-050.md).

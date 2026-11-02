@@ -4,10 +4,6 @@
 
 ส่วนต่อของ [DES-011 — ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง](des-011.md)
 
-## อ้างอิง
-
-- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../requirement/decisions-027.md)
-
 ## การเปลี่ยนสถานะและการตรวจข้ามฐานข้อมูลก่อน commit
 
 - เนื่องจากไม่มี transaction เดียวครอบ SchoolBot DB กับ School DB ([decisions-027](../requirement/decisions-027.md)): ก่อน `POST /level-proposals` และก่อน `confirm`/`decline` ต้องอ่านและ **re-check สิทธิ์ครูรายวิชา, roster นักเรียน และข้อมูลเทอมถัดไป (`NYear`/`NTerm`) จาก School DB** รวมทั้ง re-check `SchoolBotLicense` active, source results, policy revisions และ current/target curriculum ใน SchoolBot DB

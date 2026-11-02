@@ -4,13 +4,6 @@
 
 ส่วนต่อของ [DES-010 — Question Bank, Attempt และนโยบายคะแนน](des-010.md)
 
-## อ้างอิง
-
-- [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)
-- [REQ-046 (Quiz/Test และคลังข้อสอบแบบ revision)](../requirement/req-046.md)
-- [BR-046-07 (หมดเวลาปิด attempt ตรวจคำตอบที่ server บันทึกทัน; ข้อว่าง 0 เต็มทั้งชุด ไม่รับย้อนหลัง แยกจาก submit)](../requirement/req-046.md)
-- [AC-046-07 (Test 10 ข้อละ 1; บันทึกทัน 6 ถูก 4; หมดเวลาไม่ส่งได้ 4/10 ไม่รับคำตอบช้า นับครั้ง/สิทธิ์ซ่อมตาม policy/snapshot เดิม)](../requirement/req-046.md)
-
 ## ข้อผิดพลาด
 
 400 INVALID_INPUT, ANSWER_INVALID
@@ -26,7 +19,7 @@
 
 ## ผลข้อสอบเมื่อหมดเวลา
 
-ผลเมื่อหมดเวลาใช้ decisions-042, REQ-046, BR-046-07 และ AC-046-07:
+ผลเมื่อหมดเวลาใช้ [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md), [REQ-046 (Quiz/Test และคลังข้อสอบแบบ revision)](../requirement/req-046.md), [BR-046-07 (หมดเวลาปิด attempt ตรวจคำตอบที่ server บันทึกทัน; ข้อว่าง 0 เต็มทั้งชุด ไม่รับย้อนหลัง แยกจาก submit)](../requirement/req-046.md) และ [AC-046-07 (Test 10 ข้อละ 1; บันทึกทัน 6 ถูก 4; หมดเวลาไม่ส่งได้ 4/10 ไม่รับคำตอบช้า นับครั้ง/สิทธิ์ซ่อมตาม policy/snapshot เดิม)](../requirement/req-046.md):
 - ปิดด้วย state `expired` เดิม ตรวจอัตโนมัติจากคำตอบที่ server รับและบันทึกทันเวลา แม้ไม่กด submit; ข้อว่างได้ 0 ใช้คะแนนเต็มทั้งชุดตาม snapshot ไม่มีคำตอบได้ 0/เต็มทั้งชุด ไม่รับคำตอบย้อนหลัง
 - นับครั้งตาม max_attempts/Sequence และใช้ RetakeGrant เดิมหากเป็นรอบซ่อม ไม่คืนสิทธิ์เพราะไม่กดส่ง และไม่ consume ซ้ำตอน finalize
 - Mutation answers/submit หลังหมดเวลาไม่รับ answers เพิ่ม; mapping ใช้ `409 ATTEMPT_EXPIRED` เดิม ส่วน GET อ่าน outcome ได้ตามสิทธิ์เดิม ไม่ปฏิเสธการอ่านเพียงเพราะ expired; feedback/เฉลยยังขึ้นกับ reveal ของ snapshot ไม่เปิดทันทีเพราะหมดเวลา

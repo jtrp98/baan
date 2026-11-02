@@ -4,11 +4,6 @@
 
 ส่วนต่อของ [DES-008 — Mapping หลักสูตรกับช่องคะแนน SchoolBright](des-008.md)
 
-## อ้างอิง
-
-- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../requirement/decisions-027.md)
-- [มติ 033 (ช่องคะแนนเดิม การแปลงคะแนนเต็ม และผลประเมินที่ยังไม่มี)](../requirement/decisions-033.md)
-
 ## การได้มาซึ่ง GradeSlot และการตรวจซ้ำข้าม DB ก่อน Commit
 
 1. อ่านช่องเดิมจาก PGGradeDB และ resolve context แผนการเรียน/ห้อง/เทอมจาก School DB ฝั่ง server ผ่าน connection แยก
@@ -19,5 +14,5 @@
 
 การบังคับทดแทนด้วย application/repository locks: NOT_IMPLEMENTED — ไม่มี runtime evidence; คง errors และ re-check ข้าม DB เดิม การล็อก SchoolBot DB ไม่ serialize writer ใน PGGradeDB โดยอัตโนมัติ
 
-ชื่อช่องที่มีคำว่า SchoolBot ไม่ใช่หลักฐาน ownership ห้ามยึดช่องของครูด้วยการตั้งชื่อใหม่หรือเลือก force หากไม่พบช่องว่างที่จัดสรรได้ ให้ SLOT_UNAVAILABLE การสร้าง Pgtassessment ใหม่ทำผ่านระบบเกรดเท่านั้น ตาม decisions-033 ห้ามใช้ MAX(id)+1 หรือเดา ScoreIdentifier จาก ordinal
+ชื่อช่องที่มีคำว่า SchoolBot ไม่ใช่หลักฐาน ownership ห้ามยึดช่องของครูด้วยการตั้งชื่อใหม่หรือเลือก force หากไม่พบช่องว่างที่จัดสรรได้ ให้ SLOT_UNAVAILABLE การสร้าง Pgtassessment ใหม่ทำผ่านระบบเกรดเท่านั้น ตาม [มติ 033 (ช่องคะแนนเดิม การแปลงคะแนนเต็ม และผลประเมินที่ยังไม่มี)](../requirement/decisions-033.md) ห้ามใช้ MAX(id)+1 หรือเดา ScoreIdentifier จาก ordinal
 

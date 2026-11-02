@@ -6,13 +6,6 @@
 
 ชนิดข้อมูลที่ใช้: `P` = profile ที่ระบุโรงเรียน kind และ id ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md)
-- [มติ 028 (ชนิดคอลัมน์ CreateBy/UpdateBy)](../requirement/decisions-028.md)
-- [มติ 027 (ที่ตั้งฐานข้อมูล SchoolBot)](../requirement/decisions-027.md)
-- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md)
-
 ## การประเมิน การเปลี่ยนสถานะ และการกันคำขอซ้ำ
 
 Code/Block:
@@ -25,7 +18,7 @@ Arm:
 ฐานปัจจุบันในschoolbot_db.sqlคงเฉพาะPK ไม่มีSQL FK/UQ/CHECK; applicationต้องserializeด้วยtransactionlocksและตรวจความสัมพันธ์/ความไม่ซ้ำ/tenantก่อนบันทึกทุกครั้งว่า:
 1. `Mission`/`Criteria`/`Activity`/`Curriculum` เป็น published global content (`SchoolId=null`) และ `Criteria.MissionId == Submission.MissionId`
 2. `ProjectRevision` และ `Project` อยู่ `SchoolId` เดียวกับ session, เป็นของนักเรียนคนนั้นจริง (`Project.OwnerKind == 'student'` และ `Project.OwnerId == session.ProfileId`), และ `Project.Mode` ตรงกับ `Activity.Mode` ของ project activity ที่อ้าง `Mission` นั้น (ป้องกันครู `P=employee` ส่งงานปนกับนักเรียนที่มี `sId == sEmp`)
-3. Server ไม่รับ commands/score ที่ UI อ้าง; Code parse Domain-Specific Language (DSL) ใหม่; Block compile normalized tree ใหม่ ใช้ bounds เดียวกับ DES-003 และ demo: 1–64 commands, ≤100 steps; ไม่ eval Python/JavaScript
+3. Server ไม่รับ commands/score ที่ UI อ้าง; Code parse Domain-Specific Language (DSL) ใหม่; Block compile normalized tree ใหม่ ใช้ bounds เดียวกับ [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md) และ demo: 1–64 commands, ≤100 steps; ไม่ eval Python/JavaScript
 
 Worker ใช้ durable `GradingJob`+lease (`CreateBy/UpdateBy = null` เมื่อ worker ทำเองตาม [decisions-028](../requirement/decisions-028.md)); infrastructure รัน trusted bounded evaluator โดยไม่มีสิทธิ์ network/files ของ source นักเรียน ระบบต้องมี golden vectors เทียบ host/server เพื่อกัน semantics ต่างกัน ผล automatic บันทึก evaluator version และ rule results; `passed` และคะแนนตัวเลข (เมื่อมี approved numeric rubric) คำนวณตามเกณฑ์ที่อนุมัติ
 

@@ -6,16 +6,10 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `N` = integer ≥1; `B` = boolean; `D` = UTC instant; `H` = SHA-256 hex 64 ตัว; `Tn` = ข้อความยาวไม่เกิน n ตัวอักษร ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)
-- [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)
-- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md)
-
 ## การคำนวณ, Snapshot และการป้องกัน LearnerId ชนกัน
 
 - **การป้องกัน `LearnerId` ครูชนกับนักเรียน (`sEmp == sId`)**: สมาชิกที่นำมาคำนวณ `total` และ `average` ต้องมาจาก roster นักเรียน (`TUser.sID`) ของห้องเรียนใน School DB เท่านั้น และเมื่อดึงผลจาก `SchoolBotSubmission` ต้องกรองเฉพาะแถวที่อ้าง `SchoolBotProject` ที่ `OwnerKind = 'student'` เท่านั้น 
-- `total` รายคน = คะแนนรวมหลักสูตร 0–100 ตาม `ScoringPolicy` revision และ `formula_version` (DES-010) โดยกิจกรรมที่ไม่มีผลใช้ 0; ผล expired ที่ตรวจเสร็จตาม decisions-042 เข้า selection และสูตรเดิม ไม่ถือว่าขาดผลเพราะไม่กดส่ง คง roster, strict threshold, snapshot/recheck และการยืนยันทั้งห้องเดิม
+- `total` รายคน = คะแนนรวมหลักสูตร 0–100 ตาม `ScoringPolicy` revision และ `formula_version` ([DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)) โดยกิจกรรมที่ไม่มีผลใช้ 0; ผล expired ที่ตรวจเสร็จตาม [มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md) เข้า selection และสูตรเดิม ไม่ถือว่าขาดผลเพราะไม่กดส่ง คง roster, strict threshold, snapshot/recheck และการยืนยันทั้งห้องเดิม
 - `average = Σ total / member_count`; `eligible = average > threshold`; `gap` (เมื่อไม่ผ่าน) = `threshold − average`
 - proposal เก็บ roster และผลของทุกคนเป็น immutable snapshot รวม source result refs (`id` + `update_date`), scoring policy revision, `formula_version`, promotion policy revision/threshold, current/target curriculum, average, gap, effective context และ hash
 

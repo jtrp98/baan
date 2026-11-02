@@ -6,17 +6,12 @@
 
 ชนิดข้อมูลที่ใช้: `K` = int4 primary key ของ SchoolBot; `I` = signed int32 ของระบบเดิม; `U` = UUID; `B` = boolean; `D` = UTC instant; `Tn` = ข้อความยาวไม่เกิน n ตัวอักษร ตาม [สัญญาชนิดข้อมูลร่วม](data-dictionary/contract-001.md).
 
-## อ้างอิง
-
-- [มติ 030 (ถอนคอลัมน์ Version — ใช้ UpdateDate แทน)](../requirement/decisions-030.md)
-- [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
-
 ## HTTP
 
 ใช้ headers/envelope/limits/pagination ตาม data-contract-rules
 mutation มี Idempotency-Key และ X-Request-Id
 update มี `If-Match` (ใช้ opaque `ETag` จาก `UpdateDate` ที่ server ตั้งด้วย `clock_timestamp()` ตาม [decisions-030](../requirement/decisions-030.md)); body ไม่รับ `UpdateDate`/`Version` แทน header
-ทุก endpoint ต้องมี SchoolBot session channel `school_web` (DES-012)
+ทุก endpoint ต้องมี SchoolBot session channel `school_web` ([DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md))
 
 | Endpoint | สิทธิ์ |
 |---|---|

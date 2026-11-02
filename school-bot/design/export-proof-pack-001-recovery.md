@@ -1,8 +1,8 @@
-# SA-004 — โครงชุดหลักฐาน export contract — Gate evidence เดิมทั้งห้า
+# SA-004 — โครงชุดหลักฐาน export contract — Gate, recovery และหลักฐาน
 
 > Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ส่วนต่อของ [SA-004 — โครงชุดหลักฐาน export contract](export-proof-pack-001.md) ส่วนนี้อธิบายGate evidence เดิมทั้งห้า อ่านต่อเนื่องตามลำดับในไฟล์ทางเข้า.
+ส่วนต่อของ [SA-004 — โครงชุดหลักฐาน export contract](export-proof-pack-001.md) อธิบาย Gate, recovery และหลักฐาน.
 
 ## เอกสารอ้างอิง
 
