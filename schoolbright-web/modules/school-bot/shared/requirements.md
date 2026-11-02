@@ -1,7 +1,7 @@
 ---
 module: teacher-web
 updated: 2026-10-21
-owner: design
+owner: spec
 ---
 
 # เว็บครู School Bot: Requirements (จาก role 1)
