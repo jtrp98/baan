@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # มาสคอต School Bot (DEC-29, DEC-30)
 

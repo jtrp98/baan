@@ -1,11 +1,11 @@
 ---
-owner: spec
+owner: design
 ---
 # Brand: School Bot Studio
 
 > Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (แตกจาก brand.md ของ sketchbook ให้อ่านได้ทีละไฟล์)
 
-หน้าตาของแอปนักเรียน School Bot Studio (Arm Lab · Block Lab · Quiz) และเว็บครู · **Arm Lab ที่อนุมัติแล้วเป็นแม่ของทุกหน้า** (design-taste ข้อ 1): ของที่ Arm Lab มีแล้วใช้แบบเดียวกัน ของที่ไม่มีออกแบบให้เป็นตระกูลเดียวกัน
+หน้าตาของแอปนักเรียน School Bot Studio (Arm Lab · Block Lab · Quiz) ส่วนเว็บครูใช้ระบบของเว็บ SchoolBright · **Arm Lab ที่อนุมัติแล้วเป็นแม่ของทุกหน้า** (design-taste ข้อ 1): ของที่ Arm Lab มีแล้วใช้แบบเดียวกัน ของที่ไม่มีออกแบบให้เป็นตระกูลเดียวกัน
 
 ## Design System (ตัวจริงของ token + component)
 

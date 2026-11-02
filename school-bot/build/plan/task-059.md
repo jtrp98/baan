@@ -18,4 +18,4 @@ K=C:/src/schoolbright/knowledge/school-bot. อ่านก่อน: plan/index
 
 ## Change Log
 - 2026-10-24 — เปิดใบงาน gm sync แผน/คิวหลังรอบ 055–058 (docs-only)
-- 2026-10-24 — รับผล: state=DONE — 4 edits (queue-003 เพิ่มสถานะหลังรอบ055–058 + change log; plan/index ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items + change log) นายช่าง apply ครบ; คง 110 pending/44REQ/180AC/17gates/77 NOT_RUN/Important6 OPEN; คำตอบเต็มที่ [gm-plan-sync-response-001.json](../planning/gm-plan-sync-response-001.json)
+- 2026-10-24 — รับผล: state=DONE — 4 edits (queue-003 เพิ่มสถานะหลังรอบ055–058 + change log; plan/index ปรับ Waiting on Human precedence ชี้คิว059/H5 questionnaire/gRPC open items + change log) นายช่าง apply ครบ; คง 110 pending/44REQ/180AC/17gates/77 NOT_RUN/Important6 OPEN; คำตอบเต็มที่ [gm-plan-sync-response-001.json](https://github.com/jtrp98/knowledge-sb/blob/686555d4414039f1991d23085b94bd94eceebc23/school-bot/planning/gm-plan-sync-response-001.json)

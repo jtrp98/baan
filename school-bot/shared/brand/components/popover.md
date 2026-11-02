@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # popover · เมนู · ยืนยันใกล้จุดที่กด
 

@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # ช่องพิมพ์
 

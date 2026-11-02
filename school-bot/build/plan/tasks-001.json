@@ -5,7 +5,13 @@
   "amendment_065": {
     "date": "2026-10-26",
     "notice": "precedence เหนือ adoption/first_wave/preconditions เก่า; คง revision/work_date เป็นประวัติ. index/tasks ปัจจุบัน15verified/95pending ตาม planning/status-sync-062-001.json; ไม่เพิ่ม verdict/ปิด gate. 44REQ/187AC(+AC-036-06 2026-10-28)/82TP(+TP001-082 Amendment005)/110tasks/8phases/17gates ตาม decisions-042/spec075/inspect078; snapshot180/77คงเดิม อ่าน test-plan/tp-001-amendment-004.md; canonical status ไม่ใช่เปอร์เซ็นต์โค้ด. docs-only ตาม062; t0/t1/t2=codex,t3/t4/t5=agy,--no-fallback; ไม่ใช้native subagent. คง IDs/DAG/effort/owner/tier/gate definitions",
-    "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-062.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"]
+    "refs": [
+      "queue-004.md",
+      "plan/owner-packet-001.md",
+      "../../../../memory/school-bot/_cross/planning/task-062.md",
+      "../../../../memory/school-bot/_cross/planning/task-061.md",
+      "../../../../memory/school-bot/_cross/planning/check-061-verdicts-001.md"
+    ]
   },
   "phases": [
     {
@@ -353,7 +359,8 @@
       "risk": "high",
       "wave": 1,
       "oracle": "oracle pack SA-001 (ตรึง 2026-10-29): DES-002 Rev3 · DES-003 Rev4 · DES-004 Rev11 · DES-007 Rev3 — check-093-SA-001-001 PASS",
-      "ref": "50500b0"
+      "ref": "50500b0",
+      "module": "app-shell"
     },
     {
       "id": "BE-001",
@@ -386,7 +393,11 @@
       "risk": "high",
       "wave": 1,
       "oracle": "oracle pack BE-001 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-022/023/058/079/082 — check-093-BE-001-003 PASS (rework 2/2)",
-      "ref": "50cfe90"
+      "ref": "50cfe90",
+      "module": [
+        "app-shell",
+        "quiz"
+      ]
     },
     {
       "id": "DBA-001",
@@ -420,7 +431,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — check PASS static + parser 10.3.1 evidence",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "app-shell"
     },
     {
       "id": "DBA-002",
@@ -461,7 +473,8 @@
       "risk": "high",
       "wave": 2,
       "oracle": "oracle pack DBA-002 (ตรึง 2026-10-29): DES-002 Rev3 · TP001-052/053 — check-094-DBA-002-004-001 PASS (static; ผลรัน SQL/catalog C0–C5 = DBA-003/G-CORE)",
-      "ref": "6c9f798"
+      "ref": "6c9f798",
+      "module": "app-shell"
     },
     {
       "id": "DBA-003",
@@ -496,7 +509,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 4
+      "wave": 4,
+      "module": "app-shell"
     },
     {
       "id": "BE-002",
@@ -543,9 +557,12 @@
           ],
           "status": "verified",
           "evidence": "planning/check-094-wave2-gate-001.md (FAIL F1/F2) · -002 (F1 ผ่าน, F2 ตก) · -003 (rework 2/2 FAIL) · check-094-wave2-gate-004.md (rework 3 ตามมติ051: PASS)",
-          "note": "2026-11-02 verified หลัง rework 3 (มติ051 ทาง A) · slice S1 พิสูจน์บน stub (memory/file store) — การต่อ DB จริงรอ DBA-003/G-CORE", "oracle": "oracle pack BE-002 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-008/022/023/052/053 + Amendment002 + invariant 1–6 ของ project-commit-proposal-001 (มติ051)", "ref": "target school-bot uncommitted — sha256 ที่ reports/school-bot/normal-094/check-wave2-r3-gate/source-sha256.txt"
+          "note": "2026-11-02 verified หลัง rework 3 (มติ051 ทาง A) · slice S1 พิสูจน์บน stub (memory/file store) — การต่อ DB จริงรอ DBA-003/G-CORE",
+          "oracle": "oracle pack BE-002 (ตรึง 2026-10-29): DES-004 Rev11 · TP001-008/022/023/052/053 + Amendment002 + invariant 1–6 ของ project-commit-proposal-001 (มติ051)",
+          "ref": "target school-bot uncommitted — sha256 ที่ reports/school-bot/normal-094/check-wave2-r3-gate/source-sha256.txt"
         }
-      ]
+      ],
+      "module": "app-shell"
     },
     {
       "id": "BA-001",
@@ -573,7 +590,11 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "BA-002",
@@ -599,7 +620,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "quiz"
     },
     {
       "id": "BA-003",
@@ -626,7 +648,11 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 ตาม check-060 + decisions-038",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "arm-lab",
+        "app-shell"
+      ]
     },
     {
       "id": "BA-004",
@@ -653,7 +679,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 ตาม check-060 + decisions-037/038",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "app-shell"
     },
     {
       "id": "UX-001",
@@ -681,7 +708,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — signed int-001 + check-060 PASS",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "app-shell"
     },
     {
       "id": "UX-002",
@@ -714,7 +742,12 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — signed int-003 + check-061 PASS รอบ 3",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "my-work",
+        "arm-lab",
+        "app-shell"
+      ]
     },
     {
       "id": "UX-003",
@@ -750,7 +783,13 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — signed int-002 + check-060 PASS",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "app-shell",
+        "arm-lab",
+        "code-lab",
+        "block-lab"
+      ]
     },
     {
       "id": "UX-004",
@@ -780,7 +819,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — signed int-004 + check-061 PASS รอบ 7",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "quiz"
     },
     {
       "id": "TP-001",
@@ -812,7 +852,11 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — Amendment002/003 + check-060 PASS",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "app-shell",
+        "quiz"
+      ]
     },
     {
       "id": "TP-002",
@@ -851,7 +895,12 @@
       "risk": "low",
       "wave": 1,
       "oracle": "oracle pack TP-002 (ตรึง 2026-10-29): DES-001 Rev1 · TP001-003/010/037/040/045/058/079 — check-093-wave1-gate-001 PASS (wave gate)",
-      "ref": "11e9442"
+      "ref": "11e9442",
+      "module": [
+        "app-shell",
+        "arm-lab",
+        "quiz"
+      ]
     },
     {
       "id": "SEC-001",
@@ -897,7 +946,11 @@
       "risk": "high",
       "wave": 1,
       "oracle": "oracle pack SEC-001 (ตรึง 2026-10-29): DES-001 Rev1 · DES-002 Rev3 · DES-004 Rev11 · DES-007 Rev3 — check-093-SEC-001-001 PASS (review pack; ข้อรอคน H1/H2/H4/H5 ป้อน G-AUTH/G-SEC)",
-      "ref": "058241d"
+      "ref": "058241d",
+      "module": [
+        "app-shell",
+        "quiz"
+      ]
     },
     {
       "id": "BE-003",
@@ -930,7 +983,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 3
+      "wave": 3,
+      "module": "app-shell"
     },
     {
       "id": "BE-004",
@@ -961,7 +1015,8 @@
       ],
       "status": "pending",
       "risk": "high",
-      "wave": 3
+      "wave": 3,
+      "module": "app-shell"
     },
     {
       "id": "BE-005",
@@ -991,7 +1046,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 3
+      "wave": 3,
+      "module": "app-shell"
     },
     {
       "id": "BE-006",
@@ -1031,7 +1087,8 @@
         }
       ],
       "risk": "high",
-      "wave": 4
+      "wave": 4,
+      "module": "app-shell"
     },
     {
       "id": "BE-007",
@@ -1070,7 +1127,8 @@
       ],
       "status": "pending",
       "risk": "high",
-      "wave": 3
+      "wave": 3,
+      "module": "app-shell"
     },
     {
       "id": "DBA-004",
@@ -1109,7 +1167,11 @@
       "risk": "high",
       "wave": 2,
       "oracle": "oracle pack DBA-004 (ตรึง 2026-10-29): DES-003 Rev4 · TP001-008/015/016/022/023/052/053/077 — check-094-DBA-002-004-001 PASS (static; SQL จริง = G-PROJECT-DB ที่ QA-002)",
-      "ref": "6c9f798"
+      "ref": "6c9f798",
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-008",
@@ -1144,7 +1206,11 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 4
+      "wave": 4,
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-009",
@@ -1175,7 +1241,11 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 4
+      "wave": 4,
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-010",
@@ -1207,7 +1277,13 @@
         "DES-001"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": [
+        "app-shell",
+        "arm-lab",
+        "code-lab",
+        "block-lab"
+      ]
     },
     {
       "id": "SA-003",
@@ -1235,7 +1311,11 @@
         "DES-001"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": [
+        "app-shell",
+        "arm-lab"
+      ]
     },
     {
       "id": "BE-011",
@@ -1261,7 +1341,11 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "arm-lab",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-012",
@@ -1287,7 +1371,11 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "arm-lab",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-013",
@@ -1320,7 +1408,11 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "arm-lab",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-014",
@@ -1347,7 +1439,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "FE-001",
@@ -1380,7 +1473,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 5
+      "wave": 5,
+      "module": "app-shell"
     },
     {
       "id": "FE-002",
@@ -1409,7 +1503,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 5
+      "wave": 5,
+      "module": "app-shell"
     },
     {
       "id": "FE-003",
@@ -1438,7 +1533,11 @@
         "DES-003"
       ],
       "status": "pending",
-      "risk": "low"
+      "risk": "low",
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "FE-004",
@@ -1471,7 +1570,13 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "my-work",
+        "arm-lab",
+        "code-lab",
+        "block-lab"
+      ]
     },
     {
       "id": "FE-005",
@@ -1510,7 +1615,8 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "FE-006",
@@ -1539,7 +1645,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "code-lab"
     },
     {
       "id": "FE-007",
@@ -1569,7 +1676,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "block-lab"
     },
     {
       "id": "FE-008",
@@ -1602,7 +1710,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "FE-009",
@@ -1632,7 +1741,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "FE-010",
@@ -1666,7 +1776,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "FE-011",
@@ -1698,7 +1809,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "FE-012",
@@ -1734,7 +1846,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "arm-lab"
     },
     {
       "id": "SA-002",
@@ -1767,7 +1880,8 @@
       ],
       "status": "verified",
       "oracle": "ใบงาน061 — check-061 PASS (สัญญาสามโหมด/Level/ข้อสอบ/ส่งคะแนน)",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "quiz"
     },
     {
       "id": "DBA-005",
@@ -1811,7 +1925,12 @@
         "DES-012"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": [
+        "app-shell",
+        "quiz",
+        "schoolbright-web/school-bot"
+      ]
     },
     {
       "id": "BE-015",
@@ -1846,7 +1965,8 @@
         "DES-005"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": "quiz"
     },
     {
       "id": "BA-005",
@@ -1872,7 +1992,8 @@
         "DES-005"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": "quiz"
     },
     {
       "id": "BA-006",
@@ -1898,7 +2019,8 @@
         "DES-005"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": "quiz"
     },
     {
       "id": "BE-016",
@@ -1925,7 +2047,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-017",
@@ -1961,7 +2084,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-013",
@@ -1990,7 +2114,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-014",
@@ -2017,7 +2142,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-015",
@@ -2044,7 +2170,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-016",
@@ -2069,7 +2196,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "DBA-006",
@@ -2096,7 +2224,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-018",
@@ -2125,7 +2254,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-019",
@@ -2160,7 +2290,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-020",
@@ -2194,7 +2325,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-021",
@@ -2229,7 +2361,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-022",
@@ -2257,7 +2390,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "BE-023",
@@ -2292,7 +2426,11 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "app-shell",
+        "quiz"
+      ]
     },
     {
       "id": "QA-001",
@@ -2356,7 +2494,8 @@
       ],
       "status": "pending",
       "risk": "low",
-      "wave": 5
+      "wave": 5,
+      "module": "app-shell"
     },
     {
       "id": "QA-002",
@@ -2399,7 +2538,11 @@
         "DES-001",
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "app-shell",
+        "my-work"
+      ]
     },
     {
       "id": "QA-003",
@@ -2470,7 +2613,12 @@
         "DES-001",
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "arm-lab",
+        "code-lab",
+        "block-lab"
+      ]
     },
     {
       "id": "QA-004",
@@ -2512,7 +2660,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "QA-005",
@@ -2542,7 +2691,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "QA-006",
@@ -2569,7 +2719,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "QA-007",
@@ -2596,7 +2747,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "QA-008",
@@ -2628,7 +2780,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "QA-009",
@@ -2660,7 +2813,8 @@
         "DES-006",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "QA-010",
@@ -2702,7 +2856,8 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "app-shell"
     },
     {
       "id": "SEC-002",
@@ -2746,7 +2901,11 @@
         "DES-004",
         "DES-007"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "app-shell",
+        "quiz"
+      ]
     },
     {
       "id": "PM-001",
@@ -2775,7 +2934,16 @@
       "req_ids": [],
       "ac_ids": [],
       "des_refs": [],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "app-shell",
+        "my-work",
+        "quiz",
+        "arm-lab",
+        "block-lab",
+        "code-lab",
+        "schoolbright-web/school-bot"
+      ]
     },
     {
       "id": "PM-002",
@@ -2800,7 +2968,16 @@
       "req_ids": [],
       "ac_ids": [],
       "des_refs": [],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "app-shell",
+        "my-work",
+        "quiz",
+        "arm-lab",
+        "block-lab",
+        "code-lab",
+        "schoolbright-web/school-bot"
+      ]
     },
     {
       "id": "BE-024",
@@ -2831,7 +3008,8 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "my-work"
     },
     {
       "id": "BE-025",
@@ -2863,7 +3041,8 @@
         "DES-003",
         "DES-004"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "my-work"
     },
     {
       "id": "BE-026",
@@ -2899,7 +3078,11 @@
         "DES-004",
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-027",
@@ -2938,7 +3121,8 @@
         "DES-012"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": "quiz"
     },
     {
       "id": "BE-028",
@@ -2967,7 +3151,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-029",
@@ -2998,7 +3183,8 @@
         "DES-012"
       ],
       "status": "pending",
-      "risk": "high"
+      "risk": "high",
+      "module": "quiz"
     },
     {
       "id": "BE-030",
@@ -3026,7 +3212,8 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-031",
@@ -3057,7 +3244,11 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "quiz",
+        "app-shell"
+      ]
     },
     {
       "id": "BE-032",
@@ -3085,7 +3276,8 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-033",
@@ -3117,7 +3309,8 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-034",
@@ -3147,7 +3340,8 @@
       "des_refs": [
         "DES-011"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "BE-035",
@@ -3181,7 +3375,8 @@
         "DES-008",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "BE-036",
@@ -3213,7 +3408,8 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "BE-037",
@@ -3247,7 +3443,8 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "BE-038",
@@ -3281,7 +3478,8 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "BE-039",
@@ -3335,7 +3533,11 @@
         }
       ],
       "risk": "high",
-      "wave": 2
+      "wave": 2,
+      "module": [
+        "quiz",
+        "app-shell"
+      ]
     },
     {
       "id": "FE-017",
@@ -3368,7 +3570,8 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "my-work"
     },
     {
       "id": "FE-018",
@@ -3410,7 +3613,8 @@
         "DES-003",
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "my-work"
     },
     {
       "id": "FE-019",
@@ -3450,7 +3654,8 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-020",
@@ -3479,7 +3684,8 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-021",
@@ -3512,7 +3718,11 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "quiz",
+        "app-shell"
+      ]
     },
     {
       "id": "FE-022",
@@ -3560,7 +3770,8 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "FE-023",
@@ -3592,7 +3803,8 @@
         "DES-008",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "FE-024",
@@ -3636,7 +3848,8 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "QA-011",
@@ -3684,7 +3897,11 @@
         "DES-003",
         "DES-005"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "my-work",
+        "app-shell"
+      ]
     },
     {
       "id": "QA-012",
@@ -3730,7 +3947,8 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "QA-013",
@@ -3767,7 +3985,11 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": [
+        "quiz",
+        "app-shell"
+      ]
     },
     {
       "id": "QA-014",
@@ -3804,7 +4026,8 @@
         "DES-010",
         "DES-011"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "QA-015",
@@ -3850,7 +4073,8 @@
         "DES-008",
         "DES-009"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "QA-016",
@@ -3886,7 +4110,8 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "UX-005",
@@ -3929,7 +4154,8 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "UX-006",
@@ -3981,7 +4207,8 @@
       ],
       "status": "verified",
       "oracle": "check-061 PASS รอบ 10 + decisions-041 signed",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "UX-007",
@@ -4027,7 +4254,8 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending"
+      "status": "pending",
+      "module": "quiz"
     },
     {
       "id": "SA-004",
@@ -4078,7 +4306,8 @@
       ],
       "status": "verified",
       "oracle": "check-061c PASS docs-only (planning/task-061.md)",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "TP-003",
@@ -4128,7 +4357,8 @@
       ],
       "status": "verified",
       "oracle": "check-061 PASS รอบ 2 (fixtures เอกสาร)",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": "schoolbright-web/school-bot"
     },
     {
       "id": "DBA-007",
@@ -4165,7 +4395,11 @@
       ],
       "status": "verified",
       "oracle": "check-061 PASS รอบ 2 (runtime pack ไม่ใช่ผลรัน)",
-      "ref": "0b6687b"
+      "ref": "0b6687b",
+      "module": [
+        "schoolbright-web/school-bot",
+        "app-shell"
+      ]
     }
   ],
   "first_wave": [
@@ -4203,46 +4437,167 @@
     "pm": "gm"
   },
   "change_log": [
-    {"date":"2026-10-26","revision":2,"summary":"079: มติ042เพิ่มAC-046-07ให้BE-031/FE-021/UX-007/QA-013; 186AC/81cases คงACเดิม/status/DAG/owner/tier/effort/gates/IDs","refs":["requirement/decisions-042.md","requirement/req-046.md","test-plan/tp-001-amendment-004.md"]},
-    {"date":"2026-10-26","revision":2,"summary":"074: แก้ notice ตาม status-sync-062-001; คง status/DAG/gates และประวัติ065"},
     {
       "date": "2026-10-26",
       "revision": 2,
-      "refs": ["plan/queue-004.md", "plan/owner-packet-001.md", "planning/task-061.md", "planning/check-061-verdicts-001.md"],
+      "summary": "079: มติ042เพิ่มAC-046-07ให้BE-031/FE-021/UX-007/QA-013; 186AC/81cases คงACเดิม/status/DAG/owner/tier/effort/gates/IDs",
+      "refs": [
+        "requirement/decisions-042.md",
+        "requirement/req-046.md",
+        "test-plan/tp-001-amendment-004.md"
+      ]
+    },
+    {
+      "date": "2026-10-26",
+      "revision": 2,
+      "summary": "074: แก้ notice ตาม status-sync-062-001; คง status/DAG/gates และประวัติ065"
+    },
+    {
+      "date": "2026-10-26",
+      "revision": 2,
+      "refs": [
+        "queue-004.md",
+        "plan/owner-packet-001.md",
+        "../../../../memory/school-bot/_cross/planning/task-061.md",
+        "../../../../memory/school-bot/_cross/planning/check-061-verdicts-001.md"
+      ],
       "summary": "065: เพิ่มmetadata precedence/refs; ส่งdelta15ให้ผู้คุมตรวจและapplyแยก ไม่regenerateJSONหรือแก้ประวัติ/gates"
     },
     {
       "date": "2026-10-24",
       "revision": 2,
-      "refs": ["design/gateway-integration-001.md", "planning/auth-flow-handoff-001.md", "plan/queue-003.md"],
+      "refs": [
+        "design/gateway-integration-001.md",
+        "../../../../memory/school-bot/_cross/planning/auth-flow-handoff-001.md",
+        "queue-003.md"
+      ],
       "summary": "051: precedence transport/Codex/docs-only; sync SA-001/BE-006/BE-023/BE-039 คู่md; คงscope/IDs/status/dependencies/gates/effort"
     },
     {
       "date": "2026-10-23",
       "revision": 2,
       "refs": [
-        "planning/spec-review-001.md",
-        "planning/task-011.md",
-        "planning/task-013.md",
+        "../../../../memory/school-bot/_cross/planning/spec-review-001.md",
+        "../../../../memory/school-bot/_cross/planning/task-011.md",
+        "../../../../memory/school-bot/_cross/planning/task-013.md",
         "requirement/decisions-032.md",
         "requirement/decisions-033.md",
         "requirement/decisions-034.md"
       ],
       "summary": "reconcile44/180; แตก36งานในscopeเดิม; คง17gates/8phases/74IDsเดิม/pendingทั้งหมด"
     },
-    {"date":"2026-10-26","revision":2,"summary":"089: รับ owner mapping AC-030-04..08 ตามมติ037; BE-019 Host workflow, BE-020/021 package recovery, QA-010 validation; TP-001 sync186AC; คง frozen scope/IDs/status/DAG/dependencies/gates/owner/tier/effort","refs":["planning/traceability-089-001.md","requirement/req-030.md","requirement/decisions-037.md","requirement/decisions-038.md","test-plan/tp-001.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป","refs":["plan/index.md","planning/check-061-verdicts-001.md","planning/status-sync-062-001.json"]},
-    {"date":"2026-10-29","revision":2,"summary":"re-gate ตามข้อ 10 (ผู้ใช้อนุมัติ): ถอด gate จากงานที่ทำบน stub/fake ได้ 43 งาน · ผู้ถือใหม่ QA-001 G-AUTH, BE-023 G-AUTH (DES-012 channel production), QA-002 G-PROJECT-DB+G-GUEST, QA-004 G-LEARN, QA-010 G-RELEASE-DB · G-CORE/G-LEARN-DB/G-DELIVERY คงที่ DBA-003/QA-015-016/QA-008-010 · คง G-ROBOT-CONTRACT ที่ BE-010 (สัญญา breaking + สั่งเคลื่อนที่หุ่น) · ปิด G-UX-ENTRY/PROJECT/LABS/LEARN จาก sign-off ที่มีอยู่ · งาน verified คง gate_ids เป็นประวัติ (BAAN 0.21.1 ไม่นับว่าขวาง)","refs":["plan/gates-001.md","requirement/decisions-041.md","requirement/decisions-043.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SA-001 verified จาก check-093-SA-001-001 PASS (L1 ทันที, AGY T2 ข้ามโมเดลกับ writer Codex T1) · deliverable design/contract-review-sa-001.md Rev1","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: SEC-001 verified จาก check-093-SEC-001-001 PASS (AGY T2 ข้ามโมเดลกับ writer Codex T2) · deliverable design/security-review-093-001.md + evidence/compliance · ข้อรอคน H1/H2/H4/H5 ไปที่ Waiting on Human (H3 พักตามมติ047)","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: BE-001 verified จาก check-093-BE-001-003 PASS หลัง rework 2 รอบ (รอบ1 ตก 5 ข้อหลักฐาน · รอบ2 เหลือ token canonical) · deliverable design/auth-evidence-001.md Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"093 pilot SB-W1: TP-002 verified จาก wave gate check-093-wave1-gate-001 PASS (risk low — ตรวจครั้งเดียวที่ gate) + ความสอดคล้องข้าม task SA-001/BE-001/SEC-001/TP-002 ผ่าน","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)","refs":["planning/task-094.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5","refs":["planning/task-094.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-002 verified จาก check-094-DBA-002-004-001 PASS (AGY T2 ข้ามโมเดลกับ writer vault Codex T2) · deliverable db/schoolbot_db.sql + rollback + catalog C0–C5 + runbook review-008 · writer จบ NEEDS_HUMAN เพราะการรัน SQL เป็นของคน (DBA-003)","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: DBA-004 verified จาก check-094-DBA-002-004-001 PASS · project DDL ใน db/schoolbot_db.sql · backlog arch: parity เอกสาร review-008-parity","refs":["planning/task-093.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-002 slice S1 db-adapters done-local — parent รัน test ซ้ำ 4176/0 + contract 7/0 · risk low รอ wave gate","refs":["planning/task-094.md"]},
-    {"date":"2026-10-29","revision":2,"summary":"094 SB-W2: BE-002 S1 → blocked — wave gate FAIL F1/F2 → rework1 แก้ F1 · F2 ยังตก → rework 2/2 ล้มกลางทางเพราะ DNS เครื่อง · worktree B มี test ตก 1 รอรันซ้ำ","refs":["planning/task-094.md"]}
+    {
+      "date": "2026-10-26",
+      "revision": 2,
+      "summary": "089: รับ owner mapping AC-030-04..08 ตามมติ037; BE-019 Host workflow, BE-020/021 package recovery, QA-010 validation; TP-001 sync186AC; คง frozen scope/IDs/status/DAG/dependencies/gates/owner/tier/effort",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/traceability-089-001.md",
+        "requirement/req-030.md",
+        "requirement/decisions-037.md",
+        "requirement/decisions-038.md",
+        "test-plan/tp-001.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "ตรวจตามความเสี่ยง (BAAN ข้อ 13): ผูก ac_ids ให้ SA-001/BE-001/SEC-001/DBA-002/BE-002/DBA-004/TP-002 จาก REQ เดิม (ผู้ใช้อนุมัติ) · BE-002 พึ่ง DBA-002 แทน DBA-003 (ทำบน stub DB; G-CORE คงที่ DBA-003) · BE-039 เอา G-AUTH/G-CORE ออก (G-AUTH คงที่ BE-006, G-CORE ที่ DBA-003) · risk/wave ของ slice DB→License→Login→Projects 5 wave + risk ของฐานรากนอก slice 9 งาน · ledger oracle+ref ของ 15 งาน verified (ref 0b6687b = commit แรกที่ tasks-001.json ลงสถานะ verified ให้ทั้ง 15 งาน) · re-gate ทั้งแผนยังค้าง (lint ติด 55/63) เป็นงานรอบถัดไป",
+      "refs": [
+        "plan/index.md",
+        "../../../../memory/school-bot/_cross/planning/check-061-verdicts-001.md",
+        "../../../../memory/school-bot/_cross/planning/status-sync-062-001.json"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "re-gate ตามข้อ 10 (ผู้ใช้อนุมัติ): ถอด gate จากงานที่ทำบน stub/fake ได้ 43 งาน · ผู้ถือใหม่ QA-001 G-AUTH, BE-023 G-AUTH (DES-012 channel production), QA-002 G-PROJECT-DB+G-GUEST, QA-004 G-LEARN, QA-010 G-RELEASE-DB · G-CORE/G-LEARN-DB/G-DELIVERY คงที่ DBA-003/QA-015-016/QA-008-010 · คง G-ROBOT-CONTRACT ที่ BE-010 (สัญญา breaking + สั่งเคลื่อนที่หุ่น) · ปิด G-UX-ENTRY/PROJECT/LABS/LEARN จาก sign-off ที่มีอยู่ · งาน verified คง gate_ids เป็นประวัติ (BAAN 0.21.1 ไม่นับว่าขวาง)",
+      "refs": [
+        "plan/gates-001.md",
+        "requirement/decisions-041.md",
+        "requirement/decisions-043.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "093 pilot SB-W1: SA-001 verified จาก check-093-SA-001-001 PASS (L1 ทันที, AGY T2 ข้ามโมเดลกับ writer Codex T1) · deliverable design/contract-review-sa-001.md Rev1",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "093 pilot SB-W1: SEC-001 verified จาก check-093-SEC-001-001 PASS (AGY T2 ข้ามโมเดลกับ writer Codex T2) · deliverable design/security-review-093-001.md + evidence/compliance · ข้อรอคน H1/H2/H4/H5 ไปที่ Waiting on Human (H3 พักตามมติ047)",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "093 pilot SB-W1: BE-001 verified จาก check-093-BE-001-003 PASS หลัง rework 2 รอบ (รอบ1 ตก 5 ข้อหลักฐาน · รอบ2 เหลือ token canonical) · deliverable design/auth-evidence-001.md Rev7 · ข้อรอคน TR-AUTH-03/04/06, GAP-AUTH-006",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "093 pilot SB-W1: TP-002 verified จาก wave gate check-093-wave1-gate-001 PASS (risk low — ตรวจครั้งเดียวที่ gate) + ความสอดคล้องข้าม task SA-001/BE-001/SEC-001/TP-002 ผ่าน",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: BE-039 slice S2 curriculum-auth (AC-043-01) done-local — parent รัน test ซ้ำ 4169/0 · รอ check+jpo (risk high)",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-094.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: BE-039 slice S2 (AC-043-01) verified — check PASS + jpo ไม่มี Critical/Important (Minor SEC094-001 → backlog) · task คง done-local เพราะ S1 AC-036-06 รอ full Login/H5",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-094.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: DBA-002 verified จาก check-094-DBA-002-004-001 PASS (AGY T2 ข้ามโมเดลกับ writer vault Codex T2) · deliverable db/schoolbot_db.sql + rollback + catalog C0–C5 + runbook review-008 · writer จบ NEEDS_HUMAN เพราะการรัน SQL เป็นของคน (DBA-003)",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: DBA-004 verified จาก check-094-DBA-002-004-001 PASS · project DDL ใน db/schoolbot_db.sql · backlog arch: parity เอกสาร review-008-parity",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-093.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: BE-002 slice S1 db-adapters done-local — parent รัน test ซ้ำ 4176/0 + contract 7/0 · risk low รอ wave gate",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-094.md"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "revision": 2,
+      "summary": "094 SB-W2: BE-002 S1 → blocked — wave gate FAIL F1/F2 → rework1 แก้ F1 · F2 ยังตก → rework 2/2 ล้มกลางทางเพราะ DNS เครื่อง · worktree B มี test ตก 1 รอรันซ้ำ",
+      "refs": [
+        "../../../../memory/school-bot/_cross/planning/task-094.md"
+      ]
+    }
   ],
   "preconditions": {
     "latest_contract": "ก่อนfreeze/implementationต้องรับผลarch planning/task-013และvault task-012ที่ผู้คุมบันทึกจริง ไม่อ้างcontractอนุมัติตามpolicy; runนี้เอกสารเท่านั้น; precedence051 (2026-10-24): Gateway Rev3/receipt/queue-003 ฉบับ051 มีลำดับเหนือtransport/runnerเก่า; HTTP Login G แยกจากgRPC; ไม่มีdirect public B/HTTP relay; 035/cTypeตอบแล้ว ไม่ถามซ้ำ; 4032 local PASS ไม่ยืนยันGateway/gRPC/DB runtime; ไม่เริ่มimplementation",

@@ -1,14 +1,14 @@
 # SchoolBot — คิวงานต่อเนื่องจากหลักฐานจริง (Queue 003)
 
-Current pointer065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](../../../knowledge/school-bot/plan/owner-packet-001.md) แทนคิว/ยอด/runner/Waiting on Human ทุกส่วนด้านล่าง. ไฟล์นี้คงประวัติ; ไม่สั่งทำ artifact ที่ครบแล้วซ้ำ. t0–2=codex/t3–5=agy --no-fallback ไม่ใช้native subagent.
+Current pointer065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md) แทนคิว/ยอด/runner/Waiting on Human ทุกส่วนด้านล่าง. ไฟล์นี้คงประวัติ; ไม่สั่งทำ artifact ที่ครบแล้วซ้ำ. t0–2=codex/t3–5=agy --no-fallback ไม่ใช้native subagent.
 
-วันที่ 2026-10-23 · เจ้าของ: gm · อ้างอิง: [plan/index](../../../knowledge/school-bot/plan/index.md), [evidence-002](evidence-002.md), [queue-002](queue-002.md), [backlog](../../../knowledge/school-bot/backlog.md)
+วันที่ 2026-10-23 · เจ้าของ: gm · อ้างอิง: [plan/index](index.md), [evidence-002](evidence-002.md), [queue-002](queue-002.md), [backlog](../backlog.md)
 
 ## Override ใบงาน051 — 2026-10-24
 
 ส่วนนี้มี precedence เหนือคิว/runner/Waiting on Human เดิมด้านล่าง. ผู้ใช้เลือก Codex สำหรับงานนี้และให้ทำเอกสารก่อน; ลำดับ Claude→AGY→Codex และ task023/AGY เป็นประวัติ ไม่สั่ง rerun งานเดิม.
 
-ใช้ [Gateway Rev3](../../../knowledge/school-bot/design/gateway-integration-001.md) และ [receipt](../../../../memory/school-bot/_cross/planning/auth-flow-handoff-001.md): client→HTTP G→gRPC B; browser ผ่าน BFF, ไม่มี HTTP relay/HttpClient หรือ direct public B fallback. HTTP Login เดิมของ G/decoder เป็นอีกขอบเขต. B มี HTTP logout/internal decoder และ 4032 local tests แล้ว แต่ยังไม่พิสูจน์ Gateway/gRPC/DB runtime; fullLogin NOT_READY.
+ใช้ [Gateway Rev3](../design/gateway-integration-001.md) และ [receipt](../../../../memory/school-bot/_cross/planning/auth-flow-handoff-001.md): client→HTTP G→gRPC B; browser ผ่าน BFF, ไม่มี HTTP relay/HttpClient หรือ direct public B fallback. HTTP Login เดิมของ G/decoder เป็นอีกขอบเขต. B มี HTTP logout/internal decoder และ 4032 local tests แล้ว แต่ยังไม่พิสูจน์ Gateway/gRPC/DB runtime; fullLogin NOT_READY.
 
 035 และ cType category ตอบแล้ว ไม่ถามธุรกิจซ้ำ. รอทีมตรวจ pre-auth routing/profile linkage. มนุษย์ยังต้องให้ host/env/TLS/secret/service access/staff_admin และ approvals เดิมจาก artifact ที่ครบ; ไม่รอเลือก transport/HTTP exception.
 
@@ -18,7 +18,7 @@ Current pointer065 (2026-10-26): ใช้ [queue-004](queue-004.md) และ [
 
 สามขั้นของคิวเตรียมเอกสารทำครบแล้วตามลำดับ 055/056→057→058; ยังไม่ใช่การรับรอง implementation หรือปิด gate:
 - 055 BLOCKED เพราะ symbol ไม่อยู่ใน legacy → 056 DONE หลังตรวจ G: ไม่มี pre-auth cType selector ที่พิสูจน์แล้ว; legacy/web เป็น employee-only เลือกแถวล่าสุดเงียบๆ. ผล: [evidence001](../../../../memory/school-bot/_cross/planning/routing-linkage-evidence-001.json), [evidence002](../../../../memory/school-bot/_cross/planning/routing-linkage-evidence-002.json); fullLogin NOT_READY.
-- 057 NEEDS_HUMAN: [gRPC contract Rev1](../../../knowledge/school-bot/design/gateway-grpc-contract-001.md) ยัง PROPOSED พร้อม review packet §7; Gateway integration Rev4 เพิ่ม pointer เท่านั้น ไม่แก้ DES-012.
+- 057 NEEDS_HUMAN: [gRPC contract Rev1](../design/gateway-grpc-contract-001.md) ยัง PROPOSED พร้อม review packet §7; Gateway integration Rev4 เพิ่ม pointer เท่านั้น ไม่แก้ DES-012.
 - 058: [H5 questionnaire](../../../../memory/school-bot/_cross/planning/h5-questionnaire-001.md) 7 หัวข้อพร้อมส่งเจ้าของ/มนุษย์; ผลรับมี blocker พาธอ้างอิงซึ่งนายช่างแก้และยืนยัน coverage แล้ว. H5 ยังเปิด.
 
 รอ G/Light รับรองข้อยกเว้น opaque-session/tenant pipeline และ error mapper, เจ้าของ/มนุษย์ตอบ H5, G/sys/legacy/vault พิสูจน์ selector/cardinality/account-profile linkage และ owner ตรึง continuation/attempt/device-proof ตาม contract §7 ก่อนขั้นที่พึ่งพา. ไม่ถาม transport/cType/035 ซ้ำ; คง scope/dependencies/gates/Status และไม่มี code/SQL/runtime ใหม่.

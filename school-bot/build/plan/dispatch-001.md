@@ -1,10 +1,10 @@
 # SchoolBot — Queue และ Handoff Routing
 
-Precedence065 (2026-10-26): คิว/routing ปัจจุบันใช้ [queue-004](queue-004.md) และ [owner-packet-001](../../../knowledge/school-bot/plan/owner-packet-001.md). first wave/รายการเตรียมงาน/ยอด180AC-pending110ด้านล่างเป็นฐานประวัติ ไม่ใช่คำสั่ง rerun. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates. รอบ062เอกสารก่อน: UX005/007→check→คนเซ็น; owner packetพร้อมส่ง. t0/t1/t2=codex, t3/t4/t5=agy --no-fallback ไม่ใช้native subagent. คงDAG/effort/owner/tier/gates; ไม่dispatch implementation/SQL/deployก่อนprerequisites.
+Precedence065 (2026-10-26): คิว/routing ปัจจุบันใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md). first wave/รายการเตรียมงาน/ยอด180AC-pending110ด้านล่างเป็นฐานประวัติ ไม่ใช่คำสั่ง rerun. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates. รอบ062เอกสารก่อน: UX005/007→check→คนเซ็น; owner packetพร้อมส่ง. t0/t1/t2=codex, t3/t4/t5=agy --no-fallback ไม่ใช้native subagent. คงDAG/effort/owner/tier/gates; ไม่dispatch implementation/SQL/deployก่อนprerequisites.
 
 ## Waiting on Human ก่อนคิว
 
-เริ่มรายงานด้วย [Waiting on Human](../../../knowledge/school-bot/plan/gates-001.md) ทั้งหมด โดยระบุ Task / Reference / Reason / ผู้เตรียม / ผู้ตัดสินที่ยังขาด ห้ามสะสม implementation หลังคำถามที่ตัวงานพึ่งพาค้างอยู่ งานเตรียมหลักฐานและสายที่ไม่พึ่งคำตอบเดินต่อได้
+เริ่มรายงานด้วย [Waiting on Human](gates-001.md) ทั้งหมด โดยระบุ Task / Reference / Reason / ผู้เตรียม / ผู้ตัดสินที่ยังขาด ห้ามสะสม implementation หลังคำถามที่ตัวงานพึ่งพาค้างอยู่ งานเตรียมหลักฐานและสายที่ไม่พึ่งคำตอบเดินต่อได้
 
 ## First wave
 
@@ -51,7 +51,7 @@ Hardware มีผู้ควบคุมหนึ่งคนต่ออุ�
 
 ## Routing หลังส่งงาน
 
-ใช้ [routing ปัจจุบัน](queue-003.md) ตาม precedence051 (2026-10-24); ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](../../../knowledge/school-bot/plan/archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases
+ใช้ [routing ปัจจุบัน](queue-003.md) ตาม precedence051 (2026-10-24); ทุก role ส่งผู้คุม ไม่เรียก role ต่อกันเอง; [routing เดิม](https://github.com/jtrp98/knowledge-sb/blob/686555d4414039f1991d23085b94bd94eceebc23/school-bot/plan/archive/dispatch-routing-20261021.md) เก็บเป็นประวัติ Owner resolveตามrole_aliases
 
 ## Effort และข้อจำกัด
 

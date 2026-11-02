@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # ช่องว่างของ design system (DSG ที่ยังเปิด)
 

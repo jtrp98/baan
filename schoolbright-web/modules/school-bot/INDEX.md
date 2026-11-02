@@ -13,7 +13,7 @@ requested_by: [school-bot]
 
 เป้าหมาย: ครูในโรงเรียนลูกค้า SchoolBright ใช้เว็บ (แยกจากแอป) ดูความคืบหน้าและคะแนน Quiz รายเทอม/รายปี จัดตามห้อง · ตั้งค่า · แก้ปัญหาหุ่น · ไม่ใช้มาสคอต · ไม่แสดงงาน Arm/Block
 
-**knowledge เป็นแหล่งความจริงแล้ว** (นำเข้าจากระบบเก่า 2026-10-21) · บริบทร่วม: `../../../school-bot/shared/context.md` · brand: `../../../school-bot/design/archive/sketchbook-brand.md`
+**knowledge เป็นแหล่งความจริงแล้ว** (นำเข้าจากระบบเก่า 2026-10-21) · บริบทร่วม: `../../../school-bot/shared/context.md` · brand: `../../shared/brand.md`
 
 ## ไฟล์ (อ่านเฉพาะที่งานต้องใช้)
 

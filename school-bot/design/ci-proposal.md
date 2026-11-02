@@ -7,7 +7,7 @@ used_by: session หลัก (เสนอผู้ใช้) → ถ้า app
 
 # ข้อเสนอ: CI ของ School Bot Studio (component ระดับ UI) → brand.md §11
 
-ถอดจากหน้าจอ Arm Lab ที่อนุมัติแล้ว เพื่อให้ Block Lab และหน้าอื่นใช้ "ตระกูลเดียวกัน" (design-taste ข้อ 1) · **ไฟล์นี้เป็นข้อเสนอเท่านั้น ไม่ได้แก้ `archive/sketchbook-brand.md`**
+ถอดจากหน้าจอ Arm Lab ที่อนุมัติแล้ว เพื่อให้ Block Lab และหน้าอื่นใช้ "ตระกูลเดียวกัน" (design-taste ข้อ 1) · **ไฟล์นี้เป็นข้อเสนอเท่านั้น ไม่ได้แก้ `../shared/brand/README.md`**
 
 ## ที่มาและวิธีอ่าน
 

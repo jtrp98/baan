@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # ชื่องาน + สถานะบันทึก + เปลี่ยนชื่อ inline
 

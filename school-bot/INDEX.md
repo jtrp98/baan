@@ -1,3 +1,9 @@
+---
+project: school-bot
+platform: desktop
+os: [windows, mac]
+target: school-bot
+---
 # SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น
 
 > แก้ล่าสุด 2026-11-02 · แก้โดย spec · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่)
@@ -55,3 +61,24 @@ SchoolBot เป็นระบบสำหรับนักเรียนแ�
 ## หลักฐาน
 
 สถานะอ้างหน้าแรกเดิมและ [แผนปัจจุบัน](build/plan/index.md) สัญญาอ่านที่ [Gateway integration Rev5](build/design/gateway-integration-001.md), [สัญญา gRPC Rev2](build/design/gateway-grpc-contract-001.md) และ [controller entry Rev2](build/design/gateway-controller-entry-001.md)
+
+## Modules
+
+<!-- baan:modules:start -->
+<!-- ตารางนี้สร้างจากหัวไฟล์ INDEX.md ของแต่ละ module ด้วย `baan --index` — แก้ที่หัวไฟล์ของ module ไม่ใช่ที่นี่ -->
+
+| Module | สรุป | สถานะ | อัปเดต | พึ่งพา | ไฟล์ |
+|---|---|---|---|---|---|
+| app-shell | App Shell (สารบัญ module) | draft | 2026-11-02 | - | [modules/app-shell](modules/app-shell/INDEX.md) |
+| arm-lab | Arm Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
+| block-lab | Block Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
+| code-lab | Code Lab | draft | 2026-11-02 | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
+| my-work | my-work (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
+| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
+
+**module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
+
+| Module | สรุป | สถานะ | อัปเดต | เกี่ยวข้อง | อยู่ที่ |
+|---|---|---|---|---|---|
+| school-bot | เว็บครู School Bot (สารบัญ module) | draft | 2026-11-02 | ขอโดย school-bot · พึ่ง school-bot/quiz | [schoolbright-web/modules/school-bot](../schoolbright-web/modules/school-bot/INDEX.md) |
+<!-- baan:modules:end -->

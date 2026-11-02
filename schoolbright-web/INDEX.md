@@ -12,5 +12,6 @@ platform: web
 
 | Module | สรุป | สถานะ | อัปเดต | พึ่งพา | ไฟล์ |
 |---|---|---|---|---|---|
+| school-bot | เว็บครู School Bot (สารบัญ module) · ขอโดย school-bot | draft | 2026-11-02 | school-bot/quiz | [modules/school-bot](modules/school-bot/INDEX.md) |
 | timetableai | timetableai — Module Index | draft | 2026-11-02 | - | [modules/timetableai](modules/timetableai/INDEX.md) |
 <!-- baan:modules:end -->

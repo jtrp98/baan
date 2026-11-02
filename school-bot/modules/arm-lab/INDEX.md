@@ -12,7 +12,7 @@ os: [windows, mac]
 
 เป้าหมาย: นักเรียน ป.1–6 สอนท่าแขนกล 6 ข้อต่อ แล้วเล่นเป็นลำดับ กับหุ่น Raspberry Pi ผ่าน USB · ครูตั้งค่าขั้นสูงในโหมดครู
 
-ข้อมูลจากระบบเก่า (`~/Documents/School Bot/Handoff`) นำเข้ามาไว้ใน module นี้ครบแล้ว (2026-10-21) **knowledge เป็นแหล่งความจริง** ไม่ต้องเปิดโฟลเดอร์เดิม · บริบทร่วมโปรเจกต์: `../../shared/context.md` · brand: `../../design/archive/sketchbook-brand.md`
+ข้อมูลจากระบบเก่า (`~/Documents/School Bot/Handoff`) นำเข้ามาไว้ใน module นี้ครบแล้ว (2026-10-21) **knowledge เป็นแหล่งความจริง** ไม่ต้องเปิดโฟลเดอร์เดิม · บริบทร่วมโปรเจกต์: `../../shared/context.md` · brand: `../../shared/brand/README.md`
 
 ## ไฟล์ (อ่านเฉพาะที่งานต้องใช้)
 

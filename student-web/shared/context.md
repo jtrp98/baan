@@ -3,6 +3,4 @@ owner: gm
 ---
 # student-web
 
-เอกสารของ sb-compass, sb-compass-faculty-match จัดตาม project ที่ส่งมอบโค้ด รายละเอียด requirement และสัญญาเดิมอยู่ใน module ที่เกี่ยวข้อง โดยเก็บ ID และสถานะ task เดิมไว้
-
-สถานะ module เริ่มที่ draft เพื่อไม่ตีความการย้ายเอกสารเป็นการอนุมัติแบบหรือการส่งมอบ ระบบ target จริงยังใช้ config เดิมจนกว่าจะย้าย school-bot เสร็จ
+เว็บนักเรียน: sb-compass และ sb-compass-faculty-match เอกสาร shared/design/build จัดตาม module ที่ส่งมอบโค้ด โดยเก็บ ID และสถานะ task เดิมไว้ การย้ายเอกสารไม่เพิ่มการอนุมัติแบบหรือการส่งมอบ

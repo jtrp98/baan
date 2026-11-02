@@ -1,5 +1,5 @@
 ---
-owner: spec
+owner: design
 ---
 # Tokens: School Bot Studio
 

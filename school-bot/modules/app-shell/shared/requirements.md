@@ -6,11 +6,13 @@ owner: design
 
 # App Shell (โครงแอปนักเรียน): Requirements (จาก role 1)
 
-> นำเข้าจากระบบเก่า (`Handoff/01_REQUIREMENT` v3.1, `02_FEASIBILITY` v3–v4, `03_DESIGN`, `04_AUDIT` ถึง 2026-10-21) · **knowledge เป็นแหล่งความจริงแล้ว** · ID เดิม (FR/NFR/EC/AC/DEC/ST/SCR/ENT/ARC-I/DEV-Q/BUG/CR/EDIT/FRM/DSG) เก็บในวงเล็บเพื่อ grep · ป้ายหลักฐานดู `../../../shared/context.md` · ตารางจับคู่ท่ามาสคอตอยู่ `../../../design/archive/sketchbook-brand.md` §8 (ไม่คัดลอกซ้ำ)
+> นำเข้าจากระบบเก่า (`Handoff/01_REQUIREMENT` v3.1, `02_FEASIBILITY` v3–v4, `03_DESIGN`, `04_AUDIT` ถึง 2026-10-21) · **knowledge เป็นแหล่งความจริงแล้ว** · ID เดิม (FR/NFR/EC/AC/DEC/ST/SCR/ENT/ARC-I/DEV-Q/BUG/CR/EDIT/FRM/DSG) เก็บในวงเล็บเพื่อ grep · ป้ายหลักฐานดู `../../../shared/context.md` · ตารางจับคู่ท่ามาสคอตอยู่ `../../../shared/brand/README.md` §8 (ไม่คัดลอกซ้ำ)
 > module นี้คือส่วนที่ทุก lab ใช้ร่วม: installer, แถบหน้าต่าง, login, หน้าหลัก, ตั้งค่า/ภาษา, มาสคอต · หน้าบทเรียนอยู่ `quiz` · หน้างานของฉัน/sync/กู้คืนอยู่ `my-work`
 
 ## เป้าหมาย
 นักเรียน ป.1–6 (UI เดียวกัน) ติดตั้งโปรแกรม เปิดหน้าต่างของโปรแกรมเองบน Windows/Mac login ด้วยโรงเรียน + username + password แล้วเข้าหน้าหลักเพื่อไปบทเรียน / Block Lab / Arm Lab · เห็นสถานะการบันทึกงานและการเชื่อมต่ออุปกรณ์ที่แถบหน้าต่างเสมอ · หน้าตาทันสมัยแบบ Claude, LINE, Chrome (Confirmed) · ฐานภาพ: 6A หน้าหลัก (HomeV6A)
+
+## F1 ความต้องการเดิมจากทีมออกแบบ
 
 ## Requirements
 ลำดับ: M = Must · ? = ยังไม่ยืนยัน (ดู OQ)
@@ -26,7 +28,7 @@ owner: design
 - R9 (M): **มาสคอต School Bot** ปรากฏในช่วงเวลาสำคัญทั่วแอปนักเรียน (login, หน้าว่าง, Quiz ถูก/ผิด/จบด่าน, สำเร็จ/ผิดพลาด, กำลังโหลด) ใช้ 10 ท่าตามไฟล์ EV-06 **เท่านั้น** · ไม่ใช้บนเว็บครู · ไม่ใส่ในพื้นที่ทำงานหลักของ Arm Lab ที่อนุมัติแล้วเว้นแต่ผ่าน CR · (FR-32, AC-19, DEC-29, DEC-30, ENT-27, DEL-09, RSK-10)
 - R10 (M): **UI เดียวกันทุกชั้น ป.1–6** อ่านและใช้ได้สำหรับ ป.1 · เป้า WCAG 2.2 AA + เกณฑ์เด็ก (`../../../shared/context.md`) · contrast สูง แนว Duolingo แต่คลีน · 3 ภาษา เผื่อข้อความยาว +40% · (NFR-01, NFR-02, DEC-06, DEC-19, ARC-I20, AC-15, RSK-04)
 - R11 (M): **ขนาดและแพลตฟอร์ม:** โปรแกรมติดตั้ง Windows/Mac ต่อ USB · หน้าต่าง 1440×900 = แถบหน้าต่าง **60** + พื้นที่หน้าจอ **1440×840** (ผู้ใช้ตัดสิน 2026-10-22 · เดิมแถบ 44 + พื้นที่ 856) · frame ที่ออกแบบที่ 856 ต้องแก้ตาม · ไม่เลื่อนทั้งหน้า เลื่อนเฉพาะแผงรายการ · (NFR-03, CON-01, CR-09, D-14, D-15) · **แก้ 2026-10-26 (OQ17):** หน้าต่าง **ขั้นต่ำ 1440×900** ปรับขนาดได้ทั้งกว้างและยาวเมื่อจอใหญ่กว่า · **ยืดพื้นที่ทำงาน ส่วนหัวยืดตาม** (ขนาดปุ่ม/ตัวอักษร/แผงข้างคงเดิม) · ข้อความ "หน้าต่าง 1440×900 ตายตัว" และ "ไม่มี responsive" (D-14) ใช้ไม่ได้แล้ว: **เกินขั้นต่ำอย่างเดียว ไม่ออกแบบต่ำกว่า 1440×900**
-- R12 (M): **ชื่อและถ้อยคำ:** ชื่อทางการ **School Bot Studio · Arm Lab · Block Lab** ทุกจุด (ห้าม "School Bot Academy", "Block Studio", "Code Lab") · หัวกลุ่มเมนูสม่ำเสมอ · ใช้ตาราง "คำที่ตัดสินแล้ว" ใน `../../../design/archive/sketchbook-brand.md` §7 · (DEC-01, CF-05, BUG-04, EDIT-02)
+- R12 (M): **ชื่อและถ้อยคำ:** ชื่อทางการ **School Bot Studio · Arm Lab · Block Lab** ทุกจุด (ห้าม "School Bot Academy", "Block Studio", "Code Lab") · หัวกลุ่มเมนูสม่ำเสมอ · ใช้ตาราง "คำที่ตัดสินแล้ว" ใน `../../../shared/brand/README.md` §7 · (DEC-01, CF-05, BUG-04, EDIT-02)
 
 ## กฎ/Logic
 
@@ -70,3 +72,65 @@ DEC-01 ชื่อทางการ · DEC-03 login = โรงเรียน
 - เมื่อแถบหน้าต่างมี popover/dialog เปิดอยู่ ปุ่มหยุดทั้งหมดของ lab ต้องกดได้ครั้งแรก (R5)
 
 คำถามที่ยังไม่ตัดสินอยู่ใน `oq.md`
+
+## F2 License และสิทธิ์เข้าแอป
+
+### R13 Desktop และการใช้งานออฟไลน์
+
+[REQ-009 และ AC เดิม](requirements/req-009.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R14 จัดการ license ผ่าน admin API
+
+[REQ-027 และ AC เดิม](requirements/req-027.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R15 Activate, validate และจำกัดอุปกรณ์
+
+[REQ-028 และ AC เดิม](requirements/req-028.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R16 ตรวจ License ออนไลน์และสิทธิ์ออฟไลน์ 3 วัน
+
+[REQ-034 และ AC เดิม](requirements/req-034.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R17 ผู้ดูแลปลดเครื่องและย้าย Key เดิม
+
+[REQ-035 และ AC เดิม](requirements/req-035.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+
+## F3 แอป การติดตั้งและบัญชีผู้ใช้
+
+### R18 ภาษาของแอปและข้อมูลผู้ใช้
+
+[REQ-010 และ AC เดิม](requirements/req-010.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R19 ออกจากงานและปิดหน้าต่าง
+
+[REQ-012 และ AC เดิม](requirements/req-012.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R20 ขอบเขต sample/preview/mock
+
+[REQ-013 และ AC เดิม](requirements/req-013.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R21 จัดการ release metadata
+
+[REQ-029 และ AC เดิม](requirements/req-029.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R22 ตรวจข้อมูลอัปเดตจาก Desktop
+
+[REQ-030 และ AC เดิม](requirements/req-030.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R23 ติดตั้งและดูแลแอปบน Windows
+
+[REQ-031 และ AC เดิม](requirements/req-031.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R24 ติดตั้งแอปบน macOS
+
+[REQ-032 และ AC เดิม](requirements/req-032.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R25 ชื่อและฟิลด์ข้อมูล SchoolBot
+
+[REQ-033 และ AC เดิม](requirements/req-033.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
+### R26 Guest Local และ Login Cloud
+
+[REQ-036 และ AC เดิม](requirements/req-036.md) · สถานะ DRAFT ตามทะเบียนเดิม
+
