@@ -1,7 +1,7 @@
 ---
 module: block-lab
 updated: 2026-10-30
-owner: design
+owner: spec
 ---
 
 # Block Lab: Requirements (จาก role 1)

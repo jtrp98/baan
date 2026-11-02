@@ -1,7 +1,7 @@
 ---
 module: my-work
 updated: 2026-10-21
-owner: design
+owner: spec
 ---
 
 # my-work: Open Questions

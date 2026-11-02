@@ -1,7 +1,7 @@
 ---
 module: arm-lab
 updated: 2026-10-21
-owner: design
+owner: spec
 ---
 
 # Arm Lab: Open Questions

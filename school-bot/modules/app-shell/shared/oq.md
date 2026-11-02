@@ -1,7 +1,7 @@
 ---
 module: app-shell
 updated: 2026-10-26
-owner: design
+owner: spec
 ---
 
 # App Shell: Open Questions

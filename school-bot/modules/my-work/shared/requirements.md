@@ -1,7 +1,7 @@
 ---
 module: my-work
 updated: 2026-10-26
-owner: design
+owner: spec
 ---
 
 # my-work (งานของฉัน · บันทึก · cloud · sync): Requirements (จาก role 1)

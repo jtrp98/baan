@@ -1,7 +1,7 @@
 ---
 module: quiz
 updated: 2026-11-01
-owner: design
+owner: spec
 ---
 
 # Quiz (บทเรียน): Requirements (จาก role 1)

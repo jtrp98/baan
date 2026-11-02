@@ -1,7 +1,7 @@
 ---
 module: app-shell
 updated: 2026-10-30
-owner: design
+owner: spec
 ---
 
 # App Shell (โครงแอปนักเรียน): Requirements (จาก role 1)
