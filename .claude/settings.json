@@ -1,9 +1,0 @@
-{
-  "permissions": { "allow": ["Artifact"] },
-  "autoMode": {
-    "allow": [
-      "$defaults",
-      "Publishing design updates to the user's own Design canvas artifacts (Artifact tool publish to a url the user owns, e.g. the Block Lab canvas C1) is routine work in this repo and is authorized by the user."
-    ]
-  }
-}
