@@ -4,17 +4,17 @@
 
 ส่วนนี้กำหนดลำดับการอ่าน ไม่ใช่ re-audit: transport ใช้ [Gateway Rev3](design/gateway-integration-001.md#override-rev3--transport-ปัจจุบัน-2026-10-24) และ design/index.md ก่อนข้อความเก่า: Desktop/Web→HTTP G→gRPC B; browser ผ่าน same-origin BFF ไม่มี HTTP relay หรือ direct public B fallback. HTTP routes/status/payload ที่ระบุให้อ่านเป็นฝั่ง client ของ G; ยังไม่มีหลักฐาน RPC mapping ครบ. HTTP Login เดิมของ G และ decoder เป็นอีกขอบเขต ไม่สั่ง rewrite ตาม service transport.
 
-คงทาง C, opaque session, Channel/License และ device binding. แหล่ง is_admin ใช้ override decisions-035 ใน Gateway Rev3: ตรวจกลุ่มฝั่ง server และคง superadmin เดิม แทนคำแนะนำ claim-only/คำถามแหล่งสิทธิ์เดิม. cType ใช้ตามคำชี้แจงใน [auth-flow](planning/auth-flow-handoff-001.md); ไม่ใช่สิทธิ์ admin หรือหลักฐาน AccountId=ProfileId และไม่เปิดคำถามธุรกิจเดิมซ้ำ.
+คงทาง C, opaque session, Channel/License และ device binding. แหล่ง is_admin ใช้ override decisions-035 ใน Gateway Rev3: ตรวจกลุ่มฝั่ง server และคง superadmin เดิม แทนคำแนะนำ claim-only/คำถามแหล่งสิทธิ์เดิม. cType ใช้ตามคำชี้แจงใน auth-flow (memory: planning/auth-flow-handoff-001.md); ไม่ใช่สิทธิ์ admin หรือหลักฐาน AccountId=ProfileId และไม่เปิดคำถามธุรกิจเดิมซ้ำ.
 
 มาตรฐาน gRPC ยืนยันแล้ว แต่ trust boundary, JWT tenant กับ opaque session, auth/tenant metadata, private exposure/service identity, TLS/peer และ Light/H5 ยังเป็น design/implementation gaps. การเลือก transport ไม่พิสูจน์ controls เหล่านี้ ไม่กำหนดรายละเอียดแทน sys/arch และไม่เพิ่ม finding เพียงเพราะยังไม่ implement. SEC001-002 ยังต้องพิสูจน์ credential/process boundary ของ B/worker; ห้ามตีความว่า G ถือ credential DB หรือ private B ลดผลกระทบจากบัญชี DB กว้างได้เอง.
 
-[auth-flow](planning/auth-flow-handoff-001.md) ระบุ HTTP logout ใน B และผล4032 tests เฉพาะ local/static. SEC040-001 CLOSED เฉพาะ local per-process scope ไม่ครอบคลุม distributed limiting หรือ Gateway/gRPC/DB integration. Important6/Medium6/Minor3 เดิมยัง OPEN; verdict, accepted risks และ gates เดิมไม่เปลี่ยน.
+auth-flow (memory: planning/auth-flow-handoff-001.md) ระบุ HTTP logout ใน B และผล4032 tests เฉพาะ local/static. SEC040-001 CLOSED เฉพาะ local per-process scope ไม่ครอบคลุม distributed limiting หรือ Gateway/gRPC/DB integration. Important6/Medium6/Minor3 เดิมยัง OPEN; verdict, accepted risks และ gates เดิมไม่เปลี่ยน.
 
 ข้อความรายงานและ source observations วันที่2026-10-23 ด้านล่าง รวม mitigation และคำถามเดิม เก็บเป็นหลักฐานตามเวลานั้น อ่านประกาศนี้ก่อนเมื่อขัดกัน. ไม่ใช่ข้อยืนยัน source ปัจจุบัน และไม่ใช่คำขออนุมัติใหม่.
 
 วันที่ 2026-10-23 · jpo / Claude Sonnet tier t2 · ผล role: NEEDS_HUMAN
 
-[ใบงาน](planning/task-019.md) · [ผลต้นฉบับ](../../reports/school-bot/planning/security-response-001.json)
+ใบงาน (memory: planning/task-019.md) · [ผลต้นฉบับ](../../reports/school-bot/planning/security-response-001.json (memory))
 
 ตรวจแบบ static จาก source จริงของ target/school-bot (API, Desktop host, frontend, build scripts, manifests) และเส้นทาง legacy-token ใน sb-api-gateway แล้ว พบ Important 6 รายการ (planned_gap 4, deployment_unknown 1 และ web-principal 1) และ Medium/Minor 9 รายการ ไม่พบ Critical. ระบบปัจจุบันเป็น PoC ที่ไม่มี identity, entitlement หรือ update-install จริง (API ใช้ memory store และ install_supported=false) ช่องว่างส่วนใหญ่จึงเป็นงานที่ยังไม่ได้ implement ตามแผน ไม่ใช่ช่องโหว่ที่เปิดอยู่ในโค้ดตอนนี้. ที่เป็น actual defect มีเฉพาะ SEC001-007/008/013/014/015 ซึ่งผลกระทบจำกัด. ตรวจ CVE ของ dependency และสถานะกฎหมายปัจจุบันไม่ได้ เพราะ WebFetch/WebSearch ไม่ได้รับสิทธิ์ในรอบนี้ จึงไม่ประกาศ compliant หรือ vulnerable ในสองเรื่องนี้. รอบนี้ไม่มีการเขียน source/knowledge, ไม่มี request/login จริงและไม่มี network probe.
 
@@ -30,7 +30,7 @@
 
 ## Scope
 
-- knowledge: index ทั้งสี่หมวด, plan/SEC-001.md, tasks-001.json แถว SEC-001, DES-001/002/004/007/012, DES-009 (เฉพาะส่วน auth/channel/grade write), decisions-025/029, gates-001, evidence-002
+- knowledge: index ทั้งสี่หมวด, plan/SEC-001.md (memory), tasks-001.json แถว SEC-001, DES-001/002/004/007/012, DES-009 (เฉพาะส่วน auth/channel/grade write), decisions-025/029, gates-001, evidence-002
 - code: web/src/SchoolBot.Api/Program.cs และ ApiErrors.cs, SchoolBot.Application/ManagementService.cs, SchoolBot.Domain (SchoolLicense, DesktopRelease), InMemoryManagementStore.cs
 - code: app/desktopservice.go, desktopstorage.go, main.go, internal/engine/manager.go และ environment.go, frontend core/client.ts, index.html (CSP), teacher menu
 - code: scripts/build-desktop.ps1/.sh, package-desktop.sh, docs/DEPLOYMENT.md และ API.md
@@ -315,7 +315,7 @@ Minor · actual_defect · OPEN
 
 ## รอบทบทวน mitigation — 2026-10-23
 
-[คำตอบjpoครบ5ข้อ](planning/security-mitigation-001.md) · [ข้อมูลต้นฉบับ](../../reports/school-bot/planning/security-mitigation-response-001.json)
+คำตอบjpoครบ5ข้อ (memory: planning/security-mitigation-001.md) · [ข้อมูลต้นฉบับ](../../reports/school-bot/planning/security-mitigation-response-001.json (memory))
 
 ตอบ 5 ข้อจาก DES-002/004/007/009/012, db/schoolbot_db.sql:142-167 และ source gateway (อ่านอย่างเดียว) ความเห็นนี้ไม่ใช่การปิด finding ทุก Important ยัง OPEN จนมี code จริงและ jpo re-audit ไม่มี risk acceptance แทนคน คำตอบ 'service เดียวผ่าน gateway' ยืนยันเฉพาะ routing ไม่ยืนยัน host/TLS/exposure/secret/instance จึงไม่ปิด SEC001-011/012 และไม่ปิด auth gap ใด รอผลอ่าน legacy ของ sys และ arch ปรับ topology ก่อนประเมิน SEC001-002 ใหม่ (gateway ซ่อน API ลด exposure ตรง แต่ไม่ลดความกว้างของ credential) ตัวเลข TTL/limit ทุกค่าเป็น (สมมติฐาน — ยังไม่ยืนยัน) CVE/กฎหมาย/ข้อกำหนด CA ยังไม่ได้ตรวจแหล่งทางการ
 
@@ -331,13 +331,13 @@ Minor · actual_defect · OPEN
 
 ## Logoutsubset — SEC040-001
 
-2026-10-24: [jpo040](../../reports/school-bot/planning/logout-security-response-001.json) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](../../reports/school-bot/planning/logout-limiting-response-001.json) และ [jpo043](../../reports/school-bot/planning/logout-security-response-002.json) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน [QAround001](qa/round-001.md) และ [check](../../reports/school-bot/planning/auth-flow-check-response-002.json). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
+2026-10-24: [jpo040](../../reports/school-bot/planning/logout-security-response-001.json (memory)) พบMediumเรื่องpubliclogoutทำDBworkไม่bounded; [fix042](../../reports/school-bot/planning/logout-limiting-response-001.json (memory)) และ [jpo043](../../reports/school-bot/planning/logout-security-response-002.json (memory)) ระบุstaticREMEDIATED. checkยืนยันruntimecriteriaครบตามconditionalclose จึงCLOSEDเฉพาะlocalperprocessscope. หลักฐาน QAround001 (memory: qa/round-001.md) และ [check](../../reports/school-bot/planning/auth-flow-check-response-002.json (memory)). ไม่re-audit/ปิดImportant6เดิมและsecuritygatesทั้งระบบ
 
 - 2026-10-24 — นายช่างบันทึกdispositionจากjpo+check; ไม่มีriskacceptanceใหม่
 
 ## รอบตรวจรับฝั่ง security ของใบงาน060 — 2026-10-24
 
-[ผลตรวจ jpo ฉบับเต็ม](planning/security-gap-sync-review-001.md) (runner ภายนอก codex t2 ผ่าน baan-role — ตรวจข้ามโมเดลงานที่ solo/subagent เขียนในรอบ060) · สรุปโดยนายช่าง · คงแถวเก่า/status/severity ทั้งหมด — Important6/Medium6/Minor3 ยัง OPEN · ไม่มี risk acceptance หรือ gate closure ใหม่
+ผลตรวจ jpo ฉบับเต็ม (memory: planning/security-gap-sync-review-001.md) (runner ภายนอก codex t2 ผ่าน baan-role — ตรวจข้ามโมเดลงานที่ solo/subagent เขียนในรอบ060) · สรุปโดยนายช่าง · คงแถวเก่า/status/severity ทั้งหมด — Important6/Medium6/Minor3 ยัง OPEN · ไม่มี risk acceptance หรือ gate closure ใหม่
 
 - SEC001-003/009: arch ฝังเงื่อนไข mitigation ได้ครบในระดับแบบแล้ว (release-trust-001 + DES-007 Rev3 / license-admin-security-001 + DES-002 Rev3 + rules Rev8 ครอบ MUST-1..5) — ยังไม่ใช่ remediation รอพิสูจน์สิทธิ์ registry/custody, pin จริง, negative tests, RC จริง และ backup expiry
 - SEC001-002/006: โครง credential-matrix/signing-custody/export-proof-pack พร้อมให้เจ้าของกรอก — ต้องเติม effective privileges, rate limit ของ signer, ผลสแกน private key, ผู้เขียน registry เทียบผู้ sign/publish และ synthetic fixtures เป็นหลักของ proof pack
@@ -350,7 +350,7 @@ Minor · actual_defect · OPEN
 
 ## G typed logout re-audit — 2026-10-26
 
-[JPO090](planning/jpo-090-gateway-r1-001.md), CodexT2ผ่านbaan-role: HTTP500body/headerssanitizeผ่าน แต่ dependencyGrpcclientlogยังเผยsyntheticupstreamstatusdetail. ไม่พบข้อมูลบุคคลจริงรั่วในรอบนี้; ไม่มีriskacceptance/productionproof.
+JPO090 (memory: planning/jpo-090-gateway-r1-001.md), CodexT2ผ่านbaan-role: HTTP500body/headerssanitizeผ่าน แต่ dependencyGrpcclientlogยังเผยsyntheticupstreamstatusdetail. ไม่พบข้อมูลบุคคลจริงรั่วในรอบนี้; ไม่มีriskacceptance/productionproof.
 
 | ID | Severity | Finding / Owner | Status |
 |---|---|---|---|
@@ -363,7 +363,7 @@ Currentเพิ่ม2finding: Important7/Medium6/Minor4OPEN รวมของ
 
 ## G final rework2 disposition — 2026-10-26
 
-[JPO091](planning/jpo-091-gateway-r2-001.md) CodexT2 runLqKvlN และparentextendedซ้ำ81pass15fail/96 exit1: **SEC001-016ImportantOPEN** เพราะopaqueupstreamdetail/logscope/constructorfallbackbypassจริงและsharedchannelmutation; baseline5greenไม่พอ. **SEC001-017MinorCLOSEDเฉพาะlocalearlydeadlinefix** จากindependentwireproof+parent ไม่มีriskacceptance/H5closure. CurrentOPEN: Important7/Medium6/Minor3; OriginalImportant6ไม่เปลี่ยน.
+JPO091 (memory: planning/jpo-091-gateway-r2-001.md) CodexT2 runLqKvlN และparentextendedซ้ำ81pass15fail/96 exit1: **SEC001-016ImportantOPEN** เพราะopaqueupstreamdetail/logscope/constructorfallbackbypassจริงและsharedchannelmutation; baseline5greenไม่พอ. **SEC001-017MinorCLOSEDเฉพาะlocalearlydeadlinefix** จากindependentwireproof+parent ไม่มีriskacceptance/H5closure. CurrentOPEN: Important7/Medium6/Minor3; OriginalImportant6ไม่เปลี่ยน.
 
 หลังครบ2reworksให้ผู้ใช้ตัดสินadditionalnarrowrepairหรือพักsliceท้ายวง ไม่เปิดr3เอง. B QAtriageMediumUUIDintegrity/Minorerrornormalizationตามsurfaceที่prove ไม่มีcross-tenantproof ไม่เพิ่มduplicateSECIDและQAยังFAIL.
 
@@ -371,7 +371,7 @@ Currentเพิ่ม2finding: Important7/Medium6/Minor4OPEN รวมของ
 
 ## Logout transport re-audit หลังมติ049/050 — 2026-10-28
 
-[JPO092](planning/jpo-092-logout-r4-001.md) AGY T2 run WZnc4m (Codex ติดโควตา ผู้ใช้สั่งใช้ agy) บน G r4 controller + module-owned channel ([แบบ](design/gateway-controller-entry-001.md)) และ B rework3:
+JPO092 (memory: planning/jpo-092-logout-r4-001.md) AGY T2 run WZnc4m (Codex ติดโควตา ผู้ใช้สั่งใช้ agy) บน G r4 controller + module-owned channel ([แบบ](design/gateway-controller-entry-001.md)) และ B rework3:
 
 | ID | Severity | Status ใหม่ | หลักฐาน |
 |---|---|---|---|
@@ -387,7 +387,7 @@ Current OPEN: Important6/Medium6/Minor3 · ไม่ใช่ risk acceptance ·
 
 ## Security review pack ใบงาน093 — 2026-10-29
 
-[ตาราง threat/control ครบ 10 AC](design/security-review-093-001.md) · [หลักฐานและข้อรอคน](design/security-review-093-evidence-001.md) · [compliance/dependencies](design/security-review-093-compliance-001.md) — ตาม oracle SEC-001 ตรึง DES-001 Rev1 / DES-002 Rev3 / DES-004 Rev11 / DES-007 Rev3. ต่อจาก disposition/mitigation/review060 และ JPO092 โดยอ้าง SEC001 IDs เดิม; ไม่มี finding/risk acceptance ใหม่. Important6 ยังรอ fix+re-audit หรือคนรับ residual เป็นลายลักษณ์อักษร. SEC001-016/017 คง CLOSED เฉพาะ local logout ไม่ใช่ full AC-036-06 PASS.
+ตาราง threat/control ครบ 10 AC (memory: design/security-review-093-001.md) · หลักฐานและข้อรอคน (memory: design/security-review-093-evidence-001.md) · compliance/dependencies (memory: design/security-review-093-compliance-001.md) — ตาม oracle SEC-001 ตรึง DES-001 Rev1 / DES-002 Rev3 / DES-004 Rev11 / DES-007 Rev3. ต่อจาก disposition/mitigation/review060 และ JPO092 โดยอ้าง SEC001 IDs เดิม; ไม่มี finding/risk acceptance ใหม่. Important6 ยังรอ fix+re-audit หรือคนรับ residual เป็นลายลักษณ์อักษร. SEC001-016/017 คง CLOSED เฉพาะ local logout ไม่ใช่ full AC-036-06 PASS.
 
 ตรวจ source เฉพาะจุดและอ่านผลเดิม ไม่มี test run ใหม่/DB/deploy. API csproj ปัจจุบันมี gRPC/Protobuf PackageReference แล้ว ต่างจากข้อเท็จจริงวันที่2026-10-23; ยังไม่มี CVE/license sign-off. Replay 15 นาทีอนุมัติ046แล้ว; signer/custody ของ License พักตาม047 ไม่ขอคำตอบซ้ำ. อ่าน PDPA เฉพาะส่วนจากแหล่งราชการ ยังไม่รับรอง compliance/GDPR applicability. รายละเอียด/ข้อจำกัด/ผู้ตอบ H1–H5 อยู่ใน pack ไม่เปลี่ยน plan status.
 
@@ -397,7 +397,7 @@ Current OPEN: Important6/Medium6/Minor3 · ไม่ใช่ risk acceptance ·
 
 ## BE-039 S2 ใบงาน094 — 2026-10-29
 
-[ผลตรวจ authorization หลักสูตร](planning/jpo-094-BE-039-001.md): Critical ใหม่ 0 / Important ใหม่ 0 / Minor ใหม่ 1 (SEC094-001: Service:95–104 อนุญาต publish เมื่อ authorPrincipalId ขาด) ปัจจุบัน helper มีผู้เรียกเฉพาะ tests ไม่มี curriculum HTTP/gRPC endpoint ใน B ที่ตรวจ จึงยังไม่เข้าถึงจาก client→G→B; เสนอ BE ปฏิเสธ author ขาดและโหลด canonical author ฝั่ง server เป็นรายการไม่ขวาง slice ไม่เปิด task เอง
+ผลตรวจ authorization หลักสูตร (memory: planning/jpo-094-BE-039-001.md): Critical ใหม่ 0 / Important ใหม่ 0 / Minor ใหม่ 1 (SEC094-001: Service:95–104 อนุญาต publish เมื่อ authorPrincipalId ขาด) ปัจจุบัน helper มีผู้เรียกเฉพาะ tests ไม่มี curriculum HTTP/gRPC endpoint ใน B ที่ตรวจ จึงยังไม่เข้าถึงจาก client→G→B; เสนอ BE ปฏิเสธ author ขาดและโหลด canonical author ฝั่ง server เป็นรายการไม่ขวาง slice ไม่เปิด task เอง
 
 ตรวจ channel/role/fail-closed/error และข้อจำกัด tenant/session จริงจาก source; isolated reflection runner ใช้ xUnit Assert ได้ 43 ผ่าน/0 ไม่ผ่าน (เดิม22+อิสระ21 รวม reproduction ที่ยืนยัน defect ยังไม่แก้) native suite ไม่รับรอง: VSTest เชื่อม testhost ไม่ได้ หลักฐาน `reports/school-bot/normal-094/jpo-BE-039-evidence/` การตรวจนี้เสร็จเฉพาะ S2 ไม่ใช่ full AC/release
 

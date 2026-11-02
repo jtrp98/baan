@@ -8,7 +8,7 @@ HTTP adapter ของ G คือ SchoolBotAuthController → SchoolBotLogoutSe
 
 Harness ฝั่ง G ใช้ AddSchoolBotLogoutModule กับ UseRouting/UseAuthentication/UseAuthorization/MapControllers; direct invocation ใช้ controller/service. Channel สร้างด้วย SchoolBotSessionGrpcClient.CreateChannel และ generated client ด้วย CreateGeneratedClient; constructor ปฏิเสธ instance ที่ไม่มี provenance ก่อน RPC. ไม่ใช้ reflection หรือ fallback ไป generated client ดิบ.
 
-หลักฐาน G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58; SchoolBotLogoutRegistration.cs:97–163; SchoolBotSessionGrpcClient.cs:17–102. ข้อความ “All packet outcomes initially NOT_RUN” เป็นประวัติเริ่มต้นของ packet; ผลตรวจภายหลังอ้าง [JPO092](../planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md).
+หลักฐาน G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58; SchoolBotLogoutRegistration.cs:97–163; SchoolBotSessionGrpcClient.cs:17–102. ข้อความ “All packet outcomes initially NOT_RUN” เป็นประวัติเริ่มต้นของ packet; ผลตรวจภายหลังอ้าง JPO092 (memory: planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md).
 
 คง wire baseline, negative boundary, HTTP/RPC outcomes, limits และกฎ cancellation เดิมทุกข้อ. การเปลี่ยน harness entry ไม่อนุญาตแก้ assertion/expected/logsink นอกขอบเขตที่ controller-entry §D และ JPO ระบุ; ไม่ใช้ผล local ปิด production/H5/DB/BFF gates.
 

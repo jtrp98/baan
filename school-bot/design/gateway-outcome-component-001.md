@@ -4,7 +4,7 @@
 
 ## หลักฐานและการตัดสินใจ
 
-หลักฐาน033ที่034รับแล้ว: planning/desktop-login-evidence-001.json ส่วน teacher_flow อ้าง G/src/ApiGateway.API/Controllers/WebAuthController.cs:168,191,212,245,265–348: envelope code/message/messageTh/results/requestId, สี่ outcome และ send. ไม่ตรวจ source G ซ้ำและไม่อ้างว่า035เสร็จ.
+หลักฐาน033ที่034รับแล้ว: planning/desktop-login-evidence-001.json (memory) ส่วน teacher_flow อ้าง G/src/ApiGateway.API/Controllers/WebAuthController.cs:168,191,212,245,265–348: envelope code/message/messageTh/results/requestId, สี่ outcome และ send. ไม่ตรวจ source G ซ้ำและไม่อ้างว่า035เสร็จ.
 
 ตรวจ B จริง: web/Directory.Build.props:3–6 เป็น net10.0/nullable/warnings-as-errors; web/src/SchoolBot.Infrastructure/SchoolBot.Infrastructure.csproj:2 อ้าง Application; README.md:5–6 ยืนยัน Clean Architecture. ใช้ Infrastructure สำหรับ wire decoder และ xUnit ใน SchoolBot.Tests เดิม ไม่ให้ Application อ้าง Infrastructure.
 

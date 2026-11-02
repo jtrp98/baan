@@ -8,7 +8,7 @@
 
 อ่าน `target/sb-tech-upgrade-web-system/AGENTS.md` → `_docs/policy/project-policy.md` → `CLAUDE.md` → `DESIGN.md` และ `.claude/rules/loading.md` แล้ว: ลำดับคือคำสั่งผู้ใช้ > กฎ repo > workflow ระดับเครื่อง > skill ทั่วไป ข้อความ Spinner ในใบงาน063 เป็น brief ของผู้คุม ไม่ใช่คำสั่งผู้ใช้โดยตรง เว็บครู/Level/หน้าเกณฑ์ admin ที่อยู่ web-system จึงใช้ P9: Skeleton เฉพาะส่วนที่ยังโหลด, งานบันทึกใช้ปุ่ม disabled หรือ `.sb-progress-bar`; ไม่ใช้ Spinner หรือข้อความโหลดแทนโครงข้อมูล เคารพ reduced-motion และ shared component ตาม repo การแก้ให้ตรงกฎเดิมไม่ต้องขอ human approval ใหม่ ส่วน Desktop และ admin ส่วนกลางใน school-bot คงกติกาของตน ไม่ลาก P9 ข้าม repo; component/font/spacing ของ web-system ยึด DESIGN และ shared props เดิม ไม่ hardcode หรือเปลี่ยน stack อ่านเฉพาะเอกสารกฎ ยังไม่ได้อ่าน component หรือยืนยัน UI runtime
 
-Preconditions: `plan/evidence-002.md:7,14,16,19,21,39–40` ระบุ auth/H5/staff bootstrap/content evidence/runtime ที่ยังต้องพิสูจน์; ข้อความเก่าว่า UX ทั้งหมดยังไม่เซ็นไม่แทนมติ039–041 ล่าสุด ไม่มีการปิด gate/status ในชุดนี้
+Preconditions: `plan/evidence-002.md:7,14,16,19,21,39–40` (memory) ระบุ auth/H5/staff bootstrap/content evidence/runtime ที่ยังต้องพิสูจน์; ข้อความเก่าว่า UX ทั้งหมดยังไม่เซ็นไม่แทนมติ039–041 ล่าสุด ไม่มีการปิด gate/status ในชุดนี้
 
 ## T5. Sign-off table
 

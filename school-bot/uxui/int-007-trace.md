@@ -49,7 +49,7 @@ Retry/error/opaque ETag ใช้ `design/data-contract-rules.md:41–66` ไม
 
 อ่าน `C:/src/schoolbright/target/school-bot/app/frontend/src/App.tsx` ครบ 199 บรรทัด: :1–9 import AppView/Seg; :53–54 ตั้งภาษาเอกสาร; :56–72 จัด Escape ของ overlay; :96–105 cloud helper แปลงผล JSON เป็นข้อความ; :199 ส่ง state ไป AppView ไฟล์นี้ไม่แสดงหน้าข้อสอบ/เว็บครูจริง จึงไม่อ้างว่าตรวจ component เหล่านั้นหรือยืนยันว่าทั้ง repo ไม่มีหน้า ยังไม่ได้อ่าน AppView/Seg หรือ implementation ของ component เว็บครู/admin; รอบ070 อ่านเฉพาะกฎ web-system ตาม AGENTS → project-policy → CLAUDE → DESIGN และ loading.md: repo มีลำดับสูงกว่า skill ทั่วไป ใช้ P9 และ DESIGN/shared props สำหรับหน้าที่อยู่ repo นี้ตาม [states §1/§4](int-007-states.md) ไม่ขยายกฎไป Desktop/ส่วนกลาง ไม่เปลี่ยน stack และไม่อ้าง UI verified
 
-`plan/evidence-002.md:7,14,19,21` ระบุ auth/UX/DB preconditions; ข้อความ UX เก่าใช้สถานะจาก `uxui/index.md:14–24` และมติ039–041 ที่ใหม่กว่า G/Light/H5/auth trust และ runtime ยังค้างตาม `design/index.md:8–10` งานนี้ไม่ปิด gate
+`plan/evidence-002.md:7,14,19,21` (memory) ระบุ auth/UX/DB preconditions; ข้อความ UX เก่าใช้สถานะจาก `uxui/index.md:14–24` และมติ039–041 ที่ใหม่กว่า G/Light/H5/auth trust และ runtime ยังค้างตาม `design/index.md:8–10` งานนี้ไม่ปิด gate
 
 ใช้ skill School Bright ตามพาธในใบงาน ตรวจ token/contrast ด้วยการคำนวณเท่านั้น ไม่รัน test/build/SQL/network/Git ไม่แก้ index/status/sign-off เดิม และไม่เขียนไฟล์จริง
 

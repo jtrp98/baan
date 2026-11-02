@@ -6,7 +6,7 @@
 
 G ใช้ controller กับ `/api` prefix convention เดิม โดย module ลงทะเบียนผ่าน AddSchoolBotLogoutModule และรับ route ผ่าน MapControllers. SmartScheme เลือก SchoolBotOpaque สำหรับ `/api/school-bot/service/v2`; handler คืน NoResult ไม่แปลง opaque token เป็น JWT. จึงไม่ใช้ public relay branch ก่อน UseAuthentication/UserEnricher, minimal endpoint หรือ SchoolBotLogoutMiddleware. AllowAnonymous ของ logout ทำงานร่วมกับ scheme selector ไม่ใช่มาตรการแยก token เพียงอย่างเดียว.
 
-ข้อเท็จจริงจาก G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58, SchoolBotLogoutRegistration.cs:15–28,97–163 และ SchoolBotLogoutService.cs:24–223. Channel/client สร้างผ่าน CreateChannel/CreateGeneratedClient และตรวจ provenance โดยไม่ใช้ reflection ตาม SchoolBotSessionGrpcClient.cs:17–102. ผลตรวจ local และข้อที่ยังไม่ได้ตรวจอ่านจาก [JPO092](../planning/jpo-092-logout-r4-001.md) และ [index](index.md).
+ข้อเท็จจริงจาก G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58, SchoolBotLogoutRegistration.cs:15–28,97–163 และ SchoolBotLogoutService.cs:24–223. Channel/client สร้างผ่าน CreateChannel/CreateGeneratedClient และตรวจ provenance โดยไม่ใช้ reflection ตาม SchoolBotSessionGrpcClient.cs:17–102. ผลตรวจ local และข้อที่ยังไม่ได้ตรวจอ่านจาก JPO092 (memory: planning/jpo-092-logout-r4-001.md) และ [index](index.md).
 
 ข้อความว่าไม่พบ SchoolBot route/ยังต้องเริ่ม transport implementation ในหลักฐานรอบเก่าเป็นประวัติของรอบนั้น ไม่ใช่สถานะ local logout ปัจจุบัน; ไม่ขยายผลไป Login/exchange/private introspection หรือ production. คง transport, authority ของ B, error/metadata/trailer และ gates เดิมทั้งหมด.
 
@@ -24,7 +24,7 @@ G ใช้ controller กับ `/api` prefix convention เดิม โดย
 
 Login HTTP เดิมของ G เป็นคนละขอบเขตกับ service transport ใหม่; ไม่สั่ง rewrite Login หรือ decoder ที่ parse HTTP/JSON outcomes. คง C, opaque session, Channel/License, decisions-035, cType และ private introspection ที่แยกจาก public service-route.
 
-**As-built ที่ตรวจรอบนี้:** `B/web/src/SchoolBot.Api/Program.cs:45–48,94` ผูก LogoutService/PostgresSessionLogoutStore และ `LogoutEndpoint.cs:9,22` รับ HTTP POST แล้วเรียก use case. ยังไม่ครบ G→gRPC→B; inventory csproj/proto และ Program.cs ไม่พบ gRPC registration/reference หรือ .proto ในขอบเขตตรวจ. ใช้ domain/application/logout persistence เดิมซ้ำเมื่อเปลี่ยน transport โดยยังต้องพิสูจน์ integration. [QA round001](../qa/round-001.md) 4032 tests คง verdict local/static เดิม ไม่ใช่ gRPC/Gateway/DB integration proof.
+**As-built ที่ตรวจรอบนี้:** `B/web/src/SchoolBot.Api/Program.cs:45–48,94` ผูก LogoutService/PostgresSessionLogoutStore และ `LogoutEndpoint.cs:9,22` รับ HTTP POST แล้วเรียก use case. ยังไม่ครบ G→gRPC→B; inventory csproj/proto และ Program.cs ไม่พบ gRPC registration/reference หรือ .proto ในขอบเขตตรวจ. ใช้ domain/application/logout persistence เดิมซ้ำเมื่อเปลี่ยน transport โดยยังต้องพิสูจน์ integration. QA round001 (memory: qa/round-001.md) 4032 tests คง verdict local/static เดิม ไม่ใช่ gRPC/Gateway/DB integration proof.
 
 **งานถัดไป sys/arch:** จัดทำ gRPC contract + HTTP mapping + trust boundary ก่อน transport implementation: RPC/DTO, auth/tenant metadata, error mapping, timeout/cancellation/retry และ private exposure ต้องอิงหลักฐานจริง งานนี้ไม่กำหนดรายละเอียดเหล่านั้นแทนเจ้าของ. `G/AGENTS.md:35–37` ยังต้อง reconcile tenant จาก JWT กับ opaque session และผ่าน Light review สำหรับ protected paths; H5/TLS/peer/runtime proof ยังค้าง ไม่ใช่คำถามเลือก transport ใหม่.
 
@@ -38,7 +38,7 @@ Login HTTP เดิมของ G เป็นคนละขอบเขตก
 
 ## ขอบเขตและลำดับอ้างอิง
 
-เอกสารนี้ override เฉพาะ routing/trust-boundary/H5 ของ [DES-012](des-012.md) และ [auth-evidence](auth-evidence-001.md) ตาม [คำตอบผู้ใช้](../planning/user-context-001.md) ไม่แทนสัญญา auth C, Channel, License หรือมติ025/026 และไม่ยืนยันว่ามี deployment แล้ว
+เอกสารนี้ override เฉพาะ routing/trust-boundary/H5 ของ [DES-012](des-012.md) และ auth-evidence (memory: design/auth-evidence-001.md) ตาม คำตอบผู้ใช้ (memory: planning/user-context-001.md) ไม่แทนสัญญา auth C, Channel, License หรือมติ025/026 และไม่ยืนยันว่ามี deployment แล้ว
 
 ## หลักฐาน as-built
 
@@ -86,7 +86,7 @@ Private web-principal ใช้ scheme JabjaiWebLegacy ที่ตรึงไ�
 
 ## IsAdmin: ข้อเท็จจริงและจุดหยุด
 
-รับหลักฐาน sys ที่ [legacy-auth-review-002](../planning/legacy-auth-review-002.md) พร้อม [HEAD/hash13ไฟล์](../planning/legacy-source-check-001.json) ไม่อ่าน source นอก workspace ซ้ำ
+รับหลักฐาน sys ที่ legacy-auth-review-002 (memory) พร้อม HEAD/hash13ไฟล์ (memory: planning/legacy-source-check-001.json) ไม่อ่าน source นอก workspace ซ้ำ
 
 Legacy `FingerprintPayment/Default.aspx.cs:193–240` คำนวณ IsAdmin ใน server session จากสมาชิกกลุ่มแอดมิน/ผู้บริหารที่ active ผูก SchoolID/UserID และกลุ่ม Type=W/isEditable=false พร้อมแถวเมนู แต่ `FingerprintPayment/bypassgarde.aspx.cs:55–75` ให้ JWT IsAdmin=1 เฉพาะ user_id=0/admin_id!=null; แอดมินโรงเรียนปกติได้0
 

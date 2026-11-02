@@ -4,7 +4,7 @@
 
 ตารางนี้และ raw/Joined JSON คง snapshot180 AC/77 cases. Coverage ปัจจุบัน 82 cases / 187 AC อ่าน TP Amendment003, [Amendment004](tp-001-amendment-004.md) และ [Amendment005](tp-001-amendment-005.md) (ส่วนต่อท้ายไฟล์นี้): AC-046-07 → TP001-081 ตาม decisions-042; ไม่เพิ่มแถวใน snapshot ไม่ใช่ QA PASS
 
-ผู้คุม join implementation/validation จาก canonical plan/tasks-001.json revision2 โดยตรง ไม่เปลี่ยน owner หรือ status; ทุก Actual=NOT_RUN
+ผู้คุม join implementation/validation จาก canonical plan/tasks-001.json (memory) revision2 โดยตรง ไม่เปลี่ยน owner หรือ status; ทุก Actual=NOT_RUN
 
 > Precedence 2026-10-24: ขั้นตอน online coverage ใช้ [กลยุทธ์ร่วม Gateway→gRPC](index.md#กลยุทธ์ร่วม-transport--2026-10-24) และ TP Markdown ปัจจุบัน. 180 แถวคือ AC coverage ไม่ใช่ transport readiness/PASS; joined JSON มีเฉพาะ AC expected/IDs/owners/actual จึงคง schema/ข้อมูลเดิม ไม่เพิ่ม transport summary. tp-001.json เป็น raw snapshot รวม amendment เดิม ไม่ใช้ profiles เดิม override กลยุทธ์ปัจจุบัน
 

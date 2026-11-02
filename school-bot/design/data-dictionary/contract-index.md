@@ -4,7 +4,7 @@
 
 ภาคผนวกนี้รักษาสัญญา Rev5 ไว้ครบเพื่ออ้างอิงชนิดข้อมูล enum และโครงสร้าง JSON; คำอธิบายภาษางานอยู่ในหน้าของแต่ละตาราง
 
-อ้าง REQ-011, 027–029, 033–039, 040–052; decisions-012, 013, 020–030; อ้าง physical DDL ปัจจุบันใน [db/schoolbot_db.sql](../../db/schoolbot_db.sql) และผลการตัดทอนใน [db/review-005.md](../../db/review-005.md) ชุดนี้เป็น CONFIRMED baseline (32 ตาราง)
+อ้าง REQ-011, 027–029, 033–039, 040–052; decisions-012, 013, 020–030; อ้าง physical DDL ปัจจุบันใน [db/schoolbot_db.sql](../../db/schoolbot_db.sql) และผลการตัดทอนใน `db/review-005.md` (memory) ชุดนี้เป็น CONFIRMED baseline (32 ตาราง)
 
 | ส่วน | รายละเอียด |
 |---|---|

@@ -6,7 +6,7 @@
 
 คำว่า directadapter ในย่อหน้าหลัง error table อยู่ในบริบทการเรียก adapter โดยตรงเพื่ออธิบายการแข่งขัน context cancellation กับ timer ฝั่ง B ไม่ใช่ชื่อ G entry. กฎ branchcontext ชนะเมื่อทั้งสอง signal พร้อมกันคงเดิม และ transport ยังอาจจบก่อนตอบ; ห้ามเปลี่ยนกฎนี้เป็นกฎของ controller G จากการแก้คำเรียก. รอบเอกสารนี้ไม่ได้ตรวจ B adapter ซ้ำ จึงไม่อ้างหลักฐาน runtime ใหม่ของ B.
 
-ข้อความรอ sys rework2 ใน Impact/limits เป็นประวัติใบงาน089; หลักฐานภายหลังอ่าน [JPO092](../planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md). คง error pairs, validation order, metadata accounting, UUID correlation, trace/lang และ runtime/H5 limitations เดิมทั้งหมด.
+ข้อความรอ sys rework2 ใน Impact/limits เป็นประวัติใบงาน089; หลักฐานภายหลังอ่าน JPO092 (memory: planning/jpo-092-logout-r4-001.md) และสถานะใน [index](index.md). คง error pairs, validation order, metadata accounting, UUID correlation, trace/lang และ runtime/H5 limitations เดิมทั้งหมด.
 
 วันที่2026-10-26 · arch CodexT1 · run `2026-10-26-11-08-46-arch-tier-t1-1agents-pAQfPC` · ผู้คุมสกัด
 

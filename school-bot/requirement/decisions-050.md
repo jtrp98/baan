@@ -17,7 +17,7 @@
 ## ขอบเขต
 
 - เป็นการเปลี่ยนแบบ → route ให้ `arch` ปรับ DES/สัญญาก่อน แล้วจึงเปิด sys · ไม่อนุญาต production registration/deploy เพิ่ม · ไม่ปิด H5/G-AUTH
-- ไม่ย้อนผลการตรวจ B gRPC ([check-092](../planning/check-092-grpc-r3-001.md)) — ฝั่ง B ไม่กระทบ
+- ไม่ย้อนผลการตรวจ B gRPC (check-092 (memory: planning/check-092-grpc-r3-001.md)) — ฝั่ง B ไม่กระทบ
 
 ## Change Log
 

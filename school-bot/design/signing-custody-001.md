@@ -1,6 +1,6 @@
 # Custody matrix — Rev2
 
-ร่าง SEC001-006/003/009; อ่าน [DES-002](des-002.md), [DES-007](des-007.md), [mitigation ล่าสุด](../planning/security-mitigation-001.md). สถานะที่ [index](index.md); ตารางไม่บรรจุ key/certificate ส่วน private
+ร่าง SEC001-006/003/009; อ่าน [DES-002](des-002.md), [DES-007](des-007.md), mitigation ล่าสุด (memory: planning/security-mitigation-001.md). สถานะที่ [index](index.md); ตารางไม่บรรจุ key/certificate ส่วน private
 
 | Key / การใช้ | ผู้ถือ / ที่เก็บ | ใครสั่งใช้ได้ | Rotation / revoke | Backup / หลักฐานที่ขาด |
 |---|---|---|---|---|

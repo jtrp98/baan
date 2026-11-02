@@ -1,6 +1,6 @@
 # LUX-02 — supplied-row import และ storage stopline — Rev1
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้[sharedboundaryและstoplines](../planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
 
 ส่วนที่เริ่ม local ได้คือ **validator/preview ที่รับ supplied rows** ไม่มี Google Sheet fetch, SQL หรือการแปลง business mapping โดยเดา
 

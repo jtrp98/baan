@@ -8,7 +8,7 @@
 
 ## ข้อกำหนดที่ยืนยัน
 
-- [amendment-proposal-001](../design/amendment-proposal-001.md) + [amendment-proposal-002](../design/amendment-proposal-002.md) เป็น logical baseline ใหม่ แทน data-model Rev3 / schoolbot.dbml Rev1 ที่ยืนยันใน decisions-013 (ปิดประตู H4 ฝั่งการอนุมัติแบบ)
+- amendment-proposal-001 (memory) + amendment-proposal-002 (memory) เป็น logical baseline ใหม่ แทน data-model Rev3 / schoolbot.dbml Rev1 ที่ยืนยันใน decisions-013 (ปิดประตู H4 ฝั่งการอนุมัติแบบ)
 - รับ breaking change ทั้ง 6 จุด: ถอน `Curriculum.Mode`; เนื้อหากลาง `SchoolId=null`; รูปแบบ ScoringPolicy ใหม่; Session มี Channel และ DeviceJkt/AccountId บังคับเฉพาะ desktop; `/v1/admin` → `/v2/admin`; SchoolBot เขียนเฉพาะช่องเกรดที่เป็นเจ้าของหลังผ่าน gate DES-009
 - แก้ 2 จุดของ amendment-002 ให้ตรง decisions-025:
   1. session channel `school_web` ต้องตรวจว่าโรงเรียนมี SchoolBot License ที่ active (ไม่ใช่เฉพาะ login desktop) — ไม่ต้องมี device binding

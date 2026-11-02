@@ -8,7 +8,7 @@
 
 `K` = PostgreSQL int4, 1–2147483647; `U` = UUID ที่ไม่ใช่ table key; `N` = integer ≥1; `B` = boolean; `Tn` = Unicode string ยาวไม่เกิน n; `D` = UTC instant (`timestamptz`); `H` = SHA-256 hex 64 ตัว; `?` = nullable; `[]` = array; ค่าอื่น non-null ไม่มี implicit default
 
-`I` = signed int32; `S` = SchoolId:I (JSON integer); ชนิดยืนยันจาก source ([source-review-002.md](../source-review-002.md) และ [db/review-001.md](../../db/review-001.md))
+`I` = signed int32; `S` = SchoolId:I (JSON integer); ชนิดยืนยันจาก source ([source-review-002.md](../source-review-002.md) และ `db/review-001.md` (memory))
 
 `DecimalString` = JSON string ของเลขฐานสิบไม่ติดลบ ไม่มี exponent/เครื่องหมายบวก ไม่เกิน 6 ตำแหน่งทศนิยม; เก็บคะแนนใน DB เป็น `numeric(18,6)` (และเกณฑ์เลื่อน Level เป็น `numeric(9,6)` ช่วง `0..100`); ค่าติดลบ/NaN/Infinity ถูกปฏิเสธ; API ไม่ใช้ float สำหรับคะแนนหรือน้ำหนัก; `weight_bps` เป็น `int4` ช่วง `0..10000`
 

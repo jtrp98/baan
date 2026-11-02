@@ -1,6 +1,6 @@
 # กฎ mapping/export — Rev1
 
-Canonical ของ DES-008/009/dictionary ตาม032/033; อ่าน [ผลเรียน](learning-rules-032-034.md) และ ../db/review-006.md; SQL=../db/schoolbot_db.sql
+Canonical ของ DES-008/009/dictionary ตาม032/033; อ่าน [ผลเรียน](learning-rules-032-034.md) และ ../db/review-006.md (memory); SQL=../db/schoolbot_db.sql
 
 ## ช่องและล็อก
 Sources ยาว1ถาวร: {activity_id:PK,indicator_key:UUID|null,weight_bps:10000}; null ไม่เจาะตัวชี้วัด หนึ่ง activity หลายช่องได้ หนึ่งช่องกิจกรรมเดียว คีย์ช่อง=(SchoolId,NGradeId,AssessmentId,ScoreIdentifier) ตรวจ NYear/NTerm/ClassroomId/PlanCourseId/CourseId จริง ห้าม alias ด้วย identifier/run ใหม่ ScoreIdentifier resolve จาก ScoreData ไม่เดาจาก NameIdentifier/MaxScoreIdentifier/ordinal ช่องใหม่สร้างผ่านระบบเกรดก่อนเท่านั้น

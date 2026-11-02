@@ -15,7 +15,7 @@
 
 ลำดับอ้างอิง transport ปัจจุบัน: [Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 Rev9](../design/des-012.md) มี precedence เหนือถ้อยคำเส้นทาง API เดิมในหมวดนี้: client→HTTP G→gRPC B ไม่มี HTTP relay/direct public B. HTTP paths/status ใน BR/AC ของ REQ-027 รวม AC-027-01/02 เป็นเกณฑ์ที่ client boundary ของ G ไม่บังคับ B expose HTTP และไม่ยืนยันว่ามี RPC mapping แล้ว; HTTP Login เดิมของ G แยกจาก service transport B.
 
-REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fuel-001.md)ชี้fuel1000เป็นก่อนRun; structuralvaliddraftเก็บได้ ไม่มีคำถามธุรกิจใหม่/ACIDsและ44REQ186ACไม่เปลี่ยน.
+REQ026draft/Runปัจจุบัน: spec090 (memory: planning/spec-090-draft-fuel-001.md)ชี้fuel1000เป็นก่อนRun; structuralvaliddraftเก็บได้ ไม่มีคำถามธุรกิจใหม่/ACIDsและ44REQ186ACไม่เปลี่ยน.
 
 ## รายการ
 
@@ -68,7 +68,7 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 
 รวม 44 REQ / 187 AC — DRAFT (AC-030-04..08 ตรวจรับแล้วตาม [decisions-037](decisions-037.md))
 
-ประวัติ REQ-046: [req-046-history-001.md](req-046-history-001.md)
+ประวัติ REQ-046: `requirement/req-046-history-001.md` (memory)
 
 ## หมวดตามผลิตภัณฑ์
 
@@ -89,7 +89,7 @@ REQ026draft/Runปัจจุบัน: [spec090](../planning/spec-090-draft-fu
 - [pack-content-inventory-001.md](pack-content-inventory-001.md) — inventory สามโหมด + เกณฑ์/ดาว + คู่ผ่าน–ไม่ผ่าน + ช่องผู้อนุมัติ (BA-002 · ครอบ GAP-09)
 - [pack-hardware-001.md](pack-hardware-001.md) — hardware acceptance pack ครอบ 8 AC + platform matrix + ช่องกรอกคน (BA-003 · ครอบ GAP-05)
 - [pack-delivery-001.md](pack-delivery-001.md) — delivery & decision-owner pack เข้า G-DELIVERY (BA-004)
-- [scope-history-20261023-011.md](scope-history-20261023-011.md) — ส่วนประวัติ/Change Log ที่แยกจาก scope.md; ไม่ใช่สถานะปัจจุบัน
+- `requirement/scope-history-20261023-011.md` (memory) — ส่วนประวัติ/Change Log ที่แยกจาก scope.md; ไม่ใช่สถานะปัจจุบัน
 - [scope-baseline-001.md](scope-baseline-001.md) — หลักฐานความสามารถฐานเดิมและขอบเขต sample/preview/mock ณ 2026-10-21
 - [source-references.md](source-references.md) — รายการไฟล์ source code และเอกสารต้นทางที่ใช้กลั่น requirement
 

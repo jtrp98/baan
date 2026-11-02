@@ -8,7 +8,7 @@ Rev2 ไม่เปลี่ยนแบบ entry/channel ของ Rev1. เ�
 
 ชื่อ marker ใน as-built มีทั้ง SchoolBotLogoutModuleMarker และ SchoolBotLogoutMarker; registration เพิ่มทั้งสอง และ gate ยอมรับเมื่อพบอย่างใดอย่างหนึ่ง ตาม SchoolBotLogoutRegistration.cs:41–57,101–107. Options.Enabled มีค่าเริ่มต้น true ตาม SchoolBotLogoutOptions.cs:5. นี่เป็นรายละเอียด implementation ปัจจุบัน ไม่ใช่ข้อเสนอเปลี่ยน gate.
 
-ข้อ A ที่ระบุสมมติฐาน selector, ตาราง §D และรายการ §E เป็นบริบท ณ ออก Rev1 ก่อน JPO. อ่านผล surface probe และการประเมิน assertion ที่ [JPO092](../planning/jpo-092-logout-r4-001.md); สถานะปัจจุบันและขอบเขตที่ยังไม่ได้ตรวจอยู่ใน [index](index.md). ผล local ไม่ขยายเป็นการรับรอง production/H5/Light/DB/BFF.
+ข้อ A ที่ระบุสมมติฐาน selector, ตาราง §D และรายการ §E เป็นบริบท ณ ออก Rev1 ก่อน JPO. อ่านผล surface probe และการประเมิน assertion ที่ JPO092 (memory: planning/jpo-092-logout-r4-001.md); สถานะปัจจุบันและขอบเขตที่ยังไม่ได้ตรวจอยู่ใน [index](index.md). ผล local ไม่ขยายเป็นการรับรอง production/H5/Light/DB/BFF.
 
 วันที่2026-10-28 · arch AGY T1 (gemini-4-argon-high) run 2026-10-28-06-13-11-arch-tier-t1-1agents-vMHqG4 DONE · นายช่างสกัด · ตาม[มติ050](../requirement/decisions-050.md) + Amendment [มติ049](../requirement/decisions-049.md)
 
@@ -58,7 +58,7 @@ Assertion ที่ความหมายเปลี่ยน (JPO อิส�
 
 ## E. ผลกระทบ
 
-- B (target/school-bot): 0 changes · [check-092-grpc-r3](../planning/check-092-grpc-r3-001.md) ไม่กระทบ
+- B (target/school-bot): 0 changes · check-092-grpc-r3 (memory: planning/check-092-grpc-r3-001.md) ไม่กระทบ
 - OPEN: SEC001-016 (จน JPO อิสระ) · H5/Light review/production registration/TLS/peer จริง/BFF CSRF · G-AUTH
 
 ## Change Log

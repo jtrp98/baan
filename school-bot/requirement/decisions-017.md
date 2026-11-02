@@ -2,7 +2,7 @@
 
 ## คำตอบผู้ใช้ — 2026-10-21
 
-ผู้ตอบ: ผู้ใช้ในแชตนี้ ผ่าน request_user_input_async ของ [คำถามตรวจ OS](../planning/human-questions-004.md)
+ผู้ตอบ: ผู้ใช้ในแชตนี้ ผ่าน request_user_input_async ของ คำถามตรวจ OS (memory: planning/human-questions-004.md)
 
 คำตอบ: "ต้องรองรับ Windows 10 x64 ด้วย ให้ทีมตรวจ edition/build และปรับข้อเสนอขั้นต่ำก่อนยืนยัน"
 

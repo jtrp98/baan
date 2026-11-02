@@ -19,7 +19,7 @@
 
 ## ผลกระทบ
 
-- SQL: แยกเป็น SchoolBot DB (ตาราง 33 ตาราง) + School DB (GRANT SELECT ตาราง legacy เท่านั้น) + PGGradeDB (GRANT ตาม gate เดิม) — ดู [db/review-004](../db/review-004.md)
+- SQL: แยกเป็น SchoolBot DB (ตาราง 33 ตาราง) + School DB (GRANT SELECT ตาราง legacy เท่านั้น) + PGGradeDB (GRANT ตาม gate เดิม) — ดู db/review-004 (memory: db/review-004.md)
 - ความสัมพันธ์กับข้อมูลเดิม (TUser, TEmployees, TPlanCourse ฯลฯ) เป็น logical ID ข้าม DB อยู่แล้ว ไม่มี physical FK — ไม่ต้องเปลี่ยน schema
 - การตรวจสิทธิ์ครู/roster/term ที่เคยคิดว่าอ่านใน DB เดียวกัน ต้องอ่านผ่าน connection School DB แยก → ไม่มี transaction เดียวครอบ SchoolBot + School DB; ต้อง re-check ก่อน commit ตามแบบ DES-009/011 (SA ต้อง amend data-model/DES ที่อ้าง "School transaction เดียว")
 - SA ที่กำลัง sync baseline (สั่งก่อนมตินี้) ยังเขียน placement เป็น School DB — ต้อง amend ต่อหลังได้ผล

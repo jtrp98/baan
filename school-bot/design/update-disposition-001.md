@@ -13,7 +13,7 @@ Task SA-001/BE-019 · Reference GAP-07, DES-007, REQ-030 · Reason: coverage ย
 
 ## หลักฐานและหัวข้อที่ spec ต้องรับต่อ
 
-`app/desktopservice.go:109–115` เรียก GET /v1/updates/check; `web/src/SchoolBot.Api/Program.cs:96–99` คืน install_supported=false. [REQ-030](../requirement/req-030.md) กำหนด metadata-only; [BE-019](../plan/BE-019.md) รอ disposition ก่อนเปลี่ยน coverage. Source นี้ไม่ใช่ Prepare/Install proof
+`app/desktopservice.go:109–115` เรียก GET /v1/updates/check; `web/src/SchoolBot.Api/Program.cs:96–99` คืน install_supported=false. [REQ-030](../requirement/req-030.md) กำหนด metadata-only; BE-019 (memory) รอ disposition ก่อนเปลี่ยน coverage. Source นี้ไม่ใช่ Prepare/Install proof
 
 หากคง workflow ให้ spec ร่างเกณฑ์เรื่อง explicit intent, trust/hash/publisher pin/registry, staging TOCTOU, stop/close guard, expiry/withdraw/downgrade และ installer fail/repair ให้คนตรวจ. เป็นหัวข้อเสนอ ไม่ใช่ AC ใหม่. หาก check-only ให้เจ้าของ scope/แผนจัดการก่อน build; ไม่แก้ใบงาน gm เอง
 

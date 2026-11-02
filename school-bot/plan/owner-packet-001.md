@@ -1,10 +1,10 @@
 # ชุดส่งต่อเจ้าของ — Owner Packet 001
-วันที่ 2026-10-26 · gm · ใบงาน065 · อ้าง [คิวปัจจุบัน](queue-006.md)
+วันที่ 2026-10-26 · gm · ใบงาน065 · อ้าง คิวปัจจุบัน (memory: plan/queue-006.md)
 
 ## วัตถุประสงค์และผู้ส่ง
 พร้อมให้ผู้ใช้ส่งถึง G owner/Light/infra/B owner/BFF owners และเจ้าของ Master/School/PGGradeDB. ผู้ใช้เป็นผู้ส่งจริง; packet นี้ไม่ยืนยันว่ามีการติดต่อหรือได้รับ approval. ทบทวนสัญญาปัจจุบันและคืนหลักฐานในงานเดิม SA-001/BE-001/BE-039/SEC-001/DBA-002/DBA-007 ไม่เพิ่ม scope.
 
-แนบ [gRPC Rev1 §7](../design/gateway-grpc-contract-001.md), [Gateway Rev4](../design/gateway-integration-001.md), [H5 questionnaire](../planning/h5-questionnaire-001.md), [routing/linkage evidence002](../planning/routing-linkage-evidence-002.json), [DB request](../db/db-safe-evidence-001.md) และ [DB cover](../db/db-safe-evidence-cover-001.md). เป็นเอกสารพร้อม review ไม่ขอให้เจ้าของเตรียม questionnaire ใหม่.
+แนบ [gRPC Rev1 §7](../design/gateway-grpc-contract-001.md), [Gateway Rev4](../design/gateway-integration-001.md), H5 questionnaire (memory: planning/h5-questionnaire-001.md), routing/linkage evidence002 (memory: planning/routing-linkage-evidence-002.json), DB request (memory: db/db-safe-evidence-001.md) และ DB cover (memory: db/db-safe-evidence-cover-001.md). เป็นเอกสารพร้อม review ไม่ขอให้เจ้าของเตรียม questionnaire ใหม่.
 
 ## 1. Owner approval และคำตอบ H5
 ตอบกลับในหัวข้อเดิมของ questionnaire เพื่อไม่สร้างคำถามซ้ำ:
@@ -48,6 +48,6 @@ Transport client→HTTP G→gRPC B, cType category และ035 ตัดสิ�
 - 2026-10-26 — 074: เพิ่ม pointers/แก้คิว UX; ไม่เพิ่ม approval.
 - 2026-10-26 — ใบงาน065: รวมชุด owner review พร้อมส่ง; แยก approval/DB evidence/UX sign-off/runtime. ไม่มี approval, H5/G-CORE closure หรือคำอนุญาตรันระบบเกิดจากการสร้าง packet.
 - 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
-- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม [check082](../planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure
+- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม check082 (memory: planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure
 
 - 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม

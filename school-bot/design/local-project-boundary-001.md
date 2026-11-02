@@ -2,7 +2,7 @@
 
 วันที่2026-10-26 · arch CodexT1/gpt-6-astra high ผ่านbaan-role run 2026-10-26-14-14-23-arch-tier-t1-1agents-p8z60N · นายช่างสกัด technicalclarificationของDES003ก่อนrework1
 
-ฐาน [DES003](des-003.md), [ProjectAPI](project-api-001.md), [rules](data-contract-rules.md), [commontypes](data-dictionary/contract-001.md), [Guest](guest-workspace-001.md). ไม่มีschema/publiccode/IPCfieldใหม่; source6hashตรงparent. [Parent63/26/1](../planning/check-090-local-runtime-001.md)เป็นoverlayจริง; AncestorSwapAccessDeniedเป็นharnessblocked, symlinkskipเป็นgap, junctionoutsidewrite2filesในscratchจริง.
+ฐาน [DES003](des-003.md), [ProjectAPI](project-api-001.md), [rules](data-contract-rules.md), [commontypes](data-dictionary/contract-001.md), [Guest](guest-workspace-001.md). ไม่มีschema/publiccode/IPCfieldใหม่; source6hashตรงparent. Parent63/26/1 (memory: planning/check-090-local-runtime-001.md)เป็นoverlayจริง; AncestorSwapAccessDeniedเป็นharnessblocked, symlinkskipเป็นgap, junctionoutsidewrite2filesในscratchจริง.
 
 ## Local errors และลำดับ
 
@@ -75,4 +75,4 @@ Sysrework1: containment/sharedlocks/entitlementrecheck→strictcodec→receipt/l
 
 ## Amendment — ผลspecREQ026
 
-2026-10-26 [spec090DONE](../planning/spec-090-draft-fuel-001.md)/REQ026amendmentมีprecedenceเหนือข้อความรอspecในsectionBlockdepth/fuel: **fuel≤1000ตรวจเฉพาะก่อนRun, Save/Load/Migrationไม่rejectstructurallyvaliddraftเพราะfuel/outputcommands**; ไม่มีdraftbudgetต่อstack/รวมdoc. สูตรpurefuel/structuraldepth/count/disabledvalidationจากarchไม่เปลี่ยน. CheckถอนoracleFuelOverflowของstoreและทดสอบdraftกับRunแยก ไม่เปลี่ยนผลharnessเก่าย้อนหลัง. Archต้องalignDES003sentenceตามคำวินิจฉัย ไม่businessgateใหม่.
+2026-10-26 spec090DONE (memory: planning/spec-090-draft-fuel-001.md)/REQ026amendmentมีprecedenceเหนือข้อความรอspecในsectionBlockdepth/fuel: **fuel≤1000ตรวจเฉพาะก่อนRun, Save/Load/Migrationไม่rejectstructurallyvaliddraftเพราะfuel/outputcommands**; ไม่มีdraftbudgetต่อstack/รวมdoc. สูตรpurefuel/structuraldepth/count/disabledvalidationจากarchไม่เปลี่ยน. CheckถอนoracleFuelOverflowของstoreและทดสอบdraftกับRunแยก ไม่เปลี่ยนผลharnessเก่าย้อนหลัง. Archต้องalignDES003sentenceตามคำวินิจฉัย ไม่businessgateใหม่.

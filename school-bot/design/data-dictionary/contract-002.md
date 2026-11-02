@@ -41,7 +41,7 @@
 | **SchoolBotScoreOutbox** | ScoreExportId:K, ScorePreviewItemId:K, OperationKey:U, PayloadHash:H, State:OutboxState, Attempts:integer≥0, LeaseOwner:T128?, LeaseUntil:D?, NextAttemptAt:D, ReceiptId:int8?, ReceiptHash:H?, LastErrorCode:T64? |
 | **SchoolBotLevelProposal** | CourseRunId:K, TargetCurriculumId:K, SnapshotHash:H, Snapshot:LevelSnapshot, State:LevelProposalState, DecisionBy:A?, DecisionAt:D?, Reason:T1000?, SuccessorRunId:K? |
 
-ขอบเขต `SchoolId` ตามมติ [decisions-026.md](../../requirement/decisions-026.md) และ [db/review-005.md](../../db/review-005.md):
+ขอบเขต `SchoolId` ตามมติ [decisions-026.md](../../requirement/decisions-026.md) และ `db/review-005.md` (memory):
 - **Global เท่านั้น (`SchoolId = null` เสมอ — 8 ตาราง)**: `SchoolBotLevel`, `SchoolBotLevelPromotionPolicy`, `SchoolBotCurriculum`, `SchoolBotLesson`, `SchoolBotMission`, `SchoolBotCriteria`, `SchoolBotActivity`, `SchoolBotQuestionBank`
 - **Mixed Global/Tenant (`SchoolId = null` เฉพาะ catalog/operation กลาง หรือ `SchoolId > 0` สำหรับรายการรายโรงเรียน — 3 ตาราง)**: `SchoolBotRelease`, `SchoolBotIdempotency`, `SchoolBotAuditEvent`
 - **Tenant เท่านั้น (`SchoolId > 0` เสมอ — 21 ตาราง)**: ตารางอื่นทั้งหมด (โดย `SchoolBotStaffRole.SchoolId` คือโรงเรียนต้นสังกัดของบัญชีพนักงาน)

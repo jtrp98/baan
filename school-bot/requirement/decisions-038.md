@@ -27,7 +27,7 @@
 ## ที่ยังค้าง
 
 - **spec Q3**: รุ่นหุ่น/board/firmware + calibration จริง + เกณฑ์ stop/unplug/emergency — เป็นการกรอกข้อมูลจริง (รอข้อมูลจากผู้ใช้/ทีมอุปกรณ์)
-- EV-01..06: รอผู้ใช้ forward ข้อความถึงเจ้าของ Master DB ([cover-001](../db/db-safe-evidence-cover-001.md))
+- EV-01..06: รอผู้ใช้ forward ข้อความถึงเจ้าของ Master DB (cover-001 (memory: db/db-safe-evidence-cover-001.md))
 
 ## Change Log
 

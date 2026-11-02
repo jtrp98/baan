@@ -1,7 +1,7 @@
 # TP-002 — แผน failure/race fixtures — Rev2
 
 วันที่ 2026-10-29 · inspect · สถานะเอกสารอยู่ที่ [index](index.md)
-อ้างอิง: [TP-002 Oracle pack](../plan/TP-002.md#acceptance) · [DES-001 Rev1](../design/des-001.md) · [TP-001](tp-001.md) เฉพาะ TP001-003/010/037/040/045/058/079. เอกสารนี้เป็นแผนเตรียม fixtures ไม่ใช่ harness ที่เขียนแล้วหรือผล QA
+อ้างอิง: TP-002 Oracle pack (memory: plan/TP-002.md) · [DES-001 Rev1](../design/des-001.md) · [TP-001](tp-001.md) เฉพาะ TP001-003/010/037/040/045/058/079. เอกสารนี้เป็นแผนเตรียม fixtures ไม่ใช่ harness ที่เขียนแล้วหรือผล QA
 
 ## หลักการกลาง
 

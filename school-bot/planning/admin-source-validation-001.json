@@ -1,1 +1,0 @@
-{"date":"2026-10-23","kind":"policy035-document-validation","requirements":44,"ac_count":180,"tasks":110,"status":"pending","cases":77,"actual":"NOT_RUN","changed_document_links_checked":226,"sql_sha256":"2607a5177eafe53621619c21129ac7e2c7542e86a69ec86b0a1c94a8be8ee7a6","policy_choice":"server group + existing superadmin","runtime":"NOT_RUN"}

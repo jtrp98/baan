@@ -12,6 +12,6 @@
 | [int-006-admin-curriculum.md](int-006-admin-curriculum.md) | UX-005 Admin หลักสูตร/import/bank และ companion ทั้งชุด | อนุมัติ Q39–Q42 ครบ ผู้ใช้ 2026-10-26 · decisions-043 |
 | [int-007-attempt-policy.md](int-007-attempt-policy.md) | UX-007 Attempt/policy/teacher/Level และ companion ทั้งชุด | อนุมัติ Q43–Q46 รวม delta042 ผู้ใช้ 2026-10-26 · decisions-043 |
 
-ผลตรวจเอกสาร: [check073](../planning/check-073-ux-final-001.md) PASS ฐานร่าง; [check080](../planning/check-080-expired-delta-001.md) และ [check082](../planning/check-082-expired-spot-001.md) ตรวจ delta/ปิดข้อพบเอกสารแล้ว
+ผลตรวจเอกสาร: check073 (memory: planning/check-073-ux-final-001.md) PASS ฐานร่าง; check080 (memory: planning/check-080-expired-delta-001.md) และ check082 (memory: planning/check-082-expired-spot-001.md) ตรวจ delta/ปิดข้อพบเอกสารแล้ว
 
 การเซ็นครอบรูปแบบ ข้อความ state/a11y และ interaction ตามร่าง ไม่ใช่หลักฐาน UI/runtime; [ช่องว่าง LUX-01..07](../design/learning-ux-contract-gaps-001.md), owner/H5/DB/security/hardware gates และ backend dependencies คงอยู่. FullLogin ยัง NOT_READY. Front ใช้ส่วนที่เซ็นแล้วและตรวจสัญญาของงานที่เชื่อมจริงก่อน implement; กฎ web-system ยึด repo/DESIGN/shared props ตามร่าง

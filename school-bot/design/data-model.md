@@ -80,4 +80,4 @@
 - 2026-10-23 — เชื่อม DBML Rev4 แบบเต็มและภาพ integration ผ่าน dbml-guide-001 โดยคง data-model Rev6/สัญญาเดิม
 
 - 2026-10-23 — Rev6: เพิ่มคำอธิบายหน้าที่/หนึ่งแถว/ตัวอย่าง/ผู้ใช้ข้อมูลและฟิลด์ครบ 32 ตาราง (450 ฟิลด์), แผนที่ตารางเดิมพร้อมหลักฐาน และแยกภาคผนวกสัญญา Rev5 ไว้ครบ; ไม่แก้ SQL/DBML/ข้อตกลงธุรกิจ; ฉบับก่อนปรับอ่านง่ายเก็บแบบ byte-for-byte ที่ [archive](archive/2026-10-23-before-readable-data-model/data-model.md)
-- ประวัติ Rev1–Rev5: [ประวัติ data model](data-model-history-001.md)
+- ประวัติ Rev1–Rev5: ประวัติ data model (memory: design/data-model-history-001.md)

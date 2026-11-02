@@ -1,7 +1,0 @@
-{
-  "date": "2026-10-24",
-  "note": "หลังแก้ PlanCourseIds jsonb→integer[] ตาม check-061-verify4 (annotation เท่านั้น)",
-  "tables": 32,
-  "fields": 450,
-  "ok": true
-}

@@ -2,7 +2,7 @@
 
 ## คำตอบผู้ใช้ — 2026-10-21
 
-ผู้ตอบ: ผู้ใช้ในแชตนี้ ผ่าน [คำถามแนวทาง Home/Pro](../planning/human-questions-005.md)
+ผู้ตอบ: ผู้ใช้ในแชตนี้ ผ่าน คำถามแนวทาง Home/Pro (memory: planning/human-questions-005.md)
 
 คำตอบ: "ทดสอบแพ็กเกจเดิมและสำรวจเครื่องก่อน แล้วเสนอผลกับข้อจำกัดให้ตัดสินอีกครั้ง (แนะนำ)"
 
@@ -10,7 +10,7 @@
 
 ## ผลก่อนมีคำชี้แจงถัดไป
 
-ตรวจพบ Setup/MSI 0.1.5, SHA256 ตรง sidecar ทั้งคู่ และ MSI structural checks ผ่านบนเครื่องปัจจุบันโดยไม่ติดตั้งหรือเปิดแอป ไม่มี Windows 10/VM ที่พร้อมใช้จาก inventory ที่ตรวจ จึงถามเรื่องสภาพแวดล้อม ดู [preflight](../planning/installer-preflight-001.md)
+ตรวจพบ Setup/MSI 0.1.5, SHA256 ตรง sidecar ทั้งคู่ และ MSI structural checks ผ่านบนเครื่องปัจจุบันโดยไม่ติดตั้งหรือเปิดแอป ไม่มี Windows 10/VM ที่พร้อมใช้จาก inventory ที่ตรวจ จึงถามเรื่องสภาพแวดล้อม ดู preflight (memory: planning/installer-preflight-001.md)
 
 ## มติถัดมา
 

@@ -20,7 +20,7 @@
 
 arch รับไป amend DES-012/auth-evidence/Gateway addendum ให้ตรงมติและหลักฐาน legacy เดิม รวมสิ่งที่ยังต้องพิสูจน์ก่อนเปิดใช้. ปิดเฉพาะคำถามนโยบายแหล่งสิทธิ์ ไม่ปิด G-AUTH/H5/ข้อเท็จจริง mapping/SQL/runtime/QA/security; ไม่รับความเสี่ยงใหม่ ไม่อนุมัติ GRANT/สร้างตารางหรือ deploy จากคำตอบนี้
 
-ข้อเท็จจริง session/JWT ที่เป็นเหตุให้ถามอยู่ใน [หลักฐานต้นฉบับ](../planning/legacy-auth-review-002.md); มติเดิม025/026เรื่อง token exchange/Channel/License และรูปแบบ service ผ่านgatewayยังคงเดิม
+ข้อเท็จจริง session/JWT ที่เป็นเหตุให้ถามอยู่ใน หลักฐานต้นฉบับ (memory: planning/legacy-auth-review-002.md); มติเดิม025/026เรื่อง token exchange/Channel/License และรูปแบบ service ผ่านgatewayยังคงเดิม
 
 ## Change Log
 

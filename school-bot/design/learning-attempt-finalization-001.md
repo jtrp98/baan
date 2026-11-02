@@ -1,6 +1,6 @@
 # LUX-05 — A042 finalization ที่ไม่เพิ่ม state/table — Rev1
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้[sharedboundaryและstoplines](../planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
 
 ใช้ finalizer เดียวสำหรับ submit, expiry และ recovery; ไม่สร้าง grading job ชนิดใหม่สำหรับ single-choice/boolean
 

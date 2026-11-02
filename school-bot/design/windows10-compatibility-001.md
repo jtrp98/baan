@@ -71,7 +71,7 @@ Home22H2, Pro22H2, LTSC2019/2021 × setup EXE/direct MSI ทุกแถว; เ
 
 ## ข้อจำกัดและส่งต่อ
 
-planning/host-inventory-001.md:9–13 คือเครื่องปัจจุบัน Win11 Home Single Language10.0.26300 ไม่ใช่ Win10/โรงเรียน ไม่มี compatibility proof; ไม่ build/tests/install/device/rebuild
+planning/host-inventory-001.md:9–13 (memory) คือเครื่องปัจจุบัน Win11 Home Single Language10.0.26300 ไม่ใช่ Win10/โรงเรียน ไม่มี compatibility proof; ไม่ build/tests/install/device/rebuild
 
 Task BA-004/SA-003 / Reference decisions-017, REQ-009/031, OQ-011/G-DELIVERY / Reason: รอทางจัดการ Home/Pro gap/inventory; BA/PM รับข้อเสนอ, engineering ตรวจ imports/installer, QA รับ matrix; ผู้ใช้ตรวจขั้นต่ำ/ผลจริง ไม่ปิด gate
 

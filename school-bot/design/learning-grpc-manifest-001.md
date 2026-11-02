@@ -1,6 +1,6 @@
 # LUX-07 — typed G→B manifest delta — Rev1
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้[sharedboundaryและstoplines](../planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
 
 คง `SchoolBotSession.proto` และ wire fields เดิมทุกตัว เพิ่มภายหลังเป็นไฟล์ learning แยก เช่น `SchoolBotLearning.proto`, package `schoolbot.learning.v2` โดย B เป็นเจ้าของ ไม่ copy/redefine session error messages
 

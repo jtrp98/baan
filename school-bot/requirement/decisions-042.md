@@ -17,7 +17,7 @@
 
 ## ขอบเขตและการส่งต่อ
 
-มตินี้มี precedence เหนือส่วนรอเลือก A/B ของ [ข้อเสนอเดิม](expired-attempt-decision-proposal-001.md) สำหรับผลเมื่อหมดเวลาเท่านั้น; เพิ่ม BR-046-07/AC-046-07 ใน REQ-046
+มตินี้มี precedence เหนือส่วนรอเลือก A/B ของ ข้อเสนอเดิม (memory: requirement/expired-attempt-decision-proposal-001.md) สำหรับผลเมื่อหมดเวลาเท่านั้น; เพิ่ม BR-046-07/AC-046-07 ใน REQ-046
 
 arch/sys รับ clock/race/retry/DTO/lifecycle/recovery และ LUX-05 ต่อ ไม่กำหนดวิธีเทคนิคในมติธุรกิจ ไม่มีสมมติฐานธุรกิจใหม่
 

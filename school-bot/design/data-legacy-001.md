@@ -45,7 +45,7 @@
 
 ## ขอบเขตหลักฐาน
 
-อ่านจาก source/EF ไม่ใช่การตรวจฐานที่ deploy จริง ยังไม่ยืนยัน account-profile link, กฎ roster สิ้นเทอม และ writer คะแนนเดิม อ่าน [ผลตรวจและจุดที่ยังยืนยันไม่ได้](data-evidence-001.md)
+อ่านจาก source/EF ไม่ใช่การตรวจฐานที่ deploy จริง ยังไม่ยืนยัน account-profile link, กฎ roster สิ้นเทอม และ writer คะแนนเดิม อ่าน ผลตรวจและจุดที่ยังยืนยันไม่ได้ (memory: design/data-evidence-001.md)
 
 Logs DB ยังไม่มีตาราง/use case ที่ชัดเจนในแบบนี้; ตาราง Compass สองรายการแสดงเพื่อแยกออกจาก Level ของ SchoolBot และไม่ได้เป็นปลายทางการเขียน
 

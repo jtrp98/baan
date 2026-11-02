@@ -1,12 +1,12 @@
 # Gateway Login reuse — Rev4
 
-> Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน [receipt](../planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration.
+> Override Rev3 (2026-10-24): [Gateway integration Rev3](gateway-integration-001.md) มี precedence เหนือข้อความด้านล่างที่ยังไม่เลือก relay/gRPC: G→B ใช้ gRPC ตามมาตรฐานแล้ว. HTTP Login เดิมของ G และ HTTP/JSON outcomes ของ decoder เป็นอีกขอบเขต ไม่ต้อง rewrite จาก amendment นี้. หลักฐาน local component/logout ล่าสุดอ่าน receipt (memory: planning/auth-flow-handoff-001.md); ไม่ยืนยัน full Login หรือ Gateway integration.
 
 สถานะอยู่ที่ [index](index.md). ขอบเขต: auth seam เท่านั้น; ไม่มี schema delta.
 
 ## ข้อเท็จจริงและแหล่งหลักฐาน
 
-รับ source evidence ของ sys จาก [response](../planning/gateway-login-response-001.json) และ [review](../planning/gateway-login-review-001.md); ไม่อ้างตรวจ runtime. G/W หมายถึง target/sb-api-gateway และ target/sb-tech-upgrade-web-system. [ผู้คุมยืนยัน Git](../planning/gateway-login-source-check-001.json): G HEAD 9a03c9428a47150aa960e61ca91eedad6d0196af status/diff ว่าง; W HEAD 7ae35eb4ed3123783afa04e70181eb3576503e45 status ว่าง.
+รับ source evidence ของ sys จาก response (memory: planning/gateway-login-response-001.json) และ review (memory: planning/gateway-login-review-001.md); ไม่อ้างตรวจ runtime. G/W หมายถึง target/sb-api-gateway และ target/sb-tech-upgrade-web-system. ผู้คุมยืนยัน Git (memory: planning/gateway-login-source-check-001.json): G HEAD 9a03c9428a47150aa960e61ca91eedad6d0196af status/diff ว่าง; W HEAD 7ae35eb4ed3123783afa04e70181eb3576503e45 status ว่าง.
 
 G AuthService.cs:177 ให้ temporaryToken AccessLevel0 เมื่อ device ยังไม่ verified; WebAuthController.cs:265 คืน200ได้ทั้ง token และ challenge. WebLoginService.cs:206,272 ใช้ identity keys ต่างกันระหว่าง WorkStatus กับ token จึงยังเทียบ AccountId/SId/NSystemId/sEmp ไม่ได้. Login มี side effects เช่น attempts/lock; ไม่ใช่ pure verifier. refresh ใน ServiceMobile/AuthController.cs เป็น comment ไม่ใช่ active route.
 
@@ -41,7 +41,7 @@ G/sys ต้องให้ completion/continuation DTO, device lifecycle, token
 
 [desktop-login-adapter-001.md](desktop-login-adapter-001.md) มี precedence เหนือ candidate/readiness และ bounds เดิมเฉพาะ Desktop: เลือก teacher web continuation, student mobile ยังไม่มี Desktop completion ที่พิสูจน์ได้; ไม่ fallback หรือ fake IMEI. ไม่ต้องตรวจ password/hash ซ้ำใน B แต่ต้องตรวจ directory และ authorization ต่อ.
 
-ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ [desktop-auth-review-packet-001.md](desktop-auth-review-packet-001.md).
+ข้อเสนอ decoder/admission ของ033เป็น prerequisite logic ที่ทดสอบได้ ไม่ใช่ complete slice จนมี production caller และ dependency จริง. B ปัจจุบันมีเฉพาะ v1 License/Release กับ memory store; รอบ034ไม่อนุมัติ scaffolding/constant503 เป็น feature. ข้อค้างเจาะจงและ packet สำหรับ G อยู่ที่ `design/desktop-auth-review-packet-001.md` (memory).
 
 ## Change Log
 - 2026-10-24 — Rev4: แก้คำสั่ง transport ที่ยังอ่านเป็นตัวเลือก; Login HTTP/decoder คงเดิม

@@ -4,7 +4,7 @@
 
 ## ที่มา
 
-BE-002 S1-db-adapters ครบ rework 2/2 แล้วยัง FAIL ที่ F2 ([check-094-wave2-gate-003](../planning/check-094-wave2-gate-003.md)) · ผู้ใช้สั่งให้ arch หาจุดปรับปรุง → [project-commit-proposal-001](../design/project-commit-proposal-001.md) เสนอทาง A/B/C แนะนำ A
+BE-002 S1-db-adapters ครบ rework 2/2 แล้วยัง FAIL ที่ F2 (check-094-wave2-gate-003 (memory)) · ผู้ใช้สั่งให้ arch หาจุดปรับปรุง → project-commit-proposal-001 (memory) เสนอทาง A/B/C แนะนำ A
 
 ผู้ใช้ตอบ: "อนุมัติทาง A"
 

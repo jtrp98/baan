@@ -2,7 +2,7 @@
 
 วันที่ 2026-10-24 · รันโดย นายช่าง solo (subagent role inspect) · สถานะเอกสารอยู่ที่ [index](index.md)
 
-อ้างอิง: [TP-003](../plan/TP-003.md) (นิยามงาน), [SA-004 Rev2](../design/export-proof-pack-001.md) (5 gates + synthetic fixtures หลัก), [DES-008 Rev5](../design/des-008.md), [DES-009 Rev4](../design/des-009.md), [กฎ mapping/export Rev1](../design/grade-rules-032-034.md), [REQ-049](../requirement/req-049.md)..[REQ-052](../requirement/req-052.md), [TP-002 fixture plan Rev1](tp-002-fixture-plan-001.md), [transport กลางของ index](index.md). เอกสารนี้เป็น**แผนเตรียมเท่านั้น** (docs-only) ไม่มีการรัน fixture จริง ทุก actual=NOT_RUN ไม่ใช่ QA PASS และไม่ปิด gate ใดของ SA-004
+อ้างอิง: TP-003 (memory) (นิยามงาน), [SA-004 Rev2](../design/export-proof-pack-001.md) (5 gates + synthetic fixtures หลัก), [DES-008 Rev5](../design/des-008.md), [DES-009 Rev4](../design/des-009.md), [กฎ mapping/export Rev1](../design/grade-rules-032-034.md), [REQ-049](../requirement/req-049.md)..[REQ-052](../requirement/req-052.md), [TP-002 fixture plan Rev1](tp-002-fixture-plan-001.md), [transport กลางของ index](index.md). เอกสารนี้เป็น**แผนเตรียมเท่านั้น** (docs-only) ไม่มีการรัน fixture จริง ทุก actual=NOT_RUN ไม่ใช่ QA PASS และไม่ปิด gate ใดของ SA-004
 
 ## หลักการกลาง (ต่อ TP-002)
 

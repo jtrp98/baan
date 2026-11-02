@@ -41,7 +41,7 @@ Owner เดิมเป็น alias (รวม Handoff): sa→arch, ba→spec, 
 
 ## Precedence 051 — 2026-10-24
 
-การตีความ API ใน scope เดิมใช้ [Gateway Rev3](../design/gateway-integration-001.md): client→HTTP G→gRPC B ผ่าน BFF ตาม consumer; ไม่มี direct public B/HTTP relay. HTTP Login ของ G แยกจาก service transport. clarification นี้ไม่เพิ่ม feature/task หรืออนุญาต implementation; คิวล่าสุด [queue-003](queue-003.md).
+การตีความ API ใน scope เดิมใช้ [Gateway Rev3](../design/gateway-integration-001.md): client→HTTP G→gRPC B ผ่าน BFF ตาม consumer; ไม่มี direct public B/HTTP relay. HTTP Login ของ G แยกจาก service transport. clarification นี้ไม่เพิ่ม feature/task หรืออนุญาต implementation; คิวล่าสุด queue-003 (memory).
 
 ## Change Log
 - 2026-10-24 — ใบงาน051: ชี้ transport ของ scope เดิม; คง44REQ/180AC/110งาน/effort.

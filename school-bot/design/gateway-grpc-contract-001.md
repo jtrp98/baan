@@ -10,7 +10,7 @@
 
 หลักฐาน G/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:38–58; SchoolBotLogoutRegistration.cs:120–133; SchoolBotLogoutService.cs:40–173,185–223. Client ของ logout ใช้ CreateChannel/CreateGeneratedClient ตาม SchoolBotSessionGrpcClient.cs:17–102; คำว่า named gRPC client ใน review packet ไม่ใช่ข้ออ้างว่า logout ใช้ global client registration.
 
-ข้อความ “ยังไม่มี .proto/codegen”, “ก่อน implementation” และ “ยังไม่ได้รัน” ในฉบับแรกเป็นหลักฐาน ณ ใบงาน057 สำหรับ logout; อ่านขอบเขต wire subset จาก logout slice และผลตรวจที่ [JPO092](../planning/jpo-092-logout-r4-001.md). ไม่ถือว่า RPC Login/exchange/session/me/revoke ถูก implement หรือรับรองตามไปด้วย. สถานะปัจจุบันอยู่ที่ [index](index.md).
+ข้อความ “ยังไม่มี .proto/codegen”, “ก่อน implementation” และ “ยังไม่ได้รัน” ในฉบับแรกเป็นหลักฐาน ณ ใบงาน057 สำหรับ logout; อ่านขอบเขต wire subset จาก logout slice และผลตรวจที่ JPO092 (memory: planning/jpo-092-logout-r4-001.md). ไม่ถือว่า RPC Login/exchange/session/me/revoke ถูก implement หรือรับรองตามไปด้วย. สถานะปัจจุบันอยู่ที่ [index](index.md).
 
 คง DTO/field numbers, error pairs, metadata/trailer limits, deadline/retry และ transport เดิม. ไม่เลือก global mapper หรือ middleware entry เพราะมติ050 กำหนด controller และ local logout มี service รับผิดชอบ mapping อยู่แล้ว.
 
@@ -33,7 +33,7 @@
 - `BA/LogoutEndpoint.cs:9–33,38–45`: token ผิดรูปแบบ→204; storage failure→503 AUTH_UNAVAILABLE; unexpected→500 INTERNAL_ERROR.
 - `B/web/src/SchoolBot.Application/LogoutService.cs:9–26`: ตรวจ opaque token 43 ตัว, hash แล้วเรียก store พร้อม cancellation. `SchoolBot.Infrastructure/Persistence/PostgresSessionLogoutStore.cs:19–30,32–72,74–82`: revoke+audit transaction เดียว; active session เท่านั้น; DB timeout 5s และ sanitize provider errors. ใช้ application/store เดิมได้โดยไม่ย้าย SQL ไป G.
 
-หลักฐานรับต่อ ไม่ใช่ผลตรวจ login source ซ้ำ: [sys055](../planning/routing-linkage-evidence-001.json), [sys056](../planning/routing-linkage-evidence-002.json). HTTP logout/4032 local tests ไม่พิสูจน์ Gateway/gRPC/DB integration.
+หลักฐานรับต่อ ไม่ใช่ผลตรวจ login source ซ้ำ: sys055 (memory: planning/routing-linkage-evidence-001.json), sys056 (memory: planning/routing-linkage-evidence-002.json). HTTP logout/4032 local tests ไม่พิสูจน์ Gateway/gRPC/DB integration.
 
 ## 2. RPC และ HTTP mapping
 

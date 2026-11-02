@@ -1,10 +1,10 @@
 # Desktop login adapter — Rev4
 
-สถานะอยู่ที่ [index](index.md). สัญญานี้ครอบ outcome/admission ภายใน; ไม่สร้าง public endpoint หรือ schema. ใช้ร่วม [packet](desktop-auth-review-packet-001.md), DES-004 Rev9 และ DES-012 Rev7.
+สถานะอยู่ที่ [index](index.md). สัญญานี้ครอบ outcome/admission ภายใน; ไม่สร้าง public endpoint หรือ schema. ใช้ร่วม packet (memory: design/desktop-auth-review-packet-001.md), DES-004 Rev9 และ DES-012 Rev7.
 
 ## ฐานหลักฐาน
 
-G/B = target/sb-api-gateway และ target/school-bot. G อ้าง source:line ที่ sys033 อ่านจริงใน [evidence](../planning/desktop-login-evidence-001.json); ไม่อ้างตรวจ G/runtime ซ้ำ. ตรวจ B เพิ่มจริง: Program.cs:43–44,84–118 มี memory management และ v1 License/Release; ManagementService.cs:45–65 ใช้ key/device ID ไม่ใช่ DeviceJkt proof; InMemoryManagementStore.cs:8–13 ไม่มี session; ApiErrors.cs:18–20 เป็น v1 envelope; ApiHelpers.cs:19–28 มี WebApplicationFactory/FakeClock. พาธ C# เหล่านี้อยู่ใต้ B/web/src หรือ B/web/tests/SchoolBot.Tests ตามชื่อ project.
+G/B = target/sb-api-gateway และ target/school-bot. G อ้าง source:line ที่ sys033 อ่านจริงใน evidence (memory: planning/desktop-login-evidence-001.json); ไม่อ้างตรวจ G/runtime ซ้ำ. ตรวจ B เพิ่มจริง: Program.cs:43–44,84–118 มี memory management และ v1 License/Release; ManagementService.cs:45–65 ใช้ key/device ID ไม่ใช่ DeviceJkt proof; InMemoryManagementStore.cs:8–13 ไม่มี session; ApiErrors.cs:18–20 เป็น v1 envelope; ApiHelpers.cs:19–28 มี WebApplicationFactory/FakeClock. พาธ C# เหล่านี้อยู่ใต้ B/web/src หรือ B/web/tests/SchoolBot.Tests ตามชื่อ project.
 
 ## ทางเลือก
 
@@ -69,7 +69,7 @@ Public /v2/auth/login ยังมี DTO เดิม; ห้ามเพิ่
 
 ## Override Rev3 — ใบงาน047: request bounds และ public error layer
 
-ส่วนนี้มี precedence เหนือข้อความ034/Rev2 เฉพาะ request construction และ future public completion; ไม่ override [component037](gateway-outcome-component-001.md). รับข้อเท็จจริงจาก [035](../planning/desktop-login-wire-evidence-001.json) ส่วน contract_deltas/wire_fixtures ไม่ตรวจ G ซ้ำ.
+ส่วนนี้มี precedence เหนือข้อความ034/Rev2 เฉพาะ request construction และ future public completion; ไม่ override [component037](gateway-outcome-component-001.md). รับข้อเท็จจริงจาก 035 (memory: planning/desktop-login-wire-evidence-001.json) ส่วน contract_deltas/wire_fixtures ไม่ตรวจ G ซ้ำ.
 
 - employee_login: ตรวจ raw username ยาวไม่เกิน100 UTF-16 code units ก่อน Trim แล้วต้องไม่ว่าง; เกินเพดานแม้ Trim แล้วสั้นให้400 INVALID_INPUT ก่อนเรียก G. password ไม่ Trim.
 - first_password: effective newPassword ต้องเป็น ASCII 0–9 เท่านั้น ยาว8..20; แทนข้อความ1..100ที่ไม่ใช่ effective policy. B ตรวจรูปแบบก่อนส่ง หากผิดคืน400 INVALID_INPUT; G ยังตรวจ changeToken และ policy เอง โดย source ตรวจ changeToken ก่อน policy. local validation ไม่ยืนยันว่า token ใช้ได้และไม่รับรองลำดับ error ของ G เมื่อผิดหลายเงื่อนไข. ไม่เลือก password policy ใหม่.
@@ -89,7 +89,7 @@ Wire facts: G code เป็น HTTP integer ไม่ใช่ semantic code; s
 
 ## Override Rev4 — ใบงาน048: cType และการเลือก route
 
-มี precedence เฉพาะที่มา actor/category และการเลือก upstream เหนือข้อความเดิม; คง037/047และ admission เดิม. ผู้ใช้ยืนยันให้แยกนักเรียน/ครูด้วย cType แล้ว ตาม [คำชี้แจง](../planning/desktop-login-owner-question-001.md). ค่า CType="0"→student และ "1"→employee มาจาก [033](../planning/desktop-login-evidence-001.json) identity_mapping ไม่ใช่ตัวเลขที่ผู้ใช้ระบุ.
+มี precedence เฉพาะที่มา actor/category และการเลือก upstream เหนือข้อความเดิม; คง037/047และ admission เดิม. ผู้ใช้ยืนยันให้แยกนักเรียน/ครูด้วย cType แล้ว ตาม คำชี้แจง (memory: planning/desktop-login-owner-question-001.md). ค่า CType="0"→student และ "1"→employee มาจาก 033 (memory: planning/desktop-login-evidence-001.json) identity_mapping ไม่ใช่ตัวเลขที่ผู้ใช้ระบุ.
 
 ใช้ cType จากข้อมูล server ที่ผูกกับบัญชี/tenant ของ attempt ผ่าน trusted boundary; หลัง authentication ต้องตรวจความผูกพันนี้ก่อนยืนยัน actor และตรึงตลอด attempt. body/header cType, response user หรือ JWT ที่เพียง decode ไม่เป็น authority; mobile JWT ไม่มี CType ตาม033. null/unknown/กำกวมไม่ใช่ employee และห้ามออก session; unresolved mapping ใช้503 AUTH_NOT_CONFIGURED ตามเดิม. cType ไม่พิสูจน์ admin, active, tenant, device หรือ AccountId=ProfileId.
 

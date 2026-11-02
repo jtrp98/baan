@@ -56,11 +56,11 @@ Note ของตารางมีหน้าที่ “หนึ่งแ�
 
 ตรวจด้วย `@dbml/core 10.3.1` โหมด `dbmlv2` ซึ่งรองรับ [กลุ่มสี Note และ inactive ref](https://dbml.dbdiagram.io/syntax/enrichment-visualization/) ตัว parser แบบ legacy บางตัวไม่รองรับ syntax visualization ใหม่
 
-อ่านเพิ่มเติม: [คู่มือข้อมูล](data-model.md) · [ตารางเดิมและฟิลด์เชื่อม](data-legacy-001.md) · [ผลตรวจ DBML](dbml-review-001.md)
+อ่านเพิ่มเติม: [คู่มือข้อมูล](data-model.md) · [ตารางเดิมและฟิลด์เชื่อม](data-legacy-001.md) · ผลตรวจ DBML (memory: design/dbml-review-001.md)
 
 ## ประวัติ Amendment 032..034 (ผลตรวจฉบับเก่า)
 
-Full Rev5/integration Rev2 เปลี่ยน Notes เท่านั้น; [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) เป็นกฎแอป arch ไม่ได้รัน parser ใน session ของตน ผู้คุมตรวจหลังบันทึกด้วย @dbml/core10.3.1/dbmlv2 และเทียบ semantic ผ่านแล้วตาม [dbml-review-002](dbml-review-002.md): type/NULL/default/PK/index/enum/FK/actions เดิม คง32/450/40FK และ24/112/4FK+12logical
+Full Rev5/integration Rev2 เปลี่ยน Notes เท่านั้น; [ผลเรียน](learning-rules-032-034.md)/[คะแนน](grade-rules-032-034.md) เป็นกฎแอป arch ไม่ได้รัน parser ใน session ของตน ผู้คุมตรวจหลังบันทึกด้วย @dbml/core10.3.1/dbmlv2 และเทียบ semantic ผ่านแล้วตาม dbml-review-002 (memory): type/NULL/default/PK/index/enum/FK/actions เดิม คง32/450/40FK และ24/112/4FK+12logical
 
 ## Change Log
 
