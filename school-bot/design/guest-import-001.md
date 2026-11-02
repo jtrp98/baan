@@ -1,6 +1,8 @@
-# Explicit import โครงงาน Guest — Rev1
+# Explicit import โครงงาน Guest
 
-ต่อจาก [DES-003](des-003.md), [DES-004](des-004.md); REQ-041. HTTP semantics ฝั่ง client→G ตาม Gateway; สถานะอยู่ที่ [index](index.md)
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ต่อจาก [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md), [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](des-004.md); [REQ-041 (เลือกนำเข้าโครงงาน Guest)](../requirement/req-041.md). HTTP semantics ฝั่ง client → HTTP API Gateway ตาม Gateway; สถานะอยู่ที่ [index](index.md)
 
 ## ตัวตนและคำสั่ง
 
@@ -30,11 +32,16 @@ Server ตรวจ Channel/License/device proof/ownership แล้วสร้
 
 ชื่อ/ProjectContent ผิด → `400 PROJECT_INVALID`, payload เกิน → `413 PROJECT_TOO_LARGE`; auth errors ตาม DES-004, store ล่ม → `503 STORE_UNAVAILABLE`. บางชิ้นสำเร็จรายงานแยกชิ้น ไม่รายงานสำเร็จทั้งชุด. ต้นฉบับ Guest ทุกชิ้นคงอยู่
 
-## เหตุผลและหลักฐาน
+## เหตุผลที่เลือกแบบนี้
 
-เลือก reuse Idempotency+ResourceId/tombstone เดิม (ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql`) และ Project/Revision (ตาราง `SchoolBotProject`/`SchoolBotProjectRevision`); ไม่มี ClientId/import table ใหม่. ปัดตกสุ่ม RequestKey ใหม่ทุก login, dedup ด้วยชื่อ/hash อย่างเดียว และ local receipt อย่างเดียว เพราะ response หาย/หลาย instance ทำซ้ำได้. `app/desktopstorage.go:103–147` ยังเป็น single-slot file store ไม่ใช่ implementation ของข้อเสนอนี้
+เลือก reuse Idempotency+ResourceId/tombstone เดิม (ตาราง `SchoolBotIdempotency` ใน `db/schoolbot_db.sql`) และ Project/Revision (ตาราง `SchoolBotProject`/`SchoolBotProjectRevision`); ไม่มี ClientId/import table ใหม่. ปัดตกสุ่ม RequestKey ใหม่ทุก login, dedup ด้วยชื่อ/hash อย่างเดียว และ local receipt อย่างเดียว เพราะ response หาย/หลาย instance ทำซ้ำได้. หลักฐาน E01 ยังเป็น single-slot file store ไม่ใช่ implementation ของข้อเสนอนี้
 
-AC-041-01..05 ต้องตรวจเลือกเฉพาะ A, restart/replay หลัง TTL, response หาย, สอง instance, เปลี่ยนบัญชีระหว่างรอ และ Guest ไม่ถูกแก้. หลักฐาน runtime ยังต้องจัดทำ
+[AC-041-01 (มีงาน Guest หลายงานแล้ว Login โดยไม่สั่งนำเข้า ไม่เกิดงานเหล่านั้นในบัญชี)](../requirement/req-041.md)..05 ต้องตรวจเลือกเฉพาะ A, restart/replay หลัง TTL, response หาย, สอง instance, เปลี่ยนบัญชีระหว่างรอ และ Guest ไม่ถูกแก้. หลักฐาน runtime ยังต้องจัดทำ
 
-## Change Log
-- 2026-10-24 — Rev1: ใบงาน060a กำหนด explicit import/receipt/dedup โดยใช้ schema เดิม
+## ตัวตนที่อ้างในข้อมูล local
+
+`P` คือบริบทปลายทาง `{school_id,kind,profile_id}`; `A` คือตัวตนผู้ทำรายการจาก session ตาม [ชนิดข้อมูลกลาง](data-dictionary/contract-001.md) AccountId แยกจาก student/employee profile ID และ Guest UUID ไม่พิสูจน์บัญชีผู้สร้าง
+
+## หลักฐาน
+
+- E01 — `app/desktopstorage.go:103–147`

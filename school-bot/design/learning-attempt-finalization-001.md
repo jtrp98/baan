@@ -1,12 +1,14 @@
-# LUX-05 — A042 finalization ที่ไม่เพิ่ม state/table — Rev1
+# LUX-05 — A042 finalization ที่ไม่เพิ่ม state/table
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
 ใช้ finalizer เดียวสำหรับ submit, expiry และ recovery; ไม่สร้าง grading job ชนิดใหม่สำหรับ single-choice/boolean
 
 **Clock และจุดรับคำตอบ**
 
-- ทุกเวลาตัดสินมาจาก SchoolBot authoritative store clock; fake ใช้ `TimeProvider` ที่ควบคุมได้ ห้ามใช้ client time หรือเวลาเข้าที่ G
+- ทุกเวลาตัดสินมาจาก SchoolBot authoritative store clock; fake ใช้ `TimeProvider` ที่ควบคุมได้ ห้ามใช้ client time หรือเวลาเข้าที่ HTTP API Gateway
 - `started_at` ใช้เวลาภายใน transaction เริ่มครั้ง
 - `deadline_at = min(started_at + time_limit_seconds, closes_at)` โดยข้ามค่าที่ null; ทั้งคู่ null จึงไม่มี deadline
 - รับคำตอบเมื่อ `t_accept < deadline_at`; **เท่ากับ deadline ถือว่าหมดเวลา**
@@ -55,6 +57,6 @@ Expired finalizer ไม่เพิ่ม Sequence ไม่ consume หรื�
 **พร้อม local:** clock boundary, race, replay, evaluator และ recovery fake  
 **ยังไม่พิสูจน์:** DB clock/transaction durability/multi-process locks และ worker deployment
 
-## Change Log
+## หลักฐาน
 
-- 2026-10-26 — นายช่างสกัดสัญญาย่อยจากarchGN9DS5; schema/sourceidentity/owner/H5 gatesคงอยู่ ไม่เพิ่มfieldphysicalbaselineหรือexecuteSQL.
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่

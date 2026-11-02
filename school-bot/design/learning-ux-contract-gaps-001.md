@@ -1,26 +1,26 @@
-# ช่องว่างสัญญา Learning/UX — Rev2
+# ช่องว่างสัญญา Learning/UX
 
-ใบงาน071 · 2026-10-26 · gap receipt ไม่ใช่สัญญาใหม่
+> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-พาธหลักฐานเทียบจาก knowledge/school-bot/: D=design/, R=requirement/, DD=design/data-dictionary/. ตรวจ canonical docs ตามขอบเขต ไม่ตรวจ source/DDL/runtime ใหม่; ข้อมูล storage ด้านล่างเป็นแบบจัดเก็บ ไม่ยืนยัน implementation. สถานะอยู่ใน design/index.md.
+เอกสารนี้บันทึกช่องว่างเดิมระหว่าง Learning API กับ User Experience (UX) ไม่ใช่สัญญาใหม่ ตารางเก็บข้อค้นพบต้นทางครบทั้งเจ็ดรายการ
 
-| Gap | มีแล้ว / หลักฐาน | ยังขาดและผลต่อ UX | ผู้รับ / สิ่งที่ต้องตรึงก่อน implement |
-|---|---|---|---|
-| LUX-01 draft/approval | D/des-005.md:73–86 มี published list, detail, create, content PUT และ publish/four-eyes; DD/table-012.md:28–35 มีที่มา/เวลาเผยแพร่; DD/table-005.md:22–30 มี audit | ไม่ระบุ draft list/detail อย่างชัดเจน, แก้ metadata หลังสร้าง และ read-back ผู้อนุมัติ/เวลา/ที่มา; เปิดร่างกลับมาแก้และตรวจหลักฐานยังไม่ครบ ไม่ใช่ขาด create/publish | arch → UX-005/FE-019/020: ตรึง read/edit coverage, สิทธิ์, ETag และ mapping หลักฐานอนุมัติจากข้อมูลเดิม ไม่สร้างตารางโดยอนุมาน |
-| LUX-02 Sheet | D/des-005.md:27–29 มีทุกแถวเป็น draft, D/O/P–X และ stable keys; R/req-045.md:17,21–24 ยืนยันความหมาย; DD/table-013.md:23–24 แยก key/ordinal | D/des-005.md:73–85 ไม่มี preview/validate/import contract; ขาด source-row→key, ที่เก็บป้าย D, หน่วย atomic, validation/result และ dedup เมื่อใช้คำขอใหม่. DD/table-004.md:24–25 กัน retry key เดิม ไม่พิสูจน์ source dedup | arch/sys → UX-005/FE-019/020: ตรึง mapping/storage ที่ใช้จริง, atomic boundary, replay/dedup และ outcome ก่อนทำปุ่มนำเข้า; ห้ามประกอบหลาย request แล้วอ้าง atomic. ยังสรุปไม่ได้ว่า API-only หรือจำเป็นต้องแก้ storage |
-| LUX-03 bank draft | D/des-010.md:60–73 มี create/publish และ four-eyes; DD/table-017.md:22–33 มี revision/questions/draft/UpdateDate | ไม่มี read/edit ร่างที่บันทึกแล้ว จึงเปิดกลับมาแก้ไม่ได้ตามสัญญาปัจจุบัน; เป็นช่องว่าง API ไม่ใช่ไม่มี draft storage | arch → UX-005/FE-019/020: ตรึง read/edit, concurrency, สิทธิ์เห็นเฉลยและ immutable revision |
-| LUX-04 attempt | D/des-010.md:78–100 มี scoring-policy GET, attempt GET-by-id, answers PUT, submit; DD/table-024.md:30–31 มี Snapshot/Answers; D/learning-rules-032-034.md:21 มี effective policy snapshot | AttemptView ไม่คืน saved answers/effective policy/bank revision/evaluator version; ไม่มีค้นหา attempt ค้างหรือประวัติทุกครั้ง. ไม่ใช่ขาด GET/บันทึกคำตอบทั้งหมด; resume หลังเปิดแอปใหม่และ history ยังไม่ครบ | arch/sys → UX-007/FE-021/022: ตรึง discovery/read-back/history และ policy view ตาม channel โดยรักษากฎซ่อนเฉลย; ไม่จำเป็นต้องขอมติ policy เดิมซ้ำ |
-| LUX-05 expired/time | D/des-010.md:95–100,116 มี state/deadline/error; DD/table-024.md:26–32 มีเวลา/คำตอบ/คะแนน nullable | R/decisions-042.md:11–16 และ AC-046-07 ตอบธุรกิจแล้ว: auto-score คำตอบที่ server บันทึกทัน ข้อว่าง0 เต็มทั้งชุด นับครั้ง/สิทธิ์ซ่อมเดิม; ยังขาด clock/race/idempotent finalization/recovery proof จึงไม่รับรอง runtime สำเร็จ | arch/sys ตรึงและพิสูจน์เทคนิคตาม DES-010 amendment076; แยก mutations หลัง expired จาก read outcome/feedback ตาม policy เดิม ไม่ถามธุรกิจ042ซ้ำ |
-| LUX-06 aggregate/proposal | D/des-005.md:96–97 มี selected results; D/des-011.md:54–64 มี ProposalView/average/hash; :30 ระบุ immutable snapshot; DD/table-032.md:25 มี Snapshot | ยังไม่มี aggregate breakdown/read ของ snapshot ครบชุด. DD/contract-003.md:49 มี roster totals/source_hash แต่ไม่มี source refs แบบ id+update_date ที่ DES-011:30 ระบุ จึงไม่ใช่ API-only ทั้งหมด; ห้ามเอาผลสดมาประกอบเป็น snapshot | arch/sys → UX-007/FE-021/022: reconcile JSON กับ DES, ตรึง read projection/ความสอดคล้อง snapshot และพิสูจน์ roster/term ตาม D/des-011.md:22,81–82; ไม่แต่ง join/field เพิ่ม |
-| LUX-07 G→B | D/gateway-grpc-contract-001.md:30–38 manifest มี auth/session/me/revoke และระบุไม่เปิด learning โดยปริยาย; :144–151 กำหนด owner review | learning/admin-content routes ยังไม่มี typed RPC/DTO manifest จึงต่อ frontend จริงไม่ได้ แม้ HTTP ใน DES มีแล้ว | arch/sys + G/Light/B ตาม plan/queue-004.md:26–29 (memory): ตรึง exact route/DTO/error/ETag/replay/read-back ภายใต้ gates เดิม แล้ว B ดูแล proto/sync; ห้าม generic proxy/direct public B |
+ผลนี้เทียบเฉพาะ canonical documents ไม่ตรวจ source, Data Definition Language (DDL) หรือ runtime ใหม่ ข้อมูล storage เป็นแบบจัดเก็บ ไม่ยืนยัน implementation สถานะปัจจุบันอยู่ในสารบัญ
 
-ข้อธุรกิจที่มีมติแล้ว: four-eyes/คะแนนซ่อมสูงสุดตาม R/decisions-025.md:22–24; สูตร/freeze/ขอบเขตครูตาม R/decisions-034.md:13–19. ไม่ถามซ้ำ. REQ-045:16,28 ยังมีถ้อยคำรอเก่า แต่ :17 ยืนยันนำเข้าทุกแถวแล้ว จึงไม่เปิด OQ เดิมซ้ำ.
+รายละเอียดข้อค้นพบและผลต่อหน้าจออยู่ใน [ตารางช่องว่างทั้งเจ็ดรายการ](learning-ux-contract-gaps-001-details.md) ตารางเก็บหลักฐานเดิมและสิ่งที่ต้องตรึงก่อน implement ครบทุกข้อ
 
-LUX-05 ธุรกิจตอบแล้วตาม042; ส่วนที่เหลือเป็นงานเทคนิค/หลักฐานของทีม ไม่ใช่ gate ให้ผู้ใช้เดาวิธีออกแบบ. ยังไม่มีข้อเสนอ schema/breaking ใหม่; หากงานถัดไปจำเป็นต้องเปลี่ยนจริง ให้หยุดเข้าประตูเดิม.
+ข้อธุรกิจที่มีมติแล้ว: four-eyes/คะแนนซ่อมสูงสุดตาม หลักฐาน E25; สูตร/freeze/ขอบเขตครูตาม หลักฐาน E26. ไม่ถามซ้ำ. [REQ-045 (นำเข้า Course Plan Sheet)](../requirement/req-045.md) ยังมีถ้อยคำรอเก่า แต่เนื้อหายืนยันนำเข้าทุกแถวแล้ว จึงไม่เปิด OQ เดิมซ้ำ.
 
-คิวใช้ plan/queue-004.md (memory) และ planning/task-062.md:28,33 (memory)–34. FE ต้องรอทั้งสัญญา/backend และ UX sign-off ของตน; receipt นี้ไม่ปิด gate. อ้าง requirement/index.md หลัง042: 44 REQ/186 AC; คง 15 verified/95 pending, 32 ตาราง, DES revisions/PROPOSED และ 17 gates เดิม.
+LUX-05 (ผลเมื่อหมดเวลา) มีคำตอบธุรกิจแล้วตาม [มติ 042 (ตรวจคำตอบที่บันทึกทันเมื่อหมดเวลา)](../requirement/decisions-042.md); ส่วนที่เหลือเป็นงานเทคนิค/หลักฐานของทีม ไม่ใช่ gate ให้ผู้ใช้เดาวิธีออกแบบ. ยังไม่มีข้อเสนอ schema/breaking ใหม่; หากงานถัดไปจำเป็นต้องเปลี่ยนจริง ให้หยุดเข้าประตูเดิม.
 
-## Change Log
-- 2026-10-26 — Rev2 arch091: รับ7technicalcontracts (memory: planning/arch-091-learning-001.md)และDES005Rev8/010Rev5/011Rev6/dictionary003Rev3. Gapตารางเดิมเป็นfindingต้นทาง; localread/edit/attempt/finalizer/projectionพร้อมตามสัญญาใหม่ แต่approvalstorage/importprovenance/sourceidentity/roster/readercompat/ownerH5ยังOPEN. ไม่schemaapproval/runtimeproof.
-- 2026-10-26 — Amendment076: LUX-05 รับมติ042แล้ว เหลือ technical proof; gaps อื่นไม่เปลี่ยน คง Rev1
-- 2026-10-26 — Rev1: รับช่องว่างจาก int-006 T3/int-007 §3 แล้วตรวจ canonical; ไม่รับผล067 ไม่เพิ่ม endpoint/field/schema/lifecycle หรือผลตรวจ runtime.
+Frontend ต้องรอทั้งสัญญา/backend และ UX sign-off ของตน การมีบันทึกช่องว่างนี้ไม่ปิดเงื่อนไขดังกล่าว
+
+
+## ขอบเขตสัญญาย่อยที่มีแล้ว
+
+สัญญาย่อยทั้งเจ็ดรองรับ draft read/edit, attempt, finalizer และ projection แบบ local แล้วตาม [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](des-005.md) Rev8, [DES-010 (คลังข้อสอบและ Attempt)](des-010.md) Rev5, [DES-011 (เสนอและยืนยันเลื่อน Level)](des-011.md) Rev6 และ contract-003 Rev3 โดยยังคงเรื่อง approval storage, import provenance, source identity, roster, reader compatibility และการ review ของเจ้าของระบบ/H5 ไว้ ไม่ถือว่าเป็น schema approval หรือ runtime proof
+
+## หลักฐาน
+
+ตำแหน่งอ้างอิง E แต่ละรายการอยู่ใน [หลักฐานของเอกสารนี้](learning-ux-contract-gaps-001-evidence.md)
+
+ตำแหน่งบรรทัดเพิ่มเติมที่รายงานเดิมอ้างในบริบทเดียวกัน: :16,28, :17

@@ -1,34 +1,38 @@
-# กฎผลเรียน/policy — Rev2
+# กฎผลเรียน/policy
 
-Canonical ของ DES-004/005/010/011/012 และ dictionary ตาม032..034; หลักฐานแบบคือ ตาราง SchoolBotCourseRun ถึง SchoolBotRetakeGrant ใน ../db/schoolbot_db.sql และ ../db/review-006.md (memory) ไม่ใช่ runtime
+> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ไฟล์นี้กำหนดกฎผลเรียน Profile, CourseRun, สูตรรวม การตรึง policy และ Level ใช้ร่วมกับ [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](des-004.md)/[DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](des-005.md)/[DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md)/[DES-011 (ระบบเสนอเลื่อน Level และครูยืนยันทั้งห้อง)](des-011.md)/[DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md) และพจนานุกรมข้อมูลตาม [มติ 032 (ผลทดลองครูและการจับคู่/ล็อกช่องคะแนน)](../requirement/decisions-032.md), [มติ 033 (ช่องคะแนนเดิม การแปลงคะแนนเต็ม และผลที่ยังไม่มี)](../requirement/decisions-033.md) และ [มติ 034 (สูตรรวม น้ำหนักรอบเรียน และขอบเขตครูปรับข้อสอบ)](../requirement/decisions-034.md) ส่วน [กฎ mapping/export](grade-rules-032-034.md) กำหนดช่องคะแนน การล็อก การข้ามผล และ recovery ของการส่งคะแนน จึงเป็นคนละสัญญา
 
 ## ตัวตนและรอบเรียน
-employee ทดลอง local/เก็บ Project Cloud ได้ แต่ห้ามผล Cloud รวม Submission/Attempt, direct API, Guest import, retry/worker: 403 PROFILE_NOT_ALLOWED ก่อนสร้างผล/job; import ที่มีประวัติผลปฏิเสธทั้งคำขอ โครงงานนำเข้าแยกได้ ครู school_web ตรวจงานนักเรียนได้ตามสิทธิ์เดิม ตรวจ session/profile/SchoolId/Project.OwnerKind=student/OwnerId/roster ก่อน commit ไม่เชื่อ ID จาก client
 
-Submission ไม่มี CourseRunId: รับงานโดย resolve active run เดียวจาก school/roster/ห้อง/เทอม/curriculum ของ mission และ EffectiveAt<=SubmittedAt ล็อก CourseRun แล้ว commit submission/job/idempotency กับ AuditEvent เดิม: Event=Submission.Accepted, EntityType=SchoolBotSubmission, EntityId=PK, Actor=นักเรียน, Reason เป็น JSON text {"course_run_id":K} ใน varchar(1000); K=รหัสจริง ไม่เพิ่ม FK ไม่พบ/กำกวมคืน409 COURSE_RUN_NOT_RESOLVED
+Profile แบบ `employee` ทดลอง local และเก็บ Project Cloud ได้ แต่ห้ามสร้างผล Cloud ทั้ง Submission/Attempt รวม direct API, Guest import และ retry/worker ต้องคืน `403 PROFILE_NOT_ALLOWED` ก่อนสร้างผลหรือ job หาก import มีประวัติผลให้ปฏิเสธทั้งคำขอ แต่ผู้ใช้แยกนำเข้าเฉพาะโครงงานได้ ครูช่อง `school_web` ตรวจงานนักเรียนได้ตามสิทธิ์เดิม ก่อน commit ต้องตรวจ session, profile, SchoolId, Project.OwnerKind=student, OwnerId และ roster ไม่เชื่อ ID จาก client
 
-เลือก project result เฉพาะหลักฐาน run/learner/mission/revision ตรง เลือก submission ล่าสุดตาม SubmittedAt,PK แล้ว CurrentAssessmentId ไม่ fallback ผลเก่าเมื่อยังไม่ตรวจ การตรวจใหม่คง run เดิม ผลไร้หลักฐาน run เป็น SOURCE_SCOPE_UNPROVEN และ block export/proposal ไม่เดาจากเวลา/sId เก็บ audit ตลอดอายุผล Attempt ใช้ CourseRunId จริงและผลที่ตรวจเสร็จของ submitted หรือ expired ตาม selection (decisions-042); NULL ไม่ใช่ผลศูนย์ที่ตรวจแล้ว Test รวมซ่อมใช้ best ไม่มีเพดานลดคะแนน รวมผล expired ด้วย; ProgressView.selected_attempt ใช้ผลที่เลือกนี้โดยคง DTO เดิม
+Submission ไม่มี CourseRunId จึงต้อง resolve active run เพียงรอบเดียวจาก school, roster, ห้อง, เทอม และ curriculum ของ mission โดยมี EffectiveAt<=SubmittedAt จากนั้นล็อก CourseRun และ commit submission, job, idempotency กับ AuditEvent เดิม: Event=Submission.Accepted, EntityType=SchoolBotSubmission, EntityId=PK, Actor=นักเรียน, Reason เป็น JSON text {"course_run_id":K} ใน varchar(1000); K=รหัสจริง ไม่เพิ่ม FK หากไม่พบหรือกำกวม ให้คืน `409 COURSE_RUN_NOT_RESOLVED`
 
-## สูตรและ freeze
-Policy คง {quiz_counts,activity_weights:[{activity_id,weight_bps}],formula_version}; activity ให้คะแนนต้องครบ/ไม่ซ้ำ/อยู่ curriculum ของ run น้ำหนัก int0..10000 รวม10000=100%; instruction ไม่เป็น source; quiz_counts=false ให้ quiz น้ำหนัก0
-weighted-normalized-v1: total=SUM((earned/max)*weight_bps/100) สเกล0..100 เทียบเท่า normalized0..100*weight_bps/10000; decimal, max>0, 0<=earned<=max ไม่ปัดรายส่วน ตัวอย่างสมมติ 8/10*20+6/10*30+18/20*50=79; น้ำหนัก30/20/50ได้81 ไม่มีน้ำหนักเริ่มที่กำหนดแทนผู้ใช้
+เลือก project result เฉพาะที่มีหลักฐาน run, learner, mission และ revision ตรงกัน เลือก submission ล่าสุดตาม SubmittedAt,PK แล้วใช้ CurrentAssessmentId หากยังไม่ตรวจต้องไม่ fallback ไปผลเก่า การตรวจใหม่คง run เดิม ผลไร้หลักฐาน run เป็น SOURCE_SCOPE_UNPROVEN และ block export/proposal ไม่เดาจากเวลา/sId เก็บ audit ตลอดอายุผล Attempt ใช้ CourseRunId จริงและผลที่ตรวจเสร็จของ submitted หรือ expired ตาม selection ([มติ 042 (ผลข้อสอบเมื่อหมดเวลา)](../requirement/decisions-042.md)); NULL ไม่ใช่ผลศูนย์ที่ตรวจแล้ว Test รวมซ่อมใช้ best ไม่มีเพดานลดคะแนน รวมผล expired ด้วย; ProgressView.selected_attempt ใช้ผลที่เลือกนี้โดยคง DTO เดิม
 
-policy revision/pointer แก้ได้เฉพาะ planned ที่ไม่เคยเริ่ม ภายใต้ CourseRun lock+If-Match ตรวจ same-run/tenant/weights เริ่มรอบ=planned→active transaction ตรึง CurrentPolicyId พร้อม audit/idempotency บันทึก Event=CourseRun.Started, EntityType=SchoolBotCourseRun, EntityId=PK, Reason={"policy_id":K,"policy_hash":H}; H=SHA-256 canonical Policy ต้องพร้อมก่อนเริ่ม Lifecycle ไป active→closing→closed ห้ามย้อน planned/ลบหลบ freeze
-หลังเริ่มห้ามแก้ quiz_counts/weights/formula/pointer หรือลบ policy ที่อ้าง:409 SCORING_POLICY_FROZEN น้ำหนักใหม่ใช้ run ใหม่ planned ตาม unique ห้อง/เทอม/successor เดิม ไม่ปิดรอบเพื่อย้อนคิดผล NULL สูตรคือร่างเปิดไม่ได้:409 POLICY_NOT_CONFIGURED; weights ผิด409 SCORING_WEIGHT_INVALID
+## สูตรและการตรึง policy
+
+สูตร weighted-normalized-v1 น้ำหนัก และการตรึง policy อยู่ใน [กฎสูตรคะแนนและ policy](learning-rules-032-034-policy.md) ซึ่งเป็นส่วนหนึ่งของสัญญานี้
 
 ## ข้อสอบและ Level
-PolicyOverride คง AssessmentPolicy เต็ม object หรือ null ครูเปลี่ยนเฉพาะ time_limit_seconds field อื่นต้องเท่าค่าส่วนกลาง มิฉะนั้น403 POLICY_OVERRIDE_NOT_ALLOWED ไม่บันทึกบางส่วน null กลับ default; Test ต้องมีเวลา ครูปรับ OpensAt/ClosesAt ตาม window validation เดิม
-AttemptSnapshot ใน JSON เดิมเพิ่ม effective_policy:AssessmentPolicy, opens_at:UTC ISO8601|null, closes_at:UTC ISO8601|null โดย server ตอนเริ่ม; policy_id เดิมคือ ScoringPolicy ไม่แทน effective_policy; override ใหม่ไม่เปลี่ยน attempt/deadline/เฉลยเดิม
+
+PolicyOverride คง AssessmentPolicy เต็ม object หรือ null ครูเปลี่ยนเฉพาะ time_limit_seconds field อื่นต้องเท่าค่าส่วนกลาง มิฉะนั้น 403 POLICY_OVERRIDE_NOT_ALLOWED ไม่บันทึกบางส่วน null กลับ default; Test ต้องมีเวลา ครูปรับ OpensAt/ClosesAt ตาม window validation เดิม
+
+AttemptSnapshot ใน JSON เดิมเพิ่ม effective_policy:AssessmentPolicy, opens_at:UTC ISO8601|null, closes_at:UTC ISO8601|null โดย server ตอนเริ่ม; policy_id เดิมคือ ScoringPolicy ไม่แทน effective_policy; การปรับ policy ใหม่ไม่เปลี่ยน attempt/deadline/เฉลยเดิม
+
 RetakeGrant หนึ่งใบเพิ่มหนึ่งครั้งเฉพาะคน/activity/run ล็อก CourseRun ก่อนนับ Sequence/เพดาน/consume และ commit พร้อม attempt/audit/idempotency; retry ไม่กิน grant ซ้ำ
-Level ใช้ทุกคนใน roster งานขาด/ไม่มีผล=0 quiz ไม่นับน้ำหนัก0 ไม่ renormalize; average=SUM(total)/member_count เทียบ strict> ก่อนปัด; roster ว่าง409 ROSTER_EMPTY ไม่สร้าง successor; snapshot/recheck ตาม DES-011; export ใช้ skip แยกต่างหาก
 
-SQLคงเฉพาะPK; applicationต้องserializeและตรวจrelationships/uniqueness/state/bounds/profile/JSON/freeze/weights/run-bindingเองผ่านtransactionlocksตามdata-contract-rules. Recheck สิทธิ์/License/roster ข้าม DB ก่อน commit ไม่อ้าง atomic ข้ามฐาน ปัดตก LearnerKind B, ผูกผลด้วยเวลา/sId อย่างเดียว, policy ย้อนหลัง และ flag/counter ใหม่
+Level ใช้ทุกคนใน roster งานขาด/ไม่มีผล=0 quiz ไม่นับน้ำหนัก 0 ไม่ renormalize; average=SUM(total)/member_count เทียบ strict> ก่อนปัด; roster ว่าง 409 ROSTER_EMPTY ไม่สร้าง successor; snapshot/recheck ตาม DES-011; export ใช้ skip แยกต่างหาก
 
-## Amendment 076 — 2026-10-26
-ผล expired ตาม [DES-010 amendment076](des-010.md) ใช้ earned/max เต็มทั้งชุดเข้าสูตร weighted-normalized-v1 เดิม ภายใต้ policy ที่ freeze; quiz_counts=false ยังคงน้ำหนัก0 ผล 0 ที่ตรวจแล้วต่างจากไม่มีผล ไม่ skip เพียงเพราะ expired ไม่มีการคืนครั้ง/สิทธิ์ซ่อม ไม่เปลี่ยน weights/roster/Level threshold
+ฐาน SQL คงเฉพาะ Primary Key (PK) ส่วน application ต้อง serialize และตรวจ relationships, uniqueness, state, bounds, profile, JSON, freeze, weights และ run binding เองผ่าน transaction locks ตาม [กฎข้อมูล](data-contract-rules.md) ก่อน commit ต้อง recheck สิทธิ์, License และ roster ข้าม DB โดยไม่อ้าง atomic ข้ามฐาน ทางเลือกที่ไม่ใช้คือ LearnerKind B, ผูกผลด้วยเวลา/sId อย่างเดียว, policy ย้อนหลัง และ flag/counter ใหม่
 
-## Change Log
+## การใช้ผลที่หมดเวลา
 
-- 2026-10-26 — Rev2 arch091: PK-onlywordingและ[finalization](learning-attempt-finalization-001.md)/[snapshotprojection](learning-snapshot-projection-001.md)ชี้technicalcontractsของ042/ผลรวมเดิม ไม่เพิ่มbusinesspolicy/physicalschema.
-- 2026-10-26 — Amendment076: แก้ submitted-only ให้รวม expired ที่ตรวจเสร็จตาม042; คง Rev1 และสูตรเดิม
-- 2026-10-23 — Rev1: sync032..034/review-006; physical เดิม
+ผล expired ตาม [DES-010 (คลังข้อสอบ Attempt และนโยบายคะแนน)](des-010.md) ใช้ earned/max เต็มทั้งชุดเข้าสูตร weighted-normalized-v1 เดิม ภายใต้ policy ที่ freeze; quiz_counts=false ยังคงน้ำหนัก 0 ผล 0 ที่ตรวจแล้วต่างจากไม่มีผล ไม่ skip เพียงเพราะ expired ไม่มีการคืนครั้ง/สิทธิ์ซ่อม ไม่เปลี่ยน weights/roster/Level threshold
+
+## หลักฐาน
+
+- E01 — ตาราง `SchoolBotCourseRun` ถึง `SchoolBotRetakeGrant` ใน `db/schoolbot_db.sql` และ db/review-006.md (memory) เป็นหลักฐานแบบ ไม่ใช่ runtime
+- การตรึงกฎผลหมดเวลามาจาก DES-010 และมติ 042; สัญญาเทคนิคแยกใน [finalization](learning-attempt-finalization-001.md) และ [snapshot projection](learning-snapshot-projection-001.md)

@@ -1,6 +1,8 @@
-# LUX-04 — discovery, saved answers, history และ policy — Rev1
+# LUX-04 — discovery, saved answers, history และ policy
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
 คง route create/GET/answers/submit เดิม เพิ่ม:
 
@@ -39,7 +41,7 @@ evaluator_version:T128
 server_now:D
 ```
 
-ทุก field มาจาก `Answers`/`Snapshot` เดิม รวม effective policy/windows ที่กำหนดแล้วใน [learning-rules-032-034.md:21](C:/src/schoolbright/knowledge/school-bot/design/learning-rules-032-034.md:21) ไม่เพิ่มคอลัมน์ ไม่สร้าง policy ใหม่จากค่า default ตอน resume
+ทุก field มาจาก `Answers`/`Snapshot` เดิม รวม effective policy/windows ที่กำหนดแล้วใน [กฎผลเรียนและ policy](learning-rules-032-034.md) ไม่เพิ่มคอลัมน์ ไม่สร้าง policy ใหม่จากค่า default ตอน resume
 
 เพิ่ม read ก่อนเริ่มเพื่อรองรับ signed UX:
 
@@ -68,8 +70,14 @@ Desktop `student` อ่านได้หลังตรวจ membership ข�
 - employee Cloud ปฏิเสธ `403 PROFILE_NOT_ALLOWED` รวม retry/worker/import path ตามกฎเดิม
 
 **พร้อม local:** DTO, list/discovery, resume, saved answers, history, reveal และ pre-start policy ด้วย authority fake  
-**ยังไม่พร้อมเชื่อมจริง:** authority resolver และ owner-reviewed G→B
+**ยังไม่พร้อมเชื่อมจริง:** authority resolver และ owner-reviewed HTTP API Gateway → SchoolBot gRPC service
 
-## Change Log
+## ชนิดข้อมูลที่ใช้
 
-- 2026-10-26 — นายช่างสกัดสัญญาย่อยจากarchGN9DS5; schema/sourceidentity/owner/H5 gatesคงอยู่ ไม่เพิ่มfieldphysicalbaselineหรือexecuteSQL.
+ชนิดย่ออ้าง [สัญญาชนิดข้อมูลกลาง](data-dictionary/contract-001.md): `K` คือรหัส int4 ช่วง 1–2147483647; `I` คือ signed int32; `N` คือ integer ≥1; `U` คือ UUID; `B` คือ boolean; `D` คือเวลา UTC; `H` คือ SHA-256 hex 64 ตัว; `Tn` คือ Unicode string ยาวไม่เกิน n; `A` คือตัวตนผู้ทำรายการตามช่องทาง; `?`/`null` คือค่าว่าง และ `[]` คือ array ส่วน `DecimalString` เป็นเลขฐานสิบไม่ติดลบใน JSON string ไม่เกินหกตำแหน่งทศนิยม
+
+## หลักฐาน
+
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่
+
+หลักฐานอ้างอิงเดิมของ effective policy: `design/learning-rules-032-034.md:21`

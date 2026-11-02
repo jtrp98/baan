@@ -1,28 +1,22 @@
-# Local projects boundary — Rev1
+# ขอบเขตการบันทึก Project ในเครื่อง
 
-วันที่2026-10-26 · arch CodexT1/gpt-6-astra high ผ่านbaan-role run 2026-10-26-14-14-23-arch-tier-t1-1agents-p8z60N · นายช่างสกัด technicalclarificationของDES003ก่อนrework1
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-ฐาน [DES003](des-003.md), [ProjectAPI](project-api-001.md), [rules](data-contract-rules.md), [commontypes](data-dictionary/contract-001.md), [Guest](guest-workspace-001.md). ไม่มีschema/publiccode/IPCfieldใหม่; source6hashตรงparent. Parent63/26/1 (memory: planning/check-090-local-runtime-001.md)เป็นoverlayจริง; AncestorSwapAccessDeniedเป็นharnessblocked, symlinkskipเป็นgap, junctionoutsidewrite2filesในscratchจริง.
+สัญญานี้กำหนดข้อผิดพลาด การตรวจ JSON และข้อจำกัดของ Project ในเครื่อง ใช้ร่วมกับ [DES-003 (หลายโครงงาน Local/Cloud)](des-003.md), [Project API](project-api-001.md), [กฎข้อมูล](data-contract-rules.md), [ชนิดข้อมูลกลาง](data-dictionary/contract-001.md) และ [พื้นที่ Guest](guest-workspace-001.md) ไม่เพิ่ม schema, public code หรือ field ของ Inter-Process Communication (IPC)
 
-## Local errors และลำดับ
+ส่วนต่อของสัญญาคือ [lock และ filesystem](local-project-boundary-001-filesystem.md) กับ [migration และ receipt](local-project-boundary-001-migration.md)
 
-Save/Copy missing/≤0 integer expected_local_revision → PRECONDITION_REQUIRED ก่อนtargetread/write; rawnull/string/bool/fraction/out-of-range → PROJECT_INVALIDไม่coerce. Positive mismatch → VERSION_CONFLICT/current_local_revisionใต้lock. UUIDvalidไม่มีงาน → NOT_FOUND; ไม่มีentitlement → LICENSE_REQUIRED; invaliddocument → PROJECT_INVALID; sizebound → PROJECT_TOO_LARGE; securestorage/lock/commitทำไม่ได้ → STORE_UNAVAILABLE. เปลี่ยนimplementationPROJECT_NOT_FOUND/ENTITLEMENT_REQUIREDให้canonical ไม่เพิ่มHTTPstatus.
+## ข้อผิดพลาดและลำดับตรวจ
 
-Rawsize/strictJSONก่อนtypedinput; หลังdecode: entitlement→expectedrevision→UUID→securestorage/lock→read/validatecurrentdoc→revisionconflict→candidatevalidate→entitlementrecheck→commit. ไม่เผยrevisionแก่ผู้ไม่มีสิทธิ์/ไม่ให้corruptfileกลายเป็นconflict/ไม่เขียนเมื่อสิทธิ์ถูกถอนขณะรอlock.
+Save/Copy ที่ไม่มี `expected_local_revision` หรือส่ง integer ≤0 คืน `PRECONDITION_REQUIRED` ก่อนอ่านหรือเขียนเป้าหมาย หาก raw value เป็น null, string, boolean, fraction หรือเกินช่วง ให้คืน `PROJECT_INVALID` โดยไม่แปลงชนิดอัตโนมัติ ค่า positive ที่ไม่ตรง revision ปัจจุบันคืน `VERSION_CONFLICT` พร้อม `current_local_revision` ภายใต้ lock
 
-## Shared lock และ filesystem
+UUID ถูกต้องแต่ไม่พบงานคืน `NOT_FOUND`; ไม่มี entitlement คืน `LICENSE_REQUIRED`; document ผิดคืน `PROJECT_INVALID`; เกินขนาดคืน `PROJECT_TOO_LARGE`; secure storage, lock หรือ commit ทำไม่ได้คืน `STORE_UNAVAILABLE` ใช้รหัสเหล่านี้แทน implementation เดิมที่เรียก `PROJECT_NOT_FOUND`/`ENTITLEMENT_REQUIRED` โดยไม่เพิ่ม HTTP status
 
-Stablelockต่อworkspaceidentity+projectUUIDร่วมทุกLocalStore/process ครอบreadrevisionถึงcommit; ทุกcreate/save/copy/import/migrationใช้ทางเดียว. LockartifactแยกจากJSONที่ถูกreplace ไม่unlink/recreateตอนrelease/ไม่ยึดคืนจากPIDหรืออายุโดยเดา. WindowsOSfilelock/macOSadvisoryfilelock+in-processcoordination; acquirefailure/timeout→STORE_UNAVAILABLEไม่ข้ามlock. Copyหลายlockเรียงลำดับเดียวกัน; migrationไม่recursivepubliclockจนdeadlock. Indexderivedต้องเห็นwriterอื่น ไม่ถือmapcacheตลอดprocessเป็นtruth.
+ตรวจ raw size และ strict JSON ก่อนแปลงเป็น typed input หลัง decode ให้ตรวจ entitlement, expected revision และ UUID ตามลำดับ จากนั้นเปิด secure storage/lock อ่านและตรวจ document ปัจจุบัน ตรวจ revision conflict แล้วตรวจ candidate ก่อน recheck entitlement และ commit ห้ามเผย revision แก่ผู้ไม่มีสิทธิ์ ห้ามรายงานไฟล์เสียเป็น conflict และห้ามเขียนหากสิทธิ์ถูกถอนระหว่างรอ lock
 
-Establishtrustedhostappdataanchor/rootidentityก่อนmkdir/temp/rebuild; ผูกoperationsกับdirectoryhandles/descriptorsที่ตรวจแล้วไม่กลับไปstringpath. ครอบprojects/receipts/locks/temp/legacyread/root/ancestors. Root/ancestorpolicyหรือcontainmentยืนยันไม่ได้→STORE_UNAVAILABLEก่อนเขียน; projectleaflink/nonregular→PROJECT_INVALID; documentUUIDต้องตรงfilenameก่อนindex.
+## Strict JSON และ union
 
-Lstat/EvalSymlinksแล้วเปิดตามstringไม่ปิดTOCTOU. Standardlibraryos.Rootใช้ได้เมื่อSDKรองรับoperations แต่OpenRootจากpathที่ถูกสับเปลี่ยนได้ยังไม่establishtrustedanchor. Windowsต้องถือboundaryhandle/rename-deleteconstraintsตลอดoperation; macOSdescriptorrelativeกันตามsymlinkใหม่แต่ไม่รับรองabsolutepathnameเดิมทุกขณะเมื่อdirectoryถูกย้าย. Platformที่รักษาboundaryไม่ได้failclosed ไม่fallback/stringwriteหรืออ้างsupport/runtimeที่ยังไม่พิสูจน์.
-
-ตรวจwrite/shortwrite/sync/close/replaceerrorsครบ; ห้ามremove-target-then-rename. ต้องพิสูจน์platformatomicreplaceไม่อาศัยชื่อhelper. Archอ้างprimary [GoRoot](https://go.dev/blog/osroot), [os.Root](https://pkg.go.dev/os#Root), [os.Rename](https://pkg.go.dev/os#Rename), [LockFileEx](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex), [flock](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/flock.2.html); packetนี้ไม่ใช่runtimeproof.
-
-## Strict JSON/union
-
-ทุกระดับrejectmissingrequired/null/unknown/duplicatekeysหลังJSONunescape/exactcase/invalidUTF8/multipledocuments. ตรวจrawpresenceก่อนtypedconversion ไม่ดูเฉพาะnonzeroในbroadstruct; foreignvariantfieldแม้0/false/empty/nullต้องreject.
+ทุกระดับปฏิเสธ required field ที่หาย, null, unknown field, duplicate key หลัง JSON unescape, case ไม่ตรง, invalid UTF-8 และหลาย document ต้องตรวจ raw presence ก่อน typed conversion ไม่ดูเฉพาะ nonzero ใน broad struct Field ของ variant อื่นต้องปฏิเสธแม้เป็น 0, false, empty หรือ null
 
 | Object | Required/exactfields |
 |---|---|
@@ -37,42 +31,20 @@ Lstat/EvalSymlinksแล้วเปิดตามstringไม่ปิดTOCTO
 | Pose | id,name,values,duration_ms,joint_duration_ms |
 | PoseGroup | id,name,pose_ids |
 
-source emptystring, stacks/poses/order/groups/blocks/repeatbody emptyarraysถูกต้องและต้องserializeไว้ไม่omit/null; enabledfalse/x0/y0เป็นค่าจริง. Posevalues/jointdurationsต้องrawarraylength6ก่อนแปลง[6], reject5/7/nullmember/invalidnumber/bounds. ไม่เติมdefaultsเพื่อรับrawJSONที่ผิด; codecserializeเฉพาะvariantจริงโดยไม่เพิ่มschemafield.
+`source` เป็น empty string ได้; stacks/poses/order/groups/blocks/repeat body เป็น empty array ได้ แต่ต้อง serialize ไว้ ไม่ omit หรือเป็น null ค่า enabled=false และ x=0/y=0 เป็นค่าจริง Pose values/joint durations ต้องมี raw array length 6 ก่อนแปลงเป็น [6] ปฏิเสธความยาว 5/7, null member, invalid number และค่าผิด bounds ไม่เติม default เพื่อรับ raw JSON ที่ผิด และ codec serialize เฉพาะ variant จริงโดยไม่เพิ่ม schema field
 
-## Block depth/fuel — ส่วนที่ชัดกับส่วนรอspec
+## Block depth และ compilation fuel
 
-Compilerจริงอยู่BlockMode.tsx:123/save:238. Rootdepth0, repeatbody+1;8nested+leafผ่าน9ไม่ผ่าน. Structuralตรวจทุกstoredblockรวมdisabled: IDs/cycle/type/bounds/≤1000blocksทั้งdoc.
+Root depth เท่ากับ 0; repeat body เพิ่ม depth 1 ระดับ ซ้อน 8 ชั้นพร้อม leaf ผ่าน แต่ 9 ชั้นไม่ผ่าน Structural validation ตรวจ stored block ทุกตัวรวม disabled ครอบ IDs, cycle, type, bounds และจำนวนไม่เกิน 1000 blocks ทั้ง document
 
-Purecompilationfuel: +1ทุกwalkรวมemptybody/+1ทุกblockvisitก่อนenabled; disabledเสียvisitแต่ไม่execute/ไม่เดินdisabledrepeatbody; enabledrepeatคูณbodytimesจริง;1000ผ่าน1001ไม่ผ่าน/saturatingboundedไม่expandมหาศาล. One-stack/output≤64เป็นrunconstraints ไม่ห้ามmulti-stackdraftโดยอัตโนมัติ.
+Pure compilation fuel เพิ่ม 1 ทุก walk รวม empty body และเพิ่ม 1 ทุก block visit ก่อนตรวจ enabled; disabled เสีย visit แต่ไม่ execute และไม่เดิน body ของ disabled repeat; enabled repeat คูณ body ตาม times จริง Fuel 1000 ผ่าน แต่ 1001 ไม่ผ่าน ใช้ saturating bounded calculation ไม่ขยายข้อมูลมหาศาล
 
-**ยังไม่ตรึงfuelrejectionที่Save/Load/Migration**: DESกล่าวfuel≤1000แต่ไม่ได้บอกdraftboundaryหรือmulti-stackbudgetต่อstack/รวมdoc และlegacysaveไม่compile. ParentFuelOverflowFAILจริงแต่ยังใช้ตัดสินstoreผิดจุดนี้ไม่ได้. ส่งspecREQ026; safeส่วนstructural/depth/purefuelcheckerเดินต่อ ไม่เพิ่มข้อห้ามบันทึกdraftเองหรือแก้testexpectedเงียบ.
+ตาม [REQ-026 (สร้างและทดลองโปรแกรมบล็อก)](../requirement/req-026.md) ตรวจ fuel ≤1000 เฉพาะก่อน Run; Save/Load/Migration ต้องไม่ปฏิเสธ draft ที่ผ่าน structural validation เพราะ fuel หรือจำนวน output commands ไม่มี draft budget ต่อ stack หรือรวม document ข้อจำกัดหนึ่ง stack และ output ≤64 เป็นเงื่อนไขก่อน Run จึงไม่ห้าม draft หลาย stack สูตร pure fuel, structural depth/count และการตรวจ disabled ไม่เปลี่ยน การทดสอบต้องแยก draft กับ Run และไม่เปลี่ยนผลทดสอบเก่าย้อนหลัง
 
-## Migration/receipt
+## หลักฐาน
 
-SchoolBotPoCก่อนArmStudioPoC/fallbackเฉพาะfileabsent ไม่fallbackไฟล์เสีย/อ่านไม่ได้. คงdeterministicUUIDseedเดิมsourceapp/slot/mode ไม่ใส่path/time/sourcehash. Sourcebytesคงเดิม; badslotไม่ขัดslotอื่น. InvalidlegacyJSON/schema/content/size→MIGRATION_UNSUPPORTED; I/O/containment→STORE_UNAVAILABLE.
-
-Armexplicitinvalidt/ts/v/enum/boundsrejectslotไม่clamp/default/truncate; optionaldefaultsเฉพาะพิสูจน์legacyreaderแล้ว. Invalidlegacygroupsละเฉพาะกลุ่มเสีย/เก็บกลุ่มดี/เตือนผ่านMigrationResult.Messageเดิม; v2ใหม่ต้องvalidทั้งหมด. Blocklyรองรับ3types/enabled/fields/bodyจริง ไม่แก้malformednumberเป็น1/ไม่เปิดdisabledเอง; unsupported→MIGRATION_UNSUPPORTED. Allowlistlegacyแยกv2ไม่rejectsupportedBlocklymetadataเพราะv2strict.
-
-Projectcommitก่อนreceiptใต้lockเดียว; receiptstrictschema/app/mode/hashH/ID.
-
-| State | ผล/การกู้ |
-|---|---|
-| project+receiptสำเร็จ | migrated |
-| projectสำเร็จreceiptwrite/sync/close/replacefail | error/STORE_UNAVAILABLE, คืนprojectIDได้ ไม่รายงานmigrated/ไม่ลบprojectrollback |
-| validreceipt+validproject | skipped_up_to_date คงuseredits |
-| receiptabent/projectrev1ตรงdeterministicconversionปัจจุบันทั้งmode/name/content | กู้เฉพาะreceiptหลังตรวจใต้lock ใช้hashsourcebytesครั้งกู้ ไม่เขียนprojectซ้ำ |
-| receiptabent/projectถูกแก้หรือพิสูจน์ไม่ได้ | STATE_CONFLICT คงproject/sourceไม่สร้างreceiptอ้างสำเร็จ |
-| validreceipt/sourcehashเปลี่ยน/destinationมี | skipped_existing คงproject+receiptเดิม |
-| corrupt/mismatchedreceiptหรือreceiptมีแต่projectหาย | STATE_CONFLICT ไม่overwrite/resurrect |
-
-## ส่งต่อ/acceptance
-
-Sysrework1: containment/sharedlocks/entitlementrecheck→strictcodec→receipt/legacy→depth/purefuelที่ไม่ติดspec. แยกfileIO/platformlockingจากstore; migrationorchestration/receiptแยกArmandBlocklyadaptersตามหน้าที่ ไม่framework. Checkต้องสองinstances/สองprocesses/crashlockrelease/root-ancestor-receiptjunction/swapfixtureที่setupผ่าน/strictJSON5-6-7arrays/emptyroundtrip/receiptfailทุกขั้น/restartrecovery. macOSต้องruntimeบนmacOSเองไม่ใช้Windowscrosscompileแทน.
-
-## Change Log
-
-- 2026-10-26 — รับarchpacketก่อนGo rework1; NEEDS_REQUIREMENT_CHANGEเฉพาะdraftfuel ส่งspecต่อ ส่วนอื่นพร้อม ไม่SQL/schema/hardware/productionproof.
-
-## Amendment — ผลspecREQ026
-
-2026-10-26 spec090DONE (memory: planning/spec-090-draft-fuel-001.md)/REQ026amendmentมีprecedenceเหนือข้อความรอspecในsectionBlockdepth/fuel: **fuel≤1000ตรวจเฉพาะก่อนRun, Save/Load/Migrationไม่rejectstructurallyvaliddraftเพราะfuel/outputcommands**; ไม่มีdraftbudgetต่อstack/รวมdoc. สูตรpurefuel/structuraldepth/count/disabledvalidationจากarchไม่เปลี่ยน. CheckถอนoracleFuelOverflowของstoreและทดสอบdraftกับRunแยก ไม่เปลี่ยนผลharnessเก่าย้อนหลัง. Archต้องalignDES003sentenceตามคำวินิจฉัย ไม่businessgateใหม่.
+- E01 — Compiler: `BlockMode.tsx:123`; save: `BlockMode.tsx:238` ผลทดสอบ ParentFuelOverflow เดิมไม่ใช้ตัดสิน store ว่าผิดจากการรับ draft ที่เกิน fuel
+- คำวินิจฉัย draft/Run: planning/spec-090-draft-fuel-001.md (memory)
+- เอกสารเดิมตรวจ source 6 hashes ตรงกับฐานตรวจ; ผล 63 ผ่าน/26 ไม่ผ่าน/1 ข้ามเป็น local overlay ใน planning/check-090-local-runtime-001.md (memory)
+- AncestorSwapAccessDenied เกิดจากชุดทดสอบถูกขัดขวาง; symlink ที่ข้ามยังเป็นช่องว่างหลักฐาน; junction เขียนนอก boundary 2 ไฟล์จริงใน scratch
+- ที่มา: งานออกแบบ 2026-10-26, run 2026-10-26-14-14-23-arch-tier-t1-1agents-p8z60N งานเรียบเรียงนี้ไม่ได้ตรวจ runtime ใหม่

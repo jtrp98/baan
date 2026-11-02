@@ -1,8 +1,10 @@
-# LUX-01 — draft curriculum และหลักฐานอนุมัติ — Rev1
+# LUX-01 — draft curriculum และหลักฐานอนุมัติ
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-เพิ่ม HTTP semantics ต่อ DES-005:
+เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
+
+เพิ่ม HTTP semantics ต่อ [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](des-005.md):
 
 | Route | Input / output | สิทธิ์ |
 |---|---|---|
@@ -55,6 +57,10 @@ Read-back `approval` อ่านเฉพาะ publication event ของ res
 
 ทางเลือกที่เสนอให้ gate พิจารณา: ขยาย `SchoolBotAuditEvent.Reason` เป็น `varchar(2048)` โดยคง business bounds 1,000 ของ operation อื่นไว้ นี่เป็น **schema proposal เท่านั้น**; ให้ vault ตรวจผลกระทบก่อนทำ migration อีกทางคือแก้ `approval_ref` เป็น T1000 ซึ่งเป็น contract narrowing ต้อง review เช่นกัน
 
-## Change Log
+## ชนิดข้อมูลที่ใช้
 
-- 2026-10-26 — นายช่างสกัดสัญญาย่อยจากarchGN9DS5; schema/sourceidentity/owner/H5 gatesคงอยู่ ไม่เพิ่มfieldphysicalbaselineหรือexecuteSQL.
+ชนิดย่ออ้าง [สัญญาชนิดข้อมูลกลาง](data-dictionary/contract-001.md): `K` คือรหัส int4 ช่วง 1–2147483647; `I` คือ signed int32; `N` คือ integer ≥1; `U` คือ UUID; `B` คือ boolean; `D` คือเวลา UTC; `H` คือ SHA-256 hex 64 ตัว; `Tn` คือ Unicode string ยาวไม่เกิน n; `A` คือตัวตนผู้ทำรายการตามช่องทาง; `?`/`null` คือค่าว่าง และ `[]` คือ array ส่วน `DecimalString` เป็นเลขฐานสิบไม่ติดลบใน JSON string ไม่เกินหกตำแหน่งทศนิยม
+
+## หลักฐาน
+
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่

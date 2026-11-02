@@ -1,6 +1,8 @@
-# LUX-02 — supplied-row import และ storage stopline — Rev1
+# LUX-02 — supplied-row import และ storage stopline
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
 ส่วนที่เริ่ม local ได้คือ **validator/preview ที่รับ supplied rows** ไม่มี Google Sheet fetch, SQL หรือการแปลง business mapping โดยเดา
 
@@ -18,9 +20,9 @@ SuppliedImport = {
 
 - `source_row_key` เป็น technical identity ที่ต้นทางหรือ manifest ที่ได้รับรองผูกกับแถวนั้นอย่างถาวร; `source_position` มีไว้ชี้ข้อผิดพลาดเท่านั้น
 - สำหรับ fixture ใช้ `lesson.lesson_key = source_row_key` ได้โดยตรง ไม่ต้อง hash/สร้าง mapping ใหม่
-- ห้ามอ้างว่า Sheet ปัจจุบันมี key นี้: `D/source-review-003.md:20–28` บันทึกปัญหา C/Unit/O และการเพิ่ม key ยังเป็นข้อเสนอ
+- ห้ามอ้างว่า Sheet ปัจจุบันมี key นี้: [ผลอ่าน Course Plan](source-review-003.md) บันทึกปัญหา C/Unit/O และการเพิ่ม key ยังเป็นข้อเสนอ
 - raw adapter ต้องตัด O ก่อน normalize/hash ทุกกรณี; D ไม่เป็น true ยังคงนำเข้าเป็น draft ตามมติเดิม
-- P–X ต้องอยู่ใน Lesson เดียวกัน และใช้ `instruction-v1`/media refs เดิมตาม mapping ที่ content owner ให้มา ไม่แปลงใบงานเป็น quiz/test
+- P–X ต้องอยู่ใน Lesson เดียวกัน และใช้ `instruction-v1`/media refs เดิมตาม mapping ที่ content owner ให้มา ไม่แปลงเอกสารแบบฝึกหัดเป็น quiz/test
 - merged cells, ข้อความที่ไม่ใช่ URL, hyperlink ที่ไม่ได้ส่งมา และการจับคู่แถวข้าม revision ต้องมีผล validation ชัดเจน ไม่ forward-fill หรือแต่ง mapping โดยเงียบ
 
 ผล local validation:
@@ -76,6 +78,12 @@ SchoolBotLesson.ImportSource
 
 **ยังไม่พร้อม import persistence:** ต้องได้ source identity manifest/mapping และคำตัดสิน storage ก่อน จึงค่อยตรึง commit/read-back endpoint; validator fake ไม่ต้องรอ DB query
 
-## Change Log
+## ชนิดข้อมูลที่ใช้
 
-- 2026-10-26 — นายช่างสกัดสัญญาย่อยจากarchGN9DS5; schema/sourceidentity/owner/H5 gatesคงอยู่ ไม่เพิ่มfieldphysicalbaselineหรือexecuteSQL.
+ชนิดย่ออ้าง [สัญญาชนิดข้อมูลกลาง](data-dictionary/contract-001.md): `K` คือรหัส int4 ช่วง 1–2147483647; `I` คือ signed int32; `N` คือ integer ≥1; `U` คือ UUID; `B` คือ boolean; `D` คือเวลา UTC; `H` คือ SHA-256 hex 64 ตัว; `Tn` คือ Unicode string ยาวไม่เกิน n; `A` คือตัวตนผู้ทำรายการตามช่องทาง; `?`/`null` คือค่าว่าง และ `[]` คือ array ส่วน `DecimalString` เป็นเลขฐานสิบไม่ติดลบใน JSON string ไม่เกินหกตำแหน่งทศนิยม
+
+## หลักฐาน
+
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่
+
+ตำแหน่งอ้างอิงเดิมของ source identity: `design/source-review-003.md:20–28`

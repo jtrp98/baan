@@ -1,8 +1,10 @@
-# LUX-03 — bank draft read/edit และ visibility — Rev1
+# LUX-03 — bank draft read/edit และ visibility
 
-วันที่2026-10-26 · archCodexT1 runGN9DS5 · technicalproposal/localcontract ไม่schemaapproval/runtimeproof. ใช้sharedboundaryและstoplines (memory: planning/arch-091-learning-001.md)ร่วมกับสัญญานี้.
+> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
 
-เพิ่มต่อ DES-010:
+เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
+
+เพิ่มต่อ [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](des-010.md):
 
 | Route | Contract |
 |---|---|
@@ -23,7 +25,7 @@ QuestionBankDraftView = {
 - read detail/full answers เฉพาะ `staff_admin` ที่มี `content_author` หรือ `content_approver`; mutation เฉพาะ author
 - `school_web`/Desktop ห้ามเรียก admin bank detail แม้ถือ bank ID ถูกต้อง
 - `bank_key`/`revision` immutable หลัง create; PUT ใช้ replace questions ทั้งชุดใน transaction เดียว ไม่แก้บางข้อแล้วปล่อยบางข้อไม่ผ่าน
-- ตรวจ UUID ซ้ำ, kind, จำนวน options, เฉลยอยู่ใน options และมีหนึ่งคำตอบตาม DES-010:26–35; unknown kind → `409 QUESTION_KIND_UNSUPPORTED`, รูปข้อมูลผิด → `400 INVALID_INPUT`
+- ตรวจ UUID ซ้ำ, kind, จำนวน options, เฉลยอยู่ใน options และมีหนึ่งคำตอบตาม DES-010 (กฎชนิดคำถามและเฉลย); unknown kind → `409 QUESTION_KIND_UNSUPPORTED`, รูปข้อมูลผิด → `400 INVALID_INPUT`
 - lock bank revision, ตรวจ draft/ETag, เขียน questions/audit/idempotency พร้อมกัน
 - publish ใช้ audit contributors แบบเดียวกับ curriculum: `QuestionBank.Created`, `.Updated`, `.Published`; ติด approval length stopline เดียวกัน
 - Attempt อ่านจาก snapshot ของตนเสมอ ไม่ lookup เฉลยจาก bank ล่าสุด
@@ -31,6 +33,12 @@ QuestionBankDraftView = {
 **พร้อม local:** list/detail/edit, validation, concurrency, visibility และ immutable revision  
 **ยังไม่พร้อมเต็มเส้น:** publish/read-back หลักฐาน T2048 จนแก้ storage mismatch ผ่าน gate
 
-## Change Log
+## ชนิดข้อมูลที่ใช้
 
-- 2026-10-26 — นายช่างสกัดสัญญาย่อยจากarchGN9DS5; schema/sourceidentity/owner/H5 gatesคงอยู่ ไม่เพิ่มfieldphysicalbaselineหรือexecuteSQL.
+ชนิดย่ออ้าง [สัญญาชนิดข้อมูลกลาง](data-dictionary/contract-001.md): `K` คือรหัส int4 ช่วง 1–2147483647; `I` คือ signed int32; `N` คือ integer ≥1; `U` คือ UUID; `B` คือ boolean; `D` คือเวลา UTC; `H` คือ SHA-256 hex 64 ตัว; `Tn` คือ Unicode string ยาวไม่เกิน n; `A` คือตัวตนผู้ทำรายการตามช่องทาง; `?`/`null` คือค่าว่าง และ `[]` คือ array ส่วน `DecimalString` เป็นเลขฐานสิบไม่ติดลบใน JSON string ไม่เกินหกตำแหน่งทศนิยม
+
+## หลักฐาน
+
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่
+
+ตำแหน่งอ้างอิงเดิม: `design/des-010.md:26–35`
