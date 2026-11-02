@@ -1,0 +1,45 @@
+# FE-317 — menu-relation table + form modal
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `FE-crm-ai-support-P3-07`
+
+## Goal
+
+`_components/menu-relation-table.component.tsx`, `_components/menu-relation-form-modal.component.tsx` — ประกาศ/ยืนยันความสัมพันธ์ผ่าน Form Workflow มาตรฐานเดียวกันทั้งโมดูล
+
+## References
+
+REQ-014, AC-014.1, DES-007, DEC-007
+
+## Scope
+
+component ตาราง + ฟอร์ม modal — สร้าง DECLARED / confirm-reject PENDING ผ่าน endpoints ของ area เดียวกัน
+
+- Security-sensitive: no
+
+## Out of Scope
+
+endpoint ฝั่ง BE · scaffold หน้า (task อื่น)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-014.1: ประกาศ/ยืนยันความสัมพันธ์ผ่านฟอร์มได้จริง — RelationType ตาม 3 ค่าที่กำหนด
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-014.1 ด้วย CRUD จริงบนหน้า — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+component ใหม่ — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

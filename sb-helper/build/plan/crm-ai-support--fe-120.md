@@ -1,0 +1,45 @@
+# FE-120 — use-case-review-store
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `FE-crm-ai-support-P1-06`
+
+## Goal
+
+`_stores/use-case-review-store.ts` — store กลางของหน้า review-queue — filter/ตาราง/drawer ต้องแชร์ state ผ่าน store เดียว ไม่ยก state ข้าม component
+
+## References
+
+REQ-009, AC-009.1, DES-001, DEC-001
+
+## Scope
+
+store เดียวของหน้า — pattern Zustand เดียวกับหน้าอื่นของโปรเจกต์
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+store ของหน้าอื่น · service layer (task ถัดไป)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-009.1: state ของหน้าคิว (filter/ข้อมูล/ตัวเลือก) รวมอยู่ที่ store เดียว — component ทุกตัวอ่าน-เขียนผ่าน store
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-009.1 ด้วย tsc/eslint + การใช้งานหน้าจริงผ่าน store — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+ไฟล์ store ใหม่ — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

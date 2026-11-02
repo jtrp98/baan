@@ -1,0 +1,45 @@
+# BE-103 — model TCrmSafetyKeyword
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P1-03`
+
+## Goal
+
+เพิ่ม model `TCrmSafetyKeyword` ใน `prisma/jabjai-master-single-db/schema.prisma` ตาม § Data Model — คำสำคัญความเสี่ยงร้ายแรงที่ใช้บังคับ BUG + `SafetyOverride=true` — safety override ต้องมีตารางคำสำคัญที่สั่งการได้จริง (แถว Active=true เท่านั้น) ก่อนเชื่อผล AI ตามกติกา DES-001
+
+## References
+
+REQ-004, AC-004.1, DES-001, DEC-001
+
+## Scope
+
+เพิ่ม model เดียวตรง § Data Model — กติกาใช้เฉพาะแถว `Active=true` อยู่ที่ app layer (classify) ไม่ฝังใน schema
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+model อื่น · กติกาบังคับ BUG (เขียนที่ classify เท่านั้น ไม่ใช่ใน schema)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-004.1: มีโครงเก็บคำสำคัญความเสี่ยงร้ายแรงที่ classify อ่านไปบังคับ BUG เสมอได้ — ตารางพร้อมใช้ตาม § Data Model
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-004.1 ด้วยการเทียบ schema กับ § Data Model + ยืนยันเส้นทางอ่านของ classify อ้างตารางนี้ — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+model additive — ลบออกได้ ไม่กระทบตารางอื่น
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,45 @@
+# BE-202 — dashboard metrics repository
+
+> module: sb-helper/crm-case-dashboard
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-case-dashboard-P2-02`
+
+## Goal
+
+repository implement metric ครบตาม design § Metrics — ทุก where clause: `DeleteDate IS NULL` + ช่วงวันที่ · สถานะปิดใช้ `STATUS_ALIASES.CLOSED+RESOLVED` **import จาก** `src/app/api/v1/support/crm/crm.repository.ts` ห้าม copy string ซ้ำ — ความถูกต้องของทุกเมตริกขึ้นกับ filter ร่วมและแหล่ง alias สถานะเดียว — copy string จะทำให้นิยาม "ปิด" เพี้ยนเงียบ
+
+## References
+
+REQ-001, AC-001.2, DES-003, DEC-003
+
+## Scope
+
+implement ใน repository ของ dashboard route เท่านั้น — ทุก query ต้องมี `DeleteDate IS NULL` + ช่วงวันที่จาก query param และ alias สถานะต้อง import จากที่เดียว
+
+- Security-sensitive: no
+
+## Out of Scope
+
+`crm.repository.ts` ของ v1 (แค่ import) · สูตรที่ design ล็อกไว้ (ห้ามตีความใหม่) · สคีมาใด ๆ
+
+## Expected Output
+
+Contract:CrmCaseDashboardMetrics.v1
+
+## Acceptance
+
+AC-001.2: MTTR ใช้ avg(`UpdateDate` − `IssueDate`) เฉพาะเคสสถานะปิดตาม alias เดียวกับ v1 — raw elapsed ไม่ปรับ business-hours ใน MVP
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-001.2 ด้วยการอ่าน query ที่ implement + เทียบ alias ที่ import กับต้นทาง + tsc/eslint — บันทึกเป็นหลักฐาน (verified แล้วตามแถวเดิม)
+เพิ่ม method ใน repository ของโมดูลเอง — revert ได้โดยไม่กระทบ v1 (ไม่แก้ไฟล์ต้นทาง alias)
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

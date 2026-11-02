@@ -1,0 +1,46 @@
+# FE-207 — dashboard card details (theme/buckets/badges)
+
+> module: sb-helper/crm-case-dashboard
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `FE-crm-case-dashboard-P2-02`
+
+## Goal
+
+`daily-trend-chart` ส่ง theme ครบ (2 series เคสใหม่/ปิดแล้ว) · `top-subsystems-card` dynamic TGroupMenu · `type-breakdown-tiles` QA + tile "ยังไม่จำแนก" (ไม่มีลิงก์, "รอการจำแนกด้วย AI") · `top-urgent-cases-card` badge "รอคะแนน" เมื่อ score NULL — รายละเอียดการ์ดต้องสื่อสารสถานะจริง (ยังไม่จำแนก/รอคะแนน) แทนการซ่อน และกราฟต้องรองรับ dark mode
+
+## References
+
+REQ-001, AC-001.1, AC-001.3, DES-002, DES-008
+
+## Scope
+
+แก้เฉพาะ component การ์ดที่ระบุ — subsystem dynamic จาก `TGroupMenu` (key=`groupmenuid`) ไม่ใช้ key hardcode และ tile "ยังไม่จำแนก" ไม่มีลิงก์
+
+- Security-sensitive: no
+
+## Out of Scope
+
+payload ฝั่ง BE · mock data · การ์ดของหน้า groups/schools
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-001.1: กราฟแนวโน้ม/การ์ดย่อยแสดงข้อมูลจริงจาก payload ครบทั้ง 2 series และ theme ถูกต้อง
+AC-001.3: subsystem card แสดงตาม TGroupMenu จริง (dynamic) ไม่ใช้ ModuleKey hardcode
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-001.1 และ AC-001.3 ด้วย dev server เทียบการ์ดกับ payload จริง (เคสที่ score NULL ต้องขึ้น badge "รอคะแนน") + tsc/eslint — บันทึกเป็นหลักฐาน (verified แล้ว)
+revert ราย component ได้ — ไม่กระทบโครง store/service
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

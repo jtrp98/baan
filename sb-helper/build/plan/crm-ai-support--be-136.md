@@ -1,0 +1,45 @@
+# BE-136 — GET /backfill remaining
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P1-24`
+
+## Goal
+
+เพิ่ม `GET /api/v2/support/crm-ai/backfill` (endpoint เดียวกันหรือแยก GET) คืนจำนวนเคสที่เหลือต้อง backfill ให้ frontend แสดง progress — ผู้กดต้องเห็นความคืบหน้าจริงจึงจะรู้ว่าเมื่อไรจบ — ตัวเลขต้องมาจากเงื่อนไขเดียวกับที่ endpoint เลือกเคส
+
+## References
+
+REQ-007, AC-007.1, DES-004, DEC-004
+
+## Scope
+
+read endpoint — นับด้วยเงื่อนไขเลือกเคสชุดเดียวกัน (ต่อมาแยก Mode A+B ตาม CR 2026-08-17/18) ไม่มี write
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ข้อมูลเคส (อ่านอย่างเดียว) · เงื่อนไขเลือกเคสของ POST (ต้อง sync กันเสมอ)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-007.1: จำนวนที่เหลือแสดงผลได้จริงและลดลงตามที่กด — ตัวเลขตรงกับเงื่อนไขเลือกเคส
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-007.1 ด้วยการกด batch แล้วเทียบ remaining ก่อน/หลัง — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint read additive — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,45 @@
+# BE-207 — POST /issues/[id]/link-case
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P2-07`
+
+## Goal
+
+เพิ่ม `POST /api/v2/support/crm-ai/issues/[id]/link-case` — ผูกเคสเข้าเรื่อง (เขียน `TCrmCaseAiAssessment.IssueId`) — การรวบเคสเข้าเรื่องเป็นการเขียน pointer บน assessment — จุดเดียวจึงควบคุมลำดับการผูกและการคำนวณซ้ำที่ตามมาได้
+
+## References
+
+REQ-010, AC-010.1, DES-008, DEC-008
+
+## Scope
+
+เขียน `IssueId` บน assessment ของเคสเป้าหมายเท่านั้น — ไม่แตะแถวเรื่อง/เคสอื่น (การคำนวณ priority ซ้ำของจุดนี้มาจาก DES-005 ภายหลัง)
+
+- Security-sensitive: no
+
+## Out of Scope
+
+แถว assessment อื่น · เรื่องต้นทางอื่น · schema
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-010.1: ผูกเคสเข้าเรื่องได้จริง — เคสที่ถูกติดป้ายซ้ำยังถูกนับครั้ง/โรงเรียนตามปกติ (ติดป้ายไม่ใช่การตัดออก)
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-010.1 ด้วย dev server: ผูกแล้วเคสปรากฏในเรื่อง + รายละเอียดเรื่องเห็นเคส — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint ใหม่ additive — revert รายไฟล์ได้ (การผูกที่แล้วยกเลิกได้ผ่านการแก้ค่า pointer ปกติ)
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`
