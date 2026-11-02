@@ -42,11 +42,21 @@ function fileList(paths) {
 
 // จัดกลุ่มตาม module (โฟลเดอร์ย่อยแรก) แล้วสร้างข้อความ commit ต่อ module —
 // ไฟล์ระดับรากของ repo (เช่น README.md) ใช้ชื่อ knowledge root จาก config เป็น module
-export function planCommits(entries, rootName) {
+// layout "project": กลุ่มคือ <project>/modules/<module> (ข้อความ "<project>/<module>: …") ·
+// ไฟล์ระดับ project เป็นอีกกลุ่ม — commit แยกตาม module เหมือนเดิมแม้โฟลเดอร์ลึกขึ้น
+function groupOf(seg, layout) {
+  if (layout === "project" && seg.length > 3 && seg[1] === "modules") return { key: `${seg[0]}/${seg[2]}`, scope: `${seg[0]}/modules/${seg[2]}` };
+  return { key: seg[0], scope: seg[0] };
+}
+
+export function planCommits(entries, rootName, layout = "module") {
   const groups = new Map();
+  const scopes = new Map();
   for (const e of entries) {
     const seg = e.file.split(/[\\/]/);
-    const mod = seg.length > 1 ? seg[0] : rootName;
+    const g = seg.length > 1 ? groupOf(seg, layout) : { key: rootName, scope: null };
+    const mod = g.key;
+    if (g.scope) scopes.set(mod, g.scope);
     if (!groups.has(mod)) groups.set(mod, []);
     groups.get(mod).push(e);
   }
@@ -54,7 +64,7 @@ export function planCommits(entries, rootName) {
     const kinds = new Set(es.map((e) => classifyChange(e.code)));
     const verb = kinds.size === 1 ? [...kinds][0] : "update";
     const paths = es.map((e) => e.file);
-    return { module: mod, verb, paths, message: `${mod}: ${verb} ${fileList(paths)}` };
+    return { module: mod, scope: scopes.get(mod) ?? null, verb, paths, message: `${mod}: ${verb} ${fileList(paths)}` };
   });
 }
 
@@ -67,13 +77,12 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
     log(`⚠ ${kr.name}: อ่าน git status ไม่ได้ — ${status.err.split("\n")[0]}`);
     return { repo: true, commits: [], error: status.err };
   }
-  const plans = planCommits(parsePorcelain(status.out), kr.name);
+  const plans = planCommits(parsePorcelain(status.out), kr.name, kr.layout === "project" ? "project" : "module");
   const commits = [];
   for (const p of plans) {
     // add เฉพาะขอบเขตของกลุ่มนี้ก่อน commit ด้วย pathspec เดียวกัน — ของที่ผู้ใช้ staged
     // ไว้ในกลุ่มอื่นจะไม่ถูกกลืนเข้า commit นี้ (กลุ่มไฟล์ระดับรากต้องระบุชื่อไฟล์เพราะไม่มีโฟลเดอร์ครอบ)
-    const isRootGroup = !p.paths.some((f) => f.includes("/") || f.includes("\\"));
-    const scope = isRootGroup ? p.paths : [p.module];
+    const scope = p.scope ? [p.scope] : p.paths;
     const add = gitIn(kr.path, ["add", "-A", "--", ...scope]);
     const commit = add.ok ? gitIn(kr.path, ["commit", "-m", p.message, "--", ...scope]) : add;
     if (!commit.ok) {
@@ -92,7 +101,7 @@ export function commitKnowledge(ws, log = () => {}) {
     all.push(...commitKnowledgeRoot(kr, log).commits);
     const mem = memoryRootOf(kr);
     // ชื่อ "<root>-memory" ใช้กับไฟล์ระดับรากของ memory และให้ log บอกได้ว่า commit ลง repo ไหน
-    if (mem) all.push(...commitKnowledgeRoot({ name: `${kr.name}-memory`, path: mem }, log).commits);
+    if (mem) all.push(...commitKnowledgeRoot({ name: `${kr.name}-memory`, path: mem, layout: kr.layout }, log).commits);
   }
   return all;
 }

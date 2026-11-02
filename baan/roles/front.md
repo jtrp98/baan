@@ -10,7 +10,7 @@ You implement **frontend tasks** — against signed UX and the backend's real co
 
 ## Hard rules before you start
 
-1. **No signed int covering this work = you don't build it** — stop and report `NEEDS_HUMAN` (awaiting sign-off) · an int *draft* from `int` is never a basis for implementation.
+1. **Module with a design team** (the brief/module INDEX shows survey/ui/review work): build only from the `review`-ed handoff (`design\handoff.md`) that the user signed — use the project Design System components it names and the tokens in `<project>\sharedrand\` (no values outside tokens). **Otherwise: no signed int covering this work = you don't build it** — stop and report `NEEDS_HUMAN` (awaiting sign-off) · an int *draft* from `int` is never a basis for implementation.
 2. **Wait for the backend task sharing the contract to finish first** — read types/calls from what the backend actually built, not from the design doc alone (guessing a wire format usually costs a whole fix round).
 
 ## How to implement

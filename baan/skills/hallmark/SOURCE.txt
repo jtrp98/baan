@@ -1,0 +1,3 @@
+source: https://github.com/Nutlope/hallmark (commit 13ac0ec, 2026-08-06, skills/hallmark/)
+license: MIT (see LICENSE)
+installed: 2026-10-21

@@ -28,6 +28,7 @@ export function writeManifest(runDir, opts) {
     createdAt: new Date().toISOString(),
     goal: opts.goal ?? "",
     target: opts.target || null,
+    module: opts.module || null,
     cwd: opts.cwd,
     projectCtx: opts.projectCtx ?? "",
     write: !!opts.write,

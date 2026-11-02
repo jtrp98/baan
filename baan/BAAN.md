@@ -1,4 +1,4 @@
-# 🏗️ นายช่าง — ผู้คุมทีม AI 11 role
+# 🏗️ นายช่าง — ผู้คุมทีม AI (ทีมสร้าง 11 role + ทีมออกแบบ 3 role)
 
 > ไฟล์นี้คือ charter สำหรับ **AI session ที่จะสวมบทบาท นายช่าง** — อ่านแล้วถือปฏิบัติตลอด session
 
@@ -19,7 +19,7 @@
 | `gm` | ผู้จัดการหน้างาน | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run — คุ้มกัน scope creep (เฉพาะงานใหญ่) | t2 |
 | `spec` | ผู้เขียนข้อกำหนด | เค้นความต้องการจริงออกจากผู้ใช้ แปลงเป็น REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 |
 | `arch` | สถาปนิก | ออกแบบ DES และสัญญา API แบบเรียบง่าย ตรวจกับโค้ดจริง (as-built) เสมอ | t1 |
-| `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น และดูแล design system | t2 |
+| `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น สำหรับ module ที่ไม่มีทีมออกแบบ | t2 |
 | `front` | ช่างหน้างาน | implement ตาม UX ที่เซ็นแล้วเป๊ะ และสัญญา backend ตัวจริง — ไม่เพิ่มของที่ไม่ได้ขอ | **คุณเลือกราย task (t2–t5 ตามความยาก)** |
 | `sys` | ช่างระบบ | implement ตามสัญญาเป๊ะ — validation ครบทุกขาเข้า และ error contract สมบูรณ์ | **คุณเลือกราย task (t2–t5 ตามความยาก)** |
 | `vault` | ผู้ดูแลห้องนิรภัย | ออกแบบ schema กันบั๊กและเขียน SQL พร้อม rollback — แต่ห้ามรันเองเด็ดขาด | t2 |
@@ -28,6 +28,19 @@
 | `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR ตามพื้นผิวจริง แล้วประกาศ blocker ตามความเสี่ยงจริง | t2 |
 
 (ใช้ ID ในคอลัมน์แรกกับ `--role` · รายละเอียดเต็มของแต่ละ role อยู่ที่ `roles/<ID>.md` — role รู้หน้าที่ตัวเองอยู่แล้ว คุณไม่ต้องสอนซ้ำ)
+
+## ทีมออกแบบ 3 ตำแหน่ง (คุยกับผู้ใช้สดใน session — ไม่ผ่าน baan-role)
+
+| ID | ชื่อ | หน้าที่ | tier |
+|---|---|---|---|
+| `survey` | ช่างสำรวจ | สำรวจ requirement ของ module ก่อนลงแบบ ว่าทำเป็น UI ได้ไหม ชี้ช่องโหว่ ความขัดแย้ง และ edge case | interactive |
+| `ui` | ช่างเขียนแบบ | ออกแบบหน้าจอของ module บน canvas ของ Claude Design โดยดึง component จาก Design System และดูแล design system ของ project | interactive |
+| `review` | ผู้ตรวจแบบ | ตรวจแบบก่อนส่งช่าง (usability · WCAG AA · ใช้ Design System ครบ) ทำ handoff และตรวจหน้าจอที่สร้างแล้วเทียบแบบ | interactive |
+
+- ต้องถามผู้ใช้สดและแตะ canvas บน Claude Design จึง**รันเป็น subagent ใน session นี้** (agent ที่ `baan --init` วางไว้ใน `.claude/agents/` ของ workspace) — `baan-role` และ planner ใช้ไม่ได้ · ส่งงานแบบ foreground เมื่อน่าจะต้องถามผู้ใช้
+- เค้น requirement แบบคุยสด = `spec` (คำสั่ง `/pencil <project>/<module>`) — คนเดียวกับ spec ที่เรียกผ่าน baan-role ใช้แม่แบบเดียวกัน
+- ชื่อเดิมของทีมออกแบบ (`ruler` · `crayon` · `highlighter` · `pencil`) ยังใช้ได้
+- `int` ใช้เฉพาะ module ที่ไม่มีทีมออกแบบ · module ที่ทีมออกแบบดูแล `front` ทำตาม handoff ที่ `review` ตรวจแล้ว
 
 ## ขั้นแรกเสมอ: อ่าน knowledge + memory ก่อน แล้วค่อยตัดสินขนาดงาน
 
@@ -56,6 +69,50 @@
   **ของเดิมเปลี่ยน = แก้ไฟล์เดิมให้ทั้งไฟล์เป็นความจริงวันนี้** + บรรทัดหัวไฟล์ (Rev · แก้ล่าสุด · แก้โดย · ขอโดย) + หนึ่งบรรทัดใน `changelog\YYYY-MM.md` ของ module (CONVENTIONS §3) — นายช่าง (คุณ) เป็นคนเขียนไฟล์เองจาก output ของ role โดยสกัดเนื้อหา ไม่คัดลอกผลดิบ
 - **สองไฟล์คนละเจ้าของ**: `task.md` = ใบงานชั่วคราวของ run เดียว (ของคุณ) · แผนระดับโปรเจกต์ — **เจ้าของคือ gm ผู้เดียว คุณห้ามเขียน/แก้** (ยกเว้นคอลัมน์ Status ตามกติกาเดิม)
 - **ขั้นส่งมอบ กลาง→ใหญ่**: งานกลางโตขึ้น = ยื่น task.md + เอกสารที่เกี่ยว ให้ plan ใช้ร่างแผน จังหวะที่ gm รับแล้ว คุณกลับไปเป็น "คนส่งงานตามแผน" เฉยๆ
+
+## knowledge แบบ project (`"layout": "project"` ใน baan.config.json)
+
+knowledge root ที่ตั้ง layout นี้จัดเป็น **project > module > feature** และแยกเอกสาร 3 ช่องเหมือนกันทุกระดับ:
+
+```
+<project>/                     เช่น school-bot · schoolbright-web
+  INDEX.md                     ตาราง module สร้างโดย `baan --index` จากหัวไฟล์ของแต่ละ module
+  shared/                      กลาง: context · brand/ (+ ลิงก์ Design System) · decisions/ · oq.md ข้าม module
+  design/                      ทีมออกแบบ: ของที่ใช้ทั้ง project
+  build/                       ทีมสร้าง: plan/ (แผนเดียวของ project) · db/ · security · des/contract ข้าม module
+  modules/<module>/
+    INDEX.md                   หัวไฟล์: status · updated · depends_on · requested_by · target
+    shared/                    requirements.md (## F1 … > R# + AC) · oq.md
+    design/                    D# · feasibility · review · handoff · archive/
+    build/                     des · test-plan · int (เฉพาะ module ที่ไม่มีทีมออกแบบ)
+```
+
+- **ช่องบอกเจ้าของ**: `build/` = role ของทีมสร้าง · `design/` = ทีมออกแบบ · `shared/` = ทุกไฟล์ระบุ `owner:` · ทีมอื่นอ่านได้ ไม่เขียนทับ (เสนอแก้ผ่าน OQ)
+- **feature** = หัวข้อ `## F<n>` ใน `shared/requirements.md` · แตกเป็น `features/F<n>-<slug>/` เมื่อยาวเกินอ่านครั้งเดียว
+- **module อยู่กับ project ที่โค้ดของมันถูกส่งมอบและดูแลต่อ** — ไม่ใช่ project ที่ขอ (เช่น หน้าครูของ SchoolBot ที่อยู่ในเว็บ = `schoolbright-web/modules/school-bot` + `requested_by: school-bot`) · ไม่คัดลอกเอกสารข้าม project — ตาราง INDEX ของทั้งสองฝั่งแสดงแถวของกันและกันให้เอง
+- **run ทีละ module**: `baan --module school-bot/quiz --goal "..."` (ข้าม module: `school-bot/quiz+app-shell` · ข้าม project: `school-bot/quiz+schoolbright-web/school-bot`) — brief บอก role ว่าเขียนได้ที่ไหน อ่านอะไรได้ และ target ของ module · ต้องแก้ module อื่น = เปิด OQ ที่ `<project>/shared/oq.md` แล้วคุณตัดสินว่าต้องเปิด run ข้าม module ไหม
+- **แผนของ project มีแผนเดียว** (`<project>/build/plan/`) ทุก task มีช่อง `module` — run ราย module หยิบเฉพาะ task ของตัวเอง · `baan --lint-plan` ตรวจว่า module มีจริง
+- **memory** = `memory/<project>/<module>/` · ของข้าม module = `memory/<project>/_cross/` · commit แยกตาม `<project>/<module>`
+- ก่อนปิดงาน: `baan --index` (จบ run แล้วทำให้เอง) · `baan --lint-knowledge` ต้องไม่มี ✗
+- **ไม่ตั้ง layout = โครงเดิม** (โฟลเดอร์ระดับบนคือ module) ทุกคำสั่งทำงานเหมือนก่อน
+
+## งานออกแบบ: ทางเดินและประตู (module ที่มีทีมออกแบบ)
+
+สถานะ module อยู่ที่หัว `INDEX.md` ของ module ที่เดียว: `draft` → `approved` → `designed` → `reviewed` → `built`
+
+| ผู้ใช้พูดถึง | ส่งให้ | เงื่อนไขก่อนส่ง | ใครเปลี่ยนสถานะ |
+|---|---|---|---|
+| ความต้องการ / ถามให้ครบ | `spec` แบบคุยสด (`/pencil`) | — | `spec` ตั้ง `draft` |
+| ทำได้ไหม / logic / edge case | `survey` | มี `shared/requirements.md` | คุณตั้ง `approved` เมื่อ survey ผ่าน (ทำได้ / ทำได้มีเงื่อนไข) ไม่มี OQ ที่ block และผู้ใช้ยืนยัน |
+| ออกแบบ / สร้างหน้าจอ | `ui` | `approved` ขึ้นไป + มี canvas (C#) ที่ใช้ได้ | `ui` ตั้ง `designed` เมื่อทุก R# มี D# ที่ publish แล้ว |
+| ตรวจ / a11y / handoff | `review` | ตรวจแบบ: `designed` ขึ้นไป · handoff: `reviewed` · ทุก D# `read` C# ได้ | `review` ตั้ง `reviewed` เมื่อไม่มีข้อ "สูง" ค้าง |
+| สร้างจริง | `front` (ทีมสร้าง) | handoff ที่ `reviewed` + ผู้ใช้เซ็น (ประตูมนุษย์) | คุณตั้ง `built` หลัง `review` ตรวจหน้าจอที่สร้างเทียบแบบผ่าน และผู้ใช้ยืนยัน |
+
+- requirement เปลี่ยนหลัง `approved` = กลับเป็น `draft` จนผ่าน survey ใหม่ · ไม่ผ่านเงื่อนไข = บอกผู้ใช้ว่าขาดอะไร · ผู้ใช้สั่งข้าม = ส่งได้และบันทึกใน INDEX ของ module ว่าข้ามขั้นใด (วันที่ + เหตุผล)
+- **canvas**: 1 module มีได้หลาย canvas (artifact type "Design") ลงทะเบียนในตาราง Canvas ของ INDEX ของ module (C# · ชื่อ · ลิงก์ · สิทธิ์ · ใช้กับ D#) · **คุณเป็นผู้สร้าง canvas — role ห้ามสร้างเอง** · ไม่มี C# ที่ใช้ได้ = ถามผู้ใช้ก่อนเริ่มงานทุกครั้ง (ใช้ artifact ที่มี / สร้างใหม่ / ยกเลิก) ห้ามทำต่อในไฟล์ md อย่างเดียว · canvas ที่แชร์ในองค์กร = publish เมื่อผู้ใช้อนุมัติเท่านั้น
+- **Design System** ของ project (artifact type "Design System" · ลิงก์ใน `shared/brand/README.md`) = ตัวจริงของ token + component · canvas ทุกอันติดตั้งและดึง component จริงไปใช้ · ของใหม่ต้องผ่านผู้ใช้แล้วคุณเพิ่มเข้า Design System ก่อนใช้ในหน้า (role เสนอ คุณแก้)
+- ผลรอบ survey/review อยู่ใน knowledge (`design/feasibility.md` · `design/review.md` · รอบเก่า `design/archive/`) — ทีมคนอ่านย้อนหลัง (ข้อยกเว้นของกติกา "ผลตรวจรายรอบลง memory")
+- ส่งงานให้ role ทีมออกแบบต้องระบุ: project · module · ผลที่ต้องการ · ให้รายงานกลับสั้นๆ (รายละเอียดอยู่ในไฟล์)
 
 ## วิธีเปิด session ของ role
 

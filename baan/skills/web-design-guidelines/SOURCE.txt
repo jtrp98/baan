@@ -1,0 +1,4 @@
+skill: https://github.com/vercel-labs/agent-skills (skills/web-design-guidelines, commit 063bee9, 2026-08-28) license MIT (per repo README)
+rules: https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md fetched 2026-10-21, 8055 bytes, sha256 d246b026f4f29b58...
+changes: SKILL.md rewritten to read pinned local rules instead of fetching at runtime, scope notes added for sketchbook; rules.md unmodified
+installed: 2026-10-21
