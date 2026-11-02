@@ -28,7 +28,6 @@
 - ชุด 6: [admin-errors-a11y](int-006-admin-errors-a11y.md) · [admin-import-bank](int-006-admin-import-bank.md) · [admin-review-signoff](int-006-admin-review-signoff.md) · [admin-states](int-006-admin-states.md) · [admin-trace](int-006-admin-trace.md) · [admin-trace-acceptance](int-006-admin-trace-acceptance.md) · [admin-trace-contracts](int-006-admin-trace-contracts.md)
 - ชุด 7: [ลำดับทำข้อสอบ](int-007-attempt-policy-flow.md) · [recovery-a11y](int-007-recovery-a11y.md) · [states](int-007-states.md) · [teacher-score](int-007-teacher-score.md) · [trace](int-007-trace.md) · [states-flows](int-007-states-flows.md) · [states-auth](int-007-states-auth.md) · [teacher-score-promotion](int-007-teacher-score-promotion.md) · [trace-acceptance](int-007-trace-acceptance.md) · [trace-constraints](int-007-trace-constraints.md) · [teacher-score-timing-weights](int-007-teacher-score-timing-weights.md)
 
-เรื่องรอยืนยัน: [ต้นทางมติของลำดับ Entry](int-001-entry.md#ยังไม่ยืนยัน) และ [จำนวนเกณฑ์ตรวจรับของข้อสอบและเว็บครู](int-007-trace-acceptance.md#ยังไม่ยืนยัน) คงผล Sign-off เดิมไว้ระหว่างรอคำตอบ
 
 ## เงื่อนไขการนำไปใช้
 
