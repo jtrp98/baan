@@ -22,11 +22,11 @@ BE-027 ใช้ SchoolId=NULL และ Principal=`staff_admin:{PrincipalId}` �
 
 ตัวอย่างสมมติ: A/B ใช้ UUID เดียวได้ผลของตน; revision ซ้ำยังถูก domain uniqueness ปฏิเสธ
 
-RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล็ก 64 ตัว BE-027 คงสูตรเดิม: create ใช้ `JsonSerializer.Serialize(request)`; metadata/content ใช้ `id + "|" + JsonSerializer.Serialize(request)`; publish ใช้ `id + "|" + ApprovalRef` ใช้ DTO/options เดิมคงที่รวม nested data ไม่รวมเวลาปัจจุบัน/request ID/token; If-Match เป็น precondition ของ mutation ใหม่ ไม่ตรวจ stale ETag ก่อน replay ที่ถูกต้อง
+RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล็ก 64 ตัว BE-027 คงสูตรเดิม: create ใช้ `JsonSerializer.Serialize(request)`; metadata/content ใช้ `id + "|" + JsonSerializer.Serialize(request)`; publish ใช้ `id + "|" + ApprovalRef` ใช้ Data Transfer Object (DTO)/options เดิมรวม nested data ไม่รวมเวลาปัจจุบัน/request ID/token; If-Match เป็น precondition ของ mutation ใหม่ ไม่ตรวจ stale ETag ก่อน replay ที่ถูกต้อง
 
 ## 2. คำขอซ้อน
 
-เลือก **รอ store lock** โดยรองรับ CancellationToken แล้วอ่านผลใหม่ก่อนตรวจ domain preconditions คำขอแรก commit สำเร็จ: hash เดิมต้อง replay; hash ต่างต้อง conflict ไม่คืน STATE_CONFLICT เพียงเพราะ revision ถูกสร้างแล้ว ถ้าคำขอแรก rollback ทั้งหน่วยและไม่มีผลบันทึก ผู้รอจึงเริ่ม mutation ได้
+เลือก **รอ store lock** รองรับ CancellationToken แล้วอ่านผลใหม่ก่อน domain preconditions เมื่อคำขอแรก commit: hash เดิม replay; hash ต่าง conflict ไม่คืน STATE_CONFLICT เพราะ revision ถูกสร้างแล้ว ถ้า rollback ทั้งหน่วย ผู้รอจึงเริ่ม mutation ได้
 
 ใช้ cancellation/deadline เดิม ไม่เพิ่ม code/pending row ยกเลิกผู้รอไม่ยกเลิกคำขอแรกหรือข้าม lock response ขาดหลัง commit ให้ retry tuple/hash เดิม ห้ามลบผลที่ commit แล้ว
 
@@ -52,7 +52,7 @@ Task<IdempotentCommitResult<T>> CommitWithIdempotencyAsync<T>(
 | `recheckAccess` | รับ adapter ของหน่วยนี้, resource ID ของผลเดิมหรือ NULL, เวลา UTC สดและ ct; ตรวจ session/channel/role/ownership/สิทธิ์เปิดเผยผล ไม่ mutate |
 | `mutate` | รับ adapter ของหน่วยนี้ เวลา UTC สดและ ct; ตรวจ preconditions จาก state สด แล้วเรียก domain/audit เดิมเฉพาะเมื่อไม่มี tuple |
 
-backing store เป็นเจ้าของ lock/จุด commit จริง ลำดับใต้ lock: อ่าน snapshot สด → re-check สิทธิ์ด้วย TimeProvider สด → lookup tuple รวม tombstone/IsDelete → เทียบ hash → ตรวจ expiry/สิทธิ์ resource → replay หรือทำ domain checks/mutation → สร้างและเข้ารหัสผล → commit domain+audit+idempotency พร้อมกัน → ปลด lock
+store ถือ lock จน commit: อ่าน snapshot สด → lookup tuple รวม tombstone/IsDelete → recheckAccess ด้วย TimeProvider สด → เทียบ hash → ตรวจ expiry → replay หรือ domain checks/mutate → เข้ารหัสผล → commit domain+audit+idempotency → ปลด lock บันทึกเฉพาะ success; errors ใช้ [envelope เดิม](data-contract-rules-http.md)
 
 callback รับ transaction-scoped facade: อ่าน snapshot เดียว เขียน candidate ห้าม root adapter/commit ซ้อน/network/hardware effect exception ก่อน commit ไม่เหลือทั้งสามส่วน ไม่ publish cache ก่อนเก็บสำเร็จ
 
@@ -60,25 +60,24 @@ callback รับ transaction-scoped facade: อ่าน snapshot เดีย
 
 ## 4. การเก็บผลและทางเลือก
 
-CompletedAt/ReplayUntil มาจาก store ตอนจบคำสั่ง ResultCipher/ResultKeyId เก็บ encrypted MutationResult รวม body/ETag; HttpStatus/ResourceId ตรงผลนั้น ไม่มี plaintext response ใน ledger อายุและ tombstone ตาม [กฎ replay](data-contract-rules-cross-database.md#อายุและความลับของผล-replay)
+store กำหนด CompletedAt/ReplayUntil ตอนจบ ResultCipher/ResultKeyId เก็บ encrypted MutationResult รวม body/ETag; HttpStatus/ResourceId ตรงผล ไม่เก็บ plaintext อายุ/tombstone ตาม [กฎ replay](data-contract-rules-cross-database.md#อายุและความลับของผล-replay)
 
-File stub เพิ่ม collection `idempotency` ใน `curricula_snapshot.json` เดียวกับ domain/audit แต่ละสมาชิกใช้ฟิลด์ตาม dictionary; bytea เป็น base64 และเวลาเป็น UTC อ่าน snapshot เก่าที่ไม่มี collection เป็นว่าง แต่กู้ key ที่อยู่เฉพาะ process ไม่ได้ Memory swap candidate ทั้งชุดใต้ lock เดียว fake cipher ใช้เฉพาะ tests; production ใช้ custody เดิม เข้ารหัส/serialize ไม่สำเร็จต้อง fail ก่อน commit; decode ไม่สำเร็จคืน STATE_CONFLICT เดิม ไม่ทำ mutation ซ้ำ
+File เพิ่ม `idempotency` ใน `curricula_snapshot.json` พร้อม domain/audit สมาชิกตาม dictionary; bytes เป็น base64 เวลา UTC ไม่มี collection อ่านเป็นว่างแต่กู้ key ใน process ไม่ได้ Memory swap ทั้งชุดใต้ lock เดียว fake cipher เฉพาะ tests; production ใช้ custody เดิม encode/serialize ล้มต้อง fail ก่อน commit; decode ล้มคืน STATE_CONFLICT ไม่ mutate ซ้ำ
 
 | ทางเลือก | คำตัดสิน/ต้นทุน |
 |---|---|
-| รอใต้ store lock | เลือกเพื่อให้ retry ได้ผลเดิม แลกกับเวลารอภายใน deadline |
-| ตอบ 409 ระหว่าง in-flight | ไม่เลือก แม้มี IDEMPOTENCY_CONFLICT เพราะ hash เดิมตามเกณฑ์ต้อง replay |
-| static dictionary/service lock หรือ ledger คนละไฟล์ | ไม่เลือก: ผูกอายุ process หรือหลุดหน่วย atomic |
-| เพิ่ม pending column/unique index | ไม่จำเป็นต่อ stub และ SQL ปัจจุบันไม่มี; เปลี่ยนจริงต้องผ่านคน/vault |
-| ย้ายทุก consumer พร้อมกัน | ไม่เลือก: ขยาย regression ของงานที่ผ่านแล้ว ใช้ interface เพิ่มและย้าย BE-027 ก่อน |
+| รอใต้ store lock | เลือก: retry ได้ผลเดิม แลกกับเวลารอ |
+| ตอบ 409 ระหว่าง in-flight | ไม่เลือก: hash เดิมต้อง replay |
+| dictionary/service lock/ledger คนละไฟล์ | ไม่เลือก: ผูก process หรือหลุด atomic |
+| เพิ่ม pending column/unique index | ไม่เลือก: stub ไม่ต้องใช้ เปลี่ยนต้องผ่านคน/vault |
+| ย้ายทุก consumer | ไม่เลือก: ขยาย regression งานที่ผ่านแล้ว ย้าย BE-027 ก่อน |
 
 ## หลักฐาน
 
-Source ใต้ `C:/src/schoolbright/target/school-bot/` ตรวจอ่าน 2026-11-03:
+Source ตรวจ 2026-11-03 ใต้ `C:/src/schoolbright/target/school-bot/web/src/`:
 
-- `web/src/SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — static lookup/commit/จำผลแยกกัน และสูตร hash
-- `web/src/SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:168,177,190` — domain/audit ไม่มี idempotency
-- `web/src/SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:14,29,241,267` — lock ต่อ directory และ replace snapshot; ยังไม่มี ledger
-- `web/src/SchoolBot.Application/Abstractions/ISchoolBotDbAdapter.cs:8,50` — ไม่มี interface กลาง; `web/src/SchoolBot.Domain/ErrorCodes.cs:28` — codes เดิม
+- `SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — static lookup/commit/จำผลแยกกัน และสูตร hash
+- `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:168,177,190` — domain/audit ไม่มี idempotency
+- `SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:14,29,241,267` — lock ต่อ directory และ replace snapshot; ยังไม่มี ledger
+- `SchoolBot.Application/Abstractions/ISchoolBotDbAdapter.cs:8,50` — ไม่มี interface กลาง; `SchoolBot.Domain/ErrorCodes.cs:28` — codes เดิม
 - `../db/schoolbot_db.sql:92` — ฟิลด์เดิม ไม่มี pending state/unique constraint
-
