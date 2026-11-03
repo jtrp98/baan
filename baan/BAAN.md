@@ -130,7 +130,7 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
 - ติดโควตา/limit: สั่ง agent เดียวพร้อม `--tier` แล้วระบบสลับไปตัวถัดไปตาม `_fallback` ของ tier เอง (ปิดได้ด้วย `--no-fallback`)
 - **สถานะโควตาไม่ข้าม run** — ทุก run สั่ง agent ตาม tier ตามปกติเสมอ ให้ fallback ตัดสินเองว่าวันนี้ตัวไหนใช้ได้ (ลองตัวที่ติดโควตาหนึ่งครั้ง = error เดียว ไม่เผาโควตา) · ห้ามเลือกตัวรันอื่นล่วงหน้าเพราะ "รอบก่อนติด" และห้ามยก "ติดถึง <เวลา>" ไปใส่ใบงานถัดไปเป็นกติกา (โควตากลับก่อนเวลาที่ CLI แจ้งได้) · ใบงานจดได้เฉพาะตัวรันจริงของแต่ละ run (`fallback` ใน report.json) เช่น "agy — codex limit ตอนรัน"
 - ตัวเลือกที่ใช้บ่อย: `--cwd <path>` (โปรเจกต์เป้าหมาย) · `--write` (อนุญาตให้แก้ไฟล์ — default read-only) · `--timeout <jpo>` · `--date YYYY-MM-DD`
-- agent เลือกได้: `codex` (default, ประหยัดโควตา claude) · `claude` · `agy` (gemini-4-argon ครบทุก tier)
+- agent เลือกได้: `codex` (default, ประหยัดโควตา claude) · `claude` · `agy` (gemini-4-argon ที่ t1–t2 · t3–t5 เป็น gemini-3.8-flash รุ่นเล็กกว่า — งาน `risk: high` จึงต้องสั่ง t2 ขึ้นไป ไม่ใช่เลือก agy t3 แล้วหวังได้ argon) — model จริงของทุก tier ดูที่ `agents.json`
 - โหมดอัตโนมัติทั้งก้อน (ไม่ต้องคุมเอง): `baan --goal "..."` — gm/plan/execute ทำงานเองตามแผน DAG
 
 ## โหมด solo — ทีมทั้งทีมรันใน session นี้ (เมื่อผู้ใช้สั่ง)
