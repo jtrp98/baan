@@ -1,6 +1,6 @@
 ﻿# DES-005 — สัญญา Course Plan importer (BE-028)
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 097 — ตรึงสัญญา importer บน migration-002 Rev2 ที่เพิ่มเฉพาะคอลัมน์ `SchoolBotLesson.ImportSource`)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย นายช่าง (ใบงาน 097 — ชี้จุด commit ของ importer: "helper ที่ห้ามแก้" คือ `CommitWithIdempotencyAsync` ระดับ adapter; `CommitMutationAsync` ระดับ application ทำเป็น generic ได้โดย BE-027 ไม่เปลี่ยนพฤติกรรม)
 
 BE-028 นำเข้าแถวของ Course Plan Sheet ที่ผ่าน normalization แล้วลง curriculum **draft revision ที่มีอยู่แล้ว** ด้วยคำขอเดียว ทุกแถวเป็นบทเรียนในร่าง ไม่มีแถวใด publish เอง ที่มาและค่า D ราย Lesson เก็บใน `SchoolBotLesson.ImportSource` (jsonb NULL) ตาม [migration-002 Rev2](../db/migration-002-lesson-import-source.md) ซึ่งผู้ใช้อนุญาตวันที่ 2026-11-03 ให้เพิ่มเฉพาะคอลัมน์ ไม่มี index/CHECK/UNIQUE ใด ๆ — กฎรูปทรง JSON และการกันนำเข้าซ้ำจึงเป็นหน้าที่ application ทั้งหมดตามไฟล์นี้ ผลที่คาดราย case, ขอบเขต stub และความเสี่ยงอยู่ใน [persisted state และประตูระบบจริง](des-005-import-state.md)
 
@@ -47,7 +47,20 @@ CurriculumImportRequest = {
 
 คำขอนี้รับเฉพาะแถวที่ normalize แล้ว ไม่รับคอลัมน์ดิบของ Sheet: ตัว normalize (preview ฝั่ง application) ต้องตัด O ทิ้งก่อนสร้าง request จึงไม่มีทางที่ O ไปถึง commit (AC-045-02) สื่อ P–X ต้องอยู่ใน `activities[].config` แบบ `instruction-v1` ของ Lesson เดิม ไม่สร้าง Level/Course (AC-045-03) และต้องส่ง D แบบ `bool?` ตรงจากแถวดิบ — ห้ามใช้ `TransformedCoursePlanLesson.SourceApproved` ปัจจุบันที่ยุบ null เป็น false
 
-**Idempotency** ตาม [สัญญาส่วนกลาง Rev4](idempotency-001.md): ใช้ `CommitWithIdempotencyAsync` เดิมผ่าน `CommitMutationAsync` ของ `CurriculumService` ไม่แก้ helper · SchoolId=NULL · Principal=`staff_admin:{PrincipalId}` · Operation=`import_curriculum_lessons` · RequestHash = SHA-256 ของ `id + "|" + JsonSerializer.Serialize(request)` (สูตรเดียวกับ content PUT) · ResourceId = curriculum id · ETag = `OpaqueConcurrencyToken.ToETag(Curriculum.UpdateDate)` · status 200 replay/conflict/expired ตามตารางกลางเดิม
+**Idempotency** ตาม [สัญญาส่วนกลาง Rev4](idempotency-001.md): SchoolId=NULL · Principal=`staff_admin:{PrincipalId}` · Operation=`import_curriculum_lessons` · RequestHash = SHA-256 ของ `id + "|" + JsonSerializer.Serialize(request)` (สูตรเดียวกับ content PUT) · ResourceId = curriculum id · ETag = `OpaqueConcurrencyToken.ToETag(response.update_date)` (= `Curriculum.UpdateDate` หลัง commit) · status 200 · replay/conflict/expired ตามตารางกลางเดิม
+
+**จุด commit (ตัดสินใน Rev3):** helper ที่ **ห้ามแก้** คือของส่วนกลางระดับ adapter — `IIdempotentSchoolBotCommit.CommitWithIdempotencyAsync<T>` (interface, `MutationResult<T>`, `IdempotentCommitResult<T>`), การ implement ใน `SchoolBotDbAdapter.Idempotency.cs` และ `CurriculumReplayCipher` ทั้งสามเป็น generic ต่อชนิด response อยู่แล้ว จึงรับ `CurriculumImportResponse` ได้ทันที ส่วน `CurriculumService.CommitMutationAsync` เป็น wrapper ระดับ application ของ BE-027 ซึ่งผูกชนิด `CurriculumMutationResponse` ไว้ ให้ทำดังนี้:
+
+1. แยก core เป็น generic `private Task<TResponse> CommitMutationAsync<TResponse>(principal, operation, requestHash, key, httpStatus, mutate, Func<TResponse,(int Id, DateTimeOffset UpdateDate)> resource, ct)` ที่มีขั้น recheck (เรียก `principal.RecheckAsync` บน transaction + `switch` สิทธิ์ตาม operation) และการสร้าง `MutationResult<TResponse>(body, httpStatus, resource(body).Id, ToETag(resource(body).UpdateDate))` เหมือนเดิมทุกบรรทัด
+2. คง `CommitMutationAsync` แบบเดิม (signature เดิม คืน `CurriculumMutationResponse`) เป็น wrapper บรรทัดเดียวที่ส่ง `b => (b.Id, b.UpdateDate)` — call site เดิมทั้งสี่ (create, revision, content PUT, publish) ห้ามแก้
+3. importer เรียก core ด้วย `TResponse = CurriculumImportResponse`, httpStatus 200 และ `r => (r.Id, r.UpdateDate)` สิทธิ์ใน recheck เท่ากับ content PUT (`EvaluateUpdateCurriculumContent`) — จะเขียน arm `"import_curriculum_lessons"` ให้ชัดใน `switch` ก็ได้ แต่ผลต้องเท่ากับ default arm เดิม
+
+**ข้อกำหนดที่ต้องคง:**
+- ไฟล์ของ helper ระดับ adapter ข้างบนไม่มี diff
+- operation เดิมทั้งสี่ยังใช้ `T = CurriculumMutationResponse` จึงได้ plaintext ของ ledger และ body ของ replay เป็น bytes เดิม test ของ BE-027 เดิมต้องผ่านโดยไม่แก้
+- replay ของ import (key เดิม + RequestHash เดิม ภายใน `ReplayUntil`) คืน `CurriculumImportResponse` ที่ถอดจาก ledger — `id`, `update_date` และ `lessons[]` (ลำดับและ `outcome`) ตรงกับคำตอบครั้งแรก byte-for-byte ไม่คำนวณใหม่ (คำตอบครั้งแรกเป็น `created` replay ก็ยังเป็น `created` ไม่ใช่ `unchanged`) ไม่เรียก `mutate`, ไม่เขียน audit, ไม่แตะ UpdateDate
+- `CurriculumImportResponse` และ record ของ `lessons[]` ต้อง round-trip ผ่าน `JsonSerializer` ค่าเริ่มต้น (ที่ cipher ใช้) โดยกำหนดชื่อด้วย `[JsonPropertyName]` บน type และให้ `outcome` เป็น string `"created"`/`"unchanged"` (ถ้าใช้ enum ต้องติด `JsonStringEnumConverter` บน type ไม่ใช่ใน options ของ API) — ห้ามพึ่ง options ระดับ API
+- exception ใน `mutate` (`404`/`409`) ทำให้ไม่มีการเขียน domain, audit หรือ ledger ตามพฤติกรรมเดิมของ helper ส่วน `400 INVALID_INPUT` ตรวจก่อนเรียก commit
 
 **row_hash** = SHA-256 hex lowercase ของ UTF-8 จาก `JsonSerializer.Serialize(RowHashPayload)` (options ค่าเริ่มต้นแบบ RequestHash) โดย `RowHashPayload` เป็น record เรียง property ตายตัว: `source_ref`, `source_row_key` (string lowercase), `source_approved` (true/false/null แยกกัน), `title`, `objective`, `instructions`, `missions`, `activities` จาก `lesson` — **ไม่รวม** `source_position` และ `lesson.ordinal` (ตำแหน่ง/ลำดับแสดง) และไม่มี O เพราะไม่อยู่ใน request เปลี่ยนรูป payload นี้ = hash ของทุกแถวที่เคยนำเข้าเปลี่ยน = breaking contract ต้องผ่าน arch และผู้ใช้ client ส่ง hash มาแทนไม่ได้
 
@@ -76,6 +89,9 @@ CurriculumImportRequest = {
 | unique/partial index หรือ CHECK บน ImportSource | ผู้ใช้ไม่อนุญาต (มติ 2026-11-03 "เพิ่ม column ได้ แต่ไม่เพิ่ม index หรืออะไรทั้งนั้น") |
 | เปิด `import_source` ใน public GET | ผู้เรียนไม่ต้องใช้ และเลี่ยงส่ง source_ref ออกนอกส่วนกลาง |
 | ให้ `row_hash` รวม ordinal | สลับลำดับแล้วนำเข้าซ้ำจะ conflict ขัด AC-045-04 |
+| importer เขียน commit path ของตัวเองแบบ `QuestionBankService.CommitAsync` (BE-030) | ต้องคัดลอกขั้น recheck บน transaction และ `switch` สิทธิ์ของ curriculum มาอีกชุด สองชุดจะเพี้ยนกันได้ ส่วน path ของ BE-030 ตรวจสิทธิ์จาก principal ที่ถือมาเท่านั้น ไม่ recheck ใน transaction จึงไม่ใช่แบบที่ควรลอกสำหรับ curriculum |
+| แก้ helper ระดับ adapter หรือ cipher ให้รู้จัก import | ไม่จำเป็น เพราะ generic อยู่แล้ว และกระทบ BE-027/BE-030 ทุก operation |
+| ใส่ผลราย Lesson ลงใน `CurriculumMutationResponse` | เปลี่ยน JSON ของ operation เดิมทั้งสี่ = breaking contract |
 
 ## ยังไม่ยืนยัน
 
@@ -84,4 +100,5 @@ CurriculumImportRequest = {
 ## หลักฐาน
 
 - [ผลเทียบกับโค้ดจริง Rev2](des-005-import-evidence.md) — file/line ของ DTO, transformer, content writer, reader, helper และ snapshot ตรวจ 2026-11-03 ไม่ได้รัน runtime หรือเชื่อมฐาน
+- จุด commit (ตรวจโค้ดจริง 2026-11-03): `web/src/SchoolBot.Application/Abstractions/IIdempotentSchoolBotCommit.cs:10–24` (generic `MutationResult<T>` และ `CommitWithIdempotencyAsync<T>`) · `web/src/SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Idempotency.cs:23–74` (replay ถอด `Decrypt<T>` ไม่เรียก mutate; exception ใน mutate ไม่เขียน ledger) · `web/src/SchoolBot.Infrastructure/Persistence/CurriculumReplayCipher.cs:26–49` (`JsonSerializer` ค่าเริ่มต้น) · `web/src/SchoolBot.Application/Curriculum/CurriculumService.Commit.cs:9–42` (wrapper ผูก `CurriculumMutationResponse`; default arm = `EvaluateUpdateCurriculumContent`) · call site เดิม `CurriculumService.Mutations.cs:29,102`, `CurriculumService.Content.cs:34`, `CurriculumService.Publish.cs:38` · แบบอ้างอิง BE-030 `web/src/SchoolBot.Application/Assessment/QuestionBankService.cs:64–89`
 - [physical delta และรายการที่ vault ส่งให้ arch](../db/migration-002-lesson-import-source-contract.md) ข้อ 1–6 ถูกตรึงในไฟล์นี้ทุกข้อ; [supplied-row contract](learning-sheet-import-001.md) เป็นที่มาของรูป request และกฎ dedup
