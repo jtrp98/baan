@@ -3818,9 +3818,28 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "done-local",
+      "status": "verified",
       "risk": "high",
-      "module": "quiz"
+      "module": "quiz",
+      "test_level": "normal",
+      "oracle": "pack-H ใบงาน097 (2026-11-03): DES-005 Rev12 · des-010-stub-persistence Rev1 · DES-012 Rev9 · tp-001-normal-index Rev1 TP001-060",
+      "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-F)",
+      "slices": [
+        {
+          "id": "BE-029-S1-courserun-read-stub",
+          "ac_ids": [
+            "AC-043-02",
+            "AC-043-03",
+            "AC-043-04"
+          ],
+          "status": "verified",
+          "test_level": "normal",
+          "oracle": "pack-H ใบงาน097 (2026-11-03): DES-005 Rev12 · des-010-stub-persistence Rev1 · DES-012 Rev9 · tp-001-normal-index Rev1 TP001-060",
+          "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-F)",
+          "evidence": "planning/task-097.md; reports/baan/2026-11-03-08-18-08-sys-tier-t2-1agents-TDb7yd; reports/baan/2026-11-03-08-36-06-check-tier-t2-1agents-UK9n3h",
+          "note": "2026-11-03 writer TDb7yd (t2) · นายช่างรัน 4537/3 · check UK9n3h PASS normal (2/2 · 4539/3)"
+        }
+      ]
     },
     {
       "id": "BE-030",
