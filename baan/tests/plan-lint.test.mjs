@@ -55,7 +55,7 @@ test("ติดประตูครึ่งพอดี = ผ่าน · เ�
 
 test("normalize อ่านฟิลด์ของแผนโปรเจกต์และชื่อ role เดิม", () => {
   const [t] = normalizeDagTasks([{ id: "FE-006", owner: "fe", depends_on: ["BE-1"], gate_ids: ["G-UX"], status: "Pending", ac_ids: ["AC-1"] }]);
-  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, oracle: false, ref: false, slices: [] });
+  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, tier: null, oracle: false, ref: false, slices: [] });
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
@@ -233,4 +233,12 @@ test("wave เกิน 6 task = warning ไม่ใช่ error · ไม่�
   assert.match(r.warnings.join(), /wave ที่มีเกิน 6 task: wave 1 \(7\)/);
   assert.deepEqual(r.errors, []);
   assert.doesNotMatch(verify(many(6)).warnings.join(), /เกิน 6 task/);
+});
+
+test("task high ของ sys/front ที่ตั้ง tier ต่ำกว่า t2 = warning · t2/t1, low, role อื่น หรือ verified แล้ว = เงียบ", () => {
+  const r = verify(chain({ SA: { ac_ids: ["AC-0"], risk: "high", tier: "t1" }, "BE-1": { risk: "high", tier: "t3" }, "BE-2": { risk: "low", tier: "t4" }, "FE-1": { risk: "high", tier: "T4" } }));
+  assert.match(r.warnings.join("\n"), /tier ต่ำกว่า t2 2 งาน .*: BE-1@t3, FE-1@t4$/m);
+  assert.deepEqual(r.errors, []);
+  assert.doesNotMatch(verify(chain({ "BE-1": { risk: "high", tier: "t2" } })).warnings.join(), /tier ต่ำกว่า t2/);
+  assert.doesNotMatch(verify(chain({ "BE-1": { risk: "high", tier: "t3", status: "verified", oracle: "R1", ref: "c1" } })).warnings.join(), /tier ต่ำกว่า t2/);
 });

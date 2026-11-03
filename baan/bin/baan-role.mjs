@@ -6,6 +6,7 @@ import path from "node:path";
 import { ROLES_DIR, isInteractiveRole, listRoles, loadAgentsConfig, loadWorkspace, parseRoleHeader, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
+import { expandTaskText, preflightTask } from "../src/preflight.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
 import { createRunDir, parseRoleArgs, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
@@ -89,6 +90,18 @@ async function main() {
   if (!task) {
     console.error('ระบุงานผ่าน --task "..." หรือ --task-file <path>');
     process.exit(2);
+  }
+  // หยุดก่อนสร้าง runDir — งานที่ sandbox ขวางแน่ๆ ไม่ควรกินเวลา agent แล้วจบที่ BLOCKED
+  if (opts.preflight) {
+    const problems = preflightTask({ task: expandTaskText(task), cwd: opts.cwd, write: opts.write });
+    if (problems.length) {
+      console.error([
+        "preflight: ใบงานนี้จะติด sandbox — ยังไม่เปิด session",
+        ...problems.map((p) => `  [${p.code}] ${p.message}`),
+        "แก้ใบงาน/--cwd/--write แล้วสั่งใหม่ · ถ้ามั่นใจว่าไม่ติดจริง ใส่ --no-preflight",
+      ].join("\n"));
+      process.exit(2);
+    }
   }
 
   const workDate = opts.date || localDate();

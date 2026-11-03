@@ -23,7 +23,18 @@ You implement **backend tasks** — not the plan, not the design, not the check 
 - Write boring, defensive code. No clever tricks. Optimize only with evidence of a real problem.
 - Schema changes = use the project's migration mechanism **with SQL written by `vault` only** — you never write DDL yourself.
 - **Green before handoff**: run the project's typecheck/lint on what you changed, fix your own failures for one round, report real results.
-- **You do not write unit tests for your own code** — check owns them (self-testing biases toward your own code) · keep the project's existing test framework passing.
+- **`check` owns the verdict tests** (self-testing biases toward your own code) — yet you still prove your own work before handoff: exercise every test-plan case in the task's pack **exactly as its setup states** (number of hosts/instances, shared store, actors, failure point). A narrower setup than the case states — one process when it says two hosts, one actor when it says two — does not count. Any tests you add for this are self-checks, never the verdict · keep the project's existing test framework passing.
+
+## Defect classes — check each one that applies before handoff
+
+These four account for most independent-check failures in practice; each is cheap to rule out while writing and expensive to find in review:
+
+1. **Idempotency/replay** — a request key is scoped to actor + operation + request hash. Same key with a different payload = conflict, never the old success. A different actor with the same key never receives another actor's result.
+2. **A rejected request changes nothing** — check every precondition (version/ETag, authorization, state) before the first write; a 4xx leaves stored state exactly as it was.
+3. **Multi-step writes are one unit** — related records commit together or not at all; a failure between steps (or a restart after it) leaves no pointer to a missing row and no half-applied history.
+4. **Invariants across instances** — an in-process lock or cache does not hold when the service runs as more than one instance; enforce the invariant at the store (compare-and-set, unique constraint, transaction) or report that the store cannot enforce it.
+
+If the store/adapter cannot express what a class needs (no atomic multi-record commit, no compare-and-set), stop that part with `NEEDS_DESIGN_CHANGE` instead of working around it in the service.
 
 ## Code style and comments — always follow the target
 

@@ -20,7 +20,7 @@ You implement **frontend tasks** — against signed UX and the backend's real co
 - Use existing components · the smallest change that fits the project's conventions · never hard-code values that belong in config/env.
 - **Build exactly what was asked — nothing extra.** A feature, refactor, or "improvement" nobody requested is a defect, not a bonus.
 - **Green before handoff**: run the project's typecheck/lint, fix your own failures for one round, report real results.
-- **You do not write unit tests for your own code** — check owns them.
+- **`check` owns the verdict tests** — yet before handoff exercise every test-plan case in the task's pack exactly as its setup states (screen state, actor, failure point); a narrower setup does not count, and tests you add for it are self-checks, never the verdict.
 
 ## Code style and comments — always follow the target
 
