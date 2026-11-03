@@ -78,9 +78,8 @@ AC: [AC-028-01 (เปิดใช้ Key เดียวบนเครื่�
 
 ขั้นตอน: activate A และ B พร้อมกัน ≥50 รอบ; A ซ้ำ; validate ก่อน/หลัง activate; Idempotency-Key เดิม payload ต่าง; inject commit/signer fail; proof ผิด/challenge reuse/เกิน 120s
 
-ผลที่คาด: activate ได้ 200 หนึ่งคำขอ อีกฝ่าย `409 DEVICE_LIMIT`; live=1, CurrentBindingId ชี้ผู้ชนะ, BindingEpoch=e, binding Epoch=e และ DetachedAt=null ไม่มี orphan ฝ่ายแพ้ไม่เพิ่ม success audit/result ทดสอบ A ซ้ำบน fixture ที่ A ชนะ: 200 ไม่เพิ่มแถว/ไม่เปลี่ยน License; validate ก่อน activate→`403 DEVICE_NOT_ACTIVATED` หลัง activate→200 ไม่เพิ่มแถว เปลี่ยน binding ได้เพียง LastCheckedAt/LastEntitlementExpiresAt/UpdateDate; signed lease อ้าง binding/epoch/jkt และเวลาเท่าที่ commit ยืนยัน โดย exp=min(checked_at+259200,License.ExpiresAt)
-
-ส่วน stub ใน slice นี้: ใช้ barrier ข้างต้น รวม validate สองคำขอใน epoch เดียวให้คำขออ่านก่อน commit ทีหลัง เวลา/lease ต้องไม่ถอย; replay key+payload เดิมคืน exp เดิม ไม่เพิ่ม audit/result ซ้ำ; payload ต่าง→409 ไม่เปลี่ยน state; proof ผิด/challenge reuse/เกิน 120s→DEVICE_PROOF_INVALID ไม่ออกสิทธิ์ Inject signer throw ก่อน publish และ store write throw ก่อน publish แยก fixture: ไม่ตอบ success/no token และ domain/audit/result คงเดิม; file inject publish failureก่อนสลับ generation แล้ว reopen ต้องเห็นชุดเก่าครบ ไม่ใช่ License ใหม่กับ binding เก่า
+ผลที่คาด: 200 หนึ่ง/409 DEVICE_LIMIT หนึ่ง, live=1/pointer ชี้ผู้ชนะ/epoch=e/DetachedAt=null; A ซ้ำ→200 ไม่เพิ่มแถว; validate ก่อน activate→403 DEVICE_NOT_ACTIVATED หลัง activate→200 ไม่เพิ่มแถว ไม่เปลี่ยน License และ patch เฉพาะเวลา lease; token/audit/result ตรงชุด commit ตาม [expected ฉบับเต็ม](traceability-001-license-device.md)
+ส่วน stub ใน slice นี้: รันทั้ง memory/file รวม [fault/replay/lease ที่ไม่ถอยของ TP001-005](traceability-001-license-device.md) ซึ่งเป็นส่วนบังคับ ตรวจ signer/write/file publish failure ก่อน publish ให้ state/audit/result คงเดิม ไม่มี token; replay ไม่ต่อ lease
 
 ส่วนรอของจริง: หลาย process/host, PostgreSQL lock/CAS/rollback/constraints รอ DBA-003/G-CORE; Gateway และ signed lease end-to-end รอ QA-001 ตาม S-GATE ผล stub ไม่ปิดประตูเหล่านี้
 
