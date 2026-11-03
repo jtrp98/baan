@@ -1,6 +1,6 @@
 # DES-005 — หลักสูตร ภารกิจ และผลประเมิน — โครงสร้างเนื้อหาและเกณฑ์ประเมิน
 
-> Rev 8 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 9 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — ตัดสิน storage และขอบเขต Course Plan importer)
 
 ส่วนต่อของ [DES-005 — หลักสูตร ภารกิจ และผลประเมิน](des-005.md)
 
@@ -18,6 +18,8 @@ Curriculum revision เป็นเนื้อหากลางของ Schoo
 - การนำเข้า Course Plan Sheet ([REQ-045 (นำเข้า Course Plan Sheet)](../../modules/quiz/shared/requirements/req-045.md), decisions-020 และ decisions-023): นำเข้าทุกแถวเป็น `draft` (`ContentState=draft`), แถวที่คอลัมน์ `D=TRUE` ติดป้ายว่าผ่านการตรวจจากต้นทางแต่ไม่ publish อัตโนมัติ, คอลัมน์ `O` ไม่นำเข้า, คอลัมน์ `P–X` เป็นสื่อชุดที่ 2 ของหน่วยเดิม
 - `LessonKey`, `MissionKey`, `ActivityKey` และ `IndicatorKey` เป็น `U` ถาวรข้าม revision; `Ordinal` เป็นลำดับภายใน curriculum revision เปลี่ยนลำดับได้โดยไม่เปลี่ยน key; row ID เป็น `K` ใหม่เมื่อสร้าง content revision ใหม่
 - Published curriculum และ children (`Lesson`, `Mission`, `Criteria`, `Activity`) เป็น immutable snapshots; เปลี่ยนเนื้อหาหรือเกณฑ์ต้องสร้าง revision ใหม่ ไม่ย้อนแก้ผลเก่า
+
+ข้อกำหนดนำเข้าข้างต้นยังไม่มี storage ครบตาม schema Rev8: `SchoolBotCurriculum.SourceRef` เก็บที่มาระดับ revision ได้ แต่ `SchoolBotLesson` ไม่มี provenance/D รายแถว การยัดลง Text หรือขยาย `Activity.Config` ไม่ใช่การใช้สัญญาเดิม อ่าน [คำตัดสิน importer และ human gate](des-005-import.md) ก่อนทำ persistence; validator/preview ยังทำแยกได้
 
 สัญญา `ActivityInput` และ `ActivityConfig`:
 ```text

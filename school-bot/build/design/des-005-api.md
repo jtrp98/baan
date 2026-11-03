@@ -1,6 +1,6 @@
 # DES-005 — หลักสูตร ภารกิจ และผลประเมิน — API `/v2`
 
-> Rev 9 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
+> Rev 10 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — แยก content mutation เดิมจาก importer ที่รอ storage)
 
 ส่วนต่อของ [DES-005 — หลักสูตร ภารกิจ และผลประเมิน](des-005.md)
 
@@ -38,7 +38,15 @@ Curriculum/Level/Lesson/Mission/Criteria/Activity/Submission/Assessment IDs เ�
 
 Public criteria ไม่คืน hidden expected traces หาก author กำหนดว่าเป็นข้อมูลตรวจฝั่ง server; response ใช้ `{criteria_id,method,instructions}` สำหรับส่วนดังกล่าว ไม่ส่ง secret tests ให้ Desktop
 
+## ขอบเขต Course Plan importer
+
+create และ content PUT ข้างต้นเป็นคนละ mutation ใช้ Operation `create_curriculum` และ `update_curriculum_content` ตาม [idempotency ส่วนกลาง](idempotency-001.md) การเรียกสองครั้งไม่ใช่ import batch transaction เดียว และ `LessonInput` เดิมไม่มี provenance/D จึงยังใช้รับรอง import commit ไม่ได้
+
+`GET /v2/admin/curricula/{id}` อ่าน metadata/children ของ draft ผ่าน `CurriculumDraftView` ได้ แต่ยังไม่คืน provenance/D ราย Lesson ไม่เพิ่ม import endpoint, Operation, hash หรือ success DTO ก่อน human gate ใน [คำตัดสิน importer](des-005-import.md) จะคลี่คลาย การ replay mutation เดิมไม่รับประกัน dedup แถวจากไฟล์เดียวกันเมื่อใช้ request key ใหม่
+
 ## หลักฐาน
 
 - `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด bound T1000 และ `400 INVALID_INPUT` เมื่อเกิน โดยไม่ขยาย schema
 - `knowledge/school-bot/build/db/schoolbot_db.sql:123`: Reason varchar(1000) NOT NULL; ข้อจำกัด source/implementation และ mapping/reader/transaction อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md)
+
+- Source ตรวจ 2026-11-03: หลักฐาน input/read model, Operation และ routes พร้อม file/line อยู่ใน [ผลเทียบ importer กับโค้ดจริง](des-005-import-evidence.md)
