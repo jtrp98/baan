@@ -1,10 +1,10 @@
-﻿# สัญญา idempotency ส่วนกลาง
+# สัญญา idempotency ส่วนกลาง
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (รวมการกันคำขอซ้ำที่ adapter/backing store)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — เกณฑ์ทดสอบให้ตรง actor scope, store lock และ transaction-scoped facade)
 
 adapter จองคำสั่ง/ตรวจ replay และ commit ผลพร้อม domain/audit; BE-027 (หลักสูตรกลาง) ใช้ทั้ง create, metadata, content, publish ในครั้งนี้ [ขอบเขตทดสอบ/การย้าย](data-contract-rules-cross-database.md#การพิสูจน์และขอบเขตการย้าย)
 
-คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ข้อ 1–4 เป็นแบบที่ต้องทำ หลักฐาน source อยู่ท้ายไฟล์
+คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ข้อ 1–4 เป็นแบบที่ต้องทำ Rev2 คงพฤติกรรม Rev1 และเส้นชัย BE-027 ตาม AC-043-01 (สิทธิ์แก้หลักสูตรกลาง), AC-044-03 (อนุมัติก่อนเผยแพร่), AC-044-05 (ฉบับเผยแพร่ไม่ถูกแก้ทับ); ชี้วิธีพิสูจน์โดยไม่เพิ่มกฎให้ writer หลักฐาน source อยู่ท้ายไฟล์
 
 ## 1. ขอบเขตและผลตอบ
 
@@ -22,6 +22,10 @@ BE-027 ใช้ SchoolId=NULL และ Principal=`staff_admin:{PrincipalId}` �
 
 ตัวอย่างสมมติ: A/B ใช้ UUID เดียวได้ผลของตน; revision ซ้ำยังถูก domain uniqueness ปฏิเสธ
 
+**คำตัดสิน actor ต่าง:** ไม่ยอมรับ `IDEMPOTENCY_CONFLICT` เพียงเพราะ UUID ชนอีก actor และไม่รับทั้งสองแบบเป็นทางเลือก ต้องทำตาม domain rules ของ scope ใหม่; การไม่คืน replay คนอื่นอย่างเดียวไม่พอหากปฏิเสธ scope ใหม่ผิดเหตุผล
+
+check ปรับ `AuthorizedActorCannotReceiveAnotherActorsReplay`: create revision ซ้ำคาด `409 STATE_CONFLICT`; metadata/content บน draft เดิมด้วย ETag ก่อน A แก้คาด `412 VERSION_CONFLICT`; publish ให้ใช้ `ApprovalRef` ต่างจากครั้งแรกเพื่อทดสอบ `409 STATE_CONFLICT` ทั้งสี่ fixture ที่ถูกปฏิเสธไม่เพิ่ม domain/audit/ledger โค้ดเดิมมี domain no-op เมื่อเผยแพร่แล้วด้วย `ApprovalRef` เดิม จึงห้ามใช้ body เท่ากันตัดสินว่าอ่าน replay ข้าม actor; ไม่เพิ่มกฎให้ writer เปลี่ยน no-op นี้ ทดสอบ scope ใหม่บนคนละ resource และ operation ต่างตาม TP001-085 (แยกขอบเขตคำสั่ง) ต่อไป
+
 RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล็ก 64 ตัว BE-027 คงสูตรเดิม: create ใช้ `JsonSerializer.Serialize(request)`; metadata/content ใช้ `id + "|" + JsonSerializer.Serialize(request)`; publish ใช้ `id + "|" + ApprovalRef` ใช้ Data Transfer Object (DTO)/options เดิมรวม nested data ไม่รวมเวลาปัจจุบัน/request ID/token; If-Match เป็น precondition ของ mutation ใหม่ ไม่ตรวจ stale ETag ก่อน replay ที่ถูกต้อง
 
 ## 2. คำขอซ้อน
@@ -29,6 +33,8 @@ RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล�
 เลือก **รอ store lock** รองรับ CancellationToken แล้วอ่านผลใหม่ก่อน domain preconditions เมื่อคำขอแรก commit: hash เดิม replay; hash ต่าง conflict ไม่คืน STATE_CONFLICT เพราะ revision ถูกสร้างแล้ว ถ้า rollback ทั้งหน่วย ผู้รอจึงเริ่ม mutation ได้
 
 ใช้ cancellation/deadline เดิม ไม่เพิ่ม code/pending row ยกเลิกผู้รอไม่ยกเลิกคำขอแรกหรือข้าม lock response ขาดหลัง commit ให้ retry tuple/hash เดิม ห้ามลบผลที่ commit แล้ว
+
+**คำตัดสินลำดับทดสอบ:** `ConcurrentCreateReservesKeyBeforeCommitting` ต้องพัก A ใต้ store lock → เริ่ม B → ยืนยัน B ถูกส่งเข้า commit และยังไม่จบ → ปล่อย A → รอทั้งคู่ภายใน timeout; ปลด barrier ใน finally เสมอ ห้ามรอ B จบก่อนปล่อย A เพราะ B เป็นผู้รอ hash เดิมต้องสำเร็จทั้งคู่ด้วยผลเดิม; hash ต่าง A สำเร็จ B ได้ `409 IDEMPOTENCY_CONFLICT`; domain/audit/ledger เพิ่มหนึ่ง success ไม่เพิ่ม conflict/in-progress เพื่อให้ test เดิมจบ
 
 ## 3. Interface และหน่วย atomic
 
@@ -56,6 +62,10 @@ store ถือ lock จน commit: อ่าน snapshot สด → lookup tupl
 
 callback รับ transaction-scoped facade: อ่าน snapshot เดียว เขียน candidate ห้าม root adapter/commit ซ้อน/network/hardware effect exception ก่อน commit ไม่เหลือทั้งสามส่วน ไม่ publish cache ก่อนเก็บสำเร็จ
 
+**คำตัดสินจุดดัก:** check ใช้ test wrapper ที่รองรับทั้ง `ISchoolBotDbAdapter` และ `IIdempotentSchoolBotCommit`; forward commit ไป target แล้วครอบ callback `mutate` ให้พักหลังได้ store lock ก่อนเรียก callback จริงด้วย facade ที่ target ส่งมา จุดนี้พิสูจน์ก่อน commit โดยไม่เรียก root mutation; proxy เฉพาะ interface เก่าหรือพักก่อนเข้า commit ไม่พิสูจน์ TP001-084 (คำขอซ้อนใต้ lock) writer ไม่ต้องบังคับเส้นทางใหม่ผ่าน root proxy หรือเพิ่ม production hook
+
+check ปรับ `CurriculumGateProxy` และ `PendingPublishPreservesAnotherHostsNewRevision` ที่ใช้ helper ร่วมด้วย: ถ้าพักใต้ lock ให้เริ่ม create revision ใหม่ แล้วปล่อย publish ก่อนรอ create จบ; หากต้องการให้ create จบก่อนปล่อย publish ตาม TP001-061 (สอง instance รักษาทั้งสอง revision) ให้พัก publish **ก่อนเข้า store lock** และแยกจุดดักนี้จาก TP001-084
+
 ห้าม wrapper ที่ commit ก่อนจำผลหรือ fallback ไป dictionary ทุก snapshot writer รวมคำขอภายในไม่มี key ต้องใช้ coordination เดียวและรักษา ledger; ไม่มี key ไม่รับประกัน replay
 
 ## 4. การเก็บผลและทางเลือก
@@ -72,12 +82,20 @@ File เพิ่ม `idempotency` ใน `curricula_snapshot.json` พร้อ
 | เพิ่ม pending column/unique index | ไม่เลือก: stub ไม่ต้องใช้ เปลี่ยนต้องผ่านคน/vault |
 | ย้ายทุก consumer | ไม่เลือก: ขยาย regression งานที่ผ่านแล้ว ย้าย BE-027 ก่อน |
 
+**แบ่งงาน:** writer ทำข้อ 1–4 ครบสี่ operation บน memory/file store ร่วม เลิก static ledger และคง Projects/License; ไม่แก้ Independent tests ส่วน check แก้ actor assertions/fixture, ลำดับรอ และ wrapper ตามข้อ 1–3 แล้วพิสูจน์ setup/ผลเดิมใน oracle pack ไม่ลดเหลือ service เดียวหรือย้าย barrier ออกนอก lock ของกรณีคำขอซ้อน
+
 ## หลักฐาน
 
 Source ตรวจ 2026-11-03 ใต้ `C:/src/schoolbright/target/school-bot/web/src/`:
 
-- `SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — static lookup/commit/จำผลแยกกัน และสูตร hash
-- `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:168,177,190` — domain/audit ไม่มี idempotency
-- `SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:14,29,241,267` — lock ต่อ directory และ replace snapshot; ยังไม่มี ledger
-- `SchoolBot.Application/Abstractions/ISchoolBotDbAdapter.cs:8,50` — ไม่มี interface กลาง; `SchoolBot.Domain/ErrorCodes.cs:28` — codes เดิม
-- `../db/schoolbot_db.sql:92` — ฟิลด์เดิม ไม่มี pending state/unique constraint
+- `SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — ของจริงยังใช้ static lookup/commit/จำผลแยกกันและสูตร hash เดิม; ไม่ใช่ implementation ของแบบส่วนกลางข้างต้น
+- `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:178,227,230,285,289,383,402` — create ซ้ำได้ STATE_CONFLICT; draft ที่ ETag เก่าได้ VERSION_CONFLICT; publish ตรวจ lifecycle ก่อน ETag
+- `SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:14,29,199,216` — lock ต่อ directory และ replace snapshot; `SchoolBot.Infrastructure/Persistence/MemorySchoolBotBackingStore.cs:20,150,166` — swap ใต้ lock ของ object; ทั้งสองยังไม่มี ledger ใน curriculum snapshot
+- `SchoolBot.Application/Abstractions/ISchoolBotDbAdapter.cs:8,52` — interface เดิมมี mutation แต่ไม่มีเมธอด commit กลาง; `SchoolBot.Domain/ErrorCodes.cs:28` — codes เดิม
+- `../db/schoolbot_db.sql:92` — DDL เดิม ไม่มี pending state/composite unique constraint; ไม่มี schema delta ใน Rev2
+- `SchoolBot.Application/Curriculum/CurriculumService.cs:396` และ `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:383` — published + ApprovalRef เดิมคืน domain no-op; ApprovalRef ต่างได้ STATE_CONFLICT
+
+หลักฐานเกณฑ์ ภายใต้ `C:/src/schoolbright/` ตรวจ 2026-11-03:
+
+- `target/school-bot/web/tests/SchoolBot.Tests/IndependentCurriculumReworkTests.cs:102,114,143,157,187,195,214` — assertion actor, proxy interface เก่า และรอ B ก่อนปล่อย A ทั้ง create/publish
+- `reports/school-bot/normal-096/pack-B-BE-027.txt` §1–4 — AC และ Rev1 ที่ตรึง; TP001-084–087 กำหนด actor scope/รอใต้ lock/facade อยู่แล้ว; `sys-B.out` ส่วนท้าย — writer หยุดก่อนแก้โค้ดเพราะเกณฑ์ขัดกัน
