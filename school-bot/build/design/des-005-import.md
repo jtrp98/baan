@@ -1,58 +1,87 @@
-﻿# DES-005 — คำตัดสิน Course Plan importer ก่อนทำ persistence
+﻿# DES-005 — สัญญา Course Plan importer (BE-028)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — ตัดสิน BE-028 ก่อนเปิดงาน)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 097 — ตรึงสัญญา importer บน migration-002 Rev2 ที่เพิ่มเฉพาะคอลัมน์ `SchoolBotLesson.ImportSource`)
 
-BE-028 (นำเข้า Course Plan Sheet) ยังใช้ schema เดิมไม่ได้ครบ AC-045-01 (อ่าน draft พร้อมที่มาและความหมาย D ว่าอนุมัติจากต้นทาง) จึงหยุด commit/read-back ที่ human gate โดยคง AC เดิมทั้งหมด ส่วน transformation/preview บน stub ทำต่อได้
+BE-028 นำเข้าแถวของ Course Plan Sheet ที่ผ่าน normalization แล้วลง curriculum **draft revision ที่มีอยู่แล้ว** ด้วยคำขอเดียว ทุกแถวเป็นบทเรียนในร่าง ไม่มีแถวใด publish เอง ที่มาและค่า D ราย Lesson เก็บใน `SchoolBotLesson.ImportSource` (jsonb NULL) ตาม [migration-002 Rev2](../db/migration-002-lesson-import-source.md) ซึ่งผู้ใช้อนุญาตวันที่ 2026-11-03 ให้เพิ่มเฉพาะคอลัมน์ ไม่มี index/CHECK/UNIQUE ใด ๆ — กฎรูปทรง JSON และการกันนำเข้าซ้ำจึงเป็นหน้าที่ application ทั้งหมดตามไฟล์นี้ ผลที่คาดราย case, ขอบเขต stub และความเสี่ยงอยู่ใน [persisted state และประตูระบบจริง](des-005-import-state.md)
 
-## 1. Storage ที่ใช้ได้และส่วนที่ขาด
+AC ที่สัญญานี้รองรับ: AC-045-01 (เห็น draft พร้อมที่มาและความหมายว่าอนุมัติจากต้นทาง ไม่เผยแพร่เอง), AC-045-02 (เปลี่ยนเฉพาะคอลัมน์ O แล้วข้อมูลไม่เปลี่ยน), AC-045-03 (สื่อสองชุดอยู่ใน Lesson เดิม ไม่เกิด Course/Level ใหม่), AC-045-04 (รหัส Lesson แยกจากเลข C/Unit และคงเดิมเมื่อสลับลำดับ) ใน [REQ-045](../../modules/quiz/shared/requirements/req-045.md) ตาม [มติ 023 (นำเข้าทุกแถวเป็นร่าง; D=TRUE คือป้ายอนุมัติจากต้นทาง)](../../shared/decisions/decisions-023.md) และ [มติ 020 (หลักสูตรแบบ Level)](../../shared/decisions/decisions-020.md)
 
-`SchoolBotCurriculum.SourceRef` เป็น `varchar(2048) NOT NULL` เก็บ source_ref ระดับ revision; `Lifecycle=draft` และ `PublishedAt=null` แสดงว่ายังไม่เผยแพร่ `SchoolBotLesson.LessonKey` เป็น UUID ถาวร ใช้ supplied source_row_key ตาม manifest ได้ แต่ไม่เก็บ D หรือ source_ref รายแถว และไม่ใช่หลักฐานอนุมัติ
+## 1. ImportSource เก็บอะไร และอ่านกลับทางไหน
 
-ไม่มี field ตามสัญญา Rev8 สำหรับ provenance/D ราย Lesson ให้ writer และ reader ใช้ร่วมกัน ตารางนี้ประเมินทางเลือก ไม่ใช่ schema ใหม่
+**ค่าในคอลัมน์:** SQL NULL หรือ JSON object ที่มีสี่ key พอดี ไม่รับ JSON null ทั้งคอลัมน์, scalar, array หรือ key เกิน
 
-| ทางเลือก | คำตัดสินและเหตุผล |
+| key | ชนิด | ความหมายและกฎ |
+|---|---|---|
+| `source_ref` | string 1–2048 ตัวอักษร ไม่ว่างหลัง trim | ที่มาของ batch ณ เวลานำเข้า (เช่น URL ของ Sheet) คัดลอกลงทุก Lesson ของ batch เก็บตรงตัวไม่ trim ไม่บังคับเป็น URL |
+| `source_row_key` | string UUID รูป canonical lowercase (`D` format) | identity ของแถวจาก manifest ที่รับรองแล้ว ต้องเท่ากับ `LessonKey::text` ของแถวนั้นเสมอ |
+| `source_approved` | `true` / `false` / `null` (key ต้องมีเสมอ) | ค่า D ณ เวลานำเข้า: true = อนุมัติจากต้นทาง, false = ต้นทางระบุว่ายังไม่อนุมัติ, null = ต้นทางไม่ระบุ ห้ามแปลง null เป็น false และไม่ใช่การอนุมัติหรือการเผยแพร่ของ SchoolBot |
+| `row_hash` | string SHA-256 hex lowercase 64 ตัว | server คำนวณ (สูตรในข้อ 2) เป็น snapshot ของแถวต้นทาง ณ เวลานำเข้า ไม่ใช่ hash ของเนื้อหาปัจจุบันและไม่ใช่ unique key |
+
+SQL NULL = บทเรียนนี้ไม่มีหลักฐานนำเข้าที่ยืนยันได้ (สร้างผ่าน content PUT หรือเป็นแถวก่อน migration) ไม่แปลว่าต้นทางไม่อนุมัติ ตัวอย่างสมมติ: `{"source_ref":"fixture:course-plan-096","source_row_key":"00000000-0000-4000-8000-000000000003","source_approved":true,"row_hash":"<64 hex>"}`
+
+**ตรวจก่อนเขียน (application):** ค่าทุกตัวสร้างโดย codec เดียว `LessonImportSourceCodec` ใน Application (serialize จาก record ชนิดจริงสี่ property เรียง key ตามตารางข้างบน `source_approved` เขียน null ออกมาเสมอ) และก่อนส่งให้ adapter ต้อง parse ค่าที่ serialize แล้วกลับผ่านตัวตรวจเดียวกันให้ผ่าน: object สี่ key พอดี ชนิด/ความยาว/รูปตามตาราง และ `source_row_key == LessonKey` ส่วน `SchoolId` ของ Lesson ที่นำเข้าต้องเป็น NULL (เนื้อหากลาง) ห้ามเขียน `ImportSource` จากทางอื่นนอก importer
+
+**การเก็บใน domain record:** `SchoolBotLessonRecord` เพิ่ม `string? ImportSource = null` ต่อท้ายพารามิเตอร์เดิม เก็บเป็น JSON string แบบ `SchoolBotActivityRecord.Config` และติด `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` เพื่อให้ snapshot ของงานเดิมที่ไม่มีการนำเข้า serialize เป็น bytes เดิม (แนวเดียวกับ [การเก็บบน stub store ของ DES-010](des-010-stub-persistence.md#1-ที่เก็บ-ขยาย-snapshot-หลักสูตรเดิมเป็นหน่วยเดียว))
+
+**อ่านกลับ:** `GET /v2/admin/curricula/{id}` (staff_admin) คืน `lessons[]` ที่มีฟิลด์เดิมของ `LessonInput` ครบ **บวก** `import_source:{source_ref,source_row_key,source_approved,row_hash}|null` ทุก Lesson (key มีเสมอ) อ่านจาก `Lesson.ImportSource` ด้วย codec เดียวกัน ไม่ fallback จาก publication approval, `Curriculum.SourceRef` หรือ `Audit.Reason` ค่าที่เก็บอยู่แต่ parse ไม่ผ่านถือเป็นข้อมูลเสีย: reader throw → `500` ตาม envelope เดิม ห้ามแสดงเป็น null เพราะจะกลายเป็น "ไม่มีที่มา" โดยเงียบ การแสดงผลตาม AC-045-01 = `lifecycle=draft`, `published_at=null`, `approval=null` คู่กับ `import_source.source_approved` (true = "อนุมัติจากต้นทาง ณ เวลานำเข้า")
+
+Public `GET /v2/curricula/{id}` **ไม่เพิ่ม** `import_source` — JSON ของ public คงเดิมทุก byte ไม่ส่ง `source_ref` ให้ผู้เรียน (ตอนนี้ builder เดียวกันสร้างทั้งสอง view ผู้เขียนต้องแยกชนิด view ของ admin ออก) `GET /v2/admin/curricula` (รายการ) ไม่เปลี่ยน
+
+## 2. Operation ของ importer และการกันนำเข้าซ้ำ
+
+`POST /v2/admin/curricula/{id}/import` · staff_admin ที่มี `content_author` (สิทธิ์เดียวกับ content PUT) · header `Idempotency-Key:U` แบบเดียวกับ mutation อื่น ไม่ส่ง = ทำได้แต่ไม่รับประกัน replay · **ไม่ใช้ If-Match** เพราะ import ไม่แก้แถวเดิม (ดูทางเลือกท้ายไฟล์)
+
+```text
+CurriculumImportRequest = {
+  source_ref: T2048,
+  rows: [{                         // อย่างน้อย 1 แถว
+    source_row_key: U,             // ต้องเท่ากับ lesson.lesson_key
+    source_position: N,            // ใช้ชี้ error เท่านั้น ไม่เก็บ ไม่เข้า row_hash
+    source_approved: B|null,       // [JsonRequired]: ต้องมี key, ค่า null ได้
+    lesson: LessonInput            // DTO เดิมของ content PUT
+  }]
+}
+200 CurriculumImportResponse = { id:K, update_date:D,
+  lessons: [{ source_row_key:U, lesson_id:K, outcome:"created"|"unchanged" }] }  // เรียงตาม rows
+```
+
+คำขอนี้รับเฉพาะแถวที่ normalize แล้ว ไม่รับคอลัมน์ดิบของ Sheet: ตัว normalize (preview ฝั่ง application) ต้องตัด O ทิ้งก่อนสร้าง request จึงไม่มีทางที่ O ไปถึง commit (AC-045-02) สื่อ P–X ต้องอยู่ใน `activities[].config` แบบ `instruction-v1` ของ Lesson เดิม ไม่สร้าง Level/Course (AC-045-03) และต้องส่ง D แบบ `bool?` ตรงจากแถวดิบ — ห้ามใช้ `TransformedCoursePlanLesson.SourceApproved` ปัจจุบันที่ยุบ null เป็น false
+
+**Idempotency** ตาม [สัญญาส่วนกลาง Rev4](idempotency-001.md): ใช้ `CommitWithIdempotencyAsync` เดิมผ่าน `CommitMutationAsync` ของ `CurriculumService` ไม่แก้ helper · SchoolId=NULL · Principal=`staff_admin:{PrincipalId}` · Operation=`import_curriculum_lessons` · RequestHash = SHA-256 ของ `id + "|" + JsonSerializer.Serialize(request)` (สูตรเดียวกับ content PUT) · ResourceId = curriculum id · ETag = `OpaqueConcurrencyToken.ToETag(Curriculum.UpdateDate)` · status 200 replay/conflict/expired ตามตารางกลางเดิม
+
+**row_hash** = SHA-256 hex lowercase ของ UTF-8 จาก `JsonSerializer.Serialize(RowHashPayload)` (options ค่าเริ่มต้นแบบ RequestHash) โดย `RowHashPayload` เป็น record เรียง property ตายตัว: `source_ref`, `source_row_key` (string lowercase), `source_approved` (true/false/null แยกกัน), `title`, `objective`, `instructions`, `missions`, `activities` จาก `lesson` — **ไม่รวม** `source_position` และ `lesson.ordinal` (ตำแหน่ง/ลำดับแสดง) และไม่มี O เพราะไม่อยู่ใน request เปลี่ยนรูป payload นี้ = hash ของทุกแถวที่เคยนำเข้าเปลี่ยน = breaking contract ต้องผ่าน arch และผู้ใช้ client ส่ง hash มาแทนไม่ได้
+
+**ตรวจ input ก่อนเข้า commit** (ผิด = `400 INVALID_INPUT` ทั้ง batch ไม่เขียนอะไร): source_ref ตามตารางข้อ 1; rows ไม่ว่าง; `source_row_key` ไม่ใช่ `Guid.Empty` และเท่ากับ `lesson.lesson_key`; `source_position ≥ 1`; ห้าม `source_row_key` หรือ `lesson.ordinal` ซ้ำใน batch; ทุก Lesson ผ่านกฎ `ValidateContentInput` เดิม; Activity ที่ `config.kind = instruction-v1` ต้องมี `media_refs` ทุกตัวเป็น absolute URI scheme http/https ยาว ≤2048 รายละเอียด error ใช้ `details:{source_position,source_row_key,field}` ของแถวแรกที่ผิดใน envelope เดิม เกิน body limit เดิมของ API = ปฏิเสธทั้งชุด
+
+**ค้นก่อนเขียนในหน่วยเดียว** — ทำใน `mutate` บน transaction-scoped facade ใต้ store lock เดียวกับ ledger ผ่านเมธอดใหม่ `ISchoolBotDbAdapter.ImportCurriculumLessonsAsync(curriculumId, rows, audit, ct)` ซึ่งเรียกบน root adapter แล้ว throw `InvalidOperationException` (ไม่มีทางเขียน import โดยไม่ผ่าน ledger):
+
+1. curriculum ไม่มีหรือ `IsDelete` → `404 NOT_FOUND`; `Lifecycle ≠ draft` หรือ `PublishedAt` ไม่ NULL → `409 STATE_CONFLICT`
+2. อ่าน Lesson **ทุกแถว** ของ curriculum นี้รวม `IsDelete=true` แล้วตัดสินรายแถวด้วย `LessonKey`:
+   - ไม่พบ → `created`
+   - พบ, ไม่ถูกลบ, `ImportSource` parse ผ่าน, `source_row_key` และ `row_hash` ตรง → `unchanged` (ไม่แตะแถวนั้น)
+   - กรณีอื่นทั้งหมด (ImportSource NULL, ถูกลบ, hash ต่างเพราะเปลี่ยน D/เนื้อหา/สื่อ/source_ref, parse ไม่ผ่าน) → `409 STATE_CONFLICT` ทั้ง batch พร้อม `details:{source_row_key}` ไม่ overwrite/merge/skip/auto-attach
+3. `ordinal` ของแถว `created` ต้องไม่ชน `Ordinal` ที่เก็บอยู่ของ Lesson อื่นที่ไม่ถูกลบใน revision → ชน = `409 STATE_CONFLICT`; แถว `unchanged` คง Ordinal เดิม (สลับลำดับในไฟล์ไม่ย้ายบทเรียนที่มีอยู่)
+4. มีแถว `created` ≥1: เพิ่ม Lesson (+ Mission/Criteria/Activity ตาม mapping เดียวกับ content PUT, `SchoolId=NULL`), ตั้ง `Curriculum.UpdateDate=now` และ audit หนึ่งแถว `Event=Curriculum.LessonsImported`, `EntityType=SchoolBotCurriculum`, `EntityId=id`, `Reason="Curriculum lessons imported"` (ไม่ใส่ source_ref ลง Reason) · ไม่มี `created` เลย: ไม่แตะ domain/audit, UpdateDate/ETag คงเดิม แต่ helper ยังบันทึก ledger ของ key ใหม่ตามปกติ
+
+**content PUT ต้องรักษา provenance:** `UpdateCurriculumContentAsync` ของ adapter ซึ่งแทน children ทั้งชุด ต้องคัดลอก `ImportSource` จาก Lesson เดิมของ revision ที่มี `LessonKey` เดียวกันไปยังแถวใหม่ `LessonInput` ไม่มี field นี้ client จึงตั้ง/ล้างเองไม่ได้ Lesson ที่ author ตัดออกจาก PUT หายไปพร้อม provenance (เป็นการกระทำชัดแจ้งที่มี audit `Curriculum.ContentUpdated`) การแก้เนื้อหาหลังนำเข้าไม่เปลี่ยน `row_hash` จึงนำเข้าไฟล์เดิมซ้ำได้ `unchanged` และไม่ทับงานของ author Published/retired children ไม่เปลี่ยนตามกฎเดิม และไม่ backfill ImportSource ย้อนหลัง
+
+## ทางเลือกที่ไม่เลือก
+
+| ทางเลือก | เหตุผล |
 |---|---|
-| SourceRef ของ revision + LessonKey | ใช้ได้เฉพาะที่มาระดับ revision/identity; ขาด D รายแถว |
-| ซ่อน metadata ใน Text หรือ SourceRef envelope | ไม่ใช้: เปลี่ยนความหมายข้อความ/เลขอ้างอิงและ reader เดิม |
-| เพิ่ม property ใน Activity.Config หรือใช้ Indicators/Subjects | ไม่ใช้โดยพลการ: JSON มีสัญญาธุรกิจเดิม ไม่ใช่ metadata อิสระ |
-| Criteria.ApprovedBy/ApprovedAt หรือ publication approval | ไม่ใช้: การอนุมัติเกณฑ์/เผยแพร่ของ SchoolBot คนละความหมายกับ D |
-| Audit.Reason หรือ idempotency result เป็นข้อมูลหลัก | ไม่ใช้: ไม่มี read model/dedup รายแถว; Reason จำกัด 1,000 ตัวอักษร |
-| ข้อเสนอ ImportSource ใน supplied-row contract | ต้องผ่านผู้ใช้และ vault ก่อน ยังไม่เป็น baseline |
+| create + content PUT สองคำขอ | ไม่ atomic และ content PUT ไม่รับ provenance |
+| import แทน children ทั้งชุดแบบ content PUT | ทับงานที่ author แก้หลังนำเข้า และทำให้ dedup ด้วย row identity ไม่มีความหมาย |
+| import สร้าง revision ใหม่ในคำขอเดียว | Sheet ไม่ได้กำหนด Level/ชื่อ revision ที่เชื่อถือได้; `create_curriculum` เดิมทำหน้าที่นี้แล้ว |
+| บังคับ If-Match | retry ไฟล์เดิมด้วย key ใหม่หลังคำขอแรก commit จะได้ 412 แทนผล `unchanged`; import ไม่แก้แถวเดิมจึงไม่มี lost update ที่ ETag ต้องกัน |
+| unique/partial index หรือ CHECK บน ImportSource | ผู้ใช้ไม่อนุญาต (มติ 2026-11-03 "เพิ่ม column ได้ แต่ไม่เพิ่ม index หรืออะไรทั้งนั้น") |
+| เปิด `import_source` ใน public GET | ผู้เรียนไม่ต้องใช้ และเลี่ยงส่ง source_ref ออกนอกส่วนกลาง |
+| ให้ `row_hash` รวม ordinal | สลับลำดับแล้วนำเข้าซ้ำจะ conflict ขัด AC-045-04 |
 
-## 2. Operation และการอ่านกลับ
+## ยังไม่ยืนยัน
 
-Operation เดิมคือ `create_curriculum` สำหรับสร้าง draft เปล่า และ `update_curriculum_content` สำหรับแทนเนื้อหาทั้งชุด metadata ใช้ `update_curriculum_metadata` ทั้งหมดอยู่ใต้ [idempotency ส่วนกลาง](idempotency-001.md) ไม่ตั้งชื่อ import Operation เพิ่มในงานนี้
-
-สอง mutation แรกไม่ใช่ atomic import หนึ่งครั้ง และ content DTO ไม่รับ provenance/D จึงยังไม่เลือกเป็น import commit ส่วน `GET /v2/admin/curricula/{id}` อ่าน `CurriculumDraftView` เดิมได้เพียง metadata/children ไม่มี D รายแถว ต้องตัดสิน storage ก่อนตรึง import input, hash, success response และ read-back โดยไม่ลดทอน AC
-
-## 3. Persisted state และการนำเข้าซ้ำ
-
-นับแถวที่เก็บอยู่จริง ไม่ใช่ค่า sequence ที่ใช้ไป เริ่มตาม fixture: Level=1; revision/Lesson/Activity/audit/ledger=0
-
-| กรณี | ผลที่ตรึงได้ตอนนี้ |
-|---|---|
-| preview base, เปลี่ยนเฉพาะ O, reorder, invalid หรือ preview ซ้อน | revision/Lesson/Activity/audit/ledger คง 0; Level คง 1 |
-| import commit ครั้งแรก/ไฟล์เดิม key ใหม่/เปลี่ยน D หรือสื่อ/batch conflict | ยังไม่ตรึง success state เพราะขาด storage/commit contract ห้ามใช้ผล content PUT แทน |
-| replay ของ mutation เดิม | tuple/hash เดิมคืน status/body/ID/ETag เดิม เพิ่ม domain/audit/ledger 0 ตามสัญญากลาง; hash ต่างเป็น `409 IDEMPOTENCY_CONFLICT` |
-
-สัญญากลางให้ผู้ซ้อนรอ store lock และอ่าน replay หลังผู้แรก commit แต่ไม่ได้ dedup ตาม source row เมื่อใช้ request key ใหม่ โค้ดปัจจุบันยังใช้ dictionary ใน process และไม่มี durable ledger ใน curriculum snapshot จึงยังไม่รับรอง replay ข้าม adapter/restart
-
-## 4. Stub และสิ่งที่ inspect ต้องเติม
-
-- TP001-062 (ตรวจนำเข้า): แยก raw/normalized/transformer; transformer จริงคืน D เป็น boolean โดย `null → false` และไม่มี source_ref ต่างจาก supplied input ตรวจ O ไม่ส่งต่อ, LessonKey คงเดิมเมื่อ reorder และสื่อสองชุดอยู่ Lesson เดียวได้
-- fixture คาด 5 refs เพราะรวม hyperlink J แต่ transformer แยก LessonPlan และ AllMedia มีเฉพาะ slide/exercise; validator จริงตรวจ key/position ยังไม่ตรวจ URL ต้องตรวจชั้น normalization ตามสัญญาเดิม ไม่ลด expected ให้ตรงข้อจำกัดโค้ด
-- TP001-093 (นำเข้าซ้ำ/แข่งกัน): คง commit รอ storage; หลังผู้ใช้ตัดสินจึงเติม endpoint/Operation/hash และ counts ครั้งแรก/ซ้ำ/เปลี่ยนเฉพาะ O/key ใหม่/conflict ทั้ง batch/retry หลังตัด response ห้ามเดาจำนวน success
-- stub ที่พัฒนาตามสัญญาพิสูจน์ fixture normalization/zero writes ได้; file-store race ใช้หนึ่ง process สอง adapter และ directory ร่วม ไม่อ้าง PostgreSQL/สอง OS processes จาก static semaphore
-- เนื้อหา/identity manifest จริงรอ G-LEARN; PostgreSQL/transaction ข้าม connections รอ DBA-003/G-CORE; ตัวตนและ transport จริงยังรอ H5 ตามประตูเดิม
-
-## คำตัดสินที่ต้องขอผู้ใช้
-
-Task: BE-028 · Reference: DES-005 / AC-045-01 · Reason: ไม่มี field ตามสัญญาเดิมเก็บ provenance/D ราย Lesson การเปลี่ยน schema ต้องผ่านผู้ใช้และ vault
-
-อนุมัติให้ส่งข้อเสนอ `SchoolBotLesson.ImportSource` จาก supplied-row contract ให้ vault ทบทวน schema/migration หรือไม่? หยุดก่อนเปลี่ยน dictionary/DBML/SQL หรือกำหนด persistence implementation หลังอนุมัติยังต้องคืน arch ตรึงสัญญาและให้ผู้ใช้รัน SQL ตามขั้นตอนเดิม
+- manifest ที่ผูก `source_row_key` กับแถว Sheet จริงและ mapping คอลัมน์ → `LessonInput`/`instruction-v1` ยังเป็นของ fixture `(สมมติฐาน — ยังไม่ยืนยัน)` ยืนยันเมื่อ content owner ส่ง manifest และผู้ใช้เซ็นเนื้อหา (G-LEARN)
 
 ## หลักฐาน
 
-- [ผลเทียบ schema/โค้ดจริง](des-005-import-evidence.md) ตรวจ 2026-11-03 พร้อม file/line ไม่มีการรันฐานจริง
-- [supplied-row contract](learning-sheet-import-001.md) มีข้อเสนอ ImportSource และข้อห้ามใช้ Text/SourceRef envelope/Audit.Reason หลบ schema gate อยู่แล้ว งานนี้คง stopline นั้น
-- inspect run iuY0az: normal-096/inspect-C-quiz.out (reports); [setup](../test-plan/tp-001-cases-quiz-grade-import.md) และ [TP001-062/093](../test-plan/tp-001-cases-quiz-grade-import-cases.md)
+- [ผลเทียบกับโค้ดจริง Rev2](des-005-import-evidence.md) — file/line ของ DTO, transformer, content writer, reader, helper และ snapshot ตรวจ 2026-11-03 ไม่ได้รัน runtime หรือเชื่อมฐาน
+- [physical delta และรายการที่ vault ส่งให้ arch](../db/migration-002-lesson-import-source-contract.md) ข้อ 1–6 ถูกตรึงในไฟล์นี้ทุกข้อ; [supplied-row contract](learning-sheet-import-001.md) เป็นที่มาของรูป request และกฎ dedup

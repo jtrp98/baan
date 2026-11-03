@@ -1,43 +1,48 @@
 ﻿# DES-005 — ผลเทียบ Course Plan importer กับโค้ดจริง
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — หลักฐานตัดสิน storage/commit ของ BE-028)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 097 — ตรวจ source ซ้ำหลังแยกไฟล์ CurriculumService และหลัง migration-002 Rev2)
 
-ตรวจ source และ SQL แบบอ่านอย่างเดียววันที่ 2026-11-03 เพื่อใช้กับ [คำตัดสิน importer](des-005-import.md) ข้อเท็จจริงด้านล่างเป็น baseline ที่พบ ไม่ใช่ผลทดสอบ runtime
+ตรวจ source และ SQL แบบอ่านอย่างเดียววันที่ 2026-11-03 เพื่อใช้กับ [สัญญา importer](des-005-import.md) และ [persisted state](des-005-import-state.md) ข้อเท็จจริงด้านล่างคือสิ่งที่โค้ดเป็นอยู่ตอนนี้ ไม่ใช่ผลทดสอบ runtime ส่วน "ต้องเปลี่ยน" คือสิ่งที่ BE-028 ต้องทำตามสัญญา
 
-## ข้อเท็จจริงจาก schema และ code
+## ข้อเท็จจริงจาก code และสิ่งที่ต้องเปลี่ยน
 
-| เรื่อง | สิ่งที่พบ |
-|---|---|
-| revision | SourceRef อยู่ที่ Curriculum; Lifecycle/PublishedAt รองรับ draft แต่ไม่มี provenance/D รายแถว |
-| Lesson | มี LessonKey/Ordinal และ Text สามช่อง ไม่มี ImportSource/D; input/domain/read-back ไม่มี field นี้เช่นกัน |
-| Transformer | LessonKey=SourceRowKey, IsDraft=true, SourceApproved=(D==true), เก็บ C เป็น SourceUnitReference; ไม่อ่าน ColumnO และไม่จัดสรร Course/Level |
-| สื่อ | รวม slide/exercise สองชุด; LessonPlan แยกจาก AllMedia จึงยังไม่ใช่ media_refs 5 ค่าใน fixture |
-| Validation | ตรวจ Guid.Empty และ SourcePosition≤0 เท่านั้น ไม่มี URL validation, source_ref หรือการสร้าง LessonInput/commit |
-| content writer | map LessonInput ลง records; audit เป็น Curriculum.ContentUpdated; adapter แทน children ทั้งชุดและจัด row IDs ใหม่ ไม่ทำ source-row dedup |
-| draft reader | ประกอบ LessonInput จาก children; approval อ่านเฉพาะ Curriculum.Published ไม่มี D รายแถว |
-| idempotency | service ใช้ static ConcurrentDictionary; backing snapshot มี curricula/lessons/missions/criteria/activities/auditEvents ไม่มี ledger |
-| file coordination | static semaphore ต่อ directory อยู่ใน process; lock การ replace snapshot ไม่พิสูจน์ transaction read–modify–write ข้าม adapter/process |
+| เรื่อง | as-built | ต้องเปลี่ยนตามสัญญา |
+|---|---|---|
+| Lesson record | ไม่มี ImportSource | เพิ่ม `string? ImportSource = null` (WhenWritingNull) |
+| raw row / transformer | input `SourceApproved` เป็น `bool?` และมี ColumnO; output ยุบเป็น `bool` (`== true`) ไม่มี source_ref; validator ตรวจแค่ key ว่างและตำแหน่ง ≤0 | normalizer ส่ง D แบบ `bool?`, ตัด O, สร้าง `LessonInput`; ตรวจ media URL ตามข้อ 2 |
+| content PUT | hash `id\|Serialize(request)`; adapter ตัด Lesson ทั้งหมดของ curriculum แล้วสร้างใหม่ด้วย ID ใหม่ | คัดลอก ImportSource ตาม LessonKey |
+| draft reader | admin และ public ใช้ `BuildDraftViewAsync` เดียว คืน `LessonInput` | admin เพิ่ม `import_source`; public คงเดิม |
+| idempotency | helper ถือ store lock, ค้น ledger, เรียก mutate บน facade, ต่อ ledger แล้ว commit ครั้งเดียว; root path เดิมเขียนได้โดยไม่มี ledger | import เรียกได้เฉพาะบน facade |
+| recheck สิทธิ์ | Operation ที่ไม่ใช่ create/publish ใช้ `EvaluateUpdateCurriculumContent` | `import_curriculum_lessons` ตกกรณีนี้โดยไม่ต้องแก้ switch |
+| snapshot | curricula/lessons/missions/criteria/activities/audit_events/idempotency ในไฟล์เดียว | ไม่เพิ่ม collection |
+| route | ไม่มี import route | เพิ่ม `POST /{id}/import` |
+| error envelope | รองรับ `details` | ใช้ details ตามสัญญา |
 
-## ความต่างกับเอกสารและการตรวจที่ยังต้องทำ
+## ความต่างกับเอกสารเดิม
 
-supplied-row contract เป็น input/validator ที่ต้องพัฒนาเพิ่ม ไม่ใช่ DTO ของ transformer ปัจจุบัน: input รับ source_ref และ D nullable แต่ transformed output ไม่มี source_ref และรวม false/null เป็น false การอ่าน transformed object จึงไม่ใช่หลักฐานเก็บที่มาถาวร
-
-TP001-062 (นำเข้า Sheet) และ TP001-093 (นำเข้าซ้ำ/แข่งกัน) ต้องแยก normalization กับ persistence ส่วน preview คาด zero writes ได้ ส่วน commit ยังไม่มี expected จนมนุษย์ตัดสิน storage ไม่เปลี่ยน AC-045-01..04 (draft พร้อมที่มา, ตัด O, สื่อชุดสอง, identity ถาวร) เพื่อให้ผ่านข้อจำกัด implementation
+- [supplied-row contract](learning-sheet-import-001.md) Rev1 ยังเขียนว่า ImportSource เป็นข้อเสนอที่รอ schema gate และกฎ dedup "ควรใช้" — ตอนนี้ผู้ใช้อนุญาตคอลัมน์แล้วและสัญญาตรึงใน des-005-import Rev2 ไฟล์นั้นต้องปรับให้ชี้มาที่นี่ (อยู่นอกขอบเขตไฟล์ของใบงานนี้)
+- [idempotency-001](idempotency-001.md) Rev2 ที่ vault อ้างใน migration-002 ปัจจุบันเป็น Rev4 (เพิ่ม BE-028) helper และพฤติกรรม BE-027/BE-030 ไม่เปลี่ยน
+- หลักฐาน Rev1 ของไฟล์นี้อ้าง `CurriculumService.cs` บรรทัด hash/writer ก่อนแยกไฟล์ ตอนนี้ย้ายไป `CurriculumService.Content.cs` และ `.Commit.cs`
 
 ## หลักฐาน
 
-Source ทั้งหมดอยู่ใต้ `C:/src/schoolbright/target/school-bot/`:
+Source ทั้งหมดอยู่ใต้ `C:/src/schoolbright/target/school-bot/web/src/`:
 
-- `web/src/SchoolBot.Application/Curriculum/CoursePlanSuppliedContracts.cs:3–28,37–59` — input D nullable/ColumnO; output D boolean ไม่มี source_ref
-- `web/src/SchoolBot.Application/Curriculum/CoursePlanSuppliedRowTransformer.cs:14–52,62–101` — สื่อ/identity/D และ validation ทั้งหมด
-- `web/src/SchoolBot.Application/Curriculum/CurriculumContracts.cs:14–22,51–63,87–100` — create/content/read DTO
-- `web/src/SchoolBot.Domain/Curriculum/SchoolBotCurriculumRecords.cs:9–42,76–107` — revision/Lesson/Activity/audit records
-- `web/src/SchoolBot.Application/Curriculum/CurriculumService.cs:19–28,47–61,103–107,208–220,233–249,315–345,605–644` — hash/replay, writer และ reader
-- `web/src/SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:266–337` — replace children/IDs/audit; `FileSchoolBotBackingStore.cs:14–15,190–224` — process lock/snapshot replace
-- `web/src/SchoolBot.Api/CurriculumEndpoints.cs:89–101,109–129,173–207` — draft read/create/content routes ไม่พบ import route ในไฟล์นี้
+- `SchoolBot.Domain/Curriculum/SchoolBotCurriculumRecords.cs:28–42` — `SchoolBotLessonRecord` ไม่มี ImportSource
+- `SchoolBot.Application/Curriculum/CoursePlanSuppliedContracts.cs:9,19,40` — `bool? SourceApproved`, `ColumnO`, output `bool SourceApproved`
+- `SchoolBot.Application/Curriculum/CoursePlanSuppliedRowTransformer.cs:33,37,70–86` — LessonKey=SourceRowKey, `SourceApproved == true`, validation สองข้อ
+- `SchoolBot.Application/Curriculum/CurriculumContracts.cs:51–63,87–101` — `LessonInput`, content request, `CurriculumDraftView.Lessons` เป็น `LessonInput`
+- `SchoolBot.Application/Curriculum/CurriculumService.Content.cs:32,130,143` — RequestHash ของ content, audit `Curriculum.ContentUpdated`, เรียก adapter
+- `SchoolBot.Application/Curriculum/CurriculumService.Commit.cs:20–21,25–30` — Principal/`Guid.NewGuid()` เมื่อไม่มี key; switch recheck สิทธิ์
+- `SchoolBot.Application/Curriculum/CurriculumService.cs:19–59,153` — admin และ public เรียก `BuildDraftViewAsync` เดียวกัน
+- `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.CurriculumMutations.cs:113–213` — content PUT: ตรวจ draft/ETag (136–140), ตัด Lesson ของ curriculum และจัด ID ใหม่ (147–160)
+- `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Idempotency.cs:23–74,76–84` — helper ส่วนกลาง และ root path ที่ไม่มี ledger
+- `SchoolBot.Infrastructure/Persistence/CurriculumStoreSnapshot.cs:26–34` — สมาชิกของ snapshot
+- `SchoolBot.Api/CurriculumEndpoints.cs:89,173,209` — admin GET, content PUT, publish; ไม่มี import route
+- `SchoolBot.Api/V2Errors.cs:21–24` — envelope `{error:{code,message,request_id,details}}`
 
 Knowledge ที่ตรวจ:
 
-- `../db/schoolbot_db.sql:92–111,116–130,252–287,327–336` — ledger/audit/Curriculum/Lesson/Activity physical fields
-- `data-dictionary/contract-003.md:32–38` — Text และ ActivityConfig มีโครงสร้างกำหนดแล้ว; [Curriculum](data-dictionary/table-012.md), [Lesson](data-dictionary/table-013.md), [Activity](data-dictionary/table-016.md) ระบุความหมาย field
-- [data-model Rev8](data-model.md), [content](des-005-content.md), [API](des-005-api.md), [draft reader](learning-curriculum-draft-001.md) และ [supplied-row contract](learning-sheet-import-001.md)
+- `../db/migration-002-lesson-import-source.sql:6` — `ADD COLUMN "ImportSource" jsonb NULL` คำสั่งเดียว ยังไม่รัน
+- `../db/schoolbot_db.sql:267` — SchoolBotLesson ในร่าง SQL baseline (PK เท่านั้น)
+- [Lesson dictionary](data-dictionary/table-013.md), [ActivityConfig `instruction-v1`](data-dictionary/contract-003.md) (`media_refs:T2048[]`), [DES-010 stub](des-010-stub-persistence.md)

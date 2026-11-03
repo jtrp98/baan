@@ -1,6 +1,6 @@
 # DES-005 — หลักสูตร ภารกิจ และผลประเมิน — API `/v2`
 
-> Rev 10 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — แยก content mutation เดิมจาก importer ที่รอ storage)
+> Rev 11 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 097 — เพิ่ม import endpoint และ `import_source` ใน admin draft view บน migration-002 Rev2)
 
 ส่วนต่อของ [DES-005 — หลักสูตร ภารกิจ และผลประเมิน](des-005.md)
 
@@ -13,7 +13,9 @@
 | GET /curricula | desktop, school_web, staff_admin | `level_id:K?, recommended_grade:T16?, subject_key:U?, mode:Mode?, pagination` | published curriculum summaries (กรอง `mode` จากการมี Activity โหมดนั้น) |
 | GET /curricula/{id} | desktop, school_web, staff_admin | ID | curriculum พร้อม `level_id`, `recommended_grades`, `subjects`, ordered lessons/activities/missions และ public criteria (+ ETag จาก `UpdateDate`) |
 | POST /admin/curricula | staff_admin (`content_author`) | `{curriculum_key,revision,level_id,title,source_ref,recommended_grades,subjects}` | 201 `{id,update_date}` |
-| PUT /admin/curricula/{id}/content | staff_admin (`content_author`) | `{lessons:LessonInput[]}` + If-Match (`ETag`) | 200 `{id,update_date}` |
+| GET /admin/curricula/{id} | staff_admin | ID | draft view: ฟิลด์เดียวกับ GET /curricula/{id} แต่ทุก Lesson มี `import_source:{source_ref,source_row_key,source_approved,row_hash}\|null` (+ ETag) |
+| PUT /admin/curricula/{id}/content | staff_admin (`content_author`) | `{lessons:LessonInput[]}` + If-Match (`ETag`) | 200 `{id,update_date}`; คง `ImportSource` ของ Lesson ที่ LessonKey เดิม |
+| POST /admin/curricula/{id}/import | staff_admin (`content_author`) | `CurriculumImportRequest` + `Idempotency-Key:U`; ไม่ใช้ If-Match | 200 `{id,update_date,lessons:[{source_row_key,lesson_id,outcome}]}` |
 | POST /admin/curricula/{id}/publish | staff_admin (`content_approver`, four-eyes) | `{approval_ref:T1000}` + If-Match (`ETag`) | 200 `{id,update_date,published_at}` |
 | POST /submissions | desktop (`P=student`) | `{mission_id:K,criteria_id:K,project_revision_id:K,evidence:ArmEvidence?}` | 201 SubmissionView |
 | GET /submissions/{id} | desktop (เจ้าของ) หรือ school_web (ครูตามสิทธิ์) | ID | SubmissionView (+ ETag จาก `UpdateDate`) |
