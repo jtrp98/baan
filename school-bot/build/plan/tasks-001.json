@@ -1113,21 +1113,27 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "done-local",
+      "status": "verified",
       "slices": [
         {
           "id": "BE-006-S1-grpc-logout",
           "ac_ids": [
             "AC-036-06"
           ],
-          "status": "done-local",
-          "evidence": "planning/slice-092-grpc-r3-001.md; planning/check-092-grpc-r3-001.md; planning/jpo-092-logout-r4-001.md",
-          "note": "2026-10-28 B gRPC logout local: parent 2234/0 + 4147/0, check PASS, JPO B triage CLOSED — ครอบเฉพาะส่วน local ของ AC-036-06; full Login/FE-002/License-unaffected end-to-end/production/H5 ยังรอ จึงไม่ลง verified"
+          "status": "verified",
+          "evidence": "planning/slice-092-grpc-r3-001.md; planning/check-092-grpc-r3-001.md; planning/jpo-092-logout-r4-001.md; planning/task-097.md; reports/baan/2026-11-03-07-43-02-check-tier-t2-1agents-qRQEUT",
+          "note": "2026-10-28 B gRPC logout local: parent 2234/0 + 4147/0, check PASS, JPO B triage CLOSED — ครอบเฉพาะส่วน local ของ AC-036-06; full Login/FE-002/License-unaffected end-to-end/production/H5 ยังรอ จึงไม่ลง verified · 2026-11-03 check qRQEUT **PASS normal** (desktop HTTP+gRPC 2/2 · suite 4511 ตก 3 เคสที่พัก) · local cleanup → FE-002",
+          "test_level": "normal",
+          "oracle": "pack-D ใบงาน097 (แก้ 2026-11-03: ขอบเขตบริการ SchoolBot · Gateway อ้าง check-092) · DES-004 · tp-001-normal-index Rev1 TP001-082",
+          "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-D)"
         }
       ],
       "risk": "high",
       "wave": 4,
-      "module": "app-shell"
+      "module": "app-shell",
+      "test_level": "normal",
+      "oracle": "pack-D ใบงาน097 (แก้ 2026-11-03: ขอบเขตบริการ SchoolBot · Gateway อ้าง check-092) · DES-004 · tp-001-normal-index Rev1 TP001-082",
+      "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-D)"
     },
     {
       "id": "BE-007",
