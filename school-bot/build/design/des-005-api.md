@@ -42,9 +42,9 @@ Public criteria ไม่คืน hidden expected traces หาก author ก�
 
 ## ขอบเขต Course Plan importer
 
-create และ content PUT ข้างต้นเป็นคนละ mutation ใช้ Operation `create_curriculum` และ `update_curriculum_content` ตาม [idempotency ส่วนกลาง](idempotency-001.md) การเรียกสองครั้งไม่ใช่ import batch transaction เดียว และ `LessonInput` เดิมไม่มี provenance/D จึงยังใช้รับรอง import commit ไม่ได้
+`POST /admin/curricula/{id}/import` นำเข้าแถวที่ normalize แล้วลง draft revision ที่มีอยู่ในคำขอเดียว ใช้ Operation `import_curriculum_lessons` ตาม [idempotency ส่วนกลาง](idempotency-001.md) และกันนำเข้าซ้ำด้วยการค้น LessonKey + `row_hash` ใต้ store lock เดียวกับ ledger: แถวเดิมที่ hash ตรงได้ `unchanged`, แถวใหม่ได้ `created`, แถวที่ชนแต่ไม่ตรงทำให้ทั้ง batch ได้ `409 STATE_CONFLICT` request DTO, รูป `ImportSource`, สูตร hash, error และการอ่านกลับอยู่ใน [สัญญา importer](des-005-import.md); ผลที่คาดราย case อยู่ใน [persisted state](des-005-import-state.md)
 
-`GET /v2/admin/curricula/{id}` อ่าน metadata/children ของ draft ผ่าน `CurriculumDraftView` ได้ แต่ยังไม่คืน provenance/D ราย Lesson ไม่เพิ่ม import endpoint, Operation, hash หรือ success DTO ก่อน human gate ใน [คำตัดสิน importer](des-005-import.md) จะคลี่คลาย การ replay mutation เดิมไม่รับประกัน dedup แถวจากไฟล์เดียวกันเมื่อใช้ request key ใหม่
+Public `GET /curricula/{id}` ไม่มี `import_source` JSON คงเดิม
 
 ## หลักฐาน
 

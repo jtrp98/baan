@@ -1,4 +1,4 @@
-// SchoolBot schema — Rev7: PRIMARY KEY only; no UNIQUE/FK/CHECK
+// SchoolBot schema — Rev8: PRIMARY KEY only; no UNIQUE/FK/CHECK; รวม SchoolBotLesson.ImportSource จาก migration-002 Rev2 (ยังไม่รัน) — ประวัติใหม่อยู่ใน changelog/2026-11.md
 // Change Log:
 // - 2026-10-26 — CreateBy/CreateDate/UpdateBy/UpdateDate รับNULLและdefaultNULLทุกตาราง; PK32คงเดิม.
 // - 2026-10-26 — Rev7: คง PK32 ถอน UQ/FK/CHECK representations; คง32ตาราง450ฟิลด์.
@@ -277,6 +277,7 @@ Table SchoolBotLesson [headercolor: #059669] {
   UpdateBy int4 [null, default: null, note: 'รหัสนักเรียน sId หรือบุคลากร sEmp ผู้แก้ล่าสุด; NULL = ระบบ/ผู้ทำที่ไม่มีรหัส profile นี้ ใช้กฎเดียวกับ CreateBy']
   UpdateDate timestamptz [null, default: null, note: 'วันเวลาแก้ล่าสุด UTC จาก server; ใช้ตรวจว่ามีคนแก้แทรกก่อนบันทึกผ่าน ETag/If-Match แทนคอลัมน์ Version']
   SchoolId int4 [null, note: 'รหัสโรงเรียนที่ข้อมูลแถวนี้สังกัด; ไม่ใช่รหัสผู้ใช้ ดูขอบเขตส่วนกลาง/รายโรงเรียนที่ต้นหน้านี้ | ข้อกำหนดเดิม: Global content only; CHECK (SchoolId IS NULL)']
+  ImportSource jsonb [null, note: 'ที่มาและค่า D ของแถว Course Plan ณ เวลานำเข้า (snapshot); NULL = ไม่มีหลักฐานนำเข้าที่ยืนยันได้ ไม่แปลว่าต้นทางไม่อนุมัติ | object สี่ key พอดี: source_ref (string 1–2048), source_row_key (UUID lowercase = LessonKey), source_approved (true/false/null = D=TRUE/D=FALSE/ไม่ระบุ ไม่ใช่การอนุมัติของ SchoolBot), row_hash (SHA-256 hex 64) | ไม่มี DEFAULT/CHECK/index ตามมติผู้ใช้ 2026-11-03 กฎทั้งหมดอยู่ฝั่ง application ดู des-005-import.md | เพิ่มโดย migration-002 Rev2 ยังไม่รัน ยังไม่อยู่ใน schoolbot_db.sql baseline']
 
 
   Note: 'หน้าที่: จัดเนื้อหาในหลักสูตรให้เป็นบทหรือหน่วยการเรียนที่มีกิจกรรมและภารกิจ | หนึ่งแถว: บทเรียนหนึ่งบทภายใน curriculum revision หนึ่ง | ใช้เมื่อ: ส่วนกลางจัดเนื้อหา; ผู้เรียนเปิดบทเรียน; mapping ใช้บทเรียนช่วยเลือกกลุ่มกิจกรรม | ตัวอย่าง: สมมติ: บทเรียน ลำดับคำสั่ง มีกิจกรรมอ่านคำแนะนำ ทำโครงงาน และทำ Quiz | ขอบเขต: ข้อมูลส่วนกลาง: SchoolId ต้องเป็น NULL; โรงเรียนใช้เนื้อหาร่วมกัน | คู่มือ: data-dictionary/table-013.md | ข้อกำหนดเดิม: SchoolBot DB (DES-005 Rev5). บทเรียนในหลักสูตรกลาง; immutable หลัง parent curriculum publish.'

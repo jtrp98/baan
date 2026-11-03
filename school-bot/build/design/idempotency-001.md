@@ -1,10 +1,10 @@
 # สัญญา idempotency ส่วนกลาง
 
-> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (BE-030 — คลังข้อสอบใช้ helper ส่วนกลางเดิมเป็นผู้ใช้รายที่สอง)
+> Rev 4 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 097 — BE-028 importer เป็นผู้ใช้รายที่สามของ helper เดิม ด้วย Operation `import_curriculum_lessons`)
 
-adapter จองคำสั่ง/ตรวจ replay และ commit ผลพร้อม domain/audit; ผู้ใช้ปัจจุบันคือ BE-027 (หลักสูตรกลาง: create, metadata, content, publish) และ BE-030 (คลังข้อสอบ: create, PUT draft, publish) [ขอบเขตทดสอบ/การย้าย](data-contract-rules-cross-database.md#การพิสูจน์และขอบเขตการย้าย)
+adapter จองคำสั่ง/ตรวจ replay และ commit ผลพร้อม domain/audit; ผู้ใช้ปัจจุบันคือ BE-027 (หลักสูตรกลาง: create, metadata, content, publish), BE-028 (นำเข้า Course Plan ลง draft) และ BE-030 (คลังข้อสอบ: create, PUT draft, publish) [ขอบเขตทดสอบ/การย้าย](data-contract-rules-cross-database.md#การพิสูจน์และขอบเขตการย้าย)
 
-คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ข้อ 1–4 เป็นแบบที่ต้องทำ Rev3 เพิ่มเฉพาะผู้ใช้ BE-030 โดยไม่แก้ helper, ชื่อ Operation, สูตร hash หรือ bytes ของไฟล์ของ BE-027 จึงคงพฤติกรรม Rev2 และเส้นชัย BE-027 ตาม AC-043-01 (สิทธิ์แก้หลักสูตรกลาง), AC-044-03 (อนุมัติก่อนเผยแพร่), AC-044-05 (ฉบับเผยแพร่ไม่ถูกแก้ทับ); ชี้วิธีพิสูจน์โดยไม่เพิ่มกฎให้ writer หลักฐาน source อยู่ท้ายไฟล์
+คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ของ ledger ข้อ 1–4 เป็นแบบที่ต้องทำ Rev3 เพิ่มผู้ใช้ BE-030 และ Rev4 เพิ่มผู้ใช้ BE-028 โดยไม่แก้ helper, ชื่อ Operation, สูตร hash หรือ bytes ของไฟล์ของ BE-027 จึงคงพฤติกรรม Rev2 และเส้นชัย BE-027 ตาม AC-043-01 (สิทธิ์แก้หลักสูตรกลาง), AC-044-03 (อนุมัติก่อนเผยแพร่), AC-044-05 (ฉบับเผยแพร่ไม่ถูกแก้ทับ); ชี้วิธีพิสูจน์โดยไม่เพิ่มกฎให้ writer หลักฐาน source อยู่ท้ายไฟล์
 
 ## 1. ขอบเขตและผลตอบ
 
@@ -13,6 +13,8 @@ adapter จองคำสั่ง/ตรวจ replay และ commit ผล�
 BE-027 ใช้ SchoolId=NULL และ Principal=`staff_admin:{PrincipalId}` จาก session ที่ผ่านสิทธิ์ เทียบ Principal/Operation แบบ ordinal; RequestKey เทียบ UUID ที่ parse แล้ว Operation คงชื่อ `create_curriculum`, `update_curriculum_metadata`, `update_curriculum_content`, `publish_curriculum`
 
 BE-030 ใช้ SchoolId=NULL และ Principal รูปเดียวกัน Operation `create_question_bank`, `update_question_bank_draft`, `publish_question_bank` ledger เป็นชุดเดียวกับ BE-027 (Operation อยู่ใน tuple จึงไม่ชนกัน) สิทธิ์ เงื่อนไข และ audit ของแต่ละ operation อยู่ใน [การเก็บบน stub store ของ DES-010](des-010-stub-persistence.md#2-mutation-ของคลังผ่าน-helper-ส่วนกลางเดิม)
+
+BE-028 ใช้ SchoolId=NULL และ Principal รูปเดียวกัน Operation `import_curriculum_lessons` ผ่าน `CommitMutationAsync` เดิมของหลักสูตร RequestHash สูตรเดียวกับ content (`id + "|" + JsonSerializer.Serialize(request)`) ผลสำเร็จ 200 ResourceId = curriculum id ทุกผลสำเร็จบันทึก ledger แม้ไม่มีแถวใหม่ (`unchanged` ทั้ง batch) ledger กันเฉพาะ tuple ของคำขอ ส่วนการกันนำเข้าแถวเดิมด้วย key ใหม่เป็น domain dedup ใน `mutate` ตาม [สัญญา importer](des-005-import.md#2-operation-ของ-importer-และการกันนำเข้าซ้ำ) ไม่ใช่หน้าที่ ledger
 
 | กรณีหลังตรวจสิทธิ์ปัจจุบัน | ผลบังคับ |
 |---|---|
