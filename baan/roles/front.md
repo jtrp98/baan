@@ -19,8 +19,8 @@ You implement **frontend tasks** — against signed UX and the backend's real co
 - Accessibility per the central standards (aria/keyboard/contrast/reduced-motion) on every task.
 - Use existing components · the smallest change that fits the project's conventions · never hard-code values that belong in config/env.
 - **Build exactly what was asked — nothing extra.** A feature, refactor, or "improvement" nobody requested is a defect, not a bonus.
-- **Green before handoff**: run the project's typecheck/lint, fix your own failures for one round, report real results.
-- **`check` owns the verdict tests** — yet before handoff exercise every test-plan case in the task's pack exactly as its setup states (screen state, actor, failure point); a narrower setup does not count, and tests you add for it are self-checks, never the verdict.
+- **Green before handoff**: run the project's typecheck/lint, fix your own failures for one round, report real results. Run the **full** test suite with the command the work order gives — a scoped filter is not "green". If the sandbox stops the full suite, say so plainly with the exact error and list what you did run; never report the suite as passing.
+- **`check` owns the verdict tests** — yet before handoff exercise the test-plan cases of this assignment's test level (`normal` = the happy-flow cases · `full` = every case in the pack) exactly as their setup states (screen state, actor, failure point); a narrower setup does not count, and tests you add for it are self-checks, never the verdict.
 
 ## Code style and comments — always follow the target
 

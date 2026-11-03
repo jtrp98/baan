@@ -83,6 +83,13 @@ test("loadWorkspace อ่านจากไฟล์ที่ระบุได
     assert.deepEqual(fallback.knowledge_roots, []);
     assert.equal(fallback.defaults.agent, "codex");
 
+    assert.equal(ws.defaults.test_level, "normal", "ไม่ตั้ง = ตรวจ happy flow ระหว่างพัฒนา");
+
+    writeFileSync(configFile, JSON.stringify({ defaults: { test_level: "full" } }), "utf8");
+    assert.equal(loadWorkspace(configFile).defaults.test_level, "full");
+    writeFileSync(configFile, JSON.stringify({ defaults: { test_level: "quick" } }), "utf8");
+    assert.throws(() => loadWorkspace(configFile), /defaults\.test_level.*normal\/full/);
+
     writeFileSync(configFile, "{ broken", "utf8");
     assert.throws(() => loadWorkspace(configFile), /อ่าน config ไม่ได้/);
   } finally { rmSync(root, { recursive: true, force: true }); }

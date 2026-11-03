@@ -55,7 +55,7 @@ test("ติดประตูครึ่งพอดี = ผ่าน · เ�
 
 test("normalize อ่านฟิลด์ของแผนโปรเจกต์และชื่อ role เดิม", () => {
   const [t] = normalizeDagTasks([{ id: "FE-006", owner: "fe", depends_on: ["BE-1"], gate_ids: ["G-UX"], status: "Pending", ac_ids: ["AC-1"] }]);
-  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, tier: null, oracle: false, ref: false, slices: [] });
+  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, tier: null, oracle: false, ref: false, level: null, slices: [] });
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
@@ -149,6 +149,35 @@ test("lintPlanFile แสดงความคืบหน้างาน implem
 // Regression: ตรวจตามความเสี่ยง — school-bot (2026-10-29) มี 35/110 task ไม่มี ac_ids รวมงานฐานรากที่มีงานพึ่ง
 // ทางอ้อม 79–89 งาน จึงตรึงเส้นชัยไม่ได้และตัดสินไม่ได้ว่าต้องตรวจทันทีหรือรอ wave gate
 const verify = (tasks) => lintPlanVerification(normalizeDagTasks(tasks));
+test("QA ที่ค้างเตือนให้แยกงานพัฒนาจากงานเชื่อมจริง โดยไม่ข้าม dependency", () => {
+  const tasks = [
+    { id: "QA", owner: "qa", status: "pending", ac_ids: ["AC-1"] },
+    { id: "SEC", owner: "jpo", status: "blocked", ac_ids: ["AC-1"] },
+    { id: "UI", owner: "fe", depends_on: ["QA", "SEC"], ac_ids: ["AC-1"] },
+  ];
+  const result = verify(tasks);
+  assert.deepEqual(result.errors, []);
+  assert.match(result.warnings.join(), /งานพัฒนาที่รอ QA 1 งาน.*สัญญาตรึง \+ fake.*UI/);
+  assert.deepEqual(tasks[2].depends_on, ["QA", "SEC"]);
+  assert.doesNotMatch(verify(tasks.map((t) => t.id === "UI" ? { ...t, depends_on: [] } : t)).warnings.join(), /งานพัฒนาที่รอ QA/);
+  assert.doesNotMatch(verify(tasks.map((t) => t.id !== "UI" ? { ...t, status: "verified" } : t)).warnings.join(), /งานพัฒนาที่รอ QA/);
+});
+// ระดับการตรวจ (charter ข้อ 14): ผ่าน normal ยังไม่พอสำหรับ release — ledger ต้องบอกได้ว่าเหลือ full pass ที่ไหน
+test("ledger test_level: เตือน verified ที่ยังเป็น normal · ไม่มีฟิลด์ = full · ค่าผิด = error", () => {
+  const tasks = [
+    { id: "BE-1", owner: "be", status: "verified", ac_ids: ["AC-1"], oracle: "DES-1 Rev1", ref: "abc", test_level: "normal" },
+    { id: "BE-2", owner: "be", ac_ids: ["AC-2", "AC-3"], slices: [
+      { id: "S1", status: "verified", ac_ids: ["AC-2"], oracle: "DES-1 Rev1", ref: "abc", test_level: "Normal" },
+      { id: "S2", status: "verified", ac_ids: ["AC-3"], oracle: "DES-1 Rev1", ref: "abc" },
+    ] },
+  ];
+  const r = verify(tasks);
+  assert.deepEqual(r.errors, []);
+  assert.match(r.warnings.join("\n"), /verified ระดับ normal \(happy flow\) 2 จุด.*BE-1, BE-2\/S1$/m);
+  const bad = verify([{ ...tasks[0], test_level: "quick" }]);
+  assert.match(bad.errors.join(), /BE-1: test_level ต้องเป็น normal\/full/);
+});
+
 const chain = (over = {}) => [
   { id: "SA", owner: "sa", depends_on: [], ...over.SA },
   { id: "BE-1", owner: "be", depends_on: ["SA"], ac_ids: ["AC-1"], ...over["BE-1"] },

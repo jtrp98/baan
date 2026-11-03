@@ -5,11 +5,11 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { ROLES_DIR, isInteractiveRole, listRoles, loadAgentsConfig, loadWorkspace, parseRoleHeader, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
-import { adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
+import { TEST_LEVEL_ROLES, adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { expandTaskText, preflightTask } from "../src/preflight.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
-import { createRunDir, parseRoleArgs, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
+import { createRunDir, parseRoleArgs, resolveRoleAgents, resolveRoleTestLevel, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
 
 function printResult(r) {
   const tier = [r.model && `model=${r.model}`, r.effort && `effort=${r.effort}`].filter(Boolean).join(" ");
@@ -50,12 +50,11 @@ async function main() {
     process.exit(2);
   }
   try { opts.timeoutSec = resolveRoleTimeout(opts, cfg); } catch (e) { console.error(e.message); process.exit(2); }
+  try { opts.testLevel = resolveRoleTestLevel(opts); } catch (e) { console.error(e.message); process.exit(2); }
 
-  const selected = opts.agents.includes("*") ? Object.keys(agents) : [...new Set(opts.agents)];
-  if (selected.length === 0) {
-    console.error("ระบุ --agent <name> อย่างน้อยหนึ่งตัว หรือ --all");
-    process.exit(2);
-  }
+  let requested;
+  try { requested = resolveRoleAgents(opts); } catch (e) { console.error(e.message); process.exit(2); }
+  const selected = requested.includes("*") ? Object.keys(agents) : [...new Set(requested)];
   const unknown = selected.filter((n) => !(n in agents));
   if (unknown.length) {
     console.error(`ไม่พบ agent: ${unknown.join(", ")} (ที่มี: ${Object.keys(agents).join(", ")})`);
@@ -66,7 +65,7 @@ async function main() {
   const tierConfAll = opts.tier ? (tiers[opts.tier] ?? {}) : {};
   const nullAgents = selected.filter((n) => tierConfAll[n] === null);
   if (nullAgents.length) {
-    if (!opts.agents.includes("*")) {
+    if (!requested.includes("*")) {
       console.error(`agent เหล่านี้ยังไม่มี model ทัดเทียมใน tier ${opts.tier}: ${nullAgents.join(", ")} (ตั้งเป็น null ไว้ใน agents.json — เลือก tier อื่นหรือ agent อื่น)`);
       process.exit(2);
     }
@@ -117,7 +116,7 @@ async function main() {
       process.exit(2);
     }
     if (opts.roleAlias) console.log(`(--role ${opts.roleAlias} = ชื่อเดิมของ ${opts.role} — ใช้ชื่อสั้นได้เลยครั้งหน้า)`);
-    fullTask = roleDirective(opts.role, task, null, "", workDate);
+    fullTask = roleDirective(opts.role, task, null, "", workDate, opts.testLevel);
   }
 
   const runDir = createRunDir(reportsDirOf(workspaceRoot), { role: opts.role, tier: opts.tier, write: opts.write, count: runnable.length });
@@ -129,7 +128,7 @@ async function main() {
   };
 
   console.log(`task    : ${task}`);
-  if (opts.role) console.log(`role    : ${opts.role} (บทบาทจาก roles/${opts.role}.md + CONVENTIONS ผูกอยู่กับ task) · วันที่ของงาน ${workDate}`);
+  if (opts.role) console.log(`role    : ${opts.role} (บทบาทจาก roles/${opts.role}.md + CONVENTIONS ผูกอยู่กับ task) · วันที่ของงาน ${workDate}${TEST_LEVEL_ROLES.includes(opts.role) ? ` · ระดับการตรวจ ${opts.testLevel}` : ""}`);
   console.log(`agents  : ${runnable.join(", ")}`);
   if (opts.tier) console.log(`tier    : ${opts.tier} -> ${runnable.map((n) => `${n}=${[resolveME(n, true).model, resolveME(n, true).effort].filter(Boolean).join("/")}`).join(", ")}`);
   console.log(`mode    : ${opts.write ? "write (อนุญาตให้แก้ไขไฟล์)" : "read-only"}${opts.seq ? " (ทีละตัว)" : " (ขนาน)"}`);
@@ -157,6 +156,7 @@ async function main() {
     role: opts.role || null,
     tier: opts.tier || null,
     date: opts.role ? workDate : null,
+    testLevel: TEST_LEVEL_ROLES.includes(opts.role) ? opts.testLevel : null,
     mode: opts.write ? "write" : "read-only",
     cwd: opts.cwd,
     results: results.map(({ stdout, stderr, ...rest }) => rest),

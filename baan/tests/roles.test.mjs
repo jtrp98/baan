@@ -112,7 +112,7 @@ test("jpo re-audit ไม่เลื่อนเส้นชัย: finding ใ
 test("charter + CONVENTIONS: ติดเพดาน rework = ถามทันทีไม่พักท้ายวง · oracle ตรึง · สถานะราย slice", () => {
   const charter = read("BAAN.md");
   assert.match(charter, /^12\. \*\*งานต้องจบได้/m);
-  assert.match(charter, /หยุดเปิดงานใหม่แล้วถามผู้ใช้ทันที.*ห้ามพักไว้ "ท้ายวง"/);
+  assert.match(charter, /หยุดเฉพาะ task ที่ตก.*ถามผู้ใช้ทันที.*ห้ามพักไว้ "ท้ายวง"/);
   assert.match(charter, /\*\*ตรึง oracle ต่อ task\*\*/);
   assert.match(charter, /\*\*verdict ราย slice\*\*/);
   const conv = read("CONVENTIONS.md");

@@ -54,6 +54,16 @@ export function reportsDirOf(workspaceRoot) {
   return workspaceRoot ? path.join(workspaceRoot, "reports", "baan") : REPORTS_DIR;
 }
 
+// ระดับการตรวจ (charter ข้อ 14) — normal = happy flow ระหว่างพัฒนา · full = ตรวจเต็มรอบเดียวตอนท้าย
+// normal เป็นค่าเริ่มต้นเพราะ school-bot (2026-11-03) ตรวจเต็มทุก task ระหว่างพัฒนาจนงาน License
+// วนแก้เคสขอบอยู่หลายรอบ ขณะที่อีก 75 task ยังไม่ได้เริ่ม
+export const TEST_LEVELS = ["normal", "full"];
+
+export function validateTestLevel(v, source = "--test-level") {
+  if (!TEST_LEVELS.includes(v)) throw new Error(`${source} ต้องเป็น ${TEST_LEVELS.join("/")} (ได้: ${JSON.stringify(v ?? "")})`);
+  return v;
+}
+
 export function loadWorkspace(configPath = null) {
   // ไม่พบ config = ใช้ default ในโค้ด (ไม่มี targets/knowledge) พร้อมแจ้งให้ผู้ใช้รู้ตอน --list
   let raw = {};
@@ -61,6 +71,7 @@ export function loadWorkspace(configPath = null) {
     try { raw = JSON.parse(readFileSync(configPath, "utf8")); }
     catch (e) { throw new Error(`อ่าน config ไม่ได้ (${configPath}): ${e.message}`); }
   }
+  const testLevel = validateTestLevel(raw.defaults?.test_level ?? "normal", `defaults.test_level ใน ${configPath}`);
   return {
     source: configPath ?? null,
     main_root: raw.main_root ?? "",
@@ -70,6 +81,7 @@ export function loadWorkspace(configPath = null) {
       planner_tier: raw.defaults?.planner_tier ?? "t2",
       timeout_sec: Object.hasOwn(raw.defaults ?? {}, "timeout_sec") ? raw.defaults.timeout_sec : DEFAULT_TIMEOUT_SEC,
       max_parallel: raw.defaults?.max_parallel ?? 3,
+      test_level: testLevel,
     },
   };
 }
