@@ -996,7 +996,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-01-48-00-sys-tier-t3-1agents-iMUzTb",
-          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
+          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — **รอ re-check หลัง rework 2/2 (ถ้าตก = ถามผู้ใช้)**"
         }
       ]
     },
@@ -1041,7 +1041,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-25-40-sys-tier-t3-1agents-iEurV3",
-          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high) · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
+          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high) · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — **รอ re-check หลัง rework 2/2 (ถ้าตก = ถามผู้ใช้)**"
         }
       ]
     },
@@ -3239,7 +3239,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-45-49-sys-tier-t3-1agents-dy4wyP",
-          "note": "2026-11-03 draft/revision/publish four-eyes + approval_ref T1000 บน stub · นายช่างรันซ้ำ 4241/0/0 · รอ check (high)"
+          "note": "2026-11-03 draft/revision/publish four-eyes + approval_ref T1000 บน stub · นายช่างรันซ้ำ 4241/0/0 · รอ check (high) · check 8djX2U FAIL(5) → rework1 3v6Acl → re-check mTFXNd FAIL เหลือ idempotency concurrent → **rework 2/2 ยังไม่เปิด (ผู้ใช้สั่งหยุด)**"
         }
       ]
     },
