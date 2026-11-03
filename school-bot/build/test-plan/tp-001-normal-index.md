@@ -1,8 +1,8 @@
-# TP-001 — เคส normal แยกตาม task
+﻿# TP-001 — เคส normal แยกตาม task
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — ทางหลักก่อนพัฒนาและตรวจรับ)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — เพิ่ม importer BE-028 ตามสัญญาที่ตรึงแล้ว)
 
-ครบ 8 task / 25 AC (Acceptance Criteria: เกณฑ์ตรวจรับ) / 26 คู่ task/AC / 14 normal IDs; NOT_RUN ทั้งหมด ตรวจ component/integration บน stub; normal รวมผลปฏิเสธหลักของ AC ไม่มี race/replay/fault/boundary ดู [ขอบเขตและสิ่งที่รอของจริง](tp-001-normal-scope.md)
+ครบ 9 task / 29 AC (Acceptance Criteria: เกณฑ์ตรวจรับ) / 30 คู่ task/AC / 16 normal IDs; NOT_RUN ทั้งหมด ตรวจ component/integration บน stub; normal รวมผลปฏิเสธหลักของ AC และ BE-028 case B/C ที่อ่านผลซ้ำหลัง reopen ตามใบงาน; race/fault/boundary อยู่ใน full ดู [ขอบเขตและสิ่งที่รอของจริง](tp-001-normal-scope.md)
 
 ## ตารางส่งต่อ
 
@@ -31,7 +31,8 @@
 | BE-029 | AC-043-02 Course; AC-043-03 Level ที่เลือก; AC-043-04 Activity ครบ | [TP001-060](tp-001-cases-learning-2.md#tp001-060) | L+C; student GET /v2/curricula/{id}, /v2/progress?course_run_id=runId และเปิด Activity8ผ่าน component/fake robot | 200 Level/ชั้นเริ่มต้น/Subject/Lesson/Activityตรง seed; ห้องป.4ยัง Beginner ของ run ไม่แทนด้วยชั้น; Modeตรงกิจกรรม/สื่อไม่บังคับหุ่น; curriculum/run/children/audit/result เดิม |
 | BE-030 | AC-046-01 policy สี่ด้าน | [TP001-063](tp-001-cases-quiz-grade-bank-cases.md#tp001-063-detail) | L+Q; student และ teacher GET activity quiz/test | 200 effective_policy/selection/windowตรง seed ไม่ hardcodeชื่อ; ซ่อนเฉลย; counts/payload/ETag/audit/ledger เดิม |
 | BE-030 | AC-046-04 revision คงเดิมผล | [TP001-064](tp-001-cases-quiz-grade-bank-cases.md#tp001-064-detail) | L+Q; staffAuthor create/PUT v2 เปลี่ยนเฉลย/เต็ม7+11; approverอีกคน publish ref=fixture:approved-v2; reopen/readหลังclose10นาที | 201/200/200/read200; bank2 published/audit5/ledger3; submitted2/5/started null/snapshot v1/เกณฑ์/ลำดับ/ETagเดิม; Attempt2 ไม่ repoint Activity/Run |
+| BE-028 | AC-045-01 draft/ที่มา; AC-045-02 ตัด O; AC-045-03 สื่อสองชุด; AC-045-04 identity | [TP001-062 A/D/E/P](tp-001-cases-quiz-grade-import-cases.md#tp001-062-detail) และ [TP001-093 B/C](tp-001-cases-quiz-grade-import-cases.md#tp001-093) | [setup importer](tp-001-cases-quiz-grade-import.md): 1 host/process, 2 services/adapters; memory object เดียว/file 2 objects directory เดียว; reader C ที่สาม; staff_admin+content_author, SchoolId=NULL; A/D/E/P รัน memory/file, B/C file reopen; ไม่มี fault | A200 created×3 และ admin GET200 draft/ที่มา/สื่อครบ; D/E200 unchanged×3; P201→200 revision2 LessonKey เดิม; B200 replay/C200 unchanged; state ตามตารางเคสและ des-005-import-state Rev1 §1; NOT_RUN |
 
 ## หลักฐาน
 
-[AC ต้นฉบับและ revision ที่ใช้ รวมข้อจำกัด](tp-001-normal-scope.md#หลักฐาน) · [setup License](traceability-001-license-setup.md) · [setup host](traceability-001-license-host-setup.md) · [setup bank](tp-001-cases-quiz-grade-bank.md)
+[AC ต้นฉบับและ revision ที่ใช้ รวมข้อจำกัด](tp-001-normal-scope.md#หลักฐาน) · [setup License](traceability-001-license-setup.md) · [setup host](traceability-001-license-host-setup.md) · [setup bank](tp-001-cases-quiz-grade-bank.md) · BE-028 ใช้ [import Rev2](../design/des-005-import.md), [state Rev1](../design/des-005-import-state.md), [API Rev11](../design/des-005-api.md), [idempotency Rev4](../design/idempotency-001.md), [migration-002 Rev2](../db/migration-002-lesson-import-source.md)
