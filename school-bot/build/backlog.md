@@ -1,6 +1,6 @@
 # SchoolBot — Backlog
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย gm · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> แก้ล่าสุด 2026-11-03 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (เพิ่ม BL-007 จากผลตรวจหลักสูตรกลาง)
 
 ## กติกา
 
@@ -15,13 +15,14 @@
 | [BL-003](backlog-security.md#bl-003) | SchoolId ของตารางเชื่อมชั้นเรียนใน `sb-tech-upgrade-academic` | arch: auth/security review | รอเจ้าของ security triage | นอก scope; SchoolBot ต้องกรองทุก join และรอ runtime proof |
 | [BL-004](backlog-legacy.md#bl-004) | IsAdmin และช่องโหว่ legacy `sb-web-academic-dev-1` | sys/arch: legacy auth/security review | รอเจ้าของ security triage | แหล่ง is_admin ตอบแล้วตามมติ 035; ข้อค้นพบ legacy และ technical proof ยังค้าง |
 | [BL-005](backlog-documentation.md#bl-005) | ทดสอบ logout และปรับเอกสาร Gateway เป็น controller | งาน logout/ทบทวน Gateway | ไม่ระบุในต้นฉบับ | ปิดแล้ว 2026-10-28; test actual ยัง NOT_RUN |
+| [BL-007](backlog-persistence.md#bl-007) | approval_ref ผิดชนิดได้ error code `INVALID_REQUEST` แทน `INVALID_INPUT` | check: ตรวจหลักสูตรกลาง [BE-027](plan/extension/index.md) | Minor | เปิด 2026-11-03; ไม่เปลี่ยนข้อมูล ไม่บล็อก AC |
 | [BL-006](backlog-persistence.md#bl-006) | ความคงทนและ concurrency ของ Project/License/Session | check: ตรวจงาน [BE-002](plan/index-foundation.md) (เชื่อมฐานข้อมูล) | ไม่ระบุในต้นฉบับ | ข้อ 2/3/5 รอก่อนต่อ DB จริง/production; ข้อ 4 ส่ง arch ตอนแก้ ETag ครั้งถัดไป |
 
 รายละเอียดแบ่งตามหัวข้อในลิงก์ตาราง ทุก ID คงเดิม ไม่มีการเพิ่มรายการในการเรียบเรียงนี้ ประเด็น [DES-007 (Release และ trusted update)](design/des-007.md)/[BE-019](plan/index-delivery.md) (ตรวจอัปเดตและ Prepare/Install) เป็นเงื่อนไข coverage ของ [SA-001](plan/index-foundation.md) (ทบทวนสัญญาระบบ) และ G-RELEASE-DB (อนุมัติฐานเผยแพร่) จึงติดตามใน [แผน](plan/index.md) ส่วนคำตอบจากคนติดตาม Waiting on Human ไม่สร้าง backlog ซ้ำ
 
 ## หลักฐาน
 
-รายละเอียดที่มาของแต่ละข้ออยู่ท้ายไฟล์ย่อย ข้อความเดิมว่าไม่มี BL เป็นข้อความเมื่อรับแผนครั้งแรก ถูกแทนด้วยทะเบียนหกข้อข้างต้น
+รายละเอียดที่มาของแต่ละข้ออยู่ท้ายไฟล์ย่อย ข้อความเดิมว่าไม่มี BL เป็นข้อความเมื่อรับแผนครั้งแรก ถูกแทนด้วยทะเบียนในตารางข้างต้น
 
 อ้างอิงแผนทดสอบ: [TP-001 (แผนทดสอบ SchoolBot)](test-plan/tp-001.md) ครอบคลุมงานตรวจรับที่อ้างใน backlog
 

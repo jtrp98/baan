@@ -996,7 +996,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-01-48-00-sys-tier-t3-1agents-iMUzTb",
-          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — **รอ re-check หลัง rework 2/2 (ถ้าตก = ถามผู้ใช้)**"
+          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — rework2 ต่อ G1ijZ2 (t2) BLOCKED + ถดถอย 2 เคส → **ติดเพดาน · ผู้ใช้ตัดสิน 2026-11-03: เปิด slice ใหม่หลัง BE-027 (ย้ายไป idempotency-001 + แก้ 2 เคส)**"
         }
       ]
     },
@@ -1041,7 +1041,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-25-40-sys-tier-t3-1agents-iEurV3",
-          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high) · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — **รอ re-check หลัง rework 2/2 (ถ้าตก = ถามผู้ใช้)**"
+          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high) · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md · rework1 YPmUva → re-check 20to0l FAIL (race validate/unbind) → rework2 mZypie นายช่างรันซ้ำ 4279/0/0 — rework2 ต่อ G1ijZ2 (t2) BLOCKED + ถดถอย 2 เคส → **ติดเพดาน · ผู้ใช้ตัดสิน 2026-11-03: เปิด slice ใหม่หลัง BE-027 (ย้ายไป idempotency-001 + แก้ 2 เคส)**"
         }
       ]
     },
@@ -3221,7 +3221,7 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "done-local",
+      "status": "verified",
       "risk": "high",
       "module": "quiz",
       "slices": [
@@ -3237,9 +3237,11 @@
             "AC-037-05",
             "AC-037-06"
           ],
-          "status": "done-local",
-          "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-45-49-sys-tier-t3-1agents-dy4wyP",
-          "note": "2026-11-03 draft/revision/publish four-eyes + approval_ref T1000 บน stub · นายช่างรันซ้ำ 4241/0/0 · รอ check (high) · check 8djX2U FAIL(5) → rework1 3v6Acl → re-check mTFXNd FAIL เหลือ idempotency concurrent → **rework 2/2 ยังไม่เปิด (ผู้ใช้สั่งหยุด)**"
+          "status": "verified",
+          "evidence": "planning/task-096.md; reports/baan/2026-11-03-06-24-59-check-tier-t2-1agents-sUU6Li",
+          "note": "2026-11-03 draft/revision/publish four-eyes + approval_ref T1000 บน stub · นายช่างรันซ้ำ 4241/0/0 · รอ check (high) · check 8djX2U FAIL(5) → rework1 3v6Acl → re-check mTFXNd FAIL เหลือ idempotency concurrent → arch cyNkWX (idempotency ส่วนกลาง) → rework 2/2 vLlDra (t2) → check sUU6Li **PASS** 2026-11-03 · Minor error code → BL-007",
+          "oracle": "pack-B ใบงาน096: DES-005 Rev10 · idempotency-001 Rev1 (+คำตัดสิน Rev2 quuA5j) · TP001-055/060/061/084-087 Rev1",
+          "ref": "target/school-bot worktree ยังไม่ commit — snapshot reports/school-bot/normal-096/snapshot-B (2026-11-03)"
         }
       ]
     },
