@@ -30,7 +30,7 @@ state หลังอ่านทุกครั้ง: bank revision=1, curricu
 
 ไม่มีจุดพักหรือ inject บันทึก baseline ของ Attempt ทั้งสองจาก adapter จากนั้น staffAuthor POST bank v2 → 201 เก็บ id/ETag, PUT v2 เปลี่ยน title=`คลังใหม่ที่แก้ร่าง` โดยคง questions v2 → 200, staffApprover publish v2 ด้วย approval_ref=`fixture:approved-v2` → 200 อ่าน admin detail → 200 draft ก่อน publish/published หลัง publish พร้อม ref ตรงตัว; ref ไม่ใช่หลักฐานอนุมัติเนื้อหาจริง
 
-ทิ้ง services/adapters/store objects แล้วเปิดใหม่จาก directory เดิม (memory สร้าง adapter ใหม่บน store เดิม ไม่เรียกว่า restart process) อ่าน bank v1/v2 และประวัติ student ผ่าน GET attempts/detail เวลา 02:00:02Z แล้วเลื่อน fake clock ถึง 03:00:00Z อ่านอีกครั้ง
+ทิ้ง services/adapters/store objects แล้วเปิดใหม่จาก directory เดิม (memory สร้าง adapter ใหม่บน store เดิม ไม่เรียกว่า restart process) อ่าน bank v1/v2 และประวัติ student ผ่าน GET attempts/detail เวลา 02:00:02Z แล้วเลื่อน fake clock ถึง 03:10:00Z อ่านอีกครั้ง
 
 response ก่อน close: quiz after_close ซ่อน earned/feedback; หลัง close แถว submitted ยังได้ `2/5` เฉลยเดิม 211/221 ลำดับเดิม, bank_revision=1/curriculum_revision=1/policy/evaluator_version เดิม; แถว started EarnedScore ยัง null ไม่กลายเป็น 0 หรือถูก regrade จาก v2 ปิด worker ใน harness ตลอด case เพื่อแยกการอ่าน snapshot จากการ finalization แม้เลื่อน clock เลย deadline
 

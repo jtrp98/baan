@@ -2,7 +2,7 @@
 
 > Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — ทางหลักบน stub)
 
-เคสนี้ใช้ component/integration บน stub หนึ่ง host/process สอง service/adapter instances ต่อ store ร่วม รัน memory object เดียวและ file store สอง object directory เดียวแยก fixture อ่านผลจาก adapter ที่สาม/file object ใหม่ ไม่มี barrier/fault ใช้ fake UTC clock, test signer ที่ตรวจ signature จริง, device A/B คนละ P-256 key และ challenge/proof จริงตาม S-LIC ทุกผลจริง NOT_RUN
+เคสนี้ใช้ component/integration บน stub หนึ่ง host/process สอง service/adapter instances ต่อ store ร่วม รัน memory object เดียวและ file store สอง object directory เดียวแยก fixture อ่านผลจาก adapter ที่สาม/file object ใหม่ ไม่มี barrier/fault ใช้ fake UTC clock, test signer ที่ตรวจ signature จริง, device A/B คนละ P-256 key และ challenge/proof จริงตาม S-LIC T=2026-11-03T00:00:00Z เป็นเวลาเริ่มของทุก fixture ทุกผลจริง NOT_RUN
 
 <a id="tp001-097"></a>
 ## TP001-097 — activate เครื่องเดิมและ validate ตามลำดับ

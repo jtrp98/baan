@@ -7,7 +7,7 @@
 | เอกสาร | ขอบเขต | สถานะปัจจุบัน |
 |---|---|---|
 | [เคส normal ตาม task](tp-001-normal-index.md) | 8 task / 25 AC / 14 normal cases พร้อม setup และ response+persisted state | เพิ่ม TP001-097–103; รายละเอียด full คงไว้ ผล runtime ยัง NOT_RUN |
-| [TP-001 (แผนตรวจรับทั้งหมด)](tp-001.md) | 82 cases / 187 AC พร้อมกลยุทธ์ Profile และตาราง case | มีแผนทุก AC; รอหลักฐาน runtime และเงื่อนไขแต่ละ profile |
+| [TP-001 (แผนตรวจรับทั้งหมด)](tp-001.md) | สารบัญฐาน 82 cases / 187 AC และกลยุทธ์ Profile; เคสเพิ่มเติมดูตาราง normal | มีแผนทุก AC; รอหลักฐาน runtime และเงื่อนไขแต่ละ profile |
 | [Traceability (AC → case)](traceability-001.md) | ตารางปัจจุบัน 187 AC รวมกรณีเพิ่มเติมแล้ว | ทุก Actual เป็น NOT_RUN |
 | [TP-002 (failure/race fixtures)](tp-002-fixture-plan-001.md) | FX-01–05: fake clock/trash/bridge/import/authority | เอกสารเตรียม; ไม่มี harness หรือผลรัน |
 | [TP-003 (grade fixtures)](tp-003-grade-fixture-plan-001.md) | GF-01–06: parity/coexistence/crash ภายใต้ห้าเงื่อนไขฐานคะแนน | เอกสารเตรียม; ยังไม่รัน; ใช้ test DB เท่านั้น |
@@ -15,7 +15,7 @@
 
 ## กลยุทธ์ transport
 
-[Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop) Rev8](../design/des-012.md) กำหนดเส้นทาง transport สำหรับแผนทดสอบ: Desktop→HTTP API Gateway→gRPC SchoolBot service; browser→same-origin BFF→HTTP API Gateway→gRPC SchoolBot service. HTTP paths/status ใน cases เป็นฝั่ง client ของ Gateway ไม่ใช่ RPC mapping; ไม่มี HTTP relay/direct public SchoolBot fallback. Login HTTP เดิมของ Gateway และ internal decoder แยกจาก service RPC.
+[Gateway Rev3](../design/gateway-integration-001.md) และ [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop) Rev9](../design/des-012.md) กำหนดเส้นทาง transport สำหรับแผนทดสอบ: Desktop→HTTP API Gateway→gRPC SchoolBot service; browser→same-origin BFF→HTTP API Gateway→gRPC SchoolBot service. HTTP paths/status ใน cases เป็นฝั่ง client ของ Gateway ไม่ใช่ RPC mapping; ไม่มี HTTP relay/direct public SchoolBot fallback. Login HTTP เดิมของ Gateway และ internal decoder แยกจาก service RPC.
 
 ใช้ขั้นตอนร่วมนี้กับทุก case ที่เรียก service ออนไลน์ รวม PF-API/PF-LEGACY/PF-WEB/PF-ADMIN และทางเรียกจาก PF-HOST/PF-GRADE; ไม่เปลี่ยน AC/IDs/expected ธุรกิจ. Unit/domain, local component และ static ทำแยกได้ แต่ไม่ปิด integration.
 

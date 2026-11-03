@@ -1,6 +1,6 @@
 # Negative/fault ของสิทธิ์เครื่อง
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — แยกรายละเอียด tamper/copy และ fault ให้ไฟล์อ่านจบได้)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — ติดป้าย full)
 
 ส่วนบังคับของ [pack BE-007](traceability-001-license-host-pack.md#be-007) และ [H-LIC/H-OBS/H-GATE](traceability-001-license-host-setup.md) ไม่เพิ่ม AC ผลจริงทั้งหมด NOT_RUN
 
@@ -12,6 +12,8 @@
 <a id="tp001-088"></a>
 
 ## TP001-088 — ปฏิเสธสิทธิ์ที่ถูกแก้ไขหรือคัดลอกจาก A ไป B
+
+ระดับ: full
 
 AC: [AC-034-02 (Active แล้วจึงมีสิทธิ์ในเครื่อง)](../../modules/app-shell/shared/requirements/req-034.md), [AC-035-03 (B ต้องเปิดใช้ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ของ A)](../../modules/app-shell/shared/requirements/req-035.md) · Criterion BE-007: tamper/copy ข้ามเครื่องปฏิเสธ · References: [device proof Rev3](../design/des-002-device-proof.md), [signed entitlement Rev4](../design/des-002-entitlement.md), [local state Rev4](../design/des-002-recovery.md) · Level: host component/integration บน doubles · Profile: PF-HOST
 
