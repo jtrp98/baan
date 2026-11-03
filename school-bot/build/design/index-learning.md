@@ -50,6 +50,7 @@
 | [des-010-policy.md](des-010-policy.md) | 5 | อธิบาย Activity และนโยบายข้อสอบ |
 | [des-010-question-bank.md](des-010-question-bank.md) | 5 | อธิบาย เจ้าของข้อมูลและ concurrency |
 | [des-010-references.md](des-010-references.md) | 5 | อธิบาย ข้อกำหนดและมติที่อ้าง |
+| [des-010-stub-persistence.md](des-010-stub-persistence.md) | 1 | ที่เก็บคลังข้อสอบ CourseRun และ Attempt บนที่เก็บจำลอง และวิธีเตรียมข้อมูลทดสอบ |
 | [des-011-policy.md](des-011-policy.md) | 7 | อธิบาย ขอบเขตและ Placement |
 | [des-011-proposal.md](des-011-proposal.md) | 7 | อธิบาย การคำนวณและตรึง snapshot |
 | [des-011-references.md](des-011-references.md) | 7 | อธิบาย ข้อกำหนดและมติที่อ้าง |

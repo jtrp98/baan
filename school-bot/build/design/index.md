@@ -62,7 +62,7 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 | [des-005.md](des-005.md) | 10 | DES-005: หลักสูตร ภารกิจ และผลประเมินสามโหมด | PROPOSED — รอ numeric rubric/evaluator และ implementation proof; audit ใช้ T1000 ตามมติ 054 |
 | [des-008.md](des-008.md) | 6 | DES-008: mapping หลักสูตรกับช่องคะแนน SchoolBright | PROPOSED — ยืนยันนโยบายแล้ว; รอ web-principal/H5 |
 | [des-009.md](des-009.md) | 4 | DES-009: preview/ยืนยันส่งคะแนนและป้องกันคะแนนชน | PROPOSED — export ปิดจนผ่าน parity/coexistence/target/authz/DB gates |
-| [des-010.md](des-010.md) | 7 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; audit ใช้ T1000 ตามมติ 054; รอ implementation proof |
+| [des-010.md](des-010.md) | 8 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; audit ใช้ T1000 ตามมติ 054; รอ implementation proof |
 | [des-011.md](des-011.md) | 7 | DES-011: เสนอเลื่อน Level และครูยืนยันทั้งห้อง | PROPOSED — รอ roster/วันสิ้นเทอม |
 
 กฎร่วมและ API เฉพาะเรื่องอยู่ใน [สารบัญ Learning/คะแนน](index-learning.md)
