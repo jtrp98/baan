@@ -88,3 +88,10 @@ test("findDependencyCycle: วนได้รายการ id ครบวง,
   assert.equal(cyc.length, 4);
   assert.equal(findDependencyCycle([{ id: "A", dependsOn: [] }, { id: "B", dependsOn: ["A"] }]), null);
 });
+
+// full pass ในโหมดอัตโนมัติอยู่ในแผนเดียวกับงาน dev — ระดับต้องตั้งราย task ได้ (charter ข้อ 14)
+test("testLevel ราย task: full/normal ผ่าน · ค่าอื่น = error · ไม่ใส่ = ใช้ระดับของ run", () => {
+  assert.equal(validateAndFixPlan({ tasks: [task({ testLevel: "full" })] }, cfg, opts).tasks[0].testLevel, "full");
+  assert.equal(validateAndFixPlan({ tasks: [task()] }, cfg, opts).tasks[0].testLevel, undefined);
+  assert.throws(() => validateAndFixPlan({ tasks: [task({ testLevel: "deep" })] }, cfg, opts), /T1: testLevel ต้องเป็น normal\/full/);
+});
