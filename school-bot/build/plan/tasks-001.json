@@ -1231,7 +1231,7 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "done-local",
+      "status": "verified",
       "risk": "low",
       "wave": 4,
       "module": [
@@ -1249,11 +1249,15 @@
             "AC-036-03",
             "AC-036-04"
           ],
-          "status": "done-local",
+          "status": "verified",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-08-24-sys-tier-t3-1agents-8CwCK9",
-          "note": "2026-11-03 /v2/projects บน backing store stub (มติ053) · นายช่างรันซ้ำ 4213/0/0 · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
+          "note": "2026-11-03 /v2/projects บน backing store stub (มติ053) · นายช่างรันซ้ำ 4213/0/0 · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md",
+          "oracle": "card + tasks-001.json AC-011-01..03, AC-036-02..04 · project-api-001 Rev2 · มติ051/053 (ตรึง 2026-11-03)",
+          "ref": "snapshot-rw1 (target หลัง sys rework1 YPmUva, ยังไม่ commit — ห้าม role commit target) · check yoDqtV FAIL → 20to0l PASS"
         }
-      ]
+      ],
+      "oracle": "card + tasks-001.json AC-011-01..03, AC-036-02..04 · project-api-001 Rev2 · มติ051/053 (ตรึง 2026-11-03)",
+      "ref": "snapshot-rw1 (target หลัง sys rework1 YPmUva, ยังไม่ commit — ห้าม role commit target) · check yoDqtV FAIL → 20to0l PASS"
     },
     {
       "id": "BE-009",
