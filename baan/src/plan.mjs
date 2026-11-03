@@ -290,6 +290,7 @@ export function validateAndFixPlan(plan, cfg, opts) {
       t.role = canonicalRole;
     }
     if ("title" in t && typeof t.title !== "string") errors.push(`${t.id}: title ต้องเป็น string`);
+    if (t.testLevel !== undefined && !TEST_LEVELS.includes(t.testLevel)) errors.push(`${t.id}: testLevel ต้องเป็น ${TEST_LEVELS.join("/")} (ได้ ${JSON.stringify(t.testLevel)})`);
     if (!t.role || !cfg.roleNames.includes(t.role)) errors.push(`${t.id}: role ไม่รู้จัก "${t.role}"`);
     if (t.dependsOn === undefined || t.dependsOn === null) t.dependsOn = [];
     else if (!Array.isArray(t.dependsOn) || t.dependsOn.some((d) => typeof d !== "string")) errors.push(`${t.id}: dependsOn ต้องเป็น array ของ string (id ของงานที่ต้องสำเร็จก่อน)`);
