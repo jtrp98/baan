@@ -4154,7 +4154,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/slice-092-gateway-r4-001.md; planning/jpo-092-logout-r4-001.md; design/gateway-controller-entry-001.md",
-          "note": "2026-10-28 G logout controller r4 (มติ050): parent compile/433/3/5/96 + JPO SEC001-016 CLOSED local + surface probe 6/0 — ครอบเฉพาะส่วน local ของ AC-036-06; production registration/H5/TLS/BFF CSRF ยังรอ จึงไม่ลง verified"
+          "note": "2026-10-28 G logout controller r4 (มติ050): parent compile/433/3/5/96 + JPO SEC001-016 CLOSED local + surface probe 6/0 — ครอบเฉพาะส่วน local ของ AC-036-06; production registration/H5/TLS/BFF CSRF ยังรอ จึงไม่ลง verified · 2026-11-03 ใบงาน097 check nvKPwg พบว่ายังไม่มี exchange POST /v2/auth/web-sessions → writer Fu14B4 (t2) เพิ่ม exchange · นายช่างรันซ้ำ 4498/3 (ตก 3 เคสที่พัก) · รอ check normal"
         },
         {
           "id": "BE-039-S2-curriculum-auth",
@@ -4165,7 +4165,7 @@
           "oracle": "oracle pack BE-039 (ตรึง 2026-10-29): DES-012 Rev9 · TP001-060 — check-094-BE-039-001 PASS + jpo-094-BE-039-001 DONE",
           "ref": "B f77659f + worktree 2026-10-29 (ยังไม่ commit — ห้าม role commit target)",
           "evidence": "planning/check-094-BE-039-001.md; planning/jpo-094-BE-039-001.md; parent rerun 4169/0",
-          "note": "2026-10-29 B authorization ส่วนกลาง vs โรงเรียนบน stub principal — ไม่รวม H5 · backlog: SEC094-001 (Minor publish ผู้เขียนว่าง), อ่านหลักสูตรเมื่อ license ไม่ active"
+          "note": "2026-10-29 B authorization ส่วนกลาง vs โรงเรียนบน stub principal — ไม่รวม H5 · backlog: SEC094-001 (Minor publish ผู้เขียนว่าง), อ่านหลักสูตรเมื่อ license ไม่ active · 2026-11-03 ใบงาน097 check nvKPwg พบว่ายังไม่มี exchange POST /v2/auth/web-sessions → writer Fu14B4 (t2) เพิ่ม exchange · นายช่างรันซ้ำ 4498/3 (ตก 3 เคสที่พัก) · รอ check normal"
         }
       ],
       "risk": "high",
