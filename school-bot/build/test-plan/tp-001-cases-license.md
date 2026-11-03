@@ -1,6 +1,6 @@
 # TP-001 — License และสิทธิ์เครื่อง (TP001-001–TP001-005)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup activate/validate บน store ร่วม)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup ที่รันตามได้ของ BE-005/BE-007)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -26,7 +26,7 @@ AC: [AC-009-01 (เริ่มแอปโดยไม่เคยใส่ Lic
 
 AC: [AC-028-04 (เมื่อลองเปิดใช้ด้วย License ไม่ถูกต้องและไม่เคยมีสิทธิ์ที่ใช้ได้…)](../../modules/app-shell/shared/requirements/req-028.md), [AC-034-01 (ครั้งแรกไม่มีอินเทอร์เน็ต เข้าโหมดหลักไม่ได้แม้กรอก Key แล้ว)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002, [BR-009-03 (เปิดใช้ครั้งแรกต้องออนไลน์)](../../modules/app-shell/shared/requirements/req-009.md) · Level: integration · Profiles: PF-HOST, PF-API
 
-เงื่อนไขก่อนตรวจ: เครื่องสะอาดไม่เคยมีสิทธิ์; key ถูก/ผิด/revoked/expired
+เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — topology/doubles/fault](traceability-001-license-host-setup.md) ทั้ง memory/file; A มี device key แต่ไม่มี token/anchor/binding; ปิด network ก่อนส่ง ใช้ fixture สะอาดต่อ key ถูก/ผิด/revoked/expired ส่วน credential write fail เปิด network แล้วพักหลัง Active ก่อน publish local generation; response และ server/local state ตาม [pack BE-007](traceability-001-license-host-pack.md#be-007)
 
 ขั้นตอน: กรอก key ขณะ offline; กรอก key ผิด/revoked ขณะ online; inject credential-store write fail
 
@@ -42,7 +42,7 @@ AC: [AC-028-04 (เมื่อลองเปิดใช้ด้วย Licens
 
 AC: [AC-034-03 (ออฟไลน์ภายใน 3 วันจากตรวจสำเร็จล่าสุดใช้งานได้)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-04 (ครบ 3 วันและติดต่อเซิร์ฟเวอร์ไม่ได้…)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002, DES-001, BR-009-03 · Level: integration · Profiles: PF-HOST
 
-เงื่อนไขก่อนตรวจ: entitlement checked_at=T; กรณี license_exp ไกล และ license_exp<T+3d; fake wall+monotonic clock; หุ่น busy (fake)
+เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — clock/restart/persistence](traceability-001-license-host-setup.md) ทั้ง memory/file; A activate ที่ T แล้วปิด network มี server LastCheckedAt=T/LastEntitlementExpiresAt=E และ local lease/anchor ตรงกัน รันแยก License.ExpiresAt=T+10 วัน (E=T+259200s) กับ T+1 วัน (E=T+86400s); reset fixture ต่อ boundary และหยุด/สร้าง Desktop instance ใหม่บน storage namespace A เดิม; server สอง instance/store ร่วมคงอยู่ หุ่น busy ใช้ fake; ทุก restart ต้องคง checked_at/exp=T/E, high-water mark เดินหน้าได้ตามเวลา ดู [pack BE-007](traceability-001-license-host-pack.md#be-007)
 
 ขั้นตอน: เปิดแอปซ้ำ offline ที่ T+3d-1s, exp-1s, exp, exp+1s; ย้อน wall clock/VM snapshot; เปิด session ค้างข้าม exp ขณะ robot busy
 
@@ -58,11 +58,11 @@ AC: [AC-034-03 (ออฟไลน์ภายใน 3 วันจากตร�
 
 AC: [AC-034-02 (ตรวจออนไลน์ได้ Active แล้วเข้าใช้งานได้และมีสิทธิ์ในเครื่อง)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-05 (ตรวจ Key เดิมออนไลน์ได้ Active อีกครั้ง แล้วต่อสิทธิ์ 3…)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-06 (ได้ผล Key ไม่ Active แล้วไม่ต่อสิทธิ์หรือใช้ค่าเดิมข้ามผลปฏิเสธเพื่อปลดล็อก)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002 · Level: integration · Profiles: PF-HOST, PF-API
 
-เงื่อนไขก่อนตรวจ: ผลตรวจ: Active, LICENSE_INACTIVE, BINDING_REVOKED, 403 code ไม่รู้จัก, 5xx, 429, network down, success malformed, signature/kid ผิด, device proof ผิด
+เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — response faults](traceability-001-license-host-setup.md) ทั้ง memory/file; แยก A สะอาดสำหรับ Active แรก กับ A มี lease T/E สำหรับ renew/denial; ตรวจครั้งใหม่ที่ T1=T+3600s และอีก fixture ที่ E+1s โดย License.ExpiresAt=T+10 วัน; server สอง instance/store ร่วม; revoke/unbind บน stub ก่อน validate เพื่อได้ LICENSE_INACTIVE/BINDING_REVOKED; fault อื่นตาม [pack BE-007 — response/server/local state](traceability-001-license-host-pack.md#be-007); หลัง denial restart offline ต้องยัง locked
 
 ขั้นตอน: ตรวจออนไลน์ในสถานะ valid และหลัง expired offline; replay request เดิม
 
-ผลที่คาด: Active→ปลดล็อก มีสิทธิ์ในเครื่อง exp ใหม่=checked_at+3d; inactive/revoked→denied+invalidate cache ไม่ต่อ ไม่ใช้ค่าเดิมปลดล็อก; 5xx/429/network ไม่เลื่อน exp; malformed/signature ผิด→INVALID_ENTITLEMENT; 403 ไม่รู้ code→locked; replay คืน exp เดิม ไม่ถือเป็น online check ใหม่
+ผลที่คาด: Active→ปลดล็อก มีสิทธิ์ในเครื่อง exp ใหม่=min(checked_at+259200,license_expires_at); inactive/revoked→denied+invalidate cache ไม่ต่อ ไม่ใช้ค่าเดิมปลดล็อก; 5xx/429/network ไม่เลื่อน exp; malformed/signature ผิด→INVALID_ENTITLEMENT; 403 ไม่รู้ code→locked; replay คืน exp เดิม ไม่ถือเป็น online check ใหม่
 
 หลักฐานที่ต้องเก็บ: E-API+E-TRACE
 

@@ -1,10 +1,10 @@
 # Traceability — atomic failure และผู้รอ ของหลักสูตรกลาง
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (รายละเอียด TP001-086 แบบรันตามได้)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (รายละเอียด TP001-087 แบบรันตามได้)
 
-เอกสารนี้เป็นส่วนของ [TP001-086](tp-001-cases-learning-3.md#tp001-086) ระดับ integration บน stub ครอบ AC-043-01 (mutation ส่วนกลาง), AC-044-03 (publish/audit หลักฐาน), AC-044-05 (revision ไม่ซ้ำ) ต้องใช้ [setup ร่วมและตาราง mutation](traceability-001-learning-idempotency.md#setup) ผลจริงยัง NOT_RUN
+เอกสารนี้เป็นส่วนของ [TP001-087](tp-001-cases-learning-3.md#tp001-087) ระดับ integration บน stub ครอบ AC-043-01 (mutation ส่วนกลาง), AC-044-03 (publish/audit หลักฐาน), AC-044-05 (revision ไม่ซ้ำ) ต้องใช้ [setup ร่วมและตาราง mutation](traceability-001-learning-idempotency.md#setup) ผลจริงยัง NOT_RUN
 
-<a id="tp001-086-detail"></a>
+<a id="tp001-087-detail"></a>
 
 เงื่อนไขก่อนตรวจ: setup ร่วม ทำครบสี่ operations แยก fixture ต่อจุด inject; UUID/body เดิม; baseline หลัง setup ก่อน mutation อ่านผลจาก adapter ใหม่ตามชนิด store
 

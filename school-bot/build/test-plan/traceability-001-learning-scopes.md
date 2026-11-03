@@ -1,10 +1,10 @@
 # Traceability — ขอบเขต actor/operation ของหลักสูตรกลาง
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (รายละเอียด TP001-084 แบบรันตามได้)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (รายละเอียด TP001-085 แบบรันตามได้)
 
-เอกสารนี้เป็นส่วนของ [TP001-084](tp-001-cases-learning-3.md#tp001-084) ระดับ integration บน stub ครอบ AC-043-01 (ขอบเขตผู้แก้ส่วนกลาง), AC-044-03 (ผู้อนุมัติที่ถูกต้อง), AC-044-05 (revision แยกกัน) ต้องใช้ [setup ร่วมและตาราง mutation](traceability-001-learning-idempotency.md#setup) ผลจริงยัง NOT_RUN
+เอกสารนี้เป็นส่วนของ [TP001-085](tp-001-cases-learning-3.md#tp001-085) ระดับ integration บน stub ครอบ AC-043-01 (ขอบเขตผู้แก้ส่วนกลาง), AC-044-03 (ผู้อนุมัติที่ถูกต้อง), AC-044-05 (revision แยกกัน) ต้องใช้ [setup ร่วมและตาราง mutation](traceability-001-learning-idempotency.md#setup) ผลจริงยัง NOT_RUN
 
-<a id="tp001-084-detail"></a>
+<a id="tp001-085-detail"></a>
 
 เงื่อนไขก่อนตรวจ: setup ร่วมทั้งสอง stores ไม่พักหรือ inject fail; แยก fixture (ก) actor ต่าง (ข) operation ต่าง คำขอต่อเนื่องและใช้ ETag สดสำหรับ mutation ใหม่
 

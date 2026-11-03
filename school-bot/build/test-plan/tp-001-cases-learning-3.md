@@ -1,4 +1,4 @@
-# TP-001 — นำเข้าและ idempotency หลักสูตร (TP001-062, TP001-083–086)
+# TP-001 — นำเข้าและ idempotency หลักสูตร (TP001-062, TP001-084–087)
 
 > Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (เพิ่ม cases idempotency ตามสัญญา Rev1 สำหรับ BE-027)
 
@@ -24,9 +24,9 @@ AC: [AC-045-01 (นำเข้าแถว staffSecondApprover=TRUE แล้�
 
 เงื่อนไขก่อนตรวจของ cases ใหม่ต้องใช้ [setup ร่วมและตาราง mutation](traceability-001-learning-idempotency.md#setup) ทั้งหมดร่วมกับ setup เฉพาะ case ด้านล่าง
 
-<a id="tp001-083"></a>
+<a id="tp001-084"></a>
 
-## TP001-083 — key/body เดิมและ body ต่าง ทั้งต่อเนื่องและซ้อน
+## TP001-084 — key/body เดิมและ body ต่าง ทั้งต่อเนื่องและซ้อน
 
 AC: AC-043-01 (ส่วนกลางสร้าง/แก้และโรงเรียนแก้ไม่ได้), AC-044-03 (publish มีหลักฐาน), AC-044-05 (แก้ผ่าน revision ใหม่) · References: DES-005 Rev10, idempotency Rev1, cross-database Rev1 · Level: integration · Profiles: PF-API, PF-ADMIN
 
@@ -40,21 +40,21 @@ AC: AC-043-01 (ส่วนกลางสร้าง/แก้และโร�
 
 หลักฐานที่ต้องเก็บ: ลำดับ barrier/lock, response สองคำขอ, snapshot ก่อน/หลังและ read-back ใหม่ แยก memory/file/operation/รูปแบบ · ผลจริง: NOT_RUN
 
-<a id="tp001-084"></a>
+<a id="tp001-085"></a>
 
-## TP001-084 — UUID เดียวแยก actor และ operation
+## TP001-085 — UUID เดียวแยก actor และ operation
 
-AC: AC-043-01 (ขอบเขตผู้แก้ส่วนกลาง), AC-044-03 (ผู้อนุมัติที่ถูกต้อง), AC-044-05 (revision แยกกัน) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-083
+AC: AC-043-01 (ขอบเขตผู้แก้ส่วนกลาง), AC-044-03 (ผู้อนุมัติที่ถูกต้อง), AC-044-05 (revision แยกกัน) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-084
 
-เงื่อนไขก่อนตรวจ: หนึ่ง process สอง service/adapters ใช้ memory store ร่วมหรือ file objects สองตัว directory เดียว; staffAuthor/staffEditor author, staffApprover/staffSecondApprover approver; requestKey เดียวแยก actor/operation ทุกรูปแบบตาม [setup และผลบันทึก TP001-084](traceability-001-learning-scopes.md#tp001-084-detail)
+เงื่อนไขก่อนตรวจ: หนึ่ง process สอง service/adapters ใช้ memory store ร่วมหรือ file objects สองตัว directory เดียว; staffAuthor/staffEditor author, staffApprover/staffSecondApprover approver; requestKey เดียวแยก actor/operation ทุกรูปแบบตาม [setup และผลบันทึก TP001-085](traceability-001-learning-scopes.md#tp001-085-detail)
 
 ขอบเขตพิสูจน์: stub; auth จริงรอ H5, PostgreSQL/หลาย process รอ DBA-003/G-CORE · ผลจริง: NOT_RUN
 
-<a id="tp001-085"></a>
+<a id="tp001-086"></a>
 
-## TP001-085 — โรงเรียนและผู้หมดสิทธิ์ขอ replay ผล staff
+## TP001-086 — โรงเรียนและผู้หมดสิทธิ์ขอ replay ผล staff
 
-AC: AC-043-01 (โรงเรียนแก้เนื้อหากลางไม่ได้), AC-044-03 (ผู้อนุมัติมีสิทธิ์) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-083
+AC: AC-043-01 (โรงเรียนแก้เนื้อหากลางไม่ได้), AC-044-03 (ผู้อนุมัติมีสิทธิ์) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-084
 
 เงื่อนไขก่อนตรวจ: setup ร่วมทั้งสอง stores; ให้ actor ที่ถูกสิทธิ์ทำสี่ operations สำเร็จแยก fixture แล้ว staffWithoutRole/schoolAdmin/schoolTeacher ส่ง requestKey/body/If-Match เดียวกับ staff; อีก fixture ถอน role ของ staff เดิมหลัง success แล้ว retry และอีก fixture ทำ session หมดอายุ ไม่พักหรือ inject fail; อ่าน adapter ใหม่หลังทุก rejection
 
@@ -64,13 +64,13 @@ AC: AC-043-01 (โรงเรียนแก้เนื้อหากลา�
 
 หลักฐานที่ต้องเก็บ: response ปฏิเสธและ snapshot ก่อน/หลังโดยไม่เผย token/key · ผลจริง: NOT_RUN
 
-<a id="tp001-086"></a>
+<a id="tp001-087"></a>
 
-## TP001-086 — atomic failure การยกเลิกผู้รอ และ expiry
+## TP001-087 — atomic failure การยกเลิกผู้รอ และ expiry
 
-AC: AC-043-01 (mutation ส่วนกลาง), AC-044-03 (publish/audit หลักฐาน), AC-044-05 (revision ไม่ถูกสร้างซ้ำ) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-083
+AC: AC-043-01 (mutation ส่วนกลาง), AC-044-03 (publish/audit หลักฐาน), AC-044-05 (revision ไม่ถูกสร้างซ้ำ) · References/Level/Profiles: สัญญาและ integration เดียวกับ TP001-084
 
-เงื่อนไขก่อนตรวจ: หนึ่ง process สอง service/adapters ใช้ memory store ร่วมหรือ file objects สองตัว directory เดียว; actor ตาม operation; ทดสอบ encode/ก่อน replace/หลัง commit/cancel/สิทธิ์ขณะรอ/expiry ตาม [setup จุด inject และผลบันทึก TP001-086](traceability-001-learning-failures.md#tp001-086-detail) ใช้ทั้งตารางร่วมและตารางจุด inject
+เงื่อนไขก่อนตรวจ: หนึ่ง process สอง service/adapters ใช้ memory store ร่วมหรือ file objects สองตัว directory เดียว; actor ตาม operation; ทดสอบ encode/ก่อน replace/หลัง commit/cancel/สิทธิ์ขณะรอ/expiry ตาม [setup จุด inject และผลบันทึก TP001-087](traceability-001-learning-failures.md#tp001-087-detail) ใช้ทั้งตารางร่วมและตารางจุด inject
 
 ขอบเขตพิสูจน์: stub deterministic faults; power-loss/หลาย OS processes/PostgreSQL รอ DBA-003/G-CORE · ผลจริง: NOT_RUN
 

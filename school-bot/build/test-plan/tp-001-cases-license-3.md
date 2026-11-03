@@ -1,6 +1,6 @@
-# TP-001 — License และสิทธิ์เครื่อง (TP001-009–TP001-010 และ TP001-083)
+# TP-001 — License และสิทธิ์เครื่อง (TP001-009–TP001-010, TP001-083 และ TP001-088)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup unbind และ regression validate ย้อนประวัติ)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup ที่รันตามได้ของ BE-005/BE-007)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -10,7 +10,7 @@ PF (Test Profile) คือสภาพแวดล้อมตรวจ แล�
 
 AC: [AC-035-01 (ผู้ไม่มีสิทธิ์ผู้ดูแลขอปลดเครื่องแล้วถูกปฏิเสธ และการผูกเครื่องไม่เปลี่ยน)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-02 (ผู้ดูแลปลด A แล้ว B เปิดใช้ Key เดิมได้ทันที แม้ A…)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-03 (B ต้องเปิดใช้ Key ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ออฟไลน์ของ A แทน)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-04 (หลัง Key ผูกกับ B แล้ว A ตรวจออนไลน์ไม่ผ่านและไม่ได้สิทธิ์ออฟไลน์รอบใหม่)](../../modules/app-shell/shared/requirements/req-035.md) · References: [DES-002 (License และ device binding)](../design/des-002.md) · Level: integration · Profiles: PF-API, PF-HOST
 
-เงื่อนไขก่อนตรวจ: ส่วน unbind ของ BE-003 ใช้ [S-LIC/S-OBS/S-GATE — topology/reader/ประตู](traceability-001-license-setup.md): หนึ่ง process, สอง adapter/service; memory store object เดียว หรือ file สอง object directory เดียว; License active ของ S1 ผูก A, CurrentBindingId=A-binding, BindingEpoch=e, live=1, DetachedAt=null และ lease ยังเหลือ; P1 เป็น admin ที่มีสิทธิ์, actor ไม่มี role/ผิด scope แยก fixture; P1 อ่าน ETag เก่า แล้วอีก service ทำ unbind ด้วย ETag ปัจจุบันสำเร็จ จากนั้นส่งคำขอด้วย ETag เก่า บันทึก state หลังคำขอแรกก่อนตรวจ 412 อ่านผ่าน instance ที่สาม/reopen file ใช้ fresh fixture สำหรับ success/missing If-Match/denial; ส่วน B/offline คง fixture BE-005/BE-007 แยกจาก BE-003
+เงื่อนไขก่อนตรวจ: ส่วน unbind ของ BE-003 ใช้ [S-LIC/S-OBS/S-GATE — topology/reader/ประตู](traceability-001-license-setup.md): หนึ่ง process, สอง adapter/service; memory store object เดียว หรือ file สอง object directory เดียว; License active ของ S1 ผูก A, CurrentBindingId=A-binding, BindingEpoch=e, live=1, DetachedAt=null และ lease ยังเหลือ; P1 เป็น admin ที่มีสิทธิ์, actor ไม่มี role/ผิด scope แยก fixture; P1 อ่าน ETag เก่า แล้วอีก service ทำ unbind ด้วย ETag ปัจจุบันสำเร็จ จากนั้นส่งคำขอด้วย ETag เก่า บันทึก state หลังคำขอแรกก่อนตรวจ 412 อ่านผ่าน instance ที่สาม/reopen file ใช้ fresh fixture สำหรับ success/missing If-Match/denial; ส่วน BE-005/BE-007 ใช้ [H-LIC/H-OBS — fixture ย้าย](traceability-001-license-host-setup.md) แยกจาก BE-003: Desktop A/B คนละ storage namespace/P-256 key; A มี lease T/E, B ไม่เคยมีสิทธิ์; P1 กับ actor ไม่มี active license_admin/ผิด scope ใช้ fixture แยก; ปิด network A ก่อน P1 unbind ด้วย If-Match ล่าสุด แล้ว B activate ทันทีเมื่อ unbind 200 ที่ T+3600s ไม่เลื่อน clock ไป E; เปิด network A ตรวจเดิมตาม [pack BE-005](traceability-001-license-host-pack.md#be-005)
 
 ขั้นตอน: non-admin unbind; admin unbind (If-Match ถูก/stale); B activate ทันที; B ลอง offline ด้วย entitlement ของ A; A validate online หลังย้าย; A activate กลับเอง; unbind∥activate race
 
@@ -29,17 +29,25 @@ AC: [AC-035-01 (ผู้ไม่มีสิทธิ์ผู้ดูแล�
 
 AC: [AC-035-05 (A ที่ออฟไลน์ยังใช้ได้ก่อนสิทธิ์เดิมหมด แต่ครบกำหนดแล้วเข้าโหมดหลักไม่ได้)](../../modules/app-shell/shared/requirements/req-035.md) · References: DES-002 · Level: integration · Profiles: PF-HOST
 
-เงื่อนไขก่อนตรวจ: A entitlement exp=E แล้วย้ายไป B
+เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — fixture ย้าย](traceability-001-license-host-setup.md) ทั้ง memory/file; A มี lease/anchor checked_at=T/exp=E; ปิด network A ก่อน P1 unbind และ B activate ที่ T+3600s บน server สอง instance/store ร่วม; A/B คนละ storage namespace/key; แยก fixture E-1s/E/E+1s กับ online denial; restart A ด้วย storage เดิมก่อนแต่ละ boundary ตาม [pack BE-007](traceability-001-license-host-pack.md#be-007)
 
 ขั้นตอน: A offline ที่ E-1s, E, E+1s; A online หลังย้าย
 
-ผลที่คาด: ก่อน E ใช้ได้; ที่ E locked; ย้ายไม่เลื่อน E; รู้ผลปฏิเสธออนไลน์แล้วหยุดใช้ cache ทันที
+ผลที่คาด: ก่อน E ใช้ได้; ที่ E locked; ย้ายไม่เลื่อน E; รู้ผลปฏิเสธออนไลน์แล้วหยุดใช้ cache ทันที server คง License เดิม, A detached คง LastCheckedAt=T/LastEntitlementExpiresAt=E และ B เป็น live แถวเดียว; local A คง T/E ทุก restart ขณะ offline การย้ายไม่เขียน storage A; online denial บันทึก denied/invalidate cache และ restart offline ยัง locked
 
 หลักฐานที่ต้องเก็บ: E-TRACE+E-API
 
 ผลจริง: NOT_RUN
 
 
+
+<a id="tp001-088"></a>
+
+## TP001-088 — ปฏิเสธ tamper/copy ข้ามเครื่อง
+
+AC: AC-034-02 (Active แล้วจึงมีสิทธิ์ในเครื่อง), AC-035-03 (B ต้องเปิดใช้ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ A) · Criterion BE-007: tamper/copy · Level: host component/integration บน doubles · Profile: PF-HOST
+
+เงื่อนไขก่อนตรวจ ขั้นตอน จุด inject และ expected response/server/local state ทั้งหก subcase อยู่ใน [TP001-088 ฉบับเต็ม](traceability-001-license-host-negative.md#tp001-088) ใช้ H-LIC/H-OBS ทั้ง memory/file และ secure storage แยก A/B ตามนั้น; ผลจริง NOT_RUN
 
 <a id="tp001-083"></a>
 

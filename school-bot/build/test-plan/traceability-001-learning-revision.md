@@ -19,7 +19,7 @@ staffAuthor create revision 1 ใส่สอง Lesson พร้อม stable k
 
 การแข่งขัน (ก) มี publish success เดียว อีกคำขอได้ 412 VERSION_CONFLICT หรือ 409 STATE_CONFLICT ตาม state สด; เพิ่ม Published audit/ledger อย่างละหนึ่งเท่านั้น (ข) ทั้งสองคำขอสำเร็จ มี revision 1 published และ revision 2 draft; Created และ Published audit/ledger ที่เพิ่มอย่างละหนึ่งไม่สูญหาย (ค) ผู้ชนะสำเร็จ ผู้แพ้ได้ 412/409 ตาม state สด; content ของ published ห้ามถูกเขียนทีหลัง audit/ledger เพิ่มเฉพาะผู้ชนะ จำนวน revision เท่าเดิม ห้าม snapshot เก่าทับ audit/children/ledger ของอีก instance
 
-ขอบเขตพิสูจน์: service/file stub สอง instances ใน process เดียว ไม่ใช่สอง OS hosts; snapshot/references เก่าพิสูจน์บน fixture เท่านั้น ผลผู้เรียน/CourseRun จริงและ G-LEARN ยังรอ, PostgreSQL และหลาย OS processes รอ DBA-003/G-CORE, Gateway/ตัวตนจริงรอ H5 การล้มระหว่าง commit อยู่ [TP001-086](tp-001-cases-learning-3.md#tp001-086)
+ขอบเขตพิสูจน์: service/file stub สอง instances ใน process เดียว ไม่ใช่สอง OS hosts; snapshot/references เก่าพิสูจน์บน fixture เท่านั้น ผลผู้เรียน/CourseRun จริงและ G-LEARN ยังรอ, PostgreSQL และหลาย OS processes รอ DBA-003/G-CORE, Gateway/ตัวตนจริงรอ H5 การล้มระหว่าง commit อยู่ [TP001-087](tp-001-cases-learning-3.md#tp001-087)
 
 ## หลักฐาน
 
