@@ -4,7 +4,7 @@ export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { resolveRoleName } from "./config.mjs";
+import { TEST_LEVELS, resolveRoleName } from "./config.mjs";
 
 // tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น front/sys
 // เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน BAAN.md/README ถูก test ให้ตรงกับค่านี้
@@ -75,6 +75,11 @@ export function findDependencyCycle(tasks) {
 export function normalizeDagTasks(tasks) {
   const nonEmpty = (v) => (Array.isArray(v) ? v.length > 0 : typeof v === "string" && v.trim() !== "");
   const list = (v) => (Array.isArray(v) ? v : []);
+  // ระดับที่ verdict ใช้ตัดสิน (charter ข้อ 14) — ไม่มีฟิลด์ = null: ledger ก่อนมีระดับตรวจแบบเต็มเสมอ
+  const level = (o) => {
+    const v = o?.test_level ?? o?.testLevel ?? null;
+    return typeof v === "string" ? v.trim().toLowerCase() : v;
+  };
   return tasks.map((t) => ({
     id: t.id,
     role: resolveRoleName(t.role ?? t.owner),
@@ -88,12 +93,14 @@ export function normalizeDagTasks(tasks) {
     tier: typeof t.tier === "string" ? t.tier.trim().toLowerCase() : null,
     oracle: nonEmpty(t.oracle),
     ref: nonEmpty(t.ref),
+    level: level(t),
     slices: list(t.slices).map((s) => ({
       id: s?.id,
       acIds: list(s?.acIds ?? s?.ac_ids),
       status: typeof s?.status === "string" ? s.status.trim().toLowerCase() : "",
       oracle: nonEmpty(s?.oracle),
       ref: nonEmpty(s?.ref),
+      level: level(s),
     })),
   }));
 }
@@ -140,19 +147,28 @@ export function lintPlanVerification(tasks) {
   const threshold = Math.max(3, Math.ceil(tasks.length / 4));
   const foundations = tasks.filter((t) => fanOut.get(t.id) >= threshold).sort(byFanOut).map((t) => t.id);
   const unrated = open.filter((t) => foundations.includes(t.id) && t.risk === null).sort(byFanOut);
-  if (unrated.length) warnings.push(`task ฐานราก (งานพึ่ง ≥ ${threshold}) ยังไม่ระบุ risk ${unrated.length} งาน — high = ตรวจทันทีก่อนงานต่อยอด · low = มี contract test กั้นแล้วรอ wave gate ได้: ${listIds(unrated)}`);
+  if (unrated.length) warnings.push(`task ฐานราก (งานพึ่ง ≥ ${threshold}) ยังไม่ระบุ risk ${unrated.length} งาน — high = ตรวจผลจริงก่อนเชื่อมใช้งาน แต่พัฒนาบนสัญญา + fake ต่อได้ · low = มี contract test กั้นแล้วรอ wave gate ได้: ${listIds(unrated)}`);
   const labels = (list) => `${list.slice(0, 10).join(", ")}${list.length > 10 ? ` +${list.length - 10}` : ""}`;
   const verifiedUnits = tasks.flatMap((t) => (t.slices.length
     ? t.slices.map((s, i) => ({ ...s, label: `${t.id}/${s.id ?? `slice#${i + 1}`}` }))
     : [{ ...t, label: t.id }])).filter((u) => u.status === "verified");
+  const units = tasks.flatMap((t) => [{ ...t, label: t.id }, ...t.slices.map((s, i) => ({ ...s, label: `${t.id}/${s.id ?? `slice#${i + 1}`}` }))]);
+  for (const u of units) if (u.level !== null && !TEST_LEVELS.includes(u.level)) errors.push(`${u.label}: test_level ต้องเป็น ${TEST_LEVELS.join("/")} (ได้ ${JSON.stringify(u.level)})`);
+  const normalOnly = verifiedUnits.filter((u) => u.level === "normal").map((u) => u.label);
+  if (normalOnly.length) warnings.push(`verified ระดับ normal (happy flow) ${normalOnly.length} จุด — ยังต้องผ่าน full pass ก่อน release: ${labels(normalOnly)}`);
   const noOracle = verifiedUnits.filter((u) => !u.oracle).map((u) => u.label);
   if (noOracle.length) warnings.push(`verified แต่ไม่มี oracle (revision ที่ใช้ตัดสิน) ${noOracle.length} จุด — เมื่อเอกสารเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noOracle)}`);
   // ไม่มี oracle ถูกเตือนบรรทัดบนแล้ว — บรรทัดนี้เฉพาะ ledger ที่มีครึ่งเดียว
   const noRef = verifiedUnits.filter((u) => u.oracle && !u.ref).map((u) => u.label);
   if (noRef.length) warnings.push(`verified มี oracle แต่ไม่มี ref (commit ที่ตรวจ) ${noRef.length} จุด — เมื่อโค้ดเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noRef)}`);
   const unchecked = (id) => byId.get(id)?.risk === "high" && deriveTaskStatus(byId.get(id)) !== "verified";
+  const qaDependencies = open.filter((t) => IMPLEMENT_ROLES.includes(t.role) && t.dependsOn.some((id) => {
+    const dep = byId.get(id);
+    return dep && ["check", "jpo"].includes(dep.role) && deriveTaskStatus(dep) !== "verified";
+  }));
+  if (qaDependencies.length) warnings.push(`งานพัฒนาที่รอ QA ${qaDependencies.length} งาน — ทบทวน dependency: ถ้าใช้สัญญาตรึง + fake ได้ ให้แยกงานเชื่อมจริงไว้รอ verdict แล้วเดินงานพัฒนาต่อ; ห้ามข้ามการตรวจสิทธิ์จริง: ${listIds(qaDependencies)}`);
   const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
-  if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — ตรวจ task high ก่อน ไม่งั้นถ้ามันตกต้องรื้องานเหล่านี้ตาม: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
+  if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — แยกงานพัฒนาบนสัญญา + fake ออกจากงานเชื่อมจริง และเก็บ QA ค้าง; งานที่ต้องใช้พฤติกรรมจริงยังต้องรอ verdict: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
   // รอบตกของงาน high = writer + check บนคิว writer เดียว แพงกว่าส่วนต่างค่า model (charter ข้อ 2) — school-bot
   // 2026-11-03 งาน high ฝั่ง backend ทุกงานตั้ง t3 และเวลา rework รวมมากกว่าเวลาเขียนรอบแรก
   const weakHigh = open.filter((t) => t.risk === "high" && ["sys", "front"].includes(t.role) && /^t[3-5]$/.test(t.tier ?? ""));

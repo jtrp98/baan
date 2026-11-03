@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TEAM_DIR, isInteractiveRole, layoutOf, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveModules, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, workspaceRootOf } from "../src/config.mjs";
+import { TEAM_DIR, isInteractiveRole, layoutOf, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveModules, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, validateTestLevel, workspaceRootOf } from "../src/config.mjs";
 import { lintKnowledge, qualify, scanProjects, updateIndexes, uxKnowledgeDirs } from "../src/knowledge-index.mjs";
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
@@ -20,7 +20,7 @@ import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, index: false, lintKnowledge: false, knowledgeGit: "", memoryGit: "", workspace: "", target: "", module: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, index: false, lintKnowledge: false, knowledgeGit: "", memoryGit: "", workspace: "", target: "", module: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", testLevel: "", explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -52,8 +52,11 @@ function parseArgs(argv) {
       case "--date":
         try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
         opts.explicit.add("date"); break;
+      case "--test-level":
+        try { opts.testLevel = validateTestLevel(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
+        break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]] [--commit] [--index] [--lint-knowledge] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] [--module <project>/<module>[+<module>...]] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]] [--commit] [--index] [--lint-knowledge] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] [--module <project>/<module>[+<module>...]] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--test-level normal|full] [--write]`);
         process.exit(2);
     }
   }
@@ -74,7 +77,7 @@ function printWorkspace(ws) {
     }
   }
   const d = ws.defaults;
-  console.log(`defaults : agent=${d.agent} · planner_tier=${d.planner_tier} · timeout=${d.timeout_sec}s · max_parallel=${d.max_parallel}`);
+  console.log(`defaults : agent=${d.agent} · planner_tier=${d.planner_tier} · timeout=${d.timeout_sec}s · max_parallel=${d.max_parallel} · test_level=${d.test_level}`);
 }
 
 // ขั้นต้นทางหนึ่งขั้น (PM/planner) — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
@@ -154,6 +157,7 @@ async function main() {
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;
   if (!opts.explicit.has("timeoutSec")) opts.timeoutSec = ws.defaults.timeout_sec;
   opts.maxParallel = opts.maxParallel || ws.defaults.max_parallel;
+  opts.testLevel = opts.testLevel || ws.defaults.test_level;
   // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง changelog ด้วยวันที่รันจริง
   opts.date = opts.date || localDate();
   if (!Number.isInteger(opts.maxParallel) || opts.maxParallel < 1 || opts.maxParallel > 64) { console.error(`--max-parallel ต้องเป็นจำนวนเต็ม 1–64 (ได้: ${opts.maxParallel})`); process.exit(2); }

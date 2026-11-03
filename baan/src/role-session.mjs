@@ -2,14 +2,14 @@
 // แยกจาก bin เพื่อให้ทดสอบได้โดยไม่เรียก AI CLI จริง
 import { mkdirSync, mkdtempSync } from "node:fs";
 import path from "node:path";
-import { loadWorkspace, resolveRoleName, resolveWorkspaceConfig } from "./config.mjs";
+import { loadWorkspace, resolveRoleName, resolveWorkspaceConfig, validateTestLevel } from "./config.mjs";
 import { DEFAULT_TIMEOUT_SEC, resolveTimeout, validateTimeout } from "./timeout.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { parseWorkDate } from "./prompts.mjs";
 import { capacityRetryText, classifyOutcome, runWithFallback, switchReasonText } from "./scheduler.mjs";
 
 export { DEFAULT_TIMEOUT_SEC };
-export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--list]`;
+export const ROLE_USAGE = `ใช้ [--agent <name>] [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--list]`;
 
 // cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ นายช่าง ที่อยู่ใน
 // workspace จริงแต่ลืมส่ง --cwd ได้ role ที่อ่านไฟล์ผิด repo โดยไม่มีอะไรเตือน
@@ -17,7 +17,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
     agents: [], task: "", taskFile: "", write: false, seq: false, list: false,
     cwd: path.resolve(baseCwd), timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false,
-    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", fallback: true, preflight: true,
+    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", testLevel: "", fallback: true, preflight: true,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -41,12 +41,23 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
         break;
       }
       case "--date": opts.date = parseWorkDate(argv[++i]); break;
+      case "--test-level": opts.testLevel = validateTestLevel(argv[++i]); break;
       case "--no-fallback": opts.fallback = false; break;
       case "--no-preflight": opts.preflight = false; break;
       default: throw new Error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\n${ROLE_USAGE}`);
     }
   }
   return opts;
+}
+
+// charter บอกว่า codex เป็นค่าเริ่มต้นและ config มี defaults.agent แต่เดิมไม่ระบุ --agent = exit 2
+// นายช่าง (school-bot 2026-11-03) เสียสองรันแรกกับเรื่องนี้ — ไม่ระบุ = ใช้ defaults.agent ของ workspace
+export function resolveRoleAgents(opts, ws = loadWorkspace(resolveWorkspaceConfig(null, opts.cwd))) {
+  return opts.agents.length ? opts.agents : [ws.defaults.agent];
+}
+
+export function resolveRoleTestLevel(opts, ws = loadWorkspace(resolveWorkspaceConfig(null, opts.cwd))) {
+  return opts.testLevel || ws.defaults.test_level;
 }
 
 export function resolveRoleTimeout(opts, cfg) {

@@ -7,7 +7,7 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createRunDir, parseRoleArgs, runRoleAgents } from "../src/role-session.mjs";
+import { createRunDir, parseRoleArgs, resolveRoleAgents, resolveRoleTestLevel, runRoleAgents } from "../src/role-session.mjs";
 
 const BIN = fileURLToPath(new URL("../bin/baan-role.mjs", import.meta.url));
 const cfg = {
@@ -23,6 +23,21 @@ test("cwd เริ่มต้น = ไดเรกทอรีที่เร�
   assert.equal(parseRoleArgs(["--agent", "codex"], base).cwd, base);
   assert.equal(parseRoleArgs(["--cwd", "sb-api"], base).cwd, path.join(base, "sb-api"), "--cwd แบบ relative อิงจากที่เรียก");
   assert.equal(parseRoleArgs([]).cwd, process.cwd());
+});
+
+test("resolveRoleAgents: ไม่ระบุ --agent = defaults.agent ของ workspace · ระบุแล้วใช้ที่ระบุ", () => {
+  const ws = { defaults: { agent: "claude" } };
+  assert.deepEqual(resolveRoleAgents(parseRoleArgs([]), ws), ["claude"]);
+  assert.deepEqual(resolveRoleAgents(parseRoleArgs(["--agent", "agy"]), ws), ["agy"]);
+  assert.deepEqual(resolveRoleAgents(parseRoleArgs(["--all"]), ws), ["*"]);
+});
+
+test("--test-level: ไม่ระบุ = defaults.test_level ของ workspace · ระบุแล้วใช้ที่ระบุ · ค่าผิด = error", () => {
+  const ws = { defaults: { test_level: "normal" } };
+  assert.equal(resolveRoleTestLevel(parseRoleArgs([]), ws), "normal");
+  assert.equal(resolveRoleTestLevel(parseRoleArgs(["--test-level", "full"]), ws), "full");
+  assert.throws(() => parseRoleArgs(["--test-level", "quick"]), /normal\/full/);
+  assert.throws(() => parseRoleArgs(["--test-level"]), /normal\/full/, "ลืมใส่ค่า");
 });
 
 test("parseRoleArgs: --date ตรวจรูปแบบและวันที่จริง · flag ไม่รู้จัก = error", () => {
@@ -97,10 +112,12 @@ test("runRoleAgents --seq รันทีละตัวตามลำดับ
   assert.equal(results.length, 2);
 });
 
-test("bin: ไม่ระบุ --agent ได้ข้อความที่ถูกเรื่อง · --date ผิดรูปแบบ exit 2 (ไม่เรียก provider)", () => {
-  const noAgent = spawnSync(process.execPath, [BIN, "--task", "x"], { encoding: "utf8" });
+test("bin: ไม่ระบุ --agent ไม่ error เรื่อง agent (ใช้ defaults.agent) · --date ผิดรูปแบบ exit 2 (ไม่เรียก provider)", () => {
+  // task ว่างหยุดก่อนเรียก provider — พิสูจน์ว่าผ่านขั้นเลือก agent ไปแล้วโดยไม่ต้องใส่ --agent
+  const noAgent = spawnSync(process.execPath, [BIN, "--task", ""], { encoding: "utf8" });
   assert.equal(noAgent.status, 2);
-  assert.match(noAgent.stderr, /ระบุ --agent/);
+  assert.doesNotMatch(noAgent.stderr, /ระบุ --agent/);
+  assert.match(noAgent.stderr, /ระบุงานผ่าน --task/);
   const badDate = spawnSync(process.execPath, [BIN, "--agent", "codex", "--date", "2026-13-01", "--task", "x"], { encoding: "utf8" });
   assert.equal(badDate.status, 2);
   assert.match(badDate.stderr, /YYYY-MM-DD/);

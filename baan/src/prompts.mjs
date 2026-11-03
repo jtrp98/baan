@@ -42,10 +42,18 @@ export function adhocDirective(task) {
   return `${roleSessionHeader("adhoc")}\n\n${task}`;
 }
 
-export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = localDate()) {
+// role ที่ระดับการตรวจเปลี่ยนวิธีทำงาน — writer ต้องรู้ด้วย ไม่งั้นลองเคสเต็มเองแล้วงานช้าเท่าเดิม
+export const TEST_LEVEL_ROLES = ["inspect", "check", "sys", "front"];
+
+function testLevelSection(level) {
+  return `## Test level of this assignment: ${level}\nApply the \`${level}\` rules in the "Test level" section of your role (the controller set it — do not widen or narrow it yourself).`;
+}
+
+export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = localDate(), testLevel = "") {
   const id = resolveRoleName(roleName);
   const roleContent = readFileSync(path.join(ROLES_DIR, `${id}.md`), "utf8").trim();
-  const conv = `\n\n---\n\n## Shared conventions every role must follow (binding contract):\n${readConventions()}\n\n---\n\n${dateSection(date)}`;
+  const level = testLevel && TEST_LEVEL_ROLES.includes(id) ? `\n\n${testLevelSection(testLevel)}` : "";
+  const conv = `\n\n---\n\n## Shared conventions every role must follow (binding contract):\n${readConventions()}\n\n---\n\n${dateSection(date)}${level}`;
   const pc = projectCtx ? `\n\n---\n\n## Project context:\n${projectCtx}` : "";
   const ctx = ctxBlocks?.length ? `\n\n---\n\n## Output from previous tasks:\n${ctxBlocks.join("\n\n")}` : "";
   return `${roleSessionHeader(id)}\n\nYou are now operating in a software development team, strictly under the following role:\n\n${roleContent}${conv}${pc}\n\n---\n\n## Your assignment:\n${task}${ctx}`;
@@ -91,7 +99,8 @@ ${matrix}
 5. Walking skeleton first: if the goal builds or changes software, the plan must contain at least one front/sys task that produces something runnable and testable (a thin vertical slice), and that task must not wait on a human gate directly or through dependsOn — where a dependency is still unanswered (DB not provisioned, external contract unconfirmed, UX not signed), the slice uses a stub/fake/adapter and the gate stays on the later task that connects the real thing. Plans with no implementation task are rejected unless you set "docsOnly" with the reason (e.g. the user asked for documents only).
 6. Time-box documents: spec/arch/int/inspect tasks cover only what the slice being built in this plan needs — never a full-system specification up front — and at most 3 document tasks sit in the dependency chain before the first implementation task.
 7. Related-impact sweep: if a task changes an existing contract, name, value, revision, or status that other artifacts reference, state the old values in that task so the controller can run \`baan --sweep "<old value>"\` — finding referencers is mechanical and verbatim replacements are applied by the controller, so never create a task just to search or to replace text. Add a follow-up task only where a referencing document's meaning must change, one task per owner (not per file). If nothing references the change, say so in the task so it is a decision, not an oversight.
-8. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
+8. Development-first is the default across the whole plan, not just the first skeleton: build every ready implementation task toward a runnable main flow while QA runs in small batches. Separate development using pinned contracts and isolated development-only fakes from tasks connecting real systems and judging acceptance. Do not put the whole UI chain behind License/Login/DB QA when an adapter can supply its inputs. Preserve ACs, findings and release gates; record deferred QA with an owner and closure condition in the task brief. Production auth stays fail-closed; fakes must not reach real data/hardware. A failed QA task stops only work needing its real output, not independent development. Dependencies still serialize actual shared-file writes.
+9. Anything that must be a "human gate" (e.g. UX sign-off, running SQL, a business decision) goes into humanGates.
 
 ## Reply with JSON only (no text outside the JSON):
 {

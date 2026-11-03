@@ -25,3 +25,11 @@ test("ไม่ส่งวันที่ = ใช้วันที่ขอ�
   assert.match(roleDirective("check", "เขียน test", null, ""), new RegExp(`## วันที่ของงาน \\(date of work\\): ${localDate()}`));
   assert.match(roleDirective("check", "เขียน test", null, "", undefined), new RegExp(`## วันที่ของงาน \\(date of work\\): ${localDate()}`));
 });
+
+test("roleDirective ใส่ระดับการตรวจเฉพาะ role ที่ระดับเปลี่ยนวิธีทำงาน", () => {
+  for (const role of ["check", "inspect", "sys", "front"]) {
+    assert.match(roleDirective(role, "งาน", null, "", "2026-11-03", "normal"), /## Test level of this assignment: normal/, role);
+  }
+  assert.doesNotMatch(roleDirective("spec", "งาน", null, "", "2026-11-03", "normal"), /Test level of this assignment/);
+  assert.doesNotMatch(roleDirective("check", "งาน", null, "", "2026-11-03"), /Test level of this assignment/, "ไม่ส่งระดับ = ไม่เดาให้");
+});
