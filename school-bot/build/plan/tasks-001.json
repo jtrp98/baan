@@ -1218,12 +1218,28 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "done-local",
       "risk": "low",
       "wave": 4,
       "module": [
         "my-work",
         "app-shell"
+      ],
+      "slices": [
+        {
+          "id": "BE-008-S1-v2-projects-stub",
+          "ac_ids": [
+            "AC-011-01",
+            "AC-011-02",
+            "AC-011-03",
+            "AC-036-02",
+            "AC-036-03",
+            "AC-036-04"
+          ],
+          "status": "done-local",
+          "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-08-24-sys-tier-t3-1agents-8CwCK9",
+          "note": "2026-11-03 /v2/projects บน backing store stub (มติ053) · นายช่างรันซ้ำ 4213/0/0 · รอ wave gate"
+        }
       ]
     },
     {

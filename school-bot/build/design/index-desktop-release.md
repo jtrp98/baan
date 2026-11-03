@@ -1,6 +1,6 @@
 # สารบัญ Desktop, Project, License และ Release
 
-> แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (SA-003 — เพิ่มผลทบทวน Host/robot)
+> แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — เลขอ้างอิงไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 [กลับสารบัญ design](index.md) · สัญญาหลักและสถานะอยู่ในสารบัญหลัก ส่วนตารางนี้เป็นสัญญาย่อยและหลักฐานประกอบ
 
@@ -14,8 +14,8 @@
 | [des-006-review.md](des-006-review.md) | 1 | ทบทวน Host/IPC/robot: as-built, payload, lifecycle, platform และ fake | เตรียมรายการให้คน review ก่อน BE-010; runtime/hardware ยังไม่ตรวจ |
 | [robot-boundary-001.md](robot-boundary-001.md) | 2 | Robot payload และ idle/drain-stop | poll 3000ms/debounce0 ยังเป็นสมมติฐาน |
 | [license-admin-security-001.md](license-admin-security-001.md) | 1 | License admin roles/errors และ replay/cleanup | replay create-license 15 นาทีอนุมัติแล้ว |
-| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | เก็บ evidence ของ publish และอ่านจาก event เดิมตอน withdraw | รออนุมัติขยาย Reason ตาม [physical delta](audit-evidence-migration-001.md) |
-| [release-trust-001.md](release-trust-001.md) | 2 | Manifest signer/publisher pin และ registry | รอ custody/security และอนุมัติ audit storage ร่วม |
+| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 2 | เก็บ evidence ของ publish และอ่านจาก event เดิมตอน withdraw | ใช้ T1000/Reason เดิมตามมติ 054; [ไม่มี migration](audit-evidence-migration-001.md); รอ implementation proof |
+| [release-trust-001.md](release-trust-001.md) | 3 | Manifest signer/publisher pin และ registry | รอ custody/security/implementation proof; audit ใช้ T1000 ตามมติ 054 |
 | [update-disposition-001.md](update-disposition-001.md) | 1 | ทางเลือกขอบเขต check กับ PrepareUpdate/InstallPreparedUpdate | ผู้ใช้เลือก workflow explicit และตรวจรับ AC แล้ว |
 | [credential-matrix-001.md](credential-matrix-001.md) | 2 | Process/account/สิทธิ์ที่แต่ละงานต้องใช้ | actual grants/account names ยังไม่ยืนยัน |
 | [credential-matrix-001-matrix.md](credential-matrix-001-matrix.md) | 2 | Matrix process และสิทธิ์ | ใช้ร่วมสัญญาทางเข้า Rev 2; ขอบเขตที่รับรองคงตามแถวทางเข้า |
@@ -44,6 +44,6 @@
 | [des-006-platform.md](des-006-platform.md) | 2 | กำหนดเงื่อนไข platform boundary, profile และการรับรองหุ่นจริง | ใช้ร่วมสัญญา DES-006 Rev 3; สถานะตามสารบัญหลัก |
 | [des-006-commands.md](des-006-commands.md) | 2 | กำหนดคำสั่ง ผลลัพธ์ วงจรงาน ความล้มเหลว และ release guard ของหุ่นจริง | ใช้ร่วมสัญญา DES-006 Rev 3; สถานะตามสารบัญหลัก |
 | [des-006-references.md](des-006-references.md) | 2 | รวมข้อกำหนดและมติของหุ่นจริง Windows/macOS | ใช้ร่วมสัญญา DES-006 Rev 3; สถานะตามสารบัญหลัก |
-| [des-007-manifest.md](des-007-manifest.md) | 4 | กำหนดเงื่อนไข release manifest, API และขั้นตอนของ host | ใช้ร่วมสัญญา DES-007 Rev 4; สถานะตามสารบัญหลัก |
-| [des-007-recovery.md](des-007-recovery.md) | 3 | กำหนดข้อผิดพลาด การกู้คืน ความเข้ากันได้ และเกณฑ์ตรวจ trusted update | ใช้ร่วมสัญญา DES-007 Rev 4; สถานะตามสารบัญหลัก |
-| [des-007-references.md](des-007-references.md) | 3 | รวมข้อกำหนดและมติของ release และ trusted update | ใช้ร่วมสัญญา DES-007 Rev 4; สถานะตามสารบัญหลัก |
+| [des-007-manifest.md](des-007-manifest.md) | 5 | กำหนดเงื่อนไข release manifest, API และขั้นตอนของ host | ใช้ร่วมสัญญา DES-007 Rev 5; สถานะตามสารบัญหลัก |
+| [des-007-recovery.md](des-007-recovery.md) | 3 | กำหนดข้อผิดพลาด การกู้คืน ความเข้ากันได้ และเกณฑ์ตรวจ trusted update | ใช้ร่วมสัญญา DES-007 Rev 5; สถานะตามสารบัญหลัก |
+| [des-007-references.md](des-007-references.md) | 3 | รวมข้อกำหนดและมติของ release และ trusted update | ใช้ร่วมสัญญา DES-007 Rev 5; สถานะตามสารบัญหลัก |

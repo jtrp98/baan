@@ -1,5 +1,7 @@
 # school-bot — สารบัญ design
 
+> แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — เลขอ้างอิงไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
+
 เอกสาร design กำหนดขอบเขตโมดูล สัญญา API ข้อมูล สิทธิ์ Desktop/หุ่น การเรียน และการส่งมอบ แยกข้อกำหนดเป้าหมายออกจากหลักฐาน implementation; การมีเอกสารหรือผลตรวจ local ไม่ได้ยืนยันการเชื่อมระบบจริงหรือ release
 
 ## วิธีอ่าน
@@ -43,9 +45,9 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
-| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | ข้อเสนอเก็บ approval_ref/evidence_ref ครบ 2048 ตัวอักษรร่วม DES-005/010/007 | รอมนุษย์อนุมัติ schema; baseline ยังเป็น Reason 1000 |
-| [audit-evidence-migration-001.md](audit-evidence-migration-001.md) | 1 | Physical delta หนึ่ง column และเงื่อนไข rollback ส่ง vault | รอผู้ใช้ยืนยันก่อนแก้ canonical model/DBML และเตรียม SQL |
-| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; storage/runtime และคำอธิบาย constraints เก่ายังค้าง |
+| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 2 | เก็บ approval_ref/evidence_ref ตรงตัวไม่เกิน 1,000 ตัวอักษรร่วม DES-005/010/007 | ใช้ Reason เดิมตามมติ 054; รอ implementation proof |
+| [audit-evidence-migration-001.md](audit-evidence-migration-001.md) | 2 | ไม่มี physical delta หรือ migration ตามมติ 054 | ส่ง vault ทบทวน DBA-005/DBA-006 ว่าไม่มี delta |
+| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 2 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; ไม่มี audit storage delta ตามมติ 054; runtime/คำอธิบาย constraints เก่ายังค้าง |
 | [data-model.md](data-model.md) | 8 | คู่มือ schema: 32 ตาราง 450 ฟิลด์และการใช้ข้อมูลเดิม | ฐานแบบข้อมูล — runtime/catalog/API integration ยังไม่ยืนยัน |
 | [modules.md](modules.md) | 3 | ขอบเขตและความรับผิดชอบแต่ละโมดูล | PROPOSED |
 | [quality-attributes.md](quality-attributes.md) | 1 | เกณฑ์คุณภาพและสิ่งที่ต้องพิสูจน์ | PROPOSED |
@@ -57,10 +59,10 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
-| [des-005.md](des-005.md) | 9 | DES-005: หลักสูตร ภารกิจ และผลประเมินสามโหมด | PROPOSED — รอ numeric rubric/evaluator และอนุมัติ audit storage |
+| [des-005.md](des-005.md) | 10 | DES-005: หลักสูตร ภารกิจ และผลประเมินสามโหมด | PROPOSED — รอ numeric rubric/evaluator และ implementation proof; audit ใช้ T1000 ตามมติ 054 |
 | [des-008.md](des-008.md) | 6 | DES-008: mapping หลักสูตรกับช่องคะแนน SchoolBright | PROPOSED — ยืนยันนโยบายแล้ว; รอ web-principal/H5 |
 | [des-009.md](des-009.md) | 4 | DES-009: preview/ยืนยันส่งคะแนนและป้องกันคะแนนชน | PROPOSED — export ปิดจนผ่าน parity/coexistence/target/authz/DB gates |
-| [des-010.md](des-010.md) | 6 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; รออนุมัติ audit storage/implementation proof |
+| [des-010.md](des-010.md) | 7 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; audit ใช้ T1000 ตามมติ 054; รอ implementation proof |
 | [des-011.md](des-011.md) | 7 | DES-011: เสนอเลื่อน Level และครูยืนยันทั้งห้อง | PROPOSED — รอ roster/วันสิ้นเทอม |
 
 กฎร่วมและ API เฉพาะเรื่องอยู่ใน [สารบัญ Learning/คะแนน](index-learning.md)
@@ -70,7 +72,7 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
 | [des-002.md](des-002.md) | 3 | DES-002: License และหนึ่ง Key ต่อหนึ่ง device binding | PROPOSED — รอ schema/security review |
-| [des-007.md](des-007.md) | 4 | DES-007: release และ trusted update | PROPOSED — รออนุมัติ audit storage/schema และ trust |
+| [des-007.md](des-007.md) | 5 | DES-007: release และ trusted update | PROPOSED — audit ใช้ T1000 โดยไม่มี schema delta ตามมติ 054; รอ trust/implementation proof |
 
 สิทธิ์ License admin, signer/custody, updater และชุดหลักฐานอยู่ใน [สารบัญ Desktop/License/Release](index-desktop-release.md)
 

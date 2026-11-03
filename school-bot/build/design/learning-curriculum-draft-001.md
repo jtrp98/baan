@@ -1,6 +1,6 @@
 # LUX-01 — draft curriculum และหลักฐานอนุมัติ
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
@@ -35,7 +35,7 @@ CurriculumDraftView = {
   approval:{
     actor:A,
     approved_at:D,
-    approval_ref:T2048
+    approval_ref:T1000
   }|null
 }
 ```
@@ -53,9 +53,9 @@ CurriculumDraftView = {
 
 Read-back `approval` อ่านเฉพาะ publication event ของ resource นี้ และตรวจเวลาให้ตรง `PublishedAt`; ไม่มีหลักฐานให้คืน `null` ไม่สร้างผู้อนุมัติจากผู้แก้ล่าสุด
 
-**Stopline:** full publish contract ยังไม่พร้อม เพราะ `T2048 → varchar(1000)` เก็บไม่ครบ ส่วน draft list/detail/edit ทำ local ได้ทันที ห้าม truncate, แบ่ง approval เป็นหลาย audit events หรือจำกัดเหลือ 1,000 เงียบ ๆ
+Publish รับ `approval_ref:T1000` ตาม [มติ 054 (จำกัดเลขอ้างอิงไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) ผิดชนิดหรือเกิน 1,000 ตัวอักษร → `400 INVALID_INPUT` ก่อนเปลี่ยนข้อมูล เก็บและอ่านกลับตรงตัว ห้าม truncate, เก็บเฉพาะ hash หรือแบ่ง approval เป็นหลาย audit events
 
-ข้อเสนอใช้ร่วมกับ bank/release: ขยาย `SchoolBotAuditEvent.Reason` เป็น `varchar(2048)` เก็บ approval_ref ตรงตัวตาม [mapping/reader/error](audit-evidence-storage-001.md) และ [physical delta/rollback](audit-evidence-migration-001.md) โดยคง API bounds อื่นเดิม ต้องได้รับคำยืนยันมนุษย์ก่อนเปลี่ยน schema; ไม่ลด approval_ref เป็น T1000 เอง
+ใช้ Reason `varchar(1000)` เดิมร่วมกับ bank/release ตาม [mapping/reader/error](audit-evidence-storage-001.md) และ [ผลทบทวนว่าไม่มี migration](audit-evidence-migration-001.md) ไม่เปลี่ยนตาราง ฟิลด์ หรือ API bounds อื่น การรับรอง implementation/ฐานจริงดูสถานะที่ [สารบัญ Learning](index-learning.md)
 
 ## ชนิดข้อมูลที่ใช้
 
@@ -63,4 +63,6 @@ Read-back `approval` อ่านเฉพาะ publication event ของ res
 
 ## หลักฐาน
 
-- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) ข้อเท็จจริงเดิมคงตามหลักฐานนี้; การตรวจ source ของ storage วันที่ 2026-11-03 อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md) ไม่ได้ตรวจ runtime
+
+- `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด approval_ref ไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema

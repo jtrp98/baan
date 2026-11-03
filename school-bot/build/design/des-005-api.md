@@ -1,6 +1,6 @@
 # DES-005 — หลักสูตร ภารกิจ และผลประเมิน — API `/v2`
 
-> Rev 8 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 9 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 ส่วนต่อของ [DES-005 — หลักสูตร ภารกิจ และผลประเมิน](des-005.md)
 
@@ -14,7 +14,7 @@
 | GET /curricula/{id} | desktop, school_web, staff_admin | ID | curriculum พร้อม `level_id`, `recommended_grades`, `subjects`, ordered lessons/activities/missions และ public criteria (+ ETag จาก `UpdateDate`) |
 | POST /admin/curricula | staff_admin (`content_author`) | `{curriculum_key,revision,level_id,title,source_ref,recommended_grades,subjects}` | 201 `{id,update_date}` |
 | PUT /admin/curricula/{id}/content | staff_admin (`content_author`) | `{lessons:LessonInput[]}` + If-Match (`ETag`) | 200 `{id,update_date}` |
-| POST /admin/curricula/{id}/publish | staff_admin (`content_approver`, four-eyes) | `{approval_ref:T2048}` + If-Match (`ETag`) | 200 `{id,update_date,published_at}` |
+| POST /admin/curricula/{id}/publish | staff_admin (`content_approver`, four-eyes) | `{approval_ref:T1000}` + If-Match (`ETag`) | 200 `{id,update_date,published_at}` |
 | POST /submissions | desktop (`P=student`) | `{mission_id:K,criteria_id:K,project_revision_id:K,evidence:ArmEvidence?}` | 201 SubmissionView |
 | GET /submissions/{id} | desktop (เจ้าของ) หรือ school_web (ครูตามสิทธิ์) | ID | SubmissionView (+ ETag จาก `UpdateDate`) |
 | POST /submissions/{id}/assessments | school_web (ครูรายวิชา/ผู้มีสิทธิ์ตรวจ Arm) | `{outcome,feedback,rule_results,earned_score:DecimalString?,max_score:DecimalString?,supersedes_id:K?}` + If-Match (`ETag`) | 201 AssessmentView |
@@ -23,7 +23,7 @@
 
 `LessonInput={lesson_key:U,ordinal:N,title:Text,objective:Text,instructions:Text,missions:MissionInput[],activities:ActivityInput[]}`
 `MissionInput={mission_key:U,ordinal:N,title:Text,instructions:Text,method:AssessmentMethod,criteria:{revision:N,rules:CriteriaRules,source_ref:T2048,approved_by:A?,approved_at:D?}}`
-ตอน publish server ตรวจสิทธิ์ `content_approver` และบังคับกฎ four-eyes (ผู้อนุมัติต้องไม่ใช่ผู้สร้าง/ผู้แก้ร่างของ revision นั้นตาม [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../../shared/decisions/decisions-025.md)) ไม่ยอมรับชื่อผู้อนุมัติที่ client อ้างเอง และบันทึก `approval_ref` ใน audit `Reason`
+ตอน publish server ตรวจสิทธิ์ `content_approver` และบังคับกฎ four-eyes (ผู้อนุมัติต้องไม่ใช่ผู้สร้าง/ผู้แก้ร่างของ revision นั้นตาม [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../../shared/decisions/decisions-025.md)) ไม่ยอมรับชื่อผู้อนุมัติที่ client อ้างเอง และบันทึก `approval_ref` ตรงตัวใน audit `Reason` ตาม [สัญญา storage](audit-evidence-storage-001.md) และ [มติ 054 (จำกัดเลขอ้างอิงไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) ผิดชนิดหรือเกิน 1,000 ตัวอักษร → `400 INVALID_INPUT` ก่อนเปลี่ยนข้อมูล ห้ามตัดข้อความหรือเก็บ hash แทน
 
 `learner_id:I = student.SId`; `assessor_id:I? = employee.SEmp` ใช้ `SchoolId` ของ session/resource ประกอบ `P` ตาม data-model; `/learners/{id}` รับ `I` ภายใต้ school ที่ตรวจแล้ว; IDs ของ SchoolBot เป็น `K`
 
@@ -38,3 +38,7 @@ Curriculum/Level/Lesson/Mission/Criteria/Activity/Submission/Assessment IDs เ�
 
 Public criteria ไม่คืน hidden expected traces หาก author กำหนดว่าเป็นข้อมูลตรวจฝั่ง server; response ใช้ `{criteria_id,method,instructions}` สำหรับส่วนดังกล่าว ไม่ส่ง secret tests ให้ Desktop
 
+## หลักฐาน
+
+- `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด bound T1000 และ `400 INVALID_INPUT` เมื่อเกิน โดยไม่ขยาย schema
+- `knowledge/school-bot/build/db/schoolbot_db.sql:123`: Reason varchar(1000) NOT NULL; ข้อจำกัด source/implementation และ mapping/reader/transaction อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md)

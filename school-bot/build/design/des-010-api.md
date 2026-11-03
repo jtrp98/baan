@@ -1,6 +1,6 @@
 # DES-010 — Question Bank, Attempt และนโยบายคะแนน — API
 
-> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 6 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 ส่วนต่อของ [DES-010 — Question Bank, Attempt และนโยบายคะแนน](des-010.md)
 
@@ -22,8 +22,8 @@ POST /v2/admin/question-banks
 {bank_key:U,revision:N,title:Text,questions:Question[],source_ref:T2048} → 201 {id:K,update_date:D} (+ ETag)
 
 POST /v2/admin/question-banks/{id}/publish
-{approval_ref:T2048} + If-Match (`ETag`) → 200 {id:K,update_date:D,published_at:D} (+ ETag)
-ต้องผ่าน four-eyes (`CreateBy/UpdateBy` ของร่างต้องไม่ใช่ `sEmp` ของผู้อนุมัติ ไม่งั้น `409 FOUR_EYES_REQUIRED`)
+{approval_ref:T1000} + If-Match (`ETag`) → 200 {id:K,update_date:D,published_at:D} (+ ETag)
+ต้องผ่าน four-eyes (`CreateBy/UpdateBy` ของร่างต้องไม่ใช่ `sEmp` ของผู้อนุมัติ ไม่งั้น `409 FOUR_EYES_REQUIRED`); `approval_ref` ผิดชนิดหรือเกิน 1,000 ตัวอักษร → `400 INVALID_INPUT` ก่อนเปลี่ยนข้อมูล เก็บข้อความตรงตัวใน audit `Reason` ตาม [สัญญา storage](audit-evidence-storage-001.md) และ [มติ 054 (จำกัดเลขอ้างอิงไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) ห้ามตัดข้อความหรือเก็บ hash แทน
 
 POST /v2/course-runs/{id}/scoring-policies
 {policy:ScoringPolicy} + If-Match (`ETag` ของ CourseRun) → 201 {id:K,revision:N,course_run_update_date:D} (+ ETag ของ CourseRun)
@@ -60,3 +60,7 @@ feedback:{question_key:U,correct:B,correct_option_keys:U[]}[]|null
   2. ก่อนสร้าง `Attempt` ต้อง re-check จาก **School DB** ว่านักเรียน (`P=student`, `LearnerId=sId`) อยู่ในห้องเรียน (`ClassroomId`/`NYear`/`NTerm`) ของ `CourseRun` จริง แล้วจึงเปิด **SchoolBot DB transaction** ล็อก counter/แถวของผู้เรียนสำหรับ `(SchoolId, CourseRunId, ActivityId, LearnerId)` เพื่อคำนวณ `Sequence` ถัดไป, ตรวจเพดาน `max_attempts` (และผูก `ConsumedAttemptId` ของ `SchoolBotRetakeGrant` หากเป็นการใช้สิทธิ์สอบซ่อม)
 - ตอน `submit` ทำ validate/evaluate/freeze answers/result (`UpdateDate = clock_timestamp()`)/audit/idempotency ใน **SchoolBot DB transaction เดียว**
 
+## หลักฐาน
+
+- `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด bound T1000 และ `400 INVALID_INPUT` เมื่อเกิน โดยไม่ขยาย schema
+- `knowledge/school-bot/build/db/schoolbot_db.sql:123`: Reason varchar(1000) NOT NULL; ข้อจำกัด source/implementation และ mapping/reader/transaction อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md)

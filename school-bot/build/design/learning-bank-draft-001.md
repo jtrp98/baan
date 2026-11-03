@@ -1,6 +1,6 @@
 # LUX-03 — bank draft read/edit และ visibility
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
@@ -18,7 +18,7 @@ QuestionBankDraftView = {
   title:Text, questions:Question[],
   source_ref:T2048, lifecycle:ContentState,
   published_at:D|null, update_date:D,
-  approval:{actor:A,approved_at:D,approval_ref:T2048}|null
+  approval:{actor:A,approved_at:D,approval_ref:T1000}|null
 }
 ```
 
@@ -27,11 +27,11 @@ QuestionBankDraftView = {
 - `bank_key`/`revision` immutable หลัง create; PUT ใช้ replace questions ทั้งชุดใน transaction เดียว ไม่แก้บางข้อแล้วปล่อยบางข้อไม่ผ่าน
 - ตรวจ UUID ซ้ำ, kind, จำนวน options, เฉลยอยู่ใน options และมีหนึ่งคำตอบตาม DES-010 (กฎชนิดคำถามและเฉลย); unknown kind → `409 QUESTION_KIND_UNSUPPORTED`, รูปข้อมูลผิด → `400 INVALID_INPUT`
 - lock bank revision, ตรวจ draft/ETag, เขียน questions/audit/idempotency พร้อมกัน
-- publish ใช้ audit contributors แบบเดียวกับ curriculum: `QuestionBank.Created`, `.Updated`, `.Published`; เสนอเก็บ approval_ref ตรงตัวใน Reason ของ QuestionBank.Published ตาม [storage ร่วม](audit-evidence-storage-001.md) และ [delta/rollback](audit-evidence-migration-001.md) ต้องให้มนุษย์อนุมัติขยาย column ก่อน
+- publish ใช้ audit contributors แบบเดียวกับ curriculum: `QuestionBank.Created`, `.Updated`, `.Published`; เก็บ `approval_ref:T1000` ตรงตัวใน Reason ของ QuestionBank.Published ตาม [storage ร่วม](audit-evidence-storage-001.md) และ [มติ 054 (จำกัดเลขอ้างอิงไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) ผิดชนิดหรือเกิน 1,000 ตัวอักษร → `400 INVALID_INPUT` ก่อนเปลี่ยนข้อมูล ห้ามตัดข้อความหรือเก็บ hash แทน
 - Attempt อ่านจาก snapshot ของตนเสมอ ไม่ lookup เฉลยจาก bank ล่าสุด
 
-**พร้อม local:** list/detail/edit, validation, concurrency, visibility และ immutable revision  
-**ยังไม่พร้อมเต็มเส้น:** publish/read-back หลักฐาน T2048 จนแก้ storage mismatch ผ่าน gate
+ขอบเขต local ครอบคลุม list/detail/edit, validation, concurrency, visibility และ immutable revision ตามสัญญานี้
+publish/read-back ใช้ T1000 กับ Reason เดิมโดย [ไม่มี migration](audit-evidence-migration-001.md); การรับรอง implementation/ฐานจริงดูสถานะที่ [สารบัญ Learning](index-learning.md)
 
 ## ชนิดข้อมูลที่ใช้
 
@@ -39,6 +39,8 @@ QuestionBankDraftView = {
 
 ## หลักฐาน
 
-- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) เอกสารนี้คงข้อเสนอเดิม ไม่ได้ตรวจ source หรือ runtime ใหม่
+- E01 — ที่มาของขอบเขตและเงื่อนไขร่วม: planning/arch-091-learning-001.md (memory) ข้อเท็จจริงเดิมคงตามหลักฐานนี้; การตรวจ source ของ storage วันที่ 2026-11-03 อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md) ไม่ได้ตรวจ runtime
 
 ตำแหน่งอ้างอิงเดิม: `design/des-010.md:26–35`
+
+- `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด approval_ref ไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema

@@ -1,6 +1,6 @@
 # การรับกฎ learning และคะแนนเข้าแบบปัจจุบัน
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — DBA-005)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 ผลตรวจ SQL และผลปรับแบบวันที่ 2026-10-23 ถูกนำเข้าเอกสารแล้ว กฎธุรกิจอยู่ใน [กฎผลเรียน Rev2](learning-rules-032-034.md), [สูตรและ freeze Rev2](learning-rules-032-034-policy.md) และ [กฎ mapping/export Rev1](grade-rules-032-034.md) ไม่ต้องเลือกนโยบายเดิมซ้ำหรือเพิ่ม LearnerKind การรับเอกสารไม่ใช่การรับรอง implementation หรือผลทดสอบฐานจริง
 
@@ -16,7 +16,7 @@
 | Submission ไม่มี CourseRunId ต้องพิสูจน์ผลต่อรอบ | กฎผลเรียน หัวข้อตัวตนและรอบเรียน; resolve active run เดียวและบันทึก Submission.Accepted Reason เป็น JSON {course_run_id}; ผูกกับ learner/mission/revision | ไม่มี physical field ใหม่; ไม่พบ/กำกวมคืน COURSE_RUN_NOT_RESOLVED; หลักฐานผลเดิมไม่ครบ block export/proposal |
 | ส่งคะแนน earned/max*targetMax, decimal half-up; missing แยกรายช่องจากศูนย์จริง | กฎ mapping/export หัวข้อสูตรและ skip; skipped_cells ใน snapshot, ไม่เขียนทับค่าเดิม; ผลจริง 0 ยังส่งได้ | ไม่มี delta; Level ใช้ทุกคนใน roster และงานขาด=0 ตามกฎผลเรียน ไม่เอากฎ export skip มาแทน |
 | Receipt/hash/lease/partial retry และ tenant/history | กฎ mapping/export หัวข้อ recheck และ partial; [DES-009 ส่วน delivery](des-009-delivery.md) หัวข้อ atomicity; claim lease+UpdateDate, serialize context/learner, operation lock และ receipt คู่คะแนน | รับเป็นข้อกำหนดแล้ว; ต้องพิสูจน์ lease/worker fencing และ crash/reconcile จริงใน DBA-007 ไม่อ้างผ่านจากเอกสาร |
-| ชนิด int4, UpdateDate, ประวัติ immutable และ audit/domain commit ร่วม | [กฎ commit](data-contract-rules-transactions.md), [กฎคะแนน/งานระบบ](data-contract-rules-grades.md), [ข้ามฐาน](data-contract-rules-cross-database.md) และ dictionary | ไม่มี delta จากผลรับนโยบายเดิม; ข้อขัดแย้ง approval 2048/Reason 1000 แยกใน storage proposal |
+| ชนิด int4, UpdateDate, ประวัติ immutable และ audit/domain commit ร่วม | [กฎ commit](data-contract-rules-transactions.md), [กฎคะแนน/งานระบบ](data-contract-rules-grades.md), [ข้ามฐาน](data-contract-rules-cross-database.md) และ dictionary | ไม่มี physical delta; approval_ref/evidence_ref ใช้ T1000 ตรงกับ Reason เดิมตามมติ 054 |
 
 ## ผลต่อ physical baseline และสิ่งค้าง
 
@@ -24,7 +24,7 @@
 
 ข้อความเก่าใน grade-rules-032-034.md ที่กล่าว SQL คุม active rows และชื่อ UQ ใน des-009-delivery.md ยังเป็นช่องคลาดเคลื่อนของคำอธิบาย ต้องอ่านเป็น application invariants ตามกฎข้อมูลปัจจุบัน ไม่ใช่หลักฐาน constraints หรือสิทธิ์คืน SQL เดิม ข้อเสนอแก้คำอธิบายเหล่านี้ส่งผู้คุมจัดขอบเขตต่อ ไม่เพิ่ม schema ในงานนี้
 
-สิ่งที่ยังต้องได้คำตัดสินเพื่อ freeze storage ของ DBA-005/DBA-006 คือ [การขยาย Reason](audit-evidence-storage-001.md) และ [delta/rollback](audit-evidence-migration-001.md) ไม่ใช่การรับมตินโยบายเดิมใหม่ Roster/ผู้ตรวจ/transaction/receipt/runtime และการเชื่อมฐานยังต้องมีหลักฐานตามประตูเดิม
+Storage ของ DBA-005/DBA-006 ใช้ [Reason ตรงตัวไม่เกิน 1,000 ตัวอักษร](audit-evidence-storage-001.md) ตาม [มติ 054 (จำกัดเลขอ้างอิงโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) จึง [ไม่มี physical delta หรือ migration](audit-evidence-migration-001.md) ให้ vault ทบทวนผลความจุใหม่ ส่วน roster/ผู้ตรวจ/transaction/receipt/runtime และการเชื่อมฐานยังต้องมีหลักฐานตามเงื่อนไขเดิม
 
 ## หลักฐาน
 
@@ -32,4 +32,4 @@
 - memory/school-bot/_cross/planning/task-013.md: Change Log ระบุ arch DONE และผู้คุมบันทึก patches/canonical rules แล้ว ไม่ถือเป็นคำอนุมัติ runtime ของมนุษย์
 - memory/school-bot/_cross/design/dbml-review-002.md: ผู้คุมรับ output และตรวจ @dbml/core 10.3.1 dialect dbmlv2, structural before/after เหมือนเดิมของ revision ณ 2026-10-23; ตัวเลข FK เก่าไม่ใช่ผล parser ของแบบปัจจุบัน
 - กฎผลเรียน: learning-rules-032-034.md:9–29; สูตร/freeze: learning-rules-032-034-policy.md:9–15; mapping/export: grade-rules-032-034.md:9–43; delivery: des-009-delivery.md:15–22 อ่านจริงในงานนี้
-- knowledge/school-bot/build/db/dba-005-learning-review.md และ dba-095-schema-parity.md เป็นผลตรวจไฟล์ล่าสุด ไม่ใช่ deployed catalog; source publish/memory store ที่ตรวจจริงอยู่ในหลักฐานของ storage proposal
+- knowledge/school-bot/build/db/dba-005-learning-review.md และ dba-095-schema-parity.md เป็นผลตรวจไฟล์ล่าสุด ไม่ใช่ deployed catalog; source publish/memory store ที่ตรวจจริงอยู่ในหลักฐานของสัญญา storage

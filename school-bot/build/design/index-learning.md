@@ -1,15 +1,17 @@
 # สารบัญ Learning และการส่งคะแนน
 
+> แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — เลขอ้างอิงไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
+
 [กลับสารบัญ design](index.md) · สัญญาหลักคือ [DES-005 (หลักสูตร/ผลประเมิน)](des-005.md), [DES-008 (mapping คะแนน)](des-008.md), [DES-009 (ส่งคะแนน)](des-009.md), [DES-010 (ข้อสอบ/Attempt)](des-010.md) และ [DES-011 (เลื่อน Level)](des-011.md)
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
-| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | เทียบผลรับกฎ learning/คะแนนและข้อค้างก่อน freeze DBA-005 | รับกฎเข้าแบบแล้ว; ไม่ใช่ runtime acceptance |
-| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | Mapping approval/evidence ที่เก็บตรงตัวและอ่านกลับได้ | รอมนุษย์อนุมัติ schema ตาม physical delta |
+| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 2 | เทียบผลรับกฎ learning/คะแนนและข้อค้างก่อน freeze DBA-005 | รับกฎเข้าแบบแล้ว; ไม่ใช่ runtime acceptance |
+| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 2 | Mapping approval/evidence ที่เก็บตรงตัวและอ่านกลับได้ | ใช้ T1000/Reason เดิมตามมติ 054; ไม่มี schema delta; รอ implementation proof |
 | [learning-rules-032-034.md](learning-rules-032-034.md) | 2 | Profile/run/freeze/สูตรรวมและขอบเขตครูปรับ policy | นโยบายยืนยันแล้ว; รอ implementation proof |
 | [grade-rules-032-034.md](grade-rules-032-034.md) | 1 | Mapping, partial/skip และ recovery ของการส่งคะแนน | สัญญาเดิม; export gates ยังมีผล |
-| [learning-curriculum-draft-001.md](learning-curriculum-draft-001.md) | 2 | อ่าน/แก้ curriculum draft และหลักฐานอนุมัติ | Local contract; storage ร่วมรอมนุษย์อนุมัติขยาย Reason |
-| [learning-bank-draft-001.md](learning-bank-draft-001.md) | 2 | อ่าน/แก้ bank draft และจำกัด visibility | Local contract; publish เต็มรอมนุษย์อนุมัติขยาย Reason |
+| [learning-curriculum-draft-001.md](learning-curriculum-draft-001.md) | 3 | อ่าน/แก้ curriculum draft และหลักฐานอนุมัติ | Local contract; T1000 ตามมติ 054 ไม่มี migration; รอ implementation proof |
+| [learning-bank-draft-001.md](learning-bank-draft-001.md) | 3 | อ่าน/แก้ bank draft และจำกัด visibility | Local contract; T1000 ตามมติ 054 ไม่มี migration; รอ implementation proof |
 | [learning-attempt-read-001.md](learning-attempt-read-001.md) | 1 | Discovery, saved answers, history, policy และ reveal | Local contract; การเชื่อมจริงยังต้องพิสูจน์ |
 | [learning-attempt-finalization-001.md](learning-attempt-finalization-001.md) | 1 | Finalization, clock/race/replay/recovery โดยไม่เพิ่ม state/table | Local contract; DB/worker proof ยังรอ |
 | [learning-snapshot-projection-001.md](learning-snapshot-projection-001.md) | 1 | Snapshot reconciliation และ reader projection | Fixtures/JSON dictionary พร้อมตามฐานเดิม; reader/roster จริงยังรอ |
@@ -28,7 +30,7 @@
 | เอกสาร | Rev | มีเนื้อหาอะไร |
 |---|---|---|
 | [des-005-actors.md](des-005-actors.md) | 8 | อธิบาย ผู้ใช้และเงื่อนไขก่อนเรียน |
-| [des-005-api.md](des-005-api.md) | 8 | อธิบาย API หลักสูตรและผลเรียน |
+| [des-005-api.md](des-005-api.md) | 9 | อธิบาย API หลักสูตรและผลเรียน |
 | [des-005-content.md](des-005-content.md) | 8 | อธิบาย โครงสร้างเนื้อหาและเกณฑ์ |
 | [des-005-grading.md](des-005-grading.md) | 8 | อธิบาย การประเมินผลและกันคำขอซ้ำ |
 | [des-005-offline.md](des-005-offline.md) | 8 | อธิบาย Guest ออฟไลน์และข้อผิดพลาด |
@@ -43,7 +45,7 @@
 | [des-009-gates.md](des-009-gates.md) | 4 | อธิบาย เงื่อนไขก่อนเปิดส่งคะแนน |
 | [des-009-references.md](des-009-references.md) | 4 | อธิบาย ข้อกำหนดและมติที่อ้าง |
 | [des-009-snapshot.md](des-009-snapshot.md) | 4 | อธิบาย สูตรรายช่องและ LearnerId |
-| [des-010-api.md](des-010-api.md) | 5 | อธิบาย API ข้อสอบและ Attempt |
+| [des-010-api.md](des-010-api.md) | 6 | อธิบาย API ข้อสอบและ Attempt |
 | [des-010-expiry.md](des-010-expiry.md) | 5 | อธิบาย ข้อผิดพลาดของข้อสอบ |
 | [des-010-policy.md](des-010-policy.md) | 5 | อธิบาย Activity และนโยบายข้อสอบ |
 | [des-010-question-bank.md](des-010-question-bank.md) | 5 | อธิบาย เจ้าของข้อมูลและ concurrency |

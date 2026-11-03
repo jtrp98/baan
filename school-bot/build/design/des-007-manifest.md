@@ -1,6 +1,6 @@
 # DES-007 — Release และ trusted update — ผู้ใช้และเงื่อนไขก่อนเริ่ม
 
-> Rev 4 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
+> Rev 5 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — approval_ref/evidence_ref ไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
 
 ส่วนต่อของ [DES-007 — Release และ trusted update](des-007.md)
 
@@ -21,13 +21,13 @@ Version ใช้ x.y.z ตามเดิม; HTTPS URL ≤2048 ไม่มี
 |---|---|
 | POST /admin/releases | `{manifest_input:ReleaseManifestInput}` → 201 `{id:K,update_date:D,lifecycle:"draft"}` + ETag |
 | GET /admin/releases | pagination → summaries |
-| POST /admin/releases/{id}/publish | `{evidence_ref:T2048}` + If-Match → release summary |
+| POST /admin/releases/{id}/publish | `{evidence_ref:T1000}` + If-Match → release summary |
 | POST /admin/releases/{id}/withdraw | `{reason}` + If-Match → release summary |
 | GET /updates/check | version,channel,platform → `{available,release:null|{id,manifest},install_supported:false}` |
 
 Admin ใช้ `staff_admin` session + active `release_publisher` รายบุคคล แยกจาก role อื่น; public check ใช้ global catalog ที่เสนอ null SchoolId แต่ audit/common fields ครบตาม data-model. Resource summary ใช้ update_date/ETag จาก UpdateDate; publish/withdraw ใช้ If-Match, ขาด → 428 PRECONDITION_REQUIRED, ชน → 412 VERSION_CONFLICT พร้อม details.current_etag. `version` ใน manifest/query ยังคง x.y.z ของ binary (`VersionText`) ไม่ใช่คอลัมน์ Version หรือ concurrency token
 
-Server/signer ตรวจ immutable trusted CI registry ก่อน sign/publish ตาม [release-trust-001.md](release-trust-001.md); ไม่ sign arbitrary artifact จาก API. ทางที่เลือกคง server-assigned release_id/API flow เดิม การเก็บ evidence_ref แบบไม่ตัดข้อความใช้ [ข้อเสนอ storage ร่วม](audit-evidence-storage-001.md) รอมนุษย์อนุมัติขยาย Reason; API bound 2048 คงเดิม
+Server/signer ตรวจ immutable trusted CI registry ก่อน sign/publish ตาม [release-trust-001.md](release-trust-001.md); ไม่ sign arbitrary artifact จาก API ทางที่เลือกคง server-assigned release_id/API flow เดิม เก็บ `evidence_ref:T1000` ตรงตัวใน Reason ตาม [สัญญา storage ร่วม](audit-evidence-storage-001.md) และ [มติ 054 (จำกัดเลขอ้างอิงไม่เกิน 1,000 ตัวอักษรโดยไม่ขยาย schema)](../../shared/decisions/decisions-054.md) ผิดชนิดหรือเกิน 1,000 ตัวอักษร → `400 INVALID_INPUT` ก่อน sign/publish ห้ามตัดข้อความหรือเก็บ hash แทน ไม่มี migration
 
 Trust key แยก License; public roots อยู่ใน host; rotation root-signed/keyset versioned ห้ามเชื่อ public key ที่แนบกับ manifest เอง
 
@@ -46,3 +46,7 @@ Trust key แยก License; public roots อยู่ใน host; rotation root
 
 Host บังคับ publisher pin: Authenticode subject+thumbprint / Apple Team ID จาก trusted host configuration ตาม [release trust](release-trust-001.md); signature ถูกแต่ publisher ผิดหรือไม่มี pin → ARTIFACT_UNTRUSTED
 
+## หลักฐาน
+
+- `knowledge/school-bot/shared/decisions/decisions-054.md`: มติผู้ใช้วันที่ 2026-11-03 กำหนด bound T1000 และ `400 INVALID_INPUT` เมื่อเกิน โดยไม่ขยาย schema
+- `knowledge/school-bot/build/db/schoolbot_db.sql:123`: Reason varchar(1000) NOT NULL; ข้อจำกัด source/implementation และ mapping/reader/transaction อยู่ใน [สัญญา storage ร่วม](audit-evidence-storage-001.md)
