@@ -4234,8 +4234,11 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "verified",
+      "module": "quiz",
+      "risk": "low",
+      "oracle": "acceptance/ac_ids tasks-001.json + มติ043 sign-off (ตรึง 2026-11-03)",
+      "ref": "knowledge legacy-ux evidence pack 2026-11-03 (int run igpn45) · check KknmX0 PASS เฉพาะ evidence pack"
     },
     {
       "id": "UX-006",
@@ -4334,8 +4337,11 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "verified",
+      "module": "quiz",
+      "risk": "low",
+      "oracle": "acceptance/ac_ids tasks-001.json + มติ043 sign-off (ตรึง 2026-11-03)",
+      "ref": "knowledge legacy-ux evidence pack 2026-11-03 (int run igpn45) · check KknmX0 PASS เฉพาะ evidence pack"
     },
     {
       "id": "SA-004",
