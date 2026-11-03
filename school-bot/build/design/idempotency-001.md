@@ -1,16 +1,18 @@
 # สัญญา idempotency ส่วนกลาง
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 096 — เกณฑ์ทดสอบให้ตรง actor scope, store lock และ transaction-scoped facade)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (BE-030 — คลังข้อสอบใช้ helper ส่วนกลางเดิมเป็นผู้ใช้รายที่สอง)
 
-adapter จองคำสั่ง/ตรวจ replay และ commit ผลพร้อม domain/audit; BE-027 (หลักสูตรกลาง) ใช้ทั้ง create, metadata, content, publish ในครั้งนี้ [ขอบเขตทดสอบ/การย้าย](data-contract-rules-cross-database.md#การพิสูจน์และขอบเขตการย้าย)
+adapter จองคำสั่ง/ตรวจ replay และ commit ผลพร้อม domain/audit; ผู้ใช้ปัจจุบันคือ BE-027 (หลักสูตรกลาง: create, metadata, content, publish) และ BE-030 (คลังข้อสอบ: create, PUT draft, publish) [ขอบเขตทดสอบ/การย้าย](data-contract-rules-cross-database.md#การพิสูจน์และขอบเขตการย้าย)
 
-คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ข้อ 1–4 เป็นแบบที่ต้องทำ Rev2 คงพฤติกรรม Rev1 และเส้นชัย BE-027 ตาม AC-043-01 (สิทธิ์แก้หลักสูตรกลาง), AC-044-03 (อนุมัติก่อนเผยแพร่), AC-044-05 (ฉบับเผยแพร่ไม่ถูกแก้ทับ); ชี้วิธีพิสูจน์โดยไม่เพิ่มกฎให้ writer หลักฐาน source อยู่ท้ายไฟล์
+คงฟิลด์ [SchoolBotIdempotency](data-dictionary/table-004.md) และ [กฎความไม่ซ้ำ](data-contract-rules-grades.md) ไม่เปลี่ยน schema/DBML ข้อ 1–4 เป็นแบบที่ต้องทำ Rev3 เพิ่มเฉพาะผู้ใช้ BE-030 โดยไม่แก้ helper, ชื่อ Operation, สูตร hash หรือ bytes ของไฟล์ของ BE-027 จึงคงพฤติกรรม Rev2 และเส้นชัย BE-027 ตาม AC-043-01 (สิทธิ์แก้หลักสูตรกลาง), AC-044-03 (อนุมัติก่อนเผยแพร่), AC-044-05 (ฉบับเผยแพร่ไม่ถูกแก้ทับ); ชี้วิธีพิสูจน์โดยไม่เพิ่มกฎให้ writer หลักฐาน source อยู่ท้ายไฟล์
 
 ## 1. ขอบเขตและผลตอบ
 
 ใช้ `(SchoolId, Principal, Operation, RequestKey)`; SchoolId=NULL คือส่วนกลาง แยกจากโรงเรียนเลขบวก Principal จาก server มี namespace ช่องทาง/ชนิดผู้กระทำ ไม่รับจาก body หรือเทียบ account/student/employee ด้วยเลขอย่างเดียว
 
 BE-027 ใช้ SchoolId=NULL และ Principal=`staff_admin:{PrincipalId}` จาก session ที่ผ่านสิทธิ์ เทียบ Principal/Operation แบบ ordinal; RequestKey เทียบ UUID ที่ parse แล้ว Operation คงชื่อ `create_curriculum`, `update_curriculum_metadata`, `update_curriculum_content`, `publish_curriculum`
+
+BE-030 ใช้ SchoolId=NULL และ Principal รูปเดียวกัน Operation `create_question_bank`, `update_question_bank_draft`, `publish_question_bank` ledger เป็นชุดเดียวกับ BE-027 (Operation อยู่ใน tuple จึงไม่ชนกัน) สิทธิ์ เงื่อนไข และ audit ของแต่ละ operation อยู่ใน [การเก็บบน stub store ของ DES-010](des-010-stub-persistence.md#2-mutation-ของคลังผ่าน-helper-ส่วนกลางเดิม)
 
 | กรณีหลังตรวจสิทธิ์ปัจจุบัน | ผลบังคับ |
 |---|---|
@@ -26,7 +28,7 @@ BE-027 ใช้ SchoolId=NULL และ Principal=`staff_admin:{PrincipalId}` �
 
 check ปรับ `AuthorizedActorCannotReceiveAnotherActorsReplay`: create revision ซ้ำคาด `409 STATE_CONFLICT`; metadata/content บน draft เดิมด้วย ETag ก่อน A แก้คาด `412 VERSION_CONFLICT`; publish ให้ใช้ `ApprovalRef` ต่างจากครั้งแรกเพื่อทดสอบ `409 STATE_CONFLICT` ทั้งสี่ fixture ที่ถูกปฏิเสธไม่เพิ่ม domain/audit/ledger โค้ดเดิมมี domain no-op เมื่อเผยแพร่แล้วด้วย `ApprovalRef` เดิม จึงห้ามใช้ body เท่ากันตัดสินว่าอ่าน replay ข้าม actor; ไม่เพิ่มกฎให้ writer เปลี่ยน no-op นี้ ทดสอบ scope ใหม่บนคนละ resource และ operation ต่างตาม TP001-085 (แยกขอบเขตคำสั่ง) ต่อไป
 
-RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล็ก 64 ตัว BE-027 คงสูตรเดิม: create ใช้ `JsonSerializer.Serialize(request)`; metadata/content ใช้ `id + "|" + JsonSerializer.Serialize(request)`; publish ใช้ `id + "|" + ApprovalRef` ใช้ Data Transfer Object (DTO)/options เดิมรวม nested data ไม่รวมเวลาปัจจุบัน/request ID/token; If-Match เป็น precondition ของ mutation ใหม่ ไม่ตรวจ stale ETag ก่อน replay ที่ถูกต้อง
+RequestHash เป็น SHA-256 ของ UTF-8 ตัวพิมพ์เล็ก 64 ตัว BE-027 คงสูตรเดิม: create ใช้ `JsonSerializer.Serialize(request)`; metadata/content ใช้ `id + "|" + JsonSerializer.Serialize(request)`; publish ใช้ `id + "|" + ApprovalRef` BE-030 ใช้สูตรเดียวกัน (create / PUT draft / publish ด้วย `approval_ref`) ใช้ Data Transfer Object (DTO)/options เดิมรวม nested data ไม่รวมเวลาปัจจุบัน/request ID/token; If-Match เป็น precondition ของ mutation ใหม่ ไม่ตรวจ stale ETag ก่อน replay ที่ถูกต้อง
 
 ## 2. คำขอซ้อน
 
@@ -72,7 +74,7 @@ check ปรับ `CurriculumGateProxy` และ `PendingPublishPreservesAnoth
 
 store กำหนด CompletedAt/ReplayUntil ตอนจบ ResultCipher/ResultKeyId เก็บ encrypted MutationResult รวม body/ETag; HttpStatus/ResourceId ตรงผล ไม่เก็บ plaintext อายุ/tombstone ตาม [กฎ replay](data-contract-rules-cross-database.md#อายุและความลับของผล-replay)
 
-File เพิ่ม `idempotency` ใน `curricula_snapshot.json` พร้อม domain/audit สมาชิกตาม dictionary; bytes เป็น base64 เวลา UTC ไม่มี collection อ่านเป็นว่างแต่กู้ key ใน process ไม่ได้ Memory swap ทั้งชุดใต้ lock เดียว fake cipher เฉพาะ tests; production ใช้ custody เดิม encode/serialize ล้มต้อง fail ก่อน commit; decode ล้มคืน STATE_CONFLICT ไม่ mutate ซ้ำ
+File เพิ่ม `idempotency` ใน `curricula_snapshot.json` พร้อม domain/audit สมาชิกตาม dictionary; domain ของ BE-030 (`question_banks` และชุดที่อ่านอย่างเดียว) อยู่ในไฟล์เดียวกันจึง commit ครั้งเดียวกับ audit/ledger โดยไม่ต้องทำ helper แบบ generic; bytes เป็น base64 เวลา UTC ไม่มี collection อ่านเป็นว่างแต่กู้ key ใน process ไม่ได้ Memory swap ทั้งชุดใต้ lock เดียว fake cipher เฉพาะ tests; production ใช้ custody เดิม encode/serialize ล้มต้อง fail ก่อน commit; decode ล้มคืน STATE_CONFLICT ไม่ mutate ซ้ำ
 
 | ทางเลือก | คำตัดสิน/ต้นทุน |
 |---|---|
@@ -88,9 +90,10 @@ File เพิ่ม `idempotency` ใน `curricula_snapshot.json` พร้อ
 
 Source ตรวจ 2026-11-03 ใต้ `C:/src/schoolbright/target/school-bot/web/src/`:
 
-- `SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — ของจริงยังใช้ static lookup/commit/จำผลแยกกันและสูตร hash เดิม; ไม่ใช่ implementation ของแบบส่วนกลางข้างต้น
+- `SchoolBot.Application/Curriculum/CurriculumService.cs:25,50,103,107,134,208,375` — ตอนออกแบบ Rev2 (ก่อน BE-027 ย้าย) ยังใช้ static lookup/commit/จำผลแยกกัน; สูตร hash เดิมคงไว้
 - `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:178,227,230,285,289,383,402` — create ซ้ำได้ STATE_CONFLICT; draft ที่ ETag เก่าได้ VERSION_CONFLICT; publish ตรวจ lifecycle ก่อน ETag
-- `SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:14,29,199,216` — lock ต่อ directory และ replace snapshot; `SchoolBot.Infrastructure/Persistence/MemorySchoolBotBackingStore.cs:20,150,166` — swap ใต้ lock ของ object; ทั้งสองยังไม่มี ledger ใน curriculum snapshot
+- `SchoolBot.Infrastructure/Persistence/FileSchoolBotBackingStore.cs:13–14` และ `FileSchoolBotBackingStore.Curriculum.cs:23–49` — lock ต่อ directory แบบ static และ replace snapshot ด้วย temp + `File.Move`; `MemorySchoolBotBackingStore.Curriculum.cs:17–30` — swap ใต้ lock ของ object
+- ตรวจซ้ำสำหรับ BE-030 วันที่ 2026-11-03: `CurriculumStoreSnapshot.cs:34` มี `idempotency` แล้ว, `SchoolBotDbAdapter.Idempotency.cs:40–73` คือ helper ส่วนกลางที่ BE-027 ใช้อยู่ และ `SchoolBot.Application/Curriculum/CurriculumService.Commit.cs:20–39` สร้าง `IdempotencyCommand` ด้วย Principal `staff_admin:{PrincipalId}`
 - `SchoolBot.Application/Abstractions/ISchoolBotDbAdapter.cs:8,52` — interface เดิมมี mutation แต่ไม่มีเมธอด commit กลาง; `SchoolBot.Domain/ErrorCodes.cs:28` — codes เดิม
 - `../db/schoolbot_db.sql:92` — DDL เดิม ไม่มี pending state/composite unique constraint; ไม่มี schema delta ใน Rev2
 - `SchoolBot.Application/Curriculum/CurriculumService.cs:396` และ `SchoolBot.Infrastructure/Persistence/SchoolBotDbAdapter.Curriculum.cs:383` — published + ApprovalRef เดิมคืน domain no-op; ApprovalRef ต่างได้ STATE_CONFLICT
