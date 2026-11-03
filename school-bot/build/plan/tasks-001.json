@@ -1956,13 +1956,15 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
       "module": [
         "app-shell",
         "quiz",
         "schoolbright-web/school-bot"
-      ]
+      ],
+      "oracle": "acceptance tasks-001.json + มติ054 (ตรึง 2026-11-03)",
+      "ref": "SQL sha256 b3301356… / rollback 2112a68e… · review Rev2 (vault Ri9sBH) · check wuVEE9 PASS"
     },
     {
       "id": "BE-015",
@@ -2304,8 +2306,10 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending",
-      "module": "app-shell"
+      "status": "verified",
+      "module": "app-shell",
+      "oracle": "acceptance tasks-001.json + มติ054 (ตรึง 2026-11-03)",
+      "ref": "SQL sha256 b3301356… / rollback 2112a68e… · review Rev2 (vault Ri9sBH) · check wuVEE9 PASS"
     },
     {
       "id": "BE-018",
