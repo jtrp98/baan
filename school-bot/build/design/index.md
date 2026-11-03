@@ -45,7 +45,7 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 |---|---|---|---|
 | [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | ข้อเสนอเก็บ approval_ref/evidence_ref ครบ 2048 ตัวอักษรร่วม DES-005/010/007 | รอมนุษย์อนุมัติ schema; baseline ยังเป็น Reason 1000 |
 | [audit-evidence-migration-001.md](audit-evidence-migration-001.md) | 1 | Physical delta หนึ่ง column และเงื่อนไข rollback ส่ง vault | รอผู้ใช้ยืนยันก่อนแก้ canonical model/DBML และเตรียม SQL |
-| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; storage/runtimes และคำอธิบาย constraints เก่ายังค้าง |
+| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; storage/runtime และคำอธิบาย constraints เก่ายังค้าง |
 | [data-model.md](data-model.md) | 8 | คู่มือ schema: 32 ตาราง 450 ฟิลด์และการใช้ข้อมูลเดิม | ฐานแบบข้อมูล — runtime/catalog/API integration ยังไม่ยืนยัน |
 | [modules.md](modules.md) | 3 | ขอบเขตและความรับผิดชอบแต่ละโมดูล | PROPOSED |
 | [quality-attributes.md](quality-attributes.md) | 1 | เกณฑ์คุณภาพและสิ่งที่ต้องพิสูจน์ | PROPOSED |
