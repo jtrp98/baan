@@ -3848,7 +3848,7 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending",
+      "status": "done-local",
       "module": "quiz"
     },
     {
