@@ -1,6 +1,6 @@
 # TP-001 — ข้อสอบและการส่งคะแนน (TP001-068–TP001-071)
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ของ TP001-069 และ TP001-070 สำหรับ BE-035)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -24,6 +24,10 @@ AC: [AC-048-01 (สิ้นเทอม roster 2 คนได้คะแนน
 
 ## TP001-069 — ดูบริบท
 
+ระดับ: normal
+
+เฉพาะ BE-035/AC-049-01, AC-049-03 และ AC-049-04: ผู้ดูแลโรงเรียนดูบริบท/กิจกรรม/ตัวชี้วัด/ช่องเดิม, ไม่สร้างช่องใหม่เอง, ครูสร้าง/แก้ mapping ได้ 403 SCHOOL_ADMIN_REQUIRED, สลับโรงเรียน/เทอมไม่นำ mapping ไปใช้อัตโนมัติ และรายการคู่ที่แมพตรงจริงไม่เดาหมวดจาก Quiz/Test ตาม [รายละเอียด TP001-069 ส่วน normal](tp-001-normal-grade-mapping.md#tp001-069-normal) และ [ตาราง normal](tp-001-normal-index.md); ส่วน JWT/header ปลอม, ถอนสิทธิ์กลุ่มแอดมิน, โรงเรียนไม่มี License active และการเข้าถึงข้ามโรงเรียน/วิชาที่ไม่ได้สอนเป็น **ระดับ: full**
+
 AC: [AC-049-01 (admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md), [AC-049-03 (สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md), [AC-049-04 (Preview ตรงคู่กิจกรรม–ช่องที่แมพ ไม่เพิ่มช่อง/เดาหมวดเอง)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) · References: [DES-008 (Mapping หลักสูตรกับช่องคะแนน SchoolBright)](../design/des-008.md), grade-rules-032-034, BR-049 · Level: integration · Profiles: PF-WEB, PF-API, PF-LEGACY
 
 เงื่อนไขก่อนตรวจ: school_admin จาก trusted server ตาม [มติ 035 (มติแหล่งสิทธิ์แอดมินโรงเรียน)](../../shared/decisions/decisions-035.md) รวมสมาชิกกลุ่ม active แม้ JWT IsAdmin=0, ไม่เป็นสมาชิก/ถูกถอน, superadmin เดิม และ forged body/header (Gateway Rev3 ส่วนย่อยของขอบเขตความปลอดภัย); ครู/license โรงเรียน active vs ไม่; 2 โรงเรียน/2 เทอม; ช่องเดิม. ตรวจสิทธิ์ตามสัญญา ไม่ถือ JWT/cType เป็นสิทธิ์ admin; mapping/runtime proof ยังเป็น prerequisite
@@ -39,6 +43,10 @@ AC: [AC-049-01 (admin เห็นโรงเรียน/เทอม คา�
 <a id="tp001-070"></a>
 
 ## TP001-070 — แมพซ้ำ (แก้ชุดเดิม/สร้างชุดใหม่)
+
+ระดับ: normal
+
+เฉพาะ BE-035/AC-049-02 และ AC-049-05: กิจกรรมเดียวแมพหลายช่องข้ามวิชา X และ Y ได้, แมพซ้ำช่องเดิมในบริบทเดียวกันถูกปฏิเสธทั้งแก้ชุดเดิมและสร้างชุดใหม่, mapping ที่ส่งแล้วล็อกแก้หรือยกเลิกไม่ได้ (409 MAPPING_LOCKED) และการเปลี่ยนไปใช้ชุดใหม่บนช่องว่างคงคู่/คะแนนเดิมและยังห้ามช่องซ้ำ ตาม [รายละเอียด TP001-070 ส่วน normal](tp-001-normal-grade-mapping.md#tp001-070-normal) และ [ตาราง normal](tp-001-normal-index.md); ส่วนการแข่งสร้างพร้อมกัน 2 processes/adapters, If-Match เก่าหรือขาดหาย และการหลบการล็อกด้วย soft-delete เป็น **ระดับ: full**
 
 AC: [AC-049-02 (กิจกรรม A แมพช่องวิชา X และ Y ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md), [AC-049-05 (mapping ที่ส่งแล้วแก้คู่เดิมไม่ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) · References: DES-008, grade-rules-032-034 · Level: integration · Profiles: PF-API, PF-LEGACY
 

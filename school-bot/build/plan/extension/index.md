@@ -10,7 +10,7 @@
 | BE-025 | ทำ explicit project import กันซ้ำ | sys | P3 | BE-008, BE-009 | pending |
 | BE-026 | ทำ Guest local history และตรวจใหม่ | sys | P5 | BE-025, BE-016, BE-017 | pending |
 | BE-027 | ทำหลักสูตรกลาง revision/publish | sys | P5 | BE-002, DBA-005, BE-039 | verified |
-| BE-028 | ทำ Course Plan Sheet importer | sys | P5 | BE-027 | pending |
+| BE-028 | ทำ Course Plan Sheet importer | sys | P5 | BE-027 | done-local |
 | BE-029 | ทำ CourseRun/Level/Activity รายห้อง | sys | P5 | BE-027, BE-006 | verified (normal) |
 | BE-030 | ทำคลังข้อสอบ revision/policy ส่วนกลาง | sys | P5 | BE-027 | done-local |
 | BE-031 | ทำ attempt/snapshot/เวลา/สุ่ม/ตรวจข้อสอบ | sys | P5 | BE-030, BE-029 | pending |

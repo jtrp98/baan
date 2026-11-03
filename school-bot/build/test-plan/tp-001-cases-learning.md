@@ -1,12 +1,17 @@
 # TP-001 — บทเรียนและผลประเมิน (TP001-054–TP001-057)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (เติม setup ตรวจหลักสูตรกลางตามใบงาน 096)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ของ BE-015)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
 <a id="tp001-054"></a>
 
 ## TP001-054 — เลือก Activity แต่ละ mode
+
+ระดับ: normal
+
+เฉพาะ BE-015/AC-037-02 และ AC-037-03: เปิดอ่าน Lesson/Activity/Mission/Criteria และส่งงานภารกิจทั้งสามโหมดพร้อมตรวจการอ้างโหมดและฉบับไม่ปะปนกันตาม [รายละเอียด TP001-054 ส่วน normal](tp-001-normal-learning-quiz.md#tp001-054-normal) และ [ตาราง normal](tp-001-normal-index.md); ส่วนการส่งซ้ำ/ต่างโรงเรียน/รอบเรียนกำกวมเป็น **ระดับ: full** และ AC-037-01 ของ FE-013 คงเดิม
+
 
 AC: [AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-02 (เปิด Lesson แล้วเห็นเป้าหมาย คำแนะนำ และรายการ Activity…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-03 (งานและผลภารกิจอ้าง Activity, Mode, Lesson และ revision ที่เรียนถูกต้อง…)](../../modules/quiz/shared/requirements/req-037.md) · References: [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md), [BR-043-04 (Mode อยู่ที่ Activity ภารกิจ)](../../modules/quiz/shared/requirements/req-043.md) · Level: integration · Profiles: PF-API, PF-UI-WIN
 
@@ -23,6 +28,10 @@ AC: [AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ
 <a id="tp001-055"></a>
 
 ## TP001-055 — เปิด/ปิดบทเรียน
+
+ระดับ: full
+
+BE-015: ทางหลักของ AC-037-04 (เพียงเปิดหรือปิดบทเรียนไม่สร้างผลผ่าน) ใช้ [TP001-116](tp-001-normal-learning-quiz.md#tp001-116) อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md); ส่วนการปฏิเสธบทเรียนและเกณฑ์ที่ยังไม่อนุมัติตาม AC-037-05/06 ของ BE-027 คงรายละเอียดด้านล่าง
 
 AC: [AC-037-04 (เพียงเปิดหรือกดปิดบทเรียนไม่สร้างผลผ่านจริงโดยไม่มีการประเมินตาม REQ-038)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-05 (เมื่อยังไม่มีหลักฐานอนุมัติเนื้อหาและเกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md), [AC-037-06 (กิจกรรมภารกิจจริงทุกโหมดอ้างกลับไปยังเนื้อหา ภารกิจ เกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md) · References: DES-005, [BR-044-02 (revision ผ่าน draft → อนุมัติโดยมนุษย์ → publish พร้อมที่มา ผู้อนุมัติ…)](../../modules/quiz/shared/requirements/req-044.md) · Level: integration · Profiles: PF-API, PF-ADMIN
 

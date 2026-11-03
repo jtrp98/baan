@@ -1,6 +1,6 @@
 # TP-001 — บัญชีและพื้นที่ Guest (TP001-021–TP001-024)
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ของ TP001-024 สำหรับ BE-031)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -55,6 +55,10 @@ AC: AC-036-02 · References: DES-004, [DES-012 (Auth ข้ามระบบส
 <a id="tp001-024"></a>
 
 ## TP001-024 — ทดลอง local
+
+ระดับ: normal
+
+เฉพาะ BE-031/AC-036-05 (และ BE-015): ครูบน Desktop (`P=employee` รวมกรณี `sEmp==sId` ของนักเรียนในห้อง) เก็บโครงงาน Cloud ได้แต่เรียกสร้าง/แก้ไข/อ่าน attempt และส่ง submission ไป Cloud ทางตรงได้ 403 PROFILE_NOT_ALLOWED โดยไม่เกิดแถวผล Cloud ของครู ตาม [รายละเอียด TP001-024 ส่วน normal](tp-001-normal-learning-quiz.md#tp001-024-normal) และ [ตาราง normal](tp-001-normal-index.md); ส่วนการนำเข้า Guest ที่มีประวัติผลและ retry/worker ของ BE-026 เป็น **ระดับ: full**
 
 AC: [AC-036-05 (ครูทดลองภารกิจ/ข้อสอบ local และเก็บโครงงาน Cloud ได้ แต่ส่ง…)](../../modules/app-shell/shared/requirements/req-036.md) · References: DES-004, [DES-005 (หลักสูตร ภารกิจ และผลประเมิน)](../design/des-005.md), learning-rules-032-034, [BR-036-04 (เลือกนำเข้า Guest ตาม REQ-041/042 ไม่ auto-upload)](../../modules/app-shell/shared/requirements/req-036.md) · Level: integration · Profiles: PF-API, PF-LEGACY
 

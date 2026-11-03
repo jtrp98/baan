@@ -1,16 +1,16 @@
 # Traceability — ส่งคะแนน
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — เชื่อมเคส normal TP001-069 และ TP001-070 ของ BE-035)
 
-ใช้กับ [ตาราง AC หลัก](traceability-001.md) ความหมาย case และระดับตรวจอยู่ใน [TP-001](tp-001.md) ทุกผลจริงเป็น NOT_RUN; owner เดิมคงตามต้นฉบับ
+ใช้กับ [ตาราง AC หลัก](traceability-001.md) ความหมาย case และระดับตรวจอยู่ใน [TP-001](tp-001.md) และ [ตาราง normal](tp-001-normal-index.md) ทุกผลจริงเป็น NOT_RUN; owner เดิมคงตามต้นฉบับ
 
 | AC และความหมาย | Case IDs | Implementation / role | Validation | Actual |
 |---|---|---|---|---|
-| [AC-049-01 (admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-02 (กิจกรรม A แมพช่องวิชา X และ Y ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-070](tp-001-cases-quiz-grade-2.md#tp001-070) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-03 (สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-04 (Preview ตรงคู่กิจกรรม–ช่องที่แมพ ไม่เพิ่มช่อง/เดาหมวดเอง)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
-| [AC-049-05 (mapping ที่ส่งแล้วแก้คู่เดิมไม่ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-070](tp-001-cases-quiz-grade-2.md#tp001-070) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
+| [AC-049-01 (admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) ([normal](tp-001-normal-grade-mapping.md#tp001-069-normal)) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
+| [AC-049-02 (กิจกรรม A แมพช่องวิชา X และ Y ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-070](tp-001-cases-quiz-grade-2.md#tp001-070) ([normal](tp-001-normal-grade-mapping.md#tp001-070-normal)) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
+| [AC-049-03 (สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) ([normal](tp-001-normal-grade-mapping.md#tp001-069-normal)) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
+| [AC-049-04 (Preview ตรงคู่กิจกรรม–ช่องที่แมพ ไม่เพิ่มช่อง/เดาหมวดเอง)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-069](tp-001-cases-quiz-grade-2.md#tp001-069) ([normal](tp-001-normal-grade-mapping.md#tp001-069-normal)) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
+| [AC-049-05 (mapping ที่ส่งแล้วแก้คู่เดิมไม่ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | [TP001-070](tp-001-cases-quiz-grade-2.md#tp001-070) ([normal](tp-001-normal-grade-mapping.md#tp001-070-normal)) | BE-035/sys, FE-023/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
 | [AC-050-01 (preview ตรวจค่าเดิม/ใหม่และปลายทางตาม BR-050-02/03 ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | [TP001-071](tp-001-cases-quiz-grade-2.md#tp001-071) | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
 | [AC-050-02 (ก่อนยืนยันหรือเมื่อออกจาก preview โดยไม่ยืนยัน คะแนนปลายทางไม่เปลี่ยน)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | [TP001-072](tp-001-cases-quiz-grade-3.md#tp001-072) | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |
 | [AC-050-03 (กิจกรรม 8/10 ไปช่องเต็ม 20 ได้ 16)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | [TP001-071](tp-001-cases-quiz-grade-2.md#tp001-071) | BE-036/sys, FE-024/front, UX-006/int, SA-004/arch | QA-015/check | NOT_RUN |

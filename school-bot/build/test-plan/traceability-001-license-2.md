@@ -1,6 +1,6 @@
 # Traceability — License/Release/ตัวตน
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — trace setup BE-005/BE-007 และ tamper/copy)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — เชื่อมเคส normal TP001-024 ของ BE-031)
 
 ใช้กับ [ตาราง AC หลัก](traceability-001.md) ความหมาย case และระดับตรวจอยู่ใน [TP-001](tp-001.md) ทุกผลจริงเป็น NOT_RUN; owner เดิมคงตามต้นฉบับ
 
@@ -28,7 +28,7 @@
 | [AC-036-02 (นักเรียนและครู Login ด้วยบัญชีเดิมและ License แล้วบันทึก/เปิดโครงงาน…)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-022](tp-001-cases-guest.md#tp001-022), [TP001-023](tp-001-cases-guest.md#tp001-023) | [BE-008 (Cloud projects)](../plan/index.md)/sys | QA-001/check | NOT_RUN |
 | [AC-036-03 (Restart บริการแล้ว Login บัญชีเดิมยังเรียกโครงงานที่บันทึกสำเร็จได้)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-008](tp-001-cases-license-2.md#tp001-008) | BE-008/sys | QA-001/check | NOT_RUN |
 | [AC-036-04 (บันทึก Cloud ไม่สำเร็จแล้วแจ้งความล้มเหลว ไม่แสดงว่า Cloud…)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-022](tp-001-cases-guest.md#tp001-022) | BE-008/sys | QA-001/check | NOT_RUN |
-| [AC-036-05 (ครูทดลองภารกิจ/ข้อสอบ local และเก็บโครงงาน Cloud ได้ แต่ส่ง…)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-024](tp-001-cases-guest.md#tp001-024) | BE-026/sys, BE-031/sys, FE-021/front | QA-001/check, QA-011/check, QA-013/check | NOT_RUN |
+| [AC-036-05 (ครูทดลองภารกิจ/ข้อสอบ local และเก็บโครงงาน Cloud ได้ แต่ส่ง…)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-024](tp-001-cases-guest.md#tp001-024) ([normal](tp-001-normal-learning-quiz.md#tp001-024-normal)) | BE-026/sys, BE-031/sys, FE-021/front | QA-001/check, QA-011/check, QA-013/check | NOT_RUN |
 | [AC-036-06 (เมื่อสั่งออกจากระบบของบัญชี Login…)](../../modules/app-shell/shared/requirements/req-036.md) | [TP001-082](tp-001-cases-boundary-3.md#tp001-082) | [BE-006 (Login/session)](../plan/index.md)/sys, [BE-039 (เชื่อม SchoolBot ผ่าน Gateway)](../plan/index.md)/sys, [FE-002 (Login UI)](../plan/index.md)/front | QA-001/check | NOT_RUN |
 
 [Pack BE-005/BE-007 — ครบ 3+8 AC](traceability-001-license-host-pack.md) และ [setup/doubles/ประตู](traceability-001-license-host-setup.md) เป็นส่วนบังคับของ cases; tamper/copy เป็น criterion เดิมของ BE-007 ไม่เพิ่ม AC ผลจริงยัง NOT_RUN

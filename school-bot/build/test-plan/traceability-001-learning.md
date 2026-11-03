@@ -1,15 +1,15 @@
 # Traceability — บทเรียนและ Guest
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — เพิ่มเคส normal TP001-116 และเชื่อม TP001-054 ของ BE-015)
 
-ใช้กับ [ตาราง AC หลัก](traceability-001.md) ความหมาย case และระดับตรวจอยู่ใน [TP-001](tp-001.md) ทุกผลจริงเป็น NOT_RUN; owner เดิมคงตามต้นฉบับ
+ใช้กับ [ตาราง AC หลัก](traceability-001.md) ความหมาย case และระดับตรวจอยู่ใน [TP-001](tp-001.md) และ [ตาราง normal](tp-001-normal-index.md) ทุกผลจริงเป็น NOT_RUN; owner เดิมคงตามต้นฉบับ
 
 | AC และความหมาย | Case IDs | Implementation / role | Validation | Actual |
 |---|---|---|---|---|
 | [AC-037-01 (เลือก Activity ภารกิจ Block, Arm และ Code แล้วเข้าถึงเนื้อหาและภารกิจตรง…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-054](tp-001-cases-learning.md#tp001-054) | [FE-013 (Lessons UI)](../plan/index.md)/front | [QA-004 (Learning QA)](../plan/index.md)/check | NOT_RUN |
-| [AC-037-02 (เปิด Lesson แล้วเห็นเป้าหมาย คำแนะนำ และรายการ Activity…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-054](tp-001-cases-learning.md#tp001-054) | [BE-015 (Learning API)](../plan/index.md)/sys | QA-004/check | NOT_RUN |
-| [AC-037-03 (งานและผลภารกิจอ้าง Activity, Mode, Lesson และ revision ที่เรียนถูกต้อง…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-054](tp-001-cases-learning.md#tp001-054) | BE-015/sys | QA-004/check | NOT_RUN |
-| [AC-037-04 (เพียงเปิดหรือกดปิดบทเรียนไม่สร้างผลผ่านจริงโดยไม่มีการประเมินตาม REQ-038)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-055](tp-001-cases-learning.md#tp001-055) | BE-015/sys | QA-004/check | NOT_RUN |
+| [AC-037-02 (เปิด Lesson แล้วเห็นเป้าหมาย คำแนะนำ และรายการ Activity…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-054](tp-001-cases-learning.md#tp001-054) ([normal](tp-001-normal-learning-quiz.md#tp001-054-normal)) | [BE-015 (Learning API)](../plan/index.md)/sys | QA-004/check | NOT_RUN |
+| [AC-037-03 (งานและผลภารกิจอ้าง Activity, Mode, Lesson และ revision ที่เรียนถูกต้อง…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-054](tp-001-cases-learning.md#tp001-054) ([normal](tp-001-normal-learning-quiz.md#tp001-054-normal)) | BE-015/sys | QA-004/check | NOT_RUN |
+| [AC-037-04 (เพียงเปิดหรือกดปิดบทเรียนไม่สร้างผลผ่านจริงโดยไม่มีการประเมินตาม REQ-038)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-116](tp-001-normal-learning-quiz.md#tp001-116), [TP001-055](tp-001-cases-learning.md#tp001-055) | BE-015/sys | QA-004/check | NOT_RUN |
 | [AC-037-05 (เมื่อยังไม่มีหลักฐานอนุมัติเนื้อหาและเกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-055](tp-001-cases-learning.md#tp001-055) | BE-027/sys | QA-004/check, QA-012/check | NOT_RUN |
 | [AC-037-06 (กิจกรรมภารกิจจริงทุกโหมดอ้างกลับไปยังเนื้อหา ภารกิจ เกณฑ์…)](../../modules/quiz/shared/requirements/req-037.md) | [TP001-055](tp-001-cases-learning.md#tp001-055) | BE-027/sys | QA-004/check, QA-012/check | NOT_RUN |
 | [AC-038-01 (Code/Block ที่มีเกณฑ์ภารกิจกำหนดแล้วได้รับผลอัตโนมัติตรงกับตัวอย่างผ่านแ…)](../../modules/quiz/shared/requirements/req-038.md) | [TP001-056](tp-001-cases-learning.md#tp001-056) | [BE-016 (Auto grading)](../plan/index.md)/sys | QA-004/check | NOT_RUN |

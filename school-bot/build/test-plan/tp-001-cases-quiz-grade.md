@@ -1,6 +1,6 @@
 # TP-001 — ข้อสอบและการส่งคะแนน (TP001-063–TP001-067)
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — เชื่อมเคส normal/full ของ BE-031 และ FE-020)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -10,7 +10,7 @@ PF (Test Profile) คือสภาพแวดล้อมตรวจ แล�
 
 ระดับ: normal
 
-เฉพาะ BE-030/AC-046-01: อ่าน policy สี่ด้านตามรายละเอียด TP001-063 ใน tp-001-cases-quiz-grade-bank-cases.md; ไม่จัดระดับใหม่ให้ AC-046-02/05 ของ BE-031/032 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+เฉพาะ BE-030/AC-046-01: อ่าน policy สี่ด้านตามรายละเอียด TP001-063 ใน tp-001-cases-quiz-grade-bank-cases.md; FE-020/AC-046-01 ฝั่ง UI ใช้ [TP001-119](tp-001-normal-learning-quiz.md#tp001-119) และ BE-031/AC-046-02 ทางหลักใช้ [TP001-117](tp-001-normal-learning-quiz.md#tp001-117) ส่วนการเริ่มนอกช่วงเวลา/ขาด closes_at/คำตอบผิดรูปในเคสนี้เป็น **ระดับ: full** และ AC-046-05 ของ BE-032 คงเดิม อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
 
 
 AC: [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-02 (Quiz/Test ที่ไม่ปรับค่าใช้ BR-046-05)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-05 (ครูแก้เวลาสอบ/ช่วงเปิด–ปิดได้)](../../modules/quiz/shared/requirements/req-046.md) · References: [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](../design/des-010.md), learning-rules-032-034, BR-046 · Level: integration · Profiles: PF-API, PF-WEB
@@ -31,7 +31,7 @@ AC: [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy
 
 ระดับ: normal
 
-เฉพาะ BE-030/AC-046-04: แก้และ publish revision ใหม่แล้วอ่านประวัติเดิมตามรายละเอียด TP001-064 ใน tp-001-cases-quiz-grade-bank-cases.md; AC-046-03 ของ BE-031 คงเดิม อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+เฉพาะ BE-030/AC-046-04: แก้และ publish revision ใหม่แล้วอ่านประวัติเดิมตามรายละเอียด TP001-064 ใน tp-001-cases-quiz-grade-bank-cases.md; FE-020/AC-046-04 ฝั่ง UI ใช้ [TP001-120](tp-001-normal-learning-quiz.md#tp001-120) และ BE-031/AC-046-03 ทางหลักใช้ [TP001-118](tp-001-normal-learning-quiz.md#tp001-118) ส่วนการแข่งเริ่ม attempt และการเปลี่ยน override หลังเริ่มทำแล้วเป็น **ระดับ: full** อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
 
 
 AC: [AC-046-03 (รายการที่กำหนดสุ่มข้อ แสดงประวัติชุดและลำดับข้อที่ผู้เรียนได้รับจริงได้)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot…)](../../modules/quiz/shared/requirements/req-046.md) · References: DES-010, [BR-046-02 (คลังข้อสอบมี revision)](../../modules/quiz/shared/requirements/req-046.md), [BR-046-03 (แต่ละการทำเก็บ snapshot ข้อที่ได้รับ ลำดับ เกณฑ์ตรวจ และ policy ที่ใช้)](../../modules/quiz/shared/requirements/req-046.md) · Level: integration · Profiles: PF-API

@@ -3787,7 +3787,7 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "done-local",
       "module": "quiz"
     },
     {

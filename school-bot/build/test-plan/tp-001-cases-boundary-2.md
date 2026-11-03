@@ -1,6 +1,6 @@
 # TP-001 — ความปลอดภัยและการกู้คืน (TP001-080–TP001-081)
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ของ TP001-081 สำหรับ BE-031)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -21,6 +21,10 @@ AC: [AC-030-04 (การเตรียมอัปเดตเริ่มเ�
 <a id="tp001-081"></a>
 
 ## TP001-081 — คะแนนเมื่อหมดเวลาและการนับครั้ง/สิทธิ์ซ่อม
+
+ระดับ: normal
+
+เฉพาะ BE-031/AC-046-07: ทางหลักใช้แถวที่ 1 และ 3 ของตาราง (บันทึกทัน 6 ข้อ ถูก 4 ข้อ ปล่อยหมดเวลาได้ 4/10, ปฏิเสธคำตอบช้า 409 ATTEMPT_EXPIRED และนับครั้งตาม snapshot เดิม) ตาม [รายละเอียด TP001-081 ส่วน normal](tp-001-normal-learning-quiz.md#tp001-081-normal) และ [ตาราง normal](tp-001-normal-index.md); ส่วนแถวที่ 2 (ไม่มีคำตอบเลย), แถวที่ 4 (รอบซ่อม/จำลอง response สูญหายหลังปิดผล), ขอบเวลา `t_accept == deadline_at` และ evaluator ล้มเหลวเป็น **ระดับ: full**
 
 อ้าง [AC-046-07 (Test 10 ข้อละ 1)/BR-046-07 (หมดเวลาปิด attempt ตรวจคำตอบที่ server บันทึกทัน)](../../modules/quiz/shared/requirements/req-046.md), [decisions-042 (ผลข้อสอบเมื่อหมดเวลา)](../../shared/decisions/decisions-042.md), [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](../design/des-010.md), [LUX-05](../design/learning-ux-contract-gaps-001.md)
 
