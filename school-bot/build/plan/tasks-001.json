@@ -1003,7 +1003,7 @@
     {
       "id": "BE-004",
       "owner": "be",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P2",
       "depends_on": [
         "BE-003"
@@ -1079,7 +1079,7 @@
     {
       "id": "BE-006",
       "owner": "be",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P3",
       "depends_on": [
         "BE-007",
@@ -1120,7 +1120,7 @@
     {
       "id": "BE-007",
       "owner": "be",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P2",
       "depends_on": [
         "BE-005",
@@ -1297,7 +1297,7 @@
     {
       "id": "BE-010",
       "owner": "be",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P3",
       "depends_on": [
         "BE-007",
@@ -1986,7 +1986,7 @@
     {
       "id": "BE-015",
       "owner": "be",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P5",
       "depends_on": [
         "BE-008",
@@ -3188,7 +3188,7 @@
     {
       "id": "BE-027",
       "owner": "sys",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P5",
       "depends_on": [
         "BE-002",
@@ -3276,7 +3276,7 @@
     {
       "id": "BE-029",
       "owner": "sys",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P5",
       "depends_on": [
         "BE-027",
@@ -3603,7 +3603,7 @@
     {
       "id": "BE-039",
       "owner": "sys",
-      "tier": "t3",
+      "tier": "t2",
       "phase": "P0",
       "depends_on": [
         "BE-001",
