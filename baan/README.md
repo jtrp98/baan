@@ -167,6 +167,13 @@ baan-role --list
 | `--write` | อนุญาตให้แก้ไฟล์ |
 | `--model`, `--effort` | ระบุ model หรือ effort เอง แทนค่าของ tier |
 | `--no-fallback` | ไม่สลับไป AI ตัวอื่นเมื่อโควตาหมด |
+| `--no-preflight` | ข้ามการตรวจใบงานก่อนเปิด session (ดูด้านล่าง) |
+
+ก่อนเปิด session `baan-role` จะตรวจใบงาน (รวมไฟล์ `.txt` ที่ใบงานอ้างถึง) หาเงื่อนไขที่ sandbox ของ CLI ขวางแน่ๆ ถ้าเจอจะจบด้วย exit 2 ทันทีโดยไม่เสียเวลาของ agent:
+
+- `read-build` — ใบงานสั่ง build หรือรัน test แต่ไม่ได้ใส่ `--write` (โหมดอ่านเขียน `bin/obj` ไม่ได้)
+- `write-outside` — โหมดเขียน และใบงานอ้าง path นอก `--cwd` ที่ยังไม่มีอยู่ (role ต้องสร้างเอง แต่ sandbox อนุญาตให้เขียนเฉพาะใน cwd)
+- `git-parent` — โหมดเขียน และใบงานให้อ่านประวัติ git (`git show/diff/log`, `HEAD:`) ทั้งที่ `--cwd` อยู่ใต้ราก repo
 
 option ที่ใช้ได้ทั้งสองคำสั่ง: `--config <file>`, `--timeout <วินาที>`, `--date YYYY-MM-DD`
 

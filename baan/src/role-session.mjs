@@ -9,7 +9,7 @@ import { parseWorkDate } from "./prompts.mjs";
 import { capacityRetryText, classifyOutcome, runWithFallback, switchReasonText } from "./scheduler.mjs";
 
 export { DEFAULT_TIMEOUT_SEC };
-export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--timeout <sec>] [--cwd <dir>] [--list]`;
+export const ROLE_USAGE = `ใช้ --agent <name> [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--list]`;
 
 // cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ นายช่าง ที่อยู่ใน
 // workspace จริงแต่ลืมส่ง --cwd ได้ role ที่อ่านไฟล์ผิด repo โดยไม่มีอะไรเตือน
@@ -17,7 +17,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
     agents: [], task: "", taskFile: "", write: false, seq: false, list: false,
     cwd: path.resolve(baseCwd), timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false,
-    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", fallback: true,
+    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", fallback: true, preflight: true,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -42,6 +42,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
       }
       case "--date": opts.date = parseWorkDate(argv[++i]); break;
       case "--no-fallback": opts.fallback = false; break;
+      case "--no-preflight": opts.preflight = false; break;
       default: throw new Error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\n${ROLE_USAGE}`);
     }
   }
