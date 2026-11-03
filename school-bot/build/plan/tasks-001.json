@@ -1083,10 +1083,29 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "done-local",
+      "status": "verified",
       "risk": "low",
       "wave": 3,
-      "module": "app-shell"
+      "module": "app-shell",
+      "test_level": "normal",
+      "oracle": "pack-E ใบงาน097 (แก้ pack 2026-11-03): DES-002 Rev4 · tp-001-normal-index Rev1 TP001-102 ฝั่ง server",
+      "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+      "slices": [
+        {
+          "id": "BE-005-S1-stub",
+          "ac_ids": [
+            "AC-035-01",
+            "AC-035-02",
+            "AC-035-04"
+          ],
+          "status": "verified",
+          "test_level": "normal",
+          "oracle": "pack-E ใบงาน097 (แก้ pack 2026-11-03): DES-002 Rev4 · tp-001-normal-index Rev1 TP001-102 ฝั่ง server",
+          "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+          "evidence": "planning/task-097.md; reports/baan/2026-11-03-09-01-27-check-tier-t2-1agents-OuQymc",
+          "note": "2026-11-03 wave gate check OuQymc **PASS normal** (22/22 · suite 4572/3)"
+        }
+      ]
     },
     {
       "id": "BE-006",
@@ -3787,8 +3806,28 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "done-local",
-      "module": "quiz"
+      "status": "verified",
+      "module": "quiz",
+      "test_level": "normal",
+      "oracle": "pack-F ใบงาน097: des-005-import Rev3 + state Rev1 · migration-002 Rev2 · idempotency-001 Rev4 · TP001-062/093",
+      "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+      "slices": [
+        {
+          "id": "BE-028-S1-stub",
+          "ac_ids": [
+            "AC-045-01",
+            "AC-045-02",
+            "AC-045-03",
+            "AC-045-04"
+          ],
+          "status": "verified",
+          "test_level": "normal",
+          "oracle": "pack-F ใบงาน097: des-005-import Rev3 + state Rev1 · migration-002 Rev2 · idempotency-001 Rev4 · TP001-062/093",
+          "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+          "evidence": "planning/task-097.md; reports/baan/2026-11-03-09-01-27-check-tier-t2-1agents-OuQymc",
+          "note": "2026-11-03 wave gate check OuQymc **PASS normal** (22/22 · suite 4572/3)"
+        }
+      ]
     },
     {
       "id": "BE-029",
@@ -3867,8 +3906,26 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "done-local",
-      "module": "quiz"
+      "status": "verified",
+      "module": "quiz",
+      "test_level": "normal",
+      "oracle": "pack-C ใบงาน097: des-010 Rev8 + des-010-stub-persistence Rev1 · idempotency-001 Rev3 · TP001-063/064",
+      "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+      "slices": [
+        {
+          "id": "BE-030-S1-stub",
+          "ac_ids": [
+            "AC-046-01",
+            "AC-046-04"
+          ],
+          "status": "verified",
+          "test_level": "normal",
+          "oracle": "pack-C ใบงาน097: des-010 Rev8 + des-010-stub-persistence Rev1 · idempotency-001 Rev3 · TP001-063/064",
+          "ref": "target/school-bot worktree ณ 2026-11-03 (ยังไม่ commit — snapshot reports/school-bot/normal-097/snapshot-G)",
+          "evidence": "planning/task-097.md; reports/baan/2026-11-03-09-01-27-check-tier-t2-1agents-OuQymc",
+          "note": "2026-11-03 wave gate check OuQymc **PASS normal** (22/22 · suite 4572/3)"
+        }
+      ]
     },
     {
       "id": "BE-031",

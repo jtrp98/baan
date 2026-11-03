@@ -25,7 +25,7 @@
 | SEC-001 | ทบทวนขอบเขตความเชื่อถือและความปลอดภัย | sec | P0 | — | verified |
 | BE-003 | ทำ API ผู้ดูแล License | be | P2 | BE-002, SEC-001, BE-039 | verified (normal) |
 | BE-004 | ทำ signed offline lease | be | P2 | BE-003 | verified (normal) |
-| BE-005 | ทำการย้าย License Key | be | P2 | BE-004 | done-local |
+| BE-005 | ทำการย้าย License Key | be | P2 | BE-004 | verified (normal) |
 | BE-006 | ทำ Login และ session | be | P3 | BE-007, BE-001 | verified (normal) |
 | BE-007 | ตรวจสิทธิ์ใช้งานของ Desktop host | be | P2 | BE-005, SEC-001 | pending |
 | DBA-004 | เตรียม DDL โครงงาน | dba | P3 | DBA-001, SA-001, BA-001 | verified |
