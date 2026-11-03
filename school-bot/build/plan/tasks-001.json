@@ -3217,9 +3217,27 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending",
+      "status": "done-local",
       "risk": "high",
-      "module": "quiz"
+      "module": "quiz",
+      "slices": [
+        {
+          "id": "BE-027-S1-curriculum-publish-stub",
+          "ac_ids": [
+            "AC-044-01",
+            "AC-044-02",
+            "AC-044-03",
+            "AC-044-04",
+            "AC-044-05",
+            "AC-043-01",
+            "AC-037-05",
+            "AC-037-06"
+          ],
+          "status": "done-local",
+          "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-45-49-sys-tier-t3-1agents-dy4wyP",
+          "note": "2026-11-03 draft/revision/publish four-eyes + approval_ref T1000 บน stub · นายช่างรันซ้ำ 4241/0/0 · รอ check (high)"
+        }
+      ]
     },
     {
       "id": "BE-028",
