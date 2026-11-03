@@ -23,8 +23,8 @@
 | TP-001 | ทำตารางจับคู่เกณฑ์ตรวจรับ | tp | P0 | — | verified |
 | TP-002 | เตรียมข้อมูลทดสอบความล้มเหลว | tp | P1 | TP-001 | verified |
 | SEC-001 | ทบทวนขอบเขตความเชื่อถือและความปลอดภัย | sec | P0 | — | verified |
-| BE-003 | ทำ API ผู้ดูแล License | be | P2 | BE-002, SEC-001, BE-039 | pending |
-| BE-004 | ทำ signed offline lease | be | P2 | BE-003 | pending |
+| BE-003 | ทำ API ผู้ดูแล License | be | P2 | BE-002, SEC-001, BE-039 | verified (normal) |
+| BE-004 | ทำ signed offline lease | be | P2 | BE-003 | verified (normal) |
 | BE-005 | ทำการย้าย License Key | be | P2 | BE-004 | done-local |
 | BE-006 | ทำ Login และ session | be | P3 | BE-007, BE-001 | done-local |
 | BE-007 | ตรวจสิทธิ์ใช้งานของ Desktop host | be | P2 | BE-005, SEC-001 | pending |
