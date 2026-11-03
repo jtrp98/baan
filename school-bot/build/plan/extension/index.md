@@ -21,7 +21,7 @@
 | BE-036 | ทำ preview snapshot/แปลงคะแนน | sys | P5 | BE-035, BE-033 | pending |
 | BE-037 | ทำ grade writer/ชน/CAS/receipt | sys | P5 | BE-036, SA-004, DBA-007, TP-003 | pending |
 | BE-038 | ทำ export outbox/authz/replay/recovery | sys | P5 | BE-037, BE-032 | pending |
-| BE-039 | ทำ web-principal/BFF/session และ staff bootstrap | sys | P0 | BE-001, SA-001, SEC-001 | done-local |
+| BE-039 | ทำ web-principal/BFF/session และ staff bootstrap | sys | P0 | BE-001, SA-001, SEC-001 | verified (normal) |
 | FE-017 | เชื่อม Guest export/ถังขยะ | front | P3 | FE-003, BE-024, UX-002 | pending |
 | FE-018 | เชื่อมเลือกนำเข้า project/history | front | P5 | FE-017, BE-025, BE-026, UX-002, UX-004 | pending |
 | FE-019 | เชื่อม admin หลักสูตร/revision/นำเข้า | front | P5 | BE-027, BE-028, UX-005 | pending |
