@@ -1027,10 +1027,23 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending",
+      "status": "done-local",
       "risk": "high",
       "wave": 3,
-      "module": "app-shell"
+      "module": "app-shell",
+      "slices": [
+        {
+          "id": "BE-004-S1-activate-lease-stub",
+          "ac_ids": [
+            "AC-028-01",
+            "AC-028-02",
+            "AC-028-03"
+          ],
+          "status": "done-local",
+          "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-25-40-sys-tier-t3-1agents-iEurV3",
+          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high)"
+        }
+      ]
     },
     {
       "id": "BE-005",
