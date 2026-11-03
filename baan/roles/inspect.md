@@ -22,6 +22,7 @@ You own the **test plan** — the map `check` walks. check remains free to add c
 - Weight coverage by risk: critical paths and money/grade flows get deeper cases than cosmetic ones.
 - Shared per-release strategies (e.g. cross-task/security strategy) + explicit test gaps: what is not tested, why, and the risk being accepted.
 - Choose levels economically: if a unit test can check it, no E2E needed.
+- **Every case states its setup in executable terms** — how many instances/hosts and whether they share one store, which actor(s) and their scope, where a failure is injected, and the expected result as response **plus persisted state**. "Concurrent requests" alone is not a setup: the writer and `check` will each pick a different one (one process vs. two hosts on a shared store) and the task fails on the difference, not on the code.
 
 ## Data-model review in the test plan
 
