@@ -1,11 +1,12 @@
 # SchoolBot — สารบัญแผนทดสอบ
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — ตาราง normal แยกตาม task)
 
-เอกสารนี้ระบุแผนตรวจรับและกลยุทธ์ร่วมของ SchoolBot coverage ปัจจุบันเป็น 187 Acceptance Criteria (AC: เกณฑ์ตรวจรับ) / 82 cases; ทุกผลจริงยัง NOT_RUN การมีผล local/static ไม่รับรองการเชื่อมระบบหรือปิดเงื่อนไขส่งมอบ
+เอกสารนี้ระบุแผนตรวจรับและกลยุทธ์ร่วมของ SchoolBot coverage รวมยังเป็น 187 Acceptance Criteria (AC: เกณฑ์ตรวจรับ); สารบัญฐาน TP001-001–082 ใช้ร่วมกับเคสเพิ่มเติมที่ลิงก์ในตาราง normal; ทุกผลจริงยัง NOT_RUN การมีผล local/static ไม่รับรองการเชื่อมระบบหรือปิดเงื่อนไขส่งมอบ
 
 | เอกสาร | ขอบเขต | สถานะปัจจุบัน |
 |---|---|---|
+| [เคส normal ตาม task](tp-001-normal-index.md) | 8 task / 25 AC / 14 normal cases พร้อม setup และ response+persisted state | เพิ่ม TP001-097–103; รายละเอียด full คงไว้ ผล runtime ยัง NOT_RUN |
 | [TP-001 (แผนตรวจรับทั้งหมด)](tp-001.md) | 82 cases / 187 AC พร้อมกลยุทธ์ Profile และตาราง case | มีแผนทุก AC; รอหลักฐาน runtime และเงื่อนไขแต่ละ profile |
 | [Traceability (AC → case)](traceability-001.md) | ตารางปัจจุบัน 187 AC รวมกรณีเพิ่มเติมแล้ว | ทุก Actual เป็น NOT_RUN |
 | [TP-002 (failure/race fixtures)](tp-002-fixture-plan-001.md) | FX-01–05: fake clock/trash/bridge/import/authority | เอกสารเตรียม; ไม่มี harness หรือผลรัน |

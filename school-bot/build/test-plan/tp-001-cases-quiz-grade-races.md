@@ -1,12 +1,17 @@
 # TP-001 — concurrency และ negative ของคลังข้อสอบ BE-030
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — shared-store race, replay และ atomic failure)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 ใช้ [setup actors/stores/fixture](tp-001-cases-quiz-grade-bank.md#เงื่อนไขก่อนตรวจร่วม) ทั้งหมดร่วมกับแต่ละ case; AC-046-01 หมายถึงอ่าน policy สี่ด้าน และ AC-046-04 หมายถึง revision ใหม่ไม่เปลี่ยน snapshot/ผลเดิม ระดับ integration ของ service/adapter ใช้ทั้ง memory และ file แยกผล ทุกผลจริง NOT_RUN
 
 <a id="tp001-094"></a>
 
 ## TP001-094 — สองผู้แก้ใช้ ETag เดียว
+
+ระดับ: full
+
+BE-030: ETag race/stale/published conflict ตาม AC-046-04 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: AC-046-04 · References: DES-010 Rev7, bank draft Rev3, HTTP contract (ETag), idempotency Rev1
 
@@ -19,6 +24,11 @@ response A=200 พร้อม ETag ใหม่; B=412 VERSION_CONFLICT พร�
 <a id="tp001-095"></a>
 
 ## TP001-095 — replay ของ bank และ atomic failure
+
+ระดับ: full
+
+BE-030: replay/concurrency/atomic failure ตาม AC-046-04 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: AC-046-04 (revision และประวัติไม่เปลี่ยน) · References: DES-010 API Rev6, bank draft Rev3, idempotency Rev1
 

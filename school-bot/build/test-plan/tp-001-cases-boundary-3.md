@@ -1,6 +1,6 @@
 # TP-001 — ความปลอดภัยและการกู้คืน (TP001-082–TP001-082)
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -8,9 +8,14 @@ PF (Test Profile) คือสภาพแวดล้อมตรวจ แล�
 
 ## TP001-082 — ออกจากระบบและคงสิทธิ์ License
 
+ระดับ: normal
+
+BE-006/BE-039: normal เฉพาะแถว 1 ของตาราง logout; malformed/ไม่มี token/security/limits/fault แถว 2–4 และ fixtures ด้านล่างเป็น **ระดับ: full** แยกจากชนิดการตรวจ unit/integration/host อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 อ้าง [AC-036-06 (เมื่อสั่งออกจากระบบของบัญชี Login…)/BR-036-05 (การออกจากระบบของบัญชี Login ต้องเพิกถอนสิทธิ์ของเซสชันนั้นผ่านช่องทางบริ…)](../../modules/app-shell/shared/requirements/req-036.md), [decisions-046 (Gateway dev และระยะเวลา replay ของ License)](../../shared/decisions/decisions-046.md), [decisions-049 (อนุมัติแก้รอบ 3 แบบแคบ B gRPC logout และ Gateway typed logout)](../../shared/decisions/decisions-049.md), [decisions-050 (Gateway รับเส้น SchoolBot ตาม convention เดิมของ Gateway (controller))](../../shared/decisions/decisions-050.md), [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](../design/des-004.md), [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](../design/des-012.md), [ขอบเขต Logout ผ่าน Gateway](../design/gateway-logout-slice-001.md), [gateway-logout-negative-boundary-001](../design/gateway-logout-negative-boundary-001.md), [gateway-controller-entry-001](../design/gateway-controller-entry-001.md)
 
-ระดับ: unit/logic ตรวจ validator/rate-limiter/trailer/logger; integration ตรวจ HTTP API Gateway (`POST /api/school-bot/service/v2/auth/logout`) → gRPC SchoolBot service (`SchoolBotSessionService.Logout`) และ DB session store/audit ตาม PF-API/PF-LEGACY/PF-WEB/PF-ADMIN; UI/host ตรวจการล้างสถานะบัญชีและคงสิทธิ์ License บนเครื่องตาม PF-HOST/PF-UI-WIN/PF-UI-MAC เมื่อ full Login และ [FE-002 (Login UI)](../plan/index.md) พร้อม
+ชนิดการตรวจ: unit/logic ตรวจ validator/rate-limiter/trailer/logger; integration ตรวจ HTTP API Gateway (`POST /api/school-bot/service/v2/auth/logout`) → gRPC SchoolBot service (`SchoolBotSessionService.Logout`) และ DB session store/audit ตาม PF-API/PF-LEGACY/PF-WEB/PF-ADMIN; UI/host ตรวจการล้างสถานะบัญชีและคงสิทธิ์ License บนเครื่องตาม PF-HOST/PF-UI-WIN/PF-UI-MAC เมื่อ full Login และ [FE-002 (Login UI)](../plan/index.md) พร้อม
 
 Owner: Implementation = [BE-006 (Login/session)](../plan/index.md)/sys, [BE-039 (เชื่อม SchoolBot ผ่าน Gateway)](../plan/index.md)/sys, FE-002/front · Validation = [QA-001 (License QA)](../plan/index.md)/check
 

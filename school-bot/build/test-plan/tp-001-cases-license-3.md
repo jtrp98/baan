@@ -1,12 +1,17 @@
 # TP-001 — License และสิทธิ์เครื่อง (TP001-009–TP001-010, TP001-083 และ TP001-088)
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup ที่รันตามได้ของ BE-005/BE-007)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
 <a id="tp001-009"></a>
 
 ## TP001-009 — non-admin unbind
+
+ระดับ: full
+
+BE-003/005/007: ย้ายตามลำดับและผลสิทธิ์หลักใช้ TP001-102 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-035-01 (ผู้ไม่มีสิทธิ์ผู้ดูแลขอปลดเครื่องแล้วถูกปฏิเสธ และการผูกเครื่องไม่เปลี่ยน)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-02 (ผู้ดูแลปลด A แล้ว B เปิดใช้ Key เดิมได้ทันที แม้ A…)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-03 (B ต้องเปิดใช้ Key ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ออฟไลน์ของ A แทน)](../../modules/app-shell/shared/requirements/req-035.md), [AC-035-04 (หลัง Key ผูกกับ B แล้ว A ตรวจออนไลน์ไม่ผ่านและไม่ได้สิทธิ์ออฟไลน์รอบใหม่)](../../modules/app-shell/shared/requirements/req-035.md) · References: [DES-002 (License และ device binding)](../design/des-002.md) · Level: integration · Profiles: PF-API, PF-HOST
 
@@ -27,6 +32,11 @@ AC: [AC-035-01 (ผู้ไม่มีสิทธิ์ผู้ดูแล�
 
 ## TP001-010 — A offline ที่ E-1s, E, E+1s
 
+ระดับ: full
+
+BE-007: ก่อนและหลังหมดสิทธิ์ห่างขอบใช้ TP001-102 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 AC: [AC-035-05 (A ที่ออฟไลน์ยังใช้ได้ก่อนสิทธิ์เดิมหมด แต่ครบกำหนดแล้วเข้าโหมดหลักไม่ได้)](../../modules/app-shell/shared/requirements/req-035.md) · References: DES-002 · Level: integration · Profiles: PF-HOST
 
 เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — fixture ย้าย](traceability-001-license-host-setup.md) ทั้ง memory/file; A มี lease/anchor checked_at=T/exp=E; ปิด network A ก่อน P1 unbind และ B activate ที่ T+3600s บน server สอง instance/store ร่วม; A/B คนละ storage namespace/key; แยก fixture E-1s/E/E+1s กับ online denial; restart A ด้วย storage เดิมก่อนแต่ละ boundary ตาม [pack BE-007](traceability-001-license-host-pack.md#be-007)
@@ -45,6 +55,11 @@ AC: [AC-035-05 (A ที่ออฟไลน์ยังใช้ได้ก�
 
 ## TP001-088 — ปฏิเสธ tamper/copy ข้ามเครื่อง
 
+ระดับ: full
+
+BE-007: tamper/copy/secure-storage fault ตาม AC-034-02/AC-035-03 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 AC: AC-034-02 (Active แล้วจึงมีสิทธิ์ในเครื่อง), AC-035-03 (B ต้องเปิดใช้ออนไลน์ครั้งแรก ไม่ใช้สิทธิ์ A) · Criterion BE-007: tamper/copy · Level: host component/integration บน doubles · Profile: PF-HOST
 
 เงื่อนไขก่อนตรวจ ขั้นตอน จุด inject และ expected response/server/local state ทั้งหก subcase อยู่ใน [TP001-088 ฉบับเต็ม](traceability-001-license-host-negative.md#tp001-088) ใช้ H-LIC/H-OBS ทั้ง memory/file และ secure storage แยก A/B ตามนั้น; ผลจริง NOT_RUN
@@ -52,6 +67,11 @@ AC: AC-034-02 (Active แล้วจึงมีสิทธิ์ในเค�
 <a id="tp001-083"></a>
 
 ## TP001-083 — validate/activate เครื่องเดิมที่ค้างต้องไม่ย้อน unbind
+
+ระดับ: full
+
+BE-003/004: writer ค้างชน unbind ตาม AC-028-01/02 และ criterion เก็บ detached history อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-028-01 (A เปิดใช้ซ้ำได้ ขณะผูก A ต้องปฏิเสธ B)](../../modules/app-shell/shared/requirements/req-028.md), [AC-028-02 (validate ก่อน activate ถูกปฏิเสธ หลัง activate สำเร็จผ่าน)](../../modules/app-shell/shared/requirements/req-028.md) · ขอบเขต BE-003: unbind สำเร็จคงประวัติ detached · References: [DES-002 — CAS ของ License writers Rev4](../design/des-002.md), [หน่วย commit/lease patch Rev4](../design/des-002-entitlement.md), [setup race Rev4](../design/des-002-recovery.md), [transaction Rev12](../design/data-contract-rules-transactions.md) · Level: integration บน stub · Profile: PF-API
 

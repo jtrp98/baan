@@ -1,12 +1,17 @@
 # TP-001 — ข้อมูลผิดและสิทธิ์คลังข้อสอบ BE-030
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — negative และ replay หลังหมดสิทธิ์)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 ใช้ [setup actors/stores/fixture](tp-001-cases-quiz-grade-bank.md) ทุกส่วน ทุกผลจริง NOT_RUN
 
 <a id="tp001-096"></a>
 
 ## TP001-096 — ปฏิเสธร่างผิดรูปและสิทธิ์ไม่ครบ
+
+ระดับ: full
+
+BE-030: input/role/channel/replay หลังหมดสิทธิ์ ตาม AC-046-01/04 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: AC-046-01/04 · References: bank draft Rev3, DES-010 API Rev6, DES-012 Rev9, มติ 054 · ระดับ unit สำหรับ validator และ integration สำหรับสิทธิ์/atomicity
 

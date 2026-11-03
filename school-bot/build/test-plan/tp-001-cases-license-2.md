@@ -1,12 +1,17 @@
 # TP-001 — License และสิทธิ์เครื่อง (TP001-006–TP001-008)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup expiry/admin/restart ที่รันตามได้)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
 <a id="tp001-006"></a>
 
 ## TP001-006 — activate+validate ที่ E-1s, E, E+1s และหลัง revoke
+
+ระดับ: full
+
+BE-004: inactive ที่ทราบสถานะแล้วใช้ TP001-098 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-028-03 (หลัง revoke หรือถึงเวลาหมดอายุ ทั้ง activate และ validate ถูกปฏิเสธว่า…)](../../modules/app-shell/shared/requirements/req-028.md) · References: [DES-002 (License และ device binding)](../design/des-002.md) · Level: integration · Profiles: PF-API
 
@@ -28,6 +33,11 @@ AC: [AC-028-03 (หลัง revoke หรือถึงเวลาหมด�
 
 ## TP001-007 — POST/GET /v2/admin/licenses ตามแต่ละ fixture
 
+ระดับ: normal
+
+BE-003: normal เฉพาะ P1 สร้างข้อมูลถูกต้องและอ่าน metadata (AC-027-02/03); AC-027-01 ใช้ TP001-103 ส่วน invalid payload/ถอน role ระหว่างคำขอ/replay/TTL/fault ด้านล่างเป็น **ระดับ: full** อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 AC: [AC-027-01 (เมื่อระบบยืนยันตัวตนพนักงานที่ /v2/admin ยังไม่ถูกตั้งค่า (เดิมเรียก…)](../../modules/app-shell/shared/requirements/req-027.md), [AC-027-02 (ผู้เรียกที่มี staff session และ StaffRole ที่มีสิทธิ์…)](../../modules/app-shell/shared/requirements/req-027.md), [AC-027-03 (ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) เรียกรายการหลังสร้างแล้วเห็น…)](../../modules/app-shell/shared/requirements/req-027.md) · References: DES-002, [DES-004 (ตัวตนและสิทธิ์การใช้งาน SchoolBot)](../design/des-004.md), [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](../design/des-012.md), [BR-027-01 (admin API ของ License อยู่ที่ /v2/admin ผู้เรียกต้องมี staff session…)](../../modules/app-shell/shared/requirements/req-027.md) · Level: integration · Profiles: PF-API, PF-ADMIN
 
 เงื่อนไขก่อนตรวจ: ใช้ [setup/fixtures/expected ฉบับเต็มของ TP001-007](traceability-001-license-admin.md) ซึ่งเป็นส่วนบังคับของ case: หนึ่ง process สอง adapter/service; memory store object เดียว หรือ file สอง store object directory เดียว; P1 staff_admin + license_admin active, actor ผิดสิทธิ์/payload แยก fixture; create instance แรก list/replay อีก instance อ่าน persisted state จาก instance ที่สาม/reopen file พักก่อน store lock เฉพาะชุดถอน role และ inject failure ก่อน publish ตามรายละเอียด
@@ -46,6 +56,11 @@ AC: [AC-027-01 (เมื่อระบบยืนยันตัวตนพ�
 <a id="tp001-008"></a>
 
 ## TP001-008 — restart ทุก instance
+
+ระดับ: normal
+
+BE-003: normal เฉพาะ create สำเร็จแล้ว dispose/reopen file และ list พบข้อมูลเดิม (AC-027-04); fail ก่อน publish/lost response/retry เป็น **ระดับ: full** ไม่จัดระดับใหม่ให้ AC-036-03 ของงานอื่น อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-027-04 (ผู้เรียกที่มีสิทธิ์ (ตาม BR-027-01) สร้าง License แล้ว restart API…)](../../modules/app-shell/shared/requirements/req-027.md), [AC-036-03 (Restart บริการแล้ว Login บัญชีเดิมยังเรียกโครงงานที่บันทึกสำเร็จได้)](../../modules/app-shell/shared/requirements/req-036.md) · References: DES-002, [DES-003 (หลายโครงงาน Local/Cloud)](../design/des-003.md) · Level: integration · Profiles: PF-API, PF-LEGACY
 

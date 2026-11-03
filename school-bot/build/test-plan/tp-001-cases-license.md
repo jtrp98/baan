@@ -1,6 +1,6 @@
 # TP-001 — License และสิทธิ์เครื่อง (TP001-001–TP001-005)
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup ที่รันตามได้ของ BE-005/BE-007)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -24,6 +24,11 @@ AC: [AC-009-01 (เริ่มแอปโดยไม่เคยใส่ Lic
 
 ## TP001-002 — กรอก key ขณะ offline
 
+ระดับ: full
+
+BE-007: ทางหลัก offline ใช้ TP001-099 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 AC: [AC-028-04 (เมื่อลองเปิดใช้ด้วย License ไม่ถูกต้องและไม่เคยมีสิทธิ์ที่ใช้ได้…)](../../modules/app-shell/shared/requirements/req-028.md), [AC-034-01 (ครั้งแรกไม่มีอินเทอร์เน็ต เข้าโหมดหลักไม่ได้แม้กรอก Key แล้ว)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002, [BR-009-03 (เปิดใช้ครั้งแรกต้องออนไลน์)](../../modules/app-shell/shared/requirements/req-009.md) · Level: integration · Profiles: PF-HOST, PF-API
 
 เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — topology/doubles/fault](traceability-001-license-host-setup.md) ทั้ง memory/file; A มี device key แต่ไม่มี token/anchor/binding; ปิด network ก่อนส่ง ใช้ fixture สะอาดต่อ key ถูก/ผิด/revoked/expired ส่วน credential write fail เปิด network แล้วพักหลัง Active ก่อน publish local generation; response และ server/local state ตาม [pack BE-007](traceability-001-license-host-pack.md#be-007)
@@ -39,6 +44,11 @@ AC: [AC-028-04 (เมื่อลองเปิดใช้ด้วย Licens
 <a id="tp001-003"></a>
 
 ## TP001-003 — เปิดแอปซ้ำ offline ที่ T+3d-1s, exp-1s, exp, exp+1s
+
+ระดับ: full
+
+BE-007: ทางหลักเปิดซ้ำ offline ใช้ TP001-100 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-034-03 (ออฟไลน์ภายใน 3 วันจากตรวจสำเร็จล่าสุดใช้งานได้)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-04 (ครบ 3 วันและติดต่อเซิร์ฟเวอร์ไม่ได้…)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002, DES-001, BR-009-03 · Level: integration · Profiles: PF-HOST
 
@@ -56,6 +66,11 @@ AC: [AC-034-03 (ออฟไลน์ภายใน 3 วันจากตร�
 
 ## TP001-004 — ตรวจออนไลน์ในสถานะ valid และหลัง expired offline
 
+ระดับ: normal
+
+BE-007: normal เฉพาะ Active ครั้งแรกและตรวจ Key เดิม Active อีกครั้ง; denial ใช้ TP001-101 ส่วน replay/5xx/429/malformed/signature/unknown 403 ด้านล่างเป็น **ระดับ: full** อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
+
 AC: [AC-034-02 (ตรวจออนไลน์ได้ Active แล้วเข้าใช้งานได้และมีสิทธิ์ในเครื่อง)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-05 (ตรวจ Key เดิมออนไลน์ได้ Active อีกครั้ง แล้วต่อสิทธิ์ 3…)](../../modules/app-shell/shared/requirements/req-034.md), [AC-034-06 (ได้ผล Key ไม่ Active แล้วไม่ต่อสิทธิ์หรือใช้ค่าเดิมข้ามผลปฏิเสธเพื่อปลดล็อก)](../../modules/app-shell/shared/requirements/req-034.md) · References: DES-002 · Level: integration · Profiles: PF-HOST, PF-API
 
 เงื่อนไขก่อนตรวจ: ใช้ [H-LIC/H-OBS — response faults](traceability-001-license-host-setup.md) ทั้ง memory/file; แยก A สะอาดสำหรับ Active แรก กับ A มี lease T/E สำหรับ renew/denial; ตรวจครั้งใหม่ที่ T1=T+3600s และอีก fixture ที่ E+1s โดย License.ExpiresAt=T+10 วัน; server สอง instance/store ร่วม; revoke/unbind บน stub ก่อน validate เพื่อได้ LICENSE_INACTIVE/BINDING_REVOKED; fault อื่นตาม [pack BE-007 — response/server/local state](traceability-001-license-host-pack.md#be-007); หลัง denial restart offline ต้องยัง locked
@@ -71,6 +86,11 @@ AC: [AC-034-02 (ตรวจออนไลน์ได้ Active แล้ว�
 <a id="tp001-005"></a>
 
 ## TP001-005 — activate A และ B พร้อมกัน ≥50 รอบ
+
+ระดับ: full
+
+BE-004: activate/validate ตามลำดับใช้ TP001-097 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-028-01 (เปิดใช้ Key เดียวบนเครื่อง A ซ้ำได้)](../../modules/app-shell/shared/requirements/req-028.md), [AC-028-02 (Validate device ที่ยังไม่ activate ได้ DEVICE_NOT_ACTIVATED)](../../modules/app-shell/shared/requirements/req-028.md) · References: DES-002 · Level: integration · Profiles: PF-API
 

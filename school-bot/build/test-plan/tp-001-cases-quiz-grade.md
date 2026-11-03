@@ -1,12 +1,17 @@
 # TP-001 — ข้อสอบและการส่งคะแนน (TP001-063–TP001-067)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — setup BE-030 และ policy/snapshot)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
 <a id="tp001-063"></a>
 
 ## TP001-063 — เปิด/ทำ
+
+ระดับ: normal
+
+เฉพาะ BE-030/AC-046-01: อ่าน policy สี่ด้านตามรายละเอียด TP001-063 ใน tp-001-cases-quiz-grade-bank-cases.md; ไม่จัดระดับใหม่ให้ AC-046-02/05 ของ BE-031/032 อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-02 (Quiz/Test ที่ไม่ปรับค่าใช้ BR-046-05)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-05 (ครูแก้เวลาสอบ/ช่วงเปิด–ปิดได้)](../../modules/quiz/shared/requirements/req-046.md) · References: [DES-010 (Question Bank, Attempt และนโยบายคะแนน)](../design/des-010.md), learning-rules-032-034, BR-046 · Level: integration · Profiles: PF-API, PF-WEB
 
@@ -23,6 +28,11 @@ AC: [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy
 <a id="tp001-064"></a>
 
 ## TP001-064 — ทำ attempt
+
+ระดับ: normal
+
+เฉพาะ BE-030/AC-046-04: แก้และ publish revision ใหม่แล้วอ่านประวัติเดิมตามรายละเอียด TP001-064 ใน tp-001-cases-quiz-grade-bank-cases.md; AC-046-03 ของ BE-031 คงเดิม อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-046-03 (รายการที่กำหนดสุ่มข้อ แสดงประวัติชุดและลำดับข้อที่ผู้เรียนได้รับจริงได้)](../../modules/quiz/shared/requirements/req-046.md), [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot…)](../../modules/quiz/shared/requirements/req-046.md) · References: DES-010, [BR-046-02 (คลังข้อสอบมี revision)](../../modules/quiz/shared/requirements/req-046.md), [BR-046-03 (แต่ละการทำเก็บ snapshot ข้อที่ได้รับ ลำดับ เกณฑ์ตรวจ และ policy ที่ใช้)](../../modules/quiz/shared/requirements/req-046.md) · Level: integration · Profiles: PF-API
 

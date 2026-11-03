@@ -1,6 +1,6 @@
 # TP-001 — บทเรียนและผลประเมิน (TP001-058–TP001-061)
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — เพิ่มทางเข้า setup BE-028 โดยคงเคส BE-027)
+> Rev 3 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 097 — แยกเคส normal/full ก่อนพัฒนาและตรวจรับ)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
 
@@ -45,6 +45,11 @@ AC: [AC-039-01 (นักเรียน Login ทำภารกิจและ
 <a id="tp001-060"></a>
 
 ## TP001-060 — สร้าง/แก้ (staff vs school)
+
+ระดับ: normal
+
+เฉพาะ BE-039/BE-029: staff สร้าง/แก้ โรงเรียนเลือกอ่าน published และผู้เรียนอ่าน CourseRun ที่เลือก Level/Activity; โรงเรียนขอแก้หนึ่งครั้งเป็นผลสิทธิ์หลัก AC-043-01 งาน BE-027 นอกขอบเขตคงเดิม อ่าน [ตาราง normal พร้อม setup/ผล](tp-001-normal-index.md)
+
 
 AC: [AC-043-01 (ส่วนกลางสร้าง/แก้หลักสูตรได้)](../../modules/quiz/shared/requirements/req-043.md), [AC-043-02 (เปิด Course แล้วเห็น Level ระดับชั้นเริ่มต้น วิชาที่ผูก และ…)](../../modules/quiz/shared/requirements/req-043.md), [AC-043-03 (ห้องใช้ Level ต่างจากค่าเริ่มต้นของระดับชั้นได้ โดยยังอ้าง Level ที่เลือก)](../../modules/quiz/shared/requirements/req-043.md), [AC-043-04 (Lesson เดียวเปิด Activity ครบชนิดใน BR-043-03 และภารกิจสาม Mode ได้…)](../../modules/quiz/shared/requirements/req-043.md) · References: DES-005, BR-043 · Level: integration · Profiles: PF-ADMIN, PF-WEB, PF-API
 
