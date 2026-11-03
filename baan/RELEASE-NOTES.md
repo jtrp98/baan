@@ -2,21 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## ยังไม่ release — พัฒนาให้ลองได้ก่อน
+## 0.26.0 — 2026-11-03 · พัฒนาให้จบก่อน แล้วค่อยตรวจเต็มรอบเดียว
 
-- ปรับค่าเริ่มต้นของนายช่าง, plan, gm และ planner อัตโนมัติให้เดินงานพัฒนาทุกส่วนที่พร้อม โดยแยกงานบนสัญญา/ข้อมูลจำลองเฉพาะ development ออกจากงานเชื่อมระบบจริงและตรวจรับ
-- QA ของ License/Login/DB และงานที่แก้ครบเพดานไม่หยุดทั้งแผน: แจ้งผู้ใช้ทันทีและพักเฉพาะงานที่ต้องใช้ผลจริง งานอื่นเดินต่อ พร้อมเก็บผู้รับผิดชอบและเงื่อนไขปิด QA ค้าง
-- lint-plan เตือนงานพัฒนาที่รอ check/jpo ให้ทบทวน dependency; ไม่ข้าม dependency ให้เอง แผนเดิมต้องปรับใบงานและ dependency โดยรักษา IDs, AC, findings และ release scope
-- done-local ยังต้อง build/test ผ่านและลอง flow หลัก; verified, security และประตู release คงเดิม ข้อมูลจำลองไม่ใช้กับ production ข้อมูลจริง หรือหุ่นจริง
-- **ระดับการตรวจ `normal`/`full`** (charter ข้อ 14): ระหว่างพัฒนา check ตรวจแค่ happy flow ของ AC + test อัตโนมัติ ของที่เจอนอกทางหลักจดเป็นรายการรอ full pass ไม่ตกและไม่เปิดรอบแก้ · พัฒนาครบแล้วค่อยตรวจ full รอบเดียวทั้ง scope แล้วรวมเป็นใบแก้ใบเดียวต่อเจ้าของ · ก่อน release ต้องผ่าน full
-  - ตั้งที่ `defaults.test_level` ใน config ของ workspace หรือ `--test-level normal|full` ของ `baan`/`baan-role` · baan-role ใส่ระดับเข้าใบงานของ inspect/check/sys/front ให้เอง และบันทึกไว้ใน `report.json`
-  - inspect ติดป้าย `normal`/`full` ให้ทุกเคส · writer ลองเองเฉพาะเคสของระดับที่สั่ง
-  - `baan --lint-plan` อ่าน `test_level` ใน ledger ของ task/slice: เตือน verified ที่ยังเป็น normal และ error เมื่อค่าผิด · ledger เดิมที่ไม่มีฟิลด์นี้ถือว่าตรวจ full แล้ว
+ที่มา: school-bot ตรวจเต็มทุก task ทันทีที่เขียนเสร็จ งาน License (BE-003/004) วนแก้เคส race/replay จนติดเพดาน ขณะที่อีก 75 task ยังไม่ได้เริ่ม ผู้ใช้ขอให้พัฒนาให้จบก่อน แล้วค่อยตรวจเต็มและแก้ทีเดียว
 
 ### ⚠ ต้องทำตอนอัปเกรด
 
-- **ค่าเริ่มต้นของการตรวจเปลี่ยนเป็น `normal`** — check ไม่ไล่ edge case ระหว่างพัฒนาแล้ว ถ้าอยากได้แบบเดิมใส่ `"test_level": "full"` ใน `defaults` ของ `baan.config.json`
+- **ค่าเริ่มต้นของการตรวจเปลี่ยนเป็น `normal`** — ระหว่างพัฒนา check ไม่ไล่ edge case แล้ว ถ้าอยากได้แบบเดิมใส่ `"test_level": "full"` ใน `defaults` ของ `baan.config.json`
 - ตอนตรวจผ่านระดับ normal ให้ลง `"test_level": "normal"` ที่ task/slice ในแผน JSON ด้วย ไม่งั้น lint จะนับว่าผ่าน full แล้ว
+- แผนเดิมที่ผูกงานพัฒนาไว้หลัง QA ของ License/Login/DB: รัน `baan --lint-plan` แล้วปรับ dependency และใบงานตามคำเตือน โดยรักษา IDs, AC, findings และ release scope เดิม
+
+### เพิ่ม
+
+- **ระดับการตรวจ `normal`/`full`** (charter ข้อ 14)
+  - `normal` (ระหว่างพัฒนา): check ตรวจ happy flow ของ AC ทุกข้อ + build/test อัตโนมัติ · ของที่เจอนอกทางหลักจดเป็นรายการรอ full pass ไม่ตกและไม่เปิดรอบแก้ · ไม่เปิด jpo
+  - `full` (พัฒนาครบแล้ว / ก่อน release): ตรวจเต็มรอบเดียวทั้ง scope แล้วรวม finding เป็นใบแก้ใบเดียวต่อเจ้าของต่อ module · ก่อน release ต้องผ่าน full
+  - ตั้งที่ `defaults.test_level` ใน config ของ workspace หรือ `--test-level normal|full` ของ `baan`/`baan-role` · baan-role ใส่ระดับเข้าใบงานของ inspect/check/sys/front ให้เอง และบันทึกไว้ใน `report.json`
+  - inspect ติดป้าย `normal`/`full` ให้ทุกเคส · writer ลองเองเฉพาะเคสของระดับที่สั่ง
+  - `baan --lint-plan` อ่าน `test_level` ใน ledger ของ task/slice: เตือน verified ที่ยังเป็น normal และ error เมื่อค่าผิด · ledger เดิมที่ไม่มีฟิลด์นี้ถือว่าตรวจ full แล้ว
+- `baan --lint-plan` เตือนงานพัฒนาที่รอ check/jpo ให้ทบทวน dependency (ไม่ข้าม dependency ให้เอง)
+
+### เปลี่ยน
+
+- นายช่าง, plan, gm และ planner อัตโนมัติเดินงานพัฒนาทุกส่วนที่พร้อม โดยแยกงานบนสัญญา/ข้อมูลจำลองเฉพาะ development ออกจากงานเชื่อมระบบจริงและตรวจรับ
+- QA ของ License/Login/DB และงานที่แก้ครบเพดานไม่หยุดทั้งแผน: แจ้งผู้ใช้ทันทีและพักเฉพาะงานที่ต้องใช้ผลจริง งานอื่นเดินต่อ พร้อมเก็บผู้รับผิดชอบและเงื่อนไขปิด QA ค้าง
+- done-local ยังต้อง build/test ผ่านและลอง flow หลัก; verified, security และประตู release คงเดิม ข้อมูลจำลองไม่ใช้กับ production ข้อมูลจริง หรือหุ่นจริง
+- `baan-role` ไม่ระบุ `--agent` = ใช้ `defaults.agent` ของ workspace (เดิม exit 2)
 
 ## 0.25.0 — 2026-11-03 · ลดเวลาที่เสียไปกับรันเปล่าและรอบแก้งาน
 
