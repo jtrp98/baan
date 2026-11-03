@@ -1,8 +1,14 @@
 # TP-001 — บทเรียนและผลประเมิน (TP001-058–TP001-061)
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (เติม setup สิทธิ์ revision และการแข่งขันของหลักสูตรกลาง)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — เพิ่มทางเข้า setup BE-028 โดยคงเคส BE-027)
 
 PF (Test Profile) คือสภาพแวดล้อมตรวจ และ E คือรหัสหลักฐาน ดู [ทางเข้า TP-001](tp-001.md#profiles), [รายละเอียด Profile](tp-001-profiles.md) และ [กลยุทธ์ transport](index.md#กลยุทธ์-transport)
+
+<a id="tp001-062-detail"></a>
+
+## รายละเอียด TP001-062 — นำเข้า Course Plan
+
+ใช้ [fixture/actors TP001-062](tp-001-cases-quiz-grade-import.md) และ [ผล response+state พร้อม TP001-093](tp-001-cases-quiz-grade-import-cases.md) สำหรับ AC-045-01..04 (draft/ที่มา, ตัด O, สื่อชุดสอง, identity ถาวร) ส่วน preview เริ่มได้ แต่ persistence รอ arch ตรึง storage provenance และ commit/read-back endpoint; ทุกผลจริง NOT_RUN ไม่เปลี่ยน TP001-060/061 หรือ TP001-084–087 ที่ใช้อยู่
 
 <a id="tp001-058"></a>
 

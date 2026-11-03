@@ -1,24 +1,28 @@
-﻿# TP-001 — concurrency และ negative ของคลังข้อสอบ BE-030
+# TP-001 — concurrency และ negative ของคลังข้อสอบ BE-030
 
 > Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย inspect · ขอโดย ผู้ใช้ (ใบงาน 096 — shared-store race, replay และ atomic failure)
 
 ใช้ [setup actors/stores/fixture](tp-001-cases-quiz-grade-bank.md#เงื่อนไขก่อนตรวจร่วม) ทั้งหมดร่วมกับแต่ละ case; AC-046-01 หมายถึงอ่าน policy สี่ด้าน และ AC-046-04 หมายถึง revision ใหม่ไม่เปลี่ยน snapshot/ผลเดิม ระดับ integration ของ service/adapter ใช้ทั้ง memory และ file แยกผล ทุกผลจริง NOT_RUN
 
+<a id="tp001-094"></a>
+
 ## TP001-094 — สองผู้แก้ใช้ ETag เดียว
 
 AC: AC-046-04 · References: DES-010 Rev7, bank draft Rev3, HTTP contract (ETag), idempotency Rev1
 
-หนึ่ง process สอง bank service/adapter objects ใช้ store ร่วม actor staffAuthor/staffEditor ต่างคน seed v2 draft เพิ่มจาก fixture bank v1/history โดย audit/ledger ของ seed=0 ทั้งสองอ่าน v2 ได้ ETag เดียว ใช้คนละ Idempotency-Key; A PUT questions v2, B PUT questions v2 แต่เปลี่ยน prompt ข้อ 201 เป็น `คำขอสอง` พัก A หลังได้ store lock และตรวจ ETag ก่อน swap/replace ให้ B ถึง store call และรอ จากนั้นปล่อย A
+หนึ่ง process สอง bank service/adapter objects ใช้ store ร่วม actor staffAuthor/staffEditor ต่างคน seed v2 draft เพิ่มจาก fixture bank v1/history โดย seed audit=3/ledger=0 และ contributors ครบตาม setup ร่วม ทั้งสองอ่าน v2 ได้ ETag เดียว ใช้คนละ Idempotency-Key; A PUT questions v2, B PUT questions v2 แต่เปลี่ยน prompt ข้อ 201 เป็น `คำขอสอง` พัก A หลังได้ store lock และตรวจ ETag ก่อน swap/replace ให้ B ถึง store call และรอ จากนั้นปล่อย A
 
-response A=200 พร้อม ETag ใหม่; B=412 VERSION_CONFLICT พร้อม current_etag ของ A ไม่ใช่ last-writer-wins เปิด adapter ใหม่/disk: bank=2 revisions (v1 published/v2 draft), questions v2 ตรง A ทั้งชุด ไม่ปน B, QuestionBank.Updated=1, ledger=1; curriculum=1/Lesson=2/Activity=2/Attempt=2 และ Attempt ทั้งสองเท่า baseline
+response A=200 พร้อม ETag ใหม่; B=412 VERSION_CONFLICT พร้อม current_etag ของ A ไม่ใช่ last-writer-wins เปิด adapter ใหม่/disk: bank=2 revisions (v1 published/v2 draft), questions v2 ตรง A ทั้งชุด ไม่ปน B, QuestionBank.Updated เพิ่ม 1 (audit รวม 4), ledger=1; curriculum=1/Lesson=2/Activity=2/Attempt=2 และ Attempt ทั้งสองเท่า baseline
 
 ทำ fixture ใหม่ให้ B ไม่มี If-Match →428 PRECONDITION_REQUIRED; stale →412 VERSION_CONFLICT ทั้งคู่ audit/ledger/domain เพิ่ม 0 จาก baseline ทำกรณี A publish โดย staffApprover ก่อน B PUT ที่ถือ ETag เก่า: B ต้องปฏิเสธ ไม่ย้อนแก้ published; ทดสอบ published PUT อีกครั้งด้วย ETag สด →409 STATE_CONFLICT ทุกครั้ง v1/Attempt เดิมไม่เปลี่ยน ใช้ variant นี้แยก fixtureจาก race แรก ไม่รวม counts ปะปนกัน
+
+<a id="tp001-095"></a>
 
 ## TP001-095 — replay ของ bank และ atomic failure
 
 AC: AC-046-04 (revision และประวัติไม่เปลี่ยน) · References: DES-010 API Rev6, bank draft Rev3, idempotency Rev1
 
-หนึ่ง process สอง service/adapter objects store ร่วม actor เดียวกันต่อ operation เตรียมแต่ละแถวในตารางใหม่ทั้งหมด seed audit/ledger=0 ไม่มี operation ของเคสอื่นปะปน; ใช้ TimeProvider คงที่และ test cipher เลื่อน clock เฉพาะเวลาสร้าง ETag
+หนึ่ง process สอง service/adapter objects store ร่วม actor เดียวกันต่อ operation เตรียมแต่ละแถวในตารางใหม่ทั้งหมด seed audit=2 สำหรับ create และ audit=3 สำหรับ PUT/publish; ledger=0 ทุกแถว contributors ครบตาม setup ไม่มี operation ของเคสอื่นปะปน; ใช้ TimeProvider คงที่และ test cipher เลื่อน clock เฉพาะเวลาสร้าง ETag
 
 | Operation | actor / state ก่อนตรวจ | success response / ส่วนเพิ่ม state ต่อหนึ่ง success |
 |---|---|---|
@@ -34,21 +38,7 @@ inject ก่อน durable replace (memory ก่อน swap) หลัง muta
 
 ทุก variant curriculum/Lesson/Activity/Attempt counts คง baseline และ Attempt snapshot/result/ETag เดิมทั้งสองไม่เปลี่ยน ตรวจ disk snapshot และ read-back ใหม่พร้อมกัน memory พิสูจน์ได้แค่ adapter ใหม่บน store object เดิม ไม่ใช่ process crash/power loss
 
-## TP001-096 — ปฏิเสธร่างผิดรูปและสิทธิ์ไม่ครบ
-
-AC: AC-046-01/04 · References: bank draft Rev3, DES-010 API Rev6, DES-012 Rev9, มติ 054 · ระดับ unit สำหรับ validator และ integration สำหรับสิทธิ์/atomicity
-
-หนึ่ง process หนึ่ง service/adapter file store directory ใหม่ต่อ variant actor staffAuthor seed v1 published/v2 draft และ Attempt สองแถวเดิม ไม่มีจุดพัก/inject baseline audit/ledger=0
-
-| คำขอ | response ที่คาด | state หลัง adapter ใหม่/ดิสก์ |
-|---|---|---|
-| PUT questions: ข้อแรกแก้ได้แต่ข้อสอง correct key ไม่อยู่ options; duplicate question UUID; options ว่าง; score=0; malformed/empty body | 400 INVALID_INPUT ตาม field; unknown kind แยกเป็น 409 QUESTION_KIND_UNSUPPORTED | ไม่มี partial replace, bank=2/Lesson=2/Attempt=2, audit=ledger=0; bank/Attempt เดิมครบ |
-| staffAuthor publish v2 ที่ตนสร้าง ใช้ ref 1,000 ตัว | 409 FOUR_EYES_REQUIRED | v2 draft เหมือนเดิม audit=ledger=0 |
-| staffApprover publish v2 ใช้ approval_ref 1,001 ตัว หรือผิดชนิด | 400 INVALID_INPUT | v2 draft ไม่ตัด ref/ไม่เก็บ hash แทน audit=ledger=0 |
-| staffWithoutRole mutation หรืออ่าน admin detail | 403 STAFF_ROLE_REQUIRED | ไม่มี success body/เฉลย domain/audit/ledger ไม่เปลี่ยน |
-| schoolTeacher/schoolAdmin/student/employee desktop อ่าน admin detail หรือ mutate | 403 CHANNEL_NOT_ALLOWED | ไม่เปิดเฉลย ไม่ใช้ ID ชนเพื่อเปิดสิทธิ์ counts ไม่เปลี่ยน |
-
-อีก fixture ให้ staffAuthor create v2 success ก่อน ถอน role แล้ว retry tuple/body เดิม →403 STAFF_ROLE_REQUIRED; session หมดอายุ →401 SESSION_EXPIRED ตรวจสิทธิ์ก่อนเปิด replay ผลครั้งแรกคงเดิม เพิ่ม bank/audit/ledger จาก baselineเพียง 1 ไม่สร้าง ledger ของ rejection ไม่ให้ school actor ขโมยผล staff แม้ใช้ key เดียวกัน การตีความ HTTP error ตรวจที่ boundary fake ตาม contract ไม่ถือว่าผ่าน Gateway จริง
+ตรวจ input/สิทธิ์ต่อใน [TP001-096](tp-001-cases-quiz-grade-negative.md)
 
 ## ขอบเขตหลักฐานและช่องว่าง
 
