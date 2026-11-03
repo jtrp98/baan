@@ -1,6 +1,6 @@
 # DES-007 — Release และ trusted update — ผู้ใช้และเงื่อนไขก่อนเริ่ม
 
-> Rev 3 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 4 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
 
 ส่วนต่อของ [DES-007 — Release และ trusted update](des-007.md)
 
@@ -27,7 +27,7 @@ Version ใช้ x.y.z ตามเดิม; HTTPS URL ≤2048 ไม่มี
 
 Admin ใช้ `staff_admin` session + active `release_publisher` รายบุคคล แยกจาก role อื่น; public check ใช้ global catalog ที่เสนอ null SchoolId แต่ audit/common fields ครบตาม data-model. Resource summary ใช้ update_date/ETag จาก UpdateDate; publish/withdraw ใช้ If-Match, ขาด → 428 PRECONDITION_REQUIRED, ชน → 412 VERSION_CONFLICT พร้อม details.current_etag. `version` ใน manifest/query ยังคง x.y.z ของ binary (`VersionText`) ไม่ใช่คอลัมน์ Version หรือ concurrency token
 
-Server/signer ตรวจ immutable trusted CI registry ก่อน sign/publish ตาม [release-trust-001.md](release-trust-001.md); ไม่ sign arbitrary artifact จาก API. ทางที่เลือกคง server-assigned release_id/API flow เดิม
+Server/signer ตรวจ immutable trusted CI registry ก่อน sign/publish ตาม [release-trust-001.md](release-trust-001.md); ไม่ sign arbitrary artifact จาก API. ทางที่เลือกคง server-assigned release_id/API flow เดิม การเก็บ evidence_ref แบบไม่ตัดข้อความใช้ [ข้อเสนอ storage ร่วม](audit-evidence-storage-001.md) รอมนุษย์อนุมัติขยาย Reason; API bound 2048 คงเดิม
 
 Trust key แยก License; public roots อยู่ใน host; rotation root-signed/keyset versioned ห้ามเชื่อ public key ที่แนบกับ manifest เอง
 

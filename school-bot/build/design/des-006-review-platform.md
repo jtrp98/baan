@@ -1,4 +1,4 @@
-﻿# DES-006 — ทบทวน compatibility ของ Windows/Darwin
+# DES-006 — ทบทวน compatibility ของ Windows/Darwin
 
 > Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (SA-003 — แยก platform baseline จากข้อเสนอ)
 

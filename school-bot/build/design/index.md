@@ -26,7 +26,7 @@ local logout มี implementation และผลตรวจเฉพาะ lo
 |---|---|---|---|
 | [des-001.md](des-001.md) | 1 | DES-001: Desktop host และ Inter-Process Communication (IPC) | PROPOSED — รอ breaking review |
 | [des-003.md](des-003.md) | 4 | DES-003: บันทึก/เปิดหลาย Project ระหว่าง Local และ Cloud | PROPOSED — รอ schema/migration review |
-| [des-006.md](des-006.md) | 2 | DES-006: ควบคุมหุ่นจริงบน Windows/macOS | PROPOSED — รอ platform/hardware proof |
+| [des-006.md](des-006.md) | 3 | DES-006: ควบคุมหุ่นจริงบน Windows/macOS และผลทบทวน Host/IPC | เตรียม review แล้ว — breaking contract รอคนก่อน BE-010; platform/hardware proof ยังขาด |
 
 รายละเอียด Guest, Project API, robot และ OS อยู่ใน [สารบัญ Desktop/License/Release](index-desktop-release.md)
 
@@ -43,6 +43,9 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
+| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | ข้อเสนอเก็บ approval_ref/evidence_ref ครบ 2048 ตัวอักษรร่วม DES-005/010/007 | รอมนุษย์อนุมัติ schema; baseline ยังเป็น Reason 1000 |
+| [audit-evidence-migration-001.md](audit-evidence-migration-001.md) | 1 | Physical delta หนึ่ง column และเงื่อนไข rollback ส่ง vault | รอผู้ใช้ยืนยันก่อนแก้ canonical model/DBML และเตรียม SQL |
+| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; storage/runtimes และคำอธิบาย constraints เก่ายังค้าง |
 | [data-model.md](data-model.md) | 8 | คู่มือ schema: 32 ตาราง 450 ฟิลด์และการใช้ข้อมูลเดิม | ฐานแบบข้อมูล — runtime/catalog/API integration ยังไม่ยืนยัน |
 | [modules.md](modules.md) | 3 | ขอบเขตและความรับผิดชอบแต่ละโมดูล | PROPOSED |
 | [quality-attributes.md](quality-attributes.md) | 1 | เกณฑ์คุณภาพและสิ่งที่ต้องพิสูจน์ | PROPOSED |
@@ -54,10 +57,10 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
-| [des-005.md](des-005.md) | 8 | DES-005: หลักสูตร ภารกิจ และผลประเมินสามโหมด | PROPOSED — รอ numeric rubric/evaluator |
+| [des-005.md](des-005.md) | 9 | DES-005: หลักสูตร ภารกิจ และผลประเมินสามโหมด | PROPOSED — รอ numeric rubric/evaluator และอนุมัติ audit storage |
 | [des-008.md](des-008.md) | 6 | DES-008: mapping หลักสูตรกับช่องคะแนน SchoolBright | PROPOSED — ยืนยันนโยบายแล้ว; รอ web-principal/H5 |
 | [des-009.md](des-009.md) | 4 | DES-009: preview/ยืนยันส่งคะแนนและป้องกันคะแนนชน | PROPOSED — export ปิดจนผ่าน parity/coexistence/target/authz/DB gates |
-| [des-010.md](des-010.md) | 5 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; รอ implementation proof |
+| [des-010.md](des-010.md) | 6 | DES-010: คลังข้อสอบ Attempt และนโยบายคะแนน | PROPOSED — สูตรและขอบเขตครูยืนยันแล้ว; รออนุมัติ audit storage/implementation proof |
 | [des-011.md](des-011.md) | 7 | DES-011: เสนอเลื่อน Level และครูยืนยันทั้งห้อง | PROPOSED — รอ roster/วันสิ้นเทอม |
 
 กฎร่วมและ API เฉพาะเรื่องอยู่ใน [สารบัญ Learning/คะแนน](index-learning.md)
@@ -67,12 +70,12 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
 | [des-002.md](des-002.md) | 3 | DES-002: License และหนึ่ง Key ต่อหนึ่ง device binding | PROPOSED — รอ schema/security review |
-| [des-007.md](des-007.md) | 3 | DES-007: release และ trusted update | PROPOSED — รอ schema/trust approval |
+| [des-007.md](des-007.md) | 4 | DES-007: release และ trusted update | PROPOSED — รออนุมัติ audit storage/schema และ trust |
 
 สิทธิ์ License admin, signer/custody, updater และชุดหลักฐานอยู่ใน [สารบัญ Desktop/License/Release](index-desktop-release.md)
 
 ## หลักฐาน
 
-- Source baseline ที่ index เดิมอ้าง: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/SchoolBot.Api/Program.cs:43`, `engines/zide/src/transport.cpp:7` ใต้ `C:/src/schoolbright/target/school-bot`; งานนี้อ่านเฉพาะเอกสารที่อนุญาต ไม่ยืนยัน code/schema ปัจจุบันเพิ่ม
+- Source baseline ที่ index เดิมอ้าง: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/SchoolBot.Api/Program.cs:43`, `engines/zide/src/transport.cpp:7` ใต้ `C:/src/schoolbright/target/school-bot`; ส่วน Host/IPC/robot ตรวจ source วันที่ 2026-11-03 ใน [ผลทบทวน DES-006](des-006-review.md); ไม่ตรวจ DB/runtime เพิ่ม
 - รายงาน local logout ล่าสุด 2026-10-28 (memory: planning/jpo-092-logout-r4-001.md) รับรองเฉพาะขอบเขตที่รายงาน; auth-flow-handoff-001 และ qa/round-001 (memory) แยก local component/logout ออกจาก integration
 - สัญญาปัจจุบัน DES-004 Rev13 คงขอบเขต persistence ตาม [มติ 051 (commit Project + Revision ในหน่วยเดียว)](../../shared/decisions/decisions-051.md) ร่วมกับ Project API Rev2 และกฎข้อมูล Rev11 และนับอายุ Desktop session จากเวลา bind ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../../shared/decisions/decisions-052.md)

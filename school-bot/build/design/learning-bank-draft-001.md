@@ -1,6 +1,6 @@
 # LUX-03 — bank draft read/edit และ visibility
 
-> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
 
 เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
@@ -27,7 +27,7 @@ QuestionBankDraftView = {
 - `bank_key`/`revision` immutable หลัง create; PUT ใช้ replace questions ทั้งชุดใน transaction เดียว ไม่แก้บางข้อแล้วปล่อยบางข้อไม่ผ่าน
 - ตรวจ UUID ซ้ำ, kind, จำนวน options, เฉลยอยู่ใน options และมีหนึ่งคำตอบตาม DES-010 (กฎชนิดคำถามและเฉลย); unknown kind → `409 QUESTION_KIND_UNSUPPORTED`, รูปข้อมูลผิด → `400 INVALID_INPUT`
 - lock bank revision, ตรวจ draft/ETag, เขียน questions/audit/idempotency พร้อมกัน
-- publish ใช้ audit contributors แบบเดียวกับ curriculum: `QuestionBank.Created`, `.Updated`, `.Published`; ติด approval length stopline เดียวกัน
+- publish ใช้ audit contributors แบบเดียวกับ curriculum: `QuestionBank.Created`, `.Updated`, `.Published`; เสนอเก็บ approval_ref ตรงตัวใน Reason ของ QuestionBank.Published ตาม [storage ร่วม](audit-evidence-storage-001.md) และ [delta/rollback](audit-evidence-migration-001.md) ต้องให้มนุษย์อนุมัติขยาย column ก่อน
 - Attempt อ่านจาก snapshot ของตนเสมอ ไม่ lookup เฉลยจาก bank ล่าสุด
 
 **พร้อม local:** list/detail/edit, validation, concurrency, visibility และ immutable revision  

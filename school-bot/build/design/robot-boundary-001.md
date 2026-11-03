@@ -1,6 +1,6 @@
 # Robot payload และ idle/drain-stop
 
-> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (SA-003 — ชี้ขอบเขต validation และ drain-stop จากโค้ดจริง)
 
 ## เอกสารอ้างอิง
 
@@ -20,12 +20,12 @@ poll 3000 ms และ debounce 0 ms/หนึ่งผลสำเร็จท�
 
 ## หลักฐาน
 
-เอกสารนี้เรียบเรียงหลักฐานที่บันทึกไว้เดิม ไม่ได้ตรวจ source/runtime ซ้ำ.
+ตรวจ source แบบอ่านอย่างเดียววันที่ 2026-11-03 ไม่รัน runtime/hardware; ดู [ผลทบทวน Host/IPC/หุ่น](des-006-review.md) สำหรับข้อแตกต่างและรายการ breaking ที่รอคนก่อน BE-010
 
-Envelope JSON Lines `{protocol:"1.0",request_id:string,mode:"robot-control",action:string,data:object}` หนึ่งบรรทัด ≤65536 UTF-8 bytes, request_id 1–128 bytes; success `{protocol,request_id,status:"success",data}` / error `{protocol,request_id,status:"error",error:{code,message}}`. ห้าม unknown envelope/data keys, float แทน integer, NaN/Infinity. Host เลือก action/target จาก allowlist และส่ง explicit transport; dry-run ไม่เป็น hardware success. หลักฐาน `engines/zide/src/request.cpp:32–69,122–156`, `line_reader.cpp:7,46`
+Envelope JSON Lines `{protocol:"1.0",request_id:string,mode:"robot-control",action:string,data:object}` หนึ่งบรรทัด ≤65536 UTF-8 bytes, request_id 1–128 bytes; success `{protocol,request_id,status:"success",data}` / error `{protocol,request_id,status:"error",error:{code,message}}`. C++ ปฏิเสธ unknown envelope keys และ data keys ที่อยู่นอกชุดรวม ไม่ได้แยก allowed keys ต่อ action; integer fields ไม่รับ float และ JSON ไม่รับ NaN/Infinity ส่วน Host มี action allowlist แต่ยังไม่ตรวจ explicit transport/target ทุกคำขอ การบังคับ target และ strict response validation เป็นข้อเสนอในผลทบทวน; dry-run ไม่เป็น hardware success. หลักฐาน `engines/zide/src/request.cpp:32–69,122–156`, `line_reader.cpp:7,46`
 
 group.index integer 0–9999 ไม่ซ้ำใน batch; items ≤32, servo id ไม่ซ้ำและ bounds ตาม servo.set; live group ห้ามว่าง ส่วน empty download เป็น marker เดิม ไม่ใช่ท่าหกข้อที่ valid ใน Project. Profile UI ยังคงหกข้อ; engine ไม่เพิ่มเป็นหกโดยเงียบ. `servo.torque.id` 0–255 (255 broadcast), enabled เป็น boolean; group.run ต้อง end≥start. Serial baud ใช้ allowlist `9600,19200,38400,57600,115200,128000,230400,256000,460800,512000,921600`, default 115200; read_ms 1–1500 default 1000; UI movement/stop ใช้ 1, probe/read ใช้ 1000 ตาม engineAdapter.ts:69,103–109. หลักฐาน bounds `actions.cpp:45–100`, `protocol.cpp:38–65,90–96`; invalid → INVALID_INPUT/SAFETY_LIMIT ก่อนส่ง ห้าม clamp ให้เคลื่อนเงียบ
 
-Stop ซ้ำระหว่างกำลังหยุด join งานเดิม ไม่สร้างคิว movement/relock ใหม่; รอ child reaped และ stdout/stderr drained ก่อนส่ง stop (manager.go:115–127,188–189; process WaitDelay=1 วินาที). ไม่ยกเลิก robot.stop ที่กำลังทำจาก navigation/close ซ้ำ; deadline host 5 วินาทียังคงอยู่. ผลการ cancel อาจเกิดหลัง partial write จึงไม่รับรองว่าไม่มี movement. Relock เมื่อผู้ใช้ขอและ stop request ส่งสำเร็จเท่านั้น; failure คง lost/unknown delivery และให้ผู้ใช้ recovery ไม่ replay command
+Stop ซ้ำใน ZideTransport instance เดียว join งานเดิม ไม่สร้างคิว movement/relock ใหม่; รอ child reaped และ stdout/stderr drained ก่อนส่ง stop (manager.go:115–127,188–189; process WaitDelay=1 วินาที). ไม่ยกเลิก robot.stop ที่กำลังทำจาก navigation/close ซ้ำ; deadline host 5 วินาทียังคงอยู่ แต่ Host ยังไม่ reserve admission ระหว่าง cancel จบกับเริ่ม stop ต้องให้คนทบทวน C3 ก่อน BE-010. ผลการ cancel อาจเกิดหลัง partial write จึงไม่รับรองว่าไม่มี movement. Relock เมื่อผู้ใช้ขอและ stop request ส่งสำเร็จเท่านั้น; failure คง lost/unknown delivery และให้ผู้ใช้ recovery ไม่ replay command
 
 as-built `app/frontend/src/modes/robot-control/robotContext.tsx:119–129` ใช้ interval 3000 ms, เฉพาะ connected/มี target/transport.idle; discovery สำเร็จแต่ target transport+path หายครั้งเดียว → DEVICE_NOT_FOUND/lost; debounce เพิ่ม=0. errors จาก discovery ถูก catch ไม่ถือว่าถอดสาย; engineAdapter.ts:77–110 แยก busy/cancelled จาก command failure

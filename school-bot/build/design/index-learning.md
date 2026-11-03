@@ -4,10 +4,12 @@
 
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
+| [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 1 | เทียบผลรับกฎ learning/คะแนนและข้อค้างก่อน freeze DBA-005 | รับกฎเข้าแบบแล้ว; ไม่ใช่ runtime acceptance |
+| [audit-evidence-storage-001.md](audit-evidence-storage-001.md) | 1 | Mapping approval/evidence ที่เก็บตรงตัวและอ่านกลับได้ | รอมนุษย์อนุมัติ schema ตาม physical delta |
 | [learning-rules-032-034.md](learning-rules-032-034.md) | 2 | Profile/run/freeze/สูตรรวมและขอบเขตครูปรับ policy | นโยบายยืนยันแล้ว; รอ implementation proof |
 | [grade-rules-032-034.md](grade-rules-032-034.md) | 1 | Mapping, partial/skip และ recovery ของการส่งคะแนน | สัญญาเดิม; export gates ยังมีผล |
-| [learning-curriculum-draft-001.md](learning-curriculum-draft-001.md) | 1 | อ่าน/แก้ curriculum draft และหลักฐานอนุมัติ | Local contract; approval storage รอ vault/มนุษย์ |
-| [learning-bank-draft-001.md](learning-bank-draft-001.md) | 1 | อ่าน/แก้ bank draft และจำกัด visibility | Local contract; publish เต็มรอ approval storage |
+| [learning-curriculum-draft-001.md](learning-curriculum-draft-001.md) | 2 | อ่าน/แก้ curriculum draft และหลักฐานอนุมัติ | Local contract; storage ร่วมรอมนุษย์อนุมัติขยาย Reason |
+| [learning-bank-draft-001.md](learning-bank-draft-001.md) | 2 | อ่าน/แก้ bank draft และจำกัด visibility | Local contract; publish เต็มรอมนุษย์อนุมัติขยาย Reason |
 | [learning-attempt-read-001.md](learning-attempt-read-001.md) | 1 | Discovery, saved answers, history, policy และ reveal | Local contract; การเชื่อมจริงยังต้องพิสูจน์ |
 | [learning-attempt-finalization-001.md](learning-attempt-finalization-001.md) | 1 | Finalization, clock/race/replay/recovery โดยไม่เพิ่ม state/table | Local contract; DB/worker proof ยังรอ |
 | [learning-snapshot-projection-001.md](learning-snapshot-projection-001.md) | 1 | Snapshot reconciliation และ reader projection | Fixtures/JSON dictionary พร้อมตามฐานเดิม; reader/roster จริงยังรอ |

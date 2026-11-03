@@ -1,4 +1,4 @@
-﻿# DES-006 — ทบทวน Host/IPC และ validation
+# DES-006 — ทบทวน Host/IPC และ validation
 
 > Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (SA-003 — ตรวจ Host/robot กับโค้ดจริง)
 
@@ -42,7 +42,7 @@ schema เป็น JSON Schema draft 2020-12 แต่ไม่ใช่ Go run
 | dataString ตอน Run | ≤65536 bytes; เกิน/JSON เสีย → Go error ไม่ dispatch |
 | envelope หลัง marshal | ≤65536 bytes ไม่รวม LF; เกิน → INVALID_REQUEST ก่อน start child; data พอดีขอบเขตอาจไม่พอดี envelope |
 | stdout | ≤1048576 bytes (1 MiB); เกิน → ENGINE_FAILED; buffer ทิ้งส่วนเกินและรับ write ต่อเพื่อไม่อุด pipe |
-| stderr | เก็บ ≤8192 bytes; diagnostic ใน failure ตัด ≤512 bytes |
+| stderr | เก็บ ≤8192 bytes; เนื้อหา diagnostic ตัดที่ 512 bytes แล้วอาจต่อ … |
 | Host deadline | 5 วินาทีต่อ Execute; หมดเวลา → ENGINE_TIMEOUT ไม่ใช่ stop success |
 | pipe drain | WaitDelay 1 วินาทีจำกัด pipe ที่ descendant ถือไว้; อาจคืน failure ไม่ใช่ hardware หยุด และ 5+1 ไม่ใช่ stop latency SLA |
 | Windows exchange | deadline 4 วินาที; read_ms 1–1500 default 1000; firmware probe/pacing อยู่ภายใน exchange |

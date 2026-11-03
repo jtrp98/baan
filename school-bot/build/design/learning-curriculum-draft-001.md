@@ -1,6 +1,6 @@
 # LUX-01 — draft curriculum และหลักฐานอนุมัติ
 
-> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (ใบงาน 095 — storage หลักฐานและผลรับกฎ learning)
 
 เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 
@@ -55,7 +55,7 @@ Read-back `approval` อ่านเฉพาะ publication event ของ res
 
 **Stopline:** full publish contract ยังไม่พร้อม เพราะ `T2048 → varchar(1000)` เก็บไม่ครบ ส่วน draft list/detail/edit ทำ local ได้ทันที ห้าม truncate, แบ่ง approval เป็นหลาย audit events หรือจำกัดเหลือ 1,000 เงียบ ๆ
 
-ทางเลือกที่เสนอให้ gate พิจารณา: ขยาย `SchoolBotAuditEvent.Reason` เป็น `varchar(2048)` โดยคง business bounds 1,000 ของ operation อื่นไว้ นี่เป็น **schema proposal เท่านั้น**; ให้ vault ตรวจผลกระทบก่อนทำ migration อีกทางคือแก้ `approval_ref` เป็น T1000 ซึ่งเป็น contract narrowing ต้อง review เช่นกัน
+ข้อเสนอใช้ร่วมกับ bank/release: ขยาย `SchoolBotAuditEvent.Reason` เป็น `varchar(2048)` เก็บ approval_ref ตรงตัวตาม [mapping/reader/error](audit-evidence-storage-001.md) และ [physical delta/rollback](audit-evidence-migration-001.md) โดยคง API bounds อื่นเดิม ต้องได้รับคำยืนยันมนุษย์ก่อนเปลี่ยน schema; ไม่ลด approval_ref เป็น T1000 เอง
 
 ## ชนิดข้อมูลที่ใช้
 
