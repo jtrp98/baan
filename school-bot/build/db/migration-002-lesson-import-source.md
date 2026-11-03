@@ -1,80 +1,75 @@
 ﻿# Migration 002 — ที่มาและการอนุมัติจากต้นทางราย Lesson
 
-> Rev 1 · แก้ล่าสุด 2026-11-03 · แก้โดย vault · ขอโดย ผู้ใช้ (ใบงาน 097 — ทบทวน schema ของ BE-028 การนำเข้าแผนรายวิชา)
+> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย vault · ขอโดย ผู้ใช้ (มติ 2026-11-03 — เพิ่มเฉพาะคอลัมน์)
 
-ผลทบทวน: รูปทรง `SchoolBotLesson.ImportSource` ใช้ได้เมื่อเพิ่ม CHECK และ unique index ตาม [forward SQL](migration-002-lesson-import-source.sql) แต่ยังรอผู้ใช้อนุมัติ schema และ arch ตรึงสัญญา API/transaction ก่อนใช้จริง การอนุมัติส่งทบทวนวันที่ 2026-11-03 ไม่ใช่การอนุมัติรัน SQL
+ผลทบทวน: [forward SQL](migration-002-lesson-import-source.sql) เพิ่มเฉพาะ `SchoolBotLesson.ImportSource jsonb NULL` ตามมติผู้ใช้ ไม่มี DEFAULT, CHECK, unique/partial index, trigger หรือวัตถุอื่น รูปทรง JSON การกันนำเข้าซ้ำและรหัสคงเดิมเป็นหน้าที่ application ตาม [physical delta และรายการให้ arch ตรึง](migration-002-lesson-import-source-contract.md) ความเสี่ยงจากการไม่มี DB constraint ยังเปิด ไม่ใช่ผลรับรอง implementation
 
-เหตุผล: หนึ่ง Lesson เป็นหนึ่งบทเรียนใน curriculum revision หนึ่ง จึงเก็บ snapshot ที่มาและ D ของแถวต้นทางใน Lesson เดิมได้โดยไม่สร้างตาราง/รหัสใหม่ รายละเอียดฟิลด์ ข้อจำกัด และสิ่งที่ arch ต้องแก้อยู่ใน [physical delta และสัญญาที่เสนอ](migration-002-lesson-import-source-contract.md)
+หนึ่ง Lesson เป็นหนึ่งบทเรียนใน curriculum revision หนึ่ง จึงเก็บ snapshot ที่มาและ D (การอนุมัติจากต้นทางรายแถว) ใน Lesson เดิมได้โดยไม่สร้างตารางหรือรหัสใหม่ ข้อเสนอ Rev1 ที่เพิ่ม CHECK/index ถูกแทนด้วย Rev2 นี้ ห้ามใช้ Rev1 ต่อ หากเคยรัน Rev1 หรือมีวัตถุชื่อเดิม ให้หยุดและส่ง schema จริงให้ vault ทบทวนจากเอกสาร ห้ามถอนวัตถุเอง
 
 ## ผลต่อข้อมูลเดิมและขอบเขต
 
-- เพิ่ม `ImportSource jsonb NULL` ไม่มี DEFAULT expression; ค่าเริ่มต้นที่อ่านได้เป็น SQL NULL ทุกแถวเดิม รวม published/retired ไม่มี backfill และไม่แตะ `UpdateDate`, LessonKey, กิจกรรม หรือสถานะเผยแพร่
-- SQL NULL หมายถึงไม่มี provenance ที่ยืนยันได้ ไม่แปลว่าต้นทางไม่อนุมัติ; JSON object ต้องมีทั้งสี่ key โดย `source_approved` แยก true/false/JSON null
-- SQL บังคับโครงสร้าง, identity ตรง LessonKey, global SchoolId และความไม่ซ้ำเฉพาะแถวที่มี ImportSource รวม soft-deleted rows ความสัมพันธ์กับ parent และการห้ามแก้ published children ยังเป็น application checks ตามฐานเดิม
-- ไม่แก้ `schoolbot_db.sql`/rollback เดิม ไม่สร้าง FK ข้ามฐาน ไม่อ่าน/เขียน legacy table ไม่ใช้ Text, SourceRef envelope หรือ Audit.Reason เป็นที่เก็บ provenance
+- แถวเดิมทั้งหมดรวม published/retired อ่าน ImportSource เป็น SQL NULL ไม่มี backfill หรือ DEFAULT expression ที่ทำให้ rewrite ตาราง ไม่แตะ UpdateDate, LessonKey, กิจกรรม หรือสถานะเผยแพร่
+- SQL NULL หมายถึงไม่มี provenance ที่ยืนยันได้ ไม่แปลว่าต้นทางไม่อนุมัติ application ต้องแยก source_approved เป็น true/false/JSON null และตรวจ object สี่ key ก่อนเขียน
+- PostgreSQL บังคับเพียงชนิด jsonb/nullable; ไม่มีข้อบังคับรูปทรง ความตรงกับ LessonKey หรือความไม่ซ้ำเพิ่ม ทุก writer ต้องใช้ validation และ coordination เดียวกัน รวม idempotency-001 Rev2 และค้นก่อนเขียนในหน่วยเดียว
+- ไม่แก้ schoolbot_db.sql/rollback เดิม ไม่สร้าง FK หรืออ่าน/เขียน legacy ไม่ใช้ Text, SourceRef envelope หรือ Audit.Reason แทน provenance
 
 ## เงื่อนไขก่อนมนุษย์รัน
 
-1. ผู้ใช้อนุมัติ field/constraint/index และ arch ตรึง delta ใน DES-005 (หลักสูตรและการนำเข้า) รวมกฎ lock/publish/read-back ก่อนเปิด writer
-2. เจ้าของยืนยัน connection ไป SchoolBot DB ที่ถูกต้อง, PostgreSQL 15+, schema `public`, ตาราง/ฟิลด์เดิมตรง baseline และผู้รันเป็นเจ้าของตารางหรือมีสิทธิ์ DDL อย่านำชื่อฐานจากเอกสารไปเดา connection
-3. หยุด writer ชั่วคราว ตรวจ backup/การกู้ตามวิธีของเจ้าของ และเลือกช่วงที่รับ ACCESS EXCLUSIVE lock ได้ ทั้ง CHECK validation และการสร้าง index ปกติอาจสแกนตารางเดิม; timeout ไม่ใช่ผลสำเร็จ
-4. ต้องไม่มี ImportSource/วัตถุชื่อเดียวกันจาก migration อื่น กรณีรันซ้ำต้องมีชนิด/marker/องค์ประกอบเดิมครบ สคริปต์ไม่ซ่อม schema drift โดยเดา; marker ไม่ทดแทนการเทียบ definition จาก catalog
+1. ผู้ใช้อนุญาตเพิ่มเฉพาะคอลัมน์แล้วตามมติ 2026-11-03; arch ต้องตรึง application contract ก่อนเปิด writer การเลือกฐาน/เวลารันและการรันทุกคำสั่งเป็นหน้าที่มนุษย์
+2. เจ้าของยืนยัน connection ไป SchoolBot DB ที่ถูกต้อง, PostgreSQL 15+, schema public, ตารางเดิมตรง baseline และสิทธิ์ DDL ห้ามเดา connection จากชื่อในเอกสาร
+3. หยุด writer ตรวจ backup/วิธีกู้และเลือกช่วงที่รับ ACCESS EXCLUSIVE lock ได้ แม้ไม่มี table rewrite จาก DEFAULT ก็ยังมีความเสี่ยงรอ lock ให้มนุษย์ตั้ง session lock_timeout/statement_timeout ตามนโยบายก่อนรัน SQL ไฟล์นี้ไม่มีคำสั่งตั้งค่า session
+4. ต้องยังไม่มี ImportSource และไม่มีวัตถุจากข้อเสนอ Rev1 หรือ migration อื่น ตรวจหลักฐานก่อนรัน forward มีคำสั่ง ADD COLUMN เดียวที่ atomic แต่ไม่ใช่ idempotent: รันซ้ำจะ error ห้ามใช้ IF NOT EXISTS กลบ schema drift หาก connection ขาดหลังส่งคำสั่งให้มนุษย์ตรวจ catalog ก่อนตัดสินใจ retry
 
 ## ขั้นที่ผู้ใช้ต้องรันเอง
 
 คำสั่งต่อไปนี้เป็นคำสั่งส่งมอบ ยังไม่ได้รัน ห้ามใส่ credential ลงไฟล์หรือหลักฐานส่งกลับ
 
 ```powershell
-# ใช้ connection/service ที่เจ้าของตั้งไว้แล้วผ่าน PG* หรือวิธีขององค์กร
+# ใช้ connection/service ที่เจ้าของยืนยันและตั้ง timeout ก่อนแล้ว
 psql -X -v ON_ERROR_STOP=1 -f .\migration-002-lesson-import-source.sql
 ```
 
-ทั้งไฟล์เป็น transaction เดียว ตั้ง lock timeout 5 วินาทีและ statement timeout 60 วินาที ถ้า error ให้คง writer ปิด ตรวจสาเหตุ และ retry ทั้งไฟล์หลัง transaction ถูก rollback ห้ามข้ามคำสั่งที่ล้ม การรันซ้ำหลังสำเร็จเป็น no-op; วัตถุชื่อชนหรือองค์ประกอบขาดจะหยุด
-
-มนุษย์รัน catalog queries ด้านล่างและบันทึก definition/ผลจริง จากนั้นทดสอบ forward ซ้ำ, rollback ก่อนมี provenance, forward อีกครั้ง และทดสอบ rollback ถูกปฏิเสธหลังมี provenance บนฐานทดสอบที่อนุมัติเท่านั้น ยังไม่มีผล runtime ของชุดนี้
+เมื่อ error ให้คง writer ปิดและตรวจสาเหตุ ไม่ข้ามข้อผิดพลาด หลังสำเร็จให้มนุษย์บันทึกผล catalog และทดสอบ rollback บนฐานทดสอบที่อนุมัติ ก่อนใช้จริง ต้องพิสูจน์ทั้งกรณีไม่มี provenance และกรณี guard ปฏิเสธเมื่อมีข้อมูลหรือ dependency ยังไม่มีผล runtime ของชุดนี้
 
 ## คำสั่งตรวจหลังรัน (มนุษย์รันเอง)
 
 ```sql
--- คาด ImportSource=jsonb, nullable=true, default_expr=NULL, generated=''
+-- คาด ImportSource=jsonb, nullable=true, default_expr=NULL, generated='', identity=''
 SELECT a.attname, format_type(a.atttypid,a.atttypmod) AS type,
        NOT a.attnotnull AS nullable, a.attgenerated AS generated,
-       pg_get_expr(d.adbin,d.adrelid) AS default_expr,
-       col_description(a.attrelid,a.attnum) AS marker
+       a.attidentity AS identity,
+       pg_get_expr(d.adbin,d.adrelid) AS default_expr
 FROM pg_attribute a
 LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
 WHERE a.attrelid='public."SchoolBotLesson"'::regclass
   AND a.attname='ImportSource' AND NOT a.attisdropped;
 
--- คาด CHECK หนึ่งรายการ validated=true; เทียบ expression กับ forward SQL
-SELECT conname, contype, convalidated, pg_get_constraintdef(oid) AS definition
-FROM pg_constraint
-WHERE conrelid='public."SchoolBotLesson"'::regclass
-  AND conname='CK_SchoolBotLesson_ImportSource_v1';
-
--- คาด unique/valid/ready=true; btree (CurriculumId,LessonKey)
--- predicate ImportSource IS NOT NULL; ไม่มีตัวกรอง IsDelete
-SELECT i.indisunique, i.indisvalid, i.indisready,
-       pg_get_indexdef(i.indexrelid) AS definition
-FROM pg_index i
-WHERE i.indexrelid=to_regclass('public."UX_SchoolBotLesson_ImportSource_Row_v1"');
+-- คาดไม่มี dependency: migration นี้ไม่เพิ่ม constraint/index
+SELECT d.classid::regclass AS object_catalog, d.objid, d.objsubid, d.deptype
+FROM pg_depend d
+JOIN pg_attribute a ON a.attrelid=d.refobjid AND a.attnum=d.refobjsubid
+WHERE d.refclassid='pg_class'::regclass
+  AND a.attrelid='public."SchoolBotLesson"'::regclass
+  AND a.attname='ImportSource' AND NOT a.attisdropped;
 ```
 
-หลัง forward คาด 32 ตาราง/451 ฟิลด์, PK32, FK0, CHECK1, unique constraint0 และ unique index เพิ่มหนึ่งรายการนอก PK (รวม index33) เฉพาะเมื่อฐานก่อนหน้าตรงไฟล์เดิมและไม่มี migration อื่น ตัวเลขนี้เป็น expected จากไฟล์ ไม่ใช่ผล catalog ที่ deploy แล้ว
+เทียบ constraint/index inventory ก่อนและหลังด้วยวิธีของเจ้าของ: ต้องไม่เพิ่มจาก migration นี้ หาก baseline ตรงผลตรวจเดิม คาด 32 ตาราง/451 ฟิลด์, PK32, FK0, CHECK0, unique constraint0 และ index32 (เฉพาะ PK) ตัวเลขนี้อ้าง baseline จากผลตรวจ Rev1 ไม่ใช่ catalog ที่ deploy แล้ว และไม่ครอบคลุม migration อื่น
 
 ## Rollback ที่ไม่สูญข้อมูล
 
-**DESTRUCTIVE ต่อโครงสร้าง:** [rollback SQL](migration-002-lesson-import-source-rollback.sql) ถอน CHECK/index/column เฉพาะเมื่อทุกแถวเป็น SQL NULL ตรวจภายใต้ ACCESS EXCLUSIVE lock และ `row_security=off` หากมี provenance, สิทธิ์ไม่พอ หรือโครงสร้างผิดจะหยุดทั้ง transaction ไม่มี CASCADE และไม่ลบ Lesson
+**DESTRUCTIVE ต่อโครงสร้าง:** [rollback SQL](migration-002-lesson-import-source-rollback.sql) ถอนเฉพาะ ImportSource เมื่อทุกแถวเป็น SQL NULL ชนิด/NULL/default/generated ตรงแบบ และไม่มี dependency ใด ตรวจใต้ ACCESS EXCLUSIVE lock และ row_security=off ถ้าข้อมูลถูก RLS ซ่อน สิทธิ์ไม่พอ มี provenance แม้ JSON null หรือมี dependency จะหยุด transaction ไม่มี CASCADE ไม่ล้าง provenance ไม่ลบ Lesson
+
+ไม่มี COMMENT marker ตามมติที่เพิ่มเฉพาะคอลัมน์ มนุษย์ต้องยืนยันจากหลักฐานรันว่าเป็นคอลัมน์ที่ migration นี้เพิ่มและไม่มี consumer ใช้งานแล้ว การตรวจ catalog ไม่พิสูจน์ที่มาของคอลัมน์หรือ dependency ของ application นอกฐาน หากไม่แน่ใจให้คง schema และข้อมูลไว้
 
 ```powershell
-# มนุษย์รันหลังหยุด writer และตรวจว่าไม่มี migration ใหม่พึ่งคอลัมน์นี้
+# มนุษย์รันหลังหยุด writer และยืนยันที่มาคอลัมน์/ไม่มี consumer หรือ migration ใหม่พึ่ง
 psql -X -v ON_ERROR_STOP=1 -f .\migration-002-lesson-import-source-rollback.sql
 ```
 
-หลังถอนสำเร็จ catalog queries ทั้งสามต้องคืนศูนย์แถว; rollback ซ้ำเป็น no-op เมื่อ column และวัตถุที่เกี่ยวถูกถอนไปแล้ว หากมี provenance ให้เก็บ schema และข้อมูลไว้ ใช้ forward fix ที่ทบทวนใหม่ ห้ามล้าง provenance เพื่อให้ guard ผ่าน
+หลังถอนสำเร็จคำสั่งตรวจคอลัมน์ต้องคืนศูนย์แถว rollback ซ้ำเป็น no-op เมื่อไม่มีคอลัมน์ หาก guard หยุดให้ใช้ forward fix ที่ทบทวนใหม่ ห้ามล้างข้อมูลหรือถอน dependency เพื่อบังคับให้ผ่าน
 
 ## หลักฐาน
 
-- อ่าน `_common.txt` ของใบงาน 097, BE-028 และ acceptance ใน tasks-001.json; ขอบเขต AC-045-01..04 คือเก็บ D/ที่มา, ตัด O, สื่ออยู่ Lesson เดียว และ identity คงเดิม
-- [SQL เดิม](schoolbot_db.sql), [rollback เดิม](schoolbot_db_rollback.sql), [พจนานุกรม Lesson](../design/data-dictionary/table-013.md) และ [DBML เต็ม](../design/schoolbot.dbml) เป็นหลักฐาน static เท่านั้น
-- ผลตรวจไฟล์และรายการ mismatch ส่ง arch อยู่ท้าย [physical delta](migration-002-lesson-import-source-contract.md); ไม่เชื่อมฐานหรือรัน SQL รวมถึง SELECT
+- มติผู้ใช้ในใบงาน 097 วันที่ 2026-11-03: "เพิ่ม column ได้ แต่ไม่เพิ่ม index หรืออะไรทั้งนั้น เพิ่มได้ คอลลั่ม" และกติการ่วม normal-097/_common.txt
+- อ่าน forward/rollback/เอกสาร migration ทั้งห้าไฟล์และรายงานรอบก่อน normal-097/vault-A.out; รายการผลตรวจ baseline ของรอบก่อนแยกใน [ผลทบทวน](migration-002-lesson-import-source-review.md)
+- อ่าน [idempotency-001 Rev2](../design/idempotency-001.md) เพื่อเสนอ application contract; ไม่ตรวจ importer implementation หรือรัน SQL รวม SELECT
