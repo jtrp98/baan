@@ -85,6 +85,7 @@ export function normalizeDagTasks(tasks) {
     // ค่าดิบเก็บไว้ให้ lint บอกค่าผิดได้ — ไม่มีฟิลด์ = null (แผนเก่า)
     risk: typeof t.risk === "string" ? t.risk.trim().toLowerCase() : (t.risk ?? null),
     wave: t.wave ?? null,
+    tier: typeof t.tier === "string" ? t.tier.trim().toLowerCase() : null,
     oracle: nonEmpty(t.oracle),
     ref: nonEmpty(t.ref),
     slices: list(t.slices).map((s) => ({
@@ -152,6 +153,10 @@ export function lintPlanVerification(tasks) {
   const unchecked = (id) => byId.get(id)?.risk === "high" && deriveTaskStatus(byId.get(id)) !== "verified";
   const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
   if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — ตรวจ task high ก่อน ไม่งั้นถ้ามันตกต้องรื้องานเหล่านี้ตาม: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
+  // รอบตกของงาน high = writer + check บนคิว writer เดียว แพงกว่าส่วนต่างค่า model (charter ข้อ 2) — school-bot
+  // 2026-11-03 งาน high ฝั่ง backend ทุกงานตั้ง t3 และเวลา rework รวมมากกว่าเวลาเขียนรอบแรก
+  const weakHigh = open.filter((t) => t.risk === "high" && ["sys", "front"].includes(t.role) && /^t[3-5]$/.test(t.tier ?? ""));
+  if (weakHigh.length) warnings.push(`task high ที่ writer ใช้ tier ต่ำกว่า t2 ${weakHigh.length} งาน — ตกหนึ่งรอบเสีย writer + check บนคิวเดียว ตั้ง t2 ขึ้นไป: ${labels(weakHigh.map((t) => `${t.id}@${t.tier}`))}`);
   const waveSizes = new Map();
   for (const t of tasks) if (isWave(t.wave)) waveSizes.set(t.wave, (waveSizes.get(t.wave) ?? 0) + 1);
   // 6 = เพดานขนาด wave (3–6 task) ใน roles/gm.md — diff ทั้ง wave ใหญ่กว่านี้ผู้ตรวจ gate ใบเดียวเริ่มหลุด (recall ตกตามขนาดก้อน)
