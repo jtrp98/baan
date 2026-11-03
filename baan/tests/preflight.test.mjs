@@ -34,6 +34,16 @@ test("write-outside: path นอก cwd ที่ยังไม่มี = role
   assert.deepEqual(preflightTask({ task: "เขียนที่ c:\\WS\\Target\\School-Bot\\x.md", cwd: CWD, write: true }, none), [], "Windows ไม่สนตัวพิมพ์");
 });
 
+test("write-outside: workspace ที่มีช่องว่างใน path (OneDrive) ไม่เตือนผิด · คำในประโยคถัดไปไม่ถูกกลืนเป็นชื่อไฟล์", () => {
+  const cwd = "C:\\Users\\a\\OneDrive - Co\\proj";
+  const dirs = new Set(["C:\\Users\\a", "C:\\Users\\a\\OneDrive - Co", cwd, "C:\\ws"]);
+  const exists = (p) => dirs.has(p);
+  assert.deepEqual(preflightTask({ task: "เขียนผลที่ C:\\Users\\a\\OneDrive - Co\\proj\\out.md แล้วจบ", cwd, write: true }, { ...none, exists }), []);
+  const p = preflightTask({ task: "สร้าง C:\\ws\\new.md and then stop", cwd, write: true }, { ...none, exists });
+  assert.deepEqual(codes(p), ["write-outside"]);
+  assert.match(p[0].message, /C:\\ws\\new\.md — /);
+});
+
 test("write-outside: ข้ามบรรทัด memory ของ module จาก --module-context (นายช่างบันทึกเอง)", () => {
   const task = "- memory ของ module: C:\\ws\\memory\\school-bot\\quiz\nแก้ไฟล์ใน cwd";
   assert.deepEqual(preflightTask({ task, cwd: CWD, write: true }, none), []);

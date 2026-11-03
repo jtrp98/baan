@@ -13,10 +13,26 @@ const GIT_HISTORY = /\bgit\s+(?:-C\s+\S+\s+)?(?:show|diff|log|blame)\b|\bHEAD:/;
 const WIN_PATH = /[A-Za-z]:[\\/][^\s"'`<>|*?()[\]\u0E00-\u0E7F]+/g;
 const TASK_FILE_CAP = 64 * 1024;
 
-export function extractWinPaths(text) {
+const clean = (p) => p.replace(/[.,;:]+$/, "").replace(/#L\d+(?:-L\d+)?$/, "").replace(/:\d+(?::\d+)?$/, "");
+const SPACED_TAIL = /^(?: [^\s"'`<>|*?()[\]\u0E00-\u0E7F]+){1,6}/;
+
+// exists (ถ้าส่ง): path ที่ถูกตัดตรงช่องว่างแล้วไม่มีอยู่ ลองต่อคำถัดไป (เช่น "C:\Users\a\OneDrive - Co\proj")
+// เลือกตัวที่ยาวสุดซึ่งมีอยู่ หรือข้ามช่องว่างเข้าไปถึงโฟลเดอร์ที่มีอยู่ (ไฟล์ที่จะสร้างในนั้น) — ไม่ต่อ = workspace
+// ที่มีช่องว่างถูกเตือนผิดทุก path · ห้ามรับแค่ "โฟลเดอร์แม่เดิมมีอยู่" ไม่งั้นคำในประโยคถัดไปจะถูกกลืนเป็นชื่อไฟล์
+export function extractWinPaths(text, exists = null) {
+  const s = String(text ?? "");
   const out = new Set();
-  for (const m of String(text ?? "").matchAll(WIN_PATH)) {
-    const p = m[0].replace(/[.,;:]+$/, "").replace(/#L\d+(?:-L\d+)?$/, "").replace(/:\d+(?::\d+)?$/, "");
+  for (const m of s.matchAll(WIN_PATH)) {
+    let p = path.win32.normalize(clean(m[0]));
+    const tail = exists && !exists(p) ? SPACED_TAIL.exec(s.slice(m.index + m[0].length)) : null;
+    if (tail) {
+      const words = tail[0].slice(1).split(" ");
+      for (let i = words.length; i > 0; i--) {
+        const c = path.win32.normalize(clean(`${m[0]} ${words.slice(0, i).join(" ")}`));
+        const dir = path.win32.dirname(c);
+        if (exists(c) || (dir.length > path.win32.dirname(p).length && exists(dir))) { p = c; break; }
+      }
+    }
     if (p.length > 3) out.add(path.win32.normalize(p));
   }
   return [...out];
@@ -60,7 +76,7 @@ export function preflightTask({ task, cwd, write }, { exists = existsSync, gitRo
   if (write && /^[A-Za-z]:/.test(cwd)) {
     // บรรทัด "memory ของ module" จาก baan --module-context ชี้ที่ที่นายช่างจะบันทึกภายหลัง ไม่ใช่ปลายทางของ role
     const scanned = task.replace(/^- memory ของ module:.*$/gm, "");
-    const missing = extractWinPaths(scanned).filter((p) => !insideDir(cwd, p) && !exists(p));
+    const missing = extractWinPaths(scanned, exists).filter((p) => !insideDir(cwd, p) && !exists(p));
     if (missing.length) {
       problems.push({
         code: "write-outside",
