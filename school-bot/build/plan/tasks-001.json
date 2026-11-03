@@ -996,7 +996,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-01-48-00-sys-tier-t3-1agents-iMUzTb",
-          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate"
+          "note": "2026-11-03 /v2/admin/licenses บน backing store stub (มติ053) · นายช่างรันซ้ำ dotnet test web/SchoolBot.slnx 4206/0/0 · /v1/admin ปิดเป็นค่าเริ่มต้น · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
         }
       ]
     },
@@ -1041,7 +1041,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-25-40-sys-tier-t3-1agents-iEurV3",
-          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high)"
+          "note": "2026-11-03 activate/validate/lease บน stub + test signer (มติ047/053) · นายช่างรันซ้ำ 4227/0/0 · รอ check+jpo (high) · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
         }
       ]
     },
@@ -1251,7 +1251,7 @@
           ],
           "status": "done-local",
           "evidence": "planning/task-095.md; reports/baan/2026-11-03-02-08-24-sys-tier-t3-1agents-8CwCK9",
-          "note": "2026-11-03 /v2/projects บน backing store stub (มติ053) · นายช่างรันซ้ำ 4213/0/0 · รอ wave gate"
+          "note": "2026-11-03 /v2/projects บน backing store stub (มติ053) · นายช่างรันซ้ำ 4213/0/0 · รอ wave gate · 2026-11-03 check yoDqtV FAIL (rework 1/2 ค้าง) — ดู planning/task-095.md"
         }
       ]
     },
