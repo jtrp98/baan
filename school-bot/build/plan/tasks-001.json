@@ -1324,12 +1324,14 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
       "module": [
         "app-shell",
         "arm-lab"
-      ]
+      ],
+      "oracle": "SA-003 acceptance + close_evidence G-ROBOT-CONTRACT + มติ053 ข้อ4 (ตรึง 2026-11-03)",
+      "ref": "knowledge des-006-review* Rev1 · des-006 Rev3 · robot-boundary-001 Rev2 (2026-11-03) · check RXZyza PASS"
     },
     {
       "id": "BE-011",
@@ -2010,9 +2012,27 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
-      "module": "quiz"
+      "module": "quiz",
+      "oracle": "มติ053 ข้อ3 + acceptance/ac_ids ตรึง 2026-11-03 (slice S1 ร่างจาก source)",
+      "ref": "knowledge modules/quiz/shared/content-001* Rev1 (2026-11-03) · check 6dWcGa PASS",
+      "slices": [
+        {
+          "id": "BA-005-S1-source-draft",
+          "ac_ids": [
+            "AC-037-02",
+            "AC-037-05",
+            "AC-037-06",
+            "AC-038-01"
+          ],
+          "status": "verified",
+          "oracle": "มติ053 ข้อ3 + acceptance/ac_ids ตรึง 2026-11-03 (slice S1 ร่างจาก source)",
+          "ref": "knowledge modules/quiz/shared/content-001* Rev1 (2026-11-03) · check 6dWcGa PASS",
+          "evidence": "planning/task-095.md",
+          "note": "ร่างติดป้ายสมมติฐาน · การเซ็นรับเนื้อหาจริงผูกที่ BE-015/FE-013 ตามมติ053"
+        }
+      ]
     },
     {
       "id": "BA-006",
@@ -2043,9 +2063,28 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
-      "module": "quiz"
+      "module": "quiz",
+      "oracle": "มติ053 ข้อ3 + acceptance/ac_ids ตรึง 2026-11-03 (slice S1 ร่างจาก source)",
+      "ref": "knowledge modules/quiz/shared/content-001* Rev1 (2026-11-03) · check 6dWcGa PASS",
+      "slices": [
+        {
+          "id": "BA-006-S1-source-draft",
+          "ac_ids": [
+            "AC-037-02",
+            "AC-037-05",
+            "AC-037-06",
+            "AC-038-02",
+            "AC-038-03"
+          ],
+          "status": "verified",
+          "oracle": "มติ053 ข้อ3 + acceptance/ac_ids ตรึง 2026-11-03 (slice S1 ร่างจาก source)",
+          "ref": "knowledge modules/quiz/shared/content-001* Rev1 (2026-11-03) · check 6dWcGa PASS",
+          "evidence": "planning/task-095.md",
+          "note": "ร่างติดป้ายสมมติฐาน · การเซ็นรับเนื้อหาจริงผูกที่ BE-015/FE-013 ตามมติ053"
+        }
+      ]
     },
     {
       "id": "BE-016",

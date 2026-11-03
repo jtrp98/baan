@@ -1,9 +1,9 @@
----
+﻿---
 legacy: true
 ---
 # สารบัญ UX/UI ของ SchoolBot
 
-> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> แก้ล่าสุด 2026-11-03 · แก้โดย int · ขอโดย ผู้ใช้ (เพิ่มทางเข้าหลักฐาน UX admin และข้อสอบ)
 
 เอกสารทั้ง 7 ชุดมีผล Sign-off ครบตามบันทึกเดิม การอนุมัติครอบคลุมรูปแบบ ข้อความ สถานะ การเข้าถึง และ interaction ตามขอบเขตที่เซ็น ไม่ใช่หลักฐาน UI/runtime หรือการอนุมัติฐานข้อมูล ความปลอดภัย อุปกรณ์จริง และการเชื่อมระบบ
 
@@ -32,6 +32,12 @@ legacy: true
 - ชุด 7: [ลำดับทำข้อสอบ](../../modules/quiz/build/legacy-ux/int-007-attempt-policy-flow.md) · [recovery-a11y](../../modules/quiz/build/legacy-ux/int-007-recovery-a11y.md) · [states](../../modules/quiz/build/legacy-ux/int-007-states.md) · [teacher-score](../../../schoolbright-web/modules/school-bot/build/legacy-ux/int-007-teacher-score.md) · [trace](../../modules/quiz/build/legacy-ux/int-007-trace.md) · [states-flows](../../modules/quiz/build/legacy-ux/int-007-states-flows.md) · [states-auth](../../modules/quiz/build/legacy-ux/int-007-states-auth.md) · [teacher-score-promotion](../../../schoolbright-web/modules/school-bot/build/legacy-ux/int-007-teacher-score-promotion.md) · [trace-acceptance](../../modules/quiz/build/legacy-ux/int-007-trace-acceptance.md) · [trace-constraints](../../modules/quiz/build/legacy-ux/int-007-trace-constraints.md) · [teacher-score-timing-weights](../../../schoolbright-web/modules/school-bot/build/legacy-ux/int-007-teacher-score-timing-weights.md)
 
 
+## หลักฐานสำหรับตรวจแบบที่อนุมัติ
+
+- [UX-005 หลักสูตรและคลังข้อสอบ](evidence-ux-005.md): ตารางครบ 12 เกณฑ์ตรวจรับ อ้างหน้าจอและสถานะที่อนุมัติ พร้อม expected และข้อจำกัดหลักฐานจริง
+- [UX-007 ข้อสอบ นโยบายคะแนน และเลื่อน Level](../../modules/quiz/build/legacy-ux/evidence-ux-007.md): ตารางครบ 16 เกณฑ์ตรวจรับ รวมผลหมดเวลา
+- [เงื่อนไขร่วมและสัญญาปัจจุบัน](evidence-ux-preconditions.md): เทียบ preconditions กับมติอนุมัติและ DES ล่าสุด โดยแยกการอนุมัติ UX ออกจากผล UI/runtime
+
 ## เงื่อนไขการนำไปใช้
 
 Front ใช้ส่วนที่เซ็นแล้วและตรวจสัญญาของงานที่จะเชื่อมจริงก่อน implement ช่องว่างด้านอ่าน/แก้ร่าง นำเข้า Sheet คลังข้อสอบ อ่าน Attempt ผลหมดเวลา snapshot คะแนน และเส้นทางบริการยังติดตามใน [ช่องว่างสัญญา Learning/UX](../design/learning-ux-contract-gaps-001.md) การอนุมัติ UX ไม่ปิดเงื่อนไขผู้รับผิดชอบ ฐานข้อมูล ความปลอดภัย อุปกรณ์จริง หรือ backend dependencies; H5 คือเงื่อนไข route/env/network/trust ระหว่างระบบ FullLogin ยังไม่มีหลักฐานพร้อมใช้งานจริง กฎ web-system ใช้ DESIGN และ shared props ของ repository ตามเอกสารชุดนี้
@@ -40,3 +46,4 @@ Front ใช้ส่วนที่เซ็นแล้วและตรว�
 
 - ผลตรวจเอกสารฐานร่าง: check073 PASS (memory: planning/check-073-ux-final-001.md)
 - ผลตรวจข้อความหมดเวลาและการปิดข้อพบเอกสาร: check080 และ check082 (memory: planning/check-080-expired-delta-001.md; planning/check-082-expired-spot-001.md)
+
