@@ -1,5 +1,7 @@
 // สถานะงาน + dependency + การ execute ตาม wave ของแผน DAG
 import path from "node:path";
+import { classifyFailure } from "./failure-class.mjs";
+import { appendEvent } from "./ledger.mjs";
 import { roleDirective } from "./prompts.mjs";
 import { buildArgs, runCli } from "./runner.mjs";
 import { fallbackChainFor } from "./plan.mjs";
@@ -72,9 +74,13 @@ async function runRoleTask(cfg, opts, runDir, t, ctxBlocks, agent = t.agent) {
   const answerFile = path.join(runDir, `${t.id}.answer.txt`);
   const timeoutSec = opts.timeoutSec;
   const prompt = roleDirective(t.role, t.task, ctxBlocks, opts.projectCtx, opts.date || undefined, t.testLevel ?? opts.testLevel);
-  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile, opts.workspaceRoot);
+  const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", opts.write, answerFile, opts.workspaceRoot, opts.usage);
   if (def.promptVia === "arg") args.push(prompt);
-  return runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile);
+  const base = { run: path.basename(runDir), taskIds: [t.id], role: t.role, tier: t.tier, agent, model: conf.model ?? "", effort: conf.effort ?? "", mode: opts.write ? "write" : "read-only" };
+  appendEvent(opts.ledgerDir, { type: "call_start", ...base, promptBytes: Buffer.byteLength(prompt, "utf8") });
+  const r = await runCli(def, args, def.promptVia, prompt, opts.cwd, timeoutSec, answerFile, { usage: opts.usage });
+  appendEvent(opts.ledgerDir, { type: "call_end", ...base, startedAt: r.startedAt, durationMs: r.durationMs, cliOk: r.ok, exitCode: r.exitCode, timedOut: r.timedOut, usage: r.usage });
+  return r;
 }
 
 // ตรวจว่าความล้มเหลวเกิดจากโควตา/limit หรือไม่ — ใช้ข้อความจริงที่แต่ละ CLI แจ้ง
@@ -165,6 +171,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
     console.log(`\n── wave ${wave}: ${batch.map((t) => `${t.id}(${t.role}/${t.tier}@${t.agent})`).join(" + ")} ──`);
 
     const results = await Promise.all(batch.map(async (t) => {
+      const startedAt = new Date().toISOString();
       const ctxBlocks = buildCtxBlocks(runDir, t, states);
       // ลำดับตัวรัน: ตัวที่เลือกมาก่อน — สลับตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
       // (cfg ที่ไม่รู้จัก agent เลย เช่นตอนทดสอบ = เรียกตัวเดิมหนึ่งครั้งตามปกติ)
@@ -177,10 +184,10 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
         { onRetry: (...a) => console.log(`  ${t.id}: ${capacityRetryText(...a)}`) },
       );
       t.agent = usedAgent;
-      return { t, r, fallbackTrail };
+      return { t, r, fallbackTrail, startedAt };
     }));
 
-    for (const { t, r, fallbackTrail } of results) {
+    for (const { t, r, fallbackTrail, startedAt } of results) {
       pending.splice(pending.findIndex((p) => p.id === t.id), 1);
       writeAtomic(path.join(runDir, `${t.id}.answer.txt`), r.answer ?? "");
       writeAtomic(path.join(runDir, `${t.id}.stderr.txt`), r.stderr ?? "");
@@ -195,7 +202,10 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
         exitCode: r.exitCode ?? null,
         timedOut: !!r.timedOut,
         error: r.error || "",
+        startedAt,
         durationMs: r.durationMs ?? 0,
+        failureClass: classifyFailure({ state: cls.state, answer: r.answer, error: r.error }),
+        usage: r.usage ?? null,
         attempt: (typeof prior?.attempt === "number" ? prior.attempt : 0) + 1,
         fallback: fallbackTrail,
         finishedAt: new Date().toISOString(),
@@ -203,6 +213,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
         stderrFile: path.join(runDir, `${t.id}.stderr.txt`),
       };
       writeCheckpoint(runDir, rec);
+      appendEvent(opts.ledgerDir, { type: "task_result", run: path.basename(runDir), taskIds: [t.id], role: t.role, agent: rec.agent, state: rec.state, failureClass: rec.failureClass, fallback: fallbackTrail });
       states.set(t.id, { ...rec, answer: r.answer ?? "" });
       console.log(`  ${t.id} ${statusLabel(rec)} in ${((r.durationMs ?? 0) / 1000).toFixed(1)}s${fallbackTrail.length ? ` (สลับตัวรัน: ${fallbackTrail.join(", ")})` : ""} — ${t.title}`);
       if (!rec.ok) console.log(`    สถานะ: ${rec.state} · stderr: ${rec.stderrFile}`);
@@ -224,7 +235,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
       return {
         id: t.id, role: t.role, agent: s?.agent ?? t.agent, tier: t.tier, title: t.title,
         state: s?.state ?? "pending", ok: s?.ok ?? false, marker: s?.marker ?? null,
-        blockedBy: s?.blockedBy, durationMs: s?.durationMs ?? 0,
+        blockedBy: s?.blockedBy, startedAt: s?.startedAt ?? null, durationMs: s?.durationMs ?? 0, failureClass: s?.failureClass ?? null,
       };
     }),
     humanGates: plan.humanGates ?? [],

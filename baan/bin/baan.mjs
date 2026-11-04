@@ -11,6 +11,7 @@ import { lintKnowledge, qualify, scanProjects, updateIndexes, uxKnowledgeDirs } 
 import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
 import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
+import { ledgerDirOf } from "../src/ledger.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { formatSweep, sweep } from "../src/sweep.mjs";
@@ -20,7 +21,7 @@ import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
-  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, index: false, lintKnowledge: false, knowledgeGit: "", memoryGit: "", workspace: "", target: "", module: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", testLevel: "", explicit: new Set() };
+  const opts = { goal: "", goalFile: "", dryRun: false, planFile: "", lintPlan: "", sweep: [], sweepIn: [], resume: "", list: false, init: false, commit: false, index: false, lintKnowledge: false, knowledgeGit: "", memoryGit: "", workspace: "", target: "", module: "", agent: "", plannerTier: "", maxParallel: 0, cwd: "", timeoutSec: 0, write: false, config: "", date: "", testLevel: "", usage: false, explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     switch (a) {
@@ -48,6 +49,7 @@ function parseArgs(argv) {
       case "--cwd": opts.cwd = argv[++i] ?? ""; opts.explicit.add("cwd"); break;
       case "--timeout": opts.timeoutSec = validateTimeout(Number(argv[++i])); opts.explicit.add("timeoutSec"); break;
       case "--write": opts.write = true; opts.explicit.add("write"); break;
+      case "--usage": opts.usage = true; break;
       case "--config": opts.config = argv[++i] ?? ""; opts.explicit.add("config"); break;
       case "--date":
         try { opts.date = parseWorkDate(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
@@ -56,7 +58,7 @@ function parseArgs(argv) {
         try { opts.testLevel = validateTestLevel(argv[++i]); } catch (e) { console.error(e.message); process.exit(2); }
         break;
       default:
-        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]] [--commit] [--index] [--lint-knowledge] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] [--module <project>/<module>[+<module>...]] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--test-level normal|full] [--write]`);
+        console.error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\nใช้: baan [--list] [--init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]] [--commit] [--index] [--lint-knowledge] [--lint-plan <tasks.json>] [--sweep "<ข้อความเดิม>" ... [--sweep-in <module dir> ...]] [--config <file>] [--target <name>] [--module <project>/<module>[+<module>...]] --goal "..." [--goal-file <f>] [--dry-run] [--agent <a>] [--planner-tier <t>] [--plan-file <f>] [--resume <runDir>] [--cwd <dir>] [--max-parallel <n>] [--timeout <sec>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--usage]`);
         process.exit(2);
     }
   }
@@ -88,9 +90,9 @@ export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, p
     (agent) => {
       const def = cfg.agents[agent];
       const conf = cfg.tiers[tier]?.[agent] ?? {};
-      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile, opts.workspaceRoot);
+      const args = buildArgs(def, conf.model ?? "", conf.effort ?? "", false, answerFile, opts.workspaceRoot, opts.usage);
       if (def.promptVia === "arg") args.push(promptText);
-      return runner(def, args, def.promptVia, promptText, opts.cwd, resolveTimeout(opts, cfg.tiers[tier]), def.answerFrom === "answerFile" ? answerFile : undefined);
+      return runner(def, args, def.promptVia, promptText, opts.cwd, resolveTimeout(opts, cfg.tiers[tier]), def.answerFrom === "answerFile" ? answerFile : undefined, { usage: opts.usage });
     },
     (from, to, reason) => console.log(`[${fileName.split(".")[0]}] ${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${tier})`),
   );
@@ -152,6 +154,7 @@ async function main() {
   cfg.roleNames = listRoles().filter((r) => !isInteractiveRole(r)).map((r) => r.name);
   // รากของ workspace (จาก config เดียวกับที่โหลดไป) — ให้ runner ส่ง --add-dir ให้ agy โหมดอ่าน อ่าน knowledge/ นอก cwd ได้
   opts.workspaceRoot = workspaceRootOf(opts.config || null);
+  opts.ledgerDir = ledgerDirOf(opts.workspaceRoot);
 
   opts.agent = opts.agent || ws.defaults.agent;
   opts.plannerTier = opts.plannerTier || ws.defaults.planner_tier;

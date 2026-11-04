@@ -9,7 +9,7 @@ import { parseWorkDate } from "./prompts.mjs";
 import { capacityRetryText, classifyOutcome, runWithFallback, switchReasonText } from "./scheduler.mjs";
 
 export { DEFAULT_TIMEOUT_SEC };
-export const ROLE_USAGE = `ใช้ [--agent <name>] [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--list]`;
+export const ROLE_USAGE = `ใช้ [--agent <name>] [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--task-id <id[,id...]>] [--usage] [--list]`;
 
 // cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ นายช่าง ที่อยู่ใน
 // workspace จริงแต่ลืมส่ง --cwd ได้ role ที่อ่านไฟล์ผิด repo โดยไม่มีอะไรเตือน
@@ -17,7 +17,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
     agents: [], task: "", taskFile: "", write: false, seq: false, list: false,
     cwd: path.resolve(baseCwd), timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false,
-    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", testLevel: "", fallback: true, preflight: true,
+    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", testLevel: "", fallback: true, preflight: true, taskIds: [], usage: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -44,6 +44,14 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
       case "--test-level": opts.testLevel = validateTestLevel(argv[++i]); break;
       case "--no-fallback": opts.fallback = false; break;
       case "--no-preflight": opts.preflight = false; break;
+      // id ของ task ในแผนที่ call นี้ทำ — เดิม metrics ต้องแกะจากข้อความใบงาน ซึ่งไม่มี id ใน 29 จาก 133 call
+      case "--task-id": {
+        const ids = String(argv[++i] ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+        if (!ids.length) throw new Error(`--task-id ต้องมี id อย่างน้อยหนึ่งตัว (คั่นด้วย ,)\n${ROLE_USAGE}`);
+        opts.taskIds.push(...ids);
+        break;
+      }
+      case "--usage": opts.usage = true; break;
       default: throw new Error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\n${ROLE_USAGE}`);
     }
   }

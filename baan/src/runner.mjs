@@ -16,14 +16,97 @@ function killTree(child) {
 // (พบจริงจาก SA ที่ cwd=target อ่าน knowledge/ ไม่ได้) · โหมดเขียนไม่ใส่ เพราะ --add-dir
 // ขยายขอบเขต "การเขียน" ตามไปด้วย (ทดสอบแล้วใน accept-edits) — งานเขียนจึงต้องอยู่ใน cwd เท่านั้น
 // ส่วนการอ่านนอก cwd ในโหมดเขียนให้ผ่าน allow-rule read_file ของเครื่อง (setup/agy/grant-read.mjs) ซึ่งไม่ให้สิทธิ์เขียน
-export function buildArgs(def, model, effort, write, answerFile, workspaceRoot = "") {
+// usage (เก็บ token): ค่ายที่ประกาศ `usage` ใน agents.json เปลี่ยนรูปแบบ output เป็น JSON — แทนที่ flag เดิม
+// (เช่น --output-format text ของ claude) แทนการต่อท้ายซ้ำ เพราะ flag ซ้ำแล้วตัวไหนชนะขึ้นกับ CLI
+// usage.insertBefore: arg ท้ายที่ต้องอยู่ท้ายสุดเสมอ — "-" ของ codex (prompt ทาง stdin) และ "--print" ของ agy
+// (กลืน arg ถัดไปเป็น prompt) จึงต้องแทรก flag ของ usage ก่อนตัวนั้น
+export function buildArgs(def, model, effort, write, answerFile, workspaceRoot = "", usage = false) {
   const fill = (arr) => arr.map((a) => a.replaceAll("<ANSWER>", answerFile).replaceAll("<MODEL>", model).replaceAll("<EFFORT>", effort).replaceAll("<WORKSPACE_ROOT>", workspaceRoot));
+  let main = fill(write ? def.writeArgs : def.readArgs);
+  if (usage && def.usage?.args) {
+    for (const flag of def.usage.replaces ?? []) {
+      const i = main.indexOf(flag);
+      if (i !== -1) main = [...main.slice(0, i), ...main.slice(i + 2)];
+    }
+    const tail = def.usage.insertBefore && main.at(-1) === def.usage.insertBefore ? [main.pop()] : [];
+    main = [...main, ...def.usage.args, ...tail];
+  }
   return [
     ...(model && def.modelArgs ? fill(def.modelArgs) : []),
     ...(effort && def.effortArgs ? fill(def.effortArgs) : []),
     ...(!write && workspaceRoot && def.workspaceDirArgs ? fill(def.workspaceDirArgs) : []),
-    ...fill(write ? def.writeArgs : def.readArgs),
+    ...main,
   ];
+}
+
+// แกะ token usage จาก output แบบ JSON ของแต่ละค่าย — รูปแบบตรวจจากของจริง (Claude Code 2.1.318, codex-cli 0.166.0)
+// claude: object เดียว { result, usage, total_cost_usd, num_turns, session_id, is_error }
+// codex: JSONL events · usage อยู่ที่ turn.completed (รวมทุก turn) · error มาเป็น event แทน stderr
+// agy (1.4.12): object เดียว { response, status, num_turns, conversation_id, usage }
+export function parseUsageOutput(format, stdout) {
+  const text = String(stdout ?? "");
+  if (format === "agy-json") {
+    try {
+      const j = JSON.parse(text.trim());
+      const u = j.usage ?? {};
+      return {
+        answer: typeof j.response === "string" ? j.response.trim() : "",
+        isError: typeof j.status === "string" && j.status !== "SUCCESS",
+        usage: {
+          inputTokens: u.input_tokens ?? 0,
+          cacheReadTokens: u.cache_read_tokens ?? 0,
+          cacheWriteTokens: 0,
+          outputTokens: (u.output_tokens ?? 0) + (u.thinking_tokens ?? 0),
+          costUsd: null,
+          turns: j.num_turns ?? null,
+          sessionId: j.conversation_id ?? null,
+        },
+        errors: [],
+      };
+    } catch { return null; }
+  }
+  if (format === "claude-json") {
+    try {
+      const j = JSON.parse(text.trim());
+      const u = j.usage ?? {};
+      return {
+        answer: typeof j.result === "string" ? j.result.trim() : "",
+        isError: j.is_error === true,
+        usage: {
+          inputTokens: u.input_tokens ?? 0,
+          cacheReadTokens: u.cache_read_input_tokens ?? 0,
+          cacheWriteTokens: u.cache_creation_input_tokens ?? 0,
+          outputTokens: u.output_tokens ?? 0,
+          costUsd: j.total_cost_usd ?? null,
+          turns: j.num_turns ?? null,
+          sessionId: j.session_id ?? null,
+        },
+        errors: [],
+      };
+    } catch { return null; }
+  }
+  if (format === "codex-jsonl") {
+    const usage = { inputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: 0, costUsd: null, turns: 0, sessionId: null };
+    const errors = [];
+    let seen = false;
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.trim().startsWith("{")) continue;
+      let ev;
+      try { ev = JSON.parse(line); } catch { continue; }
+      seen = true;
+      if (ev.type === "thread.started") usage.sessionId = ev.thread_id ?? null;
+      if (ev.type === "turn.completed" && ev.usage) {
+        usage.turns++;
+        usage.inputTokens += ev.usage.input_tokens ?? 0;
+        usage.cacheReadTokens += ev.usage.cached_input_tokens ?? 0;
+        usage.cacheWriteTokens += ev.usage.cache_write_input_tokens ?? 0;
+        usage.outputTokens += (ev.usage.output_tokens ?? 0) + (ev.usage.reasoning_output_tokens ?? 0);
+      }
+      if (ev.type === "error" || ev.type === "turn.failed") errors.push(ev.message ?? ev.error?.message ?? JSON.stringify(ev));
+    }
+    return seen ? { answer: null, isError: false, usage, errors } : null;
+  }
+  return null;
 }
 
 // เหตุที่ล้มต้องอยู่ใน report.json เลย — เดิม error ว่างเมื่อ process จบเอง (codex "at capacity" exit 1,
@@ -46,9 +129,11 @@ export function summarizeStderr(stderr) {
 
 // runCli คืนผลเสมอ (ไม่ reject) เพื่อให้ scheduler จัดการความล้มเหลวเป็นสถานะงานต่อเนื่องได้
 // ส่ง prompt ทาง stdin เมื่อทำได้ เพื่อเลี่ยงปัญหา quote อักขระพิเศษ; agy รับทาง arg และ spawn ตรงไม่ผ่าน shell
-export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint) {
+// usage = args ถูกสร้างด้วย buildArgs(..., usage=true) — ต้องแกะ stdout เป็น JSON ตาม def.usage.format
+export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint, { usage = false } = {}) {
   return new Promise((resolve) => {
     const started = Date.now();
+    const startedAt = new Date(started).toISOString();
     // ใช้ command string เดียวแทน args array สำหรับตัวที่ผ่าน shell (เลี่ยง DEP0190) — ปลอดภัยเพราะ prompt
     // ไม่เคยอยู่ใน args ของ shell
     const cmdString = [def.command, ...args.map((a) => (a.includes(" ") ? `"${a}"` : a))].join(" ");
@@ -67,18 +152,21 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
     child.on("error", (err) => {
       if (settled) return;
       settled = true; clearTimeout(timer);
-      resolve({ ok: false, exitCode: null, durationMs: Date.now() - started, timedOut: false, answer: "", error: err.message, stdout, stderr });
+      resolve({ ok: false, exitCode: null, startedAt, durationMs: Date.now() - started, timedOut: false, answer: "", error: err.message, stdout, stderr, usage: null });
     });
     child.on("close", (code) => {
       if (settled) return;
       settled = true; clearTimeout(timer);
+      const parsed = usage && def.usage?.format ? parseUsageOutput(def.usage.format, stdout) : null;
       let answer = "";
       if (def.answerFrom === "answerFile" && answerFileHint) {
         try { answer = readFileSync(answerFileHint, "utf8").trim(); } catch { /* agent ไม่ได้เขียนไฟล์ = ไม่มีคำตอบ */ }
-      } else answer = stdout.trim();
-      const ok = code === 0 && !timedOut;
-      const error = ok && answer ? "" : summarizeStderr(stderr);
-      resolve({ ok, exitCode: code, durationMs: Date.now() - started, timedOut, answer, error, stdout, stderr });
+      } else answer = parsed?.answer ?? stdout.trim();
+      // error ของ codex --json มาทาง stdout เป็น event — ต่อเข้า stderr ให้การตรวจโควตา/startup error ยังเห็น
+      const errText = parsed?.errors?.length ? `${stderr}\n${parsed.errors.map((e) => `ERROR: ${e}`).join("\n")}` : stderr;
+      const ok = code === 0 && !timedOut && !parsed?.isError;
+      const error = ok && answer ? "" : summarizeStderr(errText);
+      resolve({ ok, exitCode: code, startedAt, durationMs: Date.now() - started, timedOut, answer, error, stdout, stderr: errText, usage: parsed?.usage ?? null });
     });
     if (promptVia === "stdin") {
       child.stdin.on("error", () => {}); // กัน crash ถ้า process ตายก่อนรับ stdin

@@ -188,6 +188,8 @@ baan-role --list
 | `--no-fallback` | ไม่สลับไป AI ตัวอื่นเมื่อโควตาหมด |
 | `--no-preflight` | ข้ามการตรวจใบงานก่อนเปิด session (ดูด้านล่าง) |
 | `--test-level normal\|full` | ระดับการตรวจของ `inspect`/`check`/`sys`/`front` (ค่าเริ่มต้นจาก `defaults.test_level`) |
+| `--task-id <id[,id...]>` | id ของ task ในแผนที่ call นี้ทำ (ใส่ซ้ำหรือคั่นด้วย `,` ได้) — ลง `report.json` และ ledger ให้วัดเวลาราย task ได้ |
+| `--usage` | เก็บ token (claude, codex, agy · claude มีค่าใช้จ่ายด้วย) ลง `report.json` และ ledger · opencode ยังไม่รองรับ |
 
 ก่อนเปิด session `baan-role` จะตรวจใบงาน (รวมไฟล์ `.txt` ที่ใบงานอ้างถึง) หาเงื่อนไขที่ sandbox ของ CLI ขวางแน่ๆ ถ้าเจอจะจบด้วย exit 2 ทันทีโดยไม่เสียเวลาของ agent:
 
@@ -195,7 +197,7 @@ baan-role --list
 - `write-outside` — โหมดเขียน และใบงานอ้าง path นอก `--cwd` ที่ยังไม่มีอยู่ (role ต้องสร้างเอง แต่ sandbox อนุญาตให้เขียนเฉพาะใน cwd)
 - `git-parent` — โหมดเขียน และใบงานให้อ่านประวัติ git (`git show/diff/log`, `HEAD:`) ทั้งที่ `--cwd` อยู่ใต้ราก repo
 
-option ที่ใช้ได้ทั้งสองคำสั่ง: `--config <file>`, `--timeout <วินาที>`, `--date YYYY-MM-DD`, `--test-level normal|full`
+option ที่ใช้ได้ทั้งสองคำสั่ง: `--config <file>`, `--timeout <วินาที>`, `--date YYYY-MM-DD`, `--test-level normal|full`, `--usage`
 
 ## ผลลัพธ์และสถานะงาน
 
@@ -207,6 +209,12 @@ option ที่ใช้ได้ทั้งสองคำสั่ง: `--co
 - ผลดิบของทุก run อยู่ที่ `<workspace>\reports\baan\<เวลา>-<role>-...\` และมี `report.json` สรุปสถานะ
 - จบ run แล้ว BAAN จะ commit `knowledge` และ `memory` ให้ แยก commit ตาม module ถ้าผู้คุมงานเขียนเอกสารเองหลังจากนั้น ให้รัน `baan --commit` อีกครั้ง
 - `--resume` รันใหม่เฉพาะงานที่ยังไม่สำเร็จ
+
+### วัดว่าเวลาไปไหน
+
+- `report.json` บันทึก `startedAt`, `taskIds`, `promptBytes` และต่อผลลัพธ์ `failureClass` — แยก `ENVIRONMENT_FAILURE` (sandbox, สิทธิ์, package feed, CLI เริ่มไม่ได้, DNS) ออกจากผลของงาน (`VERDICT_FAIL`, `NEEDS_DESIGN`, `NEEDS_HUMAN`, ...)
+- ทุก call เขียน event ลง ledger `<workspace>\reports\baan\ledger\YYYY-MM-DD.jsonl` (`call_start`, `call_end`, `task_result`, `preflight_block`) — append ทีละบรรทัด เปิดหลาย `baan-role` พร้อมกันได้
+- สรุปตัวชี้วัด: `node scripts/metrics.mjs [<reports dir>] [--json]` (ไม่ระบุ = `reports\baan` ของ workspace ที่เรียก) — เวลาราย role, เหตุที่ไม่สำเร็จ, เวลาที่เสียกับสภาพแวดล้อมและรอบแก้, การใช้ slot และช่วงที่ไม่มี agent รันต่อวัน
 
 timeout เริ่มต้นคือ 1800 วินาทีต่องาน (t0 ใช้ 3600) ลำดับความสำคัญคือ `--timeout` > `_timeoutSec` ของ tier ใน `agents.json` > `defaults.timeout_sec` ใน config > 1800
 
@@ -259,10 +267,10 @@ timeout เริ่มต้นคือ 1800 วินาทีต่องา
 
 ```
 bin\       baan.mjs, baan-role.mjs (entrypoint ของสองคำสั่ง)
-src\       config, runner (เรียก CLI), prompts, plan, scheduler, run-store, init, sweep, knowledge-commit
+src\       config, runner (เรียก CLI), prompts, plan, scheduler, run-store, init, sweep, knowledge-commit, ledger, metrics, failure-class
 roles\     prompt ของแต่ละตำแหน่ง
 setup\agy\ profile อ่านอย่างเดียวของ agy
-scripts\   live-smoke.mjs
+scripts\   live-smoke.mjs, metrics.mjs
 tests\     regression tests
 ```
 

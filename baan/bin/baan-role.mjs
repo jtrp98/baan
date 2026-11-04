@@ -4,7 +4,9 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { ROLES_DIR, isInteractiveRole, listRoles, loadAgentsConfig, loadWorkspace, parseRoleHeader, reportsDirOf, resolveWorkspaceConfig, roleListText, workspaceRootOf } from "../src/config.mjs";
+import { classifyFailure } from "../src/failure-class.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
+import { appendEvent, ledgerDirOf } from "../src/ledger.mjs";
 import { TEST_LEVEL_ROLES, adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { expandTaskText, preflightTask } from "../src/preflight.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
@@ -17,6 +19,7 @@ function printResult(r) {
   console.log(`\n── ${r.agent} (${r.label})${tier ? ` [${tier}]` : ""} ── ${statusLabel(r)} in ${(r.durationMs / 1000).toFixed(1)}s${via}`);
   if (r.error) console.log(`   error: ${r.error}`);
   if (r.timedOut) console.log("   ถูกยกเลิกเพราะเกิน timeout");
+  if (r.usage) console.log(`   tokens: in ${r.usage.inputTokens} · cache read ${r.usage.cacheReadTokens} · cache write ${r.usage.cacheWriteTokens} · out ${r.usage.outputTokens}${r.usage.costUsd != null ? ` · $${r.usage.costUsd.toFixed(4)}` : ""}`);
   console.log((r.answer || "(ไม่มีคำตอบ — ดู raw output ใน reports/) ").split("\n").map((l) => `   ${l}`).join("\n"));
   if (!r.ok) console.log(`   สถานะงาน: ${r.state}${r.marker ? ` (${r.marker})` : ""} — งานไม่สำเร็จ`);
 }
@@ -82,6 +85,7 @@ async function main() {
   }
   // workspace ที่เจอจาก --cwd (เดินขึ้นหา baan.config.json) — ใช้ส่ง --add-dir ให้ agy โหมดอ่าน
   const workspaceRoot = workspaceRootOf(null, opts.cwd);
+  const ledgerDir = ledgerDirOf(workspaceRoot);
 
   let task = opts.task;
   if (!task && opts.taskFile) task = readFileSync(opts.taskFile, "utf8");
@@ -94,6 +98,7 @@ async function main() {
   if (opts.preflight) {
     const problems = preflightTask({ task: expandTaskText(task), cwd: opts.cwd, write: opts.write });
     if (problems.length) {
+      appendEvent(ledgerDir, { type: "preflight_block", role: opts.role || null, taskIds: opts.taskIds, codes: problems.map((p) => p.code) });
       console.error([
         "preflight: ใบงานนี้จะติด sandbox — ยังไม่เปิด session",
         ...problems.map((p) => `  [${p.code}] ${p.message}`),
@@ -119,6 +124,7 @@ async function main() {
     fullTask = roleDirective(opts.role, task, null, "", workDate, opts.testLevel);
   }
 
+  const promptBytes = Buffer.byteLength(fullTask, "utf8");
   const runDir = createRunDir(reportsDirOf(workspaceRoot), { role: opts.role, tier: opts.tier, write: opts.write, count: runnable.length });
 
   const resolveME = (name, isRequested) => {
@@ -139,19 +145,29 @@ async function main() {
     const def = agents[name];
     const { model, effort } = resolveME(name, isRequested);
     const answerFile = path.join(runDir, `${name}.answer.txt`);
-    const args = buildArgs(def, model, effort, opts.write, answerFile, workspaceRoot);
+    const args = buildArgs(def, model, effort, opts.write, answerFile, workspaceRoot, opts.usage);
     if (def.promptVia === "arg") args.push(fullTask);
-    const r = await runCli(def, args, def.promptVia, fullTask, opts.cwd, opts.timeoutSec, answerFile);
+    const base = { run: path.basename(runDir), role: opts.role || null, tier: opts.tier || null, taskIds: opts.taskIds, agent: name, model, effort, mode: opts.write ? "write" : "read-only" };
+    appendEvent(ledgerDir, { type: "call_start", ...base, promptBytes });
+    const r = await runCli(def, args, def.promptVia, fullTask, opts.cwd, opts.timeoutSec, answerFile, { usage: opts.usage });
+    appendEvent(ledgerDir, { type: "call_end", ...base, startedAt: r.startedAt, durationMs: r.durationMs, cliOk: r.ok, exitCode: r.exitCode, timedOut: r.timedOut, usage: r.usage });
     return { ...r, label: def.label, model, effort };
   };
+  // เวลาเริ่มของ call แรก — r.startedAt ของผลลัพธ์คือของตัวรันสุดท้ายหลัง fallback
+  const startedAt = new Date().toISOString();
   const results = await runRoleAgents({ cfg, opts, selected: runnable, attempt, onResult: printResult });
 
   for (const r of results) {
     writeFileSync(path.join(runDir, `${r.agent}.stdout.txt`), r.stdout, "utf8");
     writeFileSync(path.join(runDir, `${r.agent}.stderr.txt`), r.stderr, "utf8");
   }
+  const withClass = results.map((r) => ({ ...r, failureClass: classifyFailure(r) }));
+  for (const r of withClass) appendEvent(ledgerDir, { type: "task_result", run: path.basename(runDir), role: opts.role || null, taskIds: opts.taskIds, requested: r.requested, agent: r.agent, state: r.state, failureClass: r.failureClass, fallback: r.fallback });
   const report = {
     timestamp: new Date().toISOString(),
+    startedAt,
+    taskIds: opts.taskIds,
+    promptBytes,
     task,
     role: opts.role || null,
     tier: opts.tier || null,
@@ -159,7 +175,7 @@ async function main() {
     testLevel: TEST_LEVEL_ROLES.includes(opts.role) ? opts.testLevel : null,
     mode: opts.write ? "write" : "read-only",
     cwd: opts.cwd,
-    results: results.map(({ stdout, stderr, ...rest }) => rest),
+    results: withClass.map(({ stdout, stderr, ...rest }) => rest),
   };
   writeFileSync(path.join(runDir, "report.json"), JSON.stringify(report, null, 2), "utf8");
 

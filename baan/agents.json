@@ -29,7 +29,17 @@
         "--allowedTools",
         "Read,Grep,Glob,LS,Edit,MultiEdit,Write,NotebookEdit,Bash,PowerShell"
       ],
-      "answerFrom": "stdout"
+      "answerFrom": "stdout",
+      "usage": {
+        "args": [
+          "--output-format",
+          "json"
+        ],
+        "replaces": [
+          "--output-format"
+        ],
+        "format": "claude-json"
+      }
     },
     "codex": {
       "label": "Codex CLI",
@@ -62,7 +72,14 @@
         "<ANSWER>",
         "-"
       ],
-      "answerFrom": "answerFile"
+      "answerFrom": "answerFile",
+      "usage": {
+        "args": [
+          "--json"
+        ],
+        "insertBefore": "-",
+        "format": "codex-jsonl"
+      }
     },
     "agy": {
       "label": "Agy",
@@ -91,7 +108,15 @@
         "accept-edits",
         "--print"
       ],
-      "answerFrom": "stdout"
+      "answerFrom": "stdout",
+      "usage": {
+        "args": [
+          "--output-format",
+          "json"
+        ],
+        "insertBefore": "--print",
+        "format": "agy-json"
+      }
     },
     "opencode": {
       "label": "OpenCode (Z.AI Coding Plan)",
