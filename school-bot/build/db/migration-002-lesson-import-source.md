@@ -1,6 +1,6 @@
 ﻿# Migration 002 — ที่มาและการอนุมัติจากต้นทางราย Lesson
 
-> Rev 2 · แก้ล่าสุด 2026-11-03 · แก้โดย vault · ขอโดย ผู้ใช้ (มติ 2026-11-03 — เพิ่มเฉพาะคอลัมน์)
+> Rev 3 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (สถานะ: ผู้ใช้รันบนฐานทดสอบแล้ว)
 
 ผลทบทวน: [forward SQL](migration-002-lesson-import-source.sql) เพิ่มเฉพาะ `SchoolBotLesson.ImportSource jsonb NULL` ตามมติผู้ใช้ ไม่มี DEFAULT, CHECK, unique/partial index, trigger หรือวัตถุอื่น รูปทรง JSON การกันนำเข้าซ้ำและรหัสคงเดิมเป็นหน้าที่ application ตาม [physical delta และรายการให้ arch ตรึง](migration-002-lesson-import-source-contract.md) ความเสี่ยงจากการไม่มี DB constraint ยังเปิด ไม่ใช่ผลรับรอง implementation
 
@@ -22,7 +22,7 @@
 
 ## ขั้นที่ผู้ใช้ต้องรันเอง
 
-คำสั่งต่อไปนี้เป็นคำสั่งส่งมอบ ยังไม่ได้รัน ห้ามใส่ credential ลงไฟล์หรือหลักฐานส่งกลับ
+คำสั่งต่อไปนี้เป็นคำสั่งส่งมอบ ผู้ใช้แจ้งว่ารันบนฐานทดสอบแล้ว 2026-11-04 (ไม่มีผล output แนบ) ห้ามใส่ credential ลงไฟล์หรือหลักฐานส่งกลับ
 
 ```powershell
 # ใช้ connection/service ที่เจ้าของยืนยันและตั้ง timeout ก่อนแล้ว
