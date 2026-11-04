@@ -1189,9 +1189,11 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
       "wave": 3,
+      "oracle": "DES-002 Rev4 · AC-034-01..06, AC-035-03, AC-035-05 · go test -v ./internal/license . PASS (2026-11-04)",
+      "ref": "target/school-bot/app/internal/license/{host.go,service.go,online.go,verifier.go,credentials.go,clock.go,types.go,host_normal_test.go} + app/{desktopservice.go,desktoplicense_test.go}",
       "module": "app-shell"
     },
     {
@@ -1600,9 +1602,11 @@
       "des_refs": [
         "DES-002"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "low",
       "wave": 5,
+      "oracle": "DES-002 Rev4 · AC-009-01..02, AC-028-04 · phase3-projects-and-entry.test.mjs + i18n.test.mjs + tsc --noEmit PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/app/entry/{EntryGate.tsx,EntryScreen.tsx,LicenseStatus.tsx,hostEntry.ts,useEntry.ts,useEntryForm.ts,types.ts} + src/core/client.ts",
       "module": "app-shell"
     },
     {
@@ -3988,7 +3992,9 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "implementation_note": "2026-11-04: เพิ่ม typed gRPC start/save/submit, immutable question/policy snapshot, shuffle, guarded deadline, auto-grade, idempotent transaction และ read recovery; ยังไม่ครบ bounded sweep/retake/production acceptance",
+      "ref": "target/school-bot/web/tests/ServiceSchoolBot.Tests/AttemptMutationTests.cs",
       "module": [
         "quiz",
         "app-shell"
@@ -4738,7 +4744,9 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "implementation_note": "2026-11-04: เพิ่ม acceptance subset สำหรับ attempts/deadline/replay/ETag/recovery/RPC; ยังไม่ครบ teacher policy/retake/Desktop หรือการตรวจรับทั้งหมด",
+      "local_test_evidence": "dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1 --no-restore: 4412 passed, 0 failed (2026-11-04); memory/file + in-process gRPC, not production QA acceptance",
       "module": [
         "quiz",
         "app-shell"
