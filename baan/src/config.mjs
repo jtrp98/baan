@@ -9,8 +9,9 @@ export const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)
 export const ROLES_DIR = path.join(TEAM_DIR, "roles");
 export const REPORTS_DIR = path.join(TEAM_DIR, "reports");
 
-export function loadAgentsConfig() {
-  return JSON.parse(readFileSync(path.join(TEAM_DIR, "agents.json"), "utf8"));
+// BAAN_AGENTS_FILE: ใช้ชุดตัวรันอื่นชั่วคราวโดยไม่แก้ไฟล์ของ package (เช่น การทดลองที่ต้องปิด sandbox ทุก arm เท่ากัน)
+export function loadAgentsConfig(file = process.env.BAAN_AGENTS_FILE || path.join(TEAM_DIR, "agents.json")) {
+  return JSON.parse(readFileSync(file, "utf8"));
 }
 
 // config ของ workspace เก็บ path ของเครื่องนี้ จึงต้องอยู่ "นอก" package —
