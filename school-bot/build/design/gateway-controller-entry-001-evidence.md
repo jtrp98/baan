@@ -1,6 +1,8 @@
 # Gateway SchoolBot entry — controller + module-owned channel — หลักฐานและข้อที่ยังไม่ยืนยัน
 
-> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 2 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้เก็บสัญญา/หลักฐานของ opaque session และ local logout รุ่นก่อน โดยคงผลตรวจเดิม ไม่ใช่สัญญา implementation ณ HEAD ปัจจุบัน ซึ่งใช้ JWT และห้า resource services อ่าน [สัญญาปัจจุบัน](gateway-grpc-contract-001.md) และ [หลักฐานกับข้อแตกต่าง](gateway-integration-evidence.md) ก่อนใช้อ้างอิง; ข้อกำหนด DES ที่ยังต้อง reconcile ไม่ถือว่าผ่านจากผลเก่านี้
 
 ส่วนต่อของ [Gateway SchoolBot entry — controller + module-owned channel](gateway-controller-entry-001.md) อธิบายหลักฐานและข้อที่ยังไม่ยืนยัน.
 
@@ -18,7 +20,7 @@
 
 ข้อเท็จจริงจาก sb-api-gateway/src/ApiGateway.API/SchoolBot/: SchoolBotAuthController.cs:8–58 เรียก SchoolBotLogoutService; SchoolBotLogoutRegistration.cs:97–163 ลงทะเบียน module/controller และ selector; SchoolBotSessionGrpcClient.cs:17–102 สร้าง channel/client และตรวจ provenance. ไม่พบ SchoolBotLogoutMiddleware.cs หรือ UseSchoolBotLogout/MapSchoolBotLogout ใน source กลุ่มนี้ และไม่พบการใช้ System.Reflection/BindingFlags.
 
-ชื่อ marker ใน as-built มีทั้ง SchoolBotLogoutModuleMarker และ SchoolBotLogoutMarker; registration เพิ่มทั้งสอง และ gate ยอมรับเมื่อพบอย่างใดอย่างหนึ่ง ตาม SchoolBotLogoutRegistration.cs:41–57,101–107. Options.Enabled มีค่าเริ่มต้น true ตาม SchoolBotLogoutOptions.cs:5. นี่เป็นรายละเอียด implementation ปัจจุบัน ไม่ใช่ข้อเสนอเปลี่ยน gate.
+ชื่อ marker ใน as-built มีทั้ง SchoolBotLogoutModuleMarker และ SchoolBotLogoutMarker; registration เพิ่มทั้งสอง และ gate ยอมรับเมื่อพบอย่างใดอย่างหนึ่ง ตาม SchoolBotLogoutRegistration.cs:41–57,101–107. Options.Enabled มีค่าเริ่มต้น true ตาม SchoolBotLogoutOptions.cs:5. นี่เป็นรายละเอียด implementation ณ รอบตรวจเดิม ไม่ใช่ข้อเสนอเปลี่ยน gate.
 
 - `Program.cs:60` AddControllers · pipeline `:119–129` UseAuthentication → RequestContextUserEnricher → ControlPlaneEnforcement → UseAuthorization → UseSbRateLimiting → MapControllers
 - `ApiPrefixConvention` เติม `api` หน้า `[Route]` ทุก controller (เช่น AuthController `[Route("auth")]` → `/api/auth/*`)

@@ -1,6 +1,8 @@
 # LUX-07 — typed HTTP API Gateway → SchoolBot gRPC service manifest delta
 
-> Rev 1 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 1 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+รายการ RPC/package และ prefix ด้านล่างเป็นข้อเสนอรุ่นก่อน ไม่ตรง proto ปัจจุบันที่มี CurriculumService/AssessmentService ใน package ServiceSchoolBot และ versionless routes รายการที่ยังไม่มี RPC ไม่ถือว่า implementแล้ว อ่าน [contract ปัจจุบัน](gateway-grpc-contract-001.md) และ [หลักฐาน/ข้อแตกต่าง](gateway-integration-evidence.md)
 
 เอกสารนี้เป็นสัญญาทางเทคนิคสำหรับพัฒนาและทดสอบ local โดยใช้ขอบเขตและเงื่อนไขหยุดร่วมเดิม ยังไม่ใช่การอนุมัติ schema หรือหลักฐาน runtime ของระบบจริง
 

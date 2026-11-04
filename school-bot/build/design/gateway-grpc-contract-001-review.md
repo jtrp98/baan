@@ -1,6 +1,8 @@
 # Gateway–SchoolBot gRPC contract — รายการรับรองและทางเลือก
 
-> Rev 3 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
+> Rev 3 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (มติ 052 — อายุ Desktop session นับจากเวลา bind)
+
+เอกสารนี้เก็บสัญญา/หลักฐานของ opaque session และ local logout รุ่นก่อน โดยคงผลตรวจเดิม ไม่ใช่สัญญา implementation ณ HEAD ปัจจุบัน ซึ่งใช้ JWT และห้า resource services อ่าน [สัญญาปัจจุบัน](gateway-grpc-contract-001.md) และ [หลักฐานกับข้อแตกต่าง](gateway-integration-evidence.md) ก่อนใช้อ้างอิง; ข้อกำหนด DES ที่ยังต้อง reconcile ไม่ถือว่าผ่านจากผลเก่านี้
 
 ส่วนต่อของ [Gateway–SchoolBot gRPC contract](gateway-grpc-contract-001.md) อธิบายรายการรับรองและทางเลือก.
 

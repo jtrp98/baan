@@ -1,6 +1,8 @@
 # Gateway integration — แหล่งสิทธิ์ admin โรงเรียน
 
-> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 5 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+หน้านี้เป็นนโยบายเป้าหมาย ไม่ใช่ผลตรวจสิทธิ์จริง ปัจจุบัน Gateway ส่ง IsAdmin/admin_id จาก JWT และ SchoolBot resolver ใช้ identity.IsSchoolAdmin หรือ employee.IsAdmin; หลักฐานกลุ่ม/active account/profile และการรับรองสิทธิ์ productionยังต้องตรวจ ไม่ถือว่าตรงนโยบายครบเพียงเพราะมี claim อ่าน [contract ปัจจุบัน](gateway-grpc-contract-001.md) และ [หลักฐาน/ข้อแตกต่าง](gateway-integration-evidence.md)
 
 ส่วนต่อของ [Gateway integration](gateway-integration-001.md) และ [DES-012 authorization](des-012-authorization.md) กำหนดการคำนวณ school_admin เฉพาะโรงเรียนที่ยืนยันแล้ว
 

@@ -1,32 +1,25 @@
-# Gateway SchoolBot entry — controller + module-owned channel
+# Gateway SchoolBot — controllers และ DI ปัจจุบัน
 
-> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 3 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจโค้ดและ Git ปัจจุบัน)
 
-## ส่วนต่อของสัญญา
+ทางเข้าปัจจุบันคือ controllers ใน namespace `ApiGateway.API.Controllers.ServiceSchoolBot` ทั้งห้า ใช้ `[ApiController]`, `[Authorize]` และ `[SchoolBotSliceGate]` โดย device challenge/activate/validate และ release update check มี `[AllowAnonymous]` เฉพาะ action
 
-- [การเชื่อมชุดทดสอบและ assertion](gateway-controller-entry-001-tests.md)
-- [หลักฐานและข้อที่ยังไม่ยืนยัน](gateway-controller-entry-001-evidence.md)
+## Registration และ channel
 
-สัญญานี้กำหนด controller entry และ module-owned channel ของ HTTP API Gateway (`sb-api-gateway`) สำหรับ SchoolBot gRPC service ผล surface probe และการประเมิน assertion อ้างรายงานการตรวจอิสระในหลักฐานท้ายไฟล์ ผล local ไม่ขยายเป็นการรับรอง production/H5 (เงื่อนไข listener/TLS/peer/private ingress และ trust ระหว่างระบบ)/Light (ผู้ทบทวน implementation ของ Gateway)/DB/Backend for Frontend (BFF).
+AddSchoolBotModule ลงทะเบียน Application, Infrastructure, SchoolBotModuleMarker และ MVC/prefix convention; SchoolBotOptions.Enabled เริ่ม true แต่ไม่เพียงพอให้ routes เปิด SchoolBotSliceGate ต้องมี marker และห้าม Production
 
-ใช้ controller/service แทน minimal endpoint หรือ middleware แยก กฎ error/validator/metadata/trailer เดิมคงอยู่ เว็บผ่าน BFF และไม่มี direct public SchoolBot service.
+AddSchoolBotInfrastructure ลงทะเบียน trailer validator และ ProductionSchoolBotTransportValidator (IsConfigured=false/IsPeerTrusted=false) เท่านั้น AddSchoolBotGrpcClients(channel) เป็นอีกขั้นที่ลงทะเบียน singleton repository ทั้งห้า จึงไม่ถือว่า AddSchoolBotModule สร้าง channel/client ครบ
 
-## Entry
+SchoolBotGrpcChannel.Create ตั้ง sanitizing logger, message cap 4MiB และ MaxRetryAttempts=0; SchoolBotGrpcCalls ใส่ metadata/deadline/cancellation จาก SchoolBotCall ส่งตรง CallOptions; repository แปลง response/ETag และ RpcException กลับ pipeline
 
-- `src/ApiGateway.API/SchoolBot/SchoolBotAuthController.cs` · namespace `ApiGateway.API.SchoolBot` (ไม่ชน RouteConventionTests; harness ที่คอมไพล์ `SchoolBot/*.cs` ยังเห็น)
-- class: `[ApiController] [Route("school-bot/service/v2/auth")] [Authorize(AuthenticationSchemes="SchoolBotOpaque")] [EnableRateLimiting("SensitiveEndpoint")] [SchoolBotSliceGate]`
-- `POST logout` `[AllowAnonymous]` → `/api/school-bot/service/v2/auth/logout` (ต้องถึง handler แม้ไม่มี/ผิดรูป token เพื่อคืน 204 store0 ตามสัญญา)
-- verb อื่นบน logout → action แยก `[AcceptVerbs(GET,HEAD,PUT,DELETE,PATCH,OPTIONS)]` คืน 405 JSON v2 `METHOD_NOT_ALLOWED` + no-store + X-Request-Id (ซ่อนจาก Swagger) · path อื่น 404 ตาม routing
-- auth: scheme `SchoolBotOpaque` คืน NoResult ไม่ parse Bearer เป็น JWT · PostConfigure SmartScheme ให้ path `/api/school-bot/service/v2` ใช้ SchoolBotOpaque ก่อน selector เดิม → opaque token ไม่เข้า JwtBearerHandler, principal anonymous จึงไม่ถูก revocation ตัด 401 ก่อนถึง handler · ControlPlane maintenance/disabled ยังทำงาน 
-- production ปิด: ไม่แตะ `Program.cs` · `[SchoolBotSliceGate]` (action constraint + controller convention) ซ่อนจาก ApiExplorer และ match เฉพาะเมื่อมี `SchoolBotLogoutMarker` จาก `AddSchoolBotLogoutModule` + `SchoolBotLogoutOptions.Enabled` + ไม่ใช่ Production → นอกนั้น 404
+Gateway Program ยังไม่เรียก registration สองขั้นนี้ ไม่มี endpoint address/trusted transport ที่ใช้งานจริงจากเพียงการมี source; MapControllers ตามปกติไม่ข้าม gate
 
-## Channel ที่ module เป็นเจ้าของ — ไม่มี reflection
+## HTTP pipeline
 
-- `SchoolBotSessionGrpcClient.CreateChannel(address, options?, loggerFactory?)` คัดลอก options ใหม่ (ไม่แก้ของ caller) ตั้ง `LoggerFactory` = sanitizing factory ผ่าน public `GrpcChannelOptions` · `MaxRetryAttempts=0` · บันทึก provenance ใน `ConditionalWeakTable<GrpcChannel,…>`
-- `CreateGeneratedClient(channel)` รับเฉพาะ channel ที่อยู่ในตาราง → สร้าง generated client จาก channel ตรง (ไม่มี Hidden/CallerLogger invoker) → บันทึกใน `ConditionalWeakTable<Client,GrpcChannel>`
-- constructor `SchoolBotSessionGrpcClient(GrpcChannel)` / `(generated client)` ไม่อยู่ในตาราง = throw ตอนสร้าง (RPC0) · ลบ `System.Reflection`/BindingFlags ทั้งหมด
-- `SchoolBotSanitizingLogger`: BeginScope = NullScope · message คงที่ · StatusCode เอาจาก RpcException/state/ข้อความเฉพาะเมื่อ `Enum.TryParse` + `IsDefined` ผ่าน (EventId3 ไม่รู้ = Internal) · exception ถูกแทนด้วย RpcException(status, "") หรือ generic
+SchoolBotHttpPipeline ตรวจ binding/ขนาด body, Origin, maintenance/circuit, transport configuration และ identity แล้ว invoke repository; คืน no-store/X-Request-Id, success status/ETag และแยก business error จาก transport error ดู [identity](gateway-grpc-contract-001-identity.md), [limits](gateway-grpc-contract-001-limits.md) และ [errors](gateway-grpc-contract-001-errors.md)
 
-## Mapping
+SchoolBotAuthController, AddSchoolBotLogoutModule, SchoolBotSessionGrpcClient และ SchoolBotOpaque เป็น implementation รุ่นก่อนที่ไม่มีอยู่ใน current source เอกสารทดสอบ/logout รุ่นก่อนเก็บเป็นหลักฐานประวัติ ไม่ใช้เป็น wiring ปัจจุบัน
 
-การย้ายจาก middleware เดิมใช้ `SchoolBotAuthController.cs` + `SchoolBotLogoutService.cs` (ย้าย logic middleware ครบ: 405/64KiB/413/deadline 15s 504/prep 400/Origin 403/maintenance+circuit 503/validator-client absent 503/RPC/peer 502/trailer validator/HTTP API Gateway envelope) · แก้ `SchoolBotLogoutRegistration.cs` (ลบ Use/Map, เพิ่ม AddSchoolBotLogoutModule: opaque scheme, SmartScheme selector, AddControllers+ApplicationPart, prefix convention ถ้าไม่มี ApiPrefixConvention), `SchoolBotLogoutOptions.cs` (+Enabled), `SchoolBotSessionGrpcClient.cs` · คงเดิม: ISchoolBotSessionClient, ISchoolBotTransportValidator, ProductionSchoolBotTransportValidator (fail closed), RequestPreparation, TrailerValidator, helper433, proto
+## หลักฐาน
+
+Gateway SchoolBot/SchoolBotRegistration.cs, Application/Extensions/SchoolBotApplicationExtensions.cs, Infrastructure/Extensions/SchoolBotInfrastructureExtensions.cs, Infrastructure/Repositories/Services/ServiceSchoolBot และ API Program.cs ตรวจที่ b4181ca วันที่ 2026-11-04; [หลักฐานปัจจุบัน](gateway-integration-evidence.md)

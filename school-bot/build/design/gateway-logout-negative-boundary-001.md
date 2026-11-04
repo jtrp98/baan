@@ -1,12 +1,14 @@
 # Logout negative boundary
 
-> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 2 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+เอกสารนี้เก็บสัญญา/หลักฐานของ opaque session และ local logout รุ่นก่อน โดยคงผลตรวจเดิม ไม่ใช่สัญญา implementation ณ HEAD ปัจจุบัน ซึ่งใช้ JWT และห้า resource services อ่าน [สัญญาปัจจุบัน](gateway-grpc-contract-001.md) และ [หลักฐานกับข้อแตกต่าง](gateway-integration-evidence.md) ก่อนใช้อ้างอิง; ข้อกำหนด DES ที่ยังต้อง reconcile ไม่ถือว่าผ่านจากผลเก่านี้
 
 ## ส่วนต่อของสัญญา
 
 - [Validator และข้อจำกัด](gateway-logout-negative-boundary-001-validation.md)
 
-HTTP API Gateway entry ปัจจุบันคือ SchoolBotAuthController → SchoolBotLogoutService ตาม [controller entry Rev2](gateway-controller-entry-001.md); direct invocation ฝั่ง HTTP API Gateway ใช้ controller/service ไม่ใช่ middleware.
+HTTP API Gateway entry ณ รอบตรวจเดิมคือ SchoolBotAuthController → SchoolBotLogoutService ตาม [controller entry Rev2](gateway-controller-entry-001.md); direct invocation ฝั่ง HTTP API Gateway ใช้ controller/service ไม่ใช่ middleware.
 
 คำว่า adapter ที่ถูกเรียกโดยตรง ในย่อหน้าหลัง error table อยู่ในบริบทการเรียก adapter โดยตรงเพื่ออธิบายการแข่งขัน context cancellation กับ timer ฝั่ง SchoolBot gRPC service ไม่ใช่ชื่อ HTTP API Gateway entry. กฎ branch ของ context cancellation ชนะเมื่อทั้งสอง signal พร้อมกันคงเดิม และ transport ยังอาจจบก่อนตอบ; ห้ามเปลี่ยนกฎนี้เป็นกฎของ controller HTTP API Gateway จากการแก้คำเรียก. รอบเอกสารนี้ไม่ได้ตรวจ SchoolBot gRPC service adapter ซ้ำ จึงไม่อ้างหลักฐาน runtime ใหม่ของ SchoolBot gRPC service.
 

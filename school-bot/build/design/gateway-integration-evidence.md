@@ -1,30 +1,38 @@
-# Gateway integration — หลักฐานและข้อจำกัด
+# Gateway–SchoolBot — หลักฐานปัจจุบันและรายการค้าง
 
-> Rev 5 · แก้ล่าสุด 2026-11-02 · แก้โดย arch · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+> Rev 6 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจโค้ดและ Git ปัจจุบัน)
 
-ส่วนต่อของ [Gateway integration](gateway-integration-001.md) รวบรวมผลตรวจที่เอกสารเดิมบันทึก แยก baseline เก่าจากหลักฐาน local logout ที่ใหม่กว่า งานเรียบเรียงนี้ไม่ตรวจ source หรือ runtime เพิ่ม
+อ่าน source/Git และรายงานที่มีจริงวันที่ 2026-11-04 โดยไม่ build/test ใหม่ การ commit source ไม่ใช่ผลตรวจ integration ใหม่ ไม่เปลี่ยนแผนเป็น verified และไม่ปิด production gates
+
+## ผลที่ยืนยันจากรายงานเดิม
+
+| ขอบเขต | ผลที่อ่านได้ | ข้อจำกัด |
+|---|---|---|
+| SchoolBot suite | 4397 ผ่าน / 4398, skipped0 | repository-current-test.log และ schoolbot.trx ยังล้ม idempotency คาด409ได้403 |
+| Gateway SchoolBotPipelineTests | 12/12 | gateway-schoolbot.trx; in-process fixture ไม่ใช่ production host |
+| JWT → Gateway → gRPC | 5/5 | e2e.trx; JWT จริง แต่ TestServer override trust, memory/file storage และ fake legacy profile/lookup |
+| Gateway route/Swagger + health/warm-up | 621/623, 57 batches, aborted0/notExecuted0 | summary.json: filterเดิม608/610 + checks13/13; Swagger schema conflictเดิม2เคส |
+| Proto | 6/6 bytes ตรง; normalized hashตรง metadata | ตรวจซ้ำรอบเอกสาร; ไม่ใช่ RPC runtime check |
+| Database | isolated PostgreSQL repository/DI/model checks ผ่านตามใบงาน100 | ไม่เขียนฐานร่วม; live schemaยังไม่มี ImportSource |
+| Installer/frontend | installer build; typecheck/build; i18n14/14 ผ่านตามใบงาน103 | ไม่ rebuild Go executable หรือแพ็ก/แจก installer ใหม่ |
+
+e2e เดิมตรวจ project CRUD/replay/stale ETag/tenant isolation, invalid/temporary JWT, entitlement activation/validation/second-device/revocation, TAdmin four-eyes/admin_id, approval_ref เป็นตัวเลข→400 พร้อม snapshot/auditไม่เปลี่ยน, release publish/anonymous update, no-store, HTTP business เดิม404/health200 Harness ชั่วคราวถูกลบแล้วตาม handoff จึงไม่อ้างว่า rerun จาก source harness ที่ยังอยู่
+
+## ข้อคลาดเคลื่อนและงานค้าง
+
+1. API idempotency case ApiV2LicenseSecurityAdversarialTests.Idempotency_SamePayloadReplays_DifferentPayloadConflicts ยัง expected409 actual403 ไม่พบผลใหม่ที่ปิดเคสนี้; เปลี่ยน license key ทำให้ ledger tupleไม่ตรงและ nonceถูกใช้แล้ว
+2. Gateway Swagger_IsEnabled_InDevelopment และ Swagger_TagsFollowPersonalInformationFeature ยังล้มจาก SaveJournalRequestDto ชื่อ schema ชน Accounting.Generated/GeneralAdministration.Generated ไม่ขยายแก้ข้ามโมดูล
+3. Gateway Program ยังไม่ wire module/channel; Production gate และ deny-all trust ทั้งสองฝั่งคงอยู่ H5/G-AUTH ยังไม่ผ่าน ต้องมี configuration/trusted transport และ runtime proof จริง
+4. Desktop มี signed entitlement/protected storage แล้ว แต่ URL/path/JWT flow ยังเก่า; HostServer fixture compile issue ยังเห็นใน source; BFF/CSRF และ Assessment authority/roster ยังไม่ยืนยัน
+5. repositories ใช้ scaffold contexts แล้ว ต่างจาก knowledgeเก่าที่บอกยังไม่มี DB implementation แต่ผล isolated checksไม่พิสูจน์ shared DB integration/rollback/concurrencyทุกกรณี; ImportSource migration และ multi-instance replay/signing/release configยังค้าง
+6. สัญญาเก่า opaque session/logout/package schoolbot.v2 ต่างจาก current JWT/versionless routes/package ServiceSchoolBot ต้อง reconcile DES-004/DES-012 และ acceptance ก่อนพัฒนาต่อ ผล logoutเก่าคงเป็นประวัติ ไม่รับรอง current pipelineโดยอัตโนมัติ
+
+## Git และขอบเขตหลักฐาน
+
+SchoolBot branch golf/zide HEAD35c62bf ไม่มี working-tree changes ตอนตรวจ: commits0d6d8b2/707d681/888b55f/35c62bf; Gateway branchdev/golf/school-bot HEADb4181ca commits2b02246/bf926ea/b4181ca รวม46ไฟล์ source/contract/test source ไม่มี sourceค้าง ตอนเริ่มตรวจพบ graphify-out5ไฟล์ modified และ tests/ApiGateway.Platform.Tests/TestResults/ untracked ตามใบงาน105 แต่การทวนท้ายงาน (รวมปิด fsmonitor ในคำสั่งอ่านสถานะ) พบ working treeสะอาด TestResultsยังอยู่และcheck-ignoreระบุว่าถูกignore; ไม่ได้แก้/ลบ/commit artifactsเหล่านี้ในงานนี้และยังยืนยันสาเหตุที่สถานะเปลี่ยนไม่ได้ งานเอกสารนี้ไม่เปลี่ยน branch/deploy/push และไม่แก้ source ใบงาน104/105บันทึกว่าไม่ได้pushในรอบนั้น; รอบนี้ไม่ได้push การทวนท้ายงานbranch trackingของGatewayแสดงเท่ากับorigin/dev/golf/school-bot จึงไม่ยืนยันสถานะไม่ได้pushทั้งrepositoryในปัจจุบันหรืออนุมานว่าใครpushเมื่อใด
 
 ## หลักฐาน
 
-พาธ source อ้างจาก `C:/src/schoolbright/target`: API Gateway คือ `sb-api-gateway`, SchoolBot คือ `school-bot`, เว็บโรงเรียนคือ `sb-tech-upgrade-web-system` และ academic คือ `sb-tech-upgrade-academic`
-
-### Controller และ local logout
-
-- Gateway `src/ApiGateway.API/SchoolBot/SchoolBotAuthController.cs:8–58`, `SchoolBotLogoutRegistration.cs:15–28,97–163`, `SchoolBotLogoutService.cs:24–223` ยืนยัน controller/service/module registration; `SchoolBotSessionGrpcClient.cs:17–102` ยืนยัน CreateChannel/CreateGeneratedClient และตรวจ provenance โดยไม่ใช้ reflection
-- รายงานตรวจ local logout ล่าสุด (memory: planning/jpo-092-logout-r4-001.md): ประเด็น log leak/metadata ที่รายงานปิดแล้วเฉพาะ local logout; Gateway repro 3 ผ่าน, regression 5 ผ่าน, extended 96 ผ่าน, surface probe 6 ผ่าน; SchoolBot extended 2234 ผ่าน และ 8 wire fixtures ยังไม่ได้รัน เป็นตัวเลขรับจากรายงาน ไม่ใช่การรันใหม่
-- ยังไม่ได้พิสูจน์ TLS/mTLS/peer จริง, physical HTTP/2 hidden headers บน Kestrel, 8 wire fixtures, Program.cs/production registration, full private NuGet build, PostgreSQL/atomicity, BFF CSRF และ Light/CODEOWNERS review จึงไม่รับรอง Login/exchange/private introspection หรือ release จาก local logout
-
-### Baseline ก่อนเพิ่ม gRPC/controller
-
-- Gateway `src/ApiGateway.API/Program.cs:59–72,118–130`: controller registration และ pipeline authentication → logging → control plane → authorization → rate limit → controllers
-- `src/ApiGateway.API/Extensions/ApiServiceExtensions.cs:68–123,293–296` และ `Helpers/ApiPrefixConvention.cs:13–22`: SmartScheme เดิมเลือก Bearer ก่อน JabjaiWebKey และเติม /api prefix; `src/ApiGateway.Infrastructure/Extensions/InfrastructureServiceExtensions.cs:549–614` มี gRPC client พร้อม metadata/deadline/retry
-- `src/ApiGateway.Infrastructure/Common/Authentication/JabjaiWebLegacyAuthHandler.cs:27–53` เลือก header แรกและ log ชื่อ header; `JwtTokenService.cs:41–45,184–220` มี secret fallback, ไม่บังคับ exp/iss/aud, Sid รวม admin_id/user_id
-- `src/ApiGateway.API/ControlPlane/ControlPlaneEnforcementMiddleware.cs:29–49,56–76`: revocation ใช้ principal, maintenance ใช้ route/service และ gateway envelope
-- การค้นเดิมไม่พบ SchoolBot route/web-principal/HTTP forwarder เป็นผล ณ ก่อน local logout ปัจจุบัน ไม่ใช่หลักฐานว่าไม่มี controller แล้ว และไม่พิสูจน์ทุก proxy ภายนอกหรือ deployment
-- SchoolBot `web/src/SchoolBot.Api/Program.cs:45–48,94` และ `LogoutEndpoint.cs:9,22` ในผลตรวจเก่าผูก LogoutService/PostgresSessionLogoutStore กับ HTTP POST ยังไม่พบ gRPC registration/reference/.proto ใน inventory ที่ตรวจ ใช้ domain/application/logout persistence เดิมซ้ำได้ ผลนี้ไม่ลบหลักฐาน typed gRPC logout ที่ใหม่กว่า
-- qa/round-001 (memory) รายงาน 4032 tests ในขอบเขต local/static ไม่ใช่ Gateway/gRPC/DB integration proof; auth-flow-handoff-001 (memory) บันทึก local component/logout
-
-### มติที่เกี่ยวข้อง
-
-- [มติ 049 (อนุมัติแก้ raw metadata และ log/channel boundary แบบจำกัด)](../../shared/decisions/decisions-049.md) และ [มติ 050 (controller convention)](../../shared/decisions/decisions-050.md) เป็นที่มาของขอบเขต local logout ล่าสุด
-- [มติ 035 (แหล่ง admin กลุ่มฝั่ง server)](../../shared/decisions/decisions-035.md) คง policy; [DES-012 (auth ข้ามระบบ)](des-012.md) คง token exchange, License และ session lifetime; [gRPC contract](gateway-grpc-contract-001.md) คง Data Transfer Object (DTO)/error/metadata/trailer
+- reports/schoolbot-grpc-handoff004-verification/: schoolbot.trx, gateway-schoolbot.trx, e2e.trx, e2e.log, proto-sha256.json; gateway-batches/isolated/summary.json, results.md, coverage.json และ57TRX
+- reports/repository-current-test.log (4397/1), repository-current-build.log; ใบงาน100–105และhandoff005 (memory) ไม่มีการแก้ผลย้อนหลัง
+- Source baseline SchoolBot35c62bf/Gatewayb4181ca; [contract](gateway-grpc-contract-001.md), [controller](gateway-controller-entry-001.md), [runtime](service-runtime-001.md); การอ่านรายงานเก่าไม่ใช่การรัน verificationใหม่

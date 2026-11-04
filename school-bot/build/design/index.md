@@ -1,6 +1,6 @@
 # school-bot — สารบัญ design
 
-> แก้ล่าสุด 2026-11-03 · แก้โดย arch · ขอโดย ผู้ใช้ (มติ 054 — เลขอ้างอิงไม่เกิน 1,000 ตัวอักษรและไม่ขยาย schema)
+> แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจ implementation และหลักฐาน Git)
 
 เอกสาร design กำหนดขอบเขตโมดูล สัญญา API ข้อมูล สิทธิ์ Desktop/หุ่น การเรียน และการส่งมอบ แยกข้อกำหนดเป้าหมายออกจากหลักฐาน implementation; การมีเอกสารหรือผลตรวจ local ไม่ได้ยืนยันการเชื่อมระบบจริงหรือ release
 
@@ -10,7 +10,7 @@
 
 ## ความเป็นไปได้และขอบเขตหลักฐาน
 
-ต่อยอด Desktop Go/Wails, engine routing, ฐานบัญชี/profile และ schema เดิมได้ งานที่ต้องเติมคือ authorization/session, License persistence/entitlement, หลาย Project, curriculum/ผลประเมิน, Darwin robot transport และ trusted update ตัวเลข bounds ในแบบเป็นข้อเสนอ ไม่ใช่ performance SLA ที่ผู้ใช้อนุมัติ
+ต่อยอด Desktop Go/Wails, engine routing, ฐานบัญชี/profile และ schema เดิมได้ Backend repositories/entitlement และหลาย resource RPC มี implementationแล้ว; ต้องต่อ Desktop/BFF, ตรวจ auth/Assessment authorityจริง, Darwin robot transport และ trusted update ตัวเลข bounds ในแบบเป็นข้อเสนอ ไม่ใช่ performance SLA ที่ผู้ใช้อนุมัติ
 
 ฐาน logical model ได้รับการยืนยันตาม [มติ 013 (ใช้ DBML เป็นฐานขั้นถัดไป)](../../shared/decisions/decisions-013.md) เป้าหมาย OS คือ Windows 11 25H2 x64 และ macOS 15+ Intel/Apple Silicon ตาม [มติ 019 (เป้าหมาย OS)](../../shared/decisions/decisions-019.md) Windows 10 เป็นหลักฐานประวัติ การเลือก target ไม่ใช่ผลทดสอบ runtime/hardware
 
@@ -18,7 +18,9 @@
 
 Desktop/Web → HTTP API Gateway → gRPC SchoolBot service; เว็บผ่าน same-origin Backend for Frontend (BFF) ไม่มี direct public SchoolBot fallback ใช้ controller/service และ module-owned channel สำหรับ local logout รายละเอียดเอกสารทุกฉบับอยู่ใน [สารบัญ Transport/Login](index-transport-login.md)
 
-local logout มี implementation และผลตรวจเฉพาะ local; Login/exchange/private introspection และ production integration ยังไม่มีหลักฐานรับรองครบ ยังต้องพิสูจน์ TLS/mTLS/peer, wire headers, production registration, private build, PostgreSQL/atomicity, BFF CSRF และ Light review จึงไม่ปิดเงื่อนไข auth หรือ release จากผล logout
+ปัจจุบันมี resource gRPC ห้าบริการและ Gateway JWT pipeline พร้อมผล TestServer; opaque logout/exchangeเป็นหลักฐานรุ่นก่อน Desktop/BFFและproduction integrationยังไม่มีหลักฐานครบ ยังต้องพิสูจน์ TLS/mTLS/peer, wire headers, production registration, private build, PostgreSQL/atomicity, BFF CSRF และ Light review จึงไม่ปิดเงื่อนไข auth หรือ release จากผล logout
+
+อ่าน [runtime/database/scripts ปัจจุบัน](service-runtime-001.md) และ [ผลตรวจพร้อมข้อแตกต่าง](gateway-integration-evidence.md) ก่อนใช้หลักฐาน baselineเก่า
 
 ## สัญญาหลัก
 
@@ -78,6 +80,6 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 
 ## หลักฐาน
 
-- Source baseline ที่ index เดิมอ้าง: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/SchoolBot.Api/Program.cs:43`, `engines/zide/src/transport.cpp:7` ใต้ `C:/src/schoolbright/target/school-bot`; ส่วน Host/IPC/robot ตรวจ source วันที่ 2026-11-03 ใน [ผลทบทวน DES-006](des-006-review.md); ไม่ตรวจ DB/runtime เพิ่ม
+- Source baseline ที่ index เดิมอ้าง: `app/desktopservice.go:98`, `app/desktopstorage.go:103`, `app/internal/engine/manager.go:43`, `web/src/ServiceSchoolBot.API/Program.cs`, `engines/zide/src/transport.cpp:7` ใต้ `C:/src/schoolbright/target/school-bot`; ส่วน Host/IPC/robot ตรวจ source วันที่ 2026-11-03 ใน [ผลทบทวน DES-006](des-006-review.md); ไม่ตรวจ DB/runtime เพิ่ม
 - รายงาน local logout ล่าสุด 2026-10-28 (memory: planning/jpo-092-logout-r4-001.md) รับรองเฉพาะขอบเขตที่รายงาน; auth-flow-handoff-001 และ qa/round-001 (memory) แยก local component/logout ออกจาก integration
 - สัญญาปัจจุบัน DES-004 Rev13 คงขอบเขต persistence ตาม [มติ 051 (commit Project + Revision ในหน่วยเดียว)](../../shared/decisions/decisions-051.md) ร่วมกับ Project API Rev2 และกฎข้อมูล Rev11 และนับอายุ Desktop session จากเวลา bind ตาม [มติ 052 (อายุ Desktop session นับจากเวลา bind)](../../shared/decisions/decisions-052.md)

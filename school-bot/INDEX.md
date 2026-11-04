@@ -6,7 +6,7 @@ target: school-bot
 ---
 # SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น
 
-> แก้ล่าสุด 2026-11-03 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (สถานะหลังรอบ 2026-11-03 เย็น)
+> แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจ implementation และหลักฐาน Git)
 
 SchoolBot เป็นระบบสำหรับนักเรียนและครูในโรงเรียน มีบทเรียนและพื้นที่สร้างงาน Block (โปรแกรมบล็อก), Arm (แขนกล) และ Code (เขียนโปรแกรม) พร้อมโครงงาน การประเมินผล และการส่งคะแนนกลับ SchoolBright
 
@@ -15,12 +15,12 @@ SchoolBot เป็นระบบสำหรับนักเรียนแ�
 แผนมีข้อกำหนด 44 รายการ เกณฑ์ตรวจรับ 187 ข้อ และทดสอบ 82 กรณี มี 110 งานใน 8 ระยะ และเงื่อนไขก่อนดำเนินงาน 17 จุด: ตรวจผ่านแล้ว 39 งาน (8 งานในจำนวนนี้ตรวจระดับทางหลักระหว่างพัฒนา ยังต้องตรวจเต็มก่อนส่งมอบ) และรอทำ 71 งาน ดู [แผนและสถานะงาน](build/plan/index.md)
 
 - การบันทึกโครงงานและฉบับของโครงงานเป็นหน่วยเดียวตรวจผ่านแล้ว ตาม [มติ 051 (บันทึก Project และ Revision พร้อมกัน)](shared/decisions/decisions-051.md)
-- การออกจากระบบผ่าน API Gateway และบริการ SchoolBot ผ่านการตรวจการทำงานและความปลอดภัยในเครื่องแล้ว การยืนยันตัวตนและตรรกะคำนวณคะแนนผ่านการทดสอบ แต่ Login เต็มรูปแบบ การเชื่อมฐานข้อมูลจริงกับ API และการเปิดบริการบน production ยังไม่พร้อม
-- ผู้ใช้รัน SQL สร้างฐานข้อมูลแล้ว (PostgreSQL 15.19 ฐานทดสอบ) และผลตรวจ catalog 2026-11-03 ตรงกับแบบครบ 32 ตาราง 450 ฟิลด์ ยังขาดบันทึกการรันครั้งแรก การทดสอบ rollback/การเขียนพร้อมกัน และการเชื่อม API กับฐานจริง
-- License ฝั่ง admin, การ activate เครื่อง และการย้ายเครื่อง (BE-003/004/005), Login/logout ฝั่งบริการ (BE-006), การแลก session เว็บ (BE-039), CourseRun รายห้อง (BE-029), คลังข้อสอบ (BE-030) และการนำเข้าแผนรายวิชา (BE-028) ผ่านการตรวจระดับทางหลัก (normal) บนที่เก็บข้อมูลจำลองแล้ว ยังต้องตรวจเต็ม (race/replay/ความปลอดภัย) ก่อนส่งมอบ · ข้อค้างที่ย้ายไปรอตรวจเต็มรวม License บันทึก audit/ผลไม่อยู่ในหน่วยเดียวกับข้อมูล · สิทธิ์ใช้งานฝั่ง Desktop (BE-007) มีโค้ดแล้วแต่ทดสอบทางหลักยังไม่ผ่าน
+- Backend ใช้ ServiceSchoolBot และมี gRPC ห้าบริการ; Gateway มี controllers/typed clients พร้อมผล JWT → Gateway → gRPC ใน TestServer แต่ Program ยังไม่เปิดโมดูล/trusted transport Login Desktop/BFF และ production ยังไม่พร้อม ดู [สัญญาปัจจุบัน](build/design/gateway-grpc-contract-001.md)
+- ผู้ใช้รัน SQL สร้างฐานข้อมูลแล้ว (PostgreSQL 15.19 ฐานทดสอบ) และผลตรวจ catalog 2026-11-03 ตรงกับแบบครบ 32 ตาราง 450 ฟิลด์ repositories ใช้ scaffold DbContext ทั้งห้าฐานแล้วและมีผล isolated PostgreSQL/DI/model checks; ยังขาดหลักฐาน shared API integration/rollback/concurrencyครบขอบเขต
+- License ฝั่ง admin, การ activate เครื่อง และการย้ายเครื่อง (BE-003/004/005), Login/logout ฝั่งบริการ (BE-006), การแลก session เว็บ (BE-039), CourseRun รายห้อง (BE-029), คลังข้อสอบ (BE-030) และการนำเข้าแผนรายวิชา (BE-028) ผ่านการตรวจระดับทางหลัก (normal) บนที่เก็บข้อมูลจำลองแล้ว ยังต้องตรวจเต็ม (race/replay/ความปลอดภัย) ก่อนส่งมอบ · ข้อค้าง audit/ผลเดิมต้องตรวจเต็มกับ repository transactionใหม่ ไม่ใช้ผล memoryเก่าปิดประเด็น · Desktop มี signed entitlement/device proof/protected storageแล้ว แต่ HostServer fixture ยังมี compile issue และ Gateway URL/path/JWT integrationยังค้าง
 - การนำเข้าแผนรายวิชาใช้คอลัมน์ใหม่ `SchoolBotLesson.ImportSource` ตาม [migration-002](build/db/migration-002-lesson-import-source.md) (คอลัมน์เดียว ไม่มี index/constraint ตามคำผู้ใช้) — ผู้ใช้ยังต้องรัน SQL เอง
 - เลขอ้างอิงการอนุมัติและหลักฐาน release ยาวไม่เกิน 1,000 ตัวอักษร ตาม [มติ 054](shared/decisions/decisions-054.md)
-- แอปเรียก API Gateway ผ่าน HTTP แล้ว Gateway เรียก SchoolBot ผ่าน gRPC (Remote Procedure Call) เว็บผ่าน BFF (Backend for Frontend) บน origin เดียวกัน Gateway ใช้ controller ตาม [มติ 050 (ใช้รูปแบบ controller เดิมของ Gateway)](shared/decisions/decisions-050.md) ผลในเครื่องยังไม่ยืนยันการทำงานบนระบบจริง
+- Topology กำหนดแอปเรียก HTTP Gateway แล้วต่อ gRPC (Remote Procedure Call); เว็บผ่าน same-origin BFF (Backend for Frontend) แต่ Desktopปัจจุบันยังใช้ HTTP pathsเก่า และ BFFจริงยังไม่ยืนยัน Gateway ใช้ controller ตาม [มติ 050 (ใช้รูปแบบ controller เดิมของ Gateway)](shared/decisions/decisions-050.md) ผลในเครื่องยังไม่ยืนยันการทำงานบนระบบจริง
 - ผู้ใช้อนุญาตพัฒนา Gateway และกู้ License Key เดิมจากคำขอสร้างซ้ำได้ภายใน 15 นาทีตาม [มติ 046 (พัฒนา Gateway และกำหนดช่วงกู้ Key)](shared/decisions/decisions-046.md) ส่วนที่เก็บกุญแจเซ็นและผู้ดูแลยังพักไว้ตาม [มติ 047 (พักเรื่องกุญแจเซ็น License)](shared/decisions/decisions-047.md)
 - UX/UI (ประสบการณ์ผู้ใช้และหน้าจอ) อนุมัติครบ 7 ชุด รวมหน้าจอข้อสอบเมื่อหมดเวลาตาม [มติ 043 (อนุมัติหน้าจอหลักสูตร ข้อสอบ และหน้าครู)](shared/decisions/decisions-043.md) สัญญาในเครื่องพร้อมแล้ว แต่หลักฐานอนุมัติ ที่มาข้อมูล และหลักฐานเจ้าของระบบยังค้าง
 
@@ -40,7 +40,7 @@ SchoolBot เป็นระบบสำหรับนักเรียนแ�
 ## ความเสี่ยงที่ยังเปิด
 
 - ความปลอดภัยยังมีระดับ Important 6 ข้อ, Medium 6 ข้อ และ Minor 3 ข้อ; ผลตรวจ Gateway ครั้งที่สองยังเปิด 16 ข้อ ผลปิดประเด็นของ logout ใช้ได้เฉพาะในเครื่อง
-- ฐานข้อมูลยังไม่ยืนยันความตรงกับแบบ การทำงานแบบ transaction และการเชื่อม API
+- มี scaffold/model และ isolated repository transaction checksแล้ว แต่ shared DB integration, ImportSource migration, signing/replayหลายinstance และการตรวจเต็มยังค้าง ดู [runtime](build/design/service-runtime-001.md)
 - ชุดทดสอบมี 82 กรณีครอบคลุมเกณฑ์ตรวจรับ 187 ข้อ แต่ข้อมูลเชื่อมโยงเกณฑ์กับกรณีทดสอบยังเป็นชุด 180 ข้อ/77 กรณี และผล actual ทุกกรณียังเป็น NOT_RUN
 - การอ่านโค้ดส่วนเขียนคะแนนเดิมยังติดข้อจำกัด เพราะแหล่งโค้ดอยู่นอก workspace
 
@@ -63,7 +63,7 @@ SchoolBot เป็นระบบสำหรับนักเรียนแ�
 
 ## หลักฐาน
 
-สถานะอ้างหน้าแรกเดิมและ [แผนปัจจุบัน](build/plan/index.md) สัญญาอ่านที่ [Gateway integration Rev5](build/design/gateway-integration-001.md), [สัญญา gRPC Rev2](build/design/gateway-grpc-contract-001.md) และ [controller entry Rev2](build/design/gateway-controller-entry-001.md)
+สถานะอ้างหน้าแรกเดิมและ [แผนปัจจุบัน](build/plan/index.md) สัญญาอ่านที่ [Gateway integration Rev6](build/design/gateway-integration-001.md), [สัญญา gRPC Rev4](build/design/gateway-grpc-contract-001.md) และ [controller entry Rev3](build/design/gateway-controller-entry-001.md)
 
 ## Modules
 
