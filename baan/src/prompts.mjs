@@ -7,14 +7,27 @@ import { roleSessionHeader } from "./role-guard.mjs";
 
 // CONVENTIONS.md เป็นสัญญาบังคับของทุก role — อ่านไม่ได้ให้หยุด ไม่ข้ามเงียบๆ
 // (มิฉะนั้น package ที่ติดตั้งแล้วขาดไฟล์นี้จะทำงานโดยไร้กติกากลางโดยไม่มีใครรู้)
-export function readConventions() {
+// หัวข้อที่ไม่ใช้กับ role — เดิมแนบทั้งไฟล์ (17 KB) ทุก call ซึ่งเกือบครึ่งเป็นกติกาที่ role นั้นไม่มีทางใช้:
+// engineer ไม่เขียน knowledge (§3) กติกาเส้นชัย/รอบแก้เป็นของผู้คุมกับ check (§10) §12/§13 เป็นกติกาเอกสารข้อมูล/โครง knowledge
+// check ไม่เขียน knowledge (รอบตรวจลง memory) แต่ต้องใช้ §10 และ §12
+export const CONVENTIONS_OMIT = { sys: [3, 10, 12, 13], front: [3, 10, 12, 13], check: [3] };
+
+export function readConventions(roleId = "") {
   const file = path.join(TEAM_DIR, "CONVENTIONS.md");
+  let text;
   try {
-    return readFileSync(file, "utf8").trim();
+    text = readFileSync(file, "utf8").trim();
   } catch {
     console.error(`อ่าน CONVENTIONS.md ไม่ได้ (${file}) — ไฟล์นี้เป็นสัญญาบังคับของทุก role ระบบจึงหยุด (ติดตั้ง package ให้ครบ หรือรันจากตำแหน่งที่มีไฟล์นี้)`);
     process.exit(2);
   }
+  const omit = CONVENTIONS_OMIT[roleId] ?? [];
+  if (!omit.length) return text;
+  const parts = text.split(/\n(?=## \d+\.)/);
+  const num = (p) => Number(/^## (\d+)\./.exec(p)?.[1]);
+  const kept = parts.filter((p) => !omit.includes(num(p)));
+  const dropped = parts.map(num).filter((n) => omit.includes(n));
+  return `${kept.join("\n")}\n\n(Sections ${dropped.map((n) => `§${n}`).join(", ")} of the shared conventions are omitted because they do not apply to this role.)`;
 }
 
 // role รันแบบ non-interactive จึงถามวันที่จากผู้ใช้ตาม CONVENTIONS §4 ไม่ได้ —
@@ -53,19 +66,15 @@ export function roleDirective(roleName, task, ctxBlocks, projectCtx, date = loca
   const id = resolveRoleName(roleName);
   const roleContent = readFileSync(path.join(ROLES_DIR, `${id}.md`), "utf8").trim();
   const level = testLevel && TEST_LEVEL_ROLES.includes(id) ? `\n\n${testLevelSection(testLevel)}` : "";
-  const conv = `\n\n---\n\n## Shared conventions every role must follow (binding contract):\n${readConventions()}\n\n---\n\n${dateSection(date)}${level}`;
+  const conv = `\n\n---\n\n## Shared conventions every role must follow (binding contract):\n${readConventions(id)}\n\n---\n\n${dateSection(date)}${level}`;
   const pc = projectCtx ? `\n\n---\n\n## Project context:\n${projectCtx}` : "";
   const ctx = ctxBlocks?.length ? `\n\n---\n\n## Output from previous tasks:\n${ctxBlocks.join("\n\n")}` : "";
   return `${roleSessionHeader(id)}\n\nYou are now operating in a software development team, strictly under the following role:\n\n${roleContent}${conv}${pc}\n\n---\n\n## Your assignment:\n${task}${ctx}`;
 }
 
-export function pmPrompt(goal, projectCtx, date = localDate()) {
-  return `${roleDirective("gm", `The user sent you (the site manager) a goal. Digest it and write a concise "brief for the master planner" (max 10 lines): what must be delivered, scope in/out, known constraints, and things to watch out for — do not plan it yourself, that is the master planner's job.\n\n## Goal from the user:\n${goal}`, null, projectCtx, date)}
-
-Reply with the brief text only (no JSON). Write it in Thai.`;
-}
-
-export function plannerPrompt(pmDirective, goal, cfg, projectCtx, date = localDate(), write = false) {
+// planner รับ goal ตรง — เดิมมีขั้น PM (gm @t2) เขียน brief ≤10 บรรทัดก่อน ซึ่งเป็น session เต็มหนึ่งรอบ
+// ที่ไม่ได้ข้อมูลใหม่ เพราะ planner ได้ goal ฉบับเต็มอยู่แล้ว
+export function plannerPrompt(goal, cfg, projectCtx, date = localDate(), write = false) {
   const roleContent = readFileSync(path.join(ROLES_DIR, "plan.md"), "utf8").trim();
   const roles = listRoles().map((r) => `- ${r.name} — ${r.title}: ${r.summary}${FIXED_ROLE_TIER[r.name] ? ` (fixed tier ${FIXED_ROLE_TIER[r.name]})` : ` (planner picks tier ${IMPLEMENT_TIER_RANGE} by difficulty)`}`).join("\n");
   const matrix = tierMatrixText(cfg.tiers, cfg.agents);
@@ -81,9 +90,6 @@ ${roleContent}
 
 ## Goal from the user:
 ${goal}
-
-## Brief from the site manager:
-${pmDirective}
 ${conv}${pc}
 ## Team you may call (roles — use the ID before the dash in the "role" field):
 ${roles}

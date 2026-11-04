@@ -1,10 +1,10 @@
-// สถานะงาน + dependency + การ execute ตาม wave ของแผน DAG
+// สถานะงาน + dependency + การ execute แผน DAG (เติม slot ทันทีที่ว่าง)
 import path from "node:path";
 import { classifyFailure } from "./failure-class.mjs";
 import { appendEvent } from "./ledger.mjs";
 import { roleDirective } from "./prompts.mjs";
 import { buildArgs, runCli } from "./runner.mjs";
-import { fallbackChainFor } from "./plan.mjs";
+import { fallbackChainFor, transitiveFanOut } from "./plan.mjs";
 import { readCheckpoint, writeAtomic, writeCheckpoint } from "./run-store.mjs";
 import { resolveTimeout } from "./timeout.mjs";
 
@@ -116,9 +116,26 @@ export function looksLikeCapacityError(r) {
   return CAPACITY_ERROR_RE.test(`${r.error ?? ""}\n${r.stderr ?? ""}`);
 }
 
+// CLI เริ่มทำงานไม่ได้ — งานยังไม่ได้เริ่มจริง จึงสลับตัวถัดไปได้เหมือนกรณีไม่ได้ติดตั้ง
+// school-bot 2026-11-03/04: codex "failed to initialize in-process app-server client: Access is denied" ล้มใน 0–1 วินาที
+// 5 ครั้ง และ claude "couldn't reach Anthropic to load your organization's settings" — เดิมจบ failed ให้นายช่างสั่งใหม่เอง
+// error เครือข่าย (DNS) นับเฉพาะเมื่อล้มเร็ว: ถ้าเกิดหลังทำงานไปนาน (agy เคยล้มหลัง 27 นาที) อาจแก้ไฟล์ไปแล้วบางส่วน
+// การรันซ้ำด้วยค่ายอื่นจากศูนย์เสี่ยงทับงานครึ่งทาง ให้คนตัดสิน
+const STARTUP_ERROR_PATTERNS = [/failed to initialize .*access is denied/i, /couldn.t reach .* settings/i];
+const NETWORK_ERROR_RE = /getaddrinfo|ENOTFOUND|no data of the requested type|ECONNREFUSED/i;
+export const STARTUP_WINDOW_MS = 60_000;
+
+export function looksLikeStartupError(r) {
+  if (r.ok || r.timedOut) return false;
+  const hay = `${r.error ?? ""}\n${r.stderr ?? ""}`;
+  if (STARTUP_ERROR_PATTERNS.some((p) => p.test(hay))) return true;
+  return (r.durationMs ?? Infinity) < STARTUP_WINDOW_MS && NETWORK_ERROR_RE.test(hay);
+}
+
 export function switchReasonText(reason) {
   if (reason === "missing") return "ไม่ได้ติดตั้งบนเครื่อง";
   if (reason === "capacity") return "โมเดลยังเต็มหลังลองซ้ำครบ";
+  if (reason === "startup") return "เริ่มทำงานไม่ได้ (สิทธิ์/เครือข่าย/ตั้งค่า)";
   return "ติดโควตา/limit";
 }
 
@@ -126,8 +143,8 @@ const sleepMs = (ms) => new Promise((res) => setTimeout(res, ms));
 export const capacityRetryText = (agent, n, total, delayMs) => `${agent} โมเดลเต็มชั่วคราว (at capacity) — รอ ${Math.round(delayMs / 1000)}s แล้วลองใหม่ (${n}/${total})`;
 const logRetry = (...a) => console.log(capacityRetryText(...a));
 
-// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit, ไม่ได้ติดตั้งบนเครื่อง หรือเต็มจนลองซ้ำครบ
-// ใช้ร่วมทั้งงานในแผน, ขั้น PM/planner และ baan-role เพื่อให้กติกาการสลับเป็นชุดเดียว
+// ลองตัวรันตามลำดับ chain — ไปตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit, ไม่ได้ติดตั้งบนเครื่อง, เริ่มทำงานไม่ได้ หรือเต็มจนลองซ้ำครบ
+// ใช้ร่วมทั้งงานในแผน, ขั้น planner และ baan-role เพื่อให้กติกาการสลับเป็นชุดเดียว
 export async function runWithFallback(chain, attempt, onSwitch = () => {}, { retryDelaysMs = CAPACITY_RETRY_DELAYS_MS, sleep = sleepMs, onRetry = logRetry } = {}) {
   const trail = [];
   let r = null;
@@ -140,7 +157,7 @@ export async function runWithFallback(chain, attempt, onSwitch = () => {}, { ret
       await sleep(retryDelaysMs[k]);
       r = await attempt(agent);
     }
-    const reason = looksLikeLimitError(r) ? "limit" : looksLikeMissingCli(r) ? "missing" : looksLikeCapacityError(r) ? "capacity" : null;
+    const reason = looksLikeLimitError(r) ? "limit" : looksLikeMissingCli(r) ? "missing" : looksLikeStartupError(r) ? "startup" : looksLikeCapacityError(r) ? "capacity" : null;
     if (r.ok || reason === null || i + 1 >= chain.length) break;
     trail.push(`${chain[i]}→${chain[i + 1]}`);
     onSwitch(chain[i], chain[i + 1], reason);
@@ -161,64 +178,78 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
   console.log(`\nเริ่ม execute (max ${opts.maxParallel} ขนาน, ${opts.write ? "write" : "read-only"})...`);
   const pending = plan.tasks.filter((t) => !done.has(t.id)).map((t) => ({ ...t }));
   const states = done; // id → record ที่มี state (preload ใส่เฉพาะ completed)
-  let wave = 0;
+  // งานที่มีงานอื่นพึ่งมาก (ทั้งทางตรงและทางอ้อม) ได้ slot ก่อน — ปลดงานปลายทางเร็วกว่า · เท่ากันใช้ลำดับในแผน
+  const fanOut = transitiveFanOut(plan.tasks.map((t) => ({ id: t.id, dependsOn: t.dependsOn ?? [] })));
+  const running = new Map(); // id → Promise ของผลงาน
+  let maxRunning = 0;
 
-  while (pending.length) {
-    const ready = pending.filter((t) => (t.dependsOn ?? []).every((d) => states.get(d)?.state === "completed"));
-    if (ready.length === 0) break; // cycle ถูกกันตอน validate แล้ว — เหลือค้าง = blocked โดย dependency ที่ไม่สำเร็จ
-    const batch = ready.slice(0, opts.maxParallel);
-    wave++;
-    console.log(`\n── wave ${wave}: ${batch.map((t) => `${t.id}(${t.role}/${t.tier}@${t.agent})`).join(" + ")} ──`);
+  const runOne = async (t) => {
+    const startedAt = new Date().toISOString();
+    const ctxBlocks = buildCtxBlocks(runDir, t, states);
+    // ลำดับตัวรัน: ตัวที่เลือกมาก่อน — สลับตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
+    // (cfg ที่ไม่รู้จัก agent เลย เช่นตอนทดสอบ = เรียกตัวเดิมหนึ่งครั้งตามปกติ)
+    const tryChain = fallbackChainFor(cfg, t.tier, t.agent);
+    const chain = tryChain.length ? tryChain : [t.agent];
+    const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
+      chain,
+      (agent) => runTask(cfg, { ...opts, timeoutSec: resolveTimeout(opts, cfg.tiers?.[t.tier]) }, runDir, t, ctxBlocks, agent),
+      (from, to, reason) => console.log(`  ${t.id}: ${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
+      { onRetry: (...a) => console.log(`  ${t.id}: ${capacityRetryText(...a)}`) },
+    );
+    t.agent = usedAgent;
+    return { t, r, fallbackTrail, startedAt };
+  };
 
-    const results = await Promise.all(batch.map(async (t) => {
-      const startedAt = new Date().toISOString();
-      const ctxBlocks = buildCtxBlocks(runDir, t, states);
-      // ลำดับตัวรัน: ตัวที่เลือกมาก่อน — สลับตัวถัดไปเฉพาะเมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
-      // (cfg ที่ไม่รู้จัก agent เลย เช่นตอนทดสอบ = เรียกตัวเดิมหนึ่งครั้งตามปกติ)
-      const tryChain = fallbackChainFor(cfg, t.tier, t.agent);
-      const chain = tryChain.length ? tryChain : [t.agent];
-      const { r, agent: usedAgent, trail: fallbackTrail } = await runWithFallback(
-        chain,
-        (agent) => runTask(cfg, { ...opts, timeoutSec: resolveTimeout(opts, cfg.tiers?.[t.tier]) }, runDir, t, ctxBlocks, agent),
-        (from, to, reason) => console.log(`  ${t.id}: ${from} ${switchReasonText(reason)} — สลับไป ${to} (ตามลำดับ fallback ของ tier ${t.tier})`),
-        { onRetry: (...a) => console.log(`  ${t.id}: ${capacityRetryText(...a)}`) },
-      );
-      t.agent = usedAgent;
-      return { t, r, fallbackTrail, startedAt };
-    }));
-
-    for (const { t, r, fallbackTrail, startedAt } of results) {
-      pending.splice(pending.findIndex((p) => p.id === t.id), 1);
-      writeAtomic(path.join(runDir, `${t.id}.answer.txt`), r.answer ?? "");
-      writeAtomic(path.join(runDir, `${t.id}.stderr.txt`), r.stderr ?? "");
-      const cls = classifyOutcome(r);
-      const prior = readCheckpoint(runDir, t.id);
-      const rec = {
-        id: t.id,
-        agent: t.agent,
-        state: cls.state,
-        ok: cls.ok,
-        marker: cls.marker,
-        exitCode: r.exitCode ?? null,
-        timedOut: !!r.timedOut,
-        error: r.error || "",
-        startedAt,
-        durationMs: r.durationMs ?? 0,
-        failureClass: classifyFailure({ state: cls.state, answer: r.answer, error: r.error }),
-        usage: r.usage ?? null,
-        attempt: (typeof prior?.attempt === "number" ? prior.attempt : 0) + 1,
-        fallback: fallbackTrail,
-        finishedAt: new Date().toISOString(),
-        answerFile: path.join(runDir, `${t.id}.answer.txt`),
-        stderrFile: path.join(runDir, `${t.id}.stderr.txt`),
-      };
-      writeCheckpoint(runDir, rec);
-      appendEvent(opts.ledgerDir, { type: "task_result", run: path.basename(runDir), taskIds: [t.id], role: t.role, agent: rec.agent, state: rec.state, failureClass: rec.failureClass, fallback: fallbackTrail });
-      states.set(t.id, { ...rec, answer: r.answer ?? "" });
-      console.log(`  ${t.id} ${statusLabel(rec)} in ${((r.durationMs ?? 0) / 1000).toFixed(1)}s${fallbackTrail.length ? ` (สลับตัวรัน: ${fallbackTrail.join(", ")})` : ""} — ${t.title}`);
-      if (!rec.ok) console.log(`    สถานะ: ${rec.state} · stderr: ${rec.stderrFile}`);
+  // เติม slot ทันทีที่ว่าง (charter ข้อ 7) — เดิมรอทั้ง wave จบก่อนคำนวณงานถัดไป งานที่ dependency ผ่านแล้ว
+  // จึงต้องรองานที่ยาวที่สุดใน wave ทั้งที่มี slot ว่าง
+  const fill = () => {
+    const ready = pending
+      .filter((t) => !running.has(t.id) && (t.dependsOn ?? []).every((d) => states.get(d)?.state === "completed"))
+      .sort((a, b) => (fanOut.get(b.id) ?? 0) - (fanOut.get(a.id) ?? 0));
+    for (const t of ready) {
+      if (running.size >= opts.maxParallel) break;
+      console.log(`\n── เริ่ม ${t.id}(${t.role}/${t.tier}@${t.agent})${running.size ? ` · กำลังรันอยู่: ${[...running.keys()].join(", ")}` : ""} ──`);
+      running.set(t.id, runOne(t));
     }
+    maxRunning = Math.max(maxRunning, running.size);
+  };
+
+  fill();
+  while (running.size) {
+    const { t, r, fallbackTrail, startedAt } = await Promise.race(running.values());
+    running.delete(t.id);
+    pending.splice(pending.findIndex((p) => p.id === t.id), 1);
+    writeAtomic(path.join(runDir, `${t.id}.answer.txt`), r.answer ?? "");
+    writeAtomic(path.join(runDir, `${t.id}.stderr.txt`), r.stderr ?? "");
+    const cls = classifyOutcome(r);
+    const prior = readCheckpoint(runDir, t.id);
+    const rec = {
+      id: t.id,
+      agent: t.agent,
+      state: cls.state,
+      ok: cls.ok,
+      marker: cls.marker,
+      exitCode: r.exitCode ?? null,
+      timedOut: !!r.timedOut,
+      error: r.error || "",
+      startedAt,
+      durationMs: r.durationMs ?? 0,
+      failureClass: classifyFailure({ state: cls.state, answer: r.answer, error: r.error }),
+      usage: r.usage ?? null,
+      attempt: (typeof prior?.attempt === "number" ? prior.attempt : 0) + 1,
+      fallback: fallbackTrail,
+      finishedAt: new Date().toISOString(),
+      answerFile: path.join(runDir, `${t.id}.answer.txt`),
+      stderrFile: path.join(runDir, `${t.id}.stderr.txt`),
+    };
+    writeCheckpoint(runDir, rec);
+    appendEvent(opts.ledgerDir, { type: "task_result", run: path.basename(runDir), taskIds: [t.id], role: t.role, agent: rec.agent, state: rec.state, failureClass: rec.failureClass, fallback: fallbackTrail });
+    states.set(t.id, { ...rec, answer: r.answer ?? "" });
+    console.log(`  ${t.id} ${statusLabel(rec)} in ${((r.durationMs ?? 0) / 1000).toFixed(1)}s${fallbackTrail.length ? ` (สลับตัวรัน: ${fallbackTrail.join(", ")})` : ""} — ${t.title}`);
+    if (!rec.ok) console.log(`    สถานะ: ${rec.state} · stderr: ${rec.stderrFile}`);
+    fill();
   }
+  // เหลือใน pending = ถูกกั้นด้วย dependency ที่ไม่สำเร็จ (cycle ถูกกันตอน validate แล้ว)
 
   for (const t of pending) {
     const blockedBy = (t.dependsOn ?? []).filter((d) => states.get(d)?.state !== "completed");
@@ -247,7 +278,7 @@ export async function execute(plan, opts, runDir, cfg, done, runTask = runRoleTa
   const counts = {};
   for (const t of plan.tasks) { const s = states.get(t.id)?.state ?? "pending"; counts[s] = (counts[s] ?? 0) + 1; }
   console.log(`\n======== สรุป นายช่าง ========`);
-  console.log(`สถานะ ${plan.tasks.length} task: ${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(" · ")} · ${wave} wave (รอบนี้) · รายงาน: ${runDir}`);
+  console.log(`สถานะ ${plan.tasks.length} task: ${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(" · ")} · ขนานสูงสุด ${maxRunning} · รายงาน: ${runDir}`);
   const needs = plan.tasks.filter((t) => (states.get(t.id)?.state ?? "").startsWith("needs_"));
   if (needs.length) {
     console.log(`งานที่หยุดเพราะเจอปัญหาเหนืออำนาจ role (NEEDS_*):`);

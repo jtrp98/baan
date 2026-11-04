@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { performInit } from "../src/init.mjs";
-import { adhocDirective, plannerPrompt, pmPrompt, roleDirective } from "../src/prompts.mjs";
+import { adhocDirective, plannerPrompt, roleDirective } from "../src/prompts.mjs";
 import { ROLE_SESSION_RULE, roleMarker } from "../src/role-guard.mjs";
 
 const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -30,8 +30,7 @@ test("stub ของ --init มีข้อยกเว้นของ role ก�
 test("prompt ของ role ขึ้นต้นด้วยป้าย role (ID สั้นแม้ส่งชื่อเดิม) + ประโยคเดียวกับ stub", () => {
   const p = roleDirective("business-analyst", "เขียน REQ", null, "", "2026-10-17");
   assert.ok(p.startsWith(`${roleMarker("spec")}\n${ROLE_SESSION_RULE}\n`), "ป้ายต้องอยู่บรรทัดแรก ก่อนเนื้อหาบทบาท");
-  assert.ok(pmPrompt("goal", "", "2026-10-17").startsWith(roleMarker("gm")));
-  assert.ok(plannerPrompt("คำมอบหมาย", "goal", cfg, "", "2026-10-17").startsWith(`${roleMarker("plan")}\n${ROLE_SESSION_RULE}`));
+  assert.ok(plannerPrompt("goal", cfg, "", "2026-10-17").startsWith(`${roleMarker("plan")}\n${ROLE_SESSION_RULE}`));
 });
 
 test("งานที่ไม่ผูก role ก็มีป้าย adhoc และคงคำสั่งงานเดิมไว้ครบ", () => {

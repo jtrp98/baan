@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 🏗️ นายช่าง (โหมดอัตโนมัติ) — goal → PM → planner → execute ตามแผน DAG
+// 🏗️ นายช่าง (โหมดอัตโนมัติ) — goal → planner → execute ตามแผน DAG
 // โหมดหลักของ นายช่าง คือ "AI session สวมบท" ตาม BAAN.md แล้วเปิด session ราย role
 // ด้วย baan-role — ไฟล์นี้คือทางเลือกอัตโนมัติทั้งก้อนเมื่อไม่ต้องมีคน/session คุมเอง
 // การตั้งค่าอยู่ที่ <ราก workspace>\baan.config.json (นอก package) · วิธีใช้เต็ม: baan/README.md
@@ -15,7 +15,7 @@ import { ledgerDirOf } from "../src/ledger.mjs";
 import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { formatSweep, sweep } from "../src/sweep.mjs";
-import { localDate, parseWorkDate, pmPrompt, plannerPrompt } from "../src/prompts.mjs";
+import { localDate, parseWorkDate, plannerPrompt } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
 
@@ -82,7 +82,7 @@ function printWorkspace(ws) {
   console.log(`defaults : agent=${d.agent} · planner_tier=${d.planner_tier} · timeout=${d.timeout_sec}s · max_parallel=${d.max_parallel} · test_level=${d.test_level}`);
 }
 
-// ขั้นต้นทางหนึ่งขั้น (PM/planner) — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
+// ขั้นวางแผน — สลับตัวถัดไปตามลำดับ fallback ของ tier เมื่อติดโควตา/limit
 export async function callStageWithFallback(cfg, opts, runDir, tier, fileName, promptText, runner = runCli) {
   const answerFile = path.join(runDir, fileName);
   const { r, agent } = await runWithFallback(
@@ -339,14 +339,8 @@ async function main() {
   mkdirSync(runDir, { recursive: true });
   writeManifest(runDir, opts); // บันทึกบริบทก่อนเรียก provider ใดๆ — crash กลางทางก็ resume ได้ครบ
 
-  console.log(`[pm] ${opts.agent} @ t2 รับ goal แล้วเขียนคำมอบหมาย...`);
-  const pm = await callStageWithFallback(cfg, opts, runDir, "t2", "pm.answer.txt", pmPrompt(goal, projectCtx, opts.date));
-  const pmDirective = pm.r.answer || "(PM ไม่ตอบ — planner ใช้ goal ตรงๆ)";
-  writeAtomic(pm.answerFile, pmDirective);
-  console.log(`[pm] ${pm.agent} คำมอบหมาย: ${pmDirective.split("\n")[0].slice(0, 100)}...`);
-
   console.log(`[planner] ${opts.agent} @ ${opts.plannerTier} กำลังวางแผน...`);
-  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(pmDirective, goal, cfg, projectCtx, opts.date, opts.write));
+  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(goal, cfg, projectCtx, opts.date, opts.write));
   writeAtomic(p.answerFile, p.r.answer);
   if (!p.r.ok) { console.error(`planner ล้มเหลว: exit=${p.r.exitCode} ${p.r.error} (agent สุดท้าย: ${p.agent})`); process.exit(1); }
   let plan;

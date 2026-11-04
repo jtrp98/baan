@@ -18,10 +18,13 @@ const BY_STATE = {
 
 export const ENVIRONMENT_FAILURE = "ENVIRONMENT_FAILURE";
 
+export function looksLikeEnvironmentFailure(text) {
+  return ENV_PATTERNS.test(String(text ?? ""));
+}
+
 export function classifyFailure({ state, answer = "", error = "" } = {}) {
   if (!state || state === "completed") return null;
   if (state === "timeout") return "TIMEOUT";
-  const hay = `${error ?? ""}\n${String(answer ?? "").slice(-TAIL_CHARS)}`;
-  if (ENV_PATTERNS.test(hay)) return ENVIRONMENT_FAILURE;
+  if (looksLikeEnvironmentFailure(`${error ?? ""}\n${String(answer ?? "").slice(-TAIL_CHARS)}`)) return ENVIRONMENT_FAILURE;
   return BY_STATE[state] ?? "OTHER";
 }

@@ -130,7 +130,10 @@ export function summarizeStderr(stderr) {
 // runCli คืนผลเสมอ (ไม่ reject) เพื่อให้ scheduler จัดการความล้มเหลวเป็นสถานะงานต่อเนื่องได้
 // ส่ง prompt ทาง stdin เมื่อทำได้ เพื่อเลี่ยงปัญหา quote อักขระพิเศษ; agy รับทาง arg และ spawn ตรงไม่ผ่าน shell
 // usage = args ถูกสร้างด้วย buildArgs(..., usage=true) — ต้องแกะ stdout เป็น JSON ตาม def.usage.format
-export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint, { usage = false } = {}) {
+// idle timeout: ฆ่า process ที่เงียบ (ไม่มี stdout/stderr) นานเกินกำหนด แยกจาก wall timeout — ใช้ได้เฉพาะค่ายที่
+// พิมพ์ความคืบหน้าระหว่างทำ (codex) ประกาศด้วย idleTimeoutSec ใน agents.json · claude -p/agy --print แบบ text
+// เงียบจนจบงาน ถ้าตั้งให้จะฆ่างานปกติทิ้ง · ที่มา: school-bot 2026-11-03 call เดียวค้าง 183 นาที
+export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint, { usage = false, idleTimeoutSec = def.idleTimeoutSec } = {}) {
   return new Promise((resolve) => {
     const started = Date.now();
     const startedAt = new Date(started).toISOString();
@@ -144,19 +147,28 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
     let stdout = "";
     let stderr = "";
     let timedOut = false;
+    let idle = false;
     let settled = false;
     const timer = setTimeout(() => { timedOut = true; killTree(child); }, timeoutSec * 1000);
+    let idleTimer = null;
+    const armIdle = () => {
+      if (!idleTimeoutSec) return;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { timedOut = true; idle = true; killTree(child); }, idleTimeoutSec * 1000);
+    };
+    const stopTimers = () => { clearTimeout(timer); clearTimeout(idleTimer); };
+    armIdle();
 
-    child.stdout.on("data", (d) => { stdout += d; });
-    child.stderr.on("data", (d) => { stderr += d; });
+    child.stdout.on("data", (d) => { stdout += d; armIdle(); });
+    child.stderr.on("data", (d) => { stderr += d; armIdle(); });
     child.on("error", (err) => {
       if (settled) return;
-      settled = true; clearTimeout(timer);
-      resolve({ ok: false, exitCode: null, startedAt, durationMs: Date.now() - started, timedOut: false, answer: "", error: err.message, stdout, stderr, usage: null });
+      settled = true; stopTimers();
+      resolve({ ok: false, exitCode: null, startedAt, durationMs: Date.now() - started, timedOut: false, idle: false, answer: "", error: err.message, stdout, stderr, usage: null });
     });
     child.on("close", (code) => {
       if (settled) return;
-      settled = true; clearTimeout(timer);
+      settled = true; stopTimers();
       const parsed = usage && def.usage?.format ? parseUsageOutput(def.usage.format, stdout) : null;
       let answer = "";
       if (def.answerFrom === "answerFile" && answerFileHint) {
@@ -165,8 +177,9 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
       // error ของ codex --json มาทาง stdout เป็น event — ต่อเข้า stderr ให้การตรวจโควตา/startup error ยังเห็น
       const errText = parsed?.errors?.length ? `${stderr}\n${parsed.errors.map((e) => `ERROR: ${e}`).join("\n")}` : stderr;
       const ok = code === 0 && !timedOut && !parsed?.isError;
-      const error = ok && answer ? "" : summarizeStderr(errText);
-      resolve({ ok, exitCode: code, startedAt, durationMs: Date.now() - started, timedOut, answer, error, stdout, stderr: errText, usage: parsed?.usage ?? null });
+      const idleNote = idle ? `ไม่มี output เกิน ${idleTimeoutSec} วินาที (idle timeout) — ถูกหยุด` : "";
+      const error = ok && answer ? "" : [idleNote, summarizeStderr(errText)].filter(Boolean).join(" | ");
+      resolve({ ok, exitCode: code, startedAt, durationMs: Date.now() - started, timedOut, idle, answer, error, stdout, stderr: errText, usage: parsed?.usage ?? null });
     });
     if (promptVia === "stdin") {
       child.stdin.on("error", () => {}); // กัน crash ถ้า process ตายก่อนรับ stdin

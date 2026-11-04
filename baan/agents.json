@@ -73,6 +73,7 @@
         "-"
       ],
       "answerFrom": "answerFile",
+      "idleTimeoutSec": 1200,
       "usage": {
         "args": [
           "--json"

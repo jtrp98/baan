@@ -131,7 +131,7 @@ baan-role --agent codex --role spec --tier t2 --task "คำสั่งงา�
 - **สถานะโควตาไม่ข้าม run** — ทุก run สั่ง agent ตาม tier ตามปกติเสมอ ให้ fallback ตัดสินเองว่าวันนี้ตัวไหนใช้ได้ (ลองตัวที่ติดโควตาหนึ่งครั้ง = error เดียว ไม่เผาโควตา) · ห้ามเลือกตัวรันอื่นล่วงหน้าเพราะ "รอบก่อนติด" และห้ามยก "ติดถึง <เวลา>" ไปใส่ใบงานถัดไปเป็นกติกา (โควตากลับก่อนเวลาที่ CLI แจ้งได้) · ใบงานจดได้เฉพาะตัวรันจริงของแต่ละ run (`fallback` ใน report.json) เช่น "agy — codex limit ตอนรัน"
 - ตัวเลือกที่ใช้บ่อย: `--cwd <path>` (โปรเจกต์เป้าหมาย) · `--write` (อนุญาตให้แก้ไฟล์ — default read-only) · `--timeout <jpo>` · `--date YYYY-MM-DD`
 - agent เลือกได้: `codex` (default — ไม่ใส่ `--agent` = ใช้ `defaults.agent` ของ workspace, ประหยัดโควตา claude) · `claude` · `agy` · `opencode` — **ฝีมือของ model กำหนดด้วย `--tier` ไม่ใช่ชื่อ agent** (agent เดียวกันคนละ tier ได้ model คนละรุ่น) · ดู model จริงของแต่ละคู่ agent × tier ด้วย `baan-role --list`
-- โหมดอัตโนมัติทั้งก้อน (ไม่ต้องคุมเอง): `baan --goal "..."` — gm/plan/execute ทำงานเองตามแผน DAG
+- โหมดอัตโนมัติทั้งก้อน (ไม่ต้องคุมเอง): `baan --goal "..."` — plan/execute ทำงานเองตามแผน DAG (goal ส่งให้ plan ตรง ไม่มีขั้น gm แล้ว)
 
 ## โหมด solo — ทีมทั้งทีมรันใน session นี้ (เมื่อผู้ใช้สั่ง)
 

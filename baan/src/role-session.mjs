@@ -9,7 +9,7 @@ import { parseWorkDate } from "./prompts.mjs";
 import { capacityRetryText, classifyOutcome, runWithFallback, switchReasonText } from "./scheduler.mjs";
 
 export { DEFAULT_TIMEOUT_SEC };
-export const ROLE_USAGE = `ใช้ [--agent <name>] [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--task-id <id[,id...]>] [--usage] [--list]`;
+export const ROLE_USAGE = `ใช้ [--agent <name>] [--all] --task "..." [--role <name>] [--tier t0..t5] [--model <m>] [--effort <e>] [--date YYYY-MM-DD] [--test-level normal|full] [--write] [--seq] [--no-fallback] [--no-preflight] [--timeout <sec>] [--cwd <dir>] [--task-id <id[,id...]>] [--usage] [--probe "<cmd>"] [--list]`;
 
 // cwd เริ่มต้น = ไดเรกทอรีที่เรียกคำสั่ง — ค่าเดิม (โฟลเดอร์แม่ของ package) ทำให้ นายช่าง ที่อยู่ใน
 // workspace จริงแต่ลืมส่ง --cwd ได้ role ที่อ่านไฟล์ผิด repo โดยไม่มีอะไรเตือน
@@ -17,7 +17,7 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
   const opts = {
     agents: [], task: "", taskFile: "", write: false, seq: false, list: false,
     cwd: path.resolve(baseCwd), timeoutSec: DEFAULT_TIMEOUT_SEC, timeoutSet: false,
-    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", testLevel: "", fallback: true, preflight: true, taskIds: [], usage: false,
+    tier: "", model: "", effort: "", role: "", roleAlias: "", date: "", testLevel: "", fallback: true, preflight: true, taskIds: [], usage: false, probe: "",
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -52,6 +52,10 @@ export function parseRoleArgs(argv, baseCwd = process.cwd()) {
         break;
       }
       case "--usage": opts.usage = true; break;
+      case "--probe":
+        opts.probe = String(argv[++i] ?? "").trim();
+        if (!opts.probe) throw new Error(`--probe ต้องตามด้วยคำสั่งที่จะรัน เช่น --probe "dotnet build"\n${ROLE_USAGE}`);
+        break;
       default: throw new Error(`อาร์กิวเมนต์ไม่รู้จัก: ${a}\n${ROLE_USAGE}`);
     }
   }

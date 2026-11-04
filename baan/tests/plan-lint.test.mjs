@@ -80,12 +80,12 @@ test("lintPlanFile คืน exit code และจับ dependency วนล�
 });
 
 test("planner prompt ไม่บังคับ read-only ทั้งแผนแล้ว และบอกโหมดรันตาม --write", () => {
-  const ro = plannerPrompt("คำมอบหมาย", "goal", cfg, "", "2026-10-26");
+  const ro = plannerPrompt("goal", cfg, "", "2026-10-26");
   assert.doesNotMatch(ro, /Every task works read-only/);
   assert.match(ro, /\*\*read-only\*\*.*diff\/patch/);
   assert.match(ro, /Walking skeleton first/);
   assert.match(ro, /"docsOnly"/);
-  assert.match(plannerPrompt("คำมอบหมาย", "goal", cfg, "", "2026-10-26", true), /\*\*write\*\* — front\/sys tasks edit code/);
+  assert.match(plannerPrompt("goal", cfg, "", "2026-10-26", true), /\*\*write\*\* — front\/sys tasks edit code/);
 });
 
 // Regression: ความคืบหน้าราย slice — school-bot (2026-10-28) คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local

@@ -9,6 +9,7 @@ import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { appendEvent, ledgerDirOf } from "../src/ledger.mjs";
 import { TEST_LEVEL_ROLES, adhocDirective, localDate, roleDirective } from "../src/prompts.mjs";
 import { expandTaskText, preflightTask } from "../src/preflight.mjs";
+import { runProbe } from "../src/probe.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { statusLabel } from "../src/scheduler.mjs";
 import { createRunDir, parseRoleArgs, resolveRoleAgents, resolveRoleTestLevel, resolveRoleTimeout, runRoleAgents } from "../src/role-session.mjs";
@@ -106,6 +107,19 @@ async function main() {
       ].join("\n"));
       process.exit(2);
     }
+  }
+
+  // probe รันบนเครื่องก่อนเปิด session — ล้มเพราะสภาพแวดล้อม = ไม่เปิด agent · ล้มเพราะอย่างอื่น (เช่น test แดงซึ่งเป็นงานของ role) = เดินต่อ
+  if (opts.probe) {
+    console.log(`probe: ${opts.probe}`);
+    const p = await runProbe(opts.probe, opts.cwd);
+    if (p.code === 0) console.log("probe: ผ่าน");
+    else if (p.env) {
+      const tail = p.output.trim().split(/\r?\n/).slice(-20).join("\n");
+      console.error(`probe: สภาพแวดล้อมไม่พร้อม — ยังไม่เปิด session (exit=${p.code}${p.timedOut ? ", timeout" : ""})\n${tail}`);
+      appendEvent(ledgerDir, { type: "probe_block", role: opts.role || null, taskIds: opts.taskIds, command: opts.probe, code: p.code });
+      process.exit(2);
+    } else console.log(`probe: คำสั่งจบ exit=${p.code} แต่ไม่ใช่อาการของสภาพแวดล้อม — เปิด session ต่อ`);
   }
 
   const workDate = opts.date || localDate();
