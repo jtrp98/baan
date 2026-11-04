@@ -16,7 +16,7 @@
 | AssessmentService | GetProgress, CreateQuestionBank, UpdateQuestionBank, PublishQuestionBank, GetQuestionBank, ListQuestionBanks, GetActivityPolicy, GetAttempt, ListAttempts | GET progress; POST admin/question-banks; PUT admin/question-banks/{id}; POST /{id}/publish; GET admin/question-banks และ /{id}; GET course-runs/{id}/activities/{activityId}, attempts/{id}, attempts |
 | ReleaseService | CheckUpdate, ListReleases, CreateRelease, PublishRelease | GET updates/check; GET/POST admin/releases; POST admin/releases/{id}/publish |
 
-รวม 35 RPC ไม่มี Login/ExchangeWebSession/Logout/BindProfile/GetSession/GetMe/RevokeSessions ใน proto ปัจจุบัน ไม่อ้างว่า Assessment write/submission หรือ score export ครบจากรายการอ่านข้างต้น
+รวม 35 RPC ไม่มี Login/ExchangeWebSession/Logout/BindProfile/GetSession/GetMe/RevokeSessions ใน proto ปัจจุบัน ไม่อ้างว่า Assessment write/submission หรือ score export ครบจากรายการอ่านข้างต้น · RPC เขียนของงานเรียน (5 ตัว) ตัดสินแล้วแต่ยังไม่ลงโค้ด ดู [learning-write-rpc-001](learning-write-rpc-001.md)
 
 ## Proto และ generated clients
 

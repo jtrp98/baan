@@ -39,6 +39,7 @@ Desktop/Web → HTTP API Gateway → gRPC SchoolBot service; เว็บผ่�
 | เอกสาร | Rev | สัญญา/เนื้อหา | สถานะปัจจุบัน |
 |---|---|---|---|
 | [des-004.md](des-004.md) | 13 | DES-004: ตัวตน, session และสิทธิ์แยกตามช่องทาง | PROPOSED — ยืนยันอายุ Desktop 8 ชั่วโมงหลัง bind แล้ว; รอ identity/directory และ integration proof |
+| [learning-write-rpc-001.md](learning-write-rpc-001.md) | 1 | RPC เขียนของงานเรียน: ส่งงานภารกิจ (BE-015) และทำ Quiz/Test (BE-031) ผ่าน gRPC + Gateway | ตัดสินแล้ว 2026-11-04 — ยังไม่ลงโค้ด |
 | [des-012.md](des-012.md) | 9 | DES-012: แลก token เว็บและ authorization ข้ามระบบ | PROPOSED — ยืนยัน topology/admin policy แล้ว; รอ mapping/implementation/H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ) |
 
 Data Transfer Object (DTO), decoder, trusted completion, private introspection และส่วนย่อยของ DES อยู่ใน [สารบัญ Transport/Login](index-transport-login.md)
