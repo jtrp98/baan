@@ -23,40 +23,13 @@ test("read-build: สั่งรัน test ในโหมดอ่าน = �
   assert.deepEqual(preflightTask({ task: "อ่านโค้ดแล้วสรุป", cwd: CWD, write: false }, none), []);
 });
 
-test("write-outside: path นอก cwd ที่ยังไม่มี = role ต้องสร้างแต่ sandbox ไม่ให้ · ที่มีอยู่แล้ว/อยู่ใน cwd ผ่าน", () => {
+test("โหมดเขียนไม่มี sandbox แล้ว: path นอก cwd และการอ่าน git ของโฟลเดอร์แม่ไม่หยุด session", () => {
   const exists = (p) => p === "C:\\ws\\knowledge\\req.md";
-  const task = "อ่าน C:\\ws\\knowledge\\req.md แก้ C:\\ws\\target\\school-bot\\web\\new.cs แล้วเขียนหลักฐานที่ C:\\ws\\reports\\r2b-evidence";
-  const p = preflightTask({ task, cwd: CWD, write: true }, { ...none, exists });
-  assert.deepEqual(codes(p), ["write-outside"]);
-  assert.match(p[0].message, /r2b-evidence/);
-  assert.doesNotMatch(p[0].message, /new\.cs|req\.md/);
-  assert.deepEqual(preflightTask({ task, cwd: CWD, write: false }, { ...none, exists }), [], "โหมดอ่านไม่เขียนอะไร");
-  assert.deepEqual(preflightTask({ task: "เขียนที่ c:\\WS\\Target\\School-Bot\\x.md", cwd: CWD, write: true }, none), [], "Windows ไม่สนตัวพิมพ์");
-});
-
-test("write-outside: workspace ที่มีช่องว่างใน path (OneDrive) ไม่เตือนผิด · คำในประโยคถัดไปไม่ถูกกลืนเป็นชื่อไฟล์", () => {
-  const cwd = "C:\\Users\\a\\OneDrive - Co\\proj";
-  const dirs = new Set(["C:\\Users\\a", "C:\\Users\\a\\OneDrive - Co", cwd, "C:\\ws"]);
-  const exists = (p) => dirs.has(p);
-  assert.deepEqual(preflightTask({ task: "เขียนผลที่ C:\\Users\\a\\OneDrive - Co\\proj\\out.md แล้วจบ", cwd, write: true }, { ...none, exists }), []);
-  const p = preflightTask({ task: "สร้าง C:\\ws\\new.md and then stop", cwd, write: true }, { ...none, exists });
-  assert.deepEqual(codes(p), ["write-outside"]);
-  assert.match(p[0].message, /C:\\ws\\new\.md — /);
-});
-
-test("write-outside: ข้ามบรรทัด memory ของ module จาก --module-context (นายช่างบันทึกเอง)", () => {
-  const task = "- memory ของ module: C:\\ws\\memory\\school-bot\\quiz\nแก้ไฟล์ใน cwd";
-  assert.deepEqual(preflightTask({ task, cwd: CWD, write: true }, none), []);
-});
-
-test("git-parent: อ่านประวัติ git ขณะ cwd อยู่ใต้ repo = ติด · แค่พูดถึง git หรือ cwd เป็นราก repo ผ่าน", () => {
-  const cwd = "C:\\ws\\knowledge\\school-bot";
+  const outside = "อ่าน C:\\ws\\knowledge\\req.md แล้วเขียนหลักฐานที่ C:\\ws\\reports\\r2b-evidence";
+  assert.deepEqual(preflightTask({ task: outside, cwd: CWD, write: true }, { ...none, exists }), []);
   const gitRoot = () => "C:\\ws\\knowledge";
-  const task = "ก่อนจบเทียบกับฉบับเดิม (`git -C .. show HEAD:school-bot/<ไฟล์>`)";
-  assert.deepEqual(codes(preflightTask({ task, cwd, write: true }, { ...none, gitRoot })), ["git-parent"]);
-  assert.deepEqual(preflightTask({ task: "ห้าม git stage/commit/push · ประวัติอยู่ใน git", cwd, write: true }, { ...none, gitRoot }), []);
-  assert.deepEqual(preflightTask({ task, cwd: "C:\\ws\\knowledge", write: true }, { ...none, gitRoot }), []);
-  assert.deepEqual(preflightTask({ task, cwd, write: false }, { ...none, gitRoot }), [], "โหมดอ่านอ่าน .git ได้");
+  const git = "ก่อนจบเทียบกับฉบับเดิม (`git -C .. show HEAD:school-bot/<ไฟล์>`)";
+  assert.deepEqual(preflightTask({ task: git, cwd: "C:\\ws\\knowledge\\school-bot", write: true }, { ...none, gitRoot }), []);
 });
 
 test("expandTaskText: ตามอ่านไฟล์ใบงาน .txt ที่อ้างชั้นเดียว ไม่อ่าน .md", () => {

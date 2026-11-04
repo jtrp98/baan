@@ -47,7 +47,7 @@ test("agy: t1/t2 = gemini-4-argon · t3–t5 = flash · t0 = null (ไม่ม�
 
 // agy: --print กลืน argument ถัดไปเป็น prompt — flag อื่นต้องอยู่ก่อน --print เสมอ
 // (เคยวาง --mode หลัง --print จน --write ของ agy ล้มด้วย exit 2 ทุกครั้ง — พบจาก live smoke 2026-10-17)
-test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --agent baan-readonly · write ใช้ --mode accept-edits", () => {
+test("agy: --print เป็น arg สุดท้ายทั้งสองโหมด · read-only ใช้ --agent baan-readonly · write ใช้ --mode auto (ไม่จำกัด)", () => {
   const { readArgs, writeArgs } = cfg.agents.agy;
   for (const args of [readArgs, writeArgs]) assert.equal(args.at(-1), "--print", `ต้องจบด้วย --print: ${JSON.stringify(args)}`);
   // --mode plan ไม่ได้กันการเขียนไฟล์ จึงใช้ custom agent profile baan-readonly (ตัด write tools + PreToolUse guard hook)
@@ -56,7 +56,8 @@ test("agy: --print เป็น arg สุดท้ายทั้งสอง�
   // ไม่ใส่ --sandbox: live smoke พบว่ากันแค่ terminal (อ่าน/รันคำสั่งไม่ได้เลย) แต่ edit tool ยังเขียนไฟล์ได้ — แย่กว่าไม่ใส่
   assert.ok(!readArgs.includes("--sandbox"));
   const mode = (args) => args[args.indexOf("--mode") + 1];
-  assert.equal(mode(writeArgs), "accept-edits");
+  // ผู้ใช้สั่ง 2026-11-04: โหมดเขียนไม่มีข้อจำกัด — accept-edits ยังถูกปฏิเสธคำสั่ง/การอ่านนอก cwd ใน headless
+  assert.equal(mode(writeArgs), "auto");
 });
 
 // jetski ของ agy ปฏิเสธการอ่านไฟล์นอก workspace ใน headless โดยไม่ถาม (ได้คำตอบว่างเปล่า) —
@@ -79,7 +80,7 @@ test("agy: workspaceDirArgs ใส่ --add-dir เฉพาะโหมดอ�
 });
 
 // claude -p ไม่มีคนกดอนุมัติ — tool ที่ไม่อยู่ใน --allowedTools ใช้ไม่ได้เลย (เคยรันคำสั่งไม่ได้ทั้งสองโหมด)
-test("claude: read-only อนุญาตเฉพาะ tool/คำสั่งอ่านอย่างเดียว · write อนุญาตแก้ไฟล์และรันคำสั่ง", () => {
+test("claude: read-only อนุญาตเฉพาะ tool/คำสั่งอ่านอย่างเดียว · write = bypassPermissions (ไม่จำกัด)", () => {
   const tools = (args) => args[args.indexOf("--allowedTools") + 1].split(",");
   const { readArgs, writeArgs } = cfg.agents.claude;
   const ro = tools(readArgs);
@@ -90,9 +91,11 @@ test("claude: read-only อนุญาตเฉพาะ tool/คำสั่�
     assert.ok(!/^(Bash|PowerShell)\((node|npm|python|pwsh|powershell|cmd|git (commit|push|checkout|reset|branch|merge|rebase))/.test(t), `read-only ห้ามคำสั่งที่เขียนได้: ${t}`);
   }
   assert.ok(!readArgs.includes("--permission-mode"), "read-only ต้องไม่ auto-accept การแก้ไฟล์");
-  const rw = tools(writeArgs);
-  for (const t of ["Edit", "Write", "Bash", "PowerShell"]) assert.ok(rw.includes(t), `write ต้องมี ${t}`);
-  assert.equal(writeArgs[writeArgs.indexOf("--permission-mode") + 1], "acceptEdits");
+  // ผู้ใช้สั่ง 2026-11-04: โหมดเขียนไม่มี sandbox/allow-list เหมือน session standalone
+  assert.equal(writeArgs[writeArgs.indexOf("--permission-mode") + 1], "bypassPermissions");
+  assert.ok(!writeArgs.includes("--allowedTools"), "bypassPermissions ไม่ต้องมี allow-list");
+  assert.ok(cfg.agents.codex.writeArgs.includes("--dangerously-bypass-approvals-and-sandbox"), "codex โหมดเขียนต้องไม่มี sandbox");
+  assert.ok(cfg.agents.codex.readArgs.includes("read-only"), "codex โหมดอ่านยังเป็น sandbox read-only");
 });
 
 // opencode: variant ของ GLM ฝังใน model string ผ่าน `#` (เช่น glm-5.3#high) — ผ่านการทดสอบจริง 2026-10-23

@@ -192,11 +192,7 @@ baan-role --list
 | `--probe "<cmd>"` | รันคำสั่งตรวจสภาพแวดล้อม (เช่น `dotnet build --no-restore`) ในโฟลเดอร์งานก่อนเปิด session — ล้มเพราะสภาพแวดล้อม (feed, สิทธิ์, เครื่องมือขาด) จบ exit 2 โดยไม่เปิด agent · ล้มเพราะเหตุอื่น (เช่น test แดงซึ่งเป็นงานของ role) เปิด session ต่อ |
 | `--usage` | เก็บ token (claude, codex, agy · claude มีค่าใช้จ่ายด้วย) ลง `report.json` และ ledger · opencode ยังไม่รองรับ |
 
-ก่อนเปิด session `baan-role` จะตรวจใบงาน (รวมไฟล์ `.txt` ที่ใบงานอ้างถึง) หาเงื่อนไขที่ sandbox ของ CLI ขวางแน่ๆ ถ้าเจอจะจบด้วย exit 2 ทันทีโดยไม่เสียเวลาของ agent:
-
-- `read-build` — ใบงานสั่ง build หรือรัน test แต่ไม่ได้ใส่ `--write` (โหมดอ่านเขียน `bin/obj` ไม่ได้)
-- `write-outside` — โหมดเขียน และใบงานอ้าง path นอก `--cwd` ที่ยังไม่มีอยู่ (role ต้องสร้างเอง แต่ sandbox อนุญาตให้เขียนเฉพาะใน cwd)
-- `git-parent` — โหมดเขียน และใบงานให้อ่านประวัติ git (`git show/diff/log`, `HEAD:`) ทั้งที่ `--cwd` อยู่ใต้ราก repo
+ก่อนเปิด session `baan-role` จะตรวจใบงาน (รวมไฟล์ `.txt` ที่ใบงานอ้างถึง) ถ้าใบงานสั่ง build หรือรัน test แต่ไม่ได้ใส่ `--write` จะจบด้วย exit 2 (`read-build`) ทันทีโดยไม่เสียเวลาของ agent เพราะโหมดอ่านเขียน `bin/obj` ไม่ได้ · โหมดเขียนไม่มี sandbox แล้ว จึงไม่ตรวจ path นอก `--cwd` หรือการอ่าน git ของโฟลเดอร์แม่อีก
 
 option ที่ใช้ได้ทั้งสองคำสั่ง: `--config <file>`, `--timeout <วินาที>`, `--date YYYY-MM-DD`, `--test-level normal|full`, `--usage`
 
@@ -241,12 +237,12 @@ timeout เริ่มต้นคือ 1800 วินาทีต่องา
 - "ไม่มี" หมายถึงค่ายนั้นยังไม่มี model ที่เก่งพอสำหรับ tier นั้น ถ้าใช้ `--all` ตัวนั้นจะถูกข้าม ถ้าระบุ `--agent` ตรงๆ จะ error
 - ถ้า AI ตัวแรกติดโควตา, ไม่ได้ติดตั้ง หรือเริ่มทำงานไม่ได้ (เช่น codex `Access is denied` ตอนเริ่ม, claude โหลดตั้งค่าองค์กรไม่ได้, DNS ล้มภายใน 60 วินาทีแรก) ระบบจะสลับไปตัวถัดไปตาม `_fallback` ของ tier นั้น ถ้าล้มด้วยเหตุอื่นจะไม่สลับ
 - ถ้า model เต็มชั่วคราว ระบบรอ 30 วินาทีและ 90 วินาทีแล้วลองใหม่ก่อนจะสลับ
-- codex โหมดเขียนเปิด `sandbox_workspace_write.network_access=true` — ไม่เปิดแล้ว `dotnet test` ใน sandbox ต่อ testhost ไม่ได้ (vstest ใช้ socket) จนงานจบ BLOCKED · codex กำหนดได้แค่เปิด/ปิด network ทั้งหมด ไม่จำกัดเฉพาะ localhost — ปิดได้ด้วยการลบสองค่านี้ออกจาก `writeArgs`
+- **โหมดเขียน (`--write`) ไม่มี sandbox** ทุกค่าย: codex `--dangerously-bypass-approvals-and-sandbox` · claude `--permission-mode bypassPermissions` · agy `--mode auto` · opencode `--auto` — AI แก้ไฟล์และรันคำสั่งได้ทุกที่บนเครื่องเหมือน session ที่คุณเปิดเอง ขอบเขตงานคุมด้วยใบงานเท่านั้น · เหตุผล: sandbox ทำให้ `dotnet test` รันไม่ได้ (testhost ต่อ socket ไม่ได้ และ `File.Move` ทับไฟล์ถูกปฏิเสธ) จน writer จบ BLOCKED ราวครึ่งหนึ่งของงานที่ไม่สำเร็จ · โหมดอ่านยังจำกัดตามตารางด้านล่าง · ใช้ชุดตัวรันอื่นชั่วคราวได้ด้วย env `BAAN_AGENTS_FILE=<ไฟล์ agents>`
 - แก้ tier หรือเพิ่ม AI CLI ตัวใหม่ได้ที่ [agents.json](agents.json)
 
 ## AI CLI ที่รองรับ
 
-| CLI | คำสั่งที่ BAAN เรียก | วิธีกันไม่ให้แก้ไฟล์ในโหมดอ่าน |
+| CLI | คำสั่งที่ BAAN เรียก (โหมดอ่าน) | วิธีกันไม่ให้แก้ไฟล์ในโหมดอ่าน |
 |---|---|---|
 | claude | `claude -p --allowedTools ...` | อนุญาตแค่ tool อ่านไฟล์และคำสั่ง git แบบอ่าน (จึงรัน node/npm ไม่ได้) |
 | codex | `codex exec -s read-only` | sandbox read-only ของ codex |
@@ -254,7 +250,7 @@ timeout เริ่มต้นคือ 1800 วินาทีต่องา
 | opencode | `opencode run -m ...` | ไม่ใส่ `--auto` ทำให้การกระทำที่ต้องขออนุญาตถูกปฏิเสธ |
 
 - ส่ง prompt ทาง stdin เมื่อทำได้ เพื่อเลี่ยงปัญหา quote บน Windows
-- agy โหมด headless อ่านไฟล์นอก cwd ไม่ได้ BAAN จึงส่ง `--add-dir <workspace>` ให้ในโหมดอ่าน ถ้าใช้โหมดเขียนแล้วต้องอ่านไฟล์นอก repo ให้รัน `node setup/agy/grant-read.mjs` หนึ่งครั้ง
+- agy โหมด headless อ่านไฟล์นอก cwd ไม่ได้ BAAN จึงส่ง `--add-dir <workspace>` ให้ในโหมดอ่าน โหมดเขียน (`--mode auto`) ไม่ต้องใช้ `setup/agy/grant-read.mjs` อีก
 - ทุกครั้งที่รันใช้โควตาของบัญชีที่ login CLI นั้นอยู่
 - `--write` ให้ AI แก้ไฟล์ใน `--cwd` ได้ ควรใช้กับ git repo เพื่อดู diff ได้
 

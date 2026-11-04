@@ -25,9 +25,7 @@
         "--output-format",
         "text",
         "--permission-mode",
-        "acceptEdits",
-        "--allowedTools",
-        "Read,Grep,Glob,LS,Edit,MultiEdit,Write,NotebookEdit,Bash,PowerShell"
+        "bypassPermissions"
       ],
       "answerFrom": "stdout",
       "usage": {
@@ -66,10 +64,7 @@
       "writeArgs": [
         "exec",
         "--skip-git-repo-check",
-        "-s",
-        "workspace-write",
-        "-c",
-        "sandbox_workspace_write.network_access=true",
+        "--dangerously-bypass-approvals-and-sandbox",
         "-o",
         "<ANSWER>",
         "-"
@@ -108,7 +103,7 @@
       ],
       "writeArgs": [
         "--mode",
-        "accept-edits",
+        "auto",
         "--print"
       ],
       "answerFrom": "stdout",

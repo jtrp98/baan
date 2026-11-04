@@ -73,25 +73,7 @@ export function preflightTask({ task, cwd, write }, { exists = existsSync, gitRo
       message: `ใบงานสั่ง build/test (${task.match(BUILD_CMD)[0]}) แต่เปิดโหมดอ่าน — sandbox โหมดอ่านเขียน bin/obj ไม่ได้ role จะตอบ BLOCKED · ใส่ --write (งานตรวจให้รันใน snapshot เพื่อไม่แตะ source)`,
     });
   }
-  if (write && /^[A-Za-z]:/.test(cwd)) {
-    // บรรทัด "memory ของ module" จาก baan --module-context ชี้ที่ที่นายช่างจะบันทึกภายหลัง ไม่ใช่ปลายทางของ role
-    const scanned = task.replace(/^- memory ของ module:.*$/gm, "");
-    const missing = extractWinPaths(scanned, exists).filter((p) => !insideDir(cwd, p) && !exists(p));
-    if (missing.length) {
-      problems.push({
-        code: "write-outside",
-        message: `ใบงานอ้าง path นอก --cwd ที่ยังไม่มีอยู่: ${missing.join(", ")} — ถ้าให้ role สร้าง sandbox โหมดเขียนจะปฏิเสธ (เขียนได้เฉพาะใน ${cwd}) · ย้ายปลายทางเข้า cwd หรือเปลี่ยน --cwd · ถ้าเป็นไฟล์ให้อ่าน แปลว่า path ผิด`,
-      });
-    }
-  }
-  if (write && GIT_HISTORY.test(task)) {
-    const root = gitRoot(cwd);
-    if (root && path.resolve(root).toLowerCase() !== path.resolve(cwd).toLowerCase()) {
-      problems.push({
-        code: "git-parent",
-        message: `ใบงานให้อ่านประวัติ git แต่ --cwd อยู่ใต้ repo ${root} — sandbox โหมดเขียนของ codex ปฏิเสธ .git ที่โฟลเดอร์แม่เป็นพักๆ (school-bot 2026-11-02: BLOCKED 4 ใน 8 รัน) · ให้ --cwd ${root} หรือให้นายช่างเทียบกับ git เองแล้วตัดคำสั่ง git ออกจากใบงาน`,
-      });
-    }
-  }
+  // โหมดเขียนไม่มี sandbox แล้ว (ผู้ใช้สั่ง 2026-11-04) — เดิมตรวจ write-outside (สร้างไฟล์นอก cwd) และ git-parent
+  // (อ่าน .git ของโฟลเดอร์แม่) ซึ่งเป็นข้อจำกัดของ sandbox โหมดเขียนเท่านั้น จึงไม่ต้องหยุดอีก
   return problems;
 }
