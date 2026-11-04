@@ -1323,9 +1323,11 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "low",
       "wave": 4,
+      "oracle": "DES-003 Rev4 · AC-011-04, AC-036-01 · go test ./internal/project/... + TestDesktopServiceV2ProjectsTrashExportAndImport PASS (2026-11-04)",
+      "ref": "target/school-bot/app/internal/project/{types,validator,store,store_ops,migration,store_test}.go + app/desktopstorage.go",
       "module": [
         "my-work",
         "app-shell"
@@ -1369,8 +1371,10 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "high",
+      "oracle": "DES-001 · AC-012-03, AC-013-01..03, AC-021-01..02, AC-025-02, AC-026-03 · go test ./... (app + internal/engine) PASS (2026-11-04)",
+      "ref": "target/school-bot/app/{desktopservice.go,desktopstorage.go,internal/engine/manager.go}",
       "module": [
         "app-shell",
         "arm-lab",
@@ -1442,7 +1446,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Darwin HID source/shared transport mocks present and Windows build passes; Darwin amd64/arm64 build, native timeout/cancel/cleanup acceptance remains unverified."},
       "module": [
         "arm-lab",
         "app-shell"
@@ -1478,7 +1483,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Darwin Serial source/shared transport mocks present and Windows build passes; Darwin native build/runtime acceptance remains unverified."},
       "module": [
         "arm-lab",
         "app-shell"
@@ -1515,7 +1521,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Added bounded in-memory six-servo simulator and Code/Block byte/action/step sandbox regression; native engine profile enforcement and full requirement acceptance remain open."},
       "module": [
         "arm-lab",
         "app-shell"
@@ -1560,7 +1567,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Simulator emergency cutoff cancels pending motion, latches torque off, and requires explicit rearm; native physical cutoff is not implemented/validated by this simulator. Existing native drain/stop/read/torque regression passes."},
       "module": "arm-lab"
     },
     {
@@ -1622,9 +1630,11 @@
       "des_refs": [
         "DES-004"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "low",
       "wave": 5,
+      "oracle": "DES-004 · AC-036-06 · phase3-projects-and-entry.test.mjs + go test . PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/app/entry/{hostEntry.ts,useEntry.ts,types.ts} + app/desktopservice.go",
       "module": "app-shell"
     },
     {
@@ -1660,8 +1670,10 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
       "risk": "low",
+      "oracle": "DES-003 · AC-011-01..03, AC-036-01..02, AC-036-04 · phase3-projects-and-entry.test.mjs PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/core/{projectStoreV2.ts,client.ts}",
       "module": [
         "my-work",
         "app-shell"
@@ -1698,7 +1710,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-003 · AC-017-01..03, AC-025-03, AC-026-04 · phase3-projects-and-entry.test.mjs PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/core/projectStoreV2.ts + src/modes/robot-control/workspace/projectStore.ts",
       "module": [
         "my-work",
         "arm-lab",
@@ -1743,7 +1757,9 @@
       "des_refs": [
         "DES-001"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-001 · AC-009-03, AC-010-01..03, AC-012-01..03, AC-013-01..03 · i18n.test.mjs + frontend-workspace.test.mjs + phase3-projects-and-entry.test.mjs PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/{App.tsx,i18n/index.ts,core/windowLifecycle.ts}",
       "module": "app-shell"
     },
     {
@@ -1773,7 +1789,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing Code Lab integrated with explicit simulator route; bounded DSL/64 commands/100 steps/16384 UTF-8 source bytes tested locally. Browser UI acceptance remains unverified."},
       "module": "code-lab"
     },
     {
@@ -1804,7 +1821,8 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing Block Lab compiler extracted for testing; repeat/roundtrip/multiple roots/nesting bounds tested; candidate workspace validation before replacing editor and 256 KiB load cap added. Browser UI acceptance remains unverified."},
       "module": "block-lab"
     },
     {
@@ -1838,7 +1856,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing profile/discovery/probe workflow now supports explicit HID and Serial Simulator through production adapter; simulator stays visibly labelled and replies remain simulated:true."},
       "module": "arm-lab"
     },
     {
@@ -1869,7 +1888,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing pose/queue workflow exercised with simulator; adapter/workspace regression covers bounds, stale completion and disconnect."},
       "module": "arm-lab"
     },
     {
@@ -1904,7 +1924,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing sequence/drain/stop workflow regression passes; Simulator emergency stop cuts torque and marks connection lost to invalidate workspace playback."},
       "module": "arm-lab"
     },
     {
@@ -1937,7 +1958,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing upload/run workflow exercised through simulator with five poses in 4+1 chunks; existing failure/progress regression passes."},
       "module": "arm-lab"
     },
     {
@@ -1974,7 +1996,8 @@
       "des_refs": [
         "DES-006"
       ],
-      "status": "pending",
+      "status": "done-local",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing atomic six-servo read/torque/lost workflow regression passes; simulator timeout/disconnect prevents motion and does not retry."},
       "module": "arm-lab"
     },
     {
@@ -2484,7 +2507,9 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-007 · AC-030-01..08 · go test -v ./internal/updater/... PASS (2026-11-04)",
+      "ref": "target/school-bot/app/internal/updater/{updater.go,updater_test.go} + app/desktopservice.go",
       "module": "app-shell"
     },
     {
@@ -2740,7 +2765,9 @@
         "DES-001",
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-001, DES-003 · AC-009-03, AC-010-01..03, AC-011-01..04, AC-012-01..03, AC-013-01..03, AC-036-01 · go test ./... + dotnet test (Project/GuestImport 20/20) + node --test tests/*.test.mjs (78/78) PASS (2026-11-04)",
+      "ref": "target/school-bot/{app,web,app/frontend/tests}",
       "module": [
         "app-shell",
         "my-work"
@@ -2815,7 +2842,8 @@
         "DES-001",
         "DES-006"
       ],
-      "status": "pending",
+      "status": "in-progress",
+      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Windows: frontend regression 59/59, i18n 14/14, C++ protocol 344 checks and transport scenarios, fresh-binary IPC 12/12 PASS. macOS two architectures and interactive UI still pending. QA-004 is P5 learning and intentionally unchanged."},
       "module": [
         "arm-lab",
         "code-lab",
@@ -3643,7 +3671,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-003 · AC-040-01..06 · go test -v ./internal/project/... (TestGuestExportImportAndThirtyDayTrashLifecycle) PASS (2026-11-04)",
+      "ref": "target/school-bot/app/internal/project/{trash.go,export.go,store_test.go}",
       "module": "my-work"
     },
     {
@@ -3676,7 +3706,9 @@
         "DES-003",
         "DES-004"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-003, DES-004 · AC-041-01..05 · go test ./internal/project/... + dotnet test ApiV2GuestImportTests (5/5) PASS (2026-11-04)",
+      "ref": "target/school-bot/app/internal/project/import_guard.go + target/school-bot/web/src/ServiceSchoolBot.Application/Services/ProjectService.Import.cs + tests/ServiceSchoolBot.Tests/ApiV2GuestImportTests.cs",
       "module": "my-work"
     },
     {
@@ -4289,7 +4321,9 @@
       "des_refs": [
         "DES-003"
       ],
-      "status": "pending",
+      "status": "verified",
+      "oracle": "DES-003 · AC-040-01..06 · phase3-projects-and-entry.test.mjs PASS (2026-11-04)",
+      "ref": "target/school-bot/app/frontend/src/core/{projectStoreV2.ts,client.ts} + tests/phase3-projects-and-entry.test.mjs",
       "module": "my-work"
     },
     {
