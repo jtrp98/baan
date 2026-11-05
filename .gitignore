@@ -1,5 +1,6 @@
 # ผลการรันของเครื่อง
 baan/reports/
+.baan/
 node_modules/
 *.tgz
 *.tmp-*

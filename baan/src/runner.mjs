@@ -133,7 +133,7 @@ export function summarizeStderr(stderr) {
 // idle timeout: ฆ่า process ที่เงียบ (ไม่มี stdout/stderr) นานเกินกำหนด แยกจาก wall timeout — ใช้ได้เฉพาะค่ายที่
 // พิมพ์ความคืบหน้าระหว่างทำ (codex) ประกาศด้วย idleTimeoutSec ใน agents.json · claude -p/agy --print แบบ text
 // เงียบจนจบงาน ถ้าตั้งให้จะฆ่างานปกติทิ้ง · ที่มา: school-bot 2026-11-03 call เดียวค้าง 183 นาที
-export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint, { usage = false, idleTimeoutSec = def.idleTimeoutSec } = {}) {
+export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFileHint, { usage = false, idleTimeoutSec = def.idleTimeoutSec, signal, onSpawn, onStdout } = {}) {
   return new Promise((resolve) => {
     const started = Date.now();
     const startedAt = new Date(started).toISOString();
@@ -143,6 +143,10 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
     const child = def.useShell
       ? spawn(cmdString, { cwd, shell: true, windowsHide: true, env: process.env })
       : spawn(def.command, args, { cwd, windowsHide: true, env: process.env });
+    onSpawn?.(child.pid);
+    const abort = () => killTree(child);
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
 
     let stdout = "";
     let stderr = "";
@@ -156,10 +160,10 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
       clearTimeout(idleTimer);
       idleTimer = setTimeout(() => { timedOut = true; idle = true; killTree(child); }, idleTimeoutSec * 1000);
     };
-    const stopTimers = () => { clearTimeout(timer); clearTimeout(idleTimer); };
+    const stopTimers = () => { clearTimeout(timer); clearTimeout(idleTimer); signal?.removeEventListener("abort", abort); };
     armIdle();
 
-    child.stdout.on("data", (d) => { stdout += d; armIdle(); });
+    child.stdout.on("data", (d) => { stdout += d; armIdle(); onStdout?.(d.toString()); });
     child.stderr.on("data", (d) => { stderr += d; armIdle(); });
     child.on("error", (err) => {
       if (settled) return;

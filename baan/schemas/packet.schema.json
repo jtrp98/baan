@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repo": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": true
+    },
+    "owns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "read_first": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": true
+      },
+      "minItems": 0
+    },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "setup": {
+          "type": "string"
+        },
+        "build": {
+          "type": "string",
+          "minLength": 1
+        },
+        "test_targeted": {
+          "type": "string",
+          "minLength": 1
+        },
+        "test_full": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "build",
+        "test_targeted",
+        "test_full"
+      ],
+      "additionalProperties": true
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "source"
+        ],
+        "additionalProperties": true
+      },
+      "minItems": 1
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk": {
+      "enum": [
+        "low",
+        "high"
+      ]
+    },
+    "acceptance_approved": {
+      "type": "boolean"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "goal",
+    "tasks",
+    "repo",
+    "owns",
+    "read_first",
+    "commands",
+    "acceptance",
+    "depends_on",
+    "risk"
+  ],
+  "additionalProperties": true
+}

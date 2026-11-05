@@ -1,7 +1,7 @@
 {
   "name": "baan",
   "version": "0.28.0",
-  "description": "เครื่องมือแบ่งงานพัฒนาซอฟต์แวร์ให้ทีม AI 11 ตำแหน่ง ผ่าน claude/codex/agy และหยุดถามคนในจุดที่ต้องให้คนตัดสิน",
+  "description": "BAAN: Planner, Senior Worker, Verifier และทีม UX/UI พร้อม core จัดคิวและเก็บหลักฐาน",
   "type": "module",
   "bin": {
     "baan": "./bin/baan.mjs",
@@ -12,6 +12,8 @@
     "src/",
     "scripts/",
     "roles/",
+    "prompts/",
+    "schemas/",
     "setup/",
     "skills/",
     "ux-knowledge/",

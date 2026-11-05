@@ -2,6 +2,26 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## ยังไม่ release — BAAN v2: 3 บทบาท + ทีม UX/UI
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- รัน `baan --init` ซ้ำที่ workspace เพื่อได้ทางเข้า `prompts/frontend.md`; config เดิมคงเดิม
+- `baan --goal`/`--plan-file` เปลี่ยนเป็น v2; run pipeline เก่า resume ด้วยรุ่นก่อนหน้า
+- ทุกงานต้องมี acceptance พร้อม source และยืนยันครั้งเดียวผ่าน `baan decide --approve --by user`
+  ก่อน dispatch; แผน tasks เดิมต้องเติม owns/commands/ข้อความ AC ที่ใช้จริงก่อนเริ่ม
+- ข้อมูล v2 อยู่ `.baan/` ใต้ workspace; ใส่ใน gitignore และเก็บเป็นข้อมูล local
+- `baan-role`, role files และ alias เดิมคงไว้ แต่ deprecated จาก workflow หลัก
+
+### เพิ่ม
+
+- `baan run/status/report/inbox/decide`, direct/planned/parallel, structured packet/result schemas
+- snapshot ที่ไม่เปลี่ยน index/stash, repo/path lock, crash/resume, cancel, limited rework,
+  probe, machine evidence gate/cache, stale references และคิวคำถาม
+- Planner, Senior Worker, Verifier ตามความเสี่ยง; ทีมออกแบบเดิมยังอยู่
+- ใบงาน/status สร้างจาก packet/state โดยไม่เขียนประวัติ memory เดิมทับ
+- Benchmark t5 แบบประหยัดตามมติผู้ใช้; ไม่เทียบความเร็วตรงกับ baseline t2
+
 ## 0.28.0 — 2026-11-05 · วัดได้ว่าเวลาไปไหน และเลิกเสียเวลากับ sandbox
 
 ที่มา: วิเคราะห์ run จริงของ school-bot 133 call — ไม่สำเร็จ 43% และครึ่งหนึ่งของนั้นเกิดจาก sandbox/สิทธิ์/เครื่องมือ ไม่ใช่ตัวงาน, ขนานจริงเฉลี่ยแค่ 1.3–1.65 จาก 3 slot, CONVENTIONS 17 KB แนบเต็มทุก call และไม่มีข้อมูลพอจะบอกว่าเวลาไปไหน

@@ -1,3 +1,110 @@
+# BAAN v2 — 3 บทบาท + ทีม UX/UI
+
+ทางหลักคือ **Planner → Senior Worker → Verifier ตามความเสี่ยง** โดย core จัดคิว ล็อก repo
+เก็บ snapshot รันคำสั่งตรวจ และบันทึกผลให้เอง ทีมออกแบบ survey/ui/review และ spec แบบคุยสดยังอยู่
+ตัวอย่างด้านล่างใช้ config เดิมได้ ไม่เพิ่ม runtime dependency และไม่ commit ใน target repo
+
+## เริ่มใช้งาน v2
+
+รัน `baan --init` ที่ workspace อีกครั้งเพื่ออัปเดต AGENTS.md/CLAUDE.md ที่ BAAN สร้างไว้
+AI session อ่าน `prompts/frontend.md` เป็นทางเข้าหลัก; config ที่มีอยู่ไม่ถูกเขียนทับ
+
+1. คุย requirement ให้ได้ acceptance พร้อมแหล่งอ้างอิงก่อน (`/pencil`; งานหน้าจอผ่าน survey/UX sign-off)
+2. เตรียม packet ตาม `schemas/packet.schema.json`; commands เป็นคำสั่งที่ผู้ใช้/ผู้คุมเตรียมไว้
+3. เริ่ม run เพื่อแสดง acceptance และ inbox ก่อนเขียนโค้ด:
+
+```sh
+baan run --direct --packet packet.json
+baan inbox --run <run-dir>
+baan decide WP-1 --run <run-dir> --approve --by user --decision "ยืนยัน acceptance" --source "chat 2026-11-05"
+baan run --resume <run-dir>
+baan report <run-dir>
+```
+
+packet ขั้นต่ำ (เปลี่ยน repo/commands/acceptance ให้ตรงงานจริง):
+
+```json
+{
+  "id": "WP-1",
+  "title": "แก้การคำนวณยอด",
+  "goal": "คำนวณจำนวนรวมตาม acceptance ที่คุยไว้",
+  "tasks": ["TASK-1"],
+  "repo": {"path": "C:/src/project"},
+  "owns": ["src/total.mjs", "tests/total.test.mjs"],
+  "read_first": [{"path": "src/total.mjs"}],
+  "acceptance": [{"id": "AC-1", "text": "รวมจำนวนบวก ศูนย์ และลบได้ถูกต้อง", "source": "requirements.md#AC-1"}],
+  "depends_on": [],
+  "risk": "low",
+  "commands": {"build": "node --check src/total.mjs", "test_targeted": "node --test tests/total.test.mjs", "test_full": "npm test"},
+  "acceptance_approved": false
+}
+```
+
+- งานเดี่ยวเล็ก: `baan run --direct --packet <file>` (ไม่เปิด Planner)
+- แผนหลาย package: `baan run --plan <file> --select <id,id>` โดยไฟล์เป็น `{packages: [...] }`
+- งานใหม่: `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
+  สร้าง acceptance จาก goal เพื่อรอยืนยันก่อน; งานเดี่ยวเล็กใช้ Worker ก่อน งานที่มี contracts หรือ needs_planning ใช้ Planner; ใช้ `--acceptance` กับ `--source` เพื่อระบุให้ชัด
+- ตรวจล่วงหน้า: `--dry-run` ไม่สร้าง run/เรียก AI; แสดง Definition of Ready
+- `baan --goal` และ `--plan-file` เป็นทางเข้า v2 แล้ว; resume pipeline รุ่นเดิมด้วย BAAN รุ่นเดิม
+- `--agent`, `--tier` (default t2), `--planner-tier`, `--max-parallel`, `--timeout` ใช้กับ v2 ได้
+
+ยืนยันครั้งเดียวต่อชุด acceptance: core เก็บ `acceptance_approved`, `approved_by`, `approved_at`
+ใน packet ของ run; มีแก้เอกสารอ้างอิงระหว่างทางจะเป็น stale และต้องยืนยันใหม่
+ไฟล์งานค้างที่ทับ owns ต้องยืนยัน `--allow-dirty --by user` ด้วย โดยเก็บมติและ source ทุกครั้ง
+อย่าใส่ approval ล่วงหน้าเว้นแต่ได้คำยืนยันจากผู้ใช้จริง
+
+## แผนเดิมและการจัดคิว
+
+แผน tasks เดิมยังอ่าน owner/depends_on/ac_ids ผ่าน normalizer เดิมได้ แต่ก่อน dispatch ต้องมี
+`owns`, `commands`, ข้อความ acceptance ตรงต้นฉบับพร้อม source (`task.acceptance` หรือ `plan.acceptance`)
+และยืนยันก่อน กลุ่ม task ที่มี `package` เดียวกัน หรือ module/owns/commands ตรงกันถูกรวมเป็น work package เดียวโดยรักษา task ids
+สคริปต์ไม่แตะไฟล์แผนต้นฉบับหรือสถานะเก่าใน memory
+
+writer ได้ 1 ตัวต่อ repo รวมข้าม run/workspace (lock ใน Git common directory); package ต่าง repo ที่มี expected_minutes ≥ 30 อย่างน้อย 2 ตัว
+จึงเลือก parallel; งานอื่นใช้ planned และรันทีละตัว เติม slot ทันทีที่ dependency ผ่าน
+`shared_files` ล็อก path กลางด้วย; verifier ใช้ไม่เกินครึ่ง slot (อย่างน้อย 1) และถือ repo lock เดียวกับ package
+
+เพิ่ม contract/integration checks ในแผนได้:
+```json
+{"packages": [], "integration": [{"packages": ["WP-api", "WP-client"], "command": "npm run test:contract"}]}
+```
+รันเมื่อ package ที่ระบุ done ครบ โดย cwd คือ repo ของ package ตัวแรก และถือ lock ทุก repo ที่เกี่ยว
+เมื่อแดง ส่ง evidence กลับเข้า worker ภายในเพดาน rework (default 2) แล้วพักให้คนตัดสิน
+
+## หลักฐานและการกู้ run
+
+ข้อมูลใหม่อยู่ `<workspace>/.baan/runs/<run>/`: run.json, packets/, ledger.jsonl, status.md,
+ใบงาน task-*.md, evidence/ และผล call รายครั้ง ทั้งหมดสร้างจากสถานะเดียวกัน ไม่เขียน memory เก่าทับ
+ควร ignore `.baan/` ใน workspace (มีข้อมูลโค้ด/prompt/ผลคำสั่ง อย่าเผยแพร่)
+
+snapshot เก็บ tracked recovery object ด้วย git stash create และ blob ของ untracked files
+โดยไม่เปลี่ยน working tree, index, stash list หรือ branch; core ไม่ reset/revert/commit
+ดู before/after ใน packet เพื่อกู้ด้วย Git เองเมื่อจำเป็น ไม่ควรใช้ snapshot เป็น backup ถาวร
+
+`baan status [<run>]` ดูสถานะ; `baan run --resume <run>` ต่อ session ของ Claude/Codex
+(บันทึก Codex session ตั้งแต่ thread.started); agy ใช้ --conversation ตาม conversation_id
+ถ้า process ลูกเดิมยังอยู่ core ปฏิเสธการเริ่มซ้อน ให้รอ/ยกเลิกก่อน resume
+`baan run --cancel <wp> --run <run>` หยุด process พร้อมเก็บการแก้ไว้ งานลูกยังไม่ถูกปล่อย
+
+machine gate ตรวจ build/targeted/full, diff นอก owns, Git head/index/stash และ mapping AC กับชื่อ test
+ผลคำสั่ง cache ตาม repo+snapshot+command; ถ้า AC ไม่มีชื่อ test ใน output จะใช้ Verifier อิสระ
+risk high/auth/security/schema/เงิน/คะแนน/PII/public contract/fan-out/milestone/release ต้องตรวจอิสระ
+Verifier เป็น read-only; test เพิ่มที่เสนอจะส่งกลับ Worker พร้อม findings ไม่มีการเขียน production โดยผู้ตรวจ
+scope gate ตรวจความเปลี่ยนแปลงที่ Git มองเห็น ไม่ใช่ sandbox จำกัดสิทธิ์ของ provider
+
+คำถามกลางทางพักเฉพาะ package นั้น; งานอิสระเดินต่อ `baan inbox` รวมคำถามท้าย run
+`baan decide <wp> --run <run> --decision "..." --source "path#section rev"` ใช้คำตอบที่อ้างแหล่งได้
+business/schema/security/UX และการยอมรับความเสี่ยงต้องถามผู้ใช้ การแก้ ENVIRONMENT_FAILURE/TEST_DEFECT
+ไม่กินจำนวนรอบ rework แต่พักไว้ให้แก้สาเหตุก่อน
+
+## โหมดเดิม (deprecated)
+
+`baan-role` และ role/alias เดิมทั้งหมดคงไว้สำหรับสคริปต์เดิมอย่างน้อยหนึ่งรุ่น
+ตารางและ charter ด้านล่างเป็นของ legacy mode; ทางหลัก v2 ใช้ 3 prompts ใน prompts/
+Benchmark แบบประหยัดใช้ตรวจ correctness และต้นทุนเบื้องต้น ไม่ได้ยืนยันความเร็วเหนือรุ่นเดิม
+
+---
+
 # BAAN
 
 BAAN แบ่งงานพัฒนาซอฟต์แวร์ให้ AI หลายตัวทำตามตำแหน่ง คล้ายทีมจริงที่มีคนเขียน requirement, คนออกแบบ, คนเขียนโค้ด และคนตรวจแยกกัน แต่ละตำแหน่งรันผ่าน AI CLI ที่ติดตั้งไว้ในเครื่อง (claude, codex, agy หรือ opencode) แบบ non-interactive

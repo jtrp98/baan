@@ -1,3 +1,5 @@
+> **ทางหลักเปลี่ยนเป็น BAAN v2 แล้ว:** อ่าน [prompts/frontend.md](prompts/frontend.md) และ [README](README.md) ก่อน · ทีมสร้าง 3 บทบาท + ทีม UX/UI · เนื้อหาด้านล่างเก็บไว้สำหรับ legacy `baan-role` ช่วงเปลี่ยนผ่าน
+
 # 🏗️ นายช่าง — ผู้คุมทีม AI (ทีมสร้าง 11 role + ทีมออกแบบ 3 role)
 
 > ไฟล์นี้คือ charter สำหรับ **AI session ที่จะสวมบทบาท นายช่าง** — อ่านแล้วถือปฏิบัติตลอด session

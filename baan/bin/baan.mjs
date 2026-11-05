@@ -1,23 +1,21 @@
 #!/usr/bin/env node
-// 🏗️ นายช่าง (โหมดอัตโนมัติ) — goal → planner → execute ตามแผน DAG
-// โหมดหลักของ นายช่าง คือ "AI session สวมบท" ตาม BAAN.md แล้วเปิด session ราย role
-// ด้วย baan-role — ไฟล์นี้คือทางเลือกอัตโนมัติทั้งก้อนเมื่อไม่ต้องมีคน/session คุมเอง
+// 🏗️ นายช่าง — core v2 + workspace utilities
 // การตั้งค่าอยู่ที่ <ราก workspace>\baan.config.json (นอก package) · วิธีใช้เต็ม: baan/README.md
 import { existsSync, mkdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { TEAM_DIR, isInteractiveRole, layoutOf, listRoles, loadAgentsConfig, loadWorkspace, memoryRootIssues, memoryRootOf, reportsDirOf, resolveModules, resolveTarget, resolveWorkspaceConfig, roleListText, tierMatrixText, validateTestLevel, workspaceRootOf } from "../src/config.mjs";
 import { lintKnowledge, qualify, scanProjects, updateIndexes, uxKnowledgeDirs } from "../src/knowledge-index.mjs";
-import { extractJson, fallbackChainFor, lintPlanFile, printPlan, validateAndFixPlan } from "../src/plan.mjs";
-import { execute, runWithFallback, switchReasonText } from "../src/scheduler.mjs";
+import { fallbackChainFor, lintPlanFile } from "../src/plan.mjs";
+import { runWithFallback, switchReasonText } from "../src/scheduler.mjs";
 import { commitKnowledge } from "../src/knowledge-commit.mjs";
 import { ledgerDirOf } from "../src/ledger.mjs";
-import { applyManifestToOpts, preloadDone, readManifest, writeAtomic, writeManifest } from "../src/run-store.mjs";
 import { performInit } from "../src/init.mjs";
 import { formatSweep, sweep } from "../src/sweep.mjs";
-import { localDate, parseWorkDate, plannerPrompt } from "../src/prompts.mjs";
+import { localDate, parseWorkDate } from "../src/prompts.mjs";
 import { buildArgs, runCli } from "../src/runner.mjs";
 import { resolveTimeout, validateTimeout } from "../src/timeout.mjs";
+import { cli as v2 } from "../src/v2/cli.mjs";
 
 function parseArgs(argv) {
   // explicit = flag ที่ผู้ใช้พิมพ์เอง — ตอน resume ค่าที่ระบุเองชนะค่าจาก manifest เสมอ
@@ -117,23 +115,6 @@ export function moduleContext(mods) {
   ].join("\n");
 }
 
-// เก็บกวาด knowledge repo หลังจบ run — git พัง/ไม่มีสิทธิ์ต้องไม่ลากผล run ไปตายด้วย
-function autoCommitKnowledge(ws) {
-  for (const kr of ws.knowledge_roots) {
-    if (layoutOf(kr) !== "project") continue;
-    try {
-      const changed = updateIndexes(kr.path);
-      if (changed.length) console.log(`📚 knowledge: สร้างตาราง module ใหม่ ${changed.length} ไฟล์`);
-    } catch (e) { console.warn(`⚠ สร้างตาราง module ไม่สำเร็จ (ไม่กระทบผล run): ${e.message}`); }
-  }
-  try {
-    const commits = commitKnowledge(ws, (m) => console.log(`📚 knowledge: ${m}`));
-    if (commits.length) console.log(`📚 knowledge: auto commit ${commits.length} รายการ`);
-  } catch (e) {
-    console.warn(`⚠ auto commit knowledge ไม่สำเร็จ (ไม่กระทบผล run): ${e.message}`);
-  }
-}
-
 async function main() {
   let opts;
   try { opts = parseArgs(process.argv.slice(2)); } catch (e) { console.error(e.message); process.exit(2); }
@@ -164,23 +145,6 @@ async function main() {
   // วันที่ไม่คืนจาก manifest ตอน resume — งานที่รันวันนี้ต้องลง changelog ด้วยวันที่รันจริง
   opts.date = opts.date || localDate();
   if (!Number.isInteger(opts.maxParallel) || opts.maxParallel < 1 || opts.maxParallel > 64) { console.error(`--max-parallel ต้องเป็นจำนวนเต็ม 1–64 (ได้: ${opts.maxParallel})`); process.exit(2); }
-
-  if (opts.resume && opts.planFile) { console.error("ใช้ --resume กับ --plan-file พร้อมกันไม่ได้ — resume ใช้แผนใน run เดิมอยู่แล้ว"); process.exit(2); }
-  if (opts.resume && (opts.explicit.has("goal") || opts.goalFile)) console.log("(--goal/--goal-file ถูกละเว้น — resume ใช้ goal จาก run เดิม)");
-
-  // คืนบริบท run เดิม (target/cwd/write/projectCtx) จาก manifest ก่อนแกะ target/cwd —
-  // ไม่คืนแล้ว resume จะทำงานที่โฟลเดอร์ package ซึ่งอาจอ่าน/เขียนผิดโปรเจกต์
-  let runDir = "";
-  if (opts.resume) {
-    runDir = path.resolve(opts.resume);
-    if (!existsSync(runDir)) { console.error(`ไม่พบ run directory: ${runDir}`); process.exit(2); }
-    if (!existsSync(path.join(runDir, "plan.json"))) { console.error(`ไม่พบ plan.json ใน ${runDir} — ไม่ใช่ run directory ของ pipeline`); process.exit(2); }
-    const manifest = readManifest(runDir);
-    if (!manifest) console.log(`(run เดิมไม่มี run.json — เป็น run ก่อน v0.3.0 จะไม่คืน target/cwd/write อัตโนมัติ)`);
-    else {
-      try { applyManifestToOpts(opts, manifest, console.log); } catch (e) { console.error(e.message); process.exit(2); }
-    }
-  }
 
   let projectCtx = opts.projectCtx ?? "";
   if (opts.target) {
@@ -213,12 +177,9 @@ async function main() {
     }
   }
   opts.cwd = opts.cwd ? path.resolve(opts.cwd) : TEAM_DIR;
-  if (opts.resume && !opts.explicit.has("cwd") && !opts.target && !readManifest(runDir)?.cwd) {
-    console.warn(`⚠ resume โดยไม่มี --cwd/--target และ run เดิมไม่มี manifest — จะทำงานที่ ${opts.cwd} (โฟลเดอร์ package) ซึ่งอาจไม่ใช่โปรเจกต์เป้าหมายของ run เดิม`);
-  }
   opts.projectCtx = projectCtx;
 
-  console.log(`🏗️ นายช่าง — ผู้คุมทีม AI (คุม ${cfg.roleNames.length} role)${opts.target ? ` · target: ${opts.target}` : ""}`);
+  console.log(`🏗️ นายช่าง — BAAN v2: Planner · Senior Worker · Verifier + ทีม UX/UI`);
 
   // --init: ติดตั้งลง workspace ครั้งเดียว — config + CLAUDE.md/AGENTS.md ให้ session สวมบทเอง
   if (opts.init) {
@@ -243,7 +204,7 @@ async function main() {
   if (opts.list) {
     printWorkspace(ws);
     console.log(`cwd      : ${opts.cwd}`);
-    console.log("roles    :");
+    console.log("legacy/design roles (baan-role deprecated):");
     console.log(roleListText(listRoles()));
     console.log("tiers (agents.json):");
     console.log(tierMatrixText(cfg.tiers, cfg.agents));
@@ -295,69 +256,13 @@ async function main() {
     return;
   }
 
-  if (opts.resume || opts.planFile) {
-    let plan;
-    try {
-      if (opts.resume) {
-        plan = validateAndFixPlan(JSON.parse(readFileSync(path.join(runDir, "plan.json"), "utf8")), cfg, opts);
-        opts.goal = plan.goal ?? opts.goal;
-        console.log(`ต่อจากแผนเดิม: ${path.join(runDir, "plan.json")}`);
-        if (!readManifest(runDir)) writeManifest(runDir, opts); // backfill ให้รอบ resume ถัดไปมีบริบท
-      } else {
-        plan = validateAndFixPlan(JSON.parse(readFileSync(opts.planFile, "utf8")), cfg, opts);
-        opts.goal = plan.goal ?? opts.goal;
-        const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-        runDir = path.join(reportsDirOf(opts.workspaceRoot), `pipeline-${stamp}`);
-        mkdirSync(runDir, { recursive: true });
-        writeManifest(runDir, opts);
-        writeAtomic(path.join(runDir, "plan.json"), JSON.stringify({ goal: opts.goal, target: opts.target || null, ...plan }, null, 2));
-        console.log(`โหลดแผนจาก ${opts.planFile}`);
-      }
-    } catch (e) {
-      console.error(`แผนไม่ผ่าน validation หรืออ่านไม่ได้: ${e.message}`);
-      process.exit(1);
-    }
-    const done = opts.resume ? preloadDone(runDir, plan) : new Map(); // plan-file = run ใหม่ ไม่มีของเก่าให้ preload
-    printPlan(plan);
-    const { ok } = await execute(plan, opts, runDir, cfg, done);
-    autoCommitKnowledge(ws);
-    process.exitCode = ok ? 0 : 1;
-    return;
-  }
+  throw new Error('ใช้ baan run --goal / --packet / --plan สำหรับ v2');
 
-  let goal = opts.goal;
-  if (!goal && opts.goalFile) goal = readFileSync(opts.goalFile, "utf8");
-  goal = (goal ?? "").trim();
-  if (!goal) { console.error('ระบุเป้าหมายผ่าน --goal "..." หรือ --goal-file <path> หรือ --resume <runDir>'); process.exit(2); }
-  opts.goal = goal;
-  if (!(opts.agent in cfg.agents)) { console.error(`agent ไม่รู้จัก: ${opts.agent}`); process.exit(2); }
-  if (!(opts.plannerTier in cfg.tiers)) { console.error(`planner tier ไม่รู้จัก: ${opts.plannerTier}`); process.exit(2); }
-  if (cfg.tiers[opts.plannerTier]?.[opts.agent] === null) { console.error(`planner ใช้ ${opts.agent} ไม่ได้ใน tier ${opts.plannerTier} (null)`); process.exit(2); }
-
-  const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
-  runDir = path.join(reportsDirOf(opts.workspaceRoot), `pipeline-${stamp}`);
-  mkdirSync(runDir, { recursive: true });
-  writeManifest(runDir, opts); // บันทึกบริบทก่อนเรียก provider ใดๆ — crash กลางทางก็ resume ได้ครบ
-
-  console.log(`[planner] ${opts.agent} @ ${opts.plannerTier} กำลังวางแผน...`);
-  const p = await callStageWithFallback(cfg, opts, runDir, opts.plannerTier, "planner.answer.txt", plannerPrompt(goal, cfg, projectCtx, opts.date, opts.write));
-  writeAtomic(p.answerFile, p.r.answer);
-  if (!p.r.ok) { console.error(`planner ล้มเหลว: exit=${p.r.exitCode} ${p.r.error} (agent สุดท้าย: ${p.agent})`); process.exit(1); }
-  let plan;
-  try {
-    plan = validateAndFixPlan(extractJson(p.r.answer), cfg, { ...opts, lintStrict: true });
-  } catch (e) {
-    console.error(`แผนจาก planner ใช้ไม่ได้: ${e.message}\nดูผลดิบที่ ${p.answerFile}`);
-    process.exit(1);
-  }
-  writeAtomic(path.join(runDir, "plan.json"), JSON.stringify({ goal, target: opts.target || null, ...plan }, null, 2));
-
-  printPlan(plan);
-  const { ok } = await execute(plan, opts, runDir, cfg, new Map());
-  autoCommitKnowledge(ws);
-  process.exitCode = ok ? 0 : 1;
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().catch((e) => { console.error(e); process.exitCode = 1; });
+  const args = process.argv.slice(2);
+  const modern = ["run", "status", "report", "inbox", "decide"].includes(args[0]) || args.some((a) => ["--goal", "--goal-file", "--plan", "--plan-file", "--packet", "--resume"].includes(a));
+  (modern ? v2(args).then((result) => { console.log(JSON.stringify(result, null, 2)); process.exitCode = result.ok === false ? 1 : 0; }) : main())
+    .catch((e) => { console.error(e.message); process.exitCode = 2; });
 }
