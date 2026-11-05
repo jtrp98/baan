@@ -2,6 +2,31 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.28.0 — 2026-11-05 · วัดได้ว่าเวลาไปไหน และเลิกเสียเวลากับ sandbox
+
+ที่มา: วิเคราะห์ run จริงของ school-bot 133 call — ไม่สำเร็จ 43% และครึ่งหนึ่งของนั้นเกิดจาก sandbox/สิทธิ์/เครื่องมือ ไม่ใช่ตัวงาน, ขนานจริงเฉลี่ยแค่ 1.3–1.65 จาก 3 slot, CONVENTIONS 17 KB แนบเต็มทุก call และไม่มีข้อมูลพอจะบอกว่าเวลาไปไหน
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **โหมดเขียน (`--write`) ไม่มี sandbox แล้วทุกค่าย** — codex `--dangerously-bypass-approvals-and-sandbox` · claude `--permission-mode bypassPermissions` · agy `--mode auto` · AI แก้ไฟล์และรันคำสั่งได้ทุกที่บนเครื่องเหมือน session ที่เปิดเอง ขอบเขตคุมด้วยใบงานเท่านั้น · ถ้าต้องการ sandbox แบบเดิม ใช้ `BAAN_AGENTS_FILE=<ไฟล์ agents ของตัวเอง>` · โหมดอ่านยังจำกัดเหมือนเดิม
+- `baan --goal` ไม่มีขั้น PM (gm เขียน brief) แล้ว — goal ส่งให้ planner ตรง · run ใหม่ไม่มี `pm.answer.txt` · สคริปต์ที่อ่านไฟล์นี้ต้องแก้
+- preflight เลิกตรวจ `write-outside` และ `git-parent` (เป็นข้อจำกัดของ sandbox โหมดเขียน) — ใบงานที่เคยต้องใส่ `--no-preflight` เพราะสองข้อนี้ไม่ต้องใส่แล้ว
+
+### เพิ่ม
+
+- **วัดเวลา**: `report.json` มี `startedAt`, `taskIds`, `promptBytes` และ `failureClass` ต่อผลลัพธ์ (แยก `ENVIRONMENT_FAILURE` ออกจาก `VERDICT_FAIL`/`NEEDS_*`/`RUNNER_FAILURE`/`TIMEOUT`) · ledger ราย call ที่ `<workspace>\reports\baan\ledger\YYYY-MM-DD.jsonl` · `node scripts/metrics.mjs [<reports dir>] [--json]` สรุปเวลาราย role, เหตุล้ม, เวลาที่เสียกับสภาพแวดล้อมและรอบแก้, การใช้ slot ต่อวัน
+- `baan-role --task-id <id[,id...]>` ผูก call กับ task ในแผน
+- `--usage` (`baan`, `baan-role`) เก็บ token จาก claude/codex/agy (claude มีค่าใช้จ่ายด้วย)
+- `baan-role --probe "<cmd>"` รันคำสั่งตรวจสภาพแวดล้อมก่อนเปิด session — ล้มเพราะ feed/สิทธิ์/เครื่องมือ = exit 2 ไม่เปิด agent · ล้มเพราะเหตุอื่น (เช่น test แดงซึ่งเป็นงานของ role) เปิดต่อ
+- env `BAAN_AGENTS_FILE` ใช้ชุดตัวรันอื่นชั่วคราวโดยไม่แก้ `agents.json` ของ package
+
+### เปลี่ยน
+
+- สลับตัวรันเมื่อ CLI เริ่มทำงานไม่ได้ (codex `Access is denied` ตอนเริ่ม, claude โหลดตั้งค่าองค์กรไม่ได้, DNS ล้มภายใน 60 วินาทีแรก) — เดิมจบ failed ให้สั่งใหม่เอง · ล้มหลังทำงานไปนานไม่สลับ
+- idle timeout: `idleTimeoutSec` ใน `agents.json` (codex 1200 วินาที) หยุด process ที่เงียบเกินกำหนด · claude/agy ไม่ตั้งเพราะไม่พิมพ์อะไรจนจบงาน
+- `baan --goal`/`--plan-file`/`--resume`: เติม slot ทันทีที่ว่างแทนรอทั้ง wave จบ · งานที่มีงานอื่นพึ่งมากได้ก่อน · สรุปท้าย run แสดง "ขนานสูงสุด" แทนจำนวน wave
+- แต่ละ role ได้ CONVENTIONS เฉพาะหัวข้อที่ใช้: `sys`/`front` ไม่ได้ §3 §10 §12 §13 · `check` ไม่ได้ §3 — prompt ของ `sys` เล็กลง 39% (24.3 → 14.8 KB)
+
 ## 0.27.0 — 2026-11-03 · คนวางแผนรู้จักระดับการตรวจ
 
 ที่มา: 0.26.0 ใส่ระดับการตรวจให้ check/inspect/writer แล้ว แต่คนวางแผน (gm, plan, planner ของโหมดอัตโนมัติ) ยังวางตรวจเต็มหลังทุก task อยู่ · อัปเกรดแล้วไม่ต้องทำอะไรเพิ่ม
