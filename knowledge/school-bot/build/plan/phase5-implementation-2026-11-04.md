@@ -1,6 +1,6 @@
 # Phase 5 — source implementation and local evidence, 2026-11-04
 
-Implementation report: [SchoolBot Phase 5 report](../../../../target/school-bot/docs/phase5-implementation-2026-11-04.md).
+Implementation report: SchoolBot Phase 5 report (หลักฐานภายนอก: `../../../../target/school-bot/docs/phase5-implementation-2026-11-04.md`).
 
 The requested BE-015..018, BE-031..038, FE-013..015, FE-018..024 and QA-011..016 records now describe implementation progress and remaining acceptance work. FE-016 is also updated because account-scoped progress is part of the delivered flow. IDs, ownership, dependencies, phase assignment and gate definitions are preserved. Existing verified records are not downgraded. `in-progress` means source/local evidence exists; it does not mean production acceptance passed.
 

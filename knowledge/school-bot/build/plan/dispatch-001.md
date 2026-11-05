@@ -1,5 +1,7 @@
 # SchoolBot — Queue และ Handoff Routing
 
+> บริบท runner เดิม — หมายเหตุการอ่าน 2026-11-05: เนื้อหา คิว สถานะและ routing ด้านล่างเป็นบันทึกตามวันที่เดิม ไม่ใช่คำสั่ง dispatch ของ BAAN 0.29.0 อ่าน [วิธีใช้ BAAN ปัจจุบัน](../../../README.md#baan-0290) ก่อนนำไปใช้; คงมติ/เงื่อนไขเดิม ไม่สั่ง rerun หรืออนุมัติ fallback จากหมายเหตุนี้
+
 Precedence065 (2026-10-26): คิว/routing ปัจจุบันใช้ [queue-004](queue-004.md) และ [owner-packet-001](owner-packet-001.md). first wave/รายการเตรียมงาน/ยอด180AC-pending110ด้านล่างเป็นฐานประวัติ ไม่ใช่คำสั่ง rerun. ปัจจุบัน44REQ/185AC/80TP/110tasks/15verified/95pending/8phases/17gates. รอบ062เอกสารก่อน: UX005/007→check→คนเซ็น; owner packetพร้อมส่ง. t0/t1/t2=codex, t3/t4/t5=agy --no-fallback ไม่ใช้native subagent. คงDAG/effort/owner/tier/gates; ไม่dispatch implementation/SQL/deployก่อนprerequisites.
 
 ## Waiting on Human ก่อนคิว

@@ -1,14 +1,16 @@
 # คิวปัจจุบัน — Queue 004
-วันที่ 2026-10-26 · gm · ใบงาน065 · ต่อ [task-062](../../../../memory/school-bot/_cross/planning/task-062.md)
+
+> บริบท runner เดิม — หมายเหตุการอ่าน 2026-11-05: เนื้อหา คิว สถานะและ routing ด้านล่างเป็นบันทึกตามวันที่เดิม ไม่ใช่คำสั่ง dispatch ของ BAAN 0.29.0 อ่าน [วิธีใช้ BAAN ปัจจุบัน](../../../README.md#baan-0290) ก่อนนำไปใช้; คงมติ/เงื่อนไขเดิม ไม่สั่ง rerun หรืออนุมัติ fallback จากหมายเหตุนี้
+วันที่ 2026-10-26 · gm · ใบงาน065 · ต่อ task-062 (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/task-062.md`)
 
 ## Precedence และสถานะ
 ใช้ไฟล์นี้เหนือ queue-003/dispatch/first_wave และ runner เดิมทุกฉบับ; คงประวัติไว้ ไม่เรียก plan มา replan. t0/t1/t2=codex, t3/t4/t5=agy, `--no-fallback`; ไม่ใช้ native subagent แทน runner.
 
-ฐานปัจจุบัน: 44 REQ/186 AC/81 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates. นับ REQ/AC จาก requirement/index, tasks/phases/gates จาก tasks-001.json และ verified 11+4 จาก index หลัก/extension เทียบ verdict ที่ task-061 และ check-061-verdicts-001. JSON sync แล้วตาม [status-sync](../../../../memory/school-bot/_cross/planning/status-sync-062-001.json); ไม่เพิ่ม verdict. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือผลปิด gate; 207 person-days เป็นสมมติฐานเดิม.
+ฐานปัจจุบัน: 44 REQ/186 AC/81 TP cases/110 tasks/15 verified/95 pending/8 phases/17 gates. นับ REQ/AC จาก requirement/index, tasks/phases/gates จาก tasks-001.json และ verified 11+4 จาก index หลัก/extension เทียบ verdict ที่ task-061 และ check-061-verdicts-001. JSON sync แล้วตาม status-sync (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/status-sync-062-001.json`); ไม่เพิ่ม verdict. canonical status ไม่ใช่เปอร์เซ็นต์โค้ดหรือผลปิด gate; 207 person-days เป็นสมมติฐานเดิม.
 
 ## Waiting on Human
 - G/Light/infra/B/BFF: รับรองและตอบ H5 ตาม [owner packet](owner-packet-001.md); contract ยัง PROPOSED, fullLogin NOT_READY.
-- ผู้ใช้: forward [DB cover](../../../../memory/school-bot/_cross/db/db-safe-evidence-cover-001.md); เจ้าของ DB ส่ง EV-01..03→04/05→06 optional ตามชุดเดิม. ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว.
+- ผู้ใช้: forward DB cover (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/db/db-safe-evidence-cover-001.md`); เจ้าของ DB ส่ง EV-01..03→04/05→06 optional ตามชุดเดิม. ยังไม่มีหลักฐานว่าส่ง/ได้รับแล้ว.
 - UX signed 7/7 ตาม [decisions-043](../../shared/decisions/decisions-043.md): Q39–Q46 รวม expired-copy delta042 อนุมัติแล้ว 2026-10-26; ไม่ถามซ้ำ. เจ้าของระบบ/DB และ technical proof ยังรอแยกตามเดิม
 - spec Q3 รุ่นหุ่น/firmware/calibration/stop-unplug-emergency, ผู้ถือ cert/ช่องทางแจกจ่าย และ security/SQL/runtime gates ยังรอคน; หุ่นจริงยังไม่อนุญาตตาม038.
 
@@ -42,6 +44,6 @@ DBA-002 ยังรอ SA-001/BE-001 แม้ DBA-001 verified; SQL/rollback/c
 - 2026-10-26 — 074: แทนคิวร่าง/JSONรอapply ของ065 ด้วยหลักฐาน062/066/070/split/071/072; ไม่มีผล073หรือ approval ใหม่.
 - 2026-10-26 — ใบงาน065: sync ยอด/verdict/runner และคิวจริง; คง IDs/DAG/effort/owner/tier/gate definitions และ frozen scope.
 - 2026-10-26 — ผู้คุมลง execution receipt: รับ076/077จริงแล้ว; แก้ข้อความรอรับที่ค้างจาก snapshotของrole โดยไม่เปลี่ยนสัญญา/QA/gates
-- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม [check082](../../../../memory/school-bot/_cross/planning/check-082-expired-spot-001.md); ไม่ใช่human sign-off/runtime/gate closure
+- 2026-10-26 — ผู้คุมลงผลตรวจ080/082จริง: ข้อพบเอกสาร3จุดปิดแล้วตาม check082 (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/check-082-expired-spot-001.md`); ไม่ใช่human sign-off/runtime/gate closure
 
 - 2026-10-26 — ใบงาน083: แก้สถานะเซ็นตามคำตอบผู้ใช้จริงใน decisions-043 (แก้ตาม sweep); คงแบบและข้อจำกัดทางเทคนิคเดิม

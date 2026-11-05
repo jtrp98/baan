@@ -4,6 +4,8 @@ target: sb-tech-upgrade-web-system
 ---
 # schoolbright-web
 
+> วิธีใช้เอกสารกับ BAAN ปัจจุบัน: ดู [คู่มือ knowledge](../README.md#baan-0290) ชื่อผู้ทำงาน สถานะ และผลตรวจเดิมคงตาม source; การปรับคู่มือไม่ใช่ผลตรวจรับหรือ approval ใหม่
+
 [บริบท](shared/context.md) · [แผนรวม](build/plan/INDEX.md)
 
 ## Modules

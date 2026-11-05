@@ -3,6 +3,8 @@ platform: mobile
 ---
 # SchoolBright App
 
+> วิธีใช้เอกสารกับ BAAN ปัจจุบัน: ดู [คู่มือ knowledge](../README.md#baan-0290) ชื่อผู้ทำงาน สถานะ และผลตรวจเดิมคงตาม source; การปรับคู่มือไม่ใช่ผลตรวจรับหรือ approval ใหม่
+
 [บริบท](shared/context.md)
 
 ## Modules

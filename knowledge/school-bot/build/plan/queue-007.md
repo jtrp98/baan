@@ -1,10 +1,12 @@
 # คิว007 — readiness ครบ63 implementation tasks
 
+> บริบท runner เดิม — หมายเหตุการอ่าน 2026-11-05: เนื้อหา คิว สถานะและ routing ด้านล่างเป็นบันทึกตามวันที่เดิม ไม่ใช่คำสั่ง dispatch ของ BAAN 0.29.0 อ่าน [วิธีใช้ BAAN ปัจจุบัน](../../../README.md#baan-0290) ก่อนนำไปใช้; คงมติ/เงื่อนไขเดิม ไม่สั่ง rerun หรืออนุมัติ fallback จากหมายเหตุนี้
+
 วันที่2026-10-26 · เจ้าของเนื้อหา GM CodexT2 run 2026-10-26-13-50-10-gm-tier-t2-1agents-ak959i · นายช่างสกัด
 
 ตรวจin-memoryครบBE39+FE24=63: **21tasksมีlocal subsetพร้อม / 5มีงานเดิมหรือผลบางส่วน / 37รอเหตุผลเฉพาะ**. จึงต้องเดินCONTINUEต่อ ไม่หยุดเพราะcanonical62/63gated. คง110tasks/17gates/44REQ186AC81TP/15verified95pending/IDs/DAG. รายการนี้เป็นsubsetreadiness ไม่เปลี่ยนcanonicalstatusและไม่รับรองruntime.
 
-เทียบreceiptล่าสุดหลังGMเริ่มอ่าน: [parentB150/4147ผ่าน](../../../../memory/school-bot/_cross/planning/slice-090-grpc-math-parent-001.md)แต่[finalcheck2222pass12fail8NOT_RUN](../../../../memory/school-bot/_cross/planning/check-090-grpc-r2-001.md)ครบ2reworksต้องรอคำตัดสินท้ายวง; [GJPO](../../../../memory/school-bot/_cross/planning/jpo-090-gateway-r1-001.md)ยังOPENlogleak/earlydeadlineส่งrework2; Local63/26/1ได้[archboundary](../design/local-project-boundary-001.md)แล้วรอGoR1/Specเฉพาะdraftfuel. ไม่เปิดimplementationเดิมซ้ำ.
+เทียบreceiptล่าสุดหลังGMเริ่มอ่าน: parentB150/4147ผ่าน (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/slice-090-grpc-math-parent-001.md`)แต่finalcheck2222pass12fail8NOT_RUN (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/check-090-grpc-r2-001.md`)ครบ2reworksต้องรอคำตัดสินท้ายวง; GJPO (หลักฐานภายนอก: `../../../../memory/school-bot/_cross/planning/jpo-090-gateway-r1-001.md`)ยังOPENlogleak/earlydeadlineส่งrework2; Local63/26/1ได้[archboundary](../design/local-project-boundary-001.md)แล้วรอGoR1/Specเฉพาะdraftfuel. ไม่เปิดimplementationเดิมซ้ำ.
 
 ## ลำดับงานพร้อม
 

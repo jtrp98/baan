@@ -7,6 +7,8 @@ status: released
 ---
 # SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น (SchoolBot Studio)
 
+> วิธีใช้เอกสารกับ BAAN ปัจจุบัน: ดู [คู่มือ knowledge](../README.md#baan-0290) ชื่อผู้ทำงาน สถานะ และผลตรวจเดิมคงตาม source; การปรับคู่มือไม่ใช่ผลตรวจรับหรือ approval ใหม่
+
 > แก้ล่าสุด: 2026-11-05 · สถานะ: **ปิดโครงการส่งมอบเสร็จสมบูรณ์ (Phase 7 Complete / Handover & Release Ready)**  
 > รับผิดชอบโดย: Lead Technical Engineer
 
@@ -33,11 +35,11 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 
 | เอกสาร | พาธไฟล์ | รายละเอียดและขอบเขตเนื้อหา |
 |---|---|---|
-| **คู่มือการติดตั้งระบบ (Installation Guide)** | [docs/INSTALLATION_GUIDE.md](../../target/school-bot/docs/INSTALLATION_GUIDE.md) | ข้อกำหนดเครื่อง, การติดตั้ง Windows MSI/Setup Bootstrapper, คำสั่ง Silent Install, macOS PKG, และการ Deploy Backend Kubernetes |
-| **คู่มือการเชื่อมต่อ API (API Integration Guide)** | [docs/API_INTEGRATION_GUIDE.md](../../target/school-bot/docs/API_INTEGRATION_GUIDE.md) | สถาปัตยกรรม Gateway-to-gRPC, Protobuf contracts 5 บริการ, มาตรฐาน Metadata, สิทธิ์ Multi-tenancy, และการจัดการ Error |
-| **เอกสารสถาปัตยกรรมระบบ (Architecture Document)** | [docs/ARCHITECTURE.md](../../target/school-bot/docs/ARCHITECTURE.md) | ไดอะแกรมระบบ Multi-tier, Wails Go Host, Zide C++ Engine, .NET gRPC Core, โครงสร้าง 32 ตารางฐานข้อมูล, และ Process Isolation |
-| **รายงานผลการทดสอบระบบ (Test Results Report)** | [docs/TEST_RESULTS_REPORT.md](../../target/school-bot/docs/TEST_RESULTS_REPORT.md) | สรุปผลการรันชุดทดสอบ 4,555+ รายการ, การทดสอบฮาร์ดแวร์จำลอง, ความปลอดภัย, และ Traceability Matrix สู่ 187 ACs |
-| **บันทึกการปล่อยระบบ (Release Notes v1.0)** | [docs/RELEASE_NOTES_v1.0.md](../../target/school-bot/docs/RELEASE_NOTES_v1.0.md) | ฟีเจอร์เด่น 3 โหมด, ระบบการสอบจับเวลา, เวิร์กโฟลว์ครูและตัดเกรด, รายการ SHA-256 Hashes และ Deployment Runbook |
+| **คู่มือการติดตั้งระบบ (Installation Guide)** | docs/INSTALLATION_GUIDE.md (หลักฐานภายนอก: `../../target/school-bot/docs/INSTALLATION_GUIDE.md`) | ข้อกำหนดเครื่อง, การติดตั้ง Windows MSI/Setup Bootstrapper, คำสั่ง Silent Install, macOS PKG, และการ Deploy Backend Kubernetes |
+| **คู่มือการเชื่อมต่อ API (API Integration Guide)** | docs/API_INTEGRATION_GUIDE.md (หลักฐานภายนอก: `../../target/school-bot/docs/API_INTEGRATION_GUIDE.md`) | สถาปัตยกรรม Gateway-to-gRPC, Protobuf contracts 5 บริการ, มาตรฐาน Metadata, สิทธิ์ Multi-tenancy, และการจัดการ Error |
+| **เอกสารสถาปัตยกรรมระบบ (Architecture Document)** | docs/ARCHITECTURE.md (หลักฐานภายนอก: `../../target/school-bot/docs/ARCHITECTURE.md`) | ไดอะแกรมระบบ Multi-tier, Wails Go Host, Zide C++ Engine, .NET gRPC Core, โครงสร้าง 32 ตารางฐานข้อมูล, และ Process Isolation |
+| **รายงานผลการทดสอบระบบ (Test Results Report)** | docs/TEST_RESULTS_REPORT.md (หลักฐานภายนอก: `../../target/school-bot/docs/TEST_RESULTS_REPORT.md`) | สรุปผลการรันชุดทดสอบ 4,555+ รายการ, การทดสอบฮาร์ดแวร์จำลอง, ความปลอดภัย, และ Traceability Matrix สู่ 187 ACs |
+| **บันทึกการปล่อยระบบ (Release Notes v1.0)** | docs/RELEASE_NOTES_v1.0.md (หลักฐานภายนอก: `../../target/school-bot/docs/RELEASE_NOTES_v1.0.md`) | ฟีเจอร์เด่น 3 โหมด, ระบบการสอบจับเวลา, เวิร์กโฟลว์ครูและตัดเกรด, รายการ SHA-256 Hashes และ Deployment Runbook |
 | **รายการตรวจสอบความพร้อมขึ้นระบบ (Go-Live Readiness)** | [build/plan/PM-001.md](build/plan/PM-001.md) | ผลการตรวจประเมินความพร้อมรอบด้าน (PM-001 Checklist) ครอบคลุม 8 Gate Preconditions |
 | **บันทึกส่งมอบและปิดโครงการ (Handover & Closure)** | [build/plan/PM-002.md](build/plan/PM-002.md) | บันทึกการส่งมอบงานอย่างเป็นทางการ (PM-002 Handover Sign-off) และใบเสร็จค่า Hash |
 | **แผนงานและสถานะงานฉบับสมบูรณ์ (Canonical Plan)** | [build/plan/tasks-001.json](build/plan/tasks-001.json) | ไฟล์ JSON ควบคุมสถานะงาน 110 งานที่ผ่านการตรวจรับ (`verified: 110`) |
@@ -49,13 +51,15 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 | ส่วนงาน | สถานะความพร้อม | แนวทางดำเนินการสำหรับทีมปฏิบัติการ (Operations Team) |
 |---|:---:|---|
 | **ฐานข้อมูล (PostgreSQL 15.19)** | พร้อมใช้งาน | รันสคริปต์ [schoolbot_db.sql](build/db/schoolbot_db.sql) บนฐานข้อมูล `SchoolBotDB` แยกต่างหากจาก 4 ฐานเดิม |
-| **Backend & Worker (Kubernetes)** | พร้อมใช้งาน | ใช้ Kustomize Manifests ใน [deploy/overlays/prod](../../target/school-bot/deploy/overlays/prod) โดยตั้งค่า Secret ตามคู่มือการติดตั้ง |
+| **Backend & Worker (Kubernetes)** | พร้อมใช้งาน | ใช้ Kustomize Manifests ใน deploy/overlays/prod (หลักฐานภายนอก: `../../target/school-bot/deploy/overlays/prod`) โดยตั้งค่า Secret ตามคู่มือการติดตั้ง |
 | **API Gateway (`sb-api-gateway`)** | พร้อมใช้งาน | เปิด Route ส่งต่อคำขอภายนอกเข้าสู่ gRPC ServiceSchoolBot (:8080) พร้อมตรวจสอบ Trusted Headers |
-| **Desktop Client (Windows/macOS)** | พร้อมใช้งาน | แจกจ่ายตัวติดตั้ง MSI ให้โรงเรียน หรือติดตั้งผ่าน Group Policy / MDM ตามคู่มือ [INSTALLATION_GUIDE.md](../../target/school-bot/docs/INSTALLATION_GUIDE.md) |
+| **Desktop Client (Windows/macOS)** | พร้อมใช้งาน | แจกจ่ายตัวติดตั้ง MSI ให้โรงเรียน หรือติดตั้งผ่าน Group Policy / MDM ตามคู่มือ INSTALLATION_GUIDE.md (หลักฐานภายนอก: `../../target/school-bot/docs/INSTALLATION_GUIDE.md`) |
 
 ---
 
 ## 4. โครงสร้างโมดูลย่อย (Submodules)
+
+ตารางด้านล่างคงข้อความและสถานะจากบันทึกส่งมอบเดิม ไม่ใช่ผลตรวจรับใหม่ของ BAAN 0.29.0
 
 | Module | สรุป | สถานะ | พึ่งพา | ไฟล์ |
 |---|---|---|---|---|
@@ -66,3 +70,26 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 | my-work | ระบบจัดเก็บโครงงาน, ออฟไลน์แคช, ถังขยะและประวัติ | **released** | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
 | quiz | ระบบบทเรียน แบบทดสอบ การสอบจับเวลา และการตรวจอัตโนมัติ | **released** | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
 | web/school-bot | ระบบเว็บครู จัดการหลักสูตร เลื่อน Level และส่งออกคะแนน | **released** | quiz | [schoolbright-web](../schoolbright-web/modules/school-bot/INDEX.md) |
+
+## 5. ดัชนีจาก metadata ของ module
+
+ตารางนี้สร้างจากหัว INDEX ของ module ตาม `baan --index` ซึ่งยังระบุ `draft` ต่างจากบันทึกส่งมอบเดิมด้านบน การปรับเอกสารคงทั้งสอง source ไว้ ไม่เปลี่ยนสถานะ อนุมัติ หรือถอนการส่งมอบแทนผู้ใช้
+
+<!-- baan:modules:start -->
+<!-- ตารางนี้สร้างจากหัวไฟล์ INDEX.md ของแต่ละ module ด้วย `baan --index` — แก้ที่หัวไฟล์ของ module ไม่ใช่ที่นี่ -->
+
+| Module | สรุป | สถานะ | อัปเดต | พึ่งพา | ไฟล์ |
+|---|---|---|---|---|---|
+| app-shell | App Shell (สารบัญ module) | draft | 2026-11-02 | - | [modules/app-shell](modules/app-shell/INDEX.md) |
+| arm-lab | Arm Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
+| block-lab | Block Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
+| code-lab | Code Lab | draft | 2026-11-02 | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
+| my-work | my-work (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
+| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
+
+**module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
+
+| Module | สรุป | สถานะ | อัปเดต | เกี่ยวข้อง | อยู่ที่ |
+|---|---|---|---|---|---|
+| school-bot | เว็บครู School Bot (สารบัญ module) | draft | 2026-11-02 | ขอโดย school-bot · พึ่ง school-bot/quiz | [schoolbright-web/modules/school-bot](../schoolbright-web/modules/school-bot/INDEX.md) |
+<!-- baan:modules:end -->
