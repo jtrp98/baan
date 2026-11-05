@@ -1,0 +1,43 @@
+# BE-036 — Module I-b ownership/IDOR enforcement
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+บังคับความเป็นเจ้าของทุก endpoint ของ Module I-b — ผูก `school_id`/`s_id` จาก JWT เสมอ ตรวจความเป็นเจ้าของจริงทุกครั้งที่อ่าน/เขียน ไม่ใช่แค่ตรวจว่า id มีอยู่จริง (กัน IDOR ผ่าน `result_id`/`attempt_id`) — ห้ามรับตัวเลขนักเรียนจากฝั่งหน้าจอ — คำตอบแบบทดสอบและ reflection เป็นข้อมูลเชิงจิตวิทยาของผู้เยาว์ — IDOR หนึ่งจุดคือการให้เด็กคนหนึ่งอ่านข้อมูลจิตวิทยาของเด็กอีกคน ซึ่งแก้ความเสียหายหลังเกิดไม่ได้
+
+## References
+
+REQ-010, AC-010.1, DES-018, DEC-018
+
+## Scope
+
+ครอบทุก endpoint ของ Module I-b (อ่านคำถาม ส่งคำตอบ ผล จุดไม่เข้ากัน quest attempt) · ตรวจความเป็นเจ้าของใน query เดียวกับการอ่าน (filter ด้วย school_id/s_id เสมอ) · fail-closed เมื่อตรวจไม่ได้
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+กลไก JWT/ตัวตนของระบบเดิม · payload/สูตรของ task อื่น (ครอบเฉพาะการตรวจสิทธิ์) · สคีมา
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-010.1: ทุก endpoint ของ Module I-b ยึดตัวตนจาก session ที่ล็อกอินเท่านั้น — การอ้าง result_id/attempt_id ของคนอื่นต้องไม่มีทางได้ข้อมูลกลับมา ไม่ว่า id นั้นจะมีอยู่จริงหรือไม่
+
+## Dependencies
+
+BE-028, BE-034
+
+## Handoff
+
+ตรวจ AC-010.1 ด้วยการยิง endpoint ทุกตัวด้วย id ของเด็กอื่น (คนละ JWT) และ id ปลอม — ต้องได้ผลลบทุกกรณี + ยืนยันไม่มี endpoint ใดรับ s_id จาก body/header — เก็บผลทดสอบราย endpoint เป็นหลักฐาน
+เป็นชั้นตรวจที่ครอบ endpoint ที่มีอยู่ — revert ได้ทางเทคนิคแต่ห้ามปล่อย endpoint เหล่านี้ใช้จริงโดยไม่มีชั้นนี้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

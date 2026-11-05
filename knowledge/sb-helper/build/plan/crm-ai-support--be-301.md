@@ -1,0 +1,46 @@
+# BE-301 — PERMISSIONS.CRM_AI_UX_UI/DEV/SALES
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P3-01`
+
+## Goal
+
+เพิ่ม `PERMISSIONS.CRM_AI_UX_UI` / `CRM_AI_DEV` / `CRM_AI_SALES` ใน `src/constants/permission.constant.ts` — ยังไม่มี constant สำหรับ 3 role ใหม่นี้ (ดู design § Risks & Dependencies) — Phase 3 เป็นเฟสแรกที่ role UX-UI/Dev/Sales ถูกใช้จริง — ค่า constant ต้องมีก่อน guard ของ endpoints/หน้าจอในเฟสนี้อ้าง
+
+## References
+
+REQ-016, AC-016.1, AC-016.2, DES-006, DEC-006
+
+## Scope
+
+เพิ่ม 3 ค่า constant ในไฟล์เดิม — guard ของ endpoints/หน้า Phase 3 อ้างชื่อค่าเหล่านี้เสมอ (Phase 4 ใช้ชุดเดียวกัน ไม่เพิ่มซ้ำ)
+
+- Security-sensitive: no
+
+## Out of Scope
+
+ค่า permission ของโมดูลอื่น · การผูก constant กับตาราง staff-role (derive เป็นของ DES-006)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-016.1: บทบาท UX_UI/DEV/SALES มีค่า permission รองรับ — `FunctionalRole` ครบ 6 ค่าที่กำหนด
+AC-016.2: การตรวจสิทธิ์ API ยังใช้ `PERMISSIONS.CRM_AI_*` — role ใหม่อยู่ในชุดเดียวกัน
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-016.1/AC-016.2 ด้วยการอ่าน guard ที่อ้างค่าใหม่ + ทดสอบ 403 ตามบทบาท — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+constant additive — ลบรายค่าได้เมื่อไม่มี guard อ้างแล้ว
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,46 @@
+# BE-327 — accept NEW/STALE_KNOWLEDGE → log คู่
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P3-18`
+
+## Goal
+
+เมื่อ accept `SuggestionType=NEW_KNOWLEDGE`/`STALE_KNOWLEDGE` — ในทรานแซกชันเดียวกับผลจริงที่ `TCrmKnowledgeEntry` เขียนแถวคู่ `TCrmAiDecisionLog` (`SubjectType=KNOWLEDGE`, `SubjectId=CrmKnowledgeEntryId` ที่เกี่ยวข้อง, `DecisionType=KNOWLEDGE_MATCH`) — subject หาย → กติกา `AppError(404)` เดียวกัน — audit ความรู้ต้องชี้ entry จริงที่ผลจริงเกิด — ใช้กติกา 404 เดียวกันทุกกลุ่มจึงไม่มี branch เฉพาะตัว
+
+## References
+
+REQ-011, AC-011.1, REQ-008, AC-008.1, DES-008, DEC-008
+
+## Scope
+
+แถวคู่ในทรานแซกชันเดียวกับผลจริง — ตรวจ subject มีจริงก่อนเขียน
+
+- Security-sensitive: no
+
+## Out of Scope
+
+แถว log เดิม · workflow ของ `TCrmKnowledgeEntry` (DRAFT/approve) · schema
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-011.1: การ accept กลุ่มความรู้มี audit คู่ในทรานแซกชันเดียว — ไม่มี audit หลุดจากผลจริง
+AC-008.1: ผลจริงต่อคลังความรู้ (สร้าง/ตั้งตรวจซ้ำ) ยังเดินตาม workflow ของตาราง
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-011.1/AC-008.1 ด้วย accept จริงทั้งสอง type: log คู่ + subject หาย 404 — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+branch ของเส้นทาง accept — revert ได้ราย branch
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

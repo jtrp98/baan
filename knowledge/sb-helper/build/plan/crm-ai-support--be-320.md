@@ -1,0 +1,45 @@
+# BE-320 — ตรวจ model TCrmAiSuggestion
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P3-11`
+
+## Goal
+
+ตรวจ model `TCrmAiSuggestion` ใน `prisma/jabjai-master-single-db/schema.prisma` ตรงกับ § Data Model — กลไกเรียนรู้ทั้งหมดผูกกับตารางนี้ — โครงตารางต้องตรง design ก่อน inbox/accept/detect อ้าง
+
+## References
+
+REQ-011, AC-011.1, DES-008, DEC-008
+
+## Scope
+
+งานยืนยัน/แก้ mapping ใน schema เท่านั้น — ไม่มี DDL ใหม่ (ตารางมีอยู่จริง)
+
+- Security-sensitive: no
+
+## Out of Scope
+
+DDL/ตารางใน DB · model อื่น · การเพิ่ม field นอก § Data Model
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-011.1: โครงตารางรองรับแถว suggestion `Status=PENDING` พร้อม `ReviewedBy` ก่อนมีผลจริง — ตรง § Data Model
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-011.1 ด้วยการเทียบ schema กับ § Data Model ทีละ field — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+งานยืนยัน — ไม่มีผลข้างเคียงถ้าไม่แก้ schema
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

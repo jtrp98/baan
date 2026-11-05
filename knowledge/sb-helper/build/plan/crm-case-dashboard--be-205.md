@@ -1,0 +1,45 @@
+# BE-205 — top urgent cases payload
+
+> module: sb-helper/crm-case-dashboard
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-case-dashboard-P2-05`
+
+## Goal
+
+top urgent = เคสเปิด sort `ComputedPriorityScore DESC NULLS LAST` take N · SLA level ของกลุ่ม (danger/warn/ok) อยู่ใน Phase 3 groups endpoint — dashboard payload ครอบ overdue_count (open card) แทน — อันดับความเร่งด่วนต้องใช้คะแนนที่ crm-ai-support คำนวณไว้แล้วเท่านั้น และต้องไม่ไปซ้ำ logic SLA ระดับกลุ่มที่อยู่ของ Phase 3
+
+## References
+
+REQ-001, AC-001.1, DES-003
+
+## Scope
+
+เฉพาะ payload ของ dashboard card — score NULL ต้องไปท้าย (NULLS LAST) และ payload ต้องมี overdue_count สำหรับ open card ส่วน SLA level กลุ่มอย่าเพิ่งทำใน dashboard
+
+- Security-sensitive: no
+
+## Out of Scope
+
+คะแนน/การประเมินของ crm-ai-support (อ่านอย่างเดียว) · สูตร SLA level กลุ่มที่เป็นของ Phase 3
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-001.1: การ์ดเคสเร่งด่วนอันดับต้นได้รายการจากเคสเปิดจริงเรียงตาม score ที่มีอยู่ — score NULL ไม่ขึ้นหน้าและ card มี overdue_count
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-001.1 ด้วยชุดข้อมูลที่มี/ไม่มี score — เทียบลำดับผลลัพธ์ + tsc/eslint (verified แล้วตามแถวเดิม)
+ส่วน query ภายใน dashboard — revert ได้ ไม่กระทบ assessment ต้นทาง
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

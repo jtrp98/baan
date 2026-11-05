@@ -1,0 +1,46 @@
+# BE-310 — PATCH /menu-relations/[id] confirm/reject
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P3-10`
+
+## Goal
+
+เพิ่ม `PATCH /api/v2/support/crm-ai/menu-relations/[id]` — confirm/reject แถว `Status=PENDING_REVIEW` (ใช้กับแถว `Source=AI_SUGGESTED` ที่ Phase 3b จะสร้าง) เขียน `ConfirmedBy`/`ConfirmedAt` — ต้องมีคำเตือน/บล็อกไม่ให้ใช้ผลปรับ priority score/severity อัตโนมัติ — **ห้ามเขียนแถวใหม่ใน `TCrmAiDecisionLog` ที่ขั้นตอนนี้เด็ดขาด** (ตัดสินใจของคน มีตัวตนกำกับในตารางตัวเองแล้ว ตาม design § AI Suggestion & Learning Loop Rules ข้อ 4 กรณีขอบ) — การยืนยันเป็นการตัดสินของคนที่ตารางเก็บตัวตนเองไว้ — เขียน log ซ้ำจะทำให้ audit มีสองแหล่งตัดสินสำหรับเหตุการณ์เดียว
+
+## References
+
+REQ-014, AC-014.2, AC-014.3, DES-007, DEC-007
+
+## Scope
+
+confirm/reject เฉพาะแถว PENDING_REVIEW — เขียน `ConfirmedBy`/`ConfirmedAt` ที่ตารางเอง · ตัดสินซ้ำ → AppError(409) ตาม DEC-007 · ห้ามเขียน decision log
+
+- Security-sensitive: no
+
+## Out of Scope
+
+`TCrmAiDecisionLog` (ห้ามเขียนแถวใหม่ที่ขั้นตอนนี้เด็ดขาด) · priority/severity ของเคส (ห้ามปรับอัตโนมัติ) · schema
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-014.2: แถว AI_SUGGESTED ที่ยืนยันเป็น CONFIRMED พร้อมตัวตนผู้ยืนยัน — ก่อนหน้านั้นเป็น hint เท่านั้น
+AC-014.3: แถว PENDING_REVIEW ไม่ถูกใช้ปรับ priority/severity อัตโนมัติในทางใด
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-014.2/AC-014.3 ด้วย dev server: confirm/reject แถว PENDING_REVIEW + ตัดสินซ้ำ 409 + ไม่มีแถว log ใหม่ — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint ใหม่ additive — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

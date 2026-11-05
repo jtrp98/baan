@@ -1,0 +1,43 @@
+# BE-017 — Approval endpoint with 6 server-side conditions
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+endpoint กดอนุมัติ — บังคับเงื่อนไขก่อนอนุมัติทั้ง 6 ข้อฝั่งเซิร์ฟเวอร์ (มีแถวน้ำหนัก ≥1, subject canonical ครบ, weight 1/2/3, **มีแถว `public."TCompassProgramCluster"` ≥1 และทุก `"ClusterID"` resolve เป็น 1 ใน 11 แถวของ `public."TCompassInterestCluster"` ได้ — v9: เดิมเช็คที่ `cluster_code`; FK บังคับความถูกต้องให้แล้ว แต่ยังต้องเช็คจำนวนแถวเองที่เซิร์ฟเวอร์**, บรรยายไม่ว่าง, มีแถวโปรไฟล์ RIASEC ≥3 ที่ level 1-5) — fail-closed พร้อมระบุข้อที่ล้ม, ตั้ง `reviewed_by`/`reviewed_at` จาก SSO subject ห้ามเป็น NULL (DES-023 §2, §4) — การอนุมัติคือประตูเดียวที่กันผล AI ถึงเด็ก — เงื่อนไขที่ตรวจแค่ฝั่งหน้าจอ (disable ปุ่ม) ไม่ใช่การป้องกัน และ approved ที่ไม่รู้ว่าใครอนุมัติตามย้อนหลังไม่ได้
+
+## References
+
+REQ-003, AC-003.1, DES-023, DEC-023, DES-018, DEC-018
+
+## Scope
+
+ตรวจเงื่อนไข 6 ข้อที่เซิร์ฟเวอร์ทุกครั้ง — ข้อใดล้มปฏิเสธพร้อมระบุข้อ · reviewed_by/reviewed_at มาจาก SSO เท่านั้น · สถานะหลังอนุมัติเป็น 'approved' เท่านั้นจึงเด็กเห็น
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+รายการเงื่อนไข 6 ข้อ (คงตามสัญญา — แก้ต้อง amend) · แถวที่ is_manual=true · สคีมา
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-003.1: เด็กเห็นเฉพาะสาขาที่อนุมัติแล้วเท่านั้น — ผลวิเคราะห์ของ AI ห้ามถึงเด็กโดยตรง และการอนุมัติทุกครั้งผ่านการตรวจเงื่อนไขที่เซิร์ฟเวอร์พร้อมผู้อนุมัติที่ระบุตัวตนได้
+
+## Dependencies
+
+BE-013, BE-015
+
+## Handoff
+
+ตรวจ AC-003.1 ด้วยการกดอนุมัติบนชุดข้อมูลที่ขาดเงื่อนไขทีละข้อ (ต้องถูกปฏิเสธพร้อมข้อที่ล้ม) + อนุมัติสำเร็จแล้วตรวจ reviewed_by/reviewed_at ไม่ NULL — เก็บผลเรียกทุกกรณีเป็นหลักฐาน
+endpoint ใหม่ additive — revert ได้ · สถานะ approved ที่ออกไปแล้วไม่ถูกย้อนโดย revert (ต้องถอนการอนุมัติด้วยมือตามกติกา)
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

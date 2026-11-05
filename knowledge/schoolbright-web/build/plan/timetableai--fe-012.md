@@ -1,0 +1,43 @@
+# FE-012 — Post-Generate shortfall report UI (UX-001, DES-020)
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+แสดงผลหลัง Generate/Regenerate ทุกครั้งจาก `generateResult` (FE-005): จำนวนรวมที่ค้าง + รายการ (ห้องเรียน, วิชา, ต้องการ/วางได้/ขาด) · "จัดครบ" เมื่อ `nShortfallTotal = 0` · หมวด `ExcludedFromAutoGenerate` แยก · "ตรวจผลการจัดไม่ได้" เมื่อคำนวณไม่ได้ · เวลา `dFinishedAt` ของผล — หน้าตา/ถ้อยคำตาม UX-001 ที่เซ็น — AC-056 — ผู้ใช้ต้องเห็นผลทุกครั้ง ห้ามจบเงียบ (FE-005 มีเฉพาะข้อมูล)
+
+## References
+
+REQ-008, AC-056, DES-020, DEC-020
+
+## Scope
+
+ใช้ UX-001 ฉบับเซ็น as-is 2026-10-04 · ไม่ระบุสาเหตุรายคู่ (BR-84) · รายงานเป็นภาพ ณ เวลา Generate จบ — การแก้มือไม่คำนวณรายงานใหม่ (BR-85) · Generate ล้มกลางทาง → ไม่แสดงรายงานของ attempt ที่ไม่ถูก apply · ไม่เพิ่มการตรวจความครบก่อนบันทึก · สรุปความเข้มข้นที่แสดงร่วม = FE-013 · `lstGenerateWarnings` (DES-011) ยังไม่มี — ไม่แสดง · UX-005 (กติกาแสดงความล้มเหลว) ไม่อยู่ใน task นี้
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+`generateResult`/solver (FE-003/FE-005/FE-008) · การบันทึกตาราง · i18n key ของหน้าอื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-056 / BR-82..BR-85: หลัง Generate/Regenerate ทุกครั้งมีผลแสดง — ค้าง: จำนวนรวม + รายการตรง `lstShortfall` · ครบ: "จัดครบ" · มีรายการถูกตัดก่อน solver: หมวด `ExcludedFromAutoGenerate` แยก · exception ในขั้นรายงาน: "ตรวจผลการจัดไม่ได้" ไม่ใช่ "จัดครบ" · แก้มือหลัง Generate ไม่เปลี่ยนรายงาน · หน้าตา/ถ้อยคำตรง UX-001 ที่เซ็น
+
+## Dependencies
+
+FE-005
+
+## Handoff
+
+ตรวจ AC-056 ด้วย Generate บนข้อมูลที่วางไม่ครบ / วางครบ / มีวิชาไม่มีครู / บังคับ exception — ภาพหน้าจอแต่ละกรณีเทียบ `generateResult` dump และ UX-001 ที่เซ็น · typecheck/lint/build ผ่าน — เก็บภาพ + dump เป็นหลักฐาน
+UI additive — revert ได้อิสระ (ข้อมูลของ FE-005 คงอยู่) · revert คู่กับ FE-013 ถ้า FE-013 วางอยู่ในผลเดียวกัน
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,41 @@
+# FE-002 — Heavy/light course classification (BR-77) — group matching corrected by FE-007
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+Heavy/light course classification (BR-77) — group matching corrected by FE-007
+
+## References
+
+REQ-002, AC-054, DES-019, DEC-019
+
+## Scope
+
+-
+
+- Security-sensitive: no
+
+## Out of Scope
+
+-
+
+## Expected Output
+
+none
+
+## Acceptance
+
+-
+
+## Dependencies
+
+—
+
+## Handoff
+
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

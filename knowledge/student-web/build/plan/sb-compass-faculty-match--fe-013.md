@@ -1,0 +1,45 @@
+# FE-013 — Development Plan screen (tab=gap in MyCompass)
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+หน้าจอแท็บแผนพัฒนาตนเอง (`tab=gap` ใน `MyCompass.cshtml` / `compass-design.js` lines 579-627): แสดงผล Gap Analysis รายกลุ่มสาระ (แถบความคืบหน้าเทียบคะแนนปัจจุบันกับคะแนนเป้าหมาย), แบบฝึกหัดทบทวน 4 ข้อ, และการ์ดแนะนำติวเตอร์/คอร์ส Orbit Tutor จาก payload `VMDevelopmentPlan` (DES-026); หากไม่มี active target major แสดงข้อความแนะนำให้เลือกเป้าหมายก่อน — REQ-018 ฝั่งแสดงผล — เชื่อมโยง UI mockup เดิมใน `tplGap` เข้ากับ API แผนพัฒนาตนเองจริงตามสัญญา DES-026
+
+## References
+
+REQ-018, AC-018.1, AC-018.2, AC-018.3, DES-026, DEC-027
+
+## Scope
+
+เรนเดอร์ข้อมูลจาก `VMDevelopmentPlan` เท่านั้น — ห้ามคำนวณ Gap เองที่หน้าจอ · หาก `RequiresTargetMajor = true` แสดง prompt แนะนำให้ไปเลือกสาขาเป้าหมายที่แท็บสาขาแนะนำ · หากทุกวิชา `Gap == 0` แสดงการ์ดยินดีและคำแนะนำการรักษามาตรฐานตาม fallback ของ DES-026
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+สูตร Gap Analysis (ทำที่ backend เท่านั้น) · แท็บอื่นใน MyCompass · โค้ดของโมดูลอื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-018.1: หน้าจอแสดงแถบ Gap Analysis รายวิชาถูกต้องตามข้อมูลที่ได้รับจาก backend
+AC-018.2: แสดงแบบฝึกหัดทบทวน 4 ข้อ และการ์ดแนะนำ Orbit Tutor
+AC-018.3: กรณีไม่มี active target major แสดงข้อความแนะนำให้เลือกเป้าหมายพร้อมปุ่มนำทางอย่างถูกต้อง
+
+## Dependencies
+
+BE-054, FE-011
+
+## Handoff
+
+ตรวจ AC-018.1, AC-018.2, AC-018.3 โดยเปิดหน้าจอจริงทั้งกรณีมีเป้าหมายและไม่มีเป้าหมาย บันทึกภาพหน้าจอและ DOM เป็นหลักฐาน
+หน้าจอ additive — revert คืนสภาพ mockup เดิมได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

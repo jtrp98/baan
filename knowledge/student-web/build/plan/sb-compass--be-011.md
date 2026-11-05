@@ -1,0 +1,47 @@
+# BE-011 — certificate/issue: identity-only fix
+
+> module: student-web/sb-compass
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+แก้แบบเดียวกับ BE-009 ให้ `certificate/issue` (`CompassApiController.cs:729` — ยืนยันบรรทัดกับ source ปัจจุบัน): ใช้ `UserData.UserID` (JWT) แทน `request.SID`, เพิ่มตรวจ `ud == null → 401`, คง field `SID` ใน request DTO แต่ server ไม่อ่าน, `SID` ใน response เป็น `UserData.UserID` เสมอ — **แก้เฉพาะเรื่อง identity เท่านั้น ห้ามแตะ business logic การออกใบรับรอง** (ขอบเขตของ module `sb-compass-certificate` แยก) — REQ-015 ระบุใช้กับ endpoint ใบรับรองด้วยแม้ module จะแยกไปทำภายหลัง เพราะโค้ด stub อยู่ไฟล์เดียวกัน ต้องไม่ทิ้งช่องโหว่ค้าง (DES-017)
+
+## References
+
+REQ-011, REQ-015, AC-011.1, AC-015.1, DES-017
+
+## Scope
+
+แก้เฉพาะแหล่งตัวตน — การตรวจว่าสอบผ่านจริง/เลขใบรับรองที่เดาได้ เป็นขอบเขต `sb-compass-certificate` ห้ามแก้ในรอบนี้
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ห้ามแตะ business logic การออกใบรับรอง (เงื่อนไขอนุมัติ/เลขใบรับรอง/รหัสตรวจสอบ) — ไม่ใช่ขอบเขตโมดูลนี้;
+ห้ามถอด field `SID` ออกจาก `VMCertificateRequest`; response ห้ามสะท้อนค่า client
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-015.1: `certificate/issue` ใช้ `UserData.UserID` เสมอ — ค่า `SID` จาก client ถูกละเว้น และ `ud == null` → 401
+AC-011.1: งานนี้ไม่พัฒนากติกาใบรับรองต่อในโมดูลนี้ — แก้แค่ identity ตามขอบเขต REQ-015
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-015.1 และ AC-011.1 ด้วย request ที่ส่ง `SID` ต่างคน/ไม่ส่ง — ผลออกใบรับรองต้องผูกกับผู้ใช้จาก JWT เสมอ;
+diff ต้องแสดงว่าไม่มีการแตะ logic การอนุมัติ/เลขใบรับรอง
+ถอด/คงตัดสินร่วมกับ BE-009/BE-010 (ชุด REQ-015 เดียวกัน) — การถอดจะเปิดช่อง IDOR ของ endpoint ใบรับรองคืน;
+business logic เดิมไม่ถูกแตะจึงไม่มีผลต่อกติกาใบรับรอง
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`
