@@ -4,7 +4,7 @@ Local npm package สำหรับควบคุมงานพัฒนา�
 Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
 Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-Source ปัจจุบันเป็น **0.29.0 ที่ยังไม่เผยแพร่**; สถานะรุ่นและสิ่งที่ต้องทำตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
+สิ่งที่เปลี่ยนใน **0.29.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
 
 ## ติดตั้งและตั้งค่า
 
