@@ -1449,7 +1449,12 @@
         "DES-006"
       ],
       "status": "in-progress",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Darwin HID source/shared transport mocks present and Windows build passes; Darwin amd64/arm64 build, native timeout/cancel/cleanup acceptance remains unverified."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Darwin HID source/shared transport mocks present and Windows build passes; Darwin amd64/arm64 build, native timeout/cancel/cleanup acceptance remains unverified."
+      },
       "module": [
         "arm-lab",
         "app-shell"
@@ -1486,7 +1491,12 @@
         "DES-006"
       ],
       "status": "in-progress",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Darwin Serial source/shared transport mocks present and Windows build passes; Darwin native build/runtime acceptance remains unverified."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Darwin Serial source/shared transport mocks present and Windows build passes; Darwin native build/runtime acceptance remains unverified."
+      },
       "module": [
         "arm-lab",
         "app-shell"
@@ -1524,7 +1534,12 @@
         "DES-006"
       ],
       "status": "in-progress",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Added bounded in-memory six-servo simulator and Code/Block byte/action/step sandbox regression; native engine profile enforcement and full requirement acceptance remain open."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Added bounded in-memory six-servo simulator and Code/Block byte/action/step sandbox regression; native engine profile enforcement and full requirement acceptance remain open."
+      },
       "module": [
         "arm-lab",
         "app-shell"
@@ -1570,7 +1585,12 @@
         "DES-006"
       ],
       "status": "in-progress",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Simulator emergency cutoff cancels pending motion, latches torque off, and requires explicit rearm; native physical cutoff is not implemented/validated by this simulator. Existing native drain/stop/read/torque regression passes."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Simulator emergency cutoff cancels pending motion, latches torque off, and requires explicit rearm; native physical cutoff is not implemented/validated by this simulator. Existing native drain/stop/read/torque regression passes."
+      },
       "module": "arm-lab"
     },
     {
@@ -1794,7 +1814,12 @@
         "DES-005"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing Code Lab integrated with explicit simulator route; bounded DSL/64 commands/100 steps/16384 UTF-8 source bytes tested locally. Browser UI acceptance remains unverified."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing Code Lab integrated with explicit simulator route; bounded DSL/64 commands/100 steps/16384 UTF-8 source bytes tested locally. Browser UI acceptance remains unverified."
+      },
       "module": "code-lab"
     },
     {
@@ -1826,7 +1851,12 @@
         "DES-005"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing Block Lab compiler extracted for testing; repeat/roundtrip/multiple roots/nesting bounds tested; candidate workspace validation before replacing editor and 256 KiB load cap added. Browser UI acceptance remains unverified."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing Block Lab compiler extracted for testing; repeat/roundtrip/multiple roots/nesting bounds tested; candidate workspace validation before replacing editor and 256 KiB load cap added. Browser UI acceptance remains unverified."
+      },
       "module": "block-lab"
     },
     {
@@ -1861,7 +1891,12 @@
         "DES-006"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing profile/discovery/probe workflow now supports explicit HID and Serial Simulator through production adapter; simulator stays visibly labelled and replies remain simulated:true."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing profile/discovery/probe workflow now supports explicit HID and Serial Simulator through production adapter; simulator stays visibly labelled and replies remain simulated:true."
+      },
       "module": "arm-lab"
     },
     {
@@ -1893,7 +1928,12 @@
         "DES-006"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing pose/queue workflow exercised with simulator; adapter/workspace regression covers bounds, stale completion and disconnect."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing pose/queue workflow exercised with simulator; adapter/workspace regression covers bounds, stale completion and disconnect."
+      },
       "module": "arm-lab"
     },
     {
@@ -1929,7 +1969,12 @@
         "DES-006"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing sequence/drain/stop workflow regression passes; Simulator emergency stop cuts torque and marks connection lost to invalidate workspace playback."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing sequence/drain/stop workflow regression passes; Simulator emergency stop cuts torque and marks connection lost to invalidate workspace playback."
+      },
       "module": "arm-lab"
     },
     {
@@ -1963,7 +2008,12 @@
         "DES-006"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing upload/run workflow exercised through simulator with five poses in 4+1 chunks; existing failure/progress regression passes."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing upload/run workflow exercised through simulator with five poses in 4+1 chunks; existing failure/progress regression passes."
+      },
       "module": "arm-lab"
     },
     {
@@ -2001,7 +2051,12 @@
         "DES-006"
       ],
       "status": "done-local",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Existing atomic six-servo read/torque/lost workflow regression passes; simulator timeout/disconnect prevents motion and does not retry."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Existing atomic six-servo read/torque/lost workflow regression passes; simulator timeout/disconnect prevents motion and does not retry."
+      },
       "module": "arm-lab"
     },
     {
@@ -2121,9 +2176,14 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
+      "status": "in-progress",
       "risk": "high",
-      "module": "quiz"
+      "module": "quiz",
+      "implementation_note": "2026-11-04: Published catalog + owned project revision submission + durable jobs/results + progress; ต้องตรวจ approved inventory และ authoritative scope บนฐานจริง",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BA-005",
@@ -2252,8 +2312,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: bounded Code/Block evaluator จาก approved criteria/version + durable grading worker; local pass/fail/bounds/recovery ผ่าน แต่ยังไม่เซ็นรับ inventory จริง",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-017",
@@ -2289,8 +2354,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม SchoolAssessmentAuthority อ่าน assignment/subject/room/term/explicit enrollment จาก School DB และ strict unique active status-0 history; movement/non-active/duplicates ยัง fail closed; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-013",
@@ -2319,8 +2389,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: Desktop Lessons แยกสามโหมดและใช้ published catalog; UI/i18n/build ผ่านในเครื่อง รอ signed inventory และ deployed end-to-end",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-014",
@@ -2350,8 +2425,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: durable account-scoped offline project/submission queue + reconnect/result refresh; ส่ง source ให้ server ตรวจใหม่ ไม่อัปโหลดคะแนน local; local tests ผ่าน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-015",
@@ -2383,8 +2463,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: เว็บครู school-bot มี Arm source/rubric review/correction และ error states; local UI/client tests ผ่าน รอ legacy scope และ browser login E2E",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-016",
@@ -2415,8 +2500,13 @@
       "des_refs": [
         "DES-005"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: Desktop progress/results แยก account namespace และ refresh ผลครู; เว็บครูมี totals/submissions; ยังไม่ผ่าน acceptance ข้ามบัญชีบนบริการจริง",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "DBA-006",
@@ -2475,8 +2565,13 @@
       "des_refs": [
         "DES-007"
       ],
-      "status": "pending",
-      "module": "app-shell"
+      "status": "in-progress",
+      "module": "app-shell",
+      "implementation_note": "2026-11-04: ReleaseService ใช้ repository/backing store และทดสอบ restart/duplicate ผ่าน; คง phase P3 ตามแผนเดิมและรอ production acceptance",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-019",
@@ -2847,7 +2942,12 @@
         "DES-006"
       ],
       "status": "in-progress",
-      "phase4_evidence": {"date":"2026-11-04","scope":"standalone local simulator; no hardware proof","report":"target/school-bot/docs/PHASE4-LABS.md","note":"Windows: frontend regression 59/59, i18n 14/14, C++ protocol 344 checks and transport scenarios, fresh-binary IPC 12/12 PASS. macOS two architectures and interactive UI still pending. QA-004 is P5 learning and intentionally unchanged."},
+      "phase4_evidence": {
+        "date": "2026-11-04",
+        "scope": "standalone local simulator; no hardware proof",
+        "report": "target/school-bot/docs/PHASE4-LABS.md",
+        "note": "Windows: frontend regression 59/59, i18n 14/14, C++ protocol 344 checks and transport scenarios, fresh-binary IPC 12/12 PASS. macOS two architectures and interactive UI still pending. QA-004 is P5 learning and intentionally unchanged."
+      },
       "module": [
         "arm-lab",
         "code-lab",
@@ -3993,12 +4093,16 @@
         "DES-010"
       ],
       "status": "in-progress",
-      "implementation_note": "2026-11-04: เพิ่ม typed gRPC start/save/submit, immutable question/policy snapshot, shuffle, guarded deadline, auto-grade, idempotent transaction และ read recovery; ยังไม่ครบ bounded sweep/retake/production acceptance",
+      "implementation_note": "2026-11-04: start/save/submit + immutable question/policy/evaluator snapshots + shuffle + server deadline + late-submit recovery + bounded expiry worker + durable idempotency implemented",
       "ref": "target/school-bot/web/tests/ServiceSchoolBot.Tests/AttemptMutationTests.cs",
       "module": [
         "quiz",
         "app-shell"
-      ]
+      ],
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-032",
@@ -4026,8 +4130,13 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: teacher time/window override และ retake grant รายคนแบบ atomic implemented/tested; รอ authoritative legacy scope และ deployed E2E",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-033",
@@ -4059,8 +4168,13 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม gap reason missing/ungraded/error ใน totals สำหรับ skipped export cells; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-034",
@@ -4090,8 +4204,13 @@
       "des_refs": [
         "DES-011"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม authoritative next registered term lookup และ timezone ที่ต้องระบุชัด; ทั้งห้องต้อง resolve ครบ ไม่ละผู้เรียนกำกวมออกจาก average; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-035",
@@ -4125,8 +4244,13 @@
         "DES-008",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม PostgreSQL existing-cell discovery จาก AssessmentId/ScoreIdentifier ที่มีจริง พร้อม tenant/context/empty ownership checks; ไม่สร้างช่อง legacy ใหม่; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-036",
@@ -4158,8 +4282,13 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เพิ่มอ่าน xmin/full-document hash/lock/template context และ skipped_cells คงค่าเดิม; เปลี่ยนคะแนนเต็มต้อง preview ใหม่; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-037",
@@ -4193,8 +4322,13 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม PostgresGradeDestination transaction/operation lock/xmin CAS/merge existing ScoreData/derived fields/PG audit receipt และ legacy calculator profile port; ยังไม่รันหรือรับรอง parity/coexistence และไม่มี GradeExportWriteAuthorization ติดตั้ง",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-038",
@@ -4228,8 +4362,13 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม current original-teacher resolver, overlap guard, unknown-commit locked receipt recovery และ keep/replace resolution preview + atomic supersession; proto/Gateway source sync แล้วแต่ไม่ได้ build/test",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "BE-039",
@@ -4372,8 +4511,13 @@
         "DES-003",
         "DES-005"
       ],
-      "status": "pending",
-      "module": "my-work"
+      "status": "in-progress",
+      "module": "my-work",
+      "implementation_note": "2026-11-04: ตรวจ local Guest export/reopen/trash/import guard regression แล้ว; ยังไม่ครบเลือกนำเข้า history และ regrade acceptance ทุกกรณี",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-019",
@@ -4413,8 +4557,13 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม server key-file loader/secret mount และ local key preparation/launch source ใช้ login sb-helper เดิม; ไม่มีการสร้างกุญแจจริง เปิด server หรือทดสอบรอบนี้",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-020",
@@ -4443,8 +4592,13 @@
         "DES-010",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04 code-only: Admin BFF รองรับ inline PEM หรือ key-file โดยใช้ JWT จากเซสชันเดิม; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-021",
@@ -4477,11 +4631,16 @@
       "des_refs": [
         "DES-010"
       ],
-      "status": "pending",
+      "status": "in-progress",
       "module": [
         "quiz",
         "app-shell"
-      ]
+      ],
+      "implementation_note": "2026-11-04: Desktop attempt UI + server-based monotonic timer + autosave/timeout submit/ETag retry/reveal implemented; build ผ่าน รอ full browser/service acceptance",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-022",
@@ -4529,8 +4688,13 @@
         "DES-011",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: เว็บครู run selector/time override/retake/scoring/activate/promotion implemented; local tests/typecheck/lint ผ่าน รอ authoritative scope/term resolver",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-023",
@@ -4562,8 +4726,13 @@
         "DES-008",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เชื่อม existing grade destination source adapter และแสดงคะแนนเดิม/ช่องที่ข้าม; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "FE-024",
@@ -4607,8 +4776,13 @@
         "DES-009",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04 code-only: เพิ่ม keep/replace รายคน สร้าง preview ใหม่ก่อนยืนยัน คงรายการที่ส่งสำเร็จแล้ว และ recovery unknown receipt; source-only ไม่ได้รัน",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation."
     },
     {
       "id": "QA-011",
@@ -4656,11 +4830,17 @@
         "DES-003",
         "DES-005"
       ],
-      "status": "pending",
+      "status": "in-progress",
       "module": [
         "my-work",
         "app-shell"
-      ]
+      ],
+      "implementation_note": "2026-11-04: รัน Guest/project/entry + offline queue local regression; full Guest history/import/regrade และ deployed restart matrix ยังไม่ครบ",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "QA-012",
@@ -4706,8 +4886,14 @@
         "DES-005",
         "DES-012"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: รัน curriculum/question-bank/criteria approval local suites และ Admin schema/payload/BFF/browser fixture; Sheet provenance migration/live four-eyes flow ยังรอ",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "QA-013",
@@ -4745,12 +4931,16 @@
         "DES-010"
       ],
       "status": "in-progress",
-      "implementation_note": "2026-11-04: เพิ่ม acceptance subset สำหรับ attempts/deadline/replay/ETag/recovery/RPC; ยังไม่ครบ teacher policy/retake/Desktop หรือการตรวจรับทั้งหมด",
-      "local_test_evidence": "dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1 --no-restore: 4412 passed, 0 failed (2026-11-04); memory/file + in-process gRPC, not production QA acceptance",
+      "implementation_note": "2026-11-04: รัน attempt/deadline/ETag/replay/recovery/teacher policy/retake + Desktop build/local checks; ยังไม่ใช่ full deployed QA verdict",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
       "module": [
         "quiz",
         "app-shell"
-      ]
+      ],
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "QA-014",
@@ -4787,8 +4977,14 @@
         "DES-010",
         "DES-011"
       ],
-      "status": "pending",
-      "module": "quiz"
+      "status": "in-progress",
+      "module": "quiz",
+      "implementation_note": "2026-11-04: รัน totals/scoring freeze/level proposal/snapshot/successor local tests; ยังรอ authoritative whole-class roster/term และ DB runtime matrix",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "QA-015",
@@ -4834,8 +5030,14 @@
         "DES-008",
         "DES-009"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04: รัน mapping/preview/rounding/conflict local test-double cases; actual PGGrade targets/CAS/coexistence ยังไม่พิสูจน์",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "QA-016",
@@ -4871,8 +5073,14 @@
       "des_refs": [
         "DES-009"
       ],
-      "status": "pending",
-      "module": "schoolbright-web/school-bot"
+      "status": "in-progress",
+      "module": "schoolbright-web/school-bot",
+      "implementation_note": "2026-11-04: รัน export/outbox/revoked permission/lease/receipt recovery local cases; actual writer/receipt/runtime evidence ยังไม่พร้อม ไม่ปิด gate",
+      "implementation_evidence": "plan/phase5-implementation-2026-11-04.md",
+      "local_test_evidence": "Historical before the code-only continuation; not verification of current source: SchoolBot 4445/0/0; Gateway SchoolBot slice 34/0; Go 6 packages + vet; Desktop frontend 24 + build/assets; teacher 8 + targeted TS/ESLint; Admin 8 unit + 5 BFF tests. Local fixture evidence only, not production QA acceptance.",
+      "continuation_mode": "code-only",
+      "continuation_verification": "Not run per user instruction: ไม่ต้องทดสอบ ทำแค่ code ก็พอ. Earlier local test counts predate this continuation.",
+      "execution_note": "No new QA execution or verdict; omitted at explicit user request. Existing acceptance status is not upgraded."
     },
     {
       "id": "UX-005",
