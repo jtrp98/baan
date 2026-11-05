@@ -64,7 +64,7 @@ The controller must run the final knowledge commit **after saving all role outpu
 
 End with a **short handoff**: the result (lead with it) → evidence (files/lines changed or read) → blockers → which role should receive it next — then stop · never assume your output was accepted.
 
-**Subagents** (your CLI's own sub-agent / task feature) may help you finish **your own assignment** faster — instead of handing work to another role:
+**Subagents** (your CLI's own sub-agent tool — codex: `collaboration.spawn_agent` + `collaboration.wait_agent` · Claude Code: the `Agent` (Task) tool · others: their built-in sub-agent tool) are **allowed in read-only and write mode** and may help you finish **your own assignment** faster — instead of handing work to another role:
 - **Use them for reading, exploring and checking**: search the code or documents in parallel and bring back only conclusions; derive tests from the acceptance criteria; check several ACs at once. You stay the owner of the result: the handoff and the single output state are yours.
 - **Writing**: only one writer per repository at a time — a subagent may write only files that no one else is editing (e.g. its own new test files), never the same files as you or another subagent.
 - **A subagent used to check work must be fresh**: give it only the AC, the contract/design and the paths — never your own explanation or claims about the code, so its judgment stays independent.

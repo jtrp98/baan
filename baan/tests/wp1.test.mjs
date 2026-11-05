@@ -150,3 +150,15 @@ test("subagent: CONVENTIONS §7 อนุญาตภายใน role พร้
     assert.match(p, /## 7\. Never chain roles yourself — subagents are allowed/, `${role} ต้องได้ §7 ด้วย`);
   }
 });
+
+test("subagent โหมดอ่าน: CONVENTIONS ระบุชื่อ tool ของแต่ละ CLI · claude read-only อนุญาต Agent/Task · ป้าย role บอกว่า subagent ใช้ได้", async () => {
+  const conv = readConventions("sys");
+  assert.match(conv, /collaboration\.spawn_agent/);
+  assert.match(conv, /allowed in read-only and write mode/);
+  const { loadAgentsConfig } = await import("../src/config.mjs");
+  const ro = loadAgentsConfig(fileURLToPath(new URL("../agents.json", import.meta.url))).agents.claude.readArgs;
+  const tools = ro[ro.indexOf("--allowedTools") + 1].split(",");
+  assert.ok(tools.includes("Agent") && tools.includes("Task"), tools.join(","));
+  const { ROLE_SESSION_RULE } = await import("../src/role-guard.mjs");
+  assert.match(ROLE_SESSION_RULE, /sub-agent tool is allowed/);
+});

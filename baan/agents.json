@@ -18,7 +18,7 @@
         "--output-format",
         "text",
         "--allowedTools",
-        "Read,Grep,Glob,LS,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),PowerShell(Get-Content:*),PowerShell(Get-ChildItem:*),PowerShell(Get-Location:*),PowerShell(Select-String:*),PowerShell(git status:*),PowerShell(git log:*),PowerShell(git diff:*),PowerShell(git show:*),PowerShell(git rev-parse:*),PowerShell(git ls-files:*)"
+        "Read,Grep,Glob,LS,Task,Agent,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),PowerShell(Get-Content:*),PowerShell(Get-ChildItem:*),PowerShell(Get-Location:*),PowerShell(Select-String:*),PowerShell(git status:*),PowerShell(git log:*),PowerShell(git diff:*),PowerShell(git show:*),PowerShell(git rev-parse:*),PowerShell(git ls-files:*)"
       ],
       "writeArgs": [
         "-p",

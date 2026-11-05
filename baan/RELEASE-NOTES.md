@@ -10,6 +10,7 @@
 
 - **โหมดเขียน (`--write`) ไม่มี sandbox แล้วทุกค่าย** — codex `--dangerously-bypass-approvals-and-sandbox` · claude `--permission-mode bypassPermissions` · agy `--mode auto` · AI แก้ไฟล์และรันคำสั่งได้ทุกที่บนเครื่องเหมือน session ที่เปิดเอง ขอบเขตคุมด้วยใบงานเท่านั้น · ถ้าต้องการ sandbox แบบเดิม ใช้ `BAAN_AGENTS_FILE=<ไฟล์ agents ของตัวเอง>` · โหมดอ่านยังจำกัดเหมือนเดิม
 - `baan --goal` ไม่มีขั้น PM (gm เขียน brief) แล้ว — goal ส่งให้ planner ตรง · run ใหม่ไม่มี `pm.answer.txt` · สคริปต์ที่อ่านไฟล์นี้ต้องแก้
+- (ไม่บังคับ) รัน `baan --init` ซ้ำใน workspace เพื่อให้ `CLAUDE.md`/`AGENTS.md` มีประโยคใหม่ว่า role ใช้ subagent ได้ — prompt ของ role มีประโยคนี้อยู่แล้วแม้ไม่รัน
 - preflight เลิกตรวจ `write-outside` และ `git-parent` (เป็นข้อจำกัดของ sandbox โหมดเขียน) — ใบงานที่เคยต้องใส่ `--no-preflight` เพราะสองข้อนี้ไม่ต้องใส่แล้ว
 
 ### เพิ่ม
@@ -19,7 +20,7 @@
 - `--usage` (`baan`, `baan-role`) เก็บ token จาก claude/codex/agy (claude มีค่าใช้จ่ายด้วย)
 - `baan-role --probe "<cmd>"` รันคำสั่งตรวจสภาพแวดล้อมก่อนเปิด session — ล้มเพราะ feed/สิทธิ์/เครื่องมือ = exit 2 ไม่เปิด agent · ล้มเพราะเหตุอื่น (เช่น test แดงซึ่งเป็นงานของ role) เปิดต่อ
 - env `BAAN_AGENTS_FILE` ใช้ชุดตัวรันอื่นชั่วคราวโดยไม่แก้ `agents.json` ของ package
-- **role ใช้ subagent ของ CLI ได้** (CONVENTIONS §7 + หัวข้อ Subagents ใน `sys`/`front`/`check`): อ่าน/สำรวจ/ตรวจขนานภายใน role แทนการส่งงานข้าม session · เขียนได้ทีละตัวต่อ repo · ตัวที่ตรวจต้องใหม่และได้แค่ AC/สัญญา/path · ทดลองแล้วกับ codex t2 โหมดเขียน (t4/t5 และโหมดอ่านปฏิเสธ)
+- **role ใช้ subagent ของ CLI ได้** (CONVENTIONS §7 + หัวข้อ Subagents ใน `sys`/`front`/`check`): อ่าน/สำรวจ/ตรวจขนานภายใน role แทนการส่งงานข้าม session · เขียนได้ทีละตัวต่อ repo · ตัวที่ตรวจต้องใหม่และได้แค่ AC/สัญญา/path · ใช้ได้ทั้งโหมดอ่านและเขียน (claude โหมดอ่านอนุญาต tool `Agent`/`Task` เพิ่ม) · CONVENTIONS §7 ระบุชื่อ tool ของแต่ละ CLI เพราะโมเดลเล็กปฏิเสธเมื่อบอกแค่ "sub-agent" · ทดลองจริงกับ codex t2/t5 ทั้งสองโหมด
 
 ### เปลี่ยน
 
