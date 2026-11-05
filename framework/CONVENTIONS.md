@@ -17,6 +17,7 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 การตัดสิน business, schema/migration/breaking contract, security, UX sign-off, deploy และ release scope
 เป็นของคน บันทึกใคร/เมื่อไร/source ตามคำตอบจริง งานที่ต้องใช้คำตอบนั้นรอ; งานอิสระทำต่อได้
 Acceptance ต้องได้รับการยืนยันก่อน dispatch และยืนยันใหม่เมื่อ source/scope/commands เปลี่ยน
+Approval และแต่ละ human gate ผูกกับ basis ของ packet ปัจจุบัน; มติเดิมเป็น source ได้แต่ไม่เซ็น audit record ของ run ใหม่โดยอัตโนมัติ
 `DONE`/`PASS` ของโมเดลไม่ใช่ความสำเร็จของ run: core ตรวจ schema, machine evidence และ risk policy อีกชั้น
 Rework สูงสุดตาม budget (default 2) แล้วถามคน; ไม่มีการลดมาตรฐาน test เพื่อให้ผ่าน
 
@@ -38,6 +39,7 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 `shared/requirements.md` จัด feature `F#` → requirement `R#` → AC; OQ อยู่ `shared/oq.md`
 หัว INDEX เป็นแหล่งจริงของ status/updated/depends_on/requested_by/target/platform/os
 สถานะ `draft → approved → designed → reviewed → built` ต้องสะท้อนหลักฐานและการเซ็นของคนจริง
+สถานะเอกสาร/โครงการไม่ใช่ package state ใน `.baan/runs`; ไม่แปลงสถานะหรือยอดผลตรวจเดิมจากการอัปเดตคู่มือ
 `baan --index` สร้างตาราง project จากหัว module; ไม่แก้ตารางที่สร้างเองด้วยมือ
 ไม่ตั้ง layout ใช้โฟลเดอร์ module เดิมและเส้นทางที่งานระบุ
 

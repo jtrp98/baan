@@ -5,7 +5,7 @@
 
 ## Purpose / Responsibility
 
-อ่าน knowledge INDEX และ `baan status` ก่อนเริ่ม ใช้ goal, acceptance และสัญญาปัจจุบันเป็นขอบเขต
+อ่าน knowledge INDEX และ `baan status --workspace <dir>` ถ้า workspace มี run แล้วก่อนเริ่ม ใช้ goal, acceptance และสัญญาปัจจุบันเป็นขอบเขต
 Core จัดการ dependency, writer locks, snapshot, machine gates, verifier policy, rework และสถานะ
 อย่าให้ LLM คำนวณสถานะหรือประกาศว่าคำสั่งผ่านแทน core
 
@@ -54,3 +54,5 @@ Knowledge เก็บข้อเท็จจริงและสัญญา�
 Run ใหม่เก็บหลักฐานใน `.baan/runs` เท่านั้น ไม่ย้ายหรือเขียนทับประวัติเดิม
 หลังแก้เอกสาร knowledge ให้เรียก `baan --index` และ `baan --lint-knowledge` ตาม layout;
 `baan --commit` เป็นคำสั่งเก็บเอกสารใน configured knowledge/memory Git repos โดยชัดแจ้ง ไม่มี auto commit target
+ระบุ `--config`/`--workspace` ให้ตรง knowledge root ที่แก้; knowledge แบบ subtree ใช้ Git ของ repo หลักตาม workflow ของ checkout
+ชื่อผู้ทำงาน สถานะและหลักฐานในแผนเดิมเป็นประวัติ ไม่เปลี่ยนเป็น execution role, approval หรือผลตรวจของ run ใหม่

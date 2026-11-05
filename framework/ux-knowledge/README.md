@@ -3,6 +3,10 @@
 ความรู้ที่ไม่ผูกกับบริษัทหรือ project ใด มากับ package baan และอัปเดตพร้อม role ที่ใช้มัน (`survey`, `ui`, `review`)
 ของเฉพาะบริษัท (เกณฑ์ WCAG ของทีม · component กลางของบริษัท) อยู่ที่ `_shared/` ของ knowledge ใน workspace · หน้าตาของแต่ละ project อยู่ที่ `<project>/shared/brand/` + Design System ของ project · ความรู้ของ module เดียว (เช่น ต้นแบบที่ลอกพฤติกรรม) อยู่ใน `design/` ของ module นั้น
 
+ทีมออกแบบใช้เอกสารชุดนี้ใน session แบบคุยสดตาม [BAAN.md](../BAAN.md) และ [CONVENTIONS.md](../CONVENTIONS.md)
+ผล review/UX sign-off เป็นบริบทและประตูของงานพัฒนา; Worker implement และ Verifier ของ execution engine ตรวจตาม packet ไม่ใช่การเรียกทีมออกแบบผ่าน role runner เดิม
+ชื่อ Feasibility/Designer/Reviewer ในเนื้อหาอ้างหน้าที่ `survey`/`ui`/`review` ตามลำดับ
+
 ## อ่านอะไรบ้าง — ตาม `platform` / `os` ในหัวไฟล์ INDEX ของ module
 
 1. **`common/` อ่านทุกงาน**

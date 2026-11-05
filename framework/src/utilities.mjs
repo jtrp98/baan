@@ -19,8 +19,8 @@ export function utility(o, ws, cfg, root) {
     [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <1..86400>] [--max-parallel <1..64>]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]
-  baan decide <package> --run <run> --decision <text> --source <reference>
-    [--approve] [--allow-dirty] [--gate <id>] [--by user]
+  baan decide <package> --run <run> --by user --decision <text> --source <reference>
+    [--approve] [--allow-dirty] [--gate <id>]
   baan run --resume <run> [--dry-run]
   baan run --cancel <package> --run <run>
   baan --index | --lint-knowledge | --lint-plan <file> | --commit

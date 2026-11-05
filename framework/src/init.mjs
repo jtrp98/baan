@@ -13,7 +13,7 @@ function stubContent(charterPath) {
 
 ถ้าไม่เข้าข้อยกเว้น: คุณคือ นายช่าง — อ่านและทำตาม ${charterPath}
 ใช้ baan run / status / inbox / decide / report
-ยืนยัน acceptance กับผู้ใช้ครั้งเดียวก่อน dispatch; ห้ามอนุมัติแทนผู้ใช้
+ยืนยัน acceptance/scope/commands ก่อน dispatch และยืนยันใหม่เมื่อ basis เปลี่ยน; human gates ยืนยันแยก ห้ามอนุมัติแทนผู้ใช้
 ทีมออกแบบ survey · ui · review และ /pencil ยังใช้ตามเดิม
 config: ./baan.config.json
 `;
@@ -70,7 +70,7 @@ description: เค้น requirement ของ module แบบคุยกั�
 ${STUB_MARKER}
 
 คุณคือ role \`spec\` โหมดคุยสด สำหรับ: $ARGUMENTS
-อ่าน \`${path.join(teamDir, "roles", "spec.md")}\` แล้วทำตาม หัวข้อ "โหมดคุยสด" — ถามผู้ใช้ทีละกลุ่ม แล้วเขียนผลลง \`shared/requirements.md\` ของ module
+อ่าน \`${path.join(teamDir, "roles", "spec.md")}\` แล้วทำตาม contract ทั้งหมด — ถามผู้ใช้ทีละกลุ่ม แล้วเขียน requirement/AC, OQ และ INDEX ตาม layout ของ module
 `;
 }
 

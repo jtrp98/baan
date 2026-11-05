@@ -43,7 +43,7 @@ npm test
 
 Clone ปกติได้ทั้ง `framework/` และ `knowledge/` โดยไม่ต้อง clone เพิ่ม คำสั่งเพิ่ม remote/fetch จำเป็นเฉพาะผู้ที่จะ sync knowledge เพราะ Git ไม่ส่ง local remote config มากับ clone หากมี remote `knowledge` อยู่แล้ว ให้ตรวจ `git remote get-url knowledge` ว่าตรง URL ด้านบนก่อนใช้ และไม่ต้อง add ซ้ำ
 
-Repository หลักใช้ default branch `dev/golf` การ clone จาก GitHub จะได้โครงสร้างนี้หลัง push commits ของการย้ายขึ้น `origin/dev/golf` แล้ว
+Repository หลักใช้ default branch `dev/golf` สำหรับ local clone จะได้เฉพาะเนื้อหาที่ commit แล้ว ส่วนการ clone จาก GitHub จะได้เนื้อหาที่ push แล้ว
 
 ## Commit และ pull/push BAAN
 
@@ -63,6 +63,9 @@ git push origin dev/golf
 ```
 
 ไม่ stage `knowledge/` ใน commit เดียวกับ source เพื่อให้ประวัติที่ split กลับ knowledge มีเฉพาะงานเอกสาร ตรวจ `git diff --cached --stat` ก่อน commit; package version ยังเป็นรุ่นเดิม การย้ายครั้งนี้ไม่ใช่ release
+
+เอกสารการใช้ BAAN ปัจจุบันอยู่ใน [คู่มือ package](framework/README.md); เอกสารโครงการและวิธีอ่านประวัติ runner เดิมอยู่ใน [คู่มือ knowledge](knowledge/README.md)
+การปรับเอกสารไม่แปลงแผน JSON ไม่อัปเดตผลตรวจหรือ approval ของโครงการ และไม่ถือเป็นคำสั่ง sync หรือ release
 
 ## Pull knowledge เข้า BAAN
 

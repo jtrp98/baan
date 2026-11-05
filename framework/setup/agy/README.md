@@ -22,7 +22,7 @@ Copy-Item (Join-Path $baanPackage "setup/agy/agents/baan-readonly/agent.md") (Jo
 Copy-Item (Join-Path $baanPackage "setup/agy/baan-readonly-guard.js") (Join-Path $baanAgyConfig "baan-readonly-guard.js")
 ```
 
-รวม entry `baan-readonly-guard` จาก hooks.example.json เข้า `.gemini/config/hooks.json` โดยรักษา hook อื่นทั้งหมด
+รวม entry `baan-readonly-guard` จาก [hooks.example.json](hooks.example.json) เข้า `.gemini/config/hooks.json` โดยรักษา hook อื่นทั้งหมด
 เปลี่ยน `<HOME>` เป็น home จริงแบบ forward slash; ใช้ `node "<HOME>/.gemini/config/baan-readonly-guard.js"` เมื่อ path มีช่องว่าง
 Matcher ต้องเป็น `.*` เพื่อปิด tool ใหม่ที่ไม่อยู่ใน whitelist ด้วย สำรอง hooks.json เดิมก่อนแก้
 ไม่ได้ติดตั้ง guard อัตโนมัติจาก package เพราะต้องรักษา config ของผู้ใช้
@@ -30,7 +30,7 @@ Matcher ต้องเป็น `.*` เพื่อปิด tool ใหม่
 ตรวจด้วย `agy agents` แล้วรัน `npm run smoke:live -- --agents agy --tier t3` จาก package
 Live smoke ใช้ quota และ temporary repository; ไม่แตะ workspace งานจริง
 หลังอัปเดต agy ให้ตรวจ tool names/profile และรัน live smoke อีกครั้ง
-`grant-read.mjs` เป็น utility เพิ่ม/ถอนสิทธิ์อ่าน workspace สำหรับการตั้งค่า agy ที่จำกัด path; ไม่ใช่เงื่อนไขของ Worker write mode
+[`grant-read.mjs`](grant-read.mjs) เป็น utility เพิ่ม/ถอนสิทธิ์อ่าน workspace สำหรับการตั้งค่า agy ที่จำกัด path; ไม่ใช่เงื่อนไขของ Worker write mode
 
 Read-only เป็นขอบเขต tools ของ provider และ hook ไม่ใช่ OS sandbox ที่ BAAN สร้างขึ้น
 Core ตรวจ mutation ของ tracked/untracked files และ Git state เพิ่มอีกชั้น และไม่ rollback ให้เอง

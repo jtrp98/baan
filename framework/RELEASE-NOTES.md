@@ -20,6 +20,7 @@
 
 ### รวมระบบและลด prompt
 
+- ตรวจและปรับคู่มือทั้ง repository รวมเอกสารโครงการใน knowledge ให้แยกวิธีใช้ 0.29.0 จาก runner เดิม; รักษาแผน JSON มติ สถานะและหลักฐานเดิม แก้การอ้างหลักฐานภายนอกและสร้างตาราง module จาก metadata เดิม ข้อความนำทางของ `--init` ใช้ contract ปัจจุบันและระบุการยืนยันใหม่เมื่อ approval basis เปลี่ยน
 - CLI/parser, execution engine, role contracts และ run lifecycle เหลือชุดเดียว ย้ายโมดูลออกจาก directory แบ่งรุ่น และลบ scheduler/checkpoint/role runner ที่ซ้ำ
 - Execution roles: Planner เมื่อจำเป็น, Worker และ Verifier ตามความเสี่ยง; แผนที่มี work packages ครบแล้วไม่เปิด Planner ซ้ำ งาน orchestration ที่เป็น deterministic อยู่ใน core
 - ทีม UX/UI คง spec (`/pencil`), survey, ui, review พร้อม Design System, handoff, accessibility และ human sign-off
