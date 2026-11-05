@@ -7,7 +7,7 @@ Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลง�
 ## ติดตั้งและตั้งค่า
 
 ```sh
-cd baan
+cd framework
 npm link
 baan --version
 baan --help
@@ -159,6 +159,8 @@ Read-only permissions ขึ้นกับ provider/การตั้งค่
 เครื่องมืออ่าน metrics เดิมยังอ่านประวัติ reports ได้; run ใหม่ใช้ ledger/evidence ของ engine เดียว
 
 ## สำหรับ maintainer
+
+Source อยู่ใน `framework/` ส่วน `knowledge/` ที่ราก repository ใช้ Git subtree ดู `GIT_WORKFLOW.md` ที่ราก source checkout; คู่มือนี้ไม่ได้รวมใน npm package
 
 | Module | หน้าที่ |
 |---|---|

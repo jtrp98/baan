@@ -6,6 +6,7 @@
 
 ### ⚠ ต้องทำตอนอัปเกรด
 
+- Source checkout ย้าย npm package จาก `baan/` ไป `framework/` ใช้ `cd framework` เพื่อ test/link และรัน `npm link` ใหม่หากเคย link จาก path เดิม; อัปเดต path ใน config/ไฟล์นำทางของ workspace ที่อ้าง package เดิม ดู `GIT_WORKFLOW.md` ที่ราก repo สำหรับ subtree knowledge
 - ใช้ CLI เดียว `baan`: ถอด `baan-role` และ role execution แยกชุดออก รัน `npm link`/ติดตั้ง artifact ใหม่ แล้วเปลี่ยนสคริปต์เป็น `baan run --packet` หรือ `--plan`
 - `baan --goal`/`--plan-file` เข้าสู่ engine เดียว แผน tasks เดิมต้องมี owns, commands และข้อความ AC/source; aliases ของ owner เดิมยังอ่านได้ผ่าน normalizer เดียว
 - Run ที่เป็น task checkpoints ต้อง resume ด้วย BAAN รุ่นที่สร้างมัน ไม่ย้าย/แก้ประวัติเดิม; run format 2 ที่ไม่มี approval basis/source ต้องให้คนยืนยันใหม่
