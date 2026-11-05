@@ -2,7 +2,7 @@
 
 > Rev 1 · แก้ล่าสุด 2026-11-04 · แก้โดย arch · ขอโดย ผู้ใช้ (กำหนดสัญญาให้ BE-015 และ BE-031 บนสถาปัตยกรรม Gateway → gRPC)
 
-สิ่งที่ตกลงแล้ว: ไม่มี schema/migration ใหม่ (ใช้ SchoolBotSubmission, SchoolBotGradingJob, SchoolBotAttempt ที่มีอยู่) · เพิ่ม 5 RPC ใน AssessmentService (CreateSubmission, GetSubmission, StartAttempt, SaveAttemptAnswers, SubmitAttempt — รวมเป็น 40 RPC) · เพิ่ม field `id` แบบ optional ให้ Lesson/Mission/Criteria/Activity ใน response ของหลักสูตร · ซ่อน `trace_equals.commands` (เฉลย) จากหลักสูตรที่ส่งให้นักเรียน · HTTP ของ Gateway อยู่ใน AssessmentsController ใต้ `/api/school-bot/service` · ลำดับงาน: writer SchoolBot BE-015 → BE-031 (ต่อกัน) → ผู้ใช้ commit school-bot → writer Gateway sync proto (hash ตรงทุกไบต์) แล้วเพิ่ม action
+สิ่งที่ตกลงแล้ว: ไม่มี schema/migration ใหม่ (ใช้ SchoolBotSubmission, SchoolBotGradingJob, SchoolBotAttempt ที่มีอยู่) · เพิ่ม 5 RPC ใน AssessmentService (CreateSubmission, GetSubmission, StartAttempt, SaveAttemptAnswers, SubmitAttempt — รวมเป็น 40 RPC) · เพิ่ม field `id` แบบ optional ให้ Lesson/Mission/Criteria/Activity ใน response ของหลักสูตร · ซ่อน `trace_equals.commands` (เฉลย) จากหลักสูตรที่ส่งให้นักเรียน · HTTP ของ Gateway อยู่ใน AssessmentsController ใต้ `/api/service-school-bot` · ลำดับงาน: writer SchoolBot BE-015 → BE-031 (ต่อกัน) → ผู้ใช้ commit school-bot → writer Gateway sync proto (hash ตรงทุกไบต์) แล้วเพิ่ม action
 
 สถานะ: มติของสถาปนิก ยังไม่ได้ implement · สัญญาที่โค้ดเป็นอยู่วันนี้คือ [Gateway–gRPC Rev4](gateway-grpc-contract-001.md) (35 RPC) จนกว่างานนี้จะลงโค้ด
 
@@ -142,7 +142,7 @@ Request ทุกตัวใช้รูปเดียวกับ question ba
 
 ส่งผิดโหมด → `409 ASSESSMENT_METHOD_MISMATCH` (`details.field=project_revision_id`) · criteria ต่างฉบับ → `409 STATE_CONFLICT` (`details.field=criteria_id`)
 
-## 2. HTTP ของ Gateway (Q = `/api/school-bot/service`) — อยู่ใน `AssessmentsController`
+## 2. HTTP ของ Gateway (Q = `/api/service-school-bot`) — อยู่ใน `AssessmentsController`
 
 | Method + path | RPC | ผลสำเร็จ | Endpoint | ต้องส่ง |
 |---|---|---|---|---|

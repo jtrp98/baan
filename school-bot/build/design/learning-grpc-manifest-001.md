@@ -8,7 +8,7 @@
 
 คง `SchoolBotSession.proto` และ wire fields เดิมทุกตัว เพิ่มภายหลังเป็นไฟล์ learning แยก เช่น `SchoolBotLearning.proto`, package `schoolbot.learning.v2` โดย SchoolBot gRPC service เป็นเจ้าของ ไม่ copy/redefine session error messages
 
-Remote Procedure Call (RPC) และ Data Transfer Object (DTO) ด้านล่างเป็น manifest draft สำหรับ owner review; `Q=/api/school-bot/service/v2`:
+Remote Procedure Call (RPC) และ Data Transfer Object (DTO) ด้านล่างเป็น manifest draft สำหรับ owner review; `Q=/api/service-school-bot/v2`:
 
 | HTTP หลัง Q | RPC ที่เสนอ | สำเร็จ |
 |---|---|---|

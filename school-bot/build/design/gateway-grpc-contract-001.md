@@ -6,7 +6,7 @@
 
 ## HTTP และ RPC ที่มีจริง
 
-ให้ Q = `/api/school-bot/service`; Gateway เติม `/api` ผ่าน convention แต่ละ controller ใช้ explicit methods ไม่มี catch-all proxy
+ให้ Q = `/api/service-school-bot`; Gateway เติม `/api` ผ่าน convention แต่ละ controller ใช้ explicit methods ไม่มี catch-all proxy
 
 | Service | RPC methods | HTTP ภายใต้ Q |
 |---|---|---|

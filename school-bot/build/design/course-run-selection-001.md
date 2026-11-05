@@ -2,7 +2,7 @@
 
 > Rev 1 · แก้ล่าสุด 2026-11-04 · แก้โดย arch · ขอโดย ผู้ใช้ (ปิดช่องว่างสัญญาที่ inspect พบ — ยังไม่ลงโค้ด)
 
-สิ่งที่ตกลงแล้ว: "เลือกหลักสูตรลงห้อง" = สร้างแถว `SchoolBotCourseRun` ใหม่ (lifecycle planned) พร้อม `SchoolBotCourseRunActivity` ทุก Activity ของ revision นั้น · เพิ่ม 3 RPC ใน AssessmentService (CreateCourseRun, GetCourseRun, ListCourseRuns) และ HTTP ของ Gateway ใต้ `/api/school-bot/service/course-runs` · ไม่มี schema change · ผู้เรียกต้องเป็น school admin ทาง school_web ที่ License active · ตรวจห้อง/ปี/เทอม/แผนผ่าน port ใหม่ `ICourseRunTargetVerifier` ค่าเริ่มต้น fail closed (503) จนกว่าจะเชื่อม School DB จริง (ผูก gate G-CORE/DBA-003) · ยังไม่มี task ในแผนรับงานนี้ — เสนอ task BE ใหม่ให้ gm
+สิ่งที่ตกลงแล้ว: "เลือกหลักสูตรลงห้อง" = สร้างแถว `SchoolBotCourseRun` ใหม่ (lifecycle planned) พร้อม `SchoolBotCourseRunActivity` ทุก Activity ของ revision นั้น · เพิ่ม 3 RPC ใน AssessmentService (CreateCourseRun, GetCourseRun, ListCourseRuns) และ HTTP ของ Gateway ใต้ `/api/service-school-bot/course-runs` · ไม่มี schema change · ผู้เรียกต้องเป็น school admin ทาง school_web ที่ License active · ตรวจห้อง/ปี/เทอม/แผนผ่าน port ใหม่ `ICourseRunTargetVerifier` ค่าเริ่มต้น fail closed (503) จนกว่าจะเชื่อม School DB จริง (ผูก gate G-CORE/DBA-003) · ยังไม่มี task ในแผนรับงานนี้ — เสนอ task BE ใหม่ให้ gm
 
 ## 1. ตรวจกับโค้ดจริง (as-built)
 
@@ -18,7 +18,7 @@
 
 ### RPC ใหม่ใน `AssessmentService` (35 → 38 RPC)
 
-| RPC | HTTP ใต้ `Q=/api/school-bot/service` | ผล |
+| RPC | HTTP ใต้ `Q=/api/service-school-bot` | ผล |
 |---|---|---|
 | `CreateCourseRun` | `POST Q/course-runs` + `Idempotency-Key: UUID` (ไม่บังคับ เหมือน create ของ BE-027 แต่ FE ควรส่งทุกครั้ง) | 201 `CourseRunItem` + ETag |
 | `GetCourseRun` | `GET Q/course-runs/{id}` | 200 `CourseRunItem` + ETag |

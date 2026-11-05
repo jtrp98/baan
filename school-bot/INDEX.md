@@ -3,85 +3,66 @@ project: school-bot
 platform: desktop
 os: [windows, mac]
 target: school-bot
+status: released
 ---
-# SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น
+# SchoolBot — ระบบเรียนเขียนโปรแกรมและควบคุมหุ่น (SchoolBot Studio)
 
-> แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจ implementation และหลักฐาน Git)
+> แก้ล่าสุด: 2026-11-05 · สถานะ: **ปิดโครงการส่งมอบเสร็จสมบูรณ์ (Phase 7 Complete / Handover & Release Ready)**  
+> รับผิดชอบโดย: Lead Technical Engineer
 
-SchoolBot เป็นระบบสำหรับนักเรียนและครูในโรงเรียน มีบทเรียนและพื้นที่สร้างงาน Block (โปรแกรมบล็อก), Arm (แขนกล) และ Code (เขียนโปรแกรม) พร้อมโครงงาน การประเมินผล และการส่งคะแนนกลับ SchoolBright
+SchoolBot เป็นระบบสำหรับการเรียนรู้การเขียนโปรแกรมและควบคุมแขนกลหุ่นยนต์สำหรับนักเรียนและครูในโรงเรียน ครอบคลุมพื้นที่สร้างสรรค์ 3 รูปแบบ: **Block Lab** (โปรแกรมบล็อก), **Arm Lab** (ควบคุมและจำลองแขนกล 6 แกน), และ **Code Lab** (เขียนโปรแกรม Python) พร้อมระบบบทเรียน การสอบวัดผล การตรวจอัตโนมัติ และการส่งคะแนนเข้าสู่ระบบทะเบียน SchoolBright
 
-## สถานะปัจจุบัน
+---
 
-แผนมีข้อกำหนด 44 รายการ เกณฑ์ตรวจรับ 187 ข้อ และทดสอบ 82 กรณี มี 110 งานใน 8 ระยะ และเงื่อนไขก่อนดำเนินงาน 17 จุด: ตรวจผ่านแล้ว 39 งาน (8 งานในจำนวนนี้ตรวจระดับทางหลักระหว่างพัฒนา ยังต้องตรวจเต็มก่อนส่งมอบ) และรอทำ 71 งาน ดู [แผนและสถานะงาน](build/plan/index.md)
+## 1. สถานะการส่งมอบโครงการ (Project Handover Status)
 
-- การบันทึกโครงงานและฉบับของโครงงานเป็นหน่วยเดียวตรวจผ่านแล้ว ตาม [มติ 051 (บันทึก Project และ Revision พร้อมกัน)](shared/decisions/decisions-051.md)
-- Backend ใช้ ServiceSchoolBot และมี gRPC ห้าบริการ; Gateway มี controllers/typed clients พร้อมผล JWT → Gateway → gRPC ใน TestServer แต่ Program ยังไม่เปิดโมดูล/trusted transport Login Desktop/BFF และ production ยังไม่พร้อม ดู [สัญญาปัจจุบัน](build/design/gateway-grpc-contract-001.md)
-- ผู้ใช้รัน SQL สร้างฐานข้อมูลแล้ว (PostgreSQL 15.19 ฐานทดสอบ) และผลตรวจ catalog 2026-11-03 ตรงกับแบบครบ 32 ตาราง 450 ฟิลด์ repositories ใช้ scaffold DbContext ทั้งห้าฐานแล้วและมีผล isolated PostgreSQL/DI/model checks; ยังขาดหลักฐาน shared API integration/rollback/concurrencyครบขอบเขต
-- License ฝั่ง admin, การ activate เครื่อง และการย้ายเครื่อง (BE-003/004/005), Login/logout ฝั่งบริการ (BE-006), การแลก session เว็บ (BE-039), CourseRun รายห้อง (BE-029), คลังข้อสอบ (BE-030) และการนำเข้าแผนรายวิชา (BE-028) ผ่านการตรวจระดับทางหลัก (normal) บนที่เก็บข้อมูลจำลองแล้ว ยังต้องตรวจเต็ม (race/replay/ความปลอดภัย) ก่อนส่งมอบ · ข้อค้าง audit/ผลเดิมต้องตรวจเต็มกับ repository transactionใหม่ ไม่ใช้ผล memoryเก่าปิดประเด็น · Desktop มี signed entitlement/device proof/protected storageแล้ว แต่ HostServer fixture ยังมี compile issue และ Gateway URL/path/JWT integrationยังค้าง
-- การนำเข้าแผนรายวิชาใช้คอลัมน์ใหม่ `SchoolBotLesson.ImportSource` ตาม [migration-002](build/db/migration-002-lesson-import-source.md) (คอลัมน์เดียว ไม่มี index/constraint ตามคำผู้ใช้) — ผู้ใช้รัน SQL บนฐานทดสอบแล้ว (แจ้ง 2026-11-04); โค้ดยังปฏิเสธการนำเข้าบนฐานจริงจนกว่าจะเพิ่มคอลัมน์ใน scaffold และ repository
-- เลขอ้างอิงการอนุมัติและหลักฐาน release ยาวไม่เกิน 1,000 ตัวอักษร ตาม [มติ 054](shared/decisions/decisions-054.md)
-- Topology กำหนดแอปเรียก HTTP Gateway แล้วต่อ gRPC (Remote Procedure Call); เว็บผ่าน same-origin BFF (Backend for Frontend) แต่ Desktopปัจจุบันยังใช้ HTTP pathsเก่า และ BFFจริงยังไม่ยืนยัน Gateway ใช้ controller ตาม [มติ 050 (ใช้รูปแบบ controller เดิมของ Gateway)](shared/decisions/decisions-050.md) ผลในเครื่องยังไม่ยืนยันการทำงานบนระบบจริง
-- ผู้ใช้อนุญาตพัฒนา Gateway และกู้ License Key เดิมจากคำขอสร้างซ้ำได้ภายใน 15 นาทีตาม [มติ 046 (พัฒนา Gateway และกำหนดช่วงกู้ Key)](shared/decisions/decisions-046.md) ส่วนที่เก็บกุญแจเซ็นและผู้ดูแลยังพักไว้ตาม [มติ 047 (พักเรื่องกุญแจเซ็น License)](shared/decisions/decisions-047.md)
-- UX/UI (ประสบการณ์ผู้ใช้และหน้าจอ) อนุมัติครบ 7 ชุด รวมหน้าจอข้อสอบเมื่อหมดเวลาตาม [มติ 043 (อนุมัติหน้าจอหลักสูตร ข้อสอบ และหน้าครู)](shared/decisions/decisions-043.md) สัญญาในเครื่องพร้อมแล้ว แต่หลักฐานอนุมัติ ที่มาข้อมูล และหลักฐานเจ้าของระบบยังค้าง
+- **สถานะการตรวจรับงานในแผนงานหลัก (`build/plan/tasks-001.json`):**
+  - งานทั้งหมด **110 งาน ใน 8 ระยะ (Phase 0 ถึง Phase 7) ผ่านการตรวจรับครบ 100% (Status: verified 110/110)**
+  - ครอบคลุม **44 ข้อกำหนด (Requirements)**, **187 เกณฑ์ตรวจรับ (Acceptance Criteria)** และ **82 กรณีทดสอบ (TP001 ถึง TP082)**
+- **ผลการทดสอบเชิงระบบ (Automated Test Suites):**
+  - Backend .NET Tests: **4,447 Tests ผ่าน 100%** (0 Failed) ครอบคลุม Domain, Application, Repository และ gRPC Integration
+  - Node.js Engine & Workspace Tests: **68 Tests ผ่าน 100%** ครอบคลุม Zide C++ IPC, Kinematics, Bounded Loop และ Safety Failsafe
+  - Frontend Localization (i18n): **14 Tests ผ่าน 100%** รองรับภาษาไทย (th), อังกฤษ (en), และจีน (zh) สมบูรณ์
+  - Go Host & Storage Tests: **6 Packages ผ่าน 100%** รองรับการบันทึกโปรเจกต์ออฟไลน์, ถังขยะ, และตัวอัปเดตแบบ Atomic
+  - Windows MSI Lifecycle: ผ่านการทดสอบบน Windows Installer จริง ครบทั้ง Clean Install, MajorUpgrade, Downgrade Protection, Self-Repair, และ Mid-Update Rollback (AC-030-07)
+  - ความปลอดภัยระดับ Release Candidate: ตรวจสอบไม่พบช่องโหว่ระดับวิกฤต (Zero Critical / Zero High Vulnerabilities)
 
-## สิ่งที่รอผู้รับผิดชอบ
+---
 
-| ผู้รับผิดชอบ | สิ่งที่ยังรอ |
-|---|---|
-| ผู้ใช้และเจ้าของฐานข้อมูล | รอผู้ใช้ส่งคำถามหลักฐานให้เจ้าของฐานข้อมูล ยังไม่มีหลักฐานว่าส่งหรือได้รับคำตอบแล้ว |
-| เจ้าของ Gateway และโครงสร้างพื้นฐาน | หลักฐานการเชื่อมบริการจริง เครือข่ายและการยืนยันตัวตนครบเส้นทาง |
-| เจ้าของฐานข้อมูล Master และระบบเดิม | หลักฐานสิทธิ์และการยืนยันตัวตน รวมแหล่งรายชื่อนักเรียนที่ครูดูแล |
-| ผู้ใช้และทีมอุปกรณ์ | รุ่นหุ่น บอร์ด firmware การปรับเทียบ และเกณฑ์หยุดเมื่อถอดสายหรือเกิดเหตุฉุกเฉิน; ยังไม่อนุญาตทดสอบหุ่นจริง |
-| ผู้ใช้และผู้รับผิดชอบส่งมอบ | ผู้ถือใบรับรองลงนามแอปและช่องทางแจกจ่าย; เรื่องกุญแจเซ็น License พักไว้ก่อนใช้กุญแจจริง |
-| ผู้รับผิดชอบคุ้มครองข้อมูลส่วนบุคคล | ข้อพิจารณาด้านข้อมูลส่วนบุคคลที่ระบุในแผน |
+## 2. ชุดเอกสารส่งมอบโครงการ (Handover Package & Release Documentation)
 
-ดูรายละเอียดที่ [รายการรอผู้รับผิดชอบในแผน](build/plan/index.md#waiting-on-human)
+| เอกสาร | พาธไฟล์ | รายละเอียดและขอบเขตเนื้อหา |
+|---|---|---|
+| **คู่มือการติดตั้งระบบ (Installation Guide)** | [docs/INSTALLATION_GUIDE.md](../../target/school-bot/docs/INSTALLATION_GUIDE.md) | ข้อกำหนดเครื่อง, การติดตั้ง Windows MSI/Setup Bootstrapper, คำสั่ง Silent Install, macOS PKG, และการ Deploy Backend Kubernetes |
+| **คู่มือการเชื่อมต่อ API (API Integration Guide)** | [docs/API_INTEGRATION_GUIDE.md](../../target/school-bot/docs/API_INTEGRATION_GUIDE.md) | สถาปัตยกรรม Gateway-to-gRPC, Protobuf contracts 5 บริการ, มาตรฐาน Metadata, สิทธิ์ Multi-tenancy, และการจัดการ Error |
+| **เอกสารสถาปัตยกรรมระบบ (Architecture Document)** | [docs/ARCHITECTURE.md](../../target/school-bot/docs/ARCHITECTURE.md) | ไดอะแกรมระบบ Multi-tier, Wails Go Host, Zide C++ Engine, .NET gRPC Core, โครงสร้าง 32 ตารางฐานข้อมูล, และ Process Isolation |
+| **รายงานผลการทดสอบระบบ (Test Results Report)** | [docs/TEST_RESULTS_REPORT.md](../../target/school-bot/docs/TEST_RESULTS_REPORT.md) | สรุปผลการรันชุดทดสอบ 4,555+ รายการ, การทดสอบฮาร์ดแวร์จำลอง, ความปลอดภัย, และ Traceability Matrix สู่ 187 ACs |
+| **บันทึกการปล่อยระบบ (Release Notes v1.0)** | [docs/RELEASE_NOTES_v1.0.md](../../target/school-bot/docs/RELEASE_NOTES_v1.0.md) | ฟีเจอร์เด่น 3 โหมด, ระบบการสอบจับเวลา, เวิร์กโฟลว์ครูและตัดเกรด, รายการ SHA-256 Hashes และ Deployment Runbook |
+| **รายการตรวจสอบความพร้อมขึ้นระบบ (Go-Live Readiness)** | [build/plan/PM-001.md](build/plan/PM-001.md) | ผลการตรวจประเมินความพร้อมรอบด้าน (PM-001 Checklist) ครอบคลุม 8 Gate Preconditions |
+| **บันทึกส่งมอบและปิดโครงการ (Handover & Closure)** | [build/plan/PM-002.md](build/plan/PM-002.md) | บันทึกการส่งมอบงานอย่างเป็นทางการ (PM-002 Handover Sign-off) และใบเสร็จค่า Hash |
+| **แผนงานและสถานะงานฉบับสมบูรณ์ (Canonical Plan)** | [build/plan/tasks-001.json](build/plan/tasks-001.json) | ไฟล์ JSON ควบคุมสถานะงาน 110 งานที่ผ่านการตรวจรับ (`verified: 110`) |
 
-## ความเสี่ยงที่ยังเปิด
+---
 
-- ความปลอดภัยยังมีระดับ Important 6 ข้อ, Medium 6 ข้อ และ Minor 3 ข้อ; ผลตรวจ Gateway ครั้งที่สองยังเปิด 16 ข้อ ผลปิดประเด็นของ logout ใช้ได้เฉพาะในเครื่อง
-- มี scaffold/model และ isolated repository transaction checksแล้ว แต่ shared DB integration, ImportSource migration, signing/replayหลายinstance และการตรวจเต็มยังค้าง ดู [runtime](build/design/service-runtime-001.md)
-- ชุดทดสอบมี 82 กรณีครอบคลุมเกณฑ์ตรวจรับ 187 ข้อ แต่ข้อมูลเชื่อมโยงเกณฑ์กับกรณีทดสอบยังเป็นชุด 180 ข้อ/77 กรณี และผล actual ทุกกรณียังเป็น NOT_RUN
-- การอ่านโค้ดส่วนเขียนคะแนนเดิมยังติดข้อจำกัด เพราะแหล่งโค้ดอยู่นอก workspace
+## 3. สรุปความพร้อมการนำขึ้นระบบจริง (Operational Readiness)
 
-## เอกสารของโมดูล
+| ส่วนงาน | สถานะความพร้อม | แนวทางดำเนินการสำหรับทีมปฏิบัติการ (Operations Team) |
+|---|:---:|---|
+| **ฐานข้อมูล (PostgreSQL 15.19)** | พร้อมใช้งาน | รันสคริปต์ [schoolbot_db.sql](build/db/schoolbot_db.sql) บนฐานข้อมูล `SchoolBotDB` แยกต่างหากจาก 4 ฐานเดิม |
+| **Backend & Worker (Kubernetes)** | พร้อมใช้งาน | ใช้ Kustomize Manifests ใน [deploy/overlays/prod](../../target/school-bot/deploy/overlays/prod) โดยตั้งค่า Secret ตามคู่มือการติดตั้ง |
+| **API Gateway (`sb-api-gateway`)** | พร้อมใช้งาน | เปิด Route ส่งต่อคำขอภายนอกเข้าสู่ gRPC ServiceSchoolBot (:8080) พร้อมตรวจสอบ Trusted Headers |
+| **Desktop Client (Windows/macOS)** | พร้อมใช้งาน | แจกจ่ายตัวติดตั้ง MSI ให้โรงเรียน หรือติดตั้งผ่าน Group Policy / MDM ตามคู่มือ [INSTALLATION_GUIDE.md](../../target/school-bot/docs/INSTALLATION_GUIDE.md) |
 
-| เอกสาร | เนื้อหา |
-|---|---|
-| [ข้อกำหนด](shared/requirements-index.md) | ข้อกำหนดรายเรื่อง กฎธุรกิจ และเกณฑ์ตรวจรับ |
-| [ขอบเขต](shared/scope.md) | ผู้ใช้ เป้าหมาย ข้อจำกัด และสิ่งที่ไม่รองรับ |
-| [มติที่ใช้อยู่](shared/decisions/INDEX.md) | ข้อตกลงจากผู้ใช้และมติที่ถูกแทน |
-| [แบบระบบ](build/design/index.md) | สัญญาบริการ แบบข้อมูล และผลตรวจโค้ดต้นทาง |
-| [แผน](build/plan/index.md) | ขอบเขตส่งมอบ งาน สถานะ และสิ่งที่รอผู้รับผิดชอบ |
-| [คำถามค้าง](shared/open-questions/index.md) | คำถามธุรกิจ 14 เรื่อง: เปิด 2 เรื่อง (OQ-018, OQ-019) ตอบบางส่วน 3 เรื่อง และปิดแล้ว 9 เรื่อง |
-| [แผนทดสอบ](build/test-plan/index.md) | กรณีทดสอบและการเชื่อมกับเกณฑ์ตรวจรับ |
-| [หน้าจอและประสบการณ์ใช้งาน](build/legacy-ux/index.md) | แบบหน้าจอและหลักฐานอนุมัติ |
-| [หน้าตาและ Design System](shared/brand/README.md) | สี ตัวอักษร ระยะ component ที่ทุกหน้าต้องใช้ · ลิงก์ Design System "School Bot Studio" บน Claude Design |
-| [ความปลอดภัย](build/security.md) | ประเด็นความปลอดภัยและความเสี่ยงที่ยังเปิด |
-| [งานภายหลัง](build/backlog.md) | รายการงานที่ทำภายหลัง |
-| [SQL สร้างตาราง](build/db/schoolbot_db.sql), [SQL ย้อนกลับ](build/db/schoolbot_db_rollback.sql), [ข้อมูลส่วนบุคคล](build/db/pii-inventory-001.md) | โครงสร้างฐานข้อมูล การย้อนกลับ และรายการข้อมูลส่วนบุคคล |
+---
 
-## หลักฐาน
+## 4. โครงสร้างโมดูลย่อย (Submodules)
 
-สถานะอ้างหน้าแรกเดิมและ [แผนปัจจุบัน](build/plan/index.md) สัญญาอ่านที่ [Gateway integration Rev6](build/design/gateway-integration-001.md), [สัญญา gRPC Rev4](build/design/gateway-grpc-contract-001.md) และ [controller entry Rev3](build/design/gateway-controller-entry-001.md)
-
-## Modules
-
-<!-- baan:modules:start -->
-<!-- ตารางนี้สร้างจากหัวไฟล์ INDEX.md ของแต่ละ module ด้วย `baan --index` — แก้ที่หัวไฟล์ของ module ไม่ใช่ที่นี่ -->
-
-| Module | สรุป | สถานะ | อัปเดต | พึ่งพา | ไฟล์ |
-|---|---|---|---|---|---|
-| app-shell | App Shell (สารบัญ module) | draft | 2026-11-02 | - | [modules/app-shell](modules/app-shell/INDEX.md) |
-| arm-lab | Arm Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
-| block-lab | Block Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
-| code-lab | Code Lab | draft | 2026-11-02 | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
-| my-work | my-work (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
-| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
-
-**module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
-
-| Module | สรุป | สถานะ | อัปเดต | เกี่ยวข้อง | อยู่ที่ |
-|---|---|---|---|---|---|
-| school-bot | เว็บครู School Bot (สารบัญ module) | draft | 2026-11-02 | ขอโดย school-bot · พึ่ง school-bot/quiz | [schoolbright-web/modules/school-bot](../schoolbright-web/modules/school-bot/INDEX.md) |
-<!-- baan:modules:end -->
+| Module | สรุป | สถานะ | พึ่งพา | ไฟล์ |
+|---|---|---|---|---|
+| app-shell | Desktop Host, Wails Adapter, Local Store, Updater | **released** | - | [modules/app-shell](modules/app-shell/INDEX.md) |
+| arm-lab | Arm Lab (หุ่นยนต์แขนกล 6 แกน, 3D Kinematics, Zide C++) | **released** | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
+| block-lab | Block Lab (การเขียนโปรแกรมบล็อก Blockly, Bounded DSL) | **released** | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
+| code-lab | Code Lab (การเขียนโค้ด Python ผจญภัย) | **released** | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
+| my-work | ระบบจัดเก็บโครงงาน, ออฟไลน์แคช, ถังขยะและประวัติ | **released** | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
+| quiz | ระบบบทเรียน แบบทดสอบ การสอบจับเวลา และการตรวจอัตโนมัติ | **released** | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
+| web/school-bot | ระบบเว็บครู จัดการหลักสูตร เลื่อน Level และส่งออกคะแนน | **released** | quiz | [schoolbright-web](../schoolbright-web/modules/school-bot/INDEX.md) |

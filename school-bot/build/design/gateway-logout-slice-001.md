@@ -10,7 +10,7 @@
 
 สัญญานี้กำหนด typed gRPC logout สำหรับ dev/in-process โดยใช้ [controller entry](gateway-controller-entry-001.md).
 
-HTTP adapter ของ HTTP API Gateway คือ SchoolBotAuthController → SchoolBotLogoutService สำหรับ `/api/school-bot/service/v2/auth/logout`. ใช้ AddSchoolBotLogoutModule และ MapControllers พร้อม prefix convention; SmartScheme เลือก SchoolBotOpaque แทนการแยก pipeline ก่อน authentication. ไม่มี SchoolBotLogoutMiddleware, UseSchoolBotLogout หรือ MapSchoolBotLogout เป็น entry ณ รอบตรวจเดิม.
+HTTP adapter ของ HTTP API Gateway คือ SchoolBotAuthController → SchoolBotLogoutService สำหรับ `/api/service-school-bot/v2/auth/logout`. ใช้ AddSchoolBotLogoutModule และ MapControllers พร้อม prefix convention; SmartScheme เลือก SchoolBotOpaque แทนการแยก pipeline ก่อน authentication. ไม่มี SchoolBotLogoutMiddleware, UseSchoolBotLogout หรือ MapSchoolBotLogout เป็น entry ณ รอบตรวจเดิม.
 
 Harness ฝั่ง HTTP API Gateway ใช้ AddSchoolBotLogoutModule กับ UseRouting/UseAuthentication/UseAuthorization/MapControllers; direct invocation ใช้ controller/service. Channel สร้างด้วย SchoolBotSessionGrpcClient.CreateChannel และ generated client ด้วย CreateGeneratedClient; constructor ปฏิเสธ instance ที่ไม่มี provenance ก่อน RPC. ไม่ใช้ reflection หรือ fallback ไป generated client ดิบ.
 
@@ -20,7 +20,7 @@ Harness ฝั่ง HTTP API Gateway ใช้ AddSchoolBotLogoutModule กั�
 
 ## ขอบเขตที่พร้อม
 
-SchoolBot gRPC service สร้าง typed gRPC server เรียก LogoutService เดิม; HTTP API Gateway ทำ exact HTTP adapter เฉพาะ `POST /api/school-bot/service/v2/auth/logout`. Registration ของทั้งสองส่วนยังไม่เปิดใน production host; harness เรียก module โดยตรงกับ fake trust/store. ทำ SchoolBot gRPC service ก่อนแล้ว sync proto ไป HTTP API Gateway ห้ามเขียน service proto ด้วยมือใน HTTP API Gateway
+SchoolBot gRPC service สร้าง typed gRPC server เรียก LogoutService เดิม; HTTP API Gateway ทำ exact HTTP adapter เฉพาะ `POST /api/service-school-bot/v2/auth/logout`. Registration ของทั้งสองส่วนยังไม่เปิดใน production host; harness เรียก module โดยตรงกับ fake trust/store. ทำ SchoolBot gRPC service ก่อนแล้ว sync proto ไป HTTP API Gateway ห้ามเขียน service proto ด้วยมือใน HTTP API Gateway
 
 ไม่เกี่ยวกับ signer, schema หรือการออก session. HTTP logout เดิมไม่ parse body และยังไม่มี Origin guard; อย่าแก้ behavior เดิมแถมหรืออ้างว่าตรงกฎทุกข้อแล้ว. Production Gateway ต้องใช้ opaque scheme selector ตาม controller entry และผ่าน implementation review/H5
 

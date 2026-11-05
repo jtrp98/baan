@@ -2,7 +2,7 @@
 
 > Rev 1 · แก้ล่าสุด 2026-11-04 · แก้โดย inspect · ขอโดย ผู้ใช้ (จัดแผนตรวจหน้า admin หลักสูตรและ revision)
 
-เคสระดับ normal (happy flow + ผลปฏิเสธหลักของ AC) ผลจริงทุกเคส NOT_RUN · path ใช้ Q = /api/school-bot/service ของ Gateway ตามสัญญา gRPC Rev4
+เคสระดับ normal (happy flow + ผลปฏิเสธหลักของ AC) ผลจริงทุกเคส NOT_RUN · path ใช้ Q = /api/service-school-bot ของ Gateway ตามสัญญา gRPC Rev4
 
 ## Setup ร่วม
 

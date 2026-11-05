@@ -8,7 +8,7 @@ Desktop/Web → HTTP API Gateway → gRPC SchoolBot เป็น topology เป
 
 Gateway มีห้า controllers ใน `src/ApiGateway.API/Controllers/ServiceSchoolBot`: Projects, Licenses, Curricula, Assessments และ Releases เรียก SchoolBotHttpPipeline → repository interfaces → typed generated gRPC clients → SchoolBot GrpcServices → application services → repositories
 
-Public prefix คือ `/api/school-bot/service` ไม่มี `/v2` ใช้ Gateway JWT สำหรับ resource ที่ต้องมีตัวตน ไม่ใช้ SchoolBotOpaque/session/logout contract รุ่นก่อน อ่าน [RPC และ routes](gateway-grpc-contract-001.md), [identity](gateway-grpc-contract-001-identity.md) และ [controller registration](gateway-controller-entry-001.md)
+Public prefix คือ `/api/service-school-bot` ไม่มี `/v2` ใช้ Gateway JWT สำหรับ resource ที่ต้องมีตัวตน ไม่ใช้ SchoolBotOpaque/session/logout contract รุ่นก่อน อ่าน [RPC และ routes](gateway-grpc-contract-001.md), [identity](gateway-grpc-contract-001-identity.md) และ [controller registration](gateway-controller-entry-001.md)
 
 SchoolBot `Program` ลงทะเบียนและ map gRPC ทั้งห้าบริการแล้ว มีเพียง HTTP `/healthz`; HTTP business routes เดิมถูกถอดออก Session storage ยังเก็บเพื่อ snapshot compatibility ไม่ได้แปลว่ามี session RPC หรือ private web-principal endpoint ปัจจุบัน
 
