@@ -1,0 +1,45 @@
+# BE-411 — POST /customer-promises (SALES)
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P4-06`
+
+## Goal
+
+เพิ่ม `POST /api/v2/support/crm-ai/customer-promises` — บันทึกคำมั่นสัญญา (`CRM_AI_SALES`) — validate `SchoolId` ผ่าน `TCompany.nCompany`, เมื่อ `PromiseType=FEATURE` แนะนำ (ไม่บังคับ schema) ให้กรอก `MenuId` หรือ `ProductFeatureId` อย่างใดอย่างหนึ่งที่ app layer ตาม design § Customer Promise Rules ข้อ 1 — Sales ต้องบันทึกคำสัญญาทันทีตอนขาย — ตัวตนผู้สัญญามาจาก session และโรงเรียนต้องมีจริงจึงไม่เกิดคำสัญญาลอย
+
+## References
+
+REQ-015, AC-015.1, DES-010, DEC-010
+
+## Scope
+
+route/service ตาม pattern โมดูล — guard `CRM_AI_SALES` · `PromisedBy` จาก session ไม่รับจาก payload · school ไม่มีจริง → 404
+
+- Security-sensitive: no
+
+## Out of Scope
+
+schema · การรับ `PromisedBy` จาก payload (ห้าม) · permission constant
+
+## Expected Output
+
+Contract:CrmAiCustomerPromise.v1
+
+## Acceptance
+
+AC-015.1: บันทึกคำสัญญาทันทีได้จริง — `PromiseType` ใน 5 ค่าที่กำหนด ผูกฟีเจอร์/เมนูได้เมื่อเกี่ยวข้อง
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-015.1 ด้วย dev server: บันทึกสำเร็จ + 403 non-Sales + 404 school ไม่มีจริง — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint ใหม่ additive — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

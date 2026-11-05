@@ -1,0 +1,41 @@
+# BE-009 — Resolver hardening: identity-keyed per-request cache (RV-1) + real-resolver integration coverage (RV-4)
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+Resolver hardening: identity-keyed per-request cache (RV-1) + real-resolver integration coverage (RV-4)
+
+## References
+
+REQ-021, AC-062, AC-064, AC-071, AC-072, DES-018, DEC-018, DES-022, DEC-022
+
+## Scope
+
+-
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+-
+
+## Expected Output
+
+none
+
+## Acceptance
+
+-
+
+## Dependencies
+
+BE-008
+
+## Handoff
+
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

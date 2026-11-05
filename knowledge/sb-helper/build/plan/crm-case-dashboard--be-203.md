@@ -1,0 +1,45 @@
+# BE-203 — MTTR + CSAT aggregation rules
+
+> module: sb-helper/crm-case-dashboard
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-case-dashboard-P2-03`
+
+## Goal
+
+MTTR: avg(`UpdateDate − IssueDate`) เฉพาะเคสปิด timestamp ครบ · delta<0 ตัด+นับ log · raw elapsed · CSAT: `%≥threshold` + avg stars จาก `TCrmFeedback` join เคสปิดในช่วง **dedupe ต่อเคส (CrmFeedbackId มากสุด)** · 0 คำตอบ → null (frontend แสดง empty state ไม่ใช่ 0%) — หมายเหตุ: dedupe ใช้ลำดับ fetch แรกต่อเคส (ยังไม่ sort by CrmFeedbackId — เพียงพอเชิง MVP เพราะ feedback ต่อเคสแทบไม่ซ้ำ; ถ้าต้องการ deterministic ให้เพิ่ม orderBy id desc) — `TCrmFeedback` ไม่มี unique constraint — ถ้าไม่ dedupe ต่อเคส CSAT จะเพี้ยนเงียบ และ 0 คำตอบต้องเป็น null ไม่ใช่ 0%
+
+## References
+
+REQ-001, AC-001.2, DES-003
+
+## Scope
+
+คำนวณใน service/repository ของ dashboard เท่านั้น — สูตรล็อกตาม contract เมตริก ห้ามตีความใหม่ · ค่าที่คำนวณไม่ได้ (timestamp ขาด/score NULL/0 คำตอบ) คืน null
+
+- Security-sensitive: no
+
+## Out of Scope
+
+สูตร MTTR ที่ design ล็อก (IssueDate→UpdateDate เสมอ) · `TCrmFeedback`/สคีมา · ตัวเลขที่ frontend ควร format เอง
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-001.2: MTTR นับเฉพาะเคสปิดที่ timestamp ครบ ตัด delta ติดลบออกพร้อม log — และ CSAT dedupe ต่อเคสก่อนคิด % satisfied + avg stars, 0 คำตอบได้ null
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-001.2 ด้วยชุดข้อมูลทดสอบ: เคสปิด/ไม่ปิด, feedback ซ้ำต่อเคส, 0 คำตอบ — เทียบผลลัพธ์กับสูตร + tsc/eslint (verified แล้วตามแถวเดิม)
+เป็นส่วนคำนวณภายใน dashboard service — revert ได้โดยไม่กระทบ endpoint อื่น
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,45 @@
+# BE-013 — Verify SB PLUS column names for TSubscription and TPlan_Feature (PRE-05)
+
+> module: student-web/sb-compass
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+ยืนยันชื่อคอลัมน์จริงของ 2 ตาราง SB PLUS ที่ยังไม่ยืนยันกับ DB จริงก่อน BE-004 เขียน query — `TSubscription` (`subscription_id`, `sID`, `parent_code`, `status`, `expire_at`, `subscription_plan_id`) · `TPlan_Feature` (`plan_id`, `feature_id`, คอลัมน์ `display_*` ถ้ามี) · ผลที่ไม่ตรงเอกสารต้องส่งกลับ `system-analyst` ไม่ใช่เดาคอลัมน์ใกล้เคียงเอง — เป็นเนื้องาน PRE-05 ภายใต้ DES-019 — เอกสาร handoff SB PLUS เคยผิดกับ DB จริงมาแล้ว 2 จุด (RISK-03) และ OQ-15(b)/(c) ยังเปิดอยู่ ผลตรวจจึงเป็นตัวกำหนดว่า query ตรวจสิทธิ์ฝั่งเซิร์ฟเวอร์ (AC-013.1) จะเขียนถูกตัวได้หรือไม่
+
+## References
+
+REQ-013, AC-013.1, DES-019
+
+## Scope
+
+ตรวจกับ DB จริงรายคอลัมน์แล้วรายงานผลตรง/ไม่ตรงพร้อมหลักฐาน — งานตรวจเท่านั้น ไม่เขียน query ของ BE-004 แทน;
+คำถาม "กลไกการระบุตัว feature" คือ OQ-15(a1)/(a2) เป็นการตัดสินของผู้ใช้ + ทีม SB PLUS เท่านั้น
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ห้ามเดา/สันนิษฐานชื่อคอลัมน์ใกล้เคียงเอง; `TSubcriptionPlan` ถูกถอดออกจาก Data Model แล้ว (v3) ห้ามเอากลับเข้ามา;
+`TFeatureSBPlus` ไม่อยู่ในขอบเขตของ BE-013 อีกต่อไป (ยืนยันครบทั้งตารางแล้วใน v4); ห้ามตอบ OQ-15(a1)/(a2) แทนผู้ใช้/ทีม SB PLUS
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-013.1: รายงานผลตรวจคอลัมน์จริงครบ 2 ตารางถูกส่งต่อให้ BE-004 ใช้เขียน query ตรวจสิทธิ์ฝั่งเซิร์ฟเวอร์ได้ทันทีโดยไม่ต้องเดา — คอลัมน์ใดไม่ตรงเอกสารต้องถูกส่งกลับ `system-analyst` แทนการเขียนต่อ
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-013.1 โดยแนบหลักฐานการตรวจรายคอลัมน์ (ผล query โครงสร้างตารางจริง) และรายการความต่างจากเอกสาร handoff ถ้ามี — งานถือเสร็จเมื่อ BE-004 รับผลตรวจไปเขียน query ได้
+งานตรวจไม่แก้โค้ดจึงไม่มีผลย้อนกลับต่อ runtime — ถ้าผลตรวจชี้ว่าโครงสร้างจริงต่างจากที่ design บันทึก ต้องให้ `system-analyst` amend `design.md` ก่อน BE-004 เขียนต่อ
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,43 @@
+# BE-051 — Confidence shrinkage + DisplayScore
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+Confidence/shrinkage + `"DisplayScore"` (สัญญา §7.4-7.6): อ่าน `"ConsistencyScore"` ที่ Phase 5 (BE-029b) เขียนไว้ที่ `public."TCompassRiasecResult"` → `ConfidenceFactor` (สูตร/ค่าคงที่ `CONF_F_MIN=0.5`/`NEUTRAL_SCORE=50`/`CLARITY_F_MIN=0.5` และ `CONSISTENCY_MIN=0.60` ปิดแล้วเป็น engineering default 2026-09-15) → ดึง CombinedScore เข้าหา NEUTRAL_SCORE ด้วยสองตัวคูณอิสระ (ClarityFactor × ConfidenceFactor คูณกัน ห้ามทำเป็นสองขั้นซ้อน) แล้วเขียน `"DisplayScore"` ที่ `TCompassStudentClusterScore` (ห้ามเขียนทับ `"CombinedScore"` ดิบ) — ปิด OQ-F16 แล้ว ปลดล็อกการคำนวณและบันทึก "DisplayScore" ครบวงจร — ปิด OQ-F16 แล้ว (ผู้ใช้ยืนยัน engineering default `CONSISTENCY_MIN = 0.60` 2026-09-15): ปลดล็อกการคำนวณและบันทึก DisplayScore ในตารางผลคะแนนคลัสเตอร์
+
+## References
+
+REQ-012, AC-012.4, DES-022, DEC-022
+
+## Scope
+
+สองตัวคูณเป็นตัวคูณอิสระบนค่าดิบตัวเดียวกัน (คุณสมบัติ: เท่ากันทุก cluster ในรอบเดียว → ลำดับ top-3 ไม่เปลี่ยน) · `"CombinedScore" IS NULL` → `"DisplayScore" IS NULL` · ใช้ `CONSISTENCY_MIN = 0.60` ตัดสินความมั่นใจ หาก ConsistencyScore < 0.60 คำนวณ ConfidenceFactor ตามสูตร shrinkage ดึงเข้าหา 50; หากไม่เข้า shrinkage และมั่นใจ ให้ใช้ค่า CombinedScore ตรงๆ หรือปรับตาม ClarityFactor
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ค่าดิบ `"CombinedScore"` (ห้ามเขียนทับ) · สูตร ClarityIndex (§6) · ค่าคงที่ `CONSISTENCY_MIN = 0.60` (ห้ามเปลี่ยนเอง)
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-012.4 (ฐานแสดงผล): ตัวเลขที่เด็กเห็นถูกปรับด้วยกลไกที่สัญญากำหนดเท่านั้น — คำนวณ `DisplayScore` สำเร็จตามเกณฑ์ `CONSISTENCY_MIN = 0.60` และบันทึกลงตาราง `TCompassStudentClusterScore`
+
+## Dependencies
+
+BE-050
+
+## Handoff
+
+ตรวจ AC-012.4 (ฐานแสดงผล) ด้วยชุดทดสอบ: ConsistencyScore สูง (≥0.60), ต่ำ (<0.60), R=0, ไม่มีผล RIASEC — ตรวจ ConfidenceFactor/DisplayScore ที่ได้ + คุณสมบัติลำดับ top-3 ไม่เปลี่ยน — เก็บตารางเทียบเป็นหลักฐาน
+เป็นขั้นคำนวณ + คอลัมน์ DisplayScore ของตารางตัวเอง — revert ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

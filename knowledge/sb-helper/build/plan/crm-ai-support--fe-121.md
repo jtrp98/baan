@@ -1,0 +1,45 @@
+# FE-121 — case-review-service API layer
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `FE-crm-ai-support-P1-07`
+
+## Goal
+
+`_api/case-review-service.ts` — service เรียก review-queue API ของหน้าคิว — URL/การเรียก API รวมที่ service เดียว — หน้าไม่ fetch เองกระจัดกระจาย
+
+## References
+
+REQ-009, AC-009.1, DES-001, DEC-001
+
+## Scope
+
+service เดียวสำหรับ GET คิว + PATCH ตัดสินใจ — ตาม pattern `_api/` ของโปรเจกต์
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+endpoint ฝั่ง BE · service ของหน้าอื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-009.1: หน้าคิวโหลดข้อมูล/ส่งการตัดสินใจผ่าน service เดียว — ไม่มีการเรียก API กระจายใน component
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-009.1 ด้วย tsc/eslint + ใช้หน้าจริง — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+ไฟล์ service ใหม่ — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

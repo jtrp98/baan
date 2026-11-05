@@ -1,0 +1,45 @@
+# BE-132 — แถว log MENU_CLASSIFICATION
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P1-20`
+
+## Goal
+
+เขียน `TCrmAiDecisionLog` แถวใหม่แยก `DecisionType=MENU_CLASSIFICATION` ทุกครั้งที่มีผลจำแนกเมนู (ไม่ปนกับ `CLASSIFICATION`/`SEVERITY_CLASSIFICATION` เดิม) — audit รายมิติต้องแยกชนิดการตัดสินใจ — ปนกันจะกรอง/ตรวจย้อนหลังไม่ได้ว่ามิติไหนถูกตัดสินด้วยอะไร
+
+## References
+
+REQ-002, AC-002.2, DES-002, DEC-002
+
+## Scope
+
+เพิ่มแถว log ที่ทุกจุดที่มีผลเมนู (classify ปกติ / override / menu-only) — ผ่าน `createDecisionLog` เท่านั้น
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+ชนิด log เดิม (CLASSIFICATION/SEVERITY_CLASSIFICATION) · คอลัมน์ append-only · แถว log ของมิติอื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-002.2: ทุกผลจำแนกเมนูมีแถว audit ชนิด MENU_CLASSIFICATION คู่กัน — กรองแยกจากชนิดอื่นได้จริง
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-002.2 ด้วยการจำแนกจริงแล้วกรอง log ตาม MENU_CLASSIFICATION — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+เพิ่มแถว log additive — revert ได้ (แถวเดิม append-only ไม่ถูกแก้)
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

@@ -1,0 +1,68 @@
+# FE-024 — Rooms frontend: mapping/setting UI + `canUseRoom` + /academic usage (fail-closed) + caretaker filter (DES-013 §38.3, BR-36..BR-57, BR-71)
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+Rooms frontend: mapping/setting UI + `canUseRoom` + /academic usage (fail-closed) + caretaker filter (DES-013 §38.3, BR-36..BR-57, BR-71)
+
+## References
+
+REQ-016, AC-038, AC-038a, AC-039, AC-040, DES-013, DEC-013 · `../../modules/timetableai/build/uxui/UX-010-subject-rooms.md` (signed jtrp98 2026-10-11: ร่างปัจจุบัน + หัวข้อ "Fold จาก UX-014") + `../../modules/timetableai/build/uxui/UX-014-multi-caretaker-delta.md` (signed — ต้นฉบับเรื่องผู้ดูแล) · DES-013 §38.5a
+
+## Scope
+
+ตาม design §38.3 ฝั่ง frontend: proxy /api/school/[schoolId]/rooms, /api/subject-room/get|set เท่านั้น (**ห้ามต่อยอด** `/api/classroom-list/get|set` — EVD-050, D42) · หน้า subject-settings ตั้ง mapping; แสดง capacity/ผู้ดูแลต่อหน่วยจาก School DB อ่านอย่างเดียวตาม C1′ (UX-010 signed) · solver/validateDrop: `roomOccupancy` = (ก) กริดปัจจุบัน + (ข) ตารางอื่นบันทึกแล้วใน conflict scope เดียวกับ BR-17 + ((ค) การใช้ห้อง `/academic` − BR-56) ต่อ `sRoomID` ต่อวัน → ฟังก์ชันเดียว `canUseRoom(sRoomID, day, start, end, nClassID)` (BR-36 — sweep เวลาจริง, ห้องเรียนเดียวกันหลายรายการทับ = นับ 1, link หลายห้องเรียนนับต่อห้องเรียน) — K ใช้ค่า**ของหน่วยตารางที่กำลังแก้** (BR-54) · โหลดการใช้ห้อง `/academic` **สดตอนเปิดหน้า generate** รวม conflict data (X2 ผ่าน gateway ด้วย JWT เลือกแล้ว jtrp98 2026-10-11; concrete API/runtime ยังรอยืนยัน) + `Timetable/GetAcademicSyncResults` (BR-56 ตัดแถวที่โมดูลส่งเอง — ตาราง sync มากับ BE-014; ต้องมี BE-014 sync-read พร้อมก่อน task นี้ ห้ามสมมติว่าผล sync ว่างเพราะยังไม่ implement) · BR-57 fail-closed: `isAcademicRoomUsageReady` — โหลดไม่สำเร็จ → Generate ถูกระงับ + การวางมือวิชาที่มี mapping ห้องถูกปฏิเสธด้วย `academicRoomUsageUnavailable`; วิชาไม่มี mapping ยังวางได้ (AC-040); **ห้ามถือว่า "ไม่มีการใช้ห้อง" เมื่ออ่านไม่ได้** · เซลล์ฝัง snapshot `{sRoomID, sRoomName}` (BR-20 — ห้ามใช้ `nClassroomID`) · ห้องของเซลล์**มาจาก mapping เสมอ** — เปิดตารางเดิม (Flow D) คำนวณใหม่จาก mapping ปัจจุบัน + แจ้งรายการเซลล์ที่ห้องเปลี่ยนจาก snapshot; ตารางที่ไม่ถูกเปิดแก้ นับตามห้องใน snapshot · ตัวกรองผู้ดูแล **BR-71** — `roomCaretakerBySubject` (map วิชา → ชุด T_R = `lstCaretakers` ที่ `isInPlan` ของหน่วย) ต่อท้ายจุด eligibility เดียวกับ DES-015 (ลำดับ: `TPlanCourseTeacher` → จำกัดห้องประจำชั้น → ผู้ดูแลห้อง); ผู้ดูแลไม่ได้สิทธิ์เพิ่ม; วางขัด → `roomCaretakerMismatch` (ระบุห้อง/ชุดผู้ดูแลที่นับได้/ครูที่พยายามวาง); ห้องที่ T_R ไม่ว่างใช้พร้อมกันข้ามห้องเรียนนอก link → `roomCaretakerLinkRequired`; ผู้ดูแลไม่นับ → คำเตือน `RoomCaretakerNotInPlan`, ชุดว่าง → `RoomSettingMissing` (รหัสเสนอ SA); ไม่มีผู้ดูแลที่นับได้มีสิทธิ์สอนวิชา → `NoEligibleTeacher (RoomCaretaker)` บล็อก Generate (DES-011) · AddCourseModal **ไม่มีตัวเลือกห้อง** (BR-35) · ฟีเจอร์ห้อง**ไม่เปิดใช้**ก่อน #13 เซ็น (Fallback)
+
+ใช้ FE-021 term context และ FE-025 shared eligibility; BE-014 sync-read ก่อน FE-024 ไม่รอ FE-027 push UI (§38.7) · C1′chosen jtrp98 2026-10-11 ตาม DES-013/data-model; ไม่มี RoomSetting proxy/editor/write/copycapacity/ผู้ดูแล. UX sign-off แล้ว (UX-010 + fold + UX-014 ตามที่ไฟล์ระบุ; ชื่อรหัส/`sTeacherName`/params เหตุปฏิเสธตาม DES-013 §38.5a — SA ตัดสิน ไม่ใช่การอนุมัติมนุษย์); เหลือ gate: module mapping §27.6 ก/concrete X2 API/runtime (#4; TClass model/read direction/usage predicate answered), security/DDL · sign-off ไม่ปลด Depends: BE-012 full, BE-014 (#5), FE-025 ต้อง verified ก่อน dispatch (read states/K=1, รูปตาราง/SA-Q25 #8 ยืนยันแล้ว); BE-012 SQL stage ไม่ทำให้ FE-024 พร้อม
+
+ใช้ FE-021 บริบทโรงเรียน/ปี/เทอมที่สร้างแล้ว ไม่สร้าง term selector/state อีกชุด; ส่ง/รีเซ็ต context ตาม DES-009
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+`parseSubjectSettingsExtra` (ใช้ตัวเดิม) · ตัวกรองของ DES-015 นอกจุดต่อ BR-71 ท้าย chain (ห้ามเขียนตัวกรองซ้ำต่อชั้น) · DES-012/017 (FE-023) · endpoint ของ Service Academic (สัญญาของเขา)
+
+## Expected Output
+
+หลัง dependencies/ownercontracts พร้อม (UX-010/UX-014 signed แล้ว): SubjectRoommappingUI+capacity/caretakerread-onlystates+sharedcanUseRoom/BR-71 และ tests ตาม real BEcontract. PM ระบุ exactWritepaths ก่อน dispatch; ไม่สร้าง RoomSetting/Setproxy/editor.
+
+## Acceptance
+
+AC-038/AC-038a ฝั่ง UI: mapping 1:1 จาก `TClass`; ความจุ/ผู้ดูแลต่อหน่วย
+AC-039: ห้องเดียวกันไม่เกิน K ในเวลาเดียวกัน — นับรวมตารางทุกชุดของขอบเขต conflict และ `/academic` (BR-36/55/56)
+AC-040: วิชาไม่มี mapping ไม่ถูกบังคับ (วางมือได้แม้ `/academic` อ่านไม่ได้)
+BR-71: วิชาที่ใช้ห้องที่มีผู้ดูแลที่นับได้ ครูของเซลล์ต้อง ∈ T_R (ชุด `lstCaretakers`/`isInPlan`) + link check — ผ่านจุด eligibility/canUseRoom เดียว
+
+## Dependencies
+
+BE-012, BE-014, FE-021, FE-025, UX-010
+
+## Handoff
+
+vitest: sweep ความจุ (K, ห้องเรียนเดียวกันนับ 1, link หลายห้องเรียน), K ของหน่วยตาราง, K=1 เมื่อไม่ตั้ง (absence/NULL ยืนยันแล้ว), BR-56 ตัดแถวโมดูล/นับทุกแถวเมื่อบันทึกผลอ่านไม่ได้, BR-57 fail-closed (ระงับ Generate/ปฏิเสธวางมือเฉพาะวิชามี mapping), BR-71 ผ่านจุดเดียว (grep) รวมผู้ดูแลหลายคน/กรอง `isInPlan`/link check · typecheck/lint/build · `[manual-E2E]` กับ X2 read path ที่ jtrp98 เลือก (contract/runtime ต้องพร้อม) · ยืนยันบรรทัดกับ HEAD ล่าสุดก่อนแก้ (2026-10-09: tree commit ครบแล้ว)
+
+DES-013 Fallback: room/mapping load ล้ม → fail-closed ตาม contract, ลงทะเบียนล้ม → ไม่บันทึก, ห้องถูกลบ → แจ้งและถือวิชาไม่มี mapping, ผู้ดูแลถูกลบ (`TEmployees.cDel`) → ไม่นับ + `RoomCaretakerNotInPlan`, sync-read ล้ม → นับ academic ทุกแถว · BR-71 snapshot ครูเดิมขัดผู้ดูแล → แจ้ง/ไม่เปลี่ยนครูอัตโนมัติ; shared eligibility ใช้ solver/validateDrop/AddCourseModal/precheck
+additive — revert ได้เดี่ยว; กลับ as-built ไม่กันห้อง · behavior-change รวมการถูกปฏิเสธเพราะระบบอื่น — ต้องแสดงผู้ใช้ห้องที่ขัด (BR-36 ข้อความ)
+ส่งต่อ reviewer
+
+## Change Log
+
+- 2026-10-11 — FE-024 ✅ Verified: Room constraints engine (canUseRoom, buildExcludedAcademicScheduleIds, checkRoomCaretaker, checkRoomCaretakerLink), 4-level check hierarchy, fail-closed readiness (unmapped bypass per AC-040), caretaker badges, and solver integration completed. Review Round 26 PASS, QA Round 27 Verified (type-check, eslint, build, 14 vitest tests pass).
+
+- 2026-10-11 — PM รับ UX-010 OD-1 เลือก (ก) จาก jtrp98 “1A 2A 3A”: แสดงชื่อห้องที่มี source เสมอ ย่อได้พร้อม focus/tooltip ชื่อเต็ม; OD ไม่ gate แล้ว คง Depends/owner/schema/security/release.
+
+- 2026-10-11 — UX-010 (+fold)/UX-014 signed jtrp98 (ไฟล์จริง), SA §38.5a; เหลือ gate UX-010 OD-1 + #4 + Depends เดิม; scope/Depends/Status คงเดิม.
+
+- 2026-10-11 — อ้าง UX-014 (draft; OD-1..6 ยืนยัน jtrp98) + gate ส่วนผู้ดูแล/คำเตือน/copy เหตุปฏิเสธรอ sign-off UX-014 + SA payload; scope/Depends/Status คงเดิม.
+
+- 2026-10-11 — ถ้อยคำผู้ดูแลเดี่ยว → ชุด `lstCaretakers`/`isInPlan` + รหัสเตือนเสนอ SA (DES-013 BR-71/§38.3); ส่วนแสดงผู้ดูแลรอ UX-010 delta (Waiting #3); scope/Depends/Status คงเดิม.
+
+- 2026-10-11 — ถ้อยคำ TRoom→TClass, gates SA-Q25/#8 TClassSetting; read states/K1 ยืนยันแล้ว; scope/Depends/Status คงเดิม.
+
+- 2026-10-11 — alignC1′read-only ไม่มี moduleeditor/proxy/copy ค่าห้อง; mapping ยังของ module; UX-010 ต้อง owneramend/sign และ remaininggates คง HOLD.
+
+Back-links: `INDEX.md`

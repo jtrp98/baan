@@ -1,0 +1,45 @@
+# FE-311 — เมนู ฟีเจอร์ที่วางแผนไว้
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `FE-crm-ai-support-P3-01`
+
+## Goal
+
+เพิ่มเมนู "ฟีเจอร์ที่วางแผนไว้" (`news: true`) ใน `sidebar-component.tsx` — แคตตาล็อกฟีเจอร์ต้องมีทางเข้าจากเมนูปกติสำหรับ PM/Sales
+
+## References
+
+REQ-013, AC-013.2, DES-007, DEC-007
+
+## Scope
+
+เพิ่ม 1 entry ใน sidebar constant — ไม่แตะเมนูอื่น
+
+- Security-sensitive: no
+
+## Out of Scope
+
+เมนูอื่นทั้งหมด · route ของหน้า
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-013.2: ทางเข้าแคตตาล็อกฟีเจอร์ปรากฏบนเมนูและพาไปถึงหน้าจริง
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-013.2 ด้วยการคลิกเมนูเข้าหน้าจริง — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+entry เมนู additive — ลบรายบรรทัดคืนได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

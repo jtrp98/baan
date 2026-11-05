@@ -1,0 +1,37 @@
+# TP-003 — ตาราง AC → fixture
+
+> Rev 2 · แก้ล่าสุด 2026-11-02 · แก้โดย inspect · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ใช้ประกอบ [แผน TP-003](tp-003-grade-fixture-plan-001.md) และ [ตาราง AC หลัก](traceability-001.md)
+
+## ตาราง AC → fixture
+
+| AC | Fixtures |
+| --- | --- |
+| [AC-049-01 (admin เห็นโรงเรียน/เทอม คาบ/กิจกรรม/ตัวชี้วัด วิชา/ช่องเดิม)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | GF-04b, GF-04c, GF-05a |
+| [AC-049-02 (กิจกรรม A แมพช่องวิชา X และ Y ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | GF-03c |
+| [AC-049-03 (สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | GF-05c |
+| [AC-049-04 (Preview ตรงคู่กิจกรรม–ช่องที่แมพ ไม่เพิ่มช่อง/เดาหมวดเอง)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | GF-01c, GF-04b |
+| [AC-049-05 (mapping ที่ส่งแล้วแก้คู่เดิมไม่ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md) | GF-03c, GF-05c |
+| [AC-050-01 (preview ตรวจค่าเดิม/ใหม่และปลายทางตาม BR-050-02/03 ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | GF-01a, GF-01b, GF-01c, GF-04c |
+| [AC-050-02 (ก่อนยืนยันหรือเมื่อออกจาก preview โดยไม่ยืนยัน คะแนนปลายทางไม่เปลี่ยน)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | GF-01c, GF-06b1 |
+| [AC-050-03 (กิจกรรม 8/10 ไปช่องเต็ม 20 ได้ 16)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | GF-01a, GF-01b |
+| [AC-050-04 (เปลี่ยนคะแนนต้นทางหรือ mapping หลัง preview แล้วส่งค่าใหม่ด้วยการยืนยัน…)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-050.md) | GF-01d |
+| [AC-051-01 (ครูแก้ช่อง SchoolBot หลังส่งรอบก่อนแล้วส่งอีกครั้ง…)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-051.md) | GF-03a, GF-05c |
+| [AC-051-02 (เลือกทับนักเรียน A และคงค่า B แล้วยืนยันอีกครั้ง A ได้ค่าที่เสนอ B คงค่าครู)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-051.md) | GF-03b, GF-03b2 |
+| [AC-051-03 (แก้ปลายทางหลัง preview หรือหลังเลือกแก้ชนแล้ว ระบบหยุดให้ตรวจใหม่…)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-051.md) | GF-01d, GF-03a, GF-03b, GF-03b2 |
+| [AC-051-04 (ส่งคะแนนในข้อมูลที่มีช่องครู override และผลพิเศษแล้วค่าคุ้มครองคงเดิม…)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-051.md) | GF-02a, GF-04a, GF-05d |
+| [AC-051-05 (A ยังไม่มีผลกิจกรรมแต่ช่องเดิมมี 5 ส่งแล้วคง 5 และแสดงข้าม)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-051.md) | GF-01b, GF-04c |
+| [AC-052-01 (ครูไม่มีสิทธิ์วิชา/ห้อง ข้ามโรงเรียน/เทอม หรือปลายทางล็อก…)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-052.md) | GF-05a, GF-05b, GF-05d |
+| [AC-052-02 (สิทธิ์/ล็อกเปลี่ยนหลัง preview แล้วการยืนยันเดิมเขียนคะแนนไม่ได้)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-052.md) | GF-05b, GF-06b6 |
+| [AC-052-03 (ส่งรายการเดิมซ้ำรวมกรณีไม่ทราบผลครั้งก่อน คะแนนไม่บวกซ้ำและไม่เกิดผลซ้ำ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-052.md) | GF-02b, GF-03d, GF-03d2, GF-04d, GF-06a, GF-06b1, GF-06b2, GF-06b3, GF-06b4, GF-06c |
+| [AC-052-04 (เมื่อส่งสำเร็จบางรายการ ระบบแสดงผลจริงแยกรายการ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-052.md) | GF-02a, GF-02b, GF-03a, GF-04a, GF-06b4, GF-06b5, GF-06b6 |
+| [AC-052-05 (ตรวจรายการส่งแล้วพบ audit ครบ BR-052-03)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-052.md) | GF-02a, GF-04a, GF-04d, GF-06a |
+
+ทุก actual=NOT_RUN — ตารางนี้เป็นการวางแผน coverage ไม่ใช่ผลตรวจรับ
+
+
+
+## คำย่อ
+
+AC = Acceptance Criteria หรือเกณฑ์ตรวจรับ · BR = Business Rule หรือกฎธุรกิจ

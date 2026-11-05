@@ -1,0 +1,30 @@
+---
+owner: spec
+---
+# วิธีตรวจรับการเชื่อมต่อและควบคุมหุ่น
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย spec · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ตารางนี้เก็บเกณฑ์ตรวจรับ 8 ข้อของ [ชุดเกณฑ์ตรวจรับหุ่น](pack-hardware-001.md) ใช้แยกผลที่คาดหวังออกจากผลจริงและหลักฐานผู้รับรอง ต้องผ่านเงื่อนไขอนุญาตอุปกรณ์จริงในไฟล์หลักก่อนดำเนินการ
+
+## เกณฑ์และวิธีตรวจ
+
+| AC | สิ่งตรวจ | วิธีตรวจ | Expected | Actual/Evidence (กรอก) | ผู้รับรอง (กรอก) |
+|---|---|---|---|---|---|
+| [AC-014-03 (ตรวจ probe ก่อนเชื่อมต่อ)](../modules/arm-lab/shared/requirements/req-014.md) | probe กับ test device | ใช้ test device ไม่ตอบ probe / ตอบถูก; เก็บ trace raw bytes+timestamp | ไม่ตอบ → ไม่เข้า connected; ตอบถูก → เชื่อมต่อ; trace ไม่มีคำสั่งเคลื่อนไหวระหว่างเชื่อม | ______ | ______ |
+| [AC-019-03 (หยุดดาวน์โหลดเมื่อชุดแรกผิดพลาด)](../modules/arm-lab/shared/requirements/req-019.md) | partial download | บังคับ error ที่ชุดแรกระหว่างอัปโหลด (เช่น unplug) | ไม่มีชุดที่สอง; ไม่มีผลยืนยัน verified บนบอร์ด | ______ | ______ |
+| [AC-021-01 (ขอหยุดระหว่างเล่น)](../modules/arm-lab/shared/requirements/req-021.md) | หยุดระหว่างเล่น | วัดเวลาตั้งแต่ผู้ใช้สั่ง แยกช่วง cancel/drain การเขียน stop และหุ่นหยุดจริง พร้อมวิดีโอหรือเครื่องมือวัด | พบการยกเลิกและจบงานค้างก่อนคำขอ stop; physical rest ภายในเกณฑ์ที่ยืนยัน (ดูเกณฑ์ในไฟล์หลัก) | ______ | ______ |
+| [AC-021-03 (แจ้งเมื่อคำขอหยุดล้มเหลว)](../modules/arm-lab/shared/requirements/req-021.md) | stop ล้มเหลว | ถอดสายก่อน stop / stale reply | ผู้ใช้เห็น error; ไม่มีข้อความยืนยันว่าหุ่นหยุดจริง | ______ | ______ |
+| [AC-024-01 (แสดงเมื่อการเชื่อมต่อขาดขณะว่าง)](../modules/arm-lab/shared/requirements/req-024.md) | อุปกรณ์หายขณะ idle | unplug ขณะ idle | สถานะเปลี่ยนเป็น lost + แสดงทางเชื่อมต่อใหม่; ค่าเวลาถึง lost ขึ้นกับ polling ของ SA-003 (ดู GAP-08 ในไฟล์หลัก) | ______ | ______ |
+| [AC-024-02 (แจ้งข้อผิดพลาดโดยไม่ส่งท่าเดิมซ้ำ)](../modules/arm-lab/shared/requirements/req-024.md) | transport error ระหว่างส่งท่า | จำลอง error กลางท่า | เห็นข้อผิดพลาด; ไม่มีการส่งท่าเดิมซ้ำเอง | ______ | ______ |
+| [AC-031-05 (ควบคุมหุ่นจริงบน Windows)](../modules/app-shell/shared/requirements/req-031.md) | หุ่นจริงบน Windows | tuple หุ่นยืนยันแล้ว บน Win11 25H2 x64 ([มติ 019 (Windows 11 25H2 x64)](decisions/decisions-019.md)) | เชื่อมต่อ + ส่งคำสั่งควบคุมผ่าน native transport ได้จริง ไม่ใช่ผลจำลอง | ______ | ______ |
+| [AC-032-02 (ควบคุมหุ่นจริงบน macOS)](../modules/app-shell/shared/requirements/req-032.md) | หุ่นจริงบน macOS | tuple เดียวกัน บน macOS 15+ Intel และ arm64 แยกแถว | เช่น AC-031-05; ปัจจุบันบล็อก: Darwin backend ยังไม่มี (รอ arch/SA-003 ตาม [DES-006 (หุ่นจริง Windows/macOS)](../build/design/des-006.md)) | ______ (Intel) / ______ (arm64) | ______ |
+
+## ยังไม่ยืนยัน
+
+ช่อง Actual/Evidence และผู้รับรองทุกแถวยังว่าง เกณฑ์ physical rest เวลาถึง lost และข้อมูลรุ่นอุปกรณ์ยังรอการยืนยันตามไฟล์หลัก ไม่ใช้ผลจำลองแทนการเคลื่อนไหวจริง
+
+## หลักฐาน
+
+- AC-014-03 อยู่ใน [REQ-014 (ค้นหาและเชื่อมต่อหุ่น)](../modules/arm-lab/shared/requirements/req-014.md); AC-019-03 อยู่ใน [REQ-019 (อัปโหลดท่าไปบอร์ด)](../modules/arm-lab/shared/requirements/req-019.md); AC-021-01 และ AC-021-03 อยู่ใน [REQ-021 (ขอหยุดหุ่นและยกเลิกงานค้าง)](../modules/arm-lab/shared/requirements/req-021.md); AC-024-01 และ AC-024-02 อยู่ใน [REQ-024 (การเชื่อมต่อขาดและคำสั่งล้มเหลว)](../modules/arm-lab/shared/requirements/req-024.md); AC-031-05 อยู่ใน [REQ-031 (ติดตั้งและดูแลแอปบน Windows)](../modules/app-shell/shared/requirements/req-031.md); AC-032-02 อยู่ใน [REQ-032 (ติดตั้งแอปบน macOS)](../modules/app-shell/shared/requirements/req-032.md)
+- [DES-006 (หุ่นจริง Windows/macOS)](../build/design/des-006.md) กำหนดขอบเขต native transport; SA-003 (สัญญาหุ่นและ transport) ต้องระบุความถี่ค้นหาอุปกรณ์ตาม GAP-08 (ขาดข้อกำหนดตรวจพบอุปกรณ์หาย)

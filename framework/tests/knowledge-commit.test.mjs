@@ -1,0 +1,232 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import { classifyChange, commitKnowledge, commitKnowledgeRoot, parsePorcelain, planCommits } from "../src/knowledge-commit.mjs";
+
+test("parsePorcelain: แกะรูปแบบ -z ครบ และ rename กิน path เดิมหนึ่งช่อง", () => {
+  const raw = ["?? school-bot/a.md", "M  school-bot/b.md", "R  school-bot/new.md", "school-bot/old.md", " D school-bot/c.md"].join("\0") + "\0";
+  assert.deepEqual(parsePorcelain(raw), [
+    { code: "??", file: "school-bot/a.md" },
+    { code: "M ", file: "school-bot/b.md" },
+    { code: "R ", file: "school-bot/new.md" },
+    { code: " D", file: "school-bot/c.md" },
+  ]);
+});
+
+test("classifyChange: ไฟล์ใหม่=add ลบเท่านั้น=remove ที่เหลือ=update", () => {
+  assert.equal(classifyChange("??"), "add");
+  assert.equal(classifyChange("A "), "add");
+  assert.equal(classifyChange("AM"), "add");
+  assert.equal(classifyChange("D "), "remove");
+  assert.equal(classifyChange(" D"), "remove");
+  assert.equal(classifyChange("M "), "update");
+  assert.equal(classifyChange("R "), "update");
+});
+
+test("planCommits: ข้อความอังกฤษสั้นต่อ module — verb ตามชนิดของ change และไฟล์เกิน 2 ย่อเป็น +N more", () => {
+  const one = planCommits([{ code: "??", file: "school-bot/db/a.sql" }], "kr");
+  assert.equal(one[0].message, "school-bot: add a.sql");
+
+  const many = planCommits([
+    { code: "??", file: "school-bot/a.md" },
+    { code: "??", file: "school-bot/b.md" },
+    { code: "??", file: "school-bot/c.md" },
+    { code: "??", file: "school-bot/d.md" },
+  ], "kr");
+  assert.equal(many[0].message, "school-bot: add a.md, b.md +2 more");
+
+  const del = planCommits([{ code: "D ", file: "school-bot/old.md" }], "kr");
+  assert.equal(del[0].message, "school-bot: remove old.md");
+
+  const mixed = planCommits([{ code: "??", file: "school-bot/new.md" }, { code: "M ", file: "school-bot/index.md" }], "kr");
+  assert.equal(mixed[0].message, "school-bot: update index.md, new.md");
+
+  const root = planCommits([{ code: "M ", file: "README.md" }], "schoolbright-knowledge");
+  assert.equal(root[0].message, "schoolbright-knowledge: update README.md");
+
+  const two = planCommits([{ code: "??", file: "a/x.md" }, { code: "M ", file: "b/y.md" }], "kr");
+  assert.deepEqual(two.map((p) => p.message), ["a: add x.md", "b: update y.md"]);
+});
+
+function makeRepo() {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-kcommit-"));
+  const git = (args) => spawnSync("git", ["-C", dir, ...args], { encoding: "utf8" });
+  git(["init", "-q"]);
+  git(["config", "user.email", "test@baan.local"]);
+  git(["config", "user.name", "baan test"]);
+  return { dir, git };
+}
+
+test("commitKnowledgeRoot: commit จริงต่อ module ข้อความตรงรูปแบบ และ commit ของ module หนึ่งไม่กลืนของอีก module", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "school-bot", "db"), { recursive: true });
+    writeFileSync(path.join(dir, "school-bot", "db", "review.md"), "# r1\n", "utf8");
+    writeFileSync(path.join(dir, "school-bot", "index.md"), "# idx\n", "utf8");
+    mkdirSync(path.join(dir, "timetableai"), { recursive: true });
+    writeFileSync(path.join(dir, "timetableai", "notes.md"), "# n\n", "utf8");
+
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, (m) => logs.push(m));
+    assert.equal(res.repo, true);
+    assert.equal(res.commits.length, 2);
+
+    const subjects = git(["log", "--format=%s"]).stdout.trim().split("\n");
+    assert.deepEqual([...subjects].sort(), ["school-bot: add review.md, index.md", "timetableai: add notes.md"]);
+    assert.equal(git(["status", "--porcelain"]).stdout.trim(), "", "ต้อง clean หลัง commit ครบ");
+
+    for (const sha of git(["rev-list", "HEAD"]).stdout.trim().split("\n")) {
+      const lines = git(["show", "--name-only", "--format=%s", sha]).stdout.trim().split("\n");
+      const subject = lines[0];
+      for (const f of lines.slice(1).filter(Boolean)) {
+        assert.ok(f.startsWith(`${subject.split(":")[0]}/`), `${subject} ต้องแตะเฉพาะ module ตัวเอง (เจอ ${f})`);
+      }
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: project กับ module ลูกแยก commit แม้มีไฟล์ staged ไว้ก่อน", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const files = ["school-bot/shared/context.md", "school-bot/modules/quiz/shared/requirements.md", "school-bot/modules/arm-lab/shared/requirements.md"];
+    for (const file of files) {
+      mkdirSync(path.dirname(path.join(dir, file)), { recursive: true });
+      writeFileSync(path.join(dir, file), "# baseline\n");
+    }
+    assert.equal(git(["add", "--all"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    for (const file of files) writeFileSync(path.join(dir, file), "# updated\n");
+    assert.equal(git(["add", "--", files[2]]).status, 0);
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir, layout: "project" }, m => logs.push(m));
+    assert.equal(res.commits.length, 3, logs.join("\n"));
+    assert(!logs.some(m => m.startsWith("⚠")), logs.join("\n"));
+    assert.equal(git(["status", "--porcelain"]).stdout, "");
+    const expected = {
+      "school-bot: update context.md": files[0],
+      "school-bot/quiz: update requirements.md": files[1],
+      "school-bot/arm-lab: update requirements.md": files[2],
+    };
+    for (const sha of git(["rev-list", "-3", "HEAD"]).stdout.trim().split("\n")) {
+      const subject = git(["show", "-s", "--format=%s", sha]).stdout.trim();
+      assert.equal(git(["show", "--format=", "--name-only", sha]).stdout.trim(), expected[subject]);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: ของที่ผู้ใช้ staged ไว้ล่วงหน้าก็ถูกเก็บเข้า commit ของ module นั้น", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "m1"), { recursive: true });
+    writeFileSync(path.join(dir, "m1", "a.md"), "# a\n", "utf8");
+    git(["add", "m1/a.md"]); // staged ค้างไว้แบบที่เจอจริงใน schoolbright
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.deepEqual(res.commits, ["m1: add a.md"]);
+    assert.equal(git(["status", "--porcelain"]).stdout.trim(), "");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: tracked file ที่แก้โดยไม่ stage เป็นรายการเดียว ต้อง commit module และ path ถูกต้อง", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "module"), { recursive: true });
+    writeFileSync(path.join(dir, "module", "file.md"), "# baseline\n", "utf8");
+    assert.equal(git(["add", "--", "module/file.md"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    writeFileSync(path.join(dir, "module", "file.md"), "# updated\n", "utf8");
+    const before = git(["status", "--porcelain", "-z"]);
+    assert.equal(before.status, 0);
+    assert.equal(before.stdout, " M module/file.md\0");
+
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.equal(res.repo, true);
+    assert.deepEqual(res.commits, ["module: update file.md"]);
+    assert.equal(git(["rev-list", "--count", "HEAD"]).stdout.trim(), "2");
+    assert.equal(git(["log", "-1", "--format=%s"]).stdout.trim(), "module: update file.md");
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD"]).stdout.trim(), "module/file.md");
+    assert.equal(git(["show", "HEAD:module/file.md"]).stdout, "# updated\n");
+    const after = git(["status", "--porcelain", "-z"]);
+    assert.equal(after.status, 0);
+    assert.equal(after.stdout, "", "ต้อง clean หลัง commit ไฟล์ที่ไม่ได้ stage");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: tracked path มีช่องว่างและเป็นรายการแรกที่ไม่ได้ stage ต้อง commit แยก module ถูกต้อง", () => {
+  const { dir, git } = makeRepo();
+  try {
+    mkdirSync(path.join(dir, "module with space"), { recursive: true });
+    mkdirSync(path.join(dir, "z-module"), { recursive: true });
+    writeFileSync(path.join(dir, "module with space", "file with space.md"), "# baseline\n", "utf8");
+    writeFileSync(path.join(dir, "z-module", "other.md"), "# baseline\n", "utf8");
+    assert.equal(git(["add", "--", "module with space/file with space.md", "z-module/other.md"]).status, 0);
+    assert.equal(git(["commit", "-qm", "baseline"]).status, 0);
+    writeFileSync(path.join(dir, "module with space", "file with space.md"), "# updated first\n", "utf8");
+    writeFileSync(path.join(dir, "z-module", "other.md"), "# updated second\n", "utf8");
+    const before = git(["status", "--porcelain", "-z"]);
+    assert.equal(before.status, 0);
+    assert.equal(before.stdout, " M module with space/file with space.md\0 M z-module/other.md\0");
+
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.equal(res.repo, true);
+    assert.deepEqual(res.commits, ["module with space: update file with space.md", "z-module: update other.md"]);
+    assert.equal(git(["rev-list", "--count", "HEAD"]).stdout.trim(), "3");
+    assert.deepEqual(git(["log", "-2", "--format=%s"]).stdout.trim().split("\n"), [
+      "z-module: update other.md",
+      "module with space: update file with space.md",
+    ]);
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD~1"]).stdout.trim(), "module with space/file with space.md");
+    assert.equal(git(["show", "--format=", "--name-only", "HEAD"]).stdout.trim(), "z-module/other.md");
+    assert.equal(git(["show", "HEAD:module with space/file with space.md"]).stdout, "# updated first\n");
+    assert.equal(git(["show", "HEAD:z-module/other.md"]).stdout, "# updated second\n");
+    const after = git(["status", "--porcelain", "-z"]);
+    assert.equal(after.status, 0);
+    assert.equal(after.stdout, "", "ต้อง clean หลัง commit ครบทั้งสอง module");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: ไม่ใช่ git repo = ข้ามเงียบไม่ต้องพัง", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-kcommit-nogit-"));
+  try {
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.equal(res.repo, false);
+    assert.deepEqual(res.commits, []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: ไม่มีการเปลี่ยนแปลง = ไม่สร้าง commit", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, () => {});
+    assert.deepEqual(res.commits, []);
+    assert.equal(git(["rev-list", "--count", "HEAD"]).status, 128, "ยังไม่มี commit แรกใน repo เลย");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledge: ตั้ง memory_root = commit ทั้ง knowledge และ memory แยก repo · ไม่ตั้ง = knowledge อย่างเดียวแบบเดิม", () => {
+  const k = makeRepo();
+  const m = makeRepo();
+  try {
+    mkdirSync(path.join(k.dir, "school-bot"), { recursive: true });
+    writeFileSync(path.join(k.dir, "school-bot", "req-001.md"), "# req\n", "utf8");
+    mkdirSync(path.join(m.dir, "school-bot", "tasks"), { recursive: true });
+    writeFileSync(path.join(m.dir, "school-bot", "tasks", "task-001.md"), "# task\n", "utf8");
+
+    const logs = [];
+    const commits = commitKnowledge({ knowledge_roots: [{ name: "kr", path: k.dir, memory_root: m.dir }] }, (s) => logs.push(s));
+    assert.deepEqual(commits, ["school-bot: add req-001.md", "school-bot: add task-001.md"]);
+    assert.equal(k.git(["log", "--format=%s"]).stdout.trim(), "school-bot: add req-001.md");
+    assert.equal(m.git(["log", "--format=%s"]).stdout.trim(), "school-bot: add task-001.md");
+    assert.ok(logs.some((s) => s.startsWith("kr-memory: ")), "log ต้องบอกได้ว่า commit ลง memory");
+
+    writeFileSync(path.join(k.dir, "school-bot", "req-002.md"), "# req2\n", "utf8");
+    writeFileSync(path.join(m.dir, "school-bot", "tasks", "task-002.md"), "# task2\n", "utf8");
+    assert.deepEqual(commitKnowledge({ knowledge_roots: [{ name: "kr", path: k.dir }] }), ["school-bot: add req-002.md"]);
+    assert.notEqual(m.git(["status", "--porcelain"]).stdout.trim(), "", "ไม่ตั้ง memory_root = ไม่แตะ repo อื่น");
+  } finally {
+    rmSync(k.dir, { recursive: true, force: true });
+    rmSync(m.dir, { recursive: true, force: true });
+  }
+});

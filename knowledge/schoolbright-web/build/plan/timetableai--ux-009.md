@@ -1,0 +1,58 @@
+# UX-009 — UX artifact: continuity block UX + config warnings (DES-012 BR-31/BR-53, DES-017 BR-65)
+
+> module: schoolbright-web/timetableai
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+UX artifact: continuity block UX + config warnings (DES-012 BR-31/BR-53, DES-017 BR-65)
+
+## References
+
+REQ-015, AC-036, AC-037, AC-037a, AC-037b, AC-037c, DES-012, DEC-012, DES-017, DEC-017 · DES-012 §37.2a / DES-018 §43.2a derived outcome boundary
+
+## Scope
+
+ร่าง UX artifact ของผลข้าง UI จาก DES-012/DES-017: การลาก/ลบ/ล็อกบล็อก continuity เป็น**หน่วยเดียว** (BR-31 — "การลากทั้งบล็อกเป็นหน่วยเดียวหรือไม่ เป็นงาน UX" แต่ทุกทางต้องผ่าน BR-31) · ข้อความปฏิเสธ `continuityBroken`/`subjectGroupOverlap` · คำเตือน config 4 ตัวของ BR-53 บน subject-settings (ตอนบันทึก) และใน `lstGenerateWarnings` — ไม่บล็อก Generate · editor continuity/subjectGroups เดิมคงรูป object ใหม่ (ห้ามทำ `subjectGroups` หาย — §37.2)
+
+รวม VR-17 error ของ subjectGroups (ชื่อว่าง/ซ้ำ/courseCodes ไม่เป็น array ของ string) ใน artifact ที่เซ็น; ไม่สร้าง server validator ใหม่
+
+ฐาน signed จริง: jtrp98 2026-10-11 "อนุมัติ UX-009 ทั้งฉบับ เลือกลากทั้งบล็อก (แนะนำ)" คง whole-block behavior เดิม. Delta signed แยกจริง: jtrp98 2026-10-11 "อนุมัติส่วนเพิ่ม UX-009 ตามร่าง (แนะนำ)" หลัง review15 ครอบ flow/copy/layout/a11y เฉพาะ DES-012 §37.2a: saved status แยกจาก failed Save; complete/partial/unavailable และ stale school/year/term/N, pending unsaved N ไม่ใช้ผล GET เก่า. Missing assessment ไม่อ้างว่าไม่มีปัญหา; ไม่เผย teacher IDs/caps/H1/config และไม่เพิ่ม Save/Generate prerequisite. Saved partial/unavailable ยังบันทึกสำเร็จ ไม่เสนอ re-save อัตโนมัติ. ใช้ outcome จาก subject API ตามคำตอบ jtrp98 2026-10-11 "ส่งผลคำเตือนผ่าน API กติกาวิชา (แนะนำ)"; Setting/Get สิทธิ์เดิม.
+
+- Write paths: C:/src/schoolbright/knowledge/timetableai/uxui/UX-009-continuity-and-subject-groups.md, C:/src/schoolbright/knowledge/timetableai/uxui/README.md
+- Security-sensitive: no
+
+## Out of Scope
+
+ไม่แตะโค้ด · สัญญา DES-012/DES-017 · editor เดิมของ subject-settings (ตรรกะ serialize คงเดิม)
+
+## Expected Output
+
+artifact uxui/UX-009-continuity-and-subject-groups.md และทะเบียน uxui/README.md บันทึก delta signed จริงแล้วตามคำตอบของ jtrp98 2026-10-11; signed base เดิมคง literal/who/when. Delta sign-off แยกหลัง review15 ไม่ขยาย approval ฐานเดิมแทนมนุษย์หรืออ้าง runtime verification.
+
+## Acceptance
+
+AC-036..AC-037c แสดงเป็น UX ที่ผู้ใช้อ่านออก (บล็อกติดกันจริง, โควตาไม่ลงตัว = เตือนแก้ค่า, เพดานครูชนะ, ลบทั้งบล็อก)
+
+DES-012 §37.2a states อ่านออก: saved + partial/unavailable ไม่ใช่ Save failed หรือ no problems; stale response ไม่ทับ pending N/context ใหม่; ไม่แสดง private support. Delta sign-off แยกจาก signed base และไม่มี code/contract change.
+
+## Dependencies
+
+UX-007
+
+## Handoff
+
+UX owner delta → review15 PASS → human gate3 signed จริงแล้ว → PM align → FE-023 หลัง actual BE-013 contract/reviewer/QA; full FE-023 ยังรอ BE-012 final room eligibility. ไม่ถาม whole-block ที่เซ็นแล้วซ้ำ; QA-owned Status เดิมไม่เปลี่ยนใน PM รอบนี้.
+ร่างเอกสาร — ไม่กระทบโค้ด/สัญญา
+ส่งต่อ reviewer
+
+## Change Log
+
+- 2026-10-11 — รับคำตอบจริง jtrp98 "อนุมัติส่วนเพิ่ม UX-009 ตามร่าง (แนะนำ)" จาก signed artifact/README; ปิด delta-only UX gate3, preserve base/history/Write paths/QA-owned Status และ BE-012/full FE-023 holds.
+
+- 2026-10-11 — preserve signed whole-block base; bound derived warning delta draft/output + gate 3 เฉพาะ saved/partial/unavailable/stale-N ตาม DES-012 §37.2a; Write paths/owner/phase/Status เดิม.
+
+- 2026-10-09 — ชื่อ output/Write paths ตรง draft ใน working tree; รักษา sign-off gate ไม่เซ็นแทนคน.
+
+Back-links: `INDEX.md`

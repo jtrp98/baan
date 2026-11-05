@@ -1,0 +1,43 @@
+# BE-004 — markitdown conversion spike (PRE-F08)
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+spike ทดสอบแปลง PDF หลักสูตรจริงของ KMUTT อย่างน้อย 3 ฉบับด้วย markitdown ก่อนเริ่ม implement pipeline จริง — รายงาน conversion rate ('ok'/'empty'/'failed') กลับ เพื่อยืนยันว่า RISK-F02 ปิดได้ หรือ Module F ต้องขยายขอบเขตเพิ่ม OCR ตั้งแต่รอบแรก — คุณภาพ markitdown กับ PDF หลักสูตรจริงยังไม่เคยถูกทดสอบ — ถ้าแย่เป็นวงกว่าง แผนทั้งเฟสต้องเปลี่ยน ค้นพบช้าไปจะเสียเวลา implement ฟรี
+
+## References
+
+REQ-001, AC-001.1, DES-019, DEC-019
+
+## Scope
+
+เป็นงานวัดผล/รายงาน ไม่ใช่ implement pipeline · ทดสอบกับไฟล์จริงอย่างน้อย 3 ฉบับและรายงานผลครบทั้งสามสถานะ ('ok'/'empty'/'failed') · ผล 'แย่เป็นวงกว่าง' ต้องยกระดับกลับมาตัดสินขอบเขต Module F ก่อน implement ต่อ
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+โค้ด production ใด ๆ (spike แยกจาก pipeline จริง) · ตาราง/สคีมา
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-001.1 (ฐานวัดผล): ได้ผลทดสอบแปลงจริงต่อไฟล์ (สถานะ 'ok'/'empty'/'failed' + เหตุผล) อย่างน้อย 3 ฉบับของ KMUTT พร้อมข้อสรุปว่า RISK-F02 ปิดได้หรือต้องเพิ่ม OCR ตั้งแต่รอบแรก
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-001.1 (ฐานวัดผล) ด้วยการเก็บไฟล์ต้นทาง + ผลแปลง + สถานะต่อฉบับไว้เป็นหลักฐานแนบรายงาน spike — ตัวเลข conversion rate ต้องมาจากการรันจริง ไม่ใช่ประเมิน
+spike ไม่แตะของถาวร — ทิ้ง/เก็บรายงานไว้เป็นหลักฐานการตัดสินขอบเขตได้อิสระ
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

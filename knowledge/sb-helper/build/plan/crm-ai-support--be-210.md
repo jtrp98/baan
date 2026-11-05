@@ -1,0 +1,45 @@
+# BE-210 — PATCH /knowledge/[id] approve
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P2-10`
+
+## Goal
+
+เพิ่ม `PATCH /api/v2/support/crm-ai/knowledge/[id]` — แก้ไข/approve (`ApprovedBy`/`ApprovedAt`) — เฉพาะ `Status=APPROVED` เท่านั้นที่ AI ดึงไปตอบ QA ได้ — จุด approve เป็นด่านเดียวที่ปลดล็อกความรู้เข้าสู่การตอบ QA — ผู้อนุมัติ/เวลาต้องถูกเก็บทุกครั้ง
+
+## References
+
+REQ-008, AC-008.1, DES-008, DEC-008
+
+## Scope
+
+update workflow ของ entry — approve เขียน `ApprovedBy`/`ApprovedAt` · ความหมาย APPROVED ผูกกับเส้นทาง retrieval ของ classify (task ถัดไป)
+
+- Security-sensitive: no
+
+## Out of Scope
+
+แถว supersede chain เดิมของตาราง · schema · endpoint อื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-008.1: approve ความรู้ผ่าน endpoint ได้จริง — เฉพาะแถว APPROVED ที่มีสิทธิ์ถูก AI ใช้ตอบ
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-008.1 ด้วย dev server: approve แล้วสถานะ/ผู้อนุมัติถูกต้อง — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint ใหม่ additive — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

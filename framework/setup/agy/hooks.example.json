@@ -1,0 +1,8 @@
+{
+  "baan-readonly-guard": {
+    "PreToolUse": [{
+      "matcher": ".*",
+      "hooks": [{"type": "command", "command": "node <HOME>/.gemini/config/baan-readonly-guard.js"}]
+    }]
+  }
+}

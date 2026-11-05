@@ -1,0 +1,22 @@
+{
+  "knowledge_roots": [
+    {
+      "name": "ชื่อที่เก็บเอกสาร เช่น schoolbright-knowledge",
+      "path": "C:/src/<workspace>/knowledge",
+      "layout": "project",
+      "memory_root": "C:/src/<workspace>/memory",
+      "targets": [
+        {
+          "name": "ชื่อโปรเจกต์ (ใช้กับ --target)",
+          "path": "C:/src/<workspace>/target/<repo>"
+        }
+      ]
+    }
+  ],
+  "defaults": {
+    "agent": "codex",
+    "planner_tier": "t2",
+    "timeout_sec": 1800,
+    "max_parallel": 3
+  }
+}

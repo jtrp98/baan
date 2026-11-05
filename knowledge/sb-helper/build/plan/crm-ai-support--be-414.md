@@ -1,0 +1,46 @@
+# BE-414 — PATCH /customer-promises/[id] สถานะด้วยมือ
+
+> module: sb-helper/crm-ai-support
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+Original Task ID: `BE-crm-ai-support-P4-09`
+
+## Goal
+
+เพิ่ม `PATCH /api/v2/support/crm-ai/customer-promises/[id]` — แก้ `Status` ด้วยมือ (`FULFILLED`/`BROKEN`/`EXPIRED`) — ไม่มี auto job ปิดสถานะในรอบนี้ ตาม design § Customer Promise Rules ข้อ 3 — สถานะคำสัญญาเป็นการตัดสินของ Sales — ปิดอัตโนมัติจะสร้างสถานะที่ไม่มีคนรับผิดชอบ
+
+## References
+
+REQ-015, AC-015.1, AC-015.2, DES-010, DEC-010
+
+## Scope
+
+update สถานะด้วยมือในชุด 3 ค่า — ไม่มี job ใด · ค่าสถานะถูก Zod ปฏิเสธก่อน service
+
+- Security-sensitive: no
+
+## Out of Scope
+
+การสร้าง auto job ปิดสถานะ (นอก scope) · schema · endpoint อื่น
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-015.1: สถานะเปลี่ยนด้วยมือภายในชุดค่าที่กำหนด — ไม่มีเส้นทางอัตโนมัติ
+AC-015.2: คำสัญญา PENDING ที่ทำจริงแล้วปิดได้จริงจนหลุดรายการเตือน
+
+## Dependencies
+
+—
+
+## Handoff
+
+ตรวจ AC-015.1/AC-015.2 ด้วย dev server: เปลี่ยนสถานะทุกค่า + เทียบรายการเตือนหลังเปลี่ยน — สถานะ verified ตามแถวเดิม หลักฐานรอบตรวจเก็บอยู่กับโมดูล (review.md/review/ และ Change Log)
+endpoint ใหม่ additive — revert รายไฟล์ได้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

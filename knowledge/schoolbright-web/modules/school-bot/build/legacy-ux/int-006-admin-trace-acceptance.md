@@ -1,0 +1,32 @@
+---
+legacy: true
+---
+# T1. ขอบเขตและหลักฐานตรวจรับที่เสนอ
+
+> แก้ล่าสุด 2026-11-02 · แก้โดย int · ขอโดย ผู้ใช้ (เรียบเรียงตามกติกาเอกสารใหม่ ความหมายไม่เปลี่ยน)
+
+ข้อกำหนดที่ใช้ในไฟล์นี้: [REQ-044 (รหัสบทเรียนและ revision หลักสูตร)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md)
+
+[กลับเอกสารหลัก](int-006-admin-trace.md)
+
+
+ตารางนี้ครอบคลุมเกณฑ์ตรวจรับ 12 ข้อตามงาน UX-005 (admin หลักสูตรและคลังข้อสอบ) ไม่ขยายเป็นทุกเกณฑ์ของ [REQ-043 (หลักสูตรกลางแบบ Level และ Activity)](../../../../../school-bot/modules/quiz/shared/requirements/req-043.md)–046 และคง dependencies ด้านข้อกำหนดและสัญญาเดิม
+
+Actual ทุกแถว: มีร่างและการตรวจเอกสารเท่านั้น ยังไม่มีผล UI/runtime หรือการตรวจรับ Acceptance Criteria (AC — เกณฑ์ตรวจรับ)
+
+| AC | จุดในร่าง | Expected / หลักฐานที่ check ต้องเก็บภายหลัง |
+|---|---|---|
+| [AC-044-01 (สลับลำดับ Lesson ผ่านข้อมูลแล้วลำดับเปลี่ยน รหัสและการอ้างผลเดิมคงเดิม โดยไม่แก้โค้ด)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) | หลัก §2 / S2 | ย้าย Lesson แล้ว Ordinal เปลี่ยน LessonKey/การอ้างผลเดิมคงเดิม; อ่านก่อน–หลัง |
+| [AC-044-02 (แก้เนื้อหาฉบับร่างแล้วเปิดดูเนื้อหาใหม่ได้โดยไม่แก้โค้ด)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) | หลัก §2 / S1 | บันทึกร่างแล้วเปิดกลับเห็นเนื้อหาใหม่ โดยไม่แก้โค้ด; ภาพและผลอ่าน server |
+| [AC-044-03 (revision ที่ไม่มีหลักฐานอนุมัติเผยแพร่ไม่ได้)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) | หลัก §3 / S2,S4 | ขาดหลักฐานเผยแพร่ไม่ได้; ฉบับเผยแพร่อ่านที่มา/ผู้อนุมัติ/เวลาได้; เพิ่มกรณีผู้สร้าง/ผู้แก้ร่างอนุมัติเองถูกปฏิเสธ |
+| [AC-044-04 (เมื่อ publish revision ใหม่ ผู้เรียนเดิมยังเปิดฉบับเดิมและดูผลเดิมได้)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) | หลัก §3 | publish ใหม่แล้วผู้เรียนเดิมยังเปิดฉบับ/ผลเดิม; เทียบกับ UX-004 |
+| [AC-044-05 (ขอแก้ฉบับ publish แล้วฉบับเดิมไม่เปลี่ยน)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) | หลัก §3 | ขอแก้ published แล้วเนื้อหาเดิมคงเดิม การแก้อยู่ revision ใหม่ |
+| [AC-045-01 (นำเข้าแถว D=TRUE แล้วเห็นเป็น draft พร้อมที่มาและความหมายว่าอนุมัติจากต้นทาง)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md) | หลัก §4 / S3 | D=TRUE เป็น draft มีที่มาและป้ายต้นทาง ไม่ publish เอง |
+| [AC-045-02 (เปลี่ยนเฉพาะ O ในข้อมูลทดสอบแล้วข้อมูลหลักสูตรที่นำเข้าไม่เปลี่ยน)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md) | หลัก §4 | เปลี่ยนเฉพาะ O แล้วผลเนื้อหา/รหัส/ลำดับไม่เปลี่ยน |
+| [AC-045-03 (แถวที่มีสื่อทั้งสองชุดแสดงสื่อครบภายใต้ Lesson เดิม โดยไม่เกิด Course/Level ใหม่จาก P–X)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md) | หลัก §4 | สื่อสองชุดอยู่ Lesson เดียว ไม่เพิ่ม Course/Level เพราะ P–X |
+| [AC-045-04 (นำเข้าแถวที่เลข C ไม่ตรง Unit ในชื่อแผนแล้วแสดงรหัส Lesson แยกจากทั้งสองค่า)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md) | หลัก §2,§4 | C ไม่ตรงชื่อ Unit แล้วยังมี LessonKey แยก; สลับลำดับแล้วยังคง key |
+| [AC-043-01 (ส่วนกลางสร้าง/แก้หลักสูตรได้)](../../../../../school-bot/modules/quiz/shared/requirements/req-043.md) | หลัก §1–§3 / S5 | ส่วนกลางสร้าง/แก้ได้ โรงเรียนเลือก published ได้แต่แก้เนื้อหากลางไม่ได้; หลักฐานสิทธิ์สองฝั่ง |
+| [AC-046-01 (เปิด Quiz และ Test แล้วตรวจ policy ทั้งสี่ด้านที่กำหนดไว้ของแต่ละรายการได้)](../../../../../school-bot/modules/quiz/shared/requirements/req-046.md) | หลัก §5 | ตรวจ policy จำนวนครั้ง/เฉลย/เวลา/สุ่มของแต่ละ Activity จากค่าจริง ไม่อนุมานจากชื่อ |
+| [AC-046-04 (แก้คลังเป็น revision ใหม่แล้วประวัติการทำเดิมยังอ้าง snapshot และเกณฑ์เดิม ผลเดิมไม่เปลี่ยน)](../../../../../school-bot/modules/quiz/shared/requirements/req-046.md) | หลัก §5 / S3 | bank revision ใหม่ไม่แก้ snapshot/เกณฑ์/ผล attempt เก่า; เปิดประวัติด้วยสิทธิ์ตามสัญญาฝั่งผู้เรียน/ครู ไม่สร้างหน้ารวมประวัตินักเรียนใน admin เอง |
+
+ฐาน AC: [req-044.md](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md); [req-045.md](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md); [req-043.md](../../../../../school-bot/modules/quiz/shared/requirements/req-043.md); [req-046.md](../../../../../school-bot/modules/quiz/shared/requirements/req-046.md) กฎร่วมเชื่อม [BR-043-01 (SchoolBright ส่วนกลางสร้าง/แก้หลักสูตร โรงเรียนเลือกใช้แต่แก้เนื้อหาไม่ได้)](../../../../../school-bot/modules/quiz/shared/requirements/req-043.md), [BR-043-05 (หน้าสร้าง/แก้/อนุมัติ/publish หลักสูตรกลางอยู่ในหน้า admin (Next.js ใน school-bot/web))](../../../../../school-bot/modules/quiz/shared/requirements/req-043.md), [BR-044-01 (Lesson มีรหัสถาวรแยกจากลำดับ)](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md) ถึง [BR-044-05 (การอนุมัติ publish ต้องเป็น staff คนที่สอง ผู้สร้างอนุมัติเองไม่ได้ ตาม [decisions-025])](../../../../../school-bot/modules/quiz/shared/requirements/req-044.md), [BR-045-01 (นำเข้าเป็น draft ตาม REQ-044)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md) ถึง [BR-045-05 (นำเข้าทุกแถวเป็น draft)](../../../../../school-bot/modules/quiz/shared/requirements/req-045.md), [BR-046-01 (Quiz/Test ใช้กลไกเดียว policy จำนวนครั้ง/เฉลย/เวลา/สุ่มต่างกัน ไม่ผูกตายตัวกับชื่อ)](../../../../../school-bot/modules/quiz/shared/requirements/req-046.md) ถึง [BR-046-06 (Test ใช้คะแนนสูงสุดครั้งจริง/ซ่อม ไม่มีเพดาน)](../../../../../school-bot/modules/quiz/shared/requirements/req-046.md) ตามร่างหลัก

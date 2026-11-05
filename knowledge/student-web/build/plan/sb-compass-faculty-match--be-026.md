@@ -1,0 +1,43 @@
+# BE-026 — Module H identity enforcement
+
+> module: student-web/sb-compass-faculty-match
+
+> Budget ≤ 4 KB (`policies\documentation.md` §4) · เขียนโดย `project-manager` · Owner/Phase/Depends/Status → `INDEX.md` (index ชนะ)
+
+## Goal
+
+บังคับตัวตนจาก `UserData.UserID`/`CompanyID` ทุก endpoint ของ Module H ห้ามรับ `SID` จากฝั่งหน้าจอ — ตรวจสิทธิ์ก่อนประกอบ response (ข้อมูลรั่วผ่าน payload ที่ประกอบก่อนตรวจสิทธิ์เป็น failure mode ที่ design เตือนไว้) — ผลจับคู่เป็นข้อสรุปเรื่องอนาคตรายบุคคลของผู้เยาว์ — SID ที่รับจาก client ทำให้เด็กแก้เลขแล้วดูผลของคนอื่นได้ทันที (IDOR)
+
+## References
+
+REQ-010, AC-010.1, DES-018, DEC-018
+
+## Scope
+
+ครอบทุก endpoint ของ Module H · query ใช้ `NpgsqlParameter` เท่านั้น ห้ามต่อ string · fail-closed เมื่อตรวจตัวตนไม่ได้
+
+- Security-sensitive: yes
+
+## Out of Scope
+
+กลไกตัวตนเดิมของระบบ · payload/สูตรของ task อื่น · สคีมา
+
+## Expected Output
+
+none
+
+## Acceptance
+
+AC-010.1: ทุก endpoint ของ Module H ยึดตัวตนจาก session เท่านั้น — SID ที่ส่งมาจากหน้าจอไม่มีผลกับข้อมูลที่คืน ทุกกรณี
+
+## Dependencies
+
+BE-022
+
+## Handoff
+
+ตรวจ AC-010.1 ด้วยการยิง endpoint ด้วย SID ของเด็กอื่นแนบใน body/query (ต้องไม่มีผล — ข้อมูลมาจาก UserData เสมอ) + กรณีไม่มี session fail-closed — เก็บผลราย endpoint เป็นหลักฐาน
+ชั้นตรวจครอบ endpoint — revert ได้ทางเทคนิคแต่ห้ามปล่อย endpoint ใช้จริงโดยไม่มีชั้นนี้
+ส่งต่อ reviewer
+
+Back-links: `INDEX.md`

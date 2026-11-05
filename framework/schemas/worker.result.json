@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "state": {
+      "enum": [
+        "DONE",
+        "NEEDS_DECISION",
+        "NEEDS_HUMAN",
+        "BLOCKED"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "proof": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "proof"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "test_changes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "failure_class": {
+      "enum": [
+        "",
+        "IMPLEMENTATION_FAILURE",
+        "TEST_DEFECT",
+        "ENVIRONMENT_FAILURE",
+        "CONTRACT_MISMATCH"
+      ]
+    }
+  },
+  "required": [
+    "state",
+    "summary",
+    "acceptance",
+    "test_changes",
+    "questions",
+    "failure_class"
+  ],
+  "additionalProperties": false
+}
