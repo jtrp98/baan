@@ -34,7 +34,7 @@ knowledge/
 
 BAAN ใช้ execution engine เดียว: Orchestrator เตรียม goal/acceptance/scope → Planner เมื่อจำเป็น → Worker → Verifier ตามความเสี่ยง Core จัด dependencies, repository locks, machine gates และหลักฐาน ทีมออกแบบ `spec` (`/pencil`), `survey`, `ui`, `review` ใช้แบบคุยสดตาม Design System และ UX sign-off ของงาน
 
-คู่มือ CLI, packet schema, provider setup และการอัปเกรดอยู่ใน package BAAN (`README.md`, `BAAN.md`, `CONVENTIONS.md`, `RELEASE-NOTES.md`) ใน checkout ของ BAAN นี้ package อยู่ที่ `framework/` ข้าง `knowledge/`; เมื่อนำ knowledge ไปใช้ใน workspace อื่น ให้เปิดเอกสารจาก package ที่ติดตั้งจริง ไม่สมมติว่ามี `../framework/` เสมอ รุ่น 0.29.0 ใน source ยังไม่เผยแพร่
+คู่มือ CLI, packet schema, provider setup และการอัปเกรดอยู่ใน package BAAN (`README.md`, `BAAN.md`, `CONVENTIONS.md`, `RELEASE-NOTES.md`) ใน checkout ของ BAAN นี้ package อยู่ที่ `framework/` ข้าง `knowledge/` เมื่อนำ knowledge ไปใช้ใน workspace อื่น ให้เปิดเอกสารจาก package ที่ติดตั้งจริง
 
 - เริ่มด้วย `baan --version`, `baan --help` และ `baan --list --workspace <workspace>` เพื่อดูรุ่น/config/tiers ที่ใช้อยู่ Paths ของ target และ knowledge กำหนดใน `baan.config.json` ของ workspace
 - เตรียม packet หรือ plan ที่มี AC พร้อมข้อความ/source ต้นฉบับ, repository-relative owns และคำสั่ง build/targeted/full test ที่ตรวจแล้ว ใช้ `baan run --packet <file>` หรือ `baan run --plan <file>`; `--dry-run` ตรวจ input/readiness โดยไม่สร้าง run หรือเรียก provider
