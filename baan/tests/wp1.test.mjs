@@ -139,3 +139,14 @@ test("looksLikeEnvironmentFailure + --probe", () => {
   assert.equal(parseRoleArgs([]).probe, "");
   assert.throws(() => parseRoleArgs(["--probe", " "]), /--probe/);
 });
+
+test("subagent: CONVENTIONS §7 อนุญาตภายใน role พร้อมกติกา · sys/front/check มีหัวข้อ Subagents และถึง prompt จริง", () => {
+  const conv = readConventions();
+  assert.match(conv, /## 7\. Never chain roles yourself — subagents are allowed inside your role/);
+  for (const must of ["one writer per repository", "must be fresh", "never calls `baan`/`baan-role`", "Report it in the handoff"]) assert.ok(conv.includes(must), `§7 ขาด: ${must}`);
+  for (const role of ["sys", "front", "check"]) {
+    const p = roleDirective(role, "งาน", null, "", "2026-11-05");
+    assert.match(p, /## Subagents \(CONVENTIONS §7\)/, role);
+    assert.match(p, /## 7\. Never chain roles yourself — subagents are allowed/, `${role} ต้องได้ §7 ด้วย`);
+  }
+});

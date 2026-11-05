@@ -19,6 +19,7 @@
 - `--usage` (`baan`, `baan-role`) เก็บ token จาก claude/codex/agy (claude มีค่าใช้จ่ายด้วย)
 - `baan-role --probe "<cmd>"` รันคำสั่งตรวจสภาพแวดล้อมก่อนเปิด session — ล้มเพราะ feed/สิทธิ์/เครื่องมือ = exit 2 ไม่เปิด agent · ล้มเพราะเหตุอื่น (เช่น test แดงซึ่งเป็นงานของ role) เปิดต่อ
 - env `BAAN_AGENTS_FILE` ใช้ชุดตัวรันอื่นชั่วคราวโดยไม่แก้ `agents.json` ของ package
+- **role ใช้ subagent ของ CLI ได้** (CONVENTIONS §7 + หัวข้อ Subagents ใน `sys`/`front`/`check`): อ่าน/สำรวจ/ตรวจขนานภายใน role แทนการส่งงานข้าม session · เขียนได้ทีละตัวต่อ repo · ตัวที่ตรวจต้องใหม่และได้แค่ AC/สัญญา/path · ทดลองแล้วกับ codex t2 โหมดเขียน (t4/t5 และโหมดอ่านปฏิเสธ)
 
 ### เปลี่ยน
 

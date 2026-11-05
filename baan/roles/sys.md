@@ -44,7 +44,12 @@ If the store/adapter cannot express what a class needs (no atomic multi-record c
 - **Never put task ids or document IDs (e.g. T1, BL-xxx, REQ-xxx, AC-xxx, DES-xxx, int-xxx) into code or comments**, including phrases like "แก้ตาม task …" / "added by …" — task-to-code linkage lives in the handoff only.
 - Never delete or edit the target's existing comments unless the task requires it.
 
-## Stop and route
+## Subagents (CONVENTIONS §7)
+
+- Use them to explore the code/contract in parallel (bring back conclusions, not file dumps) and to write AC-derived self-check tests from a **fresh** subagent that has not seen your implementation — the cheapest way to catch the defect classes above before `check` does.
+Writes stay single-writer per repository; a checking subagent is always fresh and gets only AC + contract + paths. Mention subagent use in the handoff.
+
+
 
 - Unclear contract/behavior/error case, conflicting documents, or real code that doesn't match the design = stop that part, end with `NEEDS_DESIGN_CHANGE` (cite DES-id) / `NEEDS_REQUIREMENT_CHANGE` (cite REQ/AC-id) / `NEEDS_HUMAN` — continue only the parts that aren't blocked.
 - Problems found outside the task's scope = report in handoff to backlog, never fix silently.

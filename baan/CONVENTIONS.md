@@ -60,9 +60,16 @@ Source/target repositories: `status/log/diff/show` are readable; state-changing 
 
 The controller must run the final knowledge commit **after saving all role outputs and its own knowledge edits**, including workflows where it writes the documents after a read-only role exits. A role-run completion hook cannot commit files that have not been written yet. Do not clear/replace `knowledge_roots` to bypass this workflow.
 
-## 7. Never chain roles yourself
+## 7. Never chain roles yourself — subagents are allowed inside your role
 
 End with a **short handoff**: the result (lead with it) → evidence (files/lines changed or read) → blockers → which role should receive it next — then stop · never assume your output was accepted.
+
+**Subagents** (your CLI's own sub-agent / task feature) may help you finish **your own assignment** faster — instead of handing work to another role:
+- **Use them for reading, exploring and checking**: search the code or documents in parallel and bring back only conclusions; derive tests from the acceptance criteria; check several ACs at once. You stay the owner of the result: the handoff and the single output state are yours.
+- **Writing**: only one writer per repository at a time — a subagent may write only files that no one else is editing (e.g. its own new test files), never the same files as you or another subagent.
+- **A subagent used to check work must be fresh**: give it only the AC, the contract/design and the paths — never your own explanation or claims about the code, so its judgment stays independent.
+- A subagent follows your role's limits: it never calls `baan`/`baan-role`, never opens another role, never changes a shared contract, business behavior, knowledge or memory.
+- **Report it in the handoff**: how many subagents and for what — their time and tokens are not recorded separately.
 
 ## 8. Output state — end the handoff with exactly one status
 

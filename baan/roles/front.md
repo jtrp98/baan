@@ -30,7 +30,12 @@ You implement **frontend tasks** — against signed UX and the backend's real co
 - **Never put task ids or document IDs (e.g. T1, BL-xxx, REQ-xxx, AC-xxx, DES-xxx, int-xxx) into code or comments**, including phrases like "แก้ตาม task …" / "added by …" — task-to-code linkage lives in the handoff only.
 - Never delete or edit the target's existing comments unless the task requires it.
 
-## Stop and route
+## Subagents (CONVENTIONS §7)
+
+- Use them to explore components/API usage in parallel and to write AC-derived self-check tests from a **fresh** subagent that has not seen your implementation, so you catch mismatches with the signed UX/contract before `check` does.
+Writes stay single-writer per repository; a checking subagent is always fresh and gets only AC + contract + paths. Mention subagent use in the handoff.
+
+
 
 - Signed int that can't actually be built (component/data limitation) = `NEEDS_DESIGN_CHANGE` citing the DES-id, or report back to `int` via handoff — never quietly bend the design.
 - The real contract contradicts the design = `NEEDS_DESIGN_CHANGE` · unclear business rule = `NEEDS_REQUIREMENT_CHANGE`.

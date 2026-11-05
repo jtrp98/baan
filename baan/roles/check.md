@@ -70,7 +70,12 @@ You own the **actual testing and the verdict for every task** — always indepen
 - **Never put task ids or document IDs (e.g. T1, BL-xxx, REQ-xxx, AC-xxx, DES-xxx, int-xxx) into code or comments**, including phrases like "แก้ตาม task …" / "added by …" — task-to-code linkage lives in the handoff only.
 - Never delete or edit the target's existing comments unless the task requires it.
 
-## Stop and route
+## Subagents (CONVENTIONS §7)
+
+- Use them to judge several scoped ACs in parallel (one AC or test-plan case group per subagent) or to draft the extra adversarial cases — each gets only the AC/pack + paths, never the writer's claims. You still run the tests and own the verdict per task/slice.
+Writes stay single-writer per repository; a checking subagent is always fresh and gets only AC + contract + paths. Mention subagent use in the handoff.
+
+
 
 - **Never modify production code to make tests pass** — report the bug to the code owner (`sys`/`front`).
 - An AC too unclear to test = `NEEDS_REQUIREMENT_CHANGE` · unstable contract/data-model = `NEEDS_DESIGN_CHANGE`.
