@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// สรุปตัวชี้วัดจาก report ของ baan-role: node scripts/metrics.mjs [<reports dir>] [--json]
-// ไม่ระบุ dir = <ราก workspace>/reports/baan ของ workspace ที่เรียก (เดินหา baan.config.json)
 import path from "node:path";
 import { reportsDirOf, workspaceRootOf } from "../src/config.mjs";
 import { formatSummary, loadReports, summarize } from "../src/metrics.mjs";

@@ -1,38 +1,14 @@
-// แผน DAG: นิยาม schema, การ normalize และ validation (ตรวจก่อน spawn ใดๆ)
-// id ของ task ถูกใช้ประกอบชื่อไฟล์ใน runDir ทั้งอ่านและเขียน จึงต้องจำกัดด้วย pattern
 export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { TEST_LEVELS, resolveRoleName } from "./config.mjs";
+import { resolveRoleName } from "./config.mjs";
 
-// tier คงที่ของ role ที่ไม่ใช่งาน implement — planner เลือกเองไม่ได้ ยกเว้น front/sys
-// เป็นแหล่งจริงเดียว: บรรทัด "> tier:" ใน roles/*.md และตาราง role ใน BAAN.md/README ถูก test ให้ตรงกับค่านี้
-export const FIXED_ROLE_TIER = {
-  plan: "t2",
-  gm: "t2",
-  spec: "t2",
-  arch: "t1",
-  int: "t2",
-  vault: "t2",
-  inspect: "t2",
-  check: "t2",
-  jpo: "t2",
-};
-// ช่วงที่ นายช่าง/planner ควรเลือกให้งาน implement (คำแนะนำใน prompt/เอกสาร — ไม่บังคับในโค้ด
-// เพราะผู้ใช้อาจตั้งใจรัน front/sys ที่ t0/t1 ผ่าน --plan-file)
-export const IMPLEMENT_TIER_RANGE = "t2–t5";
-export const IMPLEMENT_ROLES = ["front", "sys"];
-// ทีมออกแบบ — คุยกับผู้ใช้สดและแตะ canvas จึงไม่มี tier ของตัวรัน ("> tier: interactive" ในหัวไฟล์)
-export const DESIGN_ROLES = ["survey", "ui", "review"];
+const TEST_LEVELS = ["normal", "full"];
+const IMPLEMENT_ROLES = ["front", "sys"];
 
-// ลำดับสลับตัวรันเริ่มต้นเมื่อ tier ไม่ได้ประกาศ _fallback เอง
-// opencode (Z.AI coding plan เหมาจ่าย) อยู่ก่อน agy/claude ที่กินโควตารายเรียก
-export const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
+const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
 
-// ลำดับตัวรันจริงของงานหนึ่งงาน: agent ที่เลือกมาเป็นตัวแรกเสมอ แล้วไล่ตาม _fallback ของ tier
-// (ข้าม agent ที่ไม่รู้จักหรือเป็น null ใน tier นั้น) — ใช้ทั้งตอน validate แผน (เลือกตัวแรกที่ใช้ได้)
-// และตอน execute เมื่อตัวปัจจุบันติดโควตา/limit กลางคัน
 export function fallbackChainFor(cfg, tierName, chosenAgent) {
   const tierConf = cfg.tiers[tierName] ?? {};
   const order = Array.isArray(tierConf._fallback) && tierConf._fallback.length ? tierConf._fallback : DEFAULT_AGENT_FALLBACK_ORDER;
@@ -49,8 +25,6 @@ export function extractJson(text) {
   return JSON.parse(raw.slice(start, end + 1));
 }
 
-// คืนรายการ id ที่วนลูป เช่น ["A","B","A"] หรือ null — ต้องจับตรงนี้ ไม่ใช่ตอน execute
-// เพราะแผนที่วนลูปอาจมีงานอิสระปนอยู่ ซึ่งจะรันไปก่อนรู้ว่าแผนใช้ไม่ได้
 export function findDependencyCycle(tasks) {
   const byId = new Map(tasks.map((t) => [t.id, t]));
   const visiting = new Set();
@@ -70,12 +44,9 @@ export function findDependencyCycle(tasks) {
   return cycle;
 }
 
-// แปลง task จากแผนได้หลายรูป (แผน runtime ของ baan / tasks JSON ของ gm ที่ใช้ owner+depends_on+gate_ids)
-// ให้ lint ตัวเดียวตรวจได้ทั้งคู่ — แผนโปรเจกต์ใน knowledge ไม่มี schema กลาง แต่ละโปรเจกต์ตั้งชื่อฟิลด์เอง
 export function normalizeDagTasks(tasks) {
   const nonEmpty = (v) => (Array.isArray(v) ? v.length > 0 : typeof v === "string" && v.trim() !== "");
   const list = (v) => (Array.isArray(v) ? v : []);
-  // ระดับที่ verdict ใช้ตัดสิน (charter ข้อ 14) — ไม่มีฟิลด์ = null: ledger ก่อนมีระดับตรวจแบบเต็มเสมอ
   const level = (o) => {
     const v = o?.test_level ?? o?.testLevel ?? null;
     return typeof v === "string" ? v.trim().toLowerCase() : v;
@@ -87,7 +58,6 @@ export function normalizeDagTasks(tasks) {
     gated: nonEmpty(t.gateIds ?? t.gate_ids) || nonEmpty(t.humanGate),
     status: typeof t.status === "string" ? t.status.trim().toLowerCase() : "",
     acIds: list(t.acIds ?? t.ac_ids),
-    // ค่าดิบเก็บไว้ให้ lint บอกค่าผิดได้ — ไม่มีฟิลด์ = null (แผนเก่า)
     risk: typeof t.risk === "string" ? t.risk.trim().toLowerCase() : (t.risk ?? null),
     wave: t.wave ?? null,
     tier: typeof t.tier === "string" ? t.tier.trim().toLowerCase() : null,
@@ -105,14 +75,13 @@ export function normalizeDagTasks(tasks) {
   }));
 }
 
-// จำนวนงานที่พึ่ง task นี้ทั้งทางตรงและทางอ้อม = ขนาดความเสียหายถ้า task นี้ผิดแล้วเจอช้า
 export function transitiveFanOut(tasks) {
   const children = new Map(tasks.map((t) => [t.id, []]));
   for (const t of tasks) for (const d of t.dependsOn) children.get(d)?.push(t.id);
   const memo = new Map();
   const reach = (id) => {
     if (memo.has(id)) return memo.get(id);
-    memo.set(id, new Set()); // กันวนลูป — cycle ถูกรายงานแยกโดย findDependencyCycle
+    memo.set(id, new Set()); // Cycles are reported separately by findDependencyCycle.
     const all = new Set();
     for (const c of children.get(id) ?? []) { all.add(c); for (const x of reach(c)) all.add(x); }
     memo.set(id, all);
@@ -121,11 +90,8 @@ export function transitiveFanOut(tasks) {
   return new Map(tasks.map((t) => [t.id, reach(t.id).size]));
 }
 
-export const RISK_LEVELS = ["high", "low"];
+const RISK_LEVELS = ["high", "low"];
 
-// lint การตรวจตามความเสี่ยง (risk-gated waves, charter ข้อ 13) — ที่มา: school-bot (2026-10-29) มี 35/110 task
-// ไม่มี ac_ids รวมงานฐานรากที่มีงานพึ่งทางอ้อม 79–89 งาน จึงตรึงเส้นชัยไม่ได้และตัดสินไม่ได้ว่าต้องตรวจทันทีหรือรอ gate
-// error เกิดเฉพาะเมื่อแผนใส่ risk/wave ค่าผิด แผนเก่าที่ไม่มีฟิลด์จึงไม่ตก
 export function lintPlanVerification(tasks) {
   const errors = [];
   const warnings = [];
@@ -158,7 +124,6 @@ export function lintPlanVerification(tasks) {
   if (normalOnly.length) warnings.push(`verified ระดับ normal (happy flow) ${normalOnly.length} จุด — ยังต้องผ่าน full pass ก่อน release: ${labels(normalOnly)}`);
   const noOracle = verifiedUnits.filter((u) => !u.oracle).map((u) => u.label);
   if (noOracle.length) warnings.push(`verified แต่ไม่มี oracle (revision ที่ใช้ตัดสิน) ${noOracle.length} จุด — เมื่อเอกสารเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noOracle)}`);
-  // ไม่มี oracle ถูกเตือนบรรทัดบนแล้ว — บรรทัดนี้เฉพาะ ledger ที่มีครึ่งเดียว
   const noRef = verifiedUnits.filter((u) => u.oracle && !u.ref).map((u) => u.label);
   if (noRef.length) warnings.push(`verified มี oracle แต่ไม่มี ref (commit ที่ตรวจ) ${noRef.length} จุด — เมื่อโค้ดเปลี่ยนจะบอกไม่ได้ว่าต้องตรวจซ้ำไหม: ${labels(noRef)}`);
   const unchecked = (id) => byId.get(id)?.risk === "high" && deriveTaskStatus(byId.get(id)) !== "verified";
@@ -169,13 +134,10 @@ export function lintPlanVerification(tasks) {
   if (qaDependencies.length) warnings.push(`งานพัฒนาที่รอ QA ${qaDependencies.length} งาน — ทบทวน dependency: ถ้าใช้สัญญาตรึง + fake ได้ ให้แยกงานเชื่อมจริงไว้รอ verdict แล้วเดินงานพัฒนาต่อ; ห้ามข้ามการตรวจสิทธิ์จริง: ${listIds(qaDependencies)}`);
   const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
   if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — แยกงานพัฒนาบนสัญญา + fake ออกจากงานเชื่อมจริง และเก็บ QA ค้าง; งานที่ต้องใช้พฤติกรรมจริงยังต้องรอ verdict: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
-  // รอบตกของงาน high = writer + check บนคิว writer เดียว แพงกว่าส่วนต่างค่า model (charter ข้อ 2) — school-bot
-  // 2026-11-03 งาน high ฝั่ง backend ทุกงานตั้ง t3 และเวลา rework รวมมากกว่าเวลาเขียนรอบแรก
   const weakHigh = open.filter((t) => t.risk === "high" && ["sys", "front"].includes(t.role) && /^t[3-5]$/.test(t.tier ?? ""));
   if (weakHigh.length) warnings.push(`task high ที่ writer ใช้ tier ต่ำกว่า t2 ${weakHigh.length} งาน — ตกหนึ่งรอบเสีย writer + check บนคิวเดียว ตั้ง t2 ขึ้นไป: ${labels(weakHigh.map((t) => `${t.id}@${t.tier}`))}`);
   const waveSizes = new Map();
   for (const t of tasks) if (isWave(t.wave)) waveSizes.set(t.wave, (waveSizes.get(t.wave) ?? 0) + 1);
-  // 6 = เพดานขนาด wave (3–6 task) ใน roles/gm.md — diff ทั้ง wave ใหญ่กว่านี้ผู้ตรวจ gate ใบเดียวเริ่มหลุด (recall ตกตามขนาดก้อน)
   const bigWaves = [...waveSizes].filter(([, n]) => n > 6).sort(([a], [b]) => a - b);
   if (bigWaves.length) warnings.push(`wave ที่มีเกิน 6 task: ${bigWaves.map(([w, n]) => `wave ${w} (${n})`).join(", ")} — แบ่ง wave ให้ check ใบเดียวต่อ gate ยังตรวจทั่วถึง`);
   const riskCounts = { high: 0, low: 0, unrated: 0 };
@@ -185,9 +147,8 @@ export function lintPlanVerification(tasks) {
   return { errors, warnings, fanOut, foundations, riskCounts, waves, used };
 }
 
-export const PLAN_STATUSES = ["pending", "done-local", "verified", "blocked"];
+const PLAN_STATUSES = ["pending", "done-local", "verified", "blocked"];
 
-// สถานะที่ task ควรเป็นตาม slices — task ที่ไม่มี slices ใช้สถานะของตัวเอง (แผนเก่าไม่มีฟิลด์นี้)
 export function deriveTaskStatus(t) {
   if (!t.slices.length) return t.status;
   const covered = new Set(t.slices.filter((s) => s.status === "verified").flatMap((s) => s.acIds));
@@ -196,9 +157,6 @@ export function deriveTaskStatus(t) {
   return "pending";
 }
 
-// lint ความคืบหน้า — ที่มา: school-bot (2026-10-28) คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local สักงาน
-// และ verified ต้องครอบทั้ง task ขณะที่งานจริงเดินทีละ slice จึงไม่มีงานโค้ดไหนดูเหมือนเสร็จเลย
-// error = สถานะอ้างเกินหลักฐาน (กระทบ exit code) · warning = ความคืบหน้าที่มีจริงแต่ไม่ถูกลง (ไม่กระทบ)
 export function lintPlanProgress(tasks) {
   const errors = [];
   const warnings = [];
@@ -225,7 +183,6 @@ export function lintPlanProgress(tasks) {
   const count = (list, st) => list.filter((t) => deriveTaskStatus(t) === st).length;
   const implProgress = { verified: count(impl, "verified"), doneLocal: count(impl, "done-local"), total: impl.length };
   const docsVerified = count(tasks.filter((t) => !IMPLEMENT_ROLES.includes(t.role)), "verified");
-  // 5 = ค่าเดียวกับ time-box ใบงานเอกสารล้วน 5 ใบในกติกาข้อ 10 ของ charter
   if (impl.length && implProgress.verified + implProgress.doneLocal === 0 && docsVerified >= 5) {
     warnings.push(`งานเอกสาร verified แล้ว ${docsVerified} งาน แต่งาน implement ${impl.length} งานยังไม่มี done-local/verified เลย — ลง done-local ให้งานที่ test ผ่านในเครื่องแล้ว หรือเปิด slice โค้ดถัดไป`);
   }
@@ -233,10 +190,6 @@ export function lintPlanProgress(tasks) {
   return { errors, warnings, implProgress, slices: { verified: slices.filter((s) => s.status === "verified").length, total: slices.length } };
 }
 
-// lint รูปร่าง DAG — ที่มา: แผน school-bot (2026-10-26) ผูกงาน implement 61/63 งานไว้หลังประตูมนุษย์
-// ผ่าน dependency ทางอ้อม จนไม่มีโค้ดชิ้นไหนเริ่มได้ ทั้งที่ validation เดิมผ่านหมด
-// เกณฑ์ "เกินครึ่ง" ไม่ใช่ "ทุกงาน" เพราะแผนนั้นมีงาน sys ไม่ติดประตูอยู่หนึ่งงาน (ตรวจหลักฐาน ไม่ใช่โค้ด)
-// เกณฑ์ทุกงานจึงปล่อยแผนที่เป็นต้นเหตุให้ผ่าน
 export function lintPlanDag(tasks, { docsOnly } = {}) {
   const errors = [];
   const byId = new Map(tasks.map((t) => [t.id, t]));
@@ -246,8 +199,6 @@ export function lintPlanDag(tasks, { docsOnly } = {}) {
     const t = byId.get(id);
     if (!t || seen.has(id)) return false;
     seen.add(id);
-    // งานที่ verified แล้วผ่านประตูของมันมาแล้ว — ที่มา: school-bot (2026-10-29) SA-002/UX-002/UX-004 ตรวจผ่านแล้ว
-    // แต่ยังถูกนับว่าขวางงานที่พึ่ง 31 งาน
     const r = deriveTaskStatus(t) !== "verified" && (t.gated || t.dependsOn.some((d) => isBlocked(d, seen)));
     blockedMemo.set(id, r);
     return r;
@@ -267,76 +218,6 @@ export function lintPlanDag(tasks, { docsOnly } = {}) {
   return { errors, impl, blocked, free };
 }
 
-export function validateAndFixPlan(plan, cfg, opts) {
-  if (typeof plan !== "object" || plan === null || Array.isArray(plan)) throw new Error("แผนต้องเป็น object ที่มี tasks");
-  if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error("plan.tasks ว่างหรือไม่ใช่ array");
-  if ("humanGates" in plan && !Array.isArray(plan.humanGates)) throw new Error("humanGates ต้องเป็น array ของ string");
-  if (Array.isArray(plan.humanGates) && plan.humanGates.some((g) => typeof g !== "string")) throw new Error("humanGates ต้องเป็น array ของ string");
-  if ("docsOnly" in plan && typeof plan.docsOnly !== "string") throw new Error("docsOnly ต้องเป็น string (เหตุผลที่แผนนี้ไม่มีงาน implement)");
-  const errors = [];
-  const ids = new Set();
-  for (const t of plan.tasks) {
-    if (typeof t !== "object" || t === null || Array.isArray(t)) { errors.push("task ต้องเป็น object"); continue; }
-    if (typeof t.id !== "string" || !TASK_ID_RE.test(t.id)) {
-      errors.push(`task id ไม่ถูกต้อง: ${JSON.stringify(t.id)} (ต้องขึ้นต้นด้วย A-Za-z0-9 ตามด้วย A-Za-z0-9_- ยาวรวมไม่เกิน 64 — id ถูกใช้เป็นชื่อไฟล์จึงห้ามมี / \\ .. หรือช่องว่าง)`);
-      continue;
-    }
-    if (ids.has(t.id)) errors.push(`id ซ้ำ: ${t.id}`);
-    ids.add(t.id);
-    if (typeof t.task !== "string" || !t.task.trim()) errors.push(`${t.id}: ไม่มีคำสั่งงาน (task)`);
-    const canonicalRole = resolveRoleName(t.role);
-    if (canonicalRole !== t.role) {
-      console.log(`  แก้ ${t.id}: role "${t.role}" → ${canonicalRole} (ชื่อเดิมก่อนย่อ ID)`);
-      t.role = canonicalRole;
-    }
-    if ("title" in t && typeof t.title !== "string") errors.push(`${t.id}: title ต้องเป็น string`);
-    if (t.testLevel !== undefined && !TEST_LEVELS.includes(t.testLevel)) errors.push(`${t.id}: testLevel ต้องเป็น ${TEST_LEVELS.join("/")} (ได้ ${JSON.stringify(t.testLevel)})`);
-    if (!t.role || !cfg.roleNames.includes(t.role)) errors.push(`${t.id}: role ไม่รู้จัก "${t.role}"`);
-    if (t.dependsOn === undefined || t.dependsOn === null) t.dependsOn = [];
-    else if (!Array.isArray(t.dependsOn) || t.dependsOn.some((d) => typeof d !== "string")) errors.push(`${t.id}: dependsOn ต้องเป็น array ของ string (id ของงานที่ต้องสำเร็จก่อน)`);
-    else {
-      if (t.dependsOn.includes(t.id)) errors.push(`${t.id}: dependsOn ตัวเองไม่ได้`);
-      t.dependsOn.forEach((d) => { if (!ids.has(d) && !plan.tasks.some((x) => x.id === d)) errors.push(`${t.id}: dependsOn ไม่มีจริง (${d})`); });
-    }
-    if (FIXED_ROLE_TIER[t.role] && t.tier !== FIXED_ROLE_TIER[t.role]) {
-      console.log(`  แก้ ${t.id}: tier "${t.tier}" → ${FIXED_ROLE_TIER[t.role]} (role นี้ tier คงที่)`);
-      t.tier = FIXED_ROLE_TIER[t.role];
-    }
-    if (!t.tier || !(t.tier in cfg.tiers)) errors.push(`${t.id}: tier ไม่รู้จัก "${t.tier}"`);
-    const chain = fallbackChainFor(cfg, t.tier, opts.agent);
-    if (chain.length === 0) errors.push(`${t.id}: tier ${t.tier} ไม่มี agent ที่ใช้ได้เลย (ทุกตัว null)`);
-    t.agent = chain[0] ?? opts.agent;
-    if (t.agent !== opts.agent) console.log(`  แก้ ${t.id}: agent "${opts.agent}" → ${t.agent} (ตามลำดับ fallback ของ tier ${t.tier})`);
-  }
-  const cycle = findDependencyCycle(plan.tasks);
-  if (cycle) errors.push(`dependency วนลูป: ${cycle.join(" → ")}`);
-  if (errors.length) throw new Error("แผนไม่ผ่าน validation:\n  " + errors.join("\n  "));
-  // แผนสดจาก planner เท่านั้นที่ lint แบบปฏิเสธ — แผนจาก --plan-file/--resume อาจเขียนก่อนมีกติกานี้
-  // ถ้าปฏิเสธจะ resume run เก่าไม่ได้ จึงเตือนอย่างเดียว
-  const lint = lintPlanDag(normalizeDagTasks(plan.tasks), { docsOnly: plan.docsOnly });
-  if (opts.lintStrict && lint.errors.length) throw new Error("แผนไม่ผ่าน DAG lint:\n  " + lint.errors.join("\n  "));
-  for (const m of lint.errors) console.log(`  ⚠ DAG lint: ${m}`);
-  return plan;
-}
-
-export function printPlan(plan) {
-  console.log(`\nแผนของนักวางผัง: ${plan.summary ?? ""}`);
-  console.log("┌─────┬─────────────────────┬─────────┬──────┬──────────┬─────────────────────────────┐");
-  console.log("│ id  │ role                │ agent   │ tier │ depends  │ title                       │");
-  console.log("├─────┼─────────────────────┼─────────┼──────┼──────────┼─────────────────────────────┤");
-  for (const t of plan.tasks) {
-    console.log(`│ ${String(t.id).padEnd(3)} │ ${String(t.role).padEnd(19)} │ ${String(t.agent).padEnd(7)} │ ${String(t.tier).padEnd(4)} │ ${String((t.dependsOn ?? []).join(",") || "-").padEnd(8)} │ ${String(t.title ?? "").slice(0, 27).padEnd(27)} │`);
-  }
-  console.log("└─────┴─────────────────────┴─────────┴──────┴──────────┴─────────────────────────────┘");
-  const parallel = plan.tasks.filter((t) => (t.dependsOn ?? []).length === 0).map((t) => t.id);
-  console.log(`รันขนานกันได้ตั้งแต่ต้น: ${parallel.join(", ") || "(ไม่มี)"}`);
-  if (plan.humanGates?.length) console.log(`ประตูมนุษย์ (รอผู้ใช้ตัดสิน): ${plan.humanGates.join(" · ")}`);
-  if (plan.docsOnly) console.log(`แผนเอกสารล้วน: ${plan.docsOnly}`);
-}
-
-// แผนของ project (layout "project": <project>/build/plan/) — task บอก module ที่ทำด้วยช่อง `module`
-// (ข้าม module = array · ข้าม project = "<project>/<module>") ให้ run ราย module หยิบเฉพาะงานของตัวเองได้
-// หา project จากตำแหน่งไฟล์: โฟลเดอร์แม่ตัวแรกที่มี modules/ · ไม่เจอ = แผนแบบเดิม ไม่ตรวจ
 export function lintPlanModules(rawTasks, file, isDirFn = (p) => existsSync(p)) {
   const errors = [];
   const warnings = [];
@@ -369,7 +250,6 @@ export function lintPlanModules(rawTasks, file, isDirFn = (p) => existsSync(p)) 
   return { errors, warnings, project };
 }
 
-// lint แผนโปรเจกต์ (เช่น plan\tasks-*.json ของ gm) — คืน exit code: 0 ผ่าน · 1 มี error
 export function lintPlanFile(file, readFile, log = console.log, isDirFn) {
   const json = JSON.parse(readFile(file));
   const raw = Array.isArray(json) ? json : json.tasks;

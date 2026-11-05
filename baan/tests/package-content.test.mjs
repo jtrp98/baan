@@ -1,4 +1,3 @@
-// Regression: package ต้องส่งไฟล์สัญญาครบ (AUDIT ข้อ 6) และห้ามส่งข้อมูล run เข้า tarball
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -31,9 +30,9 @@ test("entrypoints และโมดูลหลักอยู่ครบใ�
     assert.ok(pkg.files.includes(f), `ขาด ${f}`);
   }
   assert.equal(pkg.bin.baan, "./bin/baan.mjs");
-  assert.equal(pkg.bin["baan-role"], "./bin/baan-role.mjs");
+  assert.deepEqual(Object.keys(pkg.bin), ["baan"]);
   assert.ok(existsSync(path.join(pkgDir, "bin", "baan.mjs")), "ไฟล์ bin ต้องมีจริง");
-  assert.ok(existsSync(path.join(pkgDir, "bin", "baan-role.mjs")), "ไฟล์ bin ต้องมีจริง");
+  assert.ok(!existsSync(path.join(pkgDir, "bin", "baan-role.mjs")), "ต้องมี CLI เดียว");
 });
 
 test("ข้อมูล run (reports/) และ tests ต้องไม่ติดเข้า package", () => {

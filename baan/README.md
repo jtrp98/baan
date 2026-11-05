@@ -1,392 +1,202 @@
-# BAAN v2 — 3 บทบาท + ทีม UX/UI
+# 🏗️ BAAN — นายช่าง
 
-ทางหลักคือ **Planner → Senior Worker → Verifier ตามความเสี่ยง** โดย core จัดคิว ล็อก repo
-เก็บ snapshot รันคำสั่งตรวจ และบันทึกผลให้เอง ทีมออกแบบ survey/ui/review และ spec แบบคุยสดยังอยู่
-ตัวอย่างด้านล่างใช้ config เดิมได้ ไม่เพิ่ม runtime dependency และไม่ commit ใน target repo
+Local npm package สำหรับควบคุมงานพัฒนาผ่าน AI CLI: **Orchestrator → Planner เมื่อจำเป็น → Worker → Verifier ตามความเสี่ยง**
+Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
+Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-## เริ่มใช้งาน v2
-
-รัน `baan --init` ที่ workspace อีกครั้งเพื่ออัปเดต AGENTS.md/CLAUDE.md ที่ BAAN สร้างไว้
-AI session อ่าน `prompts/frontend.md` เป็นทางเข้าหลัก; config ที่มีอยู่ไม่ถูกเขียนทับ
-
-1. คุย requirement ให้ได้ acceptance พร้อมแหล่งอ้างอิงก่อน (`/pencil`; งานหน้าจอผ่าน survey/UX sign-off)
-2. เตรียม packet ตาม `schemas/packet.schema.json`; commands เป็นคำสั่งที่ผู้ใช้/ผู้คุมเตรียมไว้
-3. เริ่ม run เพื่อแสดง acceptance และ inbox ก่อนเขียนโค้ด:
+## ติดตั้งและตั้งค่า
 
 ```sh
-baan run --direct --packet packet.json
-baan inbox --run <run-dir>
-baan decide WP-1 --run <run-dir> --approve --by user --decision "ยืนยัน acceptance" --source "chat 2026-11-05"
-baan run --resume <run-dir>
-baan report <run-dir>
+cd baan
+npm link
+baan --version
+baan --help
+baan --init --workspace C:/src/workspace
+baan --list --workspace C:/src/workspace
 ```
 
-packet ขั้นต่ำ (เปลี่ยน repo/commands/acceptance ให้ตรงงานจริง):
+ติดตั้งจาก artifact ได้ด้วย `npm install -g <path>/baan-0.29.0.tgz`
+`--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)
+อัปเดตเฉพาะไฟล์ที่ BAAN สร้างไว้ ไม่ทับไฟล์ของผู้ใช้; รันซ้ำหลังอัปเกรดได้
+แก้ paths/targets ใน config ให้ตรงเครื่อง ตัวอย่างอยู่ [baan.example.json](baan.example.json)
+`--knowledge-git <url>` / `--memory-git <url>` clone เฉพาะปลายทางที่ยังไม่มี
+
+Config discovery: `--config` → `BAAN_CONFIG` → เดินขึ้นจาก `--workspace`/`--cwd`/จุดที่เรียก
+ไม่มี config ใช้ defaults; config จริงอยู่นอก package
+Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุดด้วย `BAAN_AGENTS_FILE=<path>`
+`baan --list` แสดงชุดที่ใช้อยู่ ห้ามเดาชื่อ model จากเอกสารเก่า
+
+- **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ `exec`, structured schema, read-only sandbox สำหรับ Planner/Verifier และ session resume สำหรับ Worker
+- **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ JSON schema/session และจำกัด Planner/Verifier ให้มีเฉพาะ Read/Grep/Glob โดยปิด MCP ของ call นั้น
+- **agy**: ลงชื่อเข้าใช้ CLI และติดตั้ง [read-only profile + guard](setup/agy/README.md) ที่ตรง package ก่อนใช้ Planner/Verifier; รองรับ schema/conversation resume
+- **OpenCode**: ใช้ Worker ได้ตาม tier ที่ประกาศ; ไม่มี read-only contract ที่ core ยืนยันได้ จึงข้ามเมื่อเลือก Planner/Verifier
+  Worker เริ่ม process ใหม่พร้อม context เมื่อไม่มี session ID; ไม่อ้างว่าเป็น native resume
+
+บน Windows core เรียก native executable หรือ Node entry ของ npm Codex โดยไม่ผ่าน shell
+รองรับ npm OpenCode ที่ `@opencode/cli/bin/opencode.exe`; wrapper แบบอื่นต้องตั้ง `command` เป็น executable จริง
+การเปลี่ยน CLI/model ของเครื่องต้องตรวจ `--help` และรัน live smoke อีกครั้ง
+
+## เตรียมและรันงาน
+
+คุยให้ได้ acceptance ต้นฉบับพร้อม source ก่อน งาน UI ใช้ `/pencil` และทีมออกแบบตาม [BAAN.md](BAAN.md)
+สร้าง `packet.json` ตาม [schema](schemas/packet.schema.json) โดยเลือก scope และ commands ให้ตรงงาน:
 
 ```json
 {
   "id": "WP-1",
-  "title": "แก้การคำนวณยอด",
-  "goal": "คำนวณจำนวนรวมตาม acceptance ที่คุยไว้",
+  "title": "แก้ผลรวม",
+  "goal": "คำนวณยอดรวมตาม requirement",
   "tasks": ["TASK-1"],
   "repo": {"path": "C:/src/project"},
   "owns": ["src/total.mjs", "tests/total.test.mjs"],
-  "read_first": [{"path": "src/total.mjs"}],
-  "acceptance": [{"id": "AC-1", "text": "รวมจำนวนบวก ศูนย์ และลบได้ถูกต้อง", "source": "requirements.md#AC-1"}],
+  "read_first": [{"path": "src/total.mjs"}, {"path": "requirements.md"}],
+  "acceptance": [{"id": "AC-1", "text": "รวมค่าบวก ศูนย์ และลบได้ถูกต้อง", "source": "requirements.md#AC-1"}],
   "depends_on": [],
   "risk": "low",
-  "commands": {"build": "node --check src/total.mjs", "test_targeted": "node --test tests/total.test.mjs", "test_full": "npm test"},
+  "commands": {
+    "build": "node --check src/total.mjs",
+    "test_targeted": "node --test tests/total.test.mjs",
+    "test_full": "npm test"
+  },
   "acceptance_approved": false
 }
 ```
 
-- งานเดี่ยวเล็ก: `baan run --direct --packet <file>` (ไม่เปิด Planner)
-- แผนหลาย package: `baan run --plan <file> --select <id,id>` โดยไฟล์เป็น `{packages: [...] }`
-- งานใหม่: `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
-  สร้าง acceptance จาก goal เพื่อรอยืนยันก่อน; งานเดี่ยวเล็กใช้ Worker ก่อน งานที่มี contracts หรือ needs_planning ใช้ Planner; ใช้ `--acceptance` กับ `--source` เพื่อระบุให้ชัด
-- ตรวจล่วงหน้า: `--dry-run` ไม่สร้าง run/เรียก AI; แสดง Definition of Ready
-- `baan --goal` และ `--plan-file` เป็นทางเข้า v2 แล้ว; resume pipeline รุ่นเดิมด้วย BAAN รุ่นเดิม
-- `--agent`, `--tier` (default t2), `--planner-tier`, `--max-parallel`, `--timeout` ใช้กับ v2 ได้
+```sh
+baan run --direct --packet packet.json --workspace C:/src/workspace --dry-run
+baan run --direct --packet packet.json --workspace C:/src/workspace
+baan inbox --run <run-dir>
+baan decide WP-1 --run <run-dir> --approve --by user --decision "ยืนยัน acceptance, scope และ commands ที่แสดง" --source "chat 2026-11-05"
+baan run --resume <run-dir>
+baan report <run-dir>
+```
 
-ยืนยันครั้งเดียวต่อชุด acceptance: core เก็บ `acceptance_approved`, `approved_by`, `approved_at`
-ใน packet ของ run; มีแก้เอกสารอ้างอิงระหว่างทางจะเป็น stale และต้องยืนยันใหม่
-ไฟล์งานค้างที่ทับ owns ต้องยืนยัน `--allow-dirty --by user` ด้วย โดยเก็บมติและ source ทุกครั้ง
-อย่าใส่ approval ล่วงหน้าเว้นแต่ได้คำยืนยันจากผู้ใช้จริง
+เริ่มแบบไม่อนุมัติเพื่อเก็บ inbox ได้ ไม่มี provider call ก่อนยืนยัน
+บันทึก `--by user` เฉพาะเมื่อมีคำตอบจริงจากผู้ใช้ เป็น audit record ในเครื่อง ไม่ใช่ระบบพิสูจน์ตัวตนของผู้ใช้
+Approval ผูกกับ acceptance/scope/commands/dependencies/risk และ hash ของ source/contracts
+`read_first` ที่เป็น Markdown/DBML ถูก pin อัตโนมัติ; ไฟล์อื่นใช้ `{"path":"schema.json","pin":true}`
+implementation files ที่อ่านเป็น context ไม่ทำให้ approval stale เพียงเพราะ Worker แก้โค้ด
 
-## แผนเดิมและการจัดคิว
+`human_gates: [{"id":"G-UX","text":"คนเซ็น handoff ก่อนสร้างหน้าจอ"}]` เพิ่มประตูเฉพาะงาน
+บันทึกแยกด้วย `baan decide WP-1 --run <run-dir> --gate G-UX --by user --decision "..." --source "..."`
+Acceptance approval ไม่เซ็นประตูอื่นแทน ถ้า approval stale ต้องใช้ `--approve` อีกครั้ง; คำตอบทั่วไปไม่ refresh approval
+งานค้างที่ทับ owns ต้องให้คนยืนยันด้วย `--allow-dirty --by user` พร้อม decision/source
 
-แผน tasks เดิมยังอ่าน owner/depends_on/ac_ids ผ่าน normalizer เดิมได้ แต่ก่อน dispatch ต้องมี
-`owns`, `commands`, ข้อความ acceptance ตรงต้นฉบับพร้อม source (`task.acceptance` หรือ `plan.acceptance`)
-และยืนยันก่อน กลุ่ม task ที่มี `package` เดียวกัน หรือ module/owns/commands ตรงกันถูกรวมเป็น work package เดียวโดยรักษา task ids
-สคริปต์ไม่แตะไฟล์แผนต้นฉบับหรือสถานะเก่าใน memory
+งานใหม่ใช้ `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
+Core สร้าง acceptance จาก goal ให้รอยืนยัน; ระบุข้อความ/source เพิ่มด้วย `--acceptance`/`--source`
+`--direct` ข้าม Planner สำหรับ package เดียว แต่ยังผ่าน approval, gates และ verifier policy
+งานมี contracts, ประมาณเกิน 120 นาที หรือ `needs_planning: true` ใช้ Planner โดยปริยาย
+แผนที่มี work packages ครบแล้วจัดคิวได้โดยไม่เปิด Planner ซ้ำ งานที่รอคนไม่ปล่อย dependencies แต่ approved independent work เดินต่อได้
 
-writer ได้ 1 ตัวต่อ repo รวมข้าม run/workspace (lock ใน Git common directory); package ต่าง repo ที่มี expected_minutes ≥ 30 อย่างน้อย 2 ตัว
-จึงเลือก parallel; งานอื่นใช้ planned และรันทีละตัว เติม slot ทันทีที่ dependency ผ่าน
-`shared_files` ล็อก path กลางด้วย; verifier ใช้ไม่เกินครึ่ง slot (อย่างน้อย 1) และถือ repo lock เดียวกับ package
+## แผนและการจัดคิว
 
-เพิ่ม contract/integration checks ในแผนได้:
+`baan run --plan plan.json --select A,B` รับ `{ "packages": [ ... ], "integration": [ ... ] }`
+เส้นทาง repo แบบ relative อ้างจากโฟลเดอร์แผน การ select ต้องรวม dependencies ที่ต้องใช้
+`--plan-file` เป็น alias ของ `--plan`; `baan --goal` เข้าทาง run เดียวกัน
+แผน tasks อ่าน owner/role, depends_on/dependsOn, ac_ids/acIds และชื่อ role เดิมผ่าน normalizer เดียว
+ต้องมี owns, commands และข้อความ AC/source ที่ตรวจได้; ระบุที่ task หรือ plan.acceptance
+`gate_ids`, `gateIds`, `humanGate` และ human_gates ยังคงเป็นประตูที่ต้องยืนยัน ไม่ถูกทิ้งตอนรวม task
+แผนต้นฉบับและประวัติเดิมไม่ถูกแก้; task ที่รวม package เดียวกันต้องมี repo/scope/commands ตรงกัน
+
+หนึ่ง BAAN writer ต่อ Git repository รวมข้าม workspace/run/linked worktrees
+หลาย repo ที่มีอย่างน้อยสอง package ประมาณ ≥30 นาทีเลือก parallel; งานอื่น planned ทีละ package
+Planner แตกได้เฉพาะ scope/AC/task ของ parent และสืบ approval ที่ตรวจแล้วจาก core
+`--agent`, `--tier` (default t2), `--planner-tier`, `--max-parallel` (1–64), `--timeout` (1–86400 วินาที)
+Timeout ที่ระบุเองชนะ tier._timeoutSec แล้วจึง defaults.timeout_sec; resume ใช้ค่าที่บันทึกไว้
+
 ```json
-{"packages": [], "integration": [{"packages": ["WP-api", "WP-client"], "command": "npm run test:contract"}]}
-```
-รันเมื่อ package ที่ระบุ done ครบ โดย cwd คือ repo ของ package ตัวแรก และถือ lock ทุก repo ที่เกี่ยว
-เมื่อแดง ส่ง evidence กลับเข้า worker ภายในเพดาน rework (default 2) แล้วพักให้คนตัดสิน
-
-## หลักฐานและการกู้ run
-
-ข้อมูลใหม่อยู่ `<workspace>/.baan/runs/<run>/`: run.json, packets/, ledger.jsonl, status.md,
-ใบงาน task-*.md, evidence/ และผล call รายครั้ง ทั้งหมดสร้างจากสถานะเดียวกัน ไม่เขียน memory เก่าทับ
-ควร ignore `.baan/` ใน workspace (มีข้อมูลโค้ด/prompt/ผลคำสั่ง อย่าเผยแพร่)
-
-snapshot เก็บ tracked recovery object ด้วย git stash create และ blob ของ untracked files
-โดยไม่เปลี่ยน working tree, index, stash list หรือ branch; core ไม่ reset/revert/commit
-ดู before/after ใน packet เพื่อกู้ด้วย Git เองเมื่อจำเป็น ไม่ควรใช้ snapshot เป็น backup ถาวร
-
-`baan status [<run>]` ดูสถานะ; `baan run --resume <run>` ต่อ session ของ Claude/Codex
-(บันทึก Codex session ตั้งแต่ thread.started); agy ใช้ --conversation ตาม conversation_id
-ถ้า process ลูกเดิมยังอยู่ core ปฏิเสธการเริ่มซ้อน ให้รอ/ยกเลิกก่อน resume
-`baan run --cancel <wp> --run <run>` หยุด process พร้อมเก็บการแก้ไว้ งานลูกยังไม่ถูกปล่อย
-
-machine gate ตรวจ build/targeted/full, diff นอก owns, Git head/index/stash และ mapping AC กับชื่อ test
-ผลคำสั่ง cache ตาม repo+snapshot+command; ถ้า AC ไม่มีชื่อ test ใน output จะใช้ Verifier อิสระ
-risk high/auth/security/schema/เงิน/คะแนน/PII/public contract/fan-out/milestone/release ต้องตรวจอิสระ
-Verifier เป็น read-only; test เพิ่มที่เสนอจะส่งกลับ Worker พร้อม findings ไม่มีการเขียน production โดยผู้ตรวจ
-scope gate ตรวจความเปลี่ยนแปลงที่ Git มองเห็น ไม่ใช่ sandbox จำกัดสิทธิ์ของ provider
-
-คำถามกลางทางพักเฉพาะ package นั้น; งานอิสระเดินต่อ `baan inbox` รวมคำถามท้าย run
-`baan decide <wp> --run <run> --decision "..." --source "path#section rev"` ใช้คำตอบที่อ้างแหล่งได้
-business/schema/security/UX และการยอมรับความเสี่ยงต้องถามผู้ใช้ การแก้ ENVIRONMENT_FAILURE/TEST_DEFECT
-ไม่กินจำนวนรอบ rework แต่พักไว้ให้แก้สาเหตุก่อน
-
-## โหมดเดิม (deprecated)
-
-`baan-role` และ role/alias เดิมทั้งหมดคงไว้สำหรับสคริปต์เดิมอย่างน้อยหนึ่งรุ่น
-ตารางและ charter ด้านล่างเป็นของ legacy mode; ทางหลัก v2 ใช้ 3 prompts ใน prompts/
-Benchmark แบบประหยัดใช้ตรวจ correctness และต้นทุนเบื้องต้น ไม่ได้ยืนยันความเร็วเหนือรุ่นเดิม
-
----
-
-# BAAN
-
-BAAN แบ่งงานพัฒนาซอฟต์แวร์ให้ AI หลายตัวทำตามตำแหน่ง คล้ายทีมจริงที่มีคนเขียน requirement, คนออกแบบ, คนเขียนโค้ด และคนตรวจแยกกัน แต่ละตำแหน่งรันผ่าน AI CLI ที่ติดตั้งไว้ในเครื่อง (claude, codex, agy หรือ opencode) แบบ non-interactive
-
-ทำไมต้องแยก: ถ้าให้ AI ตัวเดียววางแผน เขียนโค้ด เขียนเทส และตรวจงานตัวเอง ผลที่ได้มักไม่มีใครตรวจจริง BAAN เลยกำหนดว่า
-
-- คนเขียนโค้ดไม่ใช่คนตรวจโค้ด และคนออกแบบ schema ไม่รัน SQL เอง
-- เรื่องที่ต้องให้คนตัดสิน ทีมจะหยุดถามเสมอ ได้แก่ เรื่องธุรกิจ, การเปลี่ยน schema หรือ contract, การเซ็น UX, ผลตรวจที่ตกซ้ำ, ความเสี่ยงด้าน security, การ deploy และการตัด scope
-- งานยากใช้ model แพง งานง่ายใช้ model ถูก ผ่านระบบ tier
-- ทุก session เริ่มแบบอ่านอย่างเดียว จะแก้ไฟล์ได้ต้องสั่ง `--write`
-
-ไม่มี runtime dependency ใช้แค่ Node.js 18 ขึ้นไป
-
-## ติดตั้ง
-
-ต้องมี AI CLI อย่างน้อยหนึ่งตัวที่ login แล้ว ถ้าใช้ agy ต้องติดตั้ง profile เพิ่มหนึ่งครั้ง ดู [setup/agy/README.md](setup/agy/README.md)
-
-```bash
-git clone https://github.com/jtrp98/baan
-cd baan/baan
-npm link
+{"packages": [], "integration": [{"packages": ["A", "B"], "command": "npm run test:contract"}]}
 ```
 
-จากนั้นตั้ง workspace ด้วยคำสั่งเดียว — ทั้งทีมสร้างและทีมออกแบบไม่ต้อง clone อะไรเพิ่มเอง
+ตัวอย่างนี้แสดงเฉพาะรูปแบบ integration; แผนจริงต้องมี packages A และ B
+ตรวจเมื่อ packages ที่เกี่ยว done ครบ cwd คือ repo ของ package แรก ถือ lock ทุก repo ที่เกี่ยว
+ล้มเหลวส่ง evidence กลับ Worker ภายใน budget.max_rework (default 2); เกินเพดานรอคน
+Integration command ที่เปลี่ยน working tree/Git state ทำให้หลักฐานใช้ต่อไม่ได้และรอการตรวจจากคน
 
-```bash
-baan --init
-```
+## สถานะ หลักฐาน resume และ cancel
 
-`--init` ถามโฟลเดอร์ workspace และ git URL ของ knowledge (กับ memory ถ้าใช้) แล้ว clone ให้ จากนั้นเขียน config ที่ path ตรงเครื่องนี้ (สคริปต์ส่งเป็น flag แทนได้: `baan --init --workspace C:\src\myworkspace --knowledge-git <url> [--memory-git <url>]`) · รันซ้ำได้ ไม่ทับไฟล์ของคุณเอง ใช้อัปเดตของทีมออกแบบหลัง `git pull` baan
+ข้อมูลทั้งหมดของ run อยู่ `<workspace>/.baan/runs/<id>/`: run.json เป็นสถานะหลัก, packets/, ledger.jsonl,
+status.md, task-*.md, evidence/*.log/*.json และ provider input/result แยกตาม call
+เพิ่ม `.baan/` ใน gitignore; อาจมีโค้ด/prompt/ข้อมูลจากผลคำสั่ง จึงไม่ควรเผยแพร่
 
-| สิ่งที่ `--init` วางให้ | ใช้ทำอะไร |
+`baan status [<run>]`, `baan report [<run>]`, `baan inbox [<run>]` อ่าน run ล่าสุดเมื่อไม่ระบุชื่อ
+`baan decide <package> --run <run> --by user --decision "..." --source "..."` บันทึกคำตอบแล้วให้ resume
+`baan run --cancel <package> --run <run>` หยุด process ของ runner ที่ยังทำงาน เก็บการแก้ไว้และไม่ปล่อยงานลูก
+Cancel ก่อนเริ่มไม่เปิด provider; resume งาน cancelled ต้องมี decide ชัดเจนก่อน
+ถ้า core หายและเหลือ orphan CLI จะไม่ฆ่า PID ที่อาจถูกนำกลับมาใช้ ให้หยุด process ต้นฉบับเองก่อน resume
+
+| State | ความหมาย / ทำต่อ |
 |---|---|
-| `knowledge\`, `memory\` | clone จาก git URL ที่ตอบ (ข้ามได้) |
-| `baan.config.json` | path ของ repo โค้ด, ที่เก็บเอกสาร และค่า default ของ workspace นี้ · clone knowledge ให้แล้ว = ตั้ง `"layout": "project"` และ path ให้เลย · ไม่ clone = ก๊อปจาก [baan.example.json](baan.example.json) ให้แก้เอง |
-| `CLAUDE.md`, `AGENTS.md` | บอก AI session ที่เปิดในโฟลเดอร์นี้ให้ทำหน้าที่คุมงาน (ถ้ามีไฟล์ของคุณเองอยู่แล้ว จะไม่เขียนทับ) |
-| `.claude\agents\` survey · ui · review · `.claude\commands\pencil.md` · `.claude\skills\` | ของทีมออกแบบสำหรับ Claude — ชี้ไป role ตัวจริงใน package จึงไม่ตกรุ่น |
+| pending / probing / running / gating / verifying | อยู่ในคิวหรือกำลังทำงาน |
+| done | ผ่าน local machine gates และการตรวจที่ risk policy กำหนด |
+| waiting_human | ดู inbox แล้วบันทึก decide |
+| stale | reference/approval เปลี่ยน แสดง acceptance ใหม่แล้วขอยืนยัน |
+| env_failed | แก้ CLI/toolchain/feed/permission แล้ว resume |
+| blocked | รอ dependency หรือแผนยังใช้ไม่ได้ ดู questions |
+| cancelled | หยุดแล้ว เก็บไฟล์เดิมไว้ |
 
-รัน `baan --list` เพื่อตรวจว่าเห็นทุกอย่างครบ แล้วเพิ่ม `targets` (repo โค้ด) ใน config เมื่อต้องใช้
+Core สร้าง diff_file/snapshots_file ให้ Verifier อ่านโดยไม่ต้องเปิด terminal; หลักฐานแต่ละ attempt ใช้ชื่อเฉพาะ ไม่เขียนทับรอบก่อน
+Machine gates รัน build/targeted/full, ตรวจ diff นอก owns, head/branch/index/stash และ AC ↔ test names
+ขาด test mapping, แก้ existing tests, high risk, security/auth/PII, DB/schema, เงิน/คะแนน, public contract,
+fan-out, milestone หรือ release ต้องมี Verifier ใหม่ที่ไม่รับคำเล่าของ Worker; Verifier อ่านอย่างเดียว
+ถ้าไม่มี mapping ที่ parser รู้จัก ให้ Verifier ตรวจหลักฐานแทน ไม่ถือว่าคำว่า AC ใน stdout เป็น test proof
+Cache เฉพาะคำสั่งผ่านบน snapshot/Git state/command เดิม; integration รวม snapshot ทุก repo
 
-## โครงสร้าง workspace
+Snapshot เก็บ tracked recovery object (`git stash create`) และ untracked blobs โดยไม่เปลี่ยน working tree,
+index content, stash list หรือ branch Core ไม่ reset/revert/commit target; การกู้เป็นการตัดสินใจของคน
+Snapshot เก็บ target ของ untracked symbolic links ด้วย และครอบไฟล์ tracked/untracked ที่ Git เห็น ไม่ใช่ backup ของ ignored files หรือข้อมูลภายนอก repo
+Scope gate เป็นการตรวจหลังแก้ ไม่ใช่ provider sandbox; Worker write mode ใน agents.json อนุญาตกว้างบนเครื่อง
+Commands ใน packet/config เป็น trusted local shell commands ต้องตรวจเองก่อนอนุมัติ ไม่รับ commands ใหม่จาก LLM
+Read-only permissions ขึ้นกับ provider/การตั้งค่าของเครื่อง มีการตรวจ mutation อีกชั้นแต่ไม่ rollback อัตโนมัติ
 
-config อยู่นอก package เพื่อไม่ให้การอัปเดต BAAN ไปทับค่าของคุณ ตัวอย่าง workspace
+## เครื่องมือ knowledge และ UX/UI
 
-```
-C:\src\myworkspace\
-  baan.config.json   config ของ workspace
-  knowledge\         เอกสารที่ทีมใช้ร่วมกัน (requirement, design, test plan, backlog)
-  memory\            สิ่งที่ทีม AI ใช้ทำงานต่อ (ใบงาน, คิว, ผลตรวจรายรอบ, หลักฐาน)
-  target\            repo โค้ดที่ทีมจะแก้
-  reports\baan\      ผลดิบของทุกครั้งที่รัน (คำตอบ, stdout, stderr)
-```
+`baan --init` ติดตั้ง spec ผ่าน `/pencil`, survey/ui/review และ web-design-guidelines ใน `.claude/`
+ทีมนี้ใช้แบบคุยสด ไม่ถูกส่งเป็น execution roles; รักษา Design System, handoff และ human UX sign-off
+`--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
+`baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--sweep "term" [--sweep-in <dir>]`
+`baan --commit` เก็บเอกสารเฉพาะ knowledge/memory Git repos ที่ตั้งใน config ไม่มี auto commit ของ run
+เครื่องมืออ่าน metrics เดิมยังอ่านประวัติ reports ได้; run ใหม่ใช้ ledger/evidence ของ engine เดียว
 
-- `knowledge` และ `memory` ควรเป็น git repo แยกกัน BAAN จะ commit ให้อัตโนมัติตอนจบงาน
-- ถ้าไม่ตั้ง `memory_root` ทุกอย่างจะลง `knowledge`
-- ตั้ง `"layout": "project"` ที่ knowledge root = จัดเอกสารเป็น project > module และแยกช่อง `shared\` (กลาง) · `design\` (ทีมออกแบบ) · `build\` (ทีมสร้าง) ทุกระดับ:
+## สำหรับ maintainer
 
-```
-knowledge\
-  school-bot\                project
-    INDEX.md                 ตาราง module (baan --index สร้างจากหัวไฟล์ของแต่ละ module)
-    shared\  design\  build\ ของที่ใช้ทั้ง project (brand, มติ, แผน, db …)
-    modules\quiz\            module
-      INDEX.md               หัวไฟล์: status · updated · depends_on · requested_by · target · platform · os
-      shared\  design\  build\
-```
-
-  module อยู่กับ project ที่โค้ดของมันถูกส่งมอบ (หน้าครูของ SchoolBot ที่อยู่ในเว็บ = `schoolbright-web\modules\school-bot` + `requested_by: school-bot`) · ตาราง INDEX ของทั้งสอง project แสดงแถวของกันและกันให้เอง ไม่ต้องคัดลอกเอกสาร · ไม่ตั้ง layout = โครงเดิม
-- ทั้ง `baan` และ `baan-role` หา `baan.config.json` โดยไล่ขึ้นจากโฟลเดอร์ที่เรียก ถ้าต้องการระบุเองใช้ `--config <file>` หรือ env `BAAN_CONFIG`
-
-## พัฒนาให้ลองได้ก่อน
-
-BAAN เดินงานพัฒนาที่พร้อมให้ได้ flow หลักที่เปิดลองได้ โดยใช้สัญญาที่ตกลงแล้วกับข้อมูลจำลองเฉพาะสภาพแวดล้อมพัฒนาเมื่อ License/Login/DB ยังรอตรวจ แยกงานเชื่อมของจริงไว้หลังประตูที่เกี่ยวข้อง งานตรวจที่ตกหยุดเฉพาะงานที่ต้องใช้ผลจริงของมัน งานอื่นเดินต่อได้ ไม่ต้องตั้ง flag เพิ่ม
-
-done-local หมายถึงพัฒนาและทดสอบในเครื่องผ่าน ยังมีรายการ QA รอตรวจพร้อมผู้รับผิดชอบและเงื่อนไขปิด ไม่ใช่ verified หรือพร้อม production ก่อน release ยังต้องตรวจครบ รวม security และประตูมนุษย์ ข้อมูลจำลองไม่เปิดทางข้ามสิทธิ์บน production และไม่ใช้กับข้อมูลหรือหุ่นจริง
-
-แผนเดิมต้องปรับ dependency และใบงานให้แยกงานพัฒนาจากงานเชื่อมจริง โดยรักษา IDs, AC และรายการตรวจค้าง; scheduler ยังคงรอ dependency ตามแผนเสมอ
-
-### ระดับการตรวจ: normal กับ full
-
-ระหว่างพัฒนาไม่ต้องตรวจทุกเคสทุก task ตั้งระดับไว้สองแบบ:
-
-| ระดับ | ใช้ตอนไหน | check ตรวจอะไร |
-|---|---|---|
-| `normal` (ค่าเริ่มต้น) | ระหว่างพัฒนา | happy flow ของ AC ทุกข้อ + build/test อัตโนมัติเขียว · ของที่เจอนอกทางหลักจดเป็น "รายการรอ full pass" ไม่ตก ไม่เปิดรอบแก้ · ไม่เปิด `jpo` |
-| `full` | พัฒนาครบแล้ว ตรวจรอบเดียวทั้ง scope · ก่อน release | เคสใน test plan ครบ + เคสโจมตีเพิ่ม + `jpo` แล้วรวม finding เป็นใบแก้ใบเดียวต่อเจ้าของต่อ module |
-
-ตั้งค่าเริ่มต้นที่ `defaults.test_level` ใน `baan.config.json` หรือสั่งราย run ด้วย `--test-level full` · ตรวจผ่านระดับ normal ให้ลง `"test_level": "normal"` ใน ledger ของแผน แล้ว `baan --lint-plan` จะเตือนจนกว่าจะผ่าน full · ก่อน release ต้องผ่าน full เสมอ
-
-## วิธีใช้
-
-มี 2 แบบ
-
-### แบบที่ 1: ให้ AI session คุมงาน (แนะนำ)
-
-เปิด AI session ในโฟลเดอร์ workspace ไฟล์ `CLAUDE.md`/`AGENTS.md` ที่ `--init` สร้างไว้จะทำให้ session นั้นรับบทผู้คุมงาน (ในเอกสารเรียกว่า "นายช่าง") หรือสั่งตรงๆ ก็ได้
-
-```
-อ่าน C:\src\AICode\baan\baan\BAAN.md แล้วทำหน้าที่นายช่าง
-เป้าหมาย: เพิ่มหน้า export รายงานคะแนน (โปรเจกต์: school-bot)
-```
-
-session นั้นจะอ่านเอกสารเดิม แบ่งงาน เปิด session ของแต่ละตำแหน่งด้วย `baan-role` ส่งผลต่อกัน และรวบรวมเรื่องที่ต้องให้คุณตัดสินมาถาม กติกาทั้งหมดของผู้คุมงานอยู่ใน [BAAN.md](BAAN.md)
-
-ถ้าใช้แอปที่ไม่มี CLI ให้เรียก (เช่น ZCode) หรืออยากประหยัดโควตา ให้บอกว่า "solo" session นั้นจะทำงานทุกตำแหน่งเองด้วย subagent
-
-### แบบที่ 2: โหมดอัตโนมัติ
-
-รันทั้งก้อนโดยไม่ต้องมี session คุม ระบบส่งเป้าหมายให้ `plan` แตกเป็นแผนโดยตรง แล้วรันตามแผน งานที่ไม่ต้องรอกันจะรันพร้อมกัน และ slot ว่างเมื่อไรก็เปิดงานที่พร้อมทันที ไม่รองานอื่นในรอบเดียวกันให้จบก่อน (งานที่มีงานอื่นพึ่งมากได้ก่อน)
-
-```bash
-baan --target school-bot --goal "แก้บั๊ก login ค้าง" --dry-run   # ดูแผนก่อน ยังไม่รัน
-baan --target school-bot --goal "แก้บั๊ก login ค้าง"
-baan --module school-bot/quiz --goal "เพิ่มหน้าเลือก Level"        # layout project: ทีละ module (ข้าม module: school-bot/quiz+app-shell)
-baan --resume <runDir>                                          # ต่อ run ที่ค้าง
-```
-
-แผนที่ได้ต้องมีงานเขียนโค้ดอย่างน้อยหนึ่งงานที่ไม่ต้องรอคนตัดสิน ของที่ยังรอคน (DB จริง, UX ที่ยังไม่เซ็น) ให้ใช้ stub ไปก่อน ถ้างานนั้นเป็นเอกสารล้วนจริงๆ ให้ใส่ `"docsOnly": "<เหตุผล>"` ในแผน
-
-## ทีม
-
-| ID | ชื่อ | หน้าที่ | tier |
-|---|---|---|---|
-| `plan` | นักวางผัง | แตก goal ใหญ่เป็นแผน DAG ที่เล็กที่สุดที่ได้งาน แล้วส่งให้ gm (เฉพาะงานใหญ่) | t2 |
-| `gm` | ผู้จัดการหน้างาน | เป็นเจ้าของ plan.md, backlog และ release scope ข้าม run — คุ้มกัน scope creep (เฉพาะงานใหญ่) | t2 |
-| `spec` | ผู้เขียนข้อกำหนด | เค้นความต้องการจริงออกจากผู้ใช้ แปลงเป็น REQ/AC/BR ที่ทดสอบได้ และทะเบียนคำถามค้าง (OQ) | t2 |
-| `arch` | สถาปนิก | ออกแบบ DES และสัญญา API แบบเรียบง่าย ตรวจกับโค้ดจริง (as-built) เสมอ | t1 |
-| `int` | นักออกแบบตกแต่งภายใน | ร่าง UX ราย feature รอคนเซ็น สำหรับ module ที่ไม่มีทีมออกแบบ | t2 |
-| `front` | ช่างหน้างาน | implement ตาม UX ที่เซ็นแล้วเป๊ะ และสัญญา backend ตัวจริง — ไม่เพิ่มของที่ไม่ได้ขอ | เลือกราย task (t2–t5) |
-| `sys` | ช่างระบบ | implement ตามสัญญาเป๊ะ — validation ครบทุกขาเข้า และ error contract สมบูรณ์ | เลือกราย task (t2–t5) |
-| `vault` | ผู้ดูแลห้องนิรภัย | ออกแบบ schema กันบั๊กและเขียน SQL พร้อม rollback — แต่ห้ามรันเองเด็ดขาด | t2 |
-| `inspect` | หัวหน้าตรวจรับ | ทำ TP, test matrix และ traceability ครบทุก AC — ล่าช่องโหว่ ไม่ใช่แค่ครอบคลุม | t2 |
-| `check` | ผู้ตรวจงานอิสระ | เขียน unit test จาก spec และตัดสิน PASS/FAIL ราย task — ทำหน้าที่ศัตรูของโค้ด | t2 |
-| `jpo` | จป. | ตรวจ OWASP และ PDPA/GDPR ตามพื้นผิวจริง แล้วประกาศ blocker ตามความเสี่ยงจริง | t2 |
-
-ทีมออกแบบ — คุยกับคุณสดใน session ที่เปิดใน workspace (ทำงานบน Claude Design) นายช่างเรียกเป็น subagent ไม่ผ่าน `baan-role`:
-
-| ID | ชื่อ | หน้าที่ | tier |
-|---|---|---|---|
-| `survey` | ช่างสำรวจ | สำรวจ requirement ของ module ก่อนลงแบบ ว่าทำเป็น UI ได้ไหม ชี้ช่องโหว่ ความขัดแย้ง และ edge case | interactive |
-| `ui` | ช่างเขียนแบบ | ออกแบบหน้าจอของ module บน canvas ของ Claude Design โดยดึง component จาก Design System และดูแล design system ของ project | interactive |
-| `review` | ผู้ตรวจแบบ | ตรวจแบบก่อนส่งช่าง (usability · WCAG AA · ใช้ Design System ครบ) ทำ handoff และตรวจหน้าจอที่สร้างแล้วเทียบแบบ | interactive |
-
-เค้น requirement แบบคุยสดใช้ `/pencil <project>/<module>` (= `spec`) · ชื่อเดิม ruler/crayon/highlighter/pencil ยังใช้ได้ · ความรู้ UX ทั่วไป (HIG, heuristics, UI 58 กฎ) อยู่ใน [ux-knowledge/](ux-knowledge/) · ทางเดินงานออกแบบ (`draft → approved → designed → reviewed → built`) อยู่ใน [BAAN.md](BAAN.md)
-
-ลำดับงานเต็มรูปแบบ: `plan` วางแผน, `gm` เรียกทีมตามแผน, `spec` เขียน requirement, `survey`/`ui`/`review` ออกแบบและส่ง handoff (หรือ `int` ร่าง UX ให้คุณเซ็น สำหรับ module ที่ไม่มีทีมออกแบบ), `arch` ออกแบบ, `vault` เขียน SQL ให้คุณรัน, `front`/`sys` เขียนโค้ด, `inspect` วางแผนทดสอบ, `check` เขียนเทสและตัดสิน PASS/FAIL, `jpo` ตรวจ security ก่อนขึ้น production
-
-งานเล็กไม่ต้องใช้ทั้งทีม `plan` และ `gm` เข้ามาเฉพาะงานใหญ่ที่ต้องมี backlog ต่อเนื่อง
-
-แต่ละตำแหน่งคือไฟล์ใน [roles/](roles/) อยากเพิ่มหรือลดตำแหน่งก็เพิ่มหรือลบไฟล์ `.md` ได้เลย กติกาที่ทุกตำแหน่งต้องทำตามอยู่ใน [CONVENTIONS.md](CONVENTIONS.md) ซึ่งถูกแนบไปกับทุก prompt เฉพาะหัวข้อที่ตำแหน่งนั้นใช้ (`sys`/`front` ไม่ได้หัวข้อ 3, 10, 12, 13 · `check` ไม่ได้หัวข้อ 3 — ตั้งที่ `CONVENTIONS_OMIT` ใน `src/prompts.mjs`)
-
-## คำสั่ง
-
-### baan
-
-| คำสั่ง | ทำอะไร |
+| Module | หน้าที่ |
 |---|---|
-| `baan --init` | ตั้งค่า workspace (clone knowledge · config · ของทีมออกแบบ) · รันซ้ำเพื่ออัปเดต |
-| `baan --list` | ดู config, repo, project/module, ตำแหน่ง และ tier ทั้งหมด |
-| `baan --goal "..." [--target <ชื่อ>] [--module <project>/<module>]` | รันโหมดอัตโนมัติ (เพิ่ม `--dry-run` เพื่อดูแผนอย่างเดียว) |
-| `baan --index` | สร้างตาราง module ใน `<project>/INDEX.md` ใหม่จากหัวไฟล์ของแต่ละ module (จบ run แล้วทำให้เอง) |
-| `baan --lint-knowledge` | ตรวจ knowledge แบบ project: ลิงก์เสีย · `depends_on`/`requested_by` ที่ไม่มีจริง · ตารางไม่ตรง · ไฟล์นอกช่อง shared/design/build |
-| `baan --plan-file <file>` | รันแผนที่แก้เอง |
-| `baan --resume <runDir>` | ต่อ run ที่ค้าง ข้ามงานที่เสร็จแล้ว และใช้ target เดิม |
-| `baan --sweep "<ค่าเดิม>"` | หาทุกไฟล์ที่อ้างค่าเดิม แยกตามเจ้าของไฟล์ ใช้ก่อนเปลี่ยนชื่อหรือค่าที่ถูกอ้างหลายที่ |
-| `baan --lint-plan <tasks.json>` | ตรวจแผน ตกถ้าไม่มีงานเขียนโค้ด, งานเขียนโค้ดเกินครึ่งรอคนตัดสิน หรือสถานะเกินจริง |
-| `baan --commit` | commit เอกสารที่ค้างใน knowledge/memory ด้วยมือ |
+| bin/baan.mjs → src/cli.mjs | CLI parser, run lifecycle, status/decisions |
+| packet / planner / triage | input/result validation, trusted plan splitting, risk policy |
+| scheduler / repolock | dependencies, one writer, rework, cancel |
+| session / runner | provider arguments, native process, schema, usage, fallback/session |
+| snapshot / gate / integrate | Git safety, command evidence/cache, integration checks |
+| store | atomic run persistence, derived packet/status/task views, append-only events |
+| config / workspace / utilities / init | workspace discovery, module context และคำสั่งจัดการ workspace |
+| prompts / schemas / roles | execution contracts / structured data / interactive design contracts |
 
-### baan-role
+ไม่มี package exports map หรือ runtime dependency; src modules เป็น implementation ภายใน
+Result schemas ใช้ subset ของ JSON Schema ที่ validator รองรับ: types/required/properties/enum/arrays/string bounds/numeric bounds
+`promptBytes` วัด UTF-8 bytes ของ prompt ที่ส่งเท่านั้น ไม่ใช่ token/cost ทั้งหมด
+Logs เต็มอยู่บน disk; Worker ได้ command summaries/paths และ rework findings, Verifier ไม่ได้ Worker summary
 
-เปิด session ของตำแหน่งเดียว เป็นคำสั่งที่ผู้คุมงานใช้
-
-```bash
-baan-role --agent codex --role spec --tier t2 --task "เขียน requirement ของหน้า export"
-baan-role --agent codex --role sys --tier t3 --cwd C:\src\myworkspace\target\api --write --task "แก้บั๊ก..."
-baan-role --all --role jpo --tier t2 --task "ตรวจ security ของ API ใหม่"
-baan-role --list
+```sh
+npm test
+npm pack --dry-run
+npm run validate:release
+npm run smoke:live -- --agents codex --tier t3
 ```
 
-| option | ความหมาย |
-|---|---|
-| `--agent <ชื่อ>` / `--all` | เลือก AI CLI ตัวเดียว หรือทุกตัวพร้อมกัน |
-| `--role <ID>` | ตำแหน่งจากตารางด้านบน |
-| `--tier <t0-t5>` | ระดับ model |
-| `--cwd <dir>` | repo ที่ให้ทำงาน (ค่าเริ่มต้นคือโฟลเดอร์ที่เรียก) |
-| `--write` | อนุญาตให้แก้ไฟล์ |
-| `--model`, `--effort` | ระบุ model หรือ effort เอง แทนค่าของ tier |
-| `--no-fallback` | ไม่สลับไป AI ตัวอื่นเมื่อโควตาหมด |
-| `--no-preflight` | ข้ามการตรวจใบงานก่อนเปิด session (ดูด้านล่าง) |
-| `--test-level normal\|full` | ระดับการตรวจของ `inspect`/`check`/`sys`/`front` (ค่าเริ่มต้นจาก `defaults.test_level`) |
-| `--task-id <id[,id...]>` | id ของ task ในแผนที่ call นี้ทำ (ใส่ซ้ำหรือคั่นด้วย `,` ได้) — ลง `report.json` และ ledger ให้วัดเวลาราย task ได้ |
-| `--probe "<cmd>"` | รันคำสั่งตรวจสภาพแวดล้อม (เช่น `dotnet build --no-restore`) ในโฟลเดอร์งานก่อนเปิด session — ล้มเพราะสภาพแวดล้อม (feed, สิทธิ์, เครื่องมือขาด) จบ exit 2 โดยไม่เปิด agent · ล้มเพราะเหตุอื่น (เช่น test แดงซึ่งเป็นงานของ role) เปิด session ต่อ |
-| `--usage` | เก็บ token (claude, codex, agy · claude มีค่าใช้จ่ายด้วย) ลง `report.json` และ ledger · opencode ยังไม่รองรับ |
+Release validation สร้าง tarball จริง ตรวจ contents ติดตั้ง offline ใน temp workspace แล้วตรวจ imports/CLI/init/
+direct/planned execution ผ่าน provider fixture และ machine commands จริง; ไม่ใช้ workspace งานจริง
+Live smoke ใช้ provider จริงใน temp repo จึงใช้โควตา ไม่รวมใน npm test
 
-ก่อนเปิด session `baan-role` จะตรวจใบงาน (รวมไฟล์ `.txt` ที่ใบงานอ้างถึง) ถ้าใบงานสั่ง build หรือรัน test แต่ไม่ได้ใส่ `--write` จะจบด้วย exit 2 (`read-build`) ทันทีโดยไม่เสียเวลาของ agent เพราะโหมดอ่านเขียน `bin/obj` ไม่ได้ · โหมดเขียนไม่มี sandbox แล้ว จึงไม่ตรวจ path นอก `--cwd` หรือการอ่าน git ของโฟลเดอร์แม่อีก
+การอัปเกรดที่ต้องแก้คำสั่งเป็น minor ระหว่าง 0.x พร้อมหมวด ⚠ ใน release notes
+เตรียมรุ่นและ artifacts ได้ แต่ push/tag/merge release/publish ต้องมีคำสั่งเผยแพร่ชัดเจน
+[Release notes](RELEASE-NOTES.md) เก็บการเปลี่ยนแปลงและประวัติตามจริง
 
-option ที่ใช้ได้ทั้งสองคำสั่ง: `--config <file>`, `--timeout <วินาที>`, `--date YYYY-MM-DD`, `--test-level normal|full`, `--usage`
+## Troubleshooting
 
-## ผลลัพธ์และสถานะงาน
-
-ทุก role ต้องจบคำตอบด้วยสถานะเดียว: `DONE`, `PASS`, `FAIL`, `BLOCKED`, `NEEDS_DESIGN_CHANGE`, `NEEDS_REQUIREMENT_CHANGE` หรือ `NEEDS_HUMAN` BAAN ตัดสินจากสถานะนี้ ไม่ได้ดูแค่ exit code ของ CLI
-
-- งานนับว่าสำเร็จเมื่อจบด้วย `DONE` หรือ `PASS` เท่านั้น
-- `baan` และ `baan-role` คืน exit code 0 เมื่อทุกงานสำเร็จ ไม่อย่างนั้นคืน 1 พร้อมสรุปสาเหตุ
-- งานที่พึ่งงานที่ล้มจะถูกข้าม แต่งานอื่นที่ไม่เกี่ยวยังทำต่อ
-- ผลดิบของทุก run อยู่ที่ `<workspace>\reports\baan\<เวลา>-<role>-...\` และมี `report.json` สรุปสถานะ
-- จบ run แล้ว BAAN จะ commit `knowledge` และ `memory` ให้ แยก commit ตาม module ถ้าผู้คุมงานเขียนเอกสารเองหลังจากนั้น ให้รัน `baan --commit` อีกครั้ง
-- `--resume` รันใหม่เฉพาะงานที่ยังไม่สำเร็จ
-
-### วัดว่าเวลาไปไหน
-
-- `report.json` บันทึก `startedAt`, `taskIds`, `promptBytes` และต่อผลลัพธ์ `failureClass` — แยก `ENVIRONMENT_FAILURE` (sandbox, สิทธิ์, package feed, CLI เริ่มไม่ได้, DNS) ออกจากผลของงาน (`VERDICT_FAIL`, `NEEDS_DESIGN`, `NEEDS_HUMAN`, ...)
-- ทุก call เขียน event ลง ledger `<workspace>\reports\baan\ledger\YYYY-MM-DD.jsonl` (`call_start`, `call_end`, `task_result`, `preflight_block`) — append ทีละบรรทัด เปิดหลาย `baan-role` พร้อมกันได้
-- สรุปตัวชี้วัด: `node scripts/metrics.mjs [<reports dir>] [--json]` (ไม่ระบุ = `reports\baan` ของ workspace ที่เรียก) — เวลาราย role, เหตุที่ไม่สำเร็จ, เวลาที่เสียกับสภาพแวดล้อมและรอบแก้, การใช้ slot และช่วงที่ไม่มี agent รันต่อวัน
-
-idle timeout: ค่ายที่พิมพ์ความคืบหน้าระหว่างทำ (codex) ถูกหยุดเมื่อเงียบเกิน `idleTimeoutSec` ใน `agents.json` (codex 1200 วินาที) แม้ยังไม่ถึง timeout รวม · claude และ agy ไม่ได้ตั้ง เพราะโหมด non-interactive ของสองตัวนี้ไม่พิมพ์อะไรจนจบงาน
-
-timeout เริ่มต้นคือ 1800 วินาทีต่องาน (t0 ใช้ 3600) ลำดับความสำคัญคือ `--timeout` > `_timeoutSec` ของ tier ใน `agents.json` > `defaults.timeout_sec` ใน config > 1800
-
-## Tier และ model
-
-เลือก tier ตามความยากของงาน ตำแหน่งส่วนใหญ่ใช้ tier คงที่ตามตารางทีม มีแค่ `front` และ `sys` ที่เลือกตามงาน
-
-- ฝีมือของ model กำหนดด้วย tier ไม่ใช่ชื่อ AI CLI — ตัวเดียวกันคนละ tier ได้ model คนละรุ่น (ดูตารางด้านล่าง หรือ `baan-role --list`)
-- งานที่แผนตั้ง `risk: high` ให้ `front`/`sys` เริ่มที่ t2 ขึ้นไป (`baan --lint-plan` เตือนถ้าต่ำกว่า) เพราะตกหนึ่งรอบต้องเสียทั้งรอบแก้และรอบตรวจซ้ำ
-- ตอนแก้งานที่ตรวจไม่ผ่าน: ปัญหาที่โค้ดขยับ tier แรงขึ้นหนึ่งขั้น ปัญหาที่แบบส่ง `arch` ตัดสินก่อน ถ้าขยับแล้วยังไม่ผ่านให้หาสาเหตุที่ระบบแทนการขยับต่อ (รายละเอียดใน [BAAN.md](BAAN.md) ข้อ 12)
-
-| tier | เหมาะกับ | claude | codex | agy | opencode |
-|---|---|---|---|---|---|
-| t0 | ปัญหายากมาก ต้องคิดลึกที่สุด | opus / xhigh | gpt-6-astra / max | ไม่มี | ไม่มี |
-| t1 | ออกแบบระบบ ตัดสินใจสำคัญ | opus / high | gpt-6.1-sol / high | gemini-4-argon-high | ไม่มี |
-| t2 | โค้ดซับซ้อน หลายไฟล์ | opus / medium | gpt-6.1-sol / medium | gemini-4-argon-medium | ไม่มี |
-| t3 | งานพัฒนาทั่วไป | sonnet / high | gpt-6.1-terra / medium | gemini-3.8-flash-medium | glm-5.3-flash / high |
-| t4 | เขียนเทส, refactor เล็กๆ | haiku / medium | gpt-6-luna / medium | gemini-3.8-flash-low | glm-5.3-flash / low |
-| t5 | สรุป จัดหมวด ตอบคำถามง่าย | haiku / low | gpt-6-luna / low | gemini-3.8-flash-low | glm-5.3-flash / low |
-
-- "ไม่มี" หมายถึงค่ายนั้นยังไม่มี model ที่เก่งพอสำหรับ tier นั้น ถ้าใช้ `--all` ตัวนั้นจะถูกข้าม ถ้าระบุ `--agent` ตรงๆ จะ error
-- ถ้า AI ตัวแรกติดโควตา, ไม่ได้ติดตั้ง หรือเริ่มทำงานไม่ได้ (เช่น codex `Access is denied` ตอนเริ่ม, claude โหลดตั้งค่าองค์กรไม่ได้, DNS ล้มภายใน 60 วินาทีแรก) ระบบจะสลับไปตัวถัดไปตาม `_fallback` ของ tier นั้น ถ้าล้มด้วยเหตุอื่นจะไม่สลับ
-- ถ้า model เต็มชั่วคราว ระบบรอ 30 วินาทีและ 90 วินาทีแล้วลองใหม่ก่อนจะสลับ
-- **โหมดเขียน (`--write`) ไม่มี sandbox** ทุกค่าย: codex `--dangerously-bypass-approvals-and-sandbox` · claude `--permission-mode bypassPermissions` · agy `--mode auto` · opencode `--auto` — AI แก้ไฟล์และรันคำสั่งได้ทุกที่บนเครื่องเหมือน session ที่คุณเปิดเอง ขอบเขตงานคุมด้วยใบงานเท่านั้น · เหตุผล: sandbox ทำให้ `dotnet test` รันไม่ได้ (testhost ต่อ socket ไม่ได้ และ `File.Move` ทับไฟล์ถูกปฏิเสธ) จน writer จบ BLOCKED ราวครึ่งหนึ่งของงานที่ไม่สำเร็จ · โหมดอ่านยังจำกัดตามตารางด้านล่าง · ใช้ชุดตัวรันอื่นชั่วคราวได้ด้วย env `BAAN_AGENTS_FILE=<ไฟล์ agents>`
-- **role เรียก subagent ของ CLI ตัวเองได้** (CONVENTIONS §7) — อ่าน/สำรวจ/ตรวจขนาน · เขียนได้ทีละตัวต่อ repo · ตัวที่ใช้ตรวจต้องเป็นตัวใหม่ที่ได้แค่ AC/สัญญา/path · ห้ามเรียก `baan`/`baan-role` · ใช้ได้ทั้งโหมดอ่านและโหมดเขียน (claude โหมดอ่านอนุญาต tool `Agent`/`Task` ใน `--allowedTools` — subagent ยังติดข้อจำกัดอ่านอย่างเดียวเดิม) · ทดลองจริง 2026-11-05: codex t2 และ t5 ทั้งโหมดอ่าน/เขียนเรียก `collaboration.spawn_agent` ได้เมื่อระบุชื่อ tool (บอกแค่ "sub-agent" โมเดลเล็กปฏิเสธ จึงระบุชื่อ tool ไว้ใน CONVENTIONS §7) · claude/agy ยังไม่ได้ทดลองจริง
-- แก้ tier หรือเพิ่ม AI CLI ตัวใหม่ได้ที่ [agents.json](agents.json)
-
-## AI CLI ที่รองรับ
-
-| CLI | คำสั่งที่ BAAN เรียก (โหมดอ่าน) | วิธีกันไม่ให้แก้ไฟล์ในโหมดอ่าน |
-|---|---|---|
-| claude | `claude -p --allowedTools ...` | อนุญาตแค่ tool อ่านไฟล์และคำสั่ง git แบบอ่าน (จึงรัน node/npm ไม่ได้) |
-| codex | `codex exec -s read-only` | sandbox read-only ของ codex |
-| agy | `agy --agent baan-readonly --print` | profile `baan-readonly` และ guard hook (ติดตั้งครั้งเดียว) |
-| opencode | `opencode run -m ...` | ไม่ใส่ `--auto` ทำให้การกระทำที่ต้องขออนุญาตถูกปฏิเสธ |
-
-- ส่ง prompt ทาง stdin เมื่อทำได้ เพื่อเลี่ยงปัญหา quote บน Windows
-- agy โหมด headless อ่านไฟล์นอก cwd ไม่ได้ BAAN จึงส่ง `--add-dir <workspace>` ให้ในโหมดอ่าน โหมดเขียน (`--mode auto`) ไม่ต้องใช้ `setup/agy/grant-read.mjs` อีก
-- ทุกครั้งที่รันใช้โควตาของบัญชีที่ login CLI นั้นอยู่
-- `--write` ให้ AI แก้ไฟล์ใน `--cwd` ได้ ควรใช้กับ git repo เพื่อดู diff ได้
-
-## เอกสารที่ทีมเขียน
-
-ทีมแยกเอกสารเป็น 2 ที่ ก่อนเขียนไฟล์ไหนจะถามก่อนว่า "คนที่ไม่ได้รัน BAAN ต้องใช้ไฟล์นี้ไหม"
-
-- `knowledge` เก็บสิ่งที่คนอื่นต้องรู้หรือใช้ตัดสินใจ เช่น requirement, มติ, design, contract, schema, test plan, backlog ทุกไฟล์เขียนให้ dev ในทีมที่ไม่เคยรัน BAAN อ่านรอบเดียวรู้เรื่อง แก้ทับให้เป็นข้อมูลปัจจุบันเสมอ และเก็บประวัติการแก้ไว้ที่ `changelog/YYYY-MM.md` ของแต่ละ module
-- `memory` เก็บสิ่งที่ทีม AI ใช้ทำงานต่อ เช่น ใบงาน คิว ผลตรวจรายรอบ หลักฐาน
-
-รายละเอียดอยู่ใน [CONVENTIONS.md](CONVENTIONS.md) หัวข้อ 3
-
-## พัฒนา BAAN
-
-```
-bin\       baan.mjs, baan-role.mjs (entrypoint ของสองคำสั่ง)
-src\       config, runner (เรียก CLI), prompts, plan, scheduler, run-store, init, sweep, knowledge-commit, ledger, metrics, failure-class
-roles\     prompt ของแต่ละตำแหน่ง
-setup\agy\ profile อ่านอย่างเดียวของ agy
-scripts\   live-smoke.mjs, metrics.mjs
-tests\     regression tests
-```
-
-```bash
-npm test               # ไม่เรียก AI จริง ไม่ใช้โควตา ต้องผ่านทั้งหมดก่อน commit
-npm run smoke:live     # ทดสอบกับ AI CLI จริงทุกตัว ใช้โควตาจริง
-```
-
-`npm run smoke:live -- --tier t3 --agents claude,codex` เลือก tier และ CLI ที่จะทดสอบได้ ตัวทดสอบตรวจว่าอ่านไฟล์ได้จริง, โหมดอ่านกันการเขียนได้จริง และ `--write` เขียนได้
-
-สิ่งที่เปลี่ยนในแต่ละรุ่นอยู่ใน [RELEASE-NOTES.md](RELEASE-NOTES.md)
+CLI ไม่พบ/เรียก wrapper ไม่ได้: ตรวจ PATH/native executable และ agents.json
+JSON/schema ไม่ผ่าน: ดู call.json/input.json และอัปเดต provider CLI; ไม่ fallback เพราะ JSON ผิดหรือแก้ไฟล์ไปแล้ว
+ENVIRONMENT_FAILURE: ดู probe/output_file และแก้ dependency/toolchain/permission ก่อน resume
+LOCK_BUSY: ตรวจ run/CLI เดิมให้หยุดจริง; core กู้ lock เฉพาะเจ้าของ PID ที่ตายแล้ว ไม่ลบ lock ที่ยังทำงาน
+Approval stale: ดู source/scope/commands ที่เปลี่ยน บันทึก --approve ใหม่จากคำตอบคนจริง
+Scope/Git state violation: ตรวจ evidence แล้วให้คนแก้หรือกู้เอง Core ไม่ล้างการแก้ที่ค้าง
+แผน/run เก่าที่เป็น task checkpoints ใช้ BAAN รุ่นที่สร้างมัน; รุ่นนี้อ่าน tasks เป็น input แต่ไม่เขียนทับประวัติเดิม

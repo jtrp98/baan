@@ -12,7 +12,11 @@ const runtime = (f) => /^(?:\.baan|reports\/baan)(?:\/|$)/.test(f);
 export function fileHash(file) {
   try {
     const stat = lstatSync(file);
-    return hash(`${stat.mode & 0o777}:` + (stat.isSymbolicLink() ? readlinkSync(file) : stat.isDirectory() ? git(file, "rev-parse", "HEAD").trim() : readFileSync(file).toString("base64")));
+    if (stat.isDirectory()) {
+      const nested = snapshot(file);
+      return hash(JSON.stringify([nested.id, nested.head, nested.branch, nested.index, nested.stash]));
+    }
+    return hash(`${stat.mode & 0o777}:` + (stat.isSymbolicLink() ? readlinkSync(file) : readFileSync(file).toString("base64")));
   } catch (e) { if (e.code === "ENOENT") return null; throw e; }
 }
 export function snapshot(repo) {
@@ -24,19 +28,21 @@ export function snapshot(repo) {
   const changes = git(repo, "diff", "--name-only", "-z", "HEAD").split("\0").filter(Boolean);
   const untracked = git(repo, "ls-files", "--others", "--exclude-standard", "-z").split("\0").filter((f) => f && !runtime(f));
   const untracked_blobs = Object.create(null);
+  const untracked_links = Object.fromEntries(untracked.filter((f) => lstatSync(path.join(repo, f)).isSymbolicLink()).map((f) => [f, readlinkSync(path.join(repo, f))]));
   for (let i = 0; i < untracked.length; i += 64) {
-    const chunk = untracked.slice(i, i + 64).filter((f) => !lstatSync(path.join(repo, f)).isSymbolicLink());
+    const chunk = untracked.slice(i, i + 64).filter((f) => !Object.hasOwn(untracked_links, f));
     if (!chunk.length) continue;
     const blobs = git(repo, "hash-object", "-w", "--", ...chunk).trim().split(/\r?\n/);
     chunk.forEach((f, j) => { untracked_blobs[f] = blobs[j]; });
   }
   // stash create writes a recovery object, without changing the index, working tree or stash list.
   const tracked = git(repo, "stash", "create").trim() || git(repo, "rev-parse", "HEAD").trim();
-  return { repo, tracked, head: git(repo, "rev-parse", "HEAD").trim(), files, untracked, untracked_blobs,
+  return { repo, tracked, head: git(repo, "rev-parse", "HEAD").trim(), branch: git(repo, "rev-parse", "--abbrev-ref", "HEAD").trim(), files, untracked, untracked_blobs, untracked_links,
     index: git(repo, "write-tree").trim(), stash: hash(git(repo, "stash", "list")),
     preexisting_changes: [...new Set([...changes, ...untracked])],
     id: hash(JSON.stringify(Object.entries(files).sort())) };
 }
+export function sameState(a, b) { return ["id", "head", "branch", "index", "stash"].every((key) => a[key] === b[key]); }
 export function changedFiles(before, after) {
   return [...new Set([...Object.keys(before.files), ...Object.keys(after.files)])].filter((f) => before.files[f] !== after.files[f]);
 }

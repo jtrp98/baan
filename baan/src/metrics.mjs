@@ -1,12 +1,8 @@
-// ตัวชี้วัดจาก report.json ของ baan-role (หนึ่งโฟลเดอร์ต่อ call) — เวลา, สถานะ, เหตุล้ม, รอบแก้, การใช้ slot
-// แยกจาก scripts/metrics.mjs เพื่อทดสอบได้ด้วยข้อมูลจำลอง
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { classifyFailure, ENVIRONMENT_FAILURE } from "./failure-class.mjs";
 
-// ชื่อโฟลเดอร์ขึ้นต้นด้วยเวลา UTC ตอนสร้าง (createRunDir) ซึ่งสร้างก่อนเรียก agent = เวลาเริ่มของ report รุ่นที่ยังไม่มี startedAt
 const DIR_STAMP = /^(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})/;
-// รอบแก้/ตรวจซ้ำ/รันซ้ำ: report ไม่มี field นี้ ต้องดูจากหัวใบงาน (ใบงานรอบแรกก็พูดถึงคำว่า rework ในกติกาได้ จึงดูแค่ต้นใบงาน)
 const REWORK_HEAD_CHARS = 300;
 const REWORK_RE = /rework|re-check|รอบแก้|ตรวจซ้ำ|รันซ้ำ|รอบ ?2|r1|r2/i;
 
@@ -47,7 +43,6 @@ export function loadReports(dir) {
   return rows;
 }
 
-// median แบบตำแหน่ง floor(n/2) — ค่าเดียวกับที่ใช้ใน planning/analysis.md §2.5
 const pick = (sorted, q) => (sorted.length ? sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * q))] : 0);
 const sum = (a) => a.reduce((x, y) => x + y, 0);
 const count = (list, key) => list.reduce((m, r) => ((m[r[key] ?? "?"] = (m[r[key] ?? "?"] ?? 0) + 1), m), {});
@@ -57,7 +52,6 @@ function groupStats(list) {
   return { n: list.length, medianMs: pick(ms, 0.5), p90Ms: pick(ms, 0.9), totalMs: sum(ms), states: count(list, "state") };
 }
 
-// วันตามเวลาท้องถิ่นของเครื่อง (งานจริงนับวันแบบไทย ไม่ใช่ UTC)
 function localDay(ms, tzOffsetMin) {
   return new Date(ms - tzOffsetMin * 60_000).toISOString().slice(0, 10);
 }

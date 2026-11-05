@@ -1,4 +1,6 @@
-import { transitiveFanOut } from "../plan.mjs";
+import { transitiveFanOut } from "./plan.mjs";
+
+export const needsPlanning = (p) => !!p.needs_planning || !!p.contracts?.length || (p.budget?.expected_minutes ?? 0) > 120;
 
 export function verification(p, packages = []) {
   const text = [p.goal, p.title, ...(p.risk_tags ?? [])].join(" ");
@@ -16,6 +18,6 @@ export function triage(packages, direct = false) {
   const repositories = new Set(packages.map((p) => p.repo.path));
   const parallel = repositories.size > 1 && packages.filter((p) => (p.budget?.expected_minutes ?? 0) >= 30).length >= 2;
   const simple = packages.length === 1 && !packages[0].needs_planning && !(packages[0].contracts?.length) && (packages[0].budget?.expected_minutes ?? 0) <= 120;
-  return { mode: (direct || simple) && packages.length === 1 ? "direct" : parallel ? "parallel" : "planned",
+  return { mode: (direct || simple) && packages.length === 1 ? "direct" : parallel ? "parallel" : "planned", needsPlanning: !direct && packages.some(needsPlanning),
     answers: { packages: packages.length, repositories: repositories.size, parallelWorthwhile: parallel } };
 }

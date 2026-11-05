@@ -1,17 +1,12 @@
-// knowledge แบบ layout "project": <project>/{shared,design,build}/ + <project>/modules/<module>/{shared,design,build}/
-// ตาราง module ใน <project>/INDEX.md สร้างจากหัวไฟล์ INDEX.md ของแต่ละ module ที่เดียว —
-// เขียนมือหลายจุดแล้วเพี้ยนกันเสมอ (sketchbook ต้องอัปเดตวันที่/สถานะ 3 จุดด้วยมือ)
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 export const TEAM_SLOTS = ["shared", "design", "build"];
-// ของที่อยู่ระดับ project/module ได้นอกจากช่องทีม — ที่เหลือคือไฟล์ที่ยังไม่ได้จัดเข้าช่อง (เตือน ไม่ใช่ error)
 const PROJECT_EXTRAS = new Set(["INDEX.md", "index.md", "modules", "changelog", "archive"]);
 const MODULE_EXTRAS = new Set(["INDEX.md", "index.md", "changelog", "archive", "features"]);
 const START = "<!-- baan:modules:start -->";
 const END = "<!-- baan:modules:end -->";
 
-// หัวไฟล์แบบ `key: value` ระหว่าง --- ทั้งสองเส้น · `[a, b]` = รายการ — ไม่ต้องมี YAML parser ทั้งตัว
 export function readFrontMatter(text) {
   const m = /^﻿?---\r?\n([\s\S]*?)\r?\n---/.exec(text);
   const out = {};
@@ -27,7 +22,6 @@ export function readFrontMatter(text) {
   return out;
 }
 
-// "school-bot/quiz+app-shell+schoolbright-web/school-bot" → ชิ้นที่ไม่มี project ใช้ project ของชิ้นก่อนหน้า
 export function parseModuleSpec(spec) {
   const out = [];
   let project = "";
@@ -55,7 +49,6 @@ function firstHeading(text) {
 
 const asList = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 
-// ความรู้ UX ของ package แยกตามแพลตฟอร์ม — role อ่านแค่หมวดของ module ไม่ใช่ HIG ของ Mac ตอนทำเว็บ
 export const PLATFORM_OS = { web: {}, desktop: { mac: "apple", windows: "windows" }, mobile: { ios: "ios", android: "android" } };
 
 export function uxKnowledgeDirs(teamDir, platform, os = []) {
@@ -68,7 +61,6 @@ export function uxKnowledgeDirs(teamDir, platform, os = []) {
   return [...new Set(dirs)].filter(isDir);
 }
 
-// project = โฟลเดอร์ระดับบนที่มี modules/ · ขึ้นต้นด้วย _ หรือ . = ของกลาง ไม่ใช่ project
 export function scanProjects(root) {
   if (!isDir(root)) return [];
   return readdirSync(root).filter((n) => !/^[_.]/.test(n) && isDir(path.join(root, n, "modules"))).sort().map((name) => {
@@ -85,7 +77,6 @@ export function scanProjects(root) {
         summary: fm.summary || firstHeading(text),
         status: fm.status || "", updated: fm.updated || "",
         dependsOn: asList(fm.depends_on), requestedBy: asList(fm.requested_by), target: fm.target || "",
-        // ไม่ระบุที่ module = ใช้ของ project (project ส่วนใหญ่มีแพลตฟอร์มเดียว)
         platform: fm.platform || header.platform || "", os: asList(fm.os ?? header.os),
       };
     });
@@ -93,7 +84,6 @@ export function scanProjects(root) {
   });
 }
 
-// "quiz" = module ใน project เดียวกัน · "school-bot/quiz" = ข้าม project
 export function qualify(dep, project) {
   return dep.includes("/") ? dep : `${project}/${dep}`;
 }
@@ -138,7 +128,6 @@ export function renderModuleTable(project, projects) {
   return lines.join("\n");
 }
 
-// ใส่ตารางแทนช่วงระหว่าง marker · ไม่มี marker = ต่อท้าย (ไฟล์ไม่มี = สร้างพร้อมชื่อ project)
 export function applyModuleTable(text, table, projectName) {
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
   const t = table.split("\n").join(eol);
@@ -149,7 +138,6 @@ export function applyModuleTable(text, table, projectName) {
   return `${text.replace(/\s*$/, "")}${eol}${eol}## Modules${eol}${eol}${t}${eol}`;
 }
 
-// คืนรายการไฟล์ INDEX ที่ต้องเปลี่ยน (write=true เขียนจริง)
 export function updateIndexes(root, { write = true } = {}) {
   const projects = scanProjects(root);
   const changed = [];
@@ -175,7 +163,6 @@ function walkMarkdown(dir, out = []) {
   return out;
 }
 
-// ลิงก์ relative ใน markdown ที่ชี้ไฟล์ไม่มีจริง (ข้าม URL, anchor ล้วน, mailto) — โค้ดบล็อกไม่นับ
 export function brokenLinks(file, text = readText(file)) {
   const body = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
   const bad = [];

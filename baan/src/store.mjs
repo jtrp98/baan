@@ -1,9 +1,15 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, appendFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, appendFileSync, writeFileSync, renameSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { writeAtomic } from "../run-store.mjs";
 import { validatePacket, checkDag } from "./packet.mjs";
+import { validateTimeout } from "./timeout.mjs";
 
 export const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
+export function writeAtomic(file, data) {
+  const tmp = `${file}.tmp-${randomUUID()}`;
+  writeFileSync(tmp, data, "utf8");
+  renameSync(tmp, file);
+}
 export function save(file, data) { mkdirSync(path.dirname(file), { recursive: true }); writeAtomic(file, JSON.stringify(data, null, 2)); }
 export function event(run, type, data = {}) {
   appendFileSync(path.join(run.dir, "ledger.jsonl"), JSON.stringify({ at: new Date().toISOString(), type, ...data }) + "\n");
@@ -21,8 +27,10 @@ export function persist(run) {
 export function loadRun(root, name) {
   const dir = name ? path.resolve(existsSync(name) ? name : path.join(root, ".baan", "runs", name)) : latest(root);
   const run = readJson(path.join(dir, "run.json"));
-  if (run.version !== 2) throw new Error("run เก่า: resume ด้วย BAAN รุ่นก่อน v2");
+  if (run.version !== 2) throw new Error("unsupported run format: ใช้ BAAN รุ่นที่สร้าง run นี้; ไม่แก้ประวัติเดิม");
   if (!Array.isArray(run.packages) || !run.packages.length) throw new Error("run ไม่มี packages");
+  validateTimeout(run.timeoutSec, "run.timeoutSec");
+  if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64) throw new Error("invalid run.maxParallel");
   run.packages.forEach(validatePacket); checkDag(run.packages);
   run.dir = dir;
   return run;
@@ -30,6 +38,6 @@ export function loadRun(root, name) {
 function latest(root) {
   const dir = path.join(root, ".baan", "runs");
   const name = existsSync(dir) && readdirSync(dir).filter((n) => existsSync(path.join(dir, n, "run.json"))).sort().at(-1);
-  if (!name) throw new Error("ยังไม่มี v2 run");
+  if (!name) throw new Error("ยังไม่มี run");
   return path.join(dir, name);
 }

@@ -1,5 +1,3 @@
-// Regression (2026-10-26): ตัวรันล้มแต่ report.json มี error ว่าง — codex "at capacity" และ agy ถูกปฏิเสธสิทธิ์อ่าน
-// ต้องไปเปิด stderr เองถึงรู้เหตุ · และสิทธิ์อ่านนอก cwd ของ agy โหมดเขียนให้ผ่าน read_file rule
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";

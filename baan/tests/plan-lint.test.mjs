@@ -1,9 +1,6 @@
-// Regression: DAG lint — แผนต้องมีทางเริ่มโค้ดได้โดยไม่รอประตูมนุษย์ (ผลตรวจอิสระ 2026-10-26: school-bot
-// ผูกงาน implement 61/63 ไว้หลังประตูทางอ้อมแต่ validation เดิมผ่านหมด)
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanProgress, lintPlanVerification, normalizeDagTasks, transitiveFanOut, validateAndFixPlan } from "../src/plan.mjs";
-import { plannerPrompt } from "../src/prompts.mjs";
+import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanProgress, lintPlanVerification, normalizeDagTasks, transitiveFanOut } from "../src/plan.mjs";
 
 const cfg = {
   roleNames: ["check", "spec", "front", "sys"],
@@ -12,6 +9,8 @@ const cfg = {
 };
 const task = (over = {}) => ({ id: "T1", role: "spec", tier: "t2", task: "ทำงาน", dependsOn: [], ...over });
 const lint = (tasks, o) => lintPlanDag(normalizeDagTasks(tasks), o);
+const be = (over = {}) => ({ id: "BE-003", owner: "be", status: "pending", ac_ids: ["AC-1", "AC-2"], ...over });
+const progress = (tasks) => lintPlanProgress(normalizeDagTasks(tasks));
 
 test("แผนไม่มีงาน implement = error เว้นแต่ใส่ docsOnly พร้อมเหตุผล", () => {
   assert.match(lint([task()]).errors.join(), /ไม่มีงาน implement/);
@@ -59,13 +58,6 @@ test("normalize อ่านฟิลด์ของแผนโปรเจก�
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
-test("แผนสดจาก planner (lintStrict) ถูกปฏิเสธ · แผนจาก --plan-file/--resume แค่เตือน (run เก่ายัง resume ได้)", () => {
-  assert.throws(() => validateAndFixPlan({ tasks: [task()] }, cfg, { agent: "codex", lintStrict: true }), /DAG lint/);
-  assert.doesNotThrow(() => validateAndFixPlan({ tasks: [task()] }, cfg, { agent: "codex" }));
-  assert.doesNotThrow(() => validateAndFixPlan({ tasks: [task()], docsOnly: "รีวิวเอกสาร" }, cfg, { agent: "codex", lintStrict: true }));
-  assert.throws(() => validateAndFixPlan({ tasks: [task()], docsOnly: true }, cfg, { agent: "codex" }), /docsOnly ต้องเป็น string/);
-});
-
 test("lintPlanFile คืน exit code และจับ dependency วนลูปของแผนโปรเจกต์", () => {
   const run = (json) => {
     const out = [];
@@ -78,20 +70,6 @@ test("lintPlanFile คืน exit code และจับ dependency วนล�
   assert.equal(run([{ id: "A", owner: "be", depends_on: ["B"] }, { id: "B", owner: "be", depends_on: ["A"] }]).code, 1);
   assert.throws(() => run({ nope: 1 }), /ไม่พบ tasks/);
 });
-
-test("planner prompt ไม่บังคับ read-only ทั้งแผนแล้ว และบอกโหมดรันตาม --write", () => {
-  const ro = plannerPrompt("goal", cfg, "", "2026-10-26");
-  assert.doesNotMatch(ro, /Every task works read-only/);
-  assert.match(ro, /\*\*read-only\*\*.*diff\/patch/);
-  assert.match(ro, /Walking skeleton first/);
-  assert.match(ro, /"docsOnly"/);
-  assert.match(plannerPrompt("goal", cfg, "", "2026-10-26", true), /\*\*write\*\* — front\/sys tasks edit code/);
-});
-
-// Regression: ความคืบหน้าราย slice — school-bot (2026-10-28) คิวบอก 21 งาน local ready แต่ JSON ไม่มี done-local
-// สักงาน และ verified ต้องครอบทั้ง task จึงไม่มีงานโค้ดไหนเสร็จในสายตาแผนเลย
-const be = (over = {}) => ({ id: "BE-003", owner: "be", depends_on: [], ac_ids: ["AC-1", "AC-2"], status: "pending", ...over });
-const progress = (tasks) => lintPlanProgress(normalizeDagTasks(tasks));
 
 test("task เป็น verified เมื่อ slice ที่ verified ครอบ ac_ids ครบ · ครอบบางส่วน = done-local", () => {
   const [part] = normalizeDagTasks([be({ slices: [{ id: "s1", ac_ids: ["AC-1"], status: "verified" }] })]);
@@ -146,8 +124,6 @@ test("lintPlanFile แสดงความคืบหน้างาน implem
   assert.match(bad.out, /✗ BE-003: status verified แต่/);
 });
 
-// Regression: ตรวจตามความเสี่ยง — school-bot (2026-10-29) มี 35/110 task ไม่มี ac_ids รวมงานฐานรากที่มีงานพึ่ง
-// ทางอ้อม 79–89 งาน จึงตรึงเส้นชัยไม่ได้และตัดสินไม่ได้ว่าต้องตรวจทันทีหรือรอ wave gate
 const verify = (tasks) => lintPlanVerification(normalizeDagTasks(tasks));
 test("QA ที่ค้างเตือนให้แยกงานพัฒนาจากงานเชื่อมจริง โดยไม่ข้าม dependency", () => {
   const tasks = [
@@ -162,7 +138,6 @@ test("QA ที่ค้างเตือนให้แยกงานพั�
   assert.doesNotMatch(verify(tasks.map((t) => t.id === "UI" ? { ...t, depends_on: [] } : t)).warnings.join(), /งานพัฒนาที่รอ QA/);
   assert.doesNotMatch(verify(tasks.map((t) => t.id !== "UI" ? { ...t, status: "verified" } : t)).warnings.join(), /งานพัฒนาที่รอ QA/);
 });
-// ระดับการตรวจ (charter ข้อ 14): ผ่าน normal ยังไม่พอสำหรับ release — ledger ต้องบอกได้ว่าเหลือ full pass ที่ไหน
 test("ledger test_level: เตือน verified ที่ยังเป็น normal · ไม่มีฟิลด์ = full · ค่าผิด = error", () => {
   const tasks = [
     { id: "BE-1", owner: "be", status: "verified", ac_ids: ["AC-1"], oracle: "DES-1 Rev1", ref: "abc", test_level: "normal" },

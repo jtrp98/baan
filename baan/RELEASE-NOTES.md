@@ -2,25 +2,43 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## ยังไม่ release — BAAN v2: 3 บทบาท + ทีม UX/UI
+## 0.29.0 — 2026-11-05 · ระบบเดียว — ยังไม่เผยแพร่
 
 ### ⚠ ต้องทำตอนอัปเกรด
 
-- รัน `baan --init` ซ้ำที่ workspace เพื่อได้ทางเข้า `prompts/frontend.md`; config เดิมคงเดิม
-- `baan --goal`/`--plan-file` เปลี่ยนเป็น v2; run pipeline เก่า resume ด้วยรุ่นก่อนหน้า
-- ทุกงานต้องมี acceptance พร้อม source และยืนยันครั้งเดียวผ่าน `baan decide --approve --by user`
-  ก่อน dispatch; แผน tasks เดิมต้องเติม owns/commands/ข้อความ AC ที่ใช้จริงก่อนเริ่ม
-- ข้อมูล v2 อยู่ `.baan/` ใต้ workspace; ใส่ใน gitignore และเก็บเป็นข้อมูล local
-- `baan-role`, role files และ alias เดิมคงไว้ แต่ deprecated จาก workflow หลัก
+- ใช้ CLI เดียว `baan`: ถอด `baan-role` และ role execution แยกชุดออก รัน `npm link`/ติดตั้ง artifact ใหม่ แล้วเปลี่ยนสคริปต์เป็น `baan run --packet` หรือ `--plan`
+- `baan --goal`/`--plan-file` เข้าสู่ engine เดียว แผน tasks เดิมต้องมี owns, commands และข้อความ AC/source; aliases ของ owner เดิมยังอ่านได้ผ่าน normalizer เดียว
+- Run ที่เป็น task checkpoints ต้อง resume ด้วย BAAN รุ่นที่สร้างมัน ไม่ย้าย/แก้ประวัติเดิม; run format 2 ที่ไม่มี approval basis/source ต้องให้คนยืนยันใหม่
+- ทุกงานต้องยืนยัน acceptance/scope/commands ผ่าน `baan decide --approve --by user` พร้อม decision/source ก่อน dispatch; ประตู UX/schema/อื่น ๆ ยืนยันแยกด้วย `--gate`
+- ไม่มี `--write`, `--test-level`, `--date`, `--usage` ของ execution pipeline เดิม: Worker เขียนหลัง approval, ตรวจ targeted/full ตาม commands, บันทึกเวลาจาก core และเก็บ usage เมื่อ provider รองรับเสมอ
+- `defaults.test_level`/`main_root` ไม่ถูกใช้ใน runtime ใหม่ ลบออกจาก template; config เดิมยังอ่านได้โดยไม่ต้องลบฟิลด์เหล่านี้
+- รัน `baan --init` ซ้ำเพื่ออัปเดตทางเข้าไป BAAN.md และทีมออกแบบ spec/survey/ui/review; ไฟล์ของผู้ใช้ไม่ถูกเขียนทับ
+- ข้อมูลใหม่อยู่ `<workspace>/.baan/runs`; เพิ่ม `.baan/` ใน gitignore ไม่มี auto commit หลัง run; เก็บเอกสารด้วย `baan --commit` ตาม config โดยชัดแจ้ง
+- agy Planner/Verifier ต้องติดตั้ง profile/guard/hook ชุดใหม่ตาม setup/agy/README.md: ไม่มี terminal/scripts/network และ input ที่อ่านไม่ได้ไม่ถูกปล่อยผ่าน; core ตรวจ setup ก่อน dispatch และ fallback เมื่อชุดเก่าไม่ปลอดภัย
+- OpenCode ใช้ Worker ได้ แต่ core ข้ามเมื่อเลือก Planner/Verifier เพราะไม่มี read-only contract ที่ยืนยันได้; ใช้ provider ที่รองรับสำหรับงานที่ต้องตรวจอิสระ
 
-### เพิ่ม
+### รวมระบบและลด prompt
 
-- `baan run/status/report/inbox/decide`, direct/planned/parallel, structured packet/result schemas
-- snapshot ที่ไม่เปลี่ยน index/stash, repo/path lock, crash/resume, cancel, limited rework,
-  probe, machine evidence gate/cache, stale references และคิวคำถาม
-- Planner, Senior Worker, Verifier ตามความเสี่ยง; ทีมออกแบบเดิมยังอยู่
-- ใบงาน/status สร้างจาก packet/state โดยไม่เขียนประวัติ memory เดิมทับ
-- Benchmark t5 แบบประหยัดตามมติผู้ใช้; ไม่เทียบความเร็วตรงกับ baseline t2
+- CLI/parser, execution engine, role contracts และ run lifecycle เหลือชุดเดียว ย้ายโมดูลออกจาก directory แบ่งรุ่น และลบ scheduler/checkpoint/role runner ที่ซ้ำ
+- Execution roles: Planner เมื่อจำเป็น, Worker และ Verifier ตามความเสี่ยง; แผนที่มี work packages ครบแล้วไม่เปิด Planner ซ้ำ งาน orchestration ที่เป็น deterministic อยู่ใน core
+- ทีม UX/UI คง spec (`/pencil`), survey, ui, review พร้อม Design System, handoff, accessibility และ human sign-off
+- เปลี่ยน prompts/charter/conventions ให้ตรง contract; ส่งเฉพาะ assignment, snapshot แบบย่อ, command summaries/paths และ rework findings ไม่แนบ log ดิบหรือ conventions ซ้ำทุก call
+- Schema ส่งผ่าน CLI ของ Codex/Claude/agy; provider อื่นใช้ inline schema และผ่าน validator เดียวกัน `promptBytes` วัด byte ของ prompt ไม่ใช่ token/cost ทั้งหมด
+- เครื่องมืออ่าน metrics ของ reports เดิมยังใช้ได้ ไม่มีการเขียน run state อีกชุด
+
+### แก้และเพิ่มการตรวจ
+
+- Approval ผูก hash กับ scope/AC/commands/dependencies/risk และ source/contracts; คำตอบทั่วไปไม่ refresh approval ที่ stale และ gate IDs จากแผนเดิมไม่หายตอนรวม task
+- หนึ่ง writer รวมข้าม run/workspace/linked worktrees; cancellation ก่อน dispatch ไม่เปิด provider และไม่ปล่อย dependencies
+- Snapshot รักษา working tree/index/stash/branch และบันทึก untracked blobs/links; ตรวจ branch แม้ HEAD commit เดิม
+- Fallback เฉพาะ provider failure ที่จำแนกได้และยังไม่มี file/Git state เปลี่ยน; ไม่ใช้ session ID ข้าม provider
+- Evidence/log/diff/snapshot ของแต่ละ attempt ใช้ชื่อเฉพาะและคงหลักฐานรอบก่อน Verifier อ่าน diff/snapshots ที่ core สร้างให้
+- Verifier ใช้ session ใหม่ที่ไม่รับ Worker summary; ตรวจ mutation อีกชั้น Claude จำกัดเฉพาะ read tools และปิด MCP ของ call
+- รักษา rework findings และ integration evidence; integration ที่เปลี่ยน repository/Git state ไม่คงสถานะ done
+- Result validation ตรวจ IDs/proof/blockers ของ DONE; empty plan, malformed budget/dependencies/scope และ timeout/parallel ที่ผิดถูกปฏิเสธก่อน dispatch
+- `--sweep` ใช้ชื่อ role ปัจจุบัน และไม่ข้ามเอกสารใน project `build/`
+- `npm run validate:release` pack จริง ตรวจ contents/secret patterns ติดตั้ง offline ตรวจ imports/CLI/init และ direct/planned workflow ด้วย provider fixture พร้อม machine commands จริง
+- Live smoke ย้ายมาใช้ engine เดียวใน temporary repositories ไม่แตะ workspace จริง
 
 ## 0.28.0 — 2026-11-05 · วัดได้ว่าเวลาไปไหน และเลิกเสียเวลากับ sandbox
 

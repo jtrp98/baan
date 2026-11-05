@@ -11,3 +11,6 @@ node_modules/
 /planning/
 /docs/
 /demo-notes.md
+
+# Local release validation artifacts
+.release/

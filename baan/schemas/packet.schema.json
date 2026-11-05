@@ -50,6 +50,9 @@
           "path": {
             "type": "string",
             "minLength": 1
+          },
+          "pin": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -132,6 +135,87 @@
     },
     "approved_at": {
       "type": "string"
+    },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "max_rework": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "expected_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10080
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "needs_planning": {
+      "type": "boolean"
+    },
+    "milestone": {
+      "type": "boolean"
+    },
+    "release": {
+      "type": "boolean"
+    },
+    "module": {
+      "type": "string"
+    },
+    "human_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "approved_source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_basis": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [

@@ -1,4 +1,4 @@
-import { mkdirSync, rmdirSync, openSync, closeSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmdirSync, openSync, closeSync, readFileSync, unlinkSync, writeFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { hash, repoRoot, git } from "./snapshot.mjs";
@@ -37,5 +37,5 @@ export function repoLock(root, repo) {
   const canonical = repoRoot(repo);
   // The Git directory is shared even when two different workspaces target the same repository.
   const common = path.resolve(canonical, git(canonical, "rev-parse", "--git-common-dir").trim());
-  return lock(common, canonical);
+  return lock(common, `repository:${realpathSync(common)}`);
 }

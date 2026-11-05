@@ -1,5 +1,3 @@
-// WP0 instrumentation: ledger (append จากหลาย process), จัดประเภทเหตุล้ม, แกะ token usage, ตัวชี้วัดจาก report
-// ใช้ข้อมูลจำลอง ไม่เรียก AI CLI จริง
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -7,44 +5,11 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { appendEvent, readEvents } from "../src/ledger.mjs";
 import { classifyFailure } from "../src/failure-class.mjs";
 import { buildArgs, parseUsageOutput } from "../src/runner.mjs";
-import { parseRoleArgs } from "../src/role-session.mjs";
 import { dirStartMs, loadReports, slotUsage, summarize } from "../src/metrics.mjs";
 
-const LEDGER = fileURLToPath(new URL("../src/ledger.mjs", import.meta.url));
 const tmp = (p) => mkdtempSync(path.join(tmpdir(), p));
-
-test("ledger: หลาย process append พร้อมกัน — ทุกบรรทัดครบและ parse ได้", async () => {
-  const dir = tmp("baan-ledger-");
-  try {
-    const PROCS = 6;
-    const LINES = 150;
-    const script = `import { appendEvent } from ${JSON.stringify(`file:///${LEDGER.replaceAll("\\", "/")}`)};
-for (let i = 0; i < ${LINES}; i++) appendEvent(process.argv[1], { type: "x", i, pad: "ก".repeat(200) });`;
-    await Promise.all(Array.from({ length: PROCS }, () => new Promise((res, rej) => {
-      const c = spawn(process.execPath, ["--input-type=module", "-e", script, dir], { stdio: "ignore" });
-      c.on("exit", (code) => (code === 0 ? res() : rej(new Error(`exit ${code}`))));
-    })));
-    const events = readEvents(dir);
-    assert.equal(events.length, PROCS * LINES);
-    assert.equal(new Set(events.map((e) => `${e.pid}:${e.i}`)).size, PROCS * LINES);
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
-
-test("ledger: บรรทัดเสียถูกข้าม · dir ว่าง/เขียนไม่ได้ไม่ throw", () => {
-  const dir = tmp("baan-ledger-");
-  try {
-    assert.equal(appendEvent(dir, { type: "a" }, new Date("2026-11-04T05:00:00Z")), true);
-    writeFileSync(path.join(dir, "2026-11-05.jsonl"), '{"type":"b"}\n{"type":"c"\n', "utf8");
-    assert.deepEqual(readEvents(dir).map((e) => e.type), ["a", "b"]);
-    assert.equal(appendEvent("", { type: "x" }), false);
-    const file = path.join(dir, "not-a-dir");
-    writeFileSync(file, "x");
-    assert.equal(appendEvent(path.join(file, "sub"), { type: "x" }), false, "path ใต้ไฟล์ = เขียนไม่ได้ ต้องคืน false");
-  } finally { rmSync(dir, { recursive: true, force: true }); }
-});
 
 test("classifyFailure: แยกสภาพแวดล้อมออกจากผลงาน · ดูเฉพาะ error + ท้ายคำตอบ", () => {
   assert.equal(classifyFailure({ state: "completed" }), null);
@@ -108,14 +73,6 @@ test("parseUsageOutput: รูปแบบจริงของ claude json แ�
   assert.deepEqual(x.usage, { inputTokens: 19345, cacheReadTokens: 11776, cacheWriteTokens: 0, outputTokens: 8, costUsd: null, turns: 1, sessionId: "t1" });
   assert.deepEqual(x.errors, ["You've hit your usage limit."]);
   assert.equal(parseUsageOutput("codex-jsonl", "plain text"), null);
-});
-
-test("baan-role: --task-id รับหลายตัว (ซ้ำ flag หรือคั่น ,) · ว่าง = error · --usage", () => {
-  assert.deepEqual(parseRoleArgs(["--task-id", "BE-031, BE-032", "--task-id", "FE-021"]).taskIds, ["BE-031", "BE-032", "FE-021"]);
-  assert.deepEqual(parseRoleArgs([]).taskIds, []);
-  assert.throws(() => parseRoleArgs(["--task-id", " , "]), /--task-id/);
-  assert.equal(parseRoleArgs(["--usage"]).usage, true);
-  assert.equal(parseRoleArgs([]).usage, false);
 });
 
 test("metrics: slotUsage นับช่วงทับกัน ขนานเฉลี่ย และช่วงว่าง", () => {
@@ -182,27 +139,4 @@ test("runCli: มี startedAt เสมอ · โหมด usage แกะค�
   const plain = await runCli(def, args, "stdin", "prompt", tmpdir(), 30);
   assert.equal(plain.usage, null, "ไม่เปิด usage = ไม่แกะ JSON");
   assert.equal(plain.answer, out);
-});
-
-test("execute: summary/checkpoint มี startedAt + failureClass และเขียน task_result ลง ledger", async () => {
-  const { execute } = await import("../src/scheduler.mjs");
-  const runDir = tmp("baan-run-");
-  const ledgerDir = tmp("baan-ledger-");
-  try {
-    const plan = { tasks: [{ id: "A", role: "sys", tier: "t2", agent: "codex", title: "a", task: "ทำ A", dependsOn: [] }, { id: "B", role: "sys", tier: "t2", agent: "codex", title: "b", task: "ทำ B", dependsOn: [] }] };
-    const runner = async (_c, _o, _d, t) => (t.id === "A"
-      ? { ok: true, exitCode: 0, durationMs: 5, timedOut: false, answer: "เสร็จ\nDONE", error: "", stdout: "", stderr: "" }
-      : { ok: true, exitCode: 0, durationMs: 5, timedOut: false, answer: "sandbox เขียนไฟล์ไม่ได้\nBLOCKED", error: "", stdout: "", stderr: "" });
-    const opts = { cwd: tmpdir(), maxParallel: 2, dryRun: false, write: false, timeoutSec: 60, projectCtx: "", ledgerDir };
-    const res = await execute(plan, opts, runDir, { agents: {}, tiers: {} }, new Map(), runner);
-    const byId = Object.fromEntries(res.summary.tasks.map((t) => [t.id, t]));
-    assert.ok(byId.A.startedAt && byId.B.startedAt);
-    assert.equal(byId.A.failureClass, null);
-    assert.equal(byId.B.failureClass, "ENVIRONMENT_FAILURE");
-    const ev = readEvents(ledgerDir).filter((e) => e.type === "task_result");
-    assert.deepEqual(ev.map((e) => e.taskIds[0]).sort(), ["A", "B"]);
-  } finally {
-    rmSync(runDir, { recursive: true, force: true });
-    rmSync(ledgerDir, { recursive: true, force: true });
-  }
 });

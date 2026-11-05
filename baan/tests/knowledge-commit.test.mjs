@@ -1,4 +1,3 @@
-// auto commit ของ knowledge repo — ข้อความอังกฤษสั้น "module: verb files" แยก commit ต่อ module
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -28,7 +27,6 @@ test("classifyChange: ไฟล์ใหม่=add ลบเท่านั้�
 });
 
 test("planCommits: ข้อความอังกฤษสั้นต่อ module — verb ตามชนิดของ change และไฟล์เกิน 2 ย่อเป็น +N more", () => {
-  // ชื่อไฟล์ในข้อความโชว์แค่ basename เพื่อความสั้น (ตำแหน่งเต็มดูได้จากตัวไฟล์ใน commit)
   const one = planCommits([{ code: "??", file: "school-bot/db/a.sql" }], "kr");
   assert.equal(one[0].message, "school-bot: add a.sql");
 
@@ -46,11 +44,9 @@ test("planCommits: ข้อความอังกฤษสั้นต่อ 
   const mixed = planCommits([{ code: "??", file: "school-bot/new.md" }, { code: "M ", file: "school-bot/index.md" }], "kr");
   assert.equal(mixed[0].message, "school-bot: update index.md, new.md");
 
-  // ไฟล์ระดับรากของ repo ไม่มี module ของตัวเอง — ใช้ชื่อ knowledge root แทน
   const root = planCommits([{ code: "M ", file: "README.md" }], "schoolbright-knowledge");
   assert.equal(root[0].message, "schoolbright-knowledge: update README.md");
 
-  // module ต่างกัน = commit ต่างกัน (เรียงตามชื่อที่เจอก่อน)
   const two = planCommits([{ code: "??", file: "a/x.md" }, { code: "M ", file: "b/y.md" }], "kr");
   assert.deepEqual(two.map((p) => p.message), ["a: add x.md", "b: update y.md"]);
 });
@@ -82,7 +78,6 @@ test("commitKnowledgeRoot: commit จริงต่อ module ข้อคว�
     assert.deepEqual([...subjects].sort(), ["school-bot: add review.md, index.md", "timetableai: add notes.md"]);
     assert.equal(git(["status", "--porcelain"]).stdout.trim(), "", "ต้อง clean หลัง commit ครบ");
 
-    // แต่ละ commit แตะเฉพาะไฟล์ของ module ตัวเอง
     for (const sha of git(["rev-list", "HEAD"]).stdout.trim().split("\n")) {
       const lines = git(["show", "--name-only", "--format=%s", sha]).stdout.trim().split("\n");
       const subject = lines[0];

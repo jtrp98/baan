@@ -1,5 +1,3 @@
-// Regression: config ของ workspace อยู่นอก package (กัน update version ทับ config)
-// อยู่ที่ <ราก workspace>\baan.config.json
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -83,19 +81,17 @@ test("loadWorkspace อ่านจากไฟล์ที่ระบุได
     assert.deepEqual(fallback.knowledge_roots, []);
     assert.equal(fallback.defaults.agent, "codex");
 
-    assert.equal(ws.defaults.test_level, "normal", "ไม่ตั้ง = ตรวจ happy flow ระหว่างพัฒนา");
 
     writeFileSync(configFile, JSON.stringify({ defaults: { test_level: "full" } }), "utf8");
-    assert.equal(loadWorkspace(configFile).defaults.test_level, "full");
+    assert.equal(loadWorkspace(configFile).defaults.test_level, undefined);
     writeFileSync(configFile, JSON.stringify({ defaults: { test_level: "quick" } }), "utf8");
-    assert.throws(() => loadWorkspace(configFile), /defaults\.test_level.*normal\/full/);
+    assert.equal(loadWorkspace(configFile).defaults.test_level, undefined, "obsolete defaults are ignored");
 
     writeFileSync(configFile, "{ broken", "utf8");
     assert.throws(() => loadWorkspace(configFile), /อ่าน config ไม่ได้/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-// Regression (2026-10-28): run dir อยู่ใน package (นอก workspace) — agy T3 โหมดเขียนอ่านโค้ดต้นแบบของ arch ไม่ได้ ล้มที่ 29 วิ
 test("run dir อยู่ใต้ราก workspace (reports/baan) ที่ agy มีสิทธิ์อ่านอยู่แล้ว · ไม่เจอ workspace = reports/ ของ package", () => {
   const root = mkdtempSync(path.join(tmpdir(), "baan-test-"));
   try {
@@ -109,7 +105,6 @@ test("run dir อยู่ใต้ราก workspace (reports/baan) ที่ 
   assert.equal(reportsDirOf(""), REPORTS_DIR);
 });
 
-// memory_root แยกความจำของทีม (ใบงาน/ผลตรวจ/หลักฐาน) ออกจาก knowledge ที่คนอื่นใช้ร่วม — ไม่ตั้ง = แบบเดิม
 test("memoryRootOf: ไม่ตั้ง/ไม่ใช่ข้อความ = ว่าง (พฤติกรรมเดิม) · ตั้งแล้วคืน path", () => {
   assert.equal(memoryRootOf({ name: "k", path: "C:/k" }), "");
   assert.equal(memoryRootOf({ name: "k", path: "C:/k", memory_root: 42 }), "");

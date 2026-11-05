@@ -1,5 +1,3 @@
-// knowledge แบบ layout "project" (0.24.0): project > module + ช่อง shared/design/build,
-// ตาราง module สร้างจากหัวไฟล์, run ราย module, commit ตาม project/module, แผนมีช่อง module, install ทีมออกแบบ
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -11,7 +9,7 @@ import { applyModuleTable, brokenLinks, lintKnowledge, parseModuleSpec, readFron
 import { LEGACY_ROLE_ALIASES, layoutOf, resolveModules } from "../src/config.mjs";
 import { planCommits } from "../src/knowledge-commit.mjs";
 import { lintPlanModules } from "../src/plan.mjs";
-import { moduleContext } from "../bin/baan.mjs";
+import { moduleContext } from "../src/workspace.mjs";
 import { performInit } from "../src/init.mjs";
 
 const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -22,7 +20,6 @@ function write(root, rel, text) {
   writeFileSync(f, text, "utf8");
 }
 
-// school-bot (quiz พึ่ง app-shell) + schoolbright-web (หน้าครูที่ school-bot ขอ และพึ่ง school-bot/quiz)
 function fixture() {
   const root = mkdtempSync(path.join(tmpdir(), "baan-kb-"));
   write(root, "school-bot/INDEX.md", "---\ntarget: school-bot\n---\n# school-bot\n\nแอปนักเรียน\n");
@@ -86,7 +83,6 @@ test("updateIndexes: ตาราง module มาจากหัวไฟล์
     const web = readFileSync(path.join(root, "schoolbright-web/INDEX.md"), "utf8");
     assert.match(web, /\| school-bot \| หน้าครู · ขอโดย school-bot \| draft \|/);
     assert.deepEqual(updateIndexes(root), [], "ตรงแล้ว ไม่เขียนซ้ำ");
-    // สถานะเปลี่ยนที่หัวไฟล์ของ module → ตารางทั้งสองฝั่งตามทันในรอบถัดไป
     write(root, "schoolbright-web/modules/school-bot/INDEX.md", "---\nstatus: approved\nupdated: 2026-11-03\nrequested_by: school-bot\nsummary: หน้าครู\n---\n");
     assert.equal(updateIndexes(root).length, 2);
     assert.match(readFileSync(path.join(root, "school-bot/INDEX.md"), "utf8"), /\| หน้าครู \| approved \| 2026-11-03 \| ขอโดย school-bot \|/);
@@ -223,7 +219,6 @@ test("init: วาง agent survey/ui/review + /pencil + skill ของที�
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", "references", "rules.md")));
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed")));
     assert.ok(res.design.length >= 5);
-    // ของผู้ใช้เอง (ไม่มี marker) ห้ามทับ · ของ baan ทับได้
     writeFileSync(path.join(dir, ".claude", "agents", "ui.md"), "ของผู้ใช้\n", "utf8");
     rmSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed"));
     const again = performInit(dir, TEAM_DIR, () => {});
