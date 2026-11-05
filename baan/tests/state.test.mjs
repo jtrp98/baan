@@ -53,3 +53,18 @@ test("classifyOutcome: timeout / exit ไม่เป็นศูนย์ / ค
   assert.equal(classifyOutcome({ ok: true, timedOut: false, answer: "" }).state, "failed");
   assert.equal(classifyOutcome({ ok: true, timedOut: false, answer: "   \n  " }).state, "failed");
 });
+
+// Regression 2026-11-05: codex ตอบว่าทำไม่ได้ แต่ประโยคท้ายพูดถึง `PASS` — เดิมถูกนับว่าสำเร็จ
+test("marker: บรรทัดที่ขึ้นต้นด้วยสถานะชนะคำที่ถูกพูดถึงในประโยค (กรณีจริงของ codex)", () => {
+  const real = "**BLOCKED** — ทำตามคำสั่งนี้ไม่ได้ เพราะสภาพแวดล้อมกำหนดให้ filesystem เป็น read-only จึงไม่ได้อ่านไฟล์\n\nสถานะที่ขอให้จบด้วย `PASS` จึงยังยืนยันไม่ได้จากหลักฐานการทดสอบที่รันได้";
+  assert.equal(detectStateMarker(real), "BLOCKED");
+  assert.equal(classifyOutcome({ ok: true, timedOut: false, answer: real }).state, "blocked");
+  assert.equal(detectStateMarker("งานเสร็จ\n- AC-1: ผ่าน\n\nDONE — ส่งต่อ check"), "DONE");
+  assert.equal(detectStateMarker("ผลตรวจ\n\nFAIL\n\nหมายเหตุ: ถ้าแก้แล้วจะได้ PASS"), "FAIL", "บรรทัดสถานะชนะคำในประโยคที่ตามมา");
+});
+
+test("marker: ไม่มีบรรทัดสถานะ — ข้ามคำใน `code` และมีทั้งสำเร็จ/ไม่สำเร็จ = ถือว่าไม่สำเร็จ", () => {
+  assert.equal(detectStateMarker("ทำไม่ได้ จึง BLOCKED แม้ใบงานขอให้ตอบ PASS"), "BLOCKED");
+  assert.equal(detectStateMarker("ทำเสร็จแล้ว ผลคือ PASS ตามที่ขอ ไม่ใช่ `FAIL`"), "PASS");
+  assert.equal(detectStateMarker("ใบงานบอกให้จบด้วย `DONE`"), null);
+});

@@ -15,20 +15,34 @@ const MARKER_WINDOW_CHARS = 800;
 // output states ตาม CONVENTIONS §8 — DONE/PASS = สำเร็จ, ที่เหลือ = งานไม่สำเร็จ
 export const STATE_MARKERS = ["DONE", "PASS", "FAIL", "BLOCKED", "NEEDS_DESIGN_CHANGE", "NEEDS_REQUIREMENT_CHANGE", "NEEDS_HUMAN"];
 
-// หา marker ตัวสุดท้ายในหน้าต่างท้ายคำตอบ — ตัวสุดท้ายชนะเพราะบรรทัดจบคือคำตอบสุดท้ายของ role
+const SUCCESS_MARKERS = new Set(["DONE", "PASS"]);
+const markerRe = (m) => new RegExp(`(?<![A-Za-z0-9_])${m}(?![A-Za-z0-9_])`, "g");
+
+// marker ที่ขึ้นต้นบรรทัด (หลังตัด markdown/bullet) — "**BLOCKED** — เหตุผล" หรือบรรทัด "PASS" ล้วน
+function leadingMarker(line) {
+  const c = line.trim().replace(/^[#>*_`\-\s]+/, "");
+  return STATE_MARKERS.find((m) => c === m || new RegExp(`^${m}(?![A-Za-z0-9_])`).test(c)) ?? null;
+}
+
+// อ่านสถานะจากหน้าต่างท้ายคำตอบ: (1) บรรทัดล่างสุดที่ขึ้นต้นด้วย marker ชนะ (บรรทัดจบคือคำตอบสุดท้ายของ role)
+// (2) ไม่มีบรรทัดแบบนั้น = ดูคำที่อยู่ในประโยค โดยข้ามที่อยู่ใน `code` และถ้ามีทั้งสำเร็จและไม่สำเร็จให้ถือว่าไม่สำเร็จ
+// ที่มา 2026-11-05: codex ตอบ "**BLOCKED** — ทำไม่ได้ ..." แล้วจบประโยคว่า "สถานะที่ขอให้จบด้วย `PASS` จึงยังยืนยันไม่ได้"
+// ตัวเดิมหยิบ PASS ตัวท้ายสุด งานที่ไม่ได้ทำถูกนับว่าสำเร็จ · นับผิดเป็นไม่สำเร็จเสียแค่การตรวจซ้ำ นับผิดเป็นสำเร็จปล่อยงานพังเดินต่อ
 export function detectStateMarker(answer) {
   if (!answer) return null;
   const tail = answer.slice(-MARKER_WINDOW_CHARS);
-  let best = null;
-  let bestIdx = -1;
-  for (const m of STATE_MARKERS) {
-    const re = new RegExp(`(?<![A-Za-z0-9_])${m}(?![A-Za-z0-9_])`, "g");
-    let match;
-    let last = -1;
-    while ((match = re.exec(tail)) !== null) last = match.index;
-    if (last > bestIdx) { bestIdx = last; best = m; }
+  const lines = tail.split(/\r?\n/);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const m = leadingMarker(lines[i]);
+    if (m) return m;
   }
-  return best;
+  const prose = tail.replace(/`[^`\n]*`/g, " ");
+  const found = [];
+  for (const m of STATE_MARKERS) for (const hit of prose.matchAll(markerRe(m))) found.push({ m, at: hit.index });
+  if (!found.length) return null;
+  found.sort((a, b) => a.at - b.at);
+  const failures = found.filter((f) => !SUCCESS_MARKERS.has(f.m));
+  return (failures.length ? failures : found).at(-1).m;
 }
 
 // แปลงผลการรัน CLI หนึ่งงานเป็นสถานะงาน — แยกจาก exit code เพราะ role ตอบ NEEDS_*/FAIL
