@@ -18,7 +18,7 @@ Windows ใช้ transaction/repair ของ MSI; Mac ไม่อ้างว
 
 ## ความเข้ากันได้ ทางเลือก และการตรวจ
 
-คง `/v1/updates/check` เป็น metadata-only และไม่เปลี่ยน [AC-030-01 (เมื่อไม่มี published release ใหม่กว่า ผลตรวจมี available=false, release=null และ install_supported=false)](../../modules/app-shell/shared/requirements/req-030.md) และ [AC-030-02 (เมื่อมี release ที่เข้าเงื่อนไข ผู้ใช้เห็น metadata แต่ไม่มีไฟล์ถูกดาวน์โหลด ติดตั้ง หรือ execute จากการตรวจ)](../../modules/app-shell/shared/requirements/req-030.md) Download/install ใหม่เป็น explicit workflow ที่ต้องทบทวนก่อน build; ไม่มีการเลือกตัด scope
+คง `/api/service-school-bot/updates/check` เป็น metadata-only และไม่เปลี่ยน [AC-030-01 (เมื่อไม่มี published release ใหม่กว่า ผลตรวจมี available=false, release=null และ install_supported=false)](../../modules/app-shell/shared/requirements/req-030.md) และ [AC-030-02 (เมื่อมี release ที่เข้าเงื่อนไข ผู้ใช้เห็น metadata แต่ไม่มีไฟล์ถูกดาวน์โหลด ติดตั้ง หรือ execute จากการตรวจ)](../../modules/app-shell/shared/requirements/req-030.md) Download/install ใหม่เป็น explicit workflow ที่ต้องทบทวนก่อน build; ไม่มีการเลือกตัด scope
 
 Disposition [GAP-07 (ขอบเขต workflow ดาวน์โหลดและติดตั้งอัปเดต)](update-disposition-001.md)/[REQ-030 (ตรวจข้อมูลอัปเดตจาก Desktop)](../../modules/app-shell/shared/requirements/req-030.md)/[BE-019 (งาน Update check/Prepare/Install)](../plan/index.md): [update-disposition-001.md](update-disposition-001.md) มีทางเลือก/ผลกระทบ/คำถามผู้มีอำนาจครบ; arch แนะนำเสนอคง explicit workflow แต่ยังไม่เพิ่ม AC หรือตัด scope
 

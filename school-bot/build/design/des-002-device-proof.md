@@ -20,13 +20,13 @@ Device ใช้ P-256 key pair; `device_jkt` เป็น JSON Web Key (JWK) th
 
 | Method/path | Input | Result |
 |---|---|---|
-| POST /v2/device-challenges | `{device_jwk}` | 200 `{challenge,server_time,expires_at}` |
-| POST /v2/licenses/activate | `{key,device_jwk,challenge,proof}` | 200 EntitlementResult |
-| POST /v2/licenses/validate | `{key,binding_id:K,challenge,proof}` | 200 EntitlementResult |
-| GET /v2/admin/licenses | pagination | LicenseView list |
-| POST /v2/admin/licenses | `{school_id,school_name,expires_at}` | 201 `{license:LicenseView,key}` |
-| POST /v2/admin/licenses/{id}/revoke | `{reason}` + If-Match | 200 LicenseView |
-| POST /v2/admin/licenses/{id}/unbind | `{reason,next_device_jkt:H?}` + If-Match | 200 LicenseView |
+| POST /api/service-school-bot/device-challenges | `{device_jwk}` | 200 `{challenge,server_time,expires_at}` |
+| POST /api/service-school-bot/licenses/activate | `{key,device_jwk,challenge,proof}` | 200 EntitlementResult |
+| POST /api/service-school-bot/licenses/validate | `{key,binding_id:K,challenge,proof}` | 200 EntitlementResult |
+| GET /api/service-school-bot/admin/licenses | pagination | LicenseView list |
+| POST /api/service-school-bot/admin/licenses | `{school_id,school_name,expires_at}` | 201 `{license:LicenseView,key}` |
+| POST /api/service-school-bot/admin/licenses/{id}/revoke | `{reason}` + If-Match | 200 LicenseView |
+| POST /api/service-school-bot/admin/licenses/{id}/unbind | `{reason,next_device_jkt:H?}` + If-Match | 200 LicenseView |
 
 `LicenseView={id:K,school_id:S,school_name,key_hint,expires_at,revoked,activated_devices:0|1,update_date:D}` ไม่คืน hash/device IDs; response ของ resource เดี่ยวส่ง `ETag` จาก `UpdateDate`; revoke/unbind ใช้ `If-Match` ตาม [กฎกลาง](data-contract-rules.md) ไม่รับ `version` จาก client
 `EntitlementResult={valid:true,license_id:K,binding_id:K,entitlement,checked_at,expires_at}` เป็น host-only; UI ได้เพียงสถานะ/กำหนดอายุ
@@ -35,7 +35,7 @@ Challenge เป็น server-signed JSON Web Signature (JWS) ผูก device_j
 
 API Cloud ใช้ device proof ผูก hash ของ access token เพิ่มด้วย และตรวจ binding ปัจจุบัน การ retry mutation ใช้ RequestKey เดิม; signed GET replay ในช่วง challenge ไม่สร้าง mutation
 
-`/v2/admin/licenses/{id}` ใช้ K; server สร้าง License/Binding PK และคืน ID เดิมเมื่อ replay; device identity/proof ไม่ใช่ PK. Challenge nonce:U และ Idempotency-Key:U เป็น proof identifiers ไม่ใช่ table keys
+`/api/service-school-bot/admin/licenses/{id}` ใช้ K; server สร้าง License/Binding PK และคืน ID เดิมเมื่อ replay; device identity/proof ไม่ใช่ PK. Challenge nonce:U และ Idempotency-Key:U เป็น proof identifiers ไม่ใช่ table keys
 
-License admin ใช้ staff_admin + active license_admin; 503 AUTH_NOT_CONFIGURED / 401 / 403 STAFF_ROLE_REQUIRED ตาม [role/errors/replay](license-admin-security-001.md); ไม่เปิด v1 static bearer
+License admin ใช้ staff_admin + active license_admin; 503 AUTH_NOT_CONFIGURED / 401 / 403 STAFF_ROLE_REQUIRED ตาม [role/errors/replay](license-admin-security-001.md); ไม่เปิด static bearer แบบเดิม
 

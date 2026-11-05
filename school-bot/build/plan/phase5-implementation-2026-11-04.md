@@ -12,7 +12,7 @@ PostgreSQL uses the new adapters; timestamp-zone configuration is mandatory. Unk
 
 Local results: SchoolBot 4,445 tests; Gateway SchoolBot slice 34 tests; Go six packages plus vet; desktop frontend 24 tests plus production build/asset scan; teacher web eight tests plus targeted TypeScript/ESLint; helper eight unit tests plus five isolated BFF tests. Admin feature TypeScript has zero feature errors but 33 dependency diagnostics, so the whole repository is not declared clean.
 
-The helper reuses its existing login and sends a server-signed 60-second JWT assertion. Gateway maps the exact active TAdmin relation; deployment signing configuration still needs to be supplied. No CR creation, new permission grant, production mutation, BAAN execution, or git commit was performed by this task.
+The helper reuses its existing login and sends a server-signed 60-second JWT assertion. Its same-origin BFF and Gateway both use `/api/service-school-bot/admin/...`. Desktop license proofs use the exact versionless HTTP path, and SchoolBot validates that same path; client and server must be updated together. Gateway maps the exact active TAdmin relation; deployment signing configuration still needs to be supplied. No CR creation, new permission grant, production mutation, or BAAN execution was performed. Source changes were committed separately per repository at the user's request; the route correction remains code-only and untested.
 
 ## Browser evidence
 
