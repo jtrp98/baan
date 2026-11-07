@@ -19,6 +19,7 @@
     "ux-knowledge/",
     "agents.json",
     "baan.example.json",
+    "local.example.json",
     "CONVENTIONS.md",
     "LEARNING.md",
     "BAAN.md",

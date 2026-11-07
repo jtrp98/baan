@@ -18,7 +18,7 @@ import { moduleContext } from "./workspace.mjs";
 export function parse(argv) {
   const o = { command: ["run", "status", "report", "inbox", "decide", "sync"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all"]);
   const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "sweep", "sweep-in"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];

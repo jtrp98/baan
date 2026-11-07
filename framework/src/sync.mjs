@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { layoutOf, memoryRootOf } from "./config.mjs";
+import { findWorkspaceConfig, layoutOf, loadWorkspace, memoryRootOf } from "./config.mjs";
 import { gitIn, parsePorcelain, commitKnowledgeRoot } from "./knowledge-commit.mjs";
 import { updateIndexes } from "./knowledge-index.mjs";
 import { performInit } from "./init.mjs";
@@ -158,6 +158,57 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       const updated = updateIndexes(kr.path);
       summary.index.push({ name: kr.name, count: updated.length });
     }
+  }
+
+  return summary;
+}
+
+export function syncAllWorkspaces(localConfig, teamDir, opts = {}, log = console.log) {
+  const summary = { ok: true, framework: null, workspaces: [] };
+  const entries = localConfig?.workspaces ?? [];
+  if (!entries.length) {
+    log("⚠ ไม่พบ workspace/company ที่ลงทะเบียนใน local.json");
+    return summary;
+  }
+
+  if (!opts.noSelfUpdate && !opts.dryRun) {
+    summary.framework = updateSelfFramework(teamDir, log);
+    if (summary.framework.ok === false) summary.ok = false;
+  }
+
+  for (const entry of entries) {
+    const wsPath = entry.path;
+    const wsName = entry.name || path.basename(wsPath);
+    if (!existsSync(wsPath)) {
+      log(`⚠ [${wsName}] ไม่พบไดเรกทอรี: ${wsPath} (ข้าม)`);
+      summary.workspaces.push({ name: wsName, path: wsPath, ok: false, error: "directory_not_found" });
+      summary.ok = false;
+      continue;
+    }
+
+    const cfgFile = findWorkspaceConfig(wsPath);
+    if (!cfgFile) {
+      log(`⚠ [${wsName}] ไม่พบ baan.config.json ใน ${wsPath} (ข้าม)`);
+      summary.workspaces.push({ name: wsName, path: wsPath, ok: false, error: "config_not_found" });
+      summary.ok = false;
+      continue;
+    }
+
+    let ws;
+    try {
+      ws = loadWorkspace(cfgFile);
+    } catch (e) {
+      log(`⚠ [${wsName}] อ่าน config ไม่ได้: ${e.message}`);
+      summary.workspaces.push({ name: wsName, path: wsPath, ok: false, error: e.message });
+      summary.ok = false;
+      continue;
+    }
+
+    log(`🔄 [${wsName}] กำลังซิงค์โครงสร้างและเอกสาร...`);
+    const wsRes = syncWorkspace(ws, wsPath, teamDir, { ...opts, noSelfUpdate: true }, log);
+    summary.workspaces.push({ name: wsName, path: wsPath, ok: wsRes.ok, ...wsRes });
+    if (!wsRes.ok) summary.ok = false;
+    log(`✨ [${wsName}] ซิงค์เรียบร้อย`);
   }
 
   return summary;
