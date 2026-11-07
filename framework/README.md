@@ -15,7 +15,15 @@ baan --version
 baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
+baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 ```
+
+`baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
+1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
+2. รีเฟรชไฟล์ stubs (`.claude/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`) ใน workspace ให้ตรงกับ BAAN รุ่นล่าสุด
+3. ทำ Safe Auto-Commit สำหรับการแก้ไขค้างใน `knowledge_roots` และ `memory`
+4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
+5. รีเฟรช `knowledge-index.json` อัตโนมัติ
 
 หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.29.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
 `--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)

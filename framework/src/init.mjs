@@ -12,7 +12,8 @@ function stubContent(charterPath, learningPath) {
 > **ข้อยกเว้น — อ่านก่อน:** ${ROLE_SESSION_RULE}
 
 ถ้าไม่เข้าข้อยกเว้น: คุณคือ นายช่าง — อ่านและทำตาม ${charterPath} และ ${learningPath}
-ใช้ baan run / status / inbox / decide / report
+ใช้ baan run / status / inbox / decide / report / sync
+เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ baan sync
 วางแผนก่อนทำเสมอ (/plan first) ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol และ Decision Quality Gate
 ยืนยัน acceptance/scope/commands ก่อน dispatch และยืนยันใหม่เมื่อ basis เปลี่ยน; human gates ยืนยันแยก ห้ามอนุมัติแทนผู้ใช้
 ทีมสร้าง (spec, arch, pm, build, check) และทีมออกแบบ (survey, ui, review) ใช้ผ่าน .claude/agents/ โดยใช้ 3-step workflow และ Subagents เสมอ

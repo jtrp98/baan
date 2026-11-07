@@ -6,11 +6,13 @@ import { lintKnowledge, updateIndexes } from "./knowledge-index.mjs";
 import { lintPlanFile } from "./plan.mjs";
 import { commitKnowledge } from "./knowledge-commit.mjs";
 import { sweep, formatSweep } from "./sweep.mjs";
+import { syncWorkspace } from "./sync.mjs";
 
-export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep"];
+export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep", "sync"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
+  baan sync [--pull-only] [--push] [--dry-run] [--no-self-update]
   baan --list | --version | --help
   baan run --packet <file> | --plan <file> | --goal <text>
     [--cwd <repo>] [--workspace <dir>] [--config <file>] [--target <name>] [--module <project/module>]
@@ -23,11 +25,19 @@ export function utility(o, ws, cfg, root) {
     [--approve] [--allow-dirty] [--gate <id>]
   baan run --resume <run> [--dry-run]
   baan run --cancel <package> --run <run>
-  baan --index | --lint-knowledge | --lint-plan <file> | --commit
+  baan --index | --lint-knowledge | --lint-plan <file> | --commit | --sync
   baan --sweep <term> [--sweep <term>] [--sweep-in <dir>] [--target <name>]
 See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.version) return JSON.parse(readFileSync(path.join(TEAM_DIR, "package.json"), "utf8")).version;
   if (o.init) return performInit(root, TEAM_DIR, () => {}, { knowledgeGit: o["knowledge-git"], memoryGit: o["memory-git"] });
+  if (o.sync) {
+    return syncWorkspace(ws, root, TEAM_DIR, {
+      push: !o["pull-only"] && (o.push || true),
+      pullOnly: Boolean(o["pull-only"]),
+      dryRun: Boolean(o["dry-run"]),
+      noSelfUpdate: Boolean(o["no-self-update"]),
+    }, (m) => console.log(m));
+  }
   if (o.list) return { config: ws.source, defaults: ws.defaults, knowledge_roots: ws.knowledge_roots.map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
     execution_roles: ["planner", "worker", "verifier"], interactive_roles: listRoles(), tiers: tierMatrixText(cfg.tiers, cfg.agents) };
   if (o["lint-plan"]) {
