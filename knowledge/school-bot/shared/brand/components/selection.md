@@ -12,3 +12,8 @@ owner: design
 | เลือกหลายรายการ (ท่าชุด) | ขอบ `border-selected` `group` + พื้น `group-bg` |
 | ไม่ได้เลือก | ขอบ `border-default` `border` (การ์ดกดได้ ขอบล่าง `raise`) |
 | hover รายการเมนู/แถว | พื้น `action-primary-subtle` |
+
+
+## การ์ดและ Tab นำทาง (DSG-20)
+- การ์ดกดได้ทั้งหมด (งาน, Level, งานล่าสุด, อุปกรณ์) มีขอบล่างนูน raise 4px ทุกใบ
+- รายการนำทางแนวตั้งใช้รูปแบบ Tab (พื้น surface ขาว + เงาเบา DSG-20)

@@ -1,6 +1,6 @@
 ---
 module: my-work
-updated: 2026-11-02
+updated: 2026-11-04
 status: draft
 depends_on: [app-shell]
 target: school-bot
@@ -10,21 +10,21 @@ os: [windows, mac]
 
 # my-work (สารบัญ module)
 
-เป้าหมาย: นักเรียนจัดการงาน Arm Lab / Block Lab ของตัวเองบน cloud (สร้าง เปิด เปลี่ยนชื่อ ทำสำเนา ลบ export import) ทำงานต่อได้เมื่อเน็ตหลุด และกู้คืนงานสำรองในเครื่องได้ · นำเข้าจากระบบเก่า 2026-10-21 (knowledge เป็นแหล่งความจริง)
+เป้าหมาย: นักเรียนจัดการงาน Arm Lab / Block Lab ของตัวเองบน cloud (สร้าง เปิด เปลี่ยนชื่อ ทำสำเนา ลบ export import) ทำงานต่อได้เมื่อเน็ตหลุด และกู้คืนงานสำรองในเครื่องได้ · นำเข้าจากระบบเก่า 2026-10-21 (sketchbook เป็นแหล่งความจริง)
 
 ## ไฟล์ (อ่านเฉพาะที่งานต้องใช้)
 
 | ไฟล์ | อ่านเมื่อ |
 |---|---|
-| [shared/requirements.md](shared/requirements.md) | ต้องรู้ว่าต้องทำอะไร (R#, กฎ, edge case, พฤติกรรม FRM-03 ที่อนุมัติแล้ว) |
-| [shared/oq.md](shared/oq.md) | ต้องรู้ว่ามีอะไรยังไม่ตัดสิน |
-| [design/feasibility.md](design/feasibility.md) | ดูสารบัญ + BUG + ความขัดแย้งในต้นฉบับ + ข้อมูลจาก role 2 |
-| [design/feasibility/R1.md](design/feasibility/R1.md) | R1, R7, R8, R11: cloud, ออฟไลน์/sync, ฉบับใหม่กว่าชนะ, ข้อมูลเด็ก (ST-03, ST-17, ARC-I05/I06/I14, DEV-Q05) |
-| [design/feasibility/R2.md](design/feasibility/R2.md) | R2, R4, R9, R10: export/import, dialog นำท่าจากงานอื่น, งาน Block (ARC-I07, DEV-Q06, ENT-17) |
-| [design/feasibility/R3.md](design/feasibility/R3.md) | R3: กู้คืนสำรอง (SCR-10, ST-18, ENT-18) |
-| [design/feasibility/R5.md](design/feasibility/R5.md) | R5, R6: หน้างานของฉัน SCR-09, การสร้างงานใหม่ (CR-06, CR-07, ARC-I17) |
+| requirements.md | ต้องรู้ว่าต้องทำอะไร (R#, กฎ, edge case, พฤติกรรม FRM-03 ที่อนุมัติแล้ว) |
+| oq.md | ต้องรู้ว่ามีอะไรยังไม่ตัดสิน |
+| feasibility.md | ดูสารบัญ + BUG + ความขัดแย้งในต้นฉบับ + ข้อมูลจาก role 2 |
+| feasibility/R1.md | R1, R7, R8, R11: cloud, ออฟไลน์/sync, ฉบับใหม่กว่าชนะ, ข้อมูลเด็ก (ST-03, ST-17, ARC-I05/I06/I14, DEV-Q05) |
+| feasibility/R2.md | R2, R4, R9, R10: export/import, dialog นำท่าจากงานอื่น, งาน Block (ARC-I07, DEV-Q06, ENT-17) |
+| feasibility/R3.md | R3: กู้คืนสำรอง (SCR-10, ST-18, ENT-18) |
+| feasibility/R5.md | R5, R6: หน้างานของฉัน SCR-09, การสร้างงานใหม่ (CR-06, CR-07, ARC-I17) |
 | design/ | แก้หรือตรวจ design (เลือกไฟล์ D# จากตาราง Design) · ยังว่าง |
-| [design/review.md](design/review.md) | ดูผลตรวจ |
+| review.md | ดูผลตรวจ |
 | handoff.md | ส่งต่อ dev (ยังไม่มี) |
 
 ## ความสัมพันธ์กับ module อื่น
@@ -39,8 +39,9 @@ os: [windows, mac]
 
 | ID | ชื่อ | ลิงก์ | สิทธิ์ | ใช้กับ |
 |---|---|---|---|---|
+| C1 | School Bot – หน้าควบคุมแขนกล (ประถม) (Canvas A · ใช้ร่วมกับ arm-lab, quiz, app-shell) | https://claude.ai/artifact/AnEWv6UNbgcNvUXS1sfHQd | shared ในองค์กร (ผู้ใช้เป็นเจ้าของ · `list files` ได้ 2026-11-03) | frame: MyWorkV1, MyWorkV1Block (SCR-09 · ผู้ใช้เรียก "File") · ยังไม่มี D# · **รอบ 1 (2026-11-04): แถบ N3 สูง 60 + พื้นที่ 840 + dc-import SidebarN3 publish แล้วที่ C1 v757 (2026-11-04 · ผู้ใช้อนุมัติ · ยังไม่ได้เปิดดู render จริง)** |
 
-ยังไม่มี C# ที่ลงทะเบียนสำหรับ module นี้ → ถามผู้ใช้ก่อนเริ่มงาน canvas (frame ของ module นี้อยู่ใน canvas ที่ลงทะเบียนเป็น C1 ของ arm-lab · รอผู้ใช้ตัดสินเรื่อง 1 canvas : 1 module)
+ลงทะเบียน C1 2026-11-03 ตามกฎ canvas ใช้ร่วมหลาย module (ผู้ใช้ตัดสิน 2026-11-03)
 
 ## Canvas และ frame ที่พบในระบบเก่า (ยังไม่ใช่ C#/D#)
 

@@ -24,3 +24,9 @@ owner: design
 | สถานะคลาวด์ | แสดงที่ส่วนหัวที่เดียว · ชิปขึ้นเฉพาะตอนผิดปกติ |
 
 หมายเหตุ: canvas Arm Lab (`WindowBarV1`, `MainV6A`) ยังเป็นแบบเก่า 44 + 856 จนกว่าจะเปิด CR แก้
+
+
+## โลโก้ประจำส่วน (3 ชุด)
+- School Bot Studio: `design/assets/logo/School Bot.svg`
+- Arm Lab: `design/assets/logo/Arm Lab.svg`
+- Block Lab: `design/assets/logo/block-lab-logo.svg`

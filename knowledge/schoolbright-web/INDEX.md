@@ -17,4 +17,10 @@ target: sb-tech-upgrade-web-system
 |---|---|---|---|---|---|
 | school-bot | เว็บครู School Bot (สารบัญ module) · ขอโดย school-bot | draft | 2026-11-02 | school-bot/quiz | [modules/school-bot](modules/school-bot/INDEX.md) |
 | timetableai | timetableai — Module Index | draft | 2026-11-02 | - | [modules/timetableai](modules/timetableai/INDEX.md) |
+
+**module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
+
+| Module | สรุป | สถานะ | อัปเดต | เกี่ยวข้อง | อยู่ที่ |
+|---|---|---|---|---|---|
+| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-06 | พึ่ง schoolbright-web/school-bot | [school-bot/modules/quiz](../school-bot/modules/quiz/INDEX.md) |
 <!-- baan:modules:end -->

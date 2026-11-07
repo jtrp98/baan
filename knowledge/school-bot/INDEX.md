@@ -80,12 +80,13 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 
 | Module | สรุป | สถานะ | อัปเดต | พึ่งพา | ไฟล์ |
 |---|---|---|---|---|---|
-| app-shell | App Shell (สารบัญ module) | draft | 2026-11-02 | - | [modules/app-shell](modules/app-shell/INDEX.md) |
-| arm-lab | Arm Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
-| block-lab | Block Lab (สารบัญ module) | draft | 2026-11-02 | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
+| app-shell | App Shell (สารบัญ module) | draft | 2026-11-06 | - | [modules/app-shell](modules/app-shell/INDEX.md) |
+| arm-lab | Arm Lab (สารบัญ module) | draft | 2026-11-06 | app-shell, my-work | [modules/arm-lab](modules/arm-lab/INDEX.md) |
+| block-lab | Block Lab (สารบัญ module) | draft | 2026-11-04 | app-shell, my-work | [modules/block-lab](modules/block-lab/INDEX.md) |
 | code-lab | Code Lab | draft | 2026-11-02 | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
-| my-work | my-work (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
-| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-02 | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
+| game-library | game-library (สารบัญ module) | draft | 2026-11-06 | app-shell, my-work, quiz | [modules/game-library](modules/game-library/INDEX.md) |
+| my-work | my-work (สารบัญ module) | draft | 2026-11-04 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
+| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-06 | app-shell, schoolbright-web/school-bot | [modules/quiz](modules/quiz/INDEX.md) |
 
 **module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
 

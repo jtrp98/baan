@@ -18,7 +18,7 @@ owner: spec
 - [R11, R12, R13, R14, R15](requirements/f1-006.md)
 - [R16, R17, R18](requirements/f1-007.md)
 - [R19, R20](requirements/f1-008.md)
-- [R21](requirements/f1-009.md)
+- [R21, R22](requirements/f1-009.md)
 - [ตารางหมวดบล็อกสำหรับ Uno (15 หมวด 3 กลุ่ม + ตัวละคร ตาม R18 · แก้ 2026-10-28 · ไม่มีแถบภารกิจ DEC-25)](requirements/f1-010.md)
 - [กฎ/Logic (AC เดิมย่อ)](requirements/f1-011.md)
 - [Edge cases](requirements/f1-012.md)

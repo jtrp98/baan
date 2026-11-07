@@ -1,6 +1,6 @@
 ---
 module: my-work
-updated: 2026-10-21
+updated: 2026-11-04
 owner: spec
 ---
 

@@ -3,13 +3,14 @@ module: quiz
 design: D1
 covers: [R12, R1, R6, R8, R10, R11, R17]
 canvas: C1
-updated: 2026-11-01
+updated: 2026-11-02
 ---
 
 # D1 หน้าเลือก Level (6 ใบ)
 
-- **Artboard:** `QuizLevelsV1.dc.html` (1440×900 · แถบหน้าต่าง 60 + พื้นที่ 840 · มี sidebar `HomeRail` เลือก "บทเรียน") ใน canvas C1 · ปลายทางลิงก์ไป `QuizMapV1.dc.html` (D2)
-- **Publish:** publish แล้ว 2026-11-01 บน C1 (version 708 · ผู้ใช้อนุมัติ) · artboard `QuizLevelsV1.dc.html` · https://claude.ai/artifact/AnEWv6UNbgcNvUXS1sfHQd · ยังไม่ได้ตรวจ render จริง · ไม่เก็บ HTML ใน sketchbook · **แก้ 2026-11-01 (ผู้ใช้ขอใช้ภาพจริงจากโฟลเดอร์ ref):** ภาพเกาะบนการ์ดเปลี่ยนจากเวกเตอร์เป็นภาพเกาะ 6 ใบที่ตัดจาก `../../../design/assets/ref/Quiz/Start Page.png` (200×176 พื้นขาว · asset ของ C1 · ค่า `img` ต่อ level ใน renderVals) publish C1 version 713 · เปิดตรวจบน canvas แล้ว: แสดงครบ 6 ใบ · ข้อสังเกต: ภาพเกาะเล็กกว่าในภาพอ้างอิง (ราว 140×124) เพราะภาพตัดจากหน้าจอขนาดเล็ก ถ้าต้องการใหญ่ขึ้นต้องได้ไฟล์ภาพเกาะต้นฉบับ (OQ19) · พื้นภาพเป็นสีขาวทึบ ใช้ได้เฉพาะบนการ์ดพื้นขาว
+- **Artboard:** `QuizLevelsV1.dc.html` (1440×900 · แถบหน้าต่าง 60 + พื้นที่ 840 · มี sidebar มาตรฐาน เลือก "บทเรียน") ใน canvas C1 · ปลายทางลิงก์ไป `QuizMapV1.dc.html` (D2)
+- **แก้ sidebar 2026-11-02 (ผู้ใช้สั่ง · งานของ app-shell ที่ทำผ่าน quiz):** ใน Play เมนู sidebar ต้องคลิก 2 ครั้ง เพราะลิงก์ข้าม artboard อยู่ใน `dc-import` child (`HomeRail`) → ย้าย markup sidebar ทั้งชุด (แถบ 104 · แถบกาง 264 · เมนูโปรไฟล์) เข้าไปในแต่ละ frame: `HomeV6A` · `MyWorkV1` · `MyWorkV1Block` · `QuizLevelsV1` · ลิงก์เมนูเป็น `<a href="X.dc.html">` แบบ literal (หน้าหลัก → HomeV6A · บทเรียน → QuizLevelsV1 · Block Lab → MyWorkV1Block · Arm Lab → MyWorkV1) · class `on`/`aria-current` มาจาก `sbVals(sel)` ใน script ของ frame (state กาง/โปรไฟล์/ภาษา + Esc อยู่ใน frame) · หน้าตา/ขนาดเดิมทุกค่า · `MyWorkV1Block` เปลี่ยนจาก import ทั้งหน้าเป็นสำเนาเต็มของ MyWorkV1 (Tweak `lab` ค่าเริ่ม block · แก้ MyWorkV1 ต้องแก้ไฟล์นี้ตาม) · `HomeRail` เหลือเป็นต้นแบบ (ไม่มีใคร import) · QuizLevelsV1 เติม CSS `.sb-mi.danger` และ reduced-motion ของ `.sb-nav:active/.sb-btn:active` (ไอคอน globe/gear/lock/star/dots/l มีครบแล้ว · medal ไม่ได้ใช้ใน sidebar) · ปุ่ม hero ของ HomeV6A: ครั้งแรก "เริ่มด่านแรก" → `QuizLevelsV1` · "เรียนต่อ"/"ไปหน่วย 4" → `QuizMapV1` (ข้อสมมติตาม app-shell R7 "ปุ่มเรียนต่อ → บทเรียน" + "เรียนต่อไป level ล่าสุด") · **ยังไม่ publish:** publish ถูกปฏิเสธเพราะมีคนแก้ `canvas.json` ของ C1 ระหว่างทำ (version 1793595082-7c21) รอ session หลักตัดสินว่าจะ publish ใหม่ · `LearnMapV1.dc.html` ไม่มีใน C1 แล้ว (version 1793595048-dec8) จึงไม่ได้แก้
+- **Publish:** publish แล้ว 2026-11-01 บน C1 (version 708 · ผู้ใช้อนุมัติ) · artboard `QuizLevelsV1.dc.html` · https://claude.ai/artifact/AnEWv6UNbgcNvUXS1sfHQd · ยังไม่ได้ตรวจ render จริง · ไม่เก็บ HTML ใน sketchbook · **แก้ 2026-11-01 (ผู้ใช้ขอใช้ภาพจริงจากโฟลเดอร์ ref):** ภาพเกาะบนการ์ดเปลี่ยนจากเวกเตอร์เป็นภาพเกาะ 6 ใบที่ตัดจาก `assets/ref/Quiz/Start Page.png` (200×176 พื้นขาว · asset ของ C1 · ค่า `img` ต่อ level ใน renderVals) publish C1 version 713 · เปิดตรวจบน canvas แล้ว: แสดงครบ 6 ใบ · ข้อสังเกต: ภาพเกาะเล็กกว่าในภาพอ้างอิง (ราว 140×124) เพราะภาพตัดจากหน้าจอขนาดเล็ก ถ้าต้องการใหญ่ขึ้นต้องได้ไฟล์ภาพเกาะต้นฉบับ (OQ19) · พื้นภาพเป็นสีขาวทึบ ใช้ได้เฉพาะบนการ์ดพื้นขาว
 - **ภาพอ้างอิง:** `Start Page.png` (ตัด Arm Lab และปุ่ม "เพิ่มท่า" ออก) · ภาพเกาะวาดใหม่เป็นเวกเตอร์ placeholder (ไม่ฝังบิตแมป) · ชื่อเกาะ/ระดับเป็นตัวอย่างสมมติ (OQ19)
 
 ## สิ่งที่ออกแบบ
