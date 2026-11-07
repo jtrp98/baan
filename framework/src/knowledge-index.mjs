@@ -187,10 +187,26 @@ export function lintKnowledge(root) {
     for (const n of readdirSync(p.dir)) {
       if (!TEAM_SLOTS.includes(n) && !PROJECT_EXTRAS.has(n)) warnings.push(`${p.name}/${n}: อยู่นอกช่อง shared/design/build ของ project`);
     }
+    if (existsSync(path.join(p.dir, "build", "design"))) {
+      warnings.push(`${p.name}/build/design: พบ build/design ซึ่งชื่อซ้ำกับช่อง design (UX/UI) — ใช้ build/architecture สำหรับสถาปัตยกรรมกลาง หรือย้ายสัญญาโค้ดเข้า modules/<module>/build/`);
+    }
+    for (const u of ["legacy-ux", "uxui", "ux-ui"]) {
+      if (existsSync(path.join(p.dir, "build", u))) {
+        warnings.push(`${p.name}/build/${u}: พบเอกสาร UX ในช่อง build — งานออกแบบและสเปกหน้าจอควรอยู่ในช่อง design`);
+      }
+    }
     for (const m of p.modules) {
       if (!m.indexFile) errors.push(`${p.name}/modules/${m.module}: ไม่มี INDEX.md`);
       for (const n of readdirSync(m.dir)) {
         if (!TEAM_SLOTS.includes(n) && !MODULE_EXTRAS.has(n)) warnings.push(`${p.name}/modules/${m.module}/${n}: อยู่นอกช่อง shared/design/build ของ module`);
+      }
+      if (existsSync(path.join(m.dir, "build", "design"))) {
+        warnings.push(`${p.name}/modules/${m.module}/build/design: พบ build/design ในโมดูล — สัญญาโค้ดควรอยู่ใน build/contracts/`);
+      }
+      for (const u of ["legacy-ux", "uxui", "ux-ui"]) {
+        if (existsSync(path.join(m.dir, "build", u))) {
+          warnings.push(`${p.name}/modules/${m.module}/build/${u}: พบเอกสาร UX ในช่อง build ของโมดูล — ควรอยู่ใน design/legacy-ux/`);
+        }
       }
       for (const d of m.dependsOn) {
         if (!known.has(qualify(d, p.name))) errors.push(`${p.name}/${m.module}: depends_on "${d}" ไม่มี module นี้`);
@@ -211,8 +227,18 @@ export function lintKnowledge(root) {
       errors.push(`${p.name}/INDEX.md: ตาราง module ไม่ตรงหัวไฟล์ของ module — รัน baan --index`);
     }
     for (const f of walkMarkdown(p.dir)) {
-      if (rel(f).split("/").includes("archive")) continue;
+      const parts = rel(f).split("/");
+      if (parts.includes("archive")) continue;
       for (const b of brokenLinks(f)) errors.push(`${rel(f)}: ลิงก์เสีย ${b}`);
+      try {
+        const sz = statSync(f).size;
+        const base = path.basename(f).toLowerCase();
+        if (base === "index.md") {
+          if (sz > 20 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 20 KB (${Math.round(sz / 1024)} KB) — สารบัญต้องสั้นกระชับ ห้ามเก็บประวัติยาวหรือเนื้อหาลงใน INDEX`);
+        } else if (!parts.includes("changelog")) {
+          if (sz > 50 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 50 KB (${Math.round(sz / 1024)} KB) เสี่ยงทำให้ AI อ่านเกินความจำเป็น — ควรแยกเป็นไฟล์ย่อยในโฟลเดอร์ หรือย้ายประวัติที่จบแล้วไป resolved/ หรือ archive/`);
+        }
+      } catch { /* ignore */ }
     }
   }
   return { projects, errors, warnings };

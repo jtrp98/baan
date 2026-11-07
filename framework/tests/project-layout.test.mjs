@@ -254,3 +254,39 @@ test("init --knowledge-git: clone knowledge แล้วเขียน config �
     assert.deepEqual([again.cloned, again.config], [[], "kept"]);
   } finally { rmSync(base, { recursive: true, force: true }); }
 });
+
+test("lintKnowledge: ตรวจพบ anti-patterns (build/design, build/legacy-ux) และ context bloat (INDEX > 20KB, content > 50KB)", () => {
+  const root = fixture();
+  try {
+    updateIndexes(root);
+    // 1. ตรวจพบ build/design และ build/legacy-ux
+    write(root, "school-bot/build/design/des-001.md", "# des\n");
+    write(root, "school-bot/build/legacy-ux/screen.md", "# ux\n");
+    write(root, "school-bot/modules/app-shell/build/design/contract.md", "# c\n");
+    write(root, "school-bot/modules/app-shell/build/legacy-ux/screen.md", "# ux\n");
+
+    // 2. ตรวจพบไฟล์บวม
+    const bigIndex = "# Big\n" + "x".repeat(25 * 1024);
+    const bigDoc = "# Doc\n" + "y".repeat(55 * 1024);
+    write(root, "school-bot/modules/quiz/INDEX.md", "---\nstatus: approved\nupdated: 2026-11-01\ndepends_on: [app-shell]\n---\n" + bigIndex);
+    write(root, "school-bot/modules/app-shell/shared/requirements.md", bigDoc);
+
+    const r = lintKnowledge(root);
+    assert.ok(r.warnings.some((w) => w.includes("พบ build/design ซึ่งชื่อซ้ำกับช่อง design")));
+    assert.ok(r.warnings.some((w) => w.includes("พบเอกสาร UX ในช่อง build")));
+    assert.ok(r.warnings.some((w) => w.includes("พบ build/design ในโมดูล")));
+    assert.ok(r.warnings.some((w) => w.includes("พบเอกสาร UX ในช่อง build ของโมดูล")));
+    assert.ok(r.warnings.some((w) => w.includes("ขนาดใหญ่เกิน 20 KB")));
+    assert.ok(r.warnings.some((w) => w.includes("ขนาดใหญ่เกิน 50 KB")));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("templates/workspace/knowledge: แม่แบบพิมพ์เขียวมาตรฐานผ่าน lintKnowledge ไร้ error และ warning 100%", () => {
+  const tplDir = path.join(TEAM_DIR, "templates", "workspace", "knowledge");
+  const r = lintKnowledge(tplDir);
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.warnings, []);
+  assert.equal(r.projects.length, 1);
+  assert.equal(r.projects[0].name, "sample-app");
+  assert.equal(r.projects[0].modules[0].module, "sample-module");
+});
