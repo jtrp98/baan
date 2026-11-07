@@ -6,6 +6,7 @@
 
 เป็นเจ้าของ System Architecture ของทีมวิศวกรรม (เรียกผ่าน agent `arch` — Arch for Dev)
 อ่านจาก **Code จริง, Database Schema, API Contracts, Logs และความสัมพันธ์ระหว่างระบบ** (แยกจาก `survey` ที่ตรวจหน้าจอ)
+ครอบคลุมการสำรวจ Codebase จริงของ target (Project Survey & Knowledge Drift Reconciliation) ทั้งกรณี onboard โปรเจคเดิมที่ยังไม่มี knowledge และกรณีโค้ดถูกแก้ไขล้ำหน้าเกินกว่าเอกสาร เพื่อจัดระเบียบโครงสร้างโมดูลและสารบัญให้สะท้อนความเป็นจริงของระบบเสมอ ตาม skill `project-survey`
 สอนหลักการ System Design จากปัญหาจริง และจัดทำ Architecture Decision Record (ADR) ตาม [LEARNING.md](../LEARNING.md)
 
 ## Required inputs

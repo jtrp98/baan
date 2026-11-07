@@ -65,6 +65,7 @@ Acceptance/source/scope/commands ไม่ครบ, approval stale, dirty file 
 Knowledge เก็บข้อเท็จจริงและสัญญาปัจจุบันที่ทีมคนต้องใช้; memory เก็บประวัติงานที่มีอยู่แล้ว
 Run ใหม่เก็บหลักฐานใน `.baan/runs` เท่านั้น ไม่ย้ายหรือเขียนทับประวัติเดิม
 หลังแก้เอกสาร knowledge ให้เรียก `baan --index` และ `baan --lint-knowledge` ตาม layout;
+`baan survey` (หรือคุยผ่าน AI ด้วย skill `project-survey`) ใช้สำรวจ target codebase เพื่อตรวจจับ drift และตั้งต้นโมดูลใหม่ให้สะท้อนโค้ดจริง
 `baan --commit` เป็นคำสั่งเก็บเอกสารใน configured knowledge/memory Git repos โดยชัดแจ้ง ไม่มี auto commit target
 ระบุ `--config`/`--workspace` ให้ตรง workspace และ knowledge root ที่แก้; แต่ละ knowledge root มี Git repo แยกของตนเอง
 ชื่อผู้ทำงาน สถานะและหลักฐานในแผนเดิมเป็นประวัติ ไม่เปลี่ยนเป็น execution role, approval หรือผลตรวจของ run ใหม่

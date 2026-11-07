@@ -16,7 +16,14 @@ baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
+baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
 ```
+
+`baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
+- ตรวจจับ Tech Stacks (.NET, Next.js, Go, Python, React, ฯลฯ) และ Architecture Components (`features/`, `backend/src/`, `engines/`)
+- วิเคราะห์ Drift: โค้ดที่เดินหน้าไปไกลกว่า Knowledge (Unmapped Code) หรือโมดูลใน Knowledge ที่หาโค้ดจริงไม่พบ
+- สร้างโครงสร้างโมดูล (`--scaffold-module <name>`) หรือโปรเจค (`--scaffold-project <name>`) ครบสัญญา 3-slot พร้อมอัปเดตสารบัญ `INDEX.md` อัตโนมัติ
+- **สั่งผ่าน AI ในแชทได้โดยตรง**: ผู้ใช้ไม่ต้องพิมพ์ CLI เอง สามารถสั่ง AI ในแชท (เช่น บทบาท `arch` หรือนายช่าง) AI จะใช้ skill `project-survey` สำรวจ วิเคราะห์ และสร้างโมดูลให้ทั้งหมด
 
 `baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
 1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
