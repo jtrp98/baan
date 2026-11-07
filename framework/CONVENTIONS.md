@@ -48,9 +48,14 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 
 ## Layout และเจ้าของ
 
-`layout: project`: `<project>/modules/<module>/{shared,design,build}` และ `INDEX.md`
+`layout: project`: 
+- **ระดับ Project (`<project>/`)**: เก็บเฉพาะสิ่งที่เป็น Cross-Cutting ทั้งโปรเจกต์ (`INDEX.md` เป็น Master Portal, `shared/` ความจริงร่วม/Glossary/ADR/ดัชนี REQ รวม, `design/` Design System กลาง/Brand Assets, `build/` สถาปัตยกรรมเชื่อมระบบรวม `build/architecture/` และ Shared DB `build/db/` — *ห้ามตั้งชื่อโฟลเดอร์ build/design ซ้ำซ้อนกับ design UX/UI*)
+- **ระดับ Module (`<project>/modules/<module>/`)**: ของโดเมนไหนต้องจบในโมดูลนั้นครบ 3 ช่อง (`shared/`, `design/`, `build/`) และมี `INDEX.md` ประจำโมดูล
+- **Folder-First & Progressive Disclosure**: เพื่อป้องกัน Context Bloat ของ AI ให้ใช้โฟลเดอร์ย่อยที่มี `INDEX.md` คุมหน้าบ้านเสมอ (`shared/requirements/`, `shared/oq/`, `design/feasibility/`, `design/screens/`, `build/contracts/`, `build/test-plan/`)
+  - ไฟล์ `INDEX.md` ต้องสั้นกระชับ (ห้ามเกิน 20 KB) ห้ามใส่ประวัติยาวหรือบันทึก Canvas ย้อนหลังลงใน INDEX
+  - ไฟล์ `.md` ทั่วไปไม่ควรเกิน 50 KB หากยาวให้แยกไฟล์ย่อย และคำถาม OQ ที่ตอบแล้วให้ย้ายไป `oq/resolved/`
 `shared` ระบุ owner ของเอกสาร, `design` เป็นทีมออกแบบ UX/UI, `build` เป็นสัญญา/หลักฐานส่งมอบด้านพัฒนา
-`shared/requirements.md` จัด feature `F#` → requirement `R#` → AC; OQ อยู่ `shared/oq.md`
+`shared/requirements/` (หรือ `shared/requirements.md`) จัด feature `F#` → requirement `R#` → AC; OQ อยู่ `shared/oq/` (หรือ `shared/oq.md`)
 หัว INDEX เป็นแหล่งจริงของ status/updated/depends_on/requested_by/target/platform/os
 สถานะ `draft → approved → designed → reviewed → built` ต้องสะท้อนหลักฐานและการเซ็นของคนจริง
 สถานะเอกสาร/โครงการไม่ใช่ package state ใน `.baan/runs`; ไม่แปลงสถานะหรือยอดผลตรวจเดิมจากการอัปเดตคู่มือ

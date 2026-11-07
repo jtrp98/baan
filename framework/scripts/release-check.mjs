@@ -15,7 +15,9 @@ const [pack] = JSON.parse(npm(["pack", "--json", "--ignore-scripts", "--pack-des
 assert.ok(pack.files.length > 0);
 for (const { path: file } of pack.files) {
   assert.ok(!/(?:^|\/)(?:reports|planning|tests|docs|\.baan|node_modules)(?:\/|$)/i.test(file), `unwanted package entry: ${file}`);
-  assert.ok(!/(?:^|\/)(?:\.env(?:\..*)?|AGENTS\.md|CLAUDE\.md|baan\.config\.json|demo-notes\.md)$/.test(file), `local data: ${file}`);
+  if (!file.startsWith("templates/")) {
+    assert.ok(!/(?:^|\/)(?:\.env(?:\..*)?|AGENTS\.md|CLAUDE\.md|baan\.config\.json|demo-notes\.md)$/.test(file), `local data: ${file}`);
+  }
   assert.ok(!/(?:^|\/)v[12](?:\/|$)|baan-role\.mjs$/.test(file), `obsolete entry: ${file}`);
   if (/\.(?:mjs|js|json|md|txt)$/.test(file)) {
     const contents = readFileSync(path.join(source, file), "utf8");

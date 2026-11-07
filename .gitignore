@@ -5,6 +5,10 @@ node_modules/
 *.tgz
 *.tmp-*
 
+# ไฟล์ตั้งค่า local ของเครื่อง (ไม่ commit)
+local.json
+framework/local.json
+
 # ไฟล์ส่วนตัวของคนที่ทำงานใน repo นี้ (ไม่ใช่ส่วนของ package)
 /CLAUDE.md
 /AGENTS.md

@@ -1,18 +1,21 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { TEAM_DIR, listRoles, tierMatrixText, resolveTarget, layoutOf, memoryRootIssues } from "./config.mjs";
+import { TEAM_DIR, listRoles, tierMatrixText, resolveTarget, layoutOf, memoryRootIssues, loadLocalConfig } from "./config.mjs";
 import { performInit } from "./init.mjs";
 import { lintKnowledge, updateIndexes } from "./knowledge-index.mjs";
 import { lintPlanFile } from "./plan.mjs";
 import { commitKnowledge } from "./knowledge-commit.mjs";
 import { sweep, formatSweep } from "./sweep.mjs";
-import { syncWorkspace } from "./sync.mjs";
+import { syncWorkspace, syncAllWorkspaces } from "./sync.mjs";
+import { surveyProject } from "./survey.mjs";
 
-export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep", "sync"];
+export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep", "sync", "survey", "scan"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
-  baan sync [--pull-only] [--push] [--dry-run] [--no-self-update]
+  baan sync [--all] [--pull-only] [--push] [--dry-run] [--no-self-update]
+  baan survey [--target <name>] [--project <name>] [--cwd <path>]
+    [--scaffold-module <name>] [--scaffold-project <name>] [--json]
   baan --list | --version | --help
   baan run --packet <file> | --plan <file> | --goal <text>
     [--cwd <repo>] [--workspace <dir>] [--config <file>] [--target <name>] [--module <project/module>]
@@ -31,6 +34,15 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.version) return JSON.parse(readFileSync(path.join(TEAM_DIR, "package.json"), "utf8")).version;
   if (o.init) return performInit(root, TEAM_DIR, () => {}, { knowledgeGit: o["knowledge-git"], memoryGit: o["memory-git"] });
   if (o.sync) {
+    const local = loadLocalConfig(TEAM_DIR);
+    if (o.all || (!ws?.source && local.workspaces.length > 0)) {
+      return syncAllWorkspaces(local, TEAM_DIR, {
+        push: !o["pull-only"] && (o.push || true),
+        pullOnly: Boolean(o["pull-only"]),
+        dryRun: Boolean(o["dry-run"]),
+        noSelfUpdate: Boolean(o["no-self-update"]),
+      }, (m) => console.log(m));
+    }
     return syncWorkspace(ws, root, TEAM_DIR, {
       push: !o["pull-only"] && (o.push || true),
       pullOnly: Boolean(o["pull-only"]),
@@ -38,8 +50,21 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
       noSelfUpdate: Boolean(o["no-self-update"]),
     }, (m) => console.log(m));
   }
-  if (o.list) return { config: ws.source, defaults: ws.defaults, knowledge_roots: ws.knowledge_roots.map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
-    execution_roles: ["planner", "worker", "verifier"], interactive_roles: listRoles(), tiers: tierMatrixText(cfg.tiers, cfg.agents) };
+  if (o.survey || o.scan) {
+    return surveyProject(o, ws, root, (m) => console.log(m));
+  }
+  if (o.list) {
+    const local = loadLocalConfig(TEAM_DIR);
+    return {
+      config: ws?.source ?? null,
+      defaults: ws?.defaults ?? {},
+      knowledge_roots: (ws?.knowledge_roots ?? []).map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
+      ...(local.workspaces.length ? { local_workspaces: local.workspaces } : {}),
+      execution_roles: ["planner", "worker", "verifier"],
+      interactive_roles: listRoles(),
+      tiers: tierMatrixText(cfg.tiers, cfg.agents),
+    };
+  }
   if (o["lint-plan"]) {
     const messages = [];
     const code = lintPlanFile(path.resolve(o["lint-plan"]), (f) => readFileSync(f, "utf8"), (m) => messages.push(m));

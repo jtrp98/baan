@@ -43,6 +43,32 @@ export function reportsDirOf(workspaceRoot) {
   return workspaceRoot ? path.join(workspaceRoot, "reports", "baan") : REPORTS_DIR;
 }
 
+export function findLocalConfig(teamDir = TEAM_DIR) {
+  const env = process.env.BAAN_LOCAL_FILE;
+  if (env && existsSync(env)) return path.resolve(env);
+  const inTeam = path.join(teamDir, "local.json");
+  if (existsSync(inTeam)) return inTeam;
+  const inParent = path.join(teamDir, "..", "local.json");
+  if (existsSync(inParent)) return inParent;
+  return null;
+}
+
+export function loadLocalConfig(teamDir = TEAM_DIR) {
+  const file = findLocalConfig(teamDir);
+  if (!file) return { source: null, workspaces: [] };
+  try {
+    const raw = JSON.parse(readFileSync(file, "utf8"));
+    const list = Array.isArray(raw.workspaces) ? raw.workspaces : (Array.isArray(raw.companies) ? raw.companies : []);
+    const workspaces = list.map((item) => {
+      if (typeof item === "string") return { name: path.basename(item), path: path.resolve(item) };
+      return { name: item.name || path.basename(item.path), path: path.resolve(item.path) };
+    });
+    return { source: file, workspaces };
+  } catch (e) {
+    throw new Error(`อ่าน local.json ไม่ได้ (${file}): ${e.message}`);
+  }
+}
+
 
 export function loadWorkspace(configPath = null) {
   let raw = {};

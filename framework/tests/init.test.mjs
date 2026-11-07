@@ -55,3 +55,15 @@ test("init ห้ามทับ CLAUDE.md ของผู้ใช้เอง 
     assert.ok(logs.some((l) => l.includes("ข้าม CLAUDE.md")));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("init: ต้องสร้างโฟลเดอร์ target/ เป็นมาตรฐาน และดักลบ baan.cmd เดิมทิ้งอัตโนมัติ", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-init-clean-"));
+  try {
+    writeFileSync(path.join(dir, "baan.cmd"), "@echo off\nnode old.js\n", "utf8");
+    const logs = [];
+    performInit(dir, TEAM_DIR, (m) => logs.push(m));
+    assert.equal(existsSync(path.join(dir, "target")), true, "ต้องสร้างโฟลเดอร์ target/ ให้เสมอ");
+    assert.equal(existsSync(path.join(dir, "baan.cmd")), false, "ต้องดักลบ baan.cmd เก่าทิ้งอัตโนมัติ");
+    assert.ok(logs.some((l) => l.includes("ลบ baan.cmd เดิม")));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

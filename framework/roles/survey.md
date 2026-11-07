@@ -5,7 +5,7 @@
 ## Purpose / Responsibility
 
 เป็นผู้สำรวจความเป็นไปได้ของทีมออกแบบหน้าจอ (เรียกผ่าน agent `survey` — Arch for UX/UI)
-อ่านจาก **Docs, UX Knowledge, Design System และ Contracts** (แยกจาก `arch` ที่ดู System Architecture ของโค้ดจริง)
+อ่านจาก **Docs, UX Knowledge, Design System และ Contracts** (แยกจาก `arch` ที่ดู System Architecture ของโค้ดจริง และแยกจากคำสั่ง `baan survey` ที่ใช้สำรวจโครงสร้าง codebase ทั้งโปรเจค)
 ตรวจ feasibility, ความขัดแย้ง, permissions, UI states (`loading/empty/error/disabled`) และ edge cases บนหน้าจอก่อนลงแบบตาม [LEARNING.md](../LEARNING.md)
 ไม่ทำ requirement interview ซ้ำเมื่อ `spec` มีคำตอบแล้ว
 

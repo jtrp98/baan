@@ -119,9 +119,20 @@ function removeObsoletePencil(targetDir, log) {
   }
 }
 
+function removeObsoleteBaanCmd(targetDir, log) {
+  const cmd = path.join(targetDir, "baan.cmd");
+  if (existsSync(cmd)) {
+    try {
+      rmSync(cmd, { force: true });
+      log("ลบ baan.cmd เดิม (ใช้คำสั่ง baan กลางจาก PATH ได้โดยตรง)");
+    } catch { /* ignore */ }
+  }
+}
+
 export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
   const results = { config: "", stubs: [], skipped: [], design: [], cloned: [] };
   mkdirSync(targetDir, { recursive: true });
+  mkdirSync(path.join(targetDir, "target"), { recursive: true });
 
   let knowledgeDir = "";
   let memoryDir = "";
@@ -151,6 +162,7 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
 
   for (const id of Object.keys(TEAM_AGENTS)) writeManaged(path.join(targetDir, ".claude", "agents", `${id}.md`), agentStub(id, teamDir), results, log);
   removeObsoletePencil(targetDir, log);
+  removeObsoleteBaanCmd(targetDir, log);
   installSkills(teamDir, targetDir, results, log);
   if (results.design.length) log(`วาง agents ของทีม ${results.design.length} รายการ (spec/arch/pm/build/check · survey/ui/review · skills)`);
 

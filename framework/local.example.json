@@ -1,0 +1,12 @@
+{
+  "workspaces": [
+    {
+      "name": "schoolbright",
+      "path": "C:/src/schoolbright"
+    },
+    {
+      "name": "projectX",
+      "path": "C:/src/_projectX"
+    }
+  ]
+}
