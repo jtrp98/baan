@@ -109,7 +109,7 @@ Get/List ใช้ขั้น 1 เหมือนกัน ถ้าขอ run
 
 ## คำถามที่รอผู้ใช้ (ประตูมนุษย์)
 
-1. หน้า admin ส่วนกลาง (FE-019) อยู่ที่ไหน — A: Next.js ใหม่ใน `target/school-bot/web/<ชื่อ>` ตามมติ 022/031 (arch แนะนำ ต้องได้ชื่อโฟลเดอร์) หรือ B: วางในเว็บ sb-tech-upgrade-web-system (ต้องเปลี่ยนมติ 022)
+1. ตำแหน่งหน้า Admin ส่วนกลาง (FE-019) — ผู้ใช้ยืนยันในแชต 2026-11-05 ว่าอยู่ใน `target/sb-web-school-robot` โค้ดปัจจุบันอยู่ที่ [frontend/app/admin](../../../../target/sb-web-school-robot/frontend/app/admin/) และมี [TAdmin login](../../../../target/sb-web-school-robot/frontend/app/admin/login/page.tsx) แยก
 2. ส่วนโรงเรียนของ AC-043-01 — arch แนะนำ: FE-019 เหลือส่วนกลาง · ส่วนโรงเรียนพิสูจน์ระดับ API ด้วย task BE ใหม่ · หน้าเลือกในเว็บโรงเรียนเป็น FE task แยกที่รอ UX เซ็น
 3. เลือกผิดแล้วแก้ได้ไหม — run planned นับเป็น run ที่ใช้อยู่ ห้องนั้นเลือกใหม่ไม่ได้ · arch แนะนำใส่ "ยกเลิก run ที่ยัง planned" ใน backlog ไม่ทำรอบนี้
 

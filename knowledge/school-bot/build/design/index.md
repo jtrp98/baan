@@ -40,7 +40,7 @@ Desktop/Web → HTTP API Gateway → gRPC SchoolBot service; เว็บผ่�
 |---|---|---|---|
 | [des-004.md](des-004.md) | 13 | DES-004: ตัวตน, session และสิทธิ์แยกตามช่องทาง | PROPOSED — ยืนยันอายุ Desktop 8 ชั่วโมงหลัง bind แล้ว; รอ identity/directory และ integration proof |
 | [learning-write-rpc-001.md](learning-write-rpc-001.md) | 1 | RPC เขียนของงานเรียน: ส่งงานภารกิจ (BE-015) และทำ Quiz/Test (BE-031) ผ่าน gRPC + Gateway | ตัดสินแล้ว 2026-11-04 — ยังไม่ลงโค้ด |
-| [course-run-selection-001.md](course-run-selection-001.md) | 1 | โรงเรียนเลือกหลักสูตรลงห้อง: 3 RPC CourseRun + ตัวตรวจห้อง/ปี/เทอม (AC-043-01) | ตัดสินแล้ว 2026-11-04 — ยังไม่ลงโค้ด · รอผู้ใช้ตอบที่อยู่หน้า admin |
+| [course-run-selection-001.md](course-run-selection-001.md) | 1 | โรงเรียนเลือกหลักสูตรลงห้อง: 3 RPC CourseRun + ตัวตรวจห้อง/ปี/เทอม (AC-043-01) | สัญญาตามมติ 2026-11-04 · ผู้ใช้ยืนยันที่อยู่หน้า Admin 2026-11-05 |
 | [des-012.md](des-012.md) | 9 | DES-012: แลก token เว็บและ authorization ข้ามระบบ | PROPOSED — ยืนยัน topology/admin policy แล้ว; รอ mapping/implementation/H5 (เงื่อนไข route/env/network/trust ระหว่างระบบ) |
 
 Data Transfer Object (DTO), decoder, trusted completion, private introspection และส่วนย่อยของ DES อยู่ใน [สารบัญ Transport/Login](index-transport-login.md)
@@ -53,7 +53,7 @@ Data Transfer Object (DTO), decoder, trusted completion, private introspection �
 | [audit-evidence-migration-001.md](audit-evidence-migration-001.md) | 2 | ไม่มี physical delta หรือ migration ตามมติ 054 | ส่ง vault ทบทวน DBA-005/DBA-006 ว่าไม่มี delta |
 | [learning-design-reconciliation-001.md](learning-design-reconciliation-001.md) | 2 | หลักฐานรับกฎ learning/คะแนนก่อน freeze ของ DBA-005 | กฎนำเข้าแบบแล้ว; ไม่มี audit storage delta ตามมติ 054; runtime/คำอธิบาย constraints เก่ายังค้าง |
 | [data-model.md](data-model.md) | 8 | คู่มือ schema: 32 ตาราง 450 ฟิลด์และการใช้ข้อมูลเดิม | ฐานแบบข้อมูล — runtime/catalog/API integration ยังไม่ยืนยัน |
-| [modules.md](modules.md) | 3 | ขอบเขตและความรับผิดชอบแต่ละโมดูล | PROPOSED |
+| [modules.md](modules.md) | 4 | ตำแหน่งโค้ดปัจจุบันและขอบเขตตามแบบของแต่ละโมดูล | PROPOSED |
 | [quality-attributes.md](quality-attributes.md) | 1 | เกณฑ์คุณภาพและสิ่งที่ต้องพิสูจน์ | PROPOSED |
 | [risks.md](risks.md) | 5 | ความเสี่ยงและเงื่อนไขที่ต้องให้ผู้รับผิดชอบยืนยัน | PROPOSED |
 

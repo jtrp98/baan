@@ -14,6 +14,8 @@ status: released
 
 SchoolBot เป็นระบบสำหรับการเรียนรู้การเขียนโปรแกรมและควบคุมแขนกลหุ่นยนต์สำหรับนักเรียนและครูในโรงเรียน ครอบคลุมพื้นที่สร้างสรรค์ 3 รูปแบบ: **Block Lab** (โปรแกรมบล็อก), **Arm Lab** (ควบคุมและจำลองแขนกล 6 แกน), และ **Code Lab** (เขียนโปรแกรม Python) พร้อมระบบบทเรียน การสอบวัดผล การตรวจอัตโนมัติ และการส่งคะแนนเข้าสู่ระบบทะเบียน SchoolBright
 
+**Source ปัจจุบัน** อยู่ที่ [target/sb-web-school-robot](../../target/sb-web-school-robot/) ดู [ตำแหน่งโค้ดของแต่ละโมดูล](build/design/modules.md) และ [runtime/configuration](build/design/service-runtime-001.md) ข้อมูลผลทดสอบและสถานะส่งมอบในหัวข้อถัดไปอ้างชุดหลักฐานของการส่งมอบเดิม
+
 ---
 
 ## 1. สถานะการส่งมอบโครงการ (Project Handover Status)
@@ -48,6 +50,8 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 
 ## 3. สรุปความพร้อมการนำขึ้นระบบจริง (Operational Readiness)
 
+ตารางนี้เป็นสถานะที่บันทึกไว้ในชุดส่งมอบเดิม ดู [runtime ปัจจุบัน](build/design/service-runtime-001.md) สำหรับสิ่งที่ตรวจจาก checkout ใหม่
+
 | ส่วนงาน | สถานะความพร้อม | แนวทางดำเนินการสำหรับทีมปฏิบัติการ (Operations Team) |
 |---|:---:|---|
 | **ฐานข้อมูล (PostgreSQL 15.19)** | พร้อมใช้งาน | รันสคริปต์ [schoolbot_db.sql](build/db/schoolbot_db.sql) บนฐานข้อมูล `SchoolBotDB` แยกต่างหากจาก 4 ฐานเดิม |
@@ -59,7 +63,7 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 
 ## 4. โครงสร้างโมดูลย่อย (Submodules)
 
-ตารางด้านล่างคงข้อความและสถานะจากบันทึกส่งมอบเดิม ไม่ใช่ผลตรวจรับใหม่ของ BAAN 0.29.0
+ตารางนี้บันทึกสถานะในชุดส่งมอบ ส่วนตาราง `Modules` ด้านล่างแสดงสถานะเอกสารจากหัวไฟล์ของแต่ละโมดูล
 
 | Module | สรุป | สถานะ | พึ่งพา | ไฟล์ |
 |---|---|---|---|---|
@@ -71,9 +75,7 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 | quiz | ระบบบทเรียน แบบทดสอบ การสอบจับเวลา และการตรวจอัตโนมัติ | **released** | app-shell | [modules/quiz](modules/quiz/INDEX.md) |
 | web/school-bot | ระบบเว็บครู จัดการหลักสูตร เลื่อน Level และส่งออกคะแนน | **released** | quiz | [schoolbright-web](../schoolbright-web/modules/school-bot/INDEX.md) |
 
-## 5. ดัชนีจาก metadata ของ module
-
-ตารางนี้สร้างจากหัว INDEX ของ module ตาม `baan --index` ซึ่งยังระบุ `draft` ต่างจากบันทึกส่งมอบเดิมด้านบน การปรับเอกสารคงทั้งสอง source ไว้ ไม่เปลี่ยนสถานะ อนุมัติ หรือถอนการส่งมอบแทนผู้ใช้
+## Modules
 
 <!-- baan:modules:start -->
 <!-- ตารางนี้สร้างจากหัวไฟล์ INDEX.md ของแต่ละ module ด้วย `baan --index` — แก้ที่หัวไฟล์ของ module ไม่ใช่ที่นี่ -->
@@ -86,7 +88,7 @@ SchoolBot เป็นระบบสำหรับการเรียนร�
 | code-lab | Code Lab | draft | 2026-11-02 | app-shell, my-work | [modules/code-lab](modules/code-lab/INDEX.md) |
 | game-library | game-library (สารบัญ module) | draft | 2026-11-06 | app-shell, my-work, quiz | [modules/game-library](modules/game-library/INDEX.md) |
 | my-work | my-work (สารบัญ module) | draft | 2026-11-04 | app-shell | [modules/my-work](modules/my-work/INDEX.md) |
-| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-06 | app-shell, schoolbright-web/school-bot | [modules/quiz](modules/quiz/INDEX.md) |
+| quiz | บทเรียนและ Quiz (สารบัญ module) | draft | 2026-11-06 | app-shell, schoolbright-web/school-bot | [modules/quiz](modules/quiz/INDEX.md) |
 
 **module ที่อยู่ project อื่นแต่เกี่ยวกับ project นี้**
 

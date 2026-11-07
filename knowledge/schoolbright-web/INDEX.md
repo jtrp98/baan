@@ -22,5 +22,5 @@ target: sb-tech-upgrade-web-system
 
 | Module | สรุป | สถานะ | อัปเดต | เกี่ยวข้อง | อยู่ที่ |
 |---|---|---|---|---|---|
-| quiz | Quiz (บทเรียน) (สารบัญ module) | draft | 2026-11-06 | พึ่ง schoolbright-web/school-bot | [school-bot/modules/quiz](../school-bot/modules/quiz/INDEX.md) |
+| quiz | บทเรียนและ Quiz (สารบัญ module) | draft | 2026-11-06 | พึ่ง schoolbright-web/school-bot | [school-bot/modules/quiz](../school-bot/modules/quiz/INDEX.md) |
 <!-- baan:modules:end -->

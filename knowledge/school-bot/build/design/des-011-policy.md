@@ -8,7 +8,7 @@
 
 รายละเอียด projection ของ snapshot, source references และความเข้ากันได้กับข้อมูลเดิมอยู่ใน [สัญญา snapshot](learning-snapshot-projection-001.md) การทดสอบ projection ด้วย fixture ที่ครบทำได้ แต่ต้องพิสูจน์ roster/term จริงและความเข้ากันได้ของ reader ก่อนเขียนหรือ confirm ห้ามเติม stored snapshot ด้วยผลสดย้อนหลัง.
 
-Level เป็นระดับหลักสูตร ไม่ใช่การเลื่อนชั้น/ย้ายห้องในทะเบียนนักเรียน ระบบเสนอจากค่าเฉลี่ยคะแนนรวมของห้อง ครูยืนยันทั้งห้องเท่านั้น ไม่เขียน CompassStudentLevelScore หรือทะเบียนชั้นเรียนเดิม ไม่เลื่อนนักเรียนเป็นรายบุคคล หน้าครูอยู่ web-system ([BR-048-05 (หน้าครูยืนยันเลื่อน Level อยู่ใน sb-tech-upgrade-web-system ตาม decisions-022)](../../modules/quiz/shared/requirements/req-048.md)); หน้าตั้งเกณฑ์อยู่ admin ส่วนกลาง
+Level เป็นระดับหลักสูตร ระบบเสนอจากค่าเฉลี่ยคะแนนรวมของห้อง ครูยืนยันทั้งห้องเท่านั้น การยืนยันไม่มีผลต่อ CompassStudentLevelScore ทะเบียนชั้นเรียน หรือระดับนักเรียนรายบุคคล หน้าเว็บครูอยู่ที่ `target/sb-web-school-robot/frontend/app/management/` ตาม [BR-048-05](../../modules/quiz/shared/requirements/req-048.md) ส่วนหน้าตั้งเกณฑ์อยู่ Admin ส่วนกลางตามแบบ
 
 - ตาราง `SchoolBotLevel`, `SchoolBotLevelPromotionPolicy`, `SchoolBotCourseRun`, `SchoolBotLevelProposal`, `SchoolBotIdempotency` และ `SchoolBotAuditEvent` อยู่บน **SchoolBot DB (`10.0.0.128:9499`)** ตาม [decisions-027](../../shared/decisions/decisions-027.md)
 - การอ่านรายชื่อนักเรียนในห้อง (roster), ข้อมูลสิ้นเทอม/เทอมถัดไป (`TTerm`) และสิทธิ์ครูรายวิชา (`TplanCourseTeacher`) อ่านจาก **School DB** ผ่าน connection แยกด้วย**บัญชี DB เดิม** ([decisions-029](../../shared/decisions/decisions-029.md))

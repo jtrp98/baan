@@ -8,27 +8,39 @@ platform: desktop
 os: [windows, mac]
 ---
 
-# Quiz (บทเรียน) (สารบัญ module)
+# บทเรียนและ Quiz (สารบัญ module)
 
-> **ค้าง (2026-11-05):** ต้องให้ `ruler` ตรวจ R7/R8/R12/R16/AC-05 ซ้ำ (แก้หลัง ruler รอบแรก) ก่อนขอผู้ใช้ approve · ดู `../../system/brief.md` "งานถัดไป" · **2026-11-06: R7 + AC-05 ตรวจซ้ำแล้ว (feasibility/R7.md) · R8/R12/R16 ตรวจซ้ำแล้ว (feasibility/R8.md, R12.md, R16.md) · งานค้างนี้ปิดแล้ว**
+> **งานออกแบบและข้อกำหนด UX/UI (2026-11-06):** ruler ตรวจซ้ำ R4/R7 และ R8/R12/R16 แล้ว (feasibility/R4.md, R7.md, R8.md, R12.md, R16.md) · ดูสรุปใน `../../design/system/brief.md`
 
-เป้าหมาย: นักเรียน ป.1–6 เลือก **Level 1–6 (= ป.1–6)** → แผนที่ภารกิจยาว 2 เทอมต่อ level แนว Duolingo → ทำแบบฝึก 4 กลุ่ม 5–8 ข้อต่อด่าน (1 ด่าน = 1 คาบ) ได้ดาว 0–3 · **phase 1 (MVP) ยังไม่ส่ง/ดึงคะแนนกับ SchoolBright** เก็บผลที่ cloud ของ School Bot · phase 2: คะแนน Quiz เป็นคะแนนเดียวที่ส่งกลับ SchoolBright และที่ครูเห็นบนเว็บครู
+เป้าหมาย: นักเรียน ป.1–6 เลือก **Level 1–6 (= ป.1–6)** → แผนที่ภารกิจยาว 2 เทอมต่อ level แนว Duolingo → ทำแบบฝึก 4 กลุ่ม 5–8 ข้อต่อด่าน (1 ด่าน = 1 คาบ) ได้ดาว 0–3 พร้อมระบบภารกิจบทเรียน (F3) · **phase 1 (MVP) ยังไม่ส่ง/ดึงคะแนนกับ SchoolBright** เก็บผลที่ cloud ของ School Bot · phase 2: คะแนน Quiz เป็นคะแนนเดียวที่ส่งกลับ SchoolBright และที่ครูเห็นบนเว็บครู
 
-แหล่งความจริง: sketchbook (นำเข้าจากระบบเก่า 2026-10-21 · แก้ตามผู้ใช้ 2026-10-31) · พึ่งพา `app-shell` (sidebar/หน้าหลัก ปุ่มเรียนต่อ ความสำเร็จ แถบหน้าต่างและสถานะ sync) · module ที่ใช้ข้อมูลจากที่นี่: `teacher-web` (ผล Quiz รายห้อง · **ต้องตรวจตาม OQ22**)
+ขอบเขตงานภารกิจอ้างคำตอบผู้ใช้ 2026-11-05 ใน F3 ส่วน D1–D4 จาก sketchbook เป็นแบบอ้างอิง Desktop และเอกสาร F1–F2 คงไว้สำหรับตรวจที่มาของแบบและระบบหลักสูตร/ข้อสอบเดิม สถานะของ F3 ตรวจแยกจากหลักฐานเดิมในหน้านี้
 
 ## ไฟล์ (อ่านเฉพาะที่งานต้องใช้)
 
 | ไฟล์ | อ่านเมื่อ |
 |---|---|
-| **curriculum-source.md** | **อ่านก่อนทุกงานบทเรียน (กฎ CLAUDE.md 2026-11-05)** · แหล่งเนื้อหาจริง: หลักสูตร ป.1–6 = Level 1–6, แผนการสอนรายคาบ, สไลด์, แบบฝึกเก็บคะแนน |
-| requirements.md | ต้องรู้ว่าต้องทำอะไร (R#, กฎ, edge case) |
-| oq.md | ต้องรู้ว่ามีอะไรยังไม่ตัดสิน |
-| feasibility.md | ตรวจ logic / ดู SCR, ST, ENT, ARC-I, DEV-Q ที่นำเข้ามา · **ผลล่าสุด 2026-11-06** ตรวจซ้ำ R8/R12/R16 + การแก้ตาม OQ47–OQ54 ("ทั่วไป › รอบ 2026-11-06 ตรวจซ้ำ") · ก่อนหน้าวันเดียวกัน ตรวจ R4/R7 (ด่านเกมไม่ให้ดาว · ด่านเกมผ่านเมื่อถึงเป้า) · รอบ 2026-11-05 R12/R16/R17 · ผล R# อื่นจากรอบ 2026-11-01 · ไฟล์ยาวเกิน ~2 หน้า: R# ที่ตรวจใหม่แตกเป็น `feasibility/R<n>.md` |
-| feasibility/R4.md | ผล R4 ดาว 0–3 + ด่านเกม/ผสม (2026-11-06) |
-| feasibility/R7.md | ผล R7 สถานะด่าน/ล็อก (2026-11-06 + รอบ 2026-11-05/11-01 ที่ยังใช้ได้ + ตรวจซ้ำ R7/AC-05) |
-| feasibility/R8.md | ผล R8 สถานะระบบ (ตรวจซ้ำ 2026-11-06) |
-| feasibility/R12.md | ผล R12 หน้าเลือก Level (ตรวจซ้ำ 2026-11-06 + รอบ 2026-11-05/11-01 ที่ยังใช้ได้) |
-| feasibility/R16.md | ผล R16 ขอบเขต phase (ตรวจซ้ำ 2026-11-06 + รอบ 2026-11-05 ที่ยังใช้ได้) |
+| [curriculum-source.md](shared/curriculum-source.md) | **อ่านก่อนทุกงานบทเรียน (กฎ CLAUDE.md 2026-11-05)** · แหล่งเนื้อหาจริง: หลักสูตร ป.1–6 = Level 1–6, แผนการสอนรายคาบ, สไลด์, แบบฝึกเก็บคะแนน |
+| [ระบบภารกิจบทเรียน (F3)](shared/requirements/f3-lessons-missions.md) | เกณฑ์ตรวจรับที่ตกลงสำหรับ Desktop, Admin และเว็บครู |
+| [UX handoff ภารกิจบทเรียน](design/lessons-missions-handoff.md) | ร่างสถานะและ flow ของ Desktop, Admin และเว็บครู รอ UX sign-off |
+| [สัญญาระบบภารกิจบทเรียน](build/lessons-missions-contract.md) | ร่างเชิงตรรกะที่ผู้ใช้ยืนยันสำหรับ G-SCHEMA รวมการเริ่มออฟไลน์ การเปิดคืน และการทดสอบ |
+| [สัญญา payload และ gRPC](build/lesson-missions-payload-v1.md) | ร่าง `Activity.Config`, โจทย์, หลักฐานออฟไลน์ และ API ร่วมก่อนยืนยัน basis รอบใหม่ |
+| [คะแนน Arm/Block Lab](build/lesson-missions-lab-scoring-rev2.md) | มติ Admin ตั้งคะแนนเต็มและครูกรอกคะแนน พร้อมร่างส่วนเพิ่มของสัญญาสำหรับ `G-SCHEMA` |
+| [สิทธิ์ครูรายห้อง](build/lesson-missions-classroom-authority.md) | มติว่าใครดูผลและเปิด–ปิดได้ พร้อม mapping จากการมอบหมายของโรงเรียน |
+| [ประเมิน schema เดิมสำหรับ F3](build/lessons-missions-schema-fit.md) | Mapping ที่ใช้ต่อได้และช่องว่างของ DDL 32 ตาราง ก่อนออกแบบ physical schema |
+| [shared/requirements.md](shared/requirements.md) | ทะเบียนข้อกำหนด F1–F3 |
+| [shared/oq.md](shared/oq.md) | ต้องรู้ว่ามีอะไรยังไม่ตัดสิน (OQ1–OQ58) |
+| [design/feasibility.md](design/feasibility.md) | ตรวจ logic / ดู SCR, ST, ENT, ARC-I, DEV-Q ที่นำเข้ามา · **ผลล่าสุด 2026-11-06** ตรวจซ้ำ R8/R12/R16 + การแก้ตาม OQ47–OQ54 |
+| [design/feasibility/R4.md](design/feasibility/R4.md) | ผล R4 ดาว 0–3 + ด่านเกม/ผสม (2026-11-06) |
+| [design/feasibility/R7.md](design/feasibility/R7.md) | ผล R7 สถานะด่าน/ล็อก (2026-11-06 + ตรวจซ้ำ R7/AC-05) |
+| [design/feasibility/R8.md](design/feasibility/R8.md) | ผล R8 สถานะระบบ (ตรวจซ้ำ 2026-11-06) |
+| [design/feasibility/R12.md](design/feasibility/R12.md) | ผล R12 หน้าเลือก Level (ตรวจซ้ำ 2026-11-06) |
+| [design/feasibility/R16.md](design/feasibility/R16.md) | ผล R16 ขอบเขต phase (ตรวจซ้ำ 2026-11-06) |
+| design/ | แก้หรือตรวจ design (เลือกไฟล์ D# จากตาราง Design) · D1–D4 |
+| [design/review.md](design/review.md) | ดูผลตรวจ |
+| handoff.md | ส่งต่อ dev (ยังไม่มี) |
+| ../../assets/ref/Quiz/ | ภาพอ้างอิงหน้าตา Quiz (ดูตารางด้านล่าง · ไฟล์ใหญ่ ห้ามเปิดทั้งโฟลเดอร์ เปิดเฉพาะไฟล์ที่ใช้) |
+| ../../assets/derived/quiz/ | ภาพที่แปลงจากต้นฉบับแล้วอัปโหลดเป็น asset ของ C1 (มาสคอตแยกท่า · แผนที่ 2 เทอมบีบแล้ว · ภาพด่าน · ภาพเกาะ) |
 | design/ | แก้หรือตรวจ design (เลือกไฟล์ D# จากตาราง Design) · D1–D4 (publish 2026-11-01) |
 | review.md | ดูผลตรวจ |
 | handoff.md | ส่งต่อ dev (ยังไม่มี) |
