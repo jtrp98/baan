@@ -235,7 +235,7 @@ export function lintKnowledge(root) {
         const base = path.basename(f).toLowerCase();
         if (base === "index.md") {
           if (sz > 20 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 20 KB (${Math.round(sz / 1024)} KB) — สารบัญต้องสั้นกระชับ ห้ามเก็บประวัติยาวหรือเนื้อหาลงใน INDEX`);
-        } else if (!parts.includes("changelog")) {
+        } else if (!parts.includes("changelog") && !parts.includes("resolved")) {
           if (sz > 50 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 50 KB (${Math.round(sz / 1024)} KB) เสี่ยงทำให้ AI อ่านเกินความจำเป็น — ควรแยกเป็นไฟล์ย่อยในโฟลเดอร์ หรือย้ายประวัติที่จบแล้วไป resolved/ หรือ archive/`);
         }
       } catch { /* ignore */ }
