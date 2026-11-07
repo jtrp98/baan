@@ -11,6 +11,8 @@ requested_by: [school-bot]
 
 # เว็บครู School Bot (สารบัญ module)
 
+**ตำแหน่ง implementation ปัจจุบัน** อยู่ใต้ [frontend ของ sb-web-school-robot](../../../../target/sb-web-school-robot/frontend/README.md) ดู [คู่มือเว็บครู](../../../../target/sb-web-school-robot/docs/teacher-web.md) และ [หน้า /management](../../../../target/sb-web-school-robot/frontend/app/management/page.tsx) ค่า `target` ในหัวไฟล์อ้างโปรเจกต์ของข้อกำหนดเดิมใน `schoolbright-web`
+
 เป้าหมาย: ครูในโรงเรียนลูกค้า SchoolBright ใช้เว็บ (แยกจากแอป) ดูความคืบหน้าและคะแนน Quiz รายเทอม/รายปี จัดตามห้อง · ตั้งค่า · แก้ปัญหาหุ่น · ไม่ใช้มาสคอต · ไม่แสดงงาน Arm/Block
 
 **knowledge เป็นแหล่งความจริงแล้ว** (นำเข้าจากระบบเก่า 2026-10-21) · บริบทร่วม: `../../../school-bot/shared/context.md` · brand: `../../shared/brand.md`

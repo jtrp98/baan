@@ -1,8 +1,8 @@
 # ServiceSchoolBot — runtime, database, Desktop และ deployment
 
-> Rev 1 · แก้ล่าสุด 2026-11-04 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจโค้ดและ Git ปัจจุบัน)
+> Rev 2 · แก้ล่าสุด 2026-11-05 · แก้โดย นายช่าง · ขอโดย ผู้ใช้ (ตรวจโค้ดใน sb-web-school-robot)
 
-Backend ใช้ `web/ServiceSchoolBot.slnx`; src มี ServiceSchoolBot.API, .Application, .Domain, .Infrastructure; tests/tools ใช้ ServiceSchoolBot.Tests, .RepositorySelfCheck, .DatabaseSelfCheck ฝั่ง app ใช้ SchoolBot เช่น SchoolBot.Installer, SchoolBot.Setup และ SchoolBot.msi; references จาก app ไป backend คง ServiceSchoolBot ตามโปรเจกต์จริง โฟลเดอร์ชื่อเก่าถูกลบแล้ว ไม่เปลี่ยน generated proto namespace
+พาธในเอกสารนี้อิง `target/sb-web-school-robot` ที่ commit `d8f27d3` Backend ใช้ [backend/ServiceSchoolBot.slnx](../../../../target/sb-web-school-robot/backend/ServiceSchoolBot.slnx) โค้ดอยู่ใน `backend/src/ServiceSchoolBot.{API,Application,Domain,Infrastructure}` ชุดทดสอบและเครื่องมือตรวจ repository/database อยู่ใต้ `backend/tests/` และ `backend/tools/` ส่วน Desktop อยู่ใต้ `app/` ดู [ขอบเขตโมดูล](modules.md) สำหรับการเชื่อมแต่ละส่วน
 
 ## Database และ storage
 
@@ -10,19 +10,33 @@ AddInfrastructureServices ลงทะเบียน scoped SchoolBotUnitOfWork
 
 SchoolBot:Storage=Memory ใช้ได้เฉพาะ Development; explicit memory repositories อยู่ Repositories/Storage/Memory และทดสอบ opt-in แยกจาก database repositories File backing/snapshot เป็นของ development/test ไม่ใช่ production database อย่างไรก็ดี AddManagementStore ยังลงทะเบียน InMemoryManagementStore; replay/nonce และ release metadata บางส่วนยัง process-local, signer ยัง PoC จึงไม่อ้าง production/multi-instance readiness
 
-มี isolated PostgreSQL repository/DI/model checks ตามใบงาน100 (memory) แต่ไม่ใช่ business writes กับฐานร่วม ImportCurriculumLessons ยังปฏิเสธ STATE_CONFLICT เพราะ live scaffold ไม่มี SchoolBotLesson.ImportSource ต้องรัน migration-002 โดยผู้มีอำนาจและ refresh scaffold; ไม่มีการรัน SQL ในงานนี้
+หลักฐาน isolated PostgreSQL repository/DI/model checks อยู่ในใบงาน100 (memory) ใน checkout ปัจจุบัน `CurriculumImportRepository.ImportCurriculumLessonsAsync` ฝั่ง PostgreSQL โยน `DomainRuleException` รหัส `STATE_CONFLICT` โดยระบุว่าต้องมี `SchoolBotLesson.ImportSource` และ refresh scaffold สถานะคอลัมน์ในฐานที่ deploy ต้องตรวจแยกจากโค้ด
 
 ## Desktop licensing
 
 โค้ด Host สร้าง device key/proof และ canonical body, ตรวจ signed ES256 entitlement, binding/JKT/expiry, trusted clock/generation และใช้ entitlement gate ก่อนเรียก engine; Windows ProtectedStore ใช้ DPAPI ส่วน macOS ใช้ Keychain ผ่าน security command ไม่ใช่ plaintext portable cache มีการตรวจ response identity/checked_at/expires_at กับ claims และล้าง/ปฏิเสธ cache ตาม online denial
 
-การมีโค้ดนี้ไม่พิสูจน์ distribution, OS runtime หรือ Gateway login ครบ HostServer test fixture ยังอ้างชนิดที่ถูกถอดก่อน rename; ไม่มีผลใหม่แทน compile failure ของใบงาน101 ดู [auth compatibility](gateway-grpc-contract-001-login.md)
+ลำดับ URL ที่ `NewDesktopService` อ่านคือ `SCHOOL_BOT_API_URL` → `ARM_API_URL` → environment ที่แอปบันทึก → `defaultAPIURL` สคริปต์ build ใช้ `SCHOOL_BOT_BUILD_API_URL` สำหรับฝัง URL ใน binary ดู [desktopservice.go](../../../../target/sb-web-school-robot/app/desktopservice.go) และ [build.ps1](../../../../target/sb-web-school-robot/scripts/desktop/build.ps1) ผล compile ของ HostServer ในใบงาน101 เป็นผลของ checkout ก่อนหน้า
+
+## เว็บครูและ Admin
+
+| ส่วน | การตั้งค่าที่อ่านจากโค้ด |
+|---|---|
+| เว็บครู | `SITE_USERNAME`, `SITE_PASSWORD` และ `SESSION_SECRET` ใช้สร้าง session `sb_auth` หน้า `/management` ใช้ `NEXT_PUBLIC_SCHOOL_BOT_API_URL` ค่าเริ่มต้น `/api/service-school-bot` |
+| Admin | `/admin/login` ใช้ `ADMIN_USERNAME`, `ADMIN_PASSWORD` และ `SESSION_SECRET` ออก session `sb_admin_auth` โดยอ่าน `SCHOOL_BOT_STAFF_ADMIN_ID2` และ `SCHOOL_BOT_STAFF_USER_ID` สำหรับตัวตนที่ส่งไป Gateway |
+| Admin BFF | อ่าน `SCHOOL_BOT_GATEWAY_ORIGIN` และลงนาม staff assertion ด้วย key ที่โหลดจาก `SCHOOL_BOT_STAFF_SIGNING_KEY_PEM` หรือ `SCHOOL_BOT_STAFF_SIGNING_KEY_FILE` |
+
+ตรวจจาก [auth.ts](../../../../target/sb-web-school-robot/frontend/lib/auth.ts), [auth-admin.ts](../../../../target/sb-web-school-robot/frontend/lib/auth-admin.ts), [learning-api.ts](../../../../target/sb-web-school-robot/frontend/lib/api/learning-api.ts), [Admin BFF](../../../../target/sb-web-school-robot/frontend/app/api/service-school-bot/admin/%5B...path%5D/route.ts) และ [staff-signing-key.ts](../../../../target/sb-web-school-robot/frontend/lib/server/staff-signing-key.ts)
 
 ## Endpoints และ deployment ที่ยังรอ
 
 หากไม่มี urls/HTTP_PORTS/HTTPS_PORTS/Kestrel:Endpoints ที่กำหนดเอง SchoolBot bind loopback HTTP/2 h2c 8080 และ HTTP/1 8081; map gRPC ทั้งห้าบริการกับ `/healthz` health คืน status ok/service/poc/storage เป็น liveness ไม่ตรวจ readiness ของ DB/trust/signing และยังไม่ใช่ gRPC health protocol
 
-Gateway ยังไม่มี SchoolBot module/channel registration ใน Program; transport validator ไม่ configured/untrusted และ SchoolBot default DenyAllGatewayPeerVerifier ปฏิเสธทุก peer ต้องทำ endpoint/env ownership, network isolation, TLS/mTLS/service peer verification, trusted metadata, BFF CSRF และ health/readiness ก่อนเปิด H5/G-AUTH ไม่เปิด h2c สู่ public เพียงเพราะ default local ใช้งานทดสอบได้
+บริการที่ลงทะเบียนคือ `ProjectService`, `LicenseService`, `CurriculumService`, `AssessmentService` และ `ReleaseService` ดู [Protobuf contracts](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/) สำหรับชื่อ RPC และ payload เช่น `ReleaseService.CheckUpdate` รับ version, channel และ platform ส่วน `CurriculumService` ใช้ `GetPublishedCurriculum`, `GetAdminCurriculum`, `ImportCurriculum` และ `PublishCurriculum` ตามประเภทงาน
+
+การตรวจรอบนี้ครอบคลุมฝั่ง SchoolBot [SchoolBotGrpcRegistration.cs](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.API/SchoolBotGrpcRegistration.cs) ลงทะเบียน `DenyAllGatewayPeerVerifier` เป็นค่าเริ่มต้น ส่วนการลงทะเบียนฝั่ง Gateway, trusted transport และสถานะ H5/G-AUTH ต้องอ้างหลักฐานจาก integration และ deployment ตามสภาพแวดล้อม
+
+ค่าการเชื่อมฐานข้อมูลอ่านจาก [DatabaseConnectionConfig.cs](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.Infrastructure/Configuration/DatabaseConnectionConfig.cs) โดยให้ `SCHOOL_BOT_DB_CONNECTION_STRING`, `MASTER_DB_CONNECTION_STRING`, `SCHOOL_DB_CONNECTION_STRING`, `LOGS_DB_CONNECTION_STRING` และ `PGGRADE_DB_CONNECTION_STRING` จาก environment มาก่อนค่า `ConnectionStrings:*` ที่ตรงกัน `SCHOOL_BOT_REPLAY_KEY` ใช้กับข้อมูล idempotency ฝั่ง persistence ตาม [ตัวอย่าง environment](../../../../target/sb-web-school-robot/backend/.env.example)
 
 ## Scripts และ artifacts
 
@@ -42,4 +56,5 @@ verify/package ไม่ได้ถูกรันในงานเอกส�
 
 ## หลักฐาน
 
-ตรวจ Git/source SchoolBot35c62bf: Program.cs, Infrastructure/Extensions/InfrastructureServiceExtensions.cs, DatabaseServiceExtensions.cs, Repositories/Databases, app/internal/license, scripts/README.md และ .gitignore; ใบงาน100–105 (memory) เป็นผลตรวจเดิม [หลักฐานทดสอบ](gateway-integration-evidence.md) ไม่ deploy หรือแจก installer ใหม่
+- ตรวจ [Program.cs](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.API/Program.cs), [InfrastructureServiceExtensions.cs](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.Infrastructure/Extensions/InfrastructureServiceExtensions.cs), [CurriculumImportRepository.cs](../../../../target/sb-web-school-robot/backend/src/ServiceSchoolBot.Infrastructure/Repositories/Databases/CurriculumImportRepository.cs), [app/internal/license](../../../../target/sb-web-school-robot/app/internal/license/) และ [scripts/README.md](../../../../target/sb-web-school-robot/scripts/README.md) ที่ `d8f27d3`
+- หลักฐานก่อนย้าย repository อ้าง `35c62bf` และใบงาน100–105 (memory) ดู [หลักฐานทดสอบ](gateway-integration-evidence.md)

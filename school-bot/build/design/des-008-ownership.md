@@ -11,7 +11,7 @@
 admin โรงเรียนที่แก้ mapping คือบัญชี `IsAdmin=1` ของโรงเรียน ตาม [มติ 025 (auth ข้ามระบบ, admin โรงเรียน, publish, สอบซ่อม และ Desktop)](../../shared/decisions/decisions-025.md)
 
 API ทั้งหมดอยู่ school-bot/web ภายใต้ /v2
-หน้า mapping อยู่ `sb-tech-upgrade-web-system` โฟลเดอร์ school-bot ซึ่งยังต้องยืนยัน
+หน้า mapping อยู่ในเว็บครูที่ `target/sb-web-school-robot/frontend/app/management/` ตามที่ผู้ใช้ยืนยันเมื่อ 2026-11-05 ดู [BR-049-05](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 เรียกผ่าน Backend for Frontend (BFF) `/api/school-bot/*` ด้วย session channel `school_web` ตาม [DES-012 (Auth ข้ามระบบสำหรับเว็บโรงเรียน, admin และ Desktop)](des-012.md)
 
 | Actor | สิทธิ์ใน DES นี้ |

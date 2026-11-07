@@ -9,6 +9,11 @@ owner: spec
 
 
 คำย่อในเอกสาร: OS = Operating System หรือระบบปฏิบัติการ; API = Application Programming Interface หรือส่วนเชื่อมต่อบริการ
+
+## Source ปัจจุบัน
+
+เริ่มจาก [ขอบเขตโมดูล](../build/design/modules.md) และ [runtime/configuration](../build/design/service-runtime-001.md) ของ `sb-web-school-robot` โดย Desktop และ engines อยู่ใต้ `app/` กับ `engines/` เว็บครูและ Admin อยู่ใต้ `frontend/` และบริการ .NET กับ Protobuf contracts อยู่ใต้ `backend/` พาธในหัวข้อหลักฐานด้านล่างอ้างตำแหน่งในช่วงที่ตรวจเดิม
+
 ## ข้อกำหนดและขอบเขต
 
 อ่านกฎธุรกิจและเกณฑ์ตรวจรับจาก [สารบัญ requirement](requirements-index.md) และอ่านขอบเขตวันนี้จาก [scope.md](scope.md) รายการความสามารถฐานเดิมอยู่ใน [scope-baseline-001.md](scope-baseline-001.md)

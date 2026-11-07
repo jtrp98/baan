@@ -23,7 +23,7 @@
 - [BR-048-02 (ระบบเสนอ ครูกดยืนยันก่อนเลื่อน; เลื่อนทั้งห้องพร้อมกัน ไม่เลือกเลื่อนรายบุคคล)](../../modules/quiz/shared/requirements/req-048.md)
 - [BR-048-03 (เฉลี่ยคะแนนรวมตาม REQ-047 จากทุกคนใน roster; งานขาด = 0 เฉพาะการเลื่อน Level ไม่ใช่ export (decisions-024/033/034))](../../modules/quiz/shared/requirements/req-048.md)
 - [BR-048-04 (การเลื่อน Level ไม่ให้สิทธิ์เปลี่ยน revision หรือผลเดิมย้อนหลัง ข้อกำหนด revision ตาม REQ-044)](../../modules/quiz/shared/requirements/req-048.md)
-- [BR-048-05 (หน้าครูยืนยันเลื่อน Level อยู่ใน sb-tech-upgrade-web-system ตาม decisions-022)](../../modules/quiz/shared/requirements/req-048.md)
+- [BR-048-05 (ตำแหน่งหน้าครูยืนยันเลื่อน Level)](../../modules/quiz/shared/requirements/req-048.md)
 - [BR-048-06 (admin ตั้งเกณฑ์ราย Level เริ่ม 70%; ประเมินสิ้นเทอม มีผลเทอมถัดไป; ไม่ผ่านอยู่ Level เดิมพร้อมส่วนที่ขาด (decisions-024))](../../modules/quiz/shared/requirements/req-048.md)
 - [AC-048-02 (ก่อนครูยืนยัน Level ของห้องและนักเรียนทุกคนยังไม่เปลี่ยน)](../../modules/quiz/shared/requirements/req-048.md)
 - [AC-048-03 (ครูยืนยันข้อเสนอสิ้นเทอมแล้ว เทอมปัจจุบันไม่เปลี่ยน; เทอมถัดไปทั้งห้องเริ่ม Level ใหม่เดียวกัน ไม่เลือกบางคน)](../../modules/quiz/shared/requirements/req-048.md)

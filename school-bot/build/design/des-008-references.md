@@ -28,7 +28,7 @@
 - [BR-049-02 (กิจกรรมหนึ่งได้หลายช่องข้ามวิชา แต่ช่องหนึ่งในบริบทโรงเรียน/เทอม/วิชารับกิจกรรมเดียว ไม่รวมหลายกิจกรรม (decisions-032))](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 - [BR-049-03 (Pgtassessment คือช่องคะแนน ไม่ใช่ตัวชี้วัดมาตรฐาน; แสดงตาม mapping)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 - [BR-049-04 (ส่งเฉพาะช่องที่แมพ ไม่เดาหมวดจาก Quiz/Test หรือแก้โครงสร้างเกรด)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
-- [BR-049-05 (หน้า mapping/ส่งคะแนนอยู่ sb-tech-upgrade-web-system เรียก SchoolBot API (decisions-021/022))](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
+- [BR-049-05 (ตำแหน่งหน้า mapping/ส่งคะแนนในเว็บครู)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 - [BR-049-06 (เฉพาะ admin โรงเรียนสร้าง/แก้ mapping ครูแก้ไม่ได้ (decisions-023))](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 - [AC-049-02 (กิจกรรม A แมพช่องวิชา X และ Y ได้; แมพ B ซ้ำช่องใดของ A ในบริบทเดียวกันถูกปฏิเสธ ทั้งแก้ชุดเดิมและสร้างชุดใหม่)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)
 - [AC-049-03 (สลับโรงเรียน/เทอมแล้ว mapping ไม่ถูกใช้ข้ามบริบทอัตโนมัติ)](../../../schoolbright-web/modules/school-bot/shared/requirements/req-049.md)

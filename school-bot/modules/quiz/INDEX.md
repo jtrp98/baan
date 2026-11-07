@@ -1,6 +1,6 @@
 ---
 module: quiz
-updated: 2026-11-02
+updated: 2026-11-05
 status: draft
 depends_on: [app-shell]
 target: school-bot
@@ -8,17 +8,24 @@ platform: desktop
 os: [windows, mac]
 ---
 
-# Quiz (บทเรียน) (สารบัญ module)
+# บทเรียนและ Quiz (สารบัญ module)
 
-เป้าหมาย: นักเรียน ป.1–6 เลือก **Level 1–6 (= ป.1–6)** → แผนที่ภารกิจยาว 2 เทอมต่อ level แนว Duolingo → ทำแบบฝึก 4 กลุ่ม 5–8 ข้อต่อด่าน (1 ด่าน = 1 คาบ) ได้ดาว 0–3 · **phase 1 (MVP) ยังไม่ส่ง/ดึงคะแนนกับ SchoolBright** เก็บผลที่ cloud ของ School Bot · phase 2: คะแนน Quiz เป็นคะแนนเดียวที่ส่งกลับ SchoolBright และที่ครูเห็นบนเว็บครู
+เป้าหมายงานภารกิจบทเรียน: นักเรียนเลือก **Level 1–6** และเข้าแผนที่สองเทอมที่แสดงด่านตามที่ Admin เผยแพร่ หนึ่งด่านมีหนึ่งกิจกรรมและตั้งเงื่อนไขผ่านกับคะแนนได้ตามชนิดกิจกรรม ครูดูผลและควบคุมการเปิดรายเทอมและรายด่านแยกตามห้อง Phase 1 เก็บผลใน School Bot และใช้ SchoolBright สำหรับยืนยันตัวตน
 
-แหล่งความจริง: sketchbook (นำเข้าจากระบบเก่า 2026-10-21 · แก้ตามผู้ใช้ 2026-10-31) · พึ่งพา `app-shell` (sidebar/หน้าหลัก ปุ่มเรียนต่อ ความสำเร็จ แถบหน้าต่างและสถานะ sync) · module ที่ใช้ข้อมูลจากที่นี่: `teacher-web` (ผล Quiz รายห้อง · **ต้องตรวจตาม OQ22**)
+ขอบเขตงานภารกิจอ้างคำตอบผู้ใช้ 2026-11-05 ใน F3 ส่วน D1–D4 จาก sketchbook เป็นแบบอ้างอิง Desktop และเอกสาร F1–F2 คงไว้สำหรับตรวจที่มาของแบบและระบบหลักสูตร/ข้อสอบเดิม สถานะของ F3 ตรวจแยกจากหลักฐานเดิมในหน้านี้
 
 ## ไฟล์ (อ่านเฉพาะที่งานต้องใช้)
 
 | ไฟล์ | อ่านเมื่อ |
 |---|---|
-| [shared/requirements.md](shared/requirements.md) | ต้องรู้ว่าต้องทำอะไร (R#, กฎ, edge case) |
+| [ระบบภารกิจบทเรียน (F3)](shared/requirements/f3-lessons-missions.md) | เกณฑ์ตรวจรับที่ตกลงสำหรับ Desktop, Admin และเว็บครู |
+| [UX handoff ภารกิจบทเรียน](design/lessons-missions-handoff.md) | ร่างสถานะและ flow ของ Desktop, Admin และเว็บครู รอ UX sign-off |
+| [สัญญาระบบภารกิจบทเรียน](build/lessons-missions-contract.md) | ร่างเชิงตรรกะที่ผู้ใช้ยืนยันสำหรับ G-SCHEMA รวมการเริ่มออฟไลน์ การเปิดคืน และการทดสอบ |
+| [สัญญา payload และ gRPC](build/lesson-missions-payload-v1.md) | ร่าง `Activity.Config`, โจทย์, หลักฐานออฟไลน์ และ API ร่วมก่อนยืนยัน basis รอบใหม่ |
+| [คะแนน Arm/Block Lab](build/lesson-missions-lab-scoring-rev2.md) | มติ Admin ตั้งคะแนนเต็มและครูกรอกคะแนน พร้อมร่างส่วนเพิ่มของสัญญาสำหรับ `G-SCHEMA` |
+| [สิทธิ์ครูรายห้อง](build/lesson-missions-classroom-authority.md) | มติว่าใครดูผลและเปิด–ปิดได้ พร้อม mapping จากการมอบหมายของโรงเรียน |
+| [ประเมิน schema เดิมสำหรับ F3](build/lessons-missions-schema-fit.md) | Mapping ที่ใช้ต่อได้และช่องว่างของ DDL 32 ตาราง ก่อนออกแบบ physical schema |
+| [shared/requirements.md](shared/requirements.md) | ทะเบียนข้อกำหนด F1–F3 |
 | [shared/oq.md](shared/oq.md) | ต้องรู้ว่ามีอะไรยังไม่ตัดสิน |
 | [design/feasibility.md](design/feasibility.md) | ตรวจ logic / ดู SCR, ST, ENT, ARC-I, DEV-Q ที่นำเข้ามา · **ผลล่าสุด 2026-11-01** ตรวจตาม requirement 2026-10-31 (R1–R18) |
 | design/ | แก้หรือตรวจ design (เลือกไฟล์ D# จากตาราง Design) · D1–D4 (publish 2026-11-01) |
