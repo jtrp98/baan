@@ -101,7 +101,7 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   }
   if (agent === "claude") {
     insert("--json-schema", JSON.stringify(schema));
-    if (role !== "worker") insert("--tools", "Read,Grep,Glob", "--permission-mode", "dontAsk", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--add-dir", run.root);
+    if (role !== "worker") insert("--tools", "Read,Grep,Glob,Agent,Task", "--permission-mode", "dontAsk", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--add-dir", run.root);
     if (role === "worker") {
       if (!p.session) p.session = { agent, id: randomUUID(), started: false };
       insert(p.session.started ? "--resume" : "--session-id", p.session.id);

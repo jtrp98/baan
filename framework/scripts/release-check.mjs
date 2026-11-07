@@ -40,7 +40,8 @@ const workspace = path.join(temp, "workspace");
 execute(process.execPath, [bin, "--init", "--workspace", workspace]);
 const stub = readFileSync(path.join(workspace, "AGENTS.md"), "utf8");
 assert.ok(stub.includes(path.join(installed, "BAAN.md")));
-for (const role of ["spec", "survey", "ui", "review"]) assert.ok(existsSync(path.join(installed, "roles", `${role}.md`)));
+assert.ok(stub.includes(path.join(installed, "LEARNING.md")));
+for (const role of ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"]) assert.ok(existsSync(path.join(installed, "roles", `${role}.md`)));
 
 // This synthetic provider and its approvals exist only inside disposable release fixtures.
 const provider = path.join(temp, "provider.cjs");

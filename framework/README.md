@@ -4,7 +4,7 @@ Local npm package สำหรับควบคุมงานพัฒนา�
 Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
 Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-สิ่งที่เปลี่ยนใน **0.29.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
+สิ่งที่เปลี่ยนใน **0.30.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
 
 ## ติดตั้งและตั้งค่า
 
@@ -15,9 +15,17 @@ baan --version
 baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
+baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 ```
 
-หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.29.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
+`baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
+1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
+2. รีเฟรชไฟล์ stubs (`.claude/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`) ใน workspace ให้ตรงกับ BAAN รุ่นล่าสุด
+3. ทำ Safe Auto-Commit สำหรับการแก้ไขค้างใน `knowledge_roots` และ `memory`
+4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
+5. รีเฟรช `knowledge-index.json` อัตโนมัติ
+
+หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.30.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
 `--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)
 อัปเดตเฉพาะไฟล์ที่ BAAN สร้างไว้ ไม่ทับไฟล์ของผู้ใช้; รันซ้ำหลังอัปเกรดได้
 แก้ paths/targets ใน config ให้ตรงเครื่อง ตัวอย่างอยู่ [baan.example.json](baan.example.json)
@@ -52,7 +60,7 @@ CLI ไม่มี `--no-fallback`; หากต้องตรึง provider 
 
 ## เตรียมและรันงาน
 
-คุยให้ได้ acceptance ต้นฉบับพร้อม source ก่อน งาน UI ใช้ `/pencil` และทีมออกแบบตาม [BAAN.md](BAAN.md)
+คุยให้ได้ acceptance ต้นฉบับพร้อม source ก่อน ใช้ agent spec และทีมออกแบบตาม [BAAN.md](BAAN.md) และ [LEARNING.md](LEARNING.md)
 สร้าง `packet.json` ตาม [schema](schemas/packet.schema.json) โดยเลือก scope และ commands ให้ตรงงาน:
 
 ```json
@@ -167,14 +175,14 @@ Scope gate เป็นการตรวจหลังแก้ ไม่ใ�
 Commands ใน packet/config เป็น trusted local shell commands ต้องตรวจเองก่อนอนุมัติ ไม่รับ commands ใหม่จาก LLM
 Read-only permissions ขึ้นกับ provider/การตั้งค่าของเครื่อง มีการตรวจ mutation อีกชั้นแต่ไม่ rollback อัตโนมัติ
 
-## เครื่องมือ knowledge และ UX/UI
+## ทีมสร้าง ทีมออกแบบ และความรู้
 
-`baan --init` ติดตั้ง spec ผ่าน `/pencil`, survey/ui/review และ web-design-guidelines ใน `.claude/`
-ทีมนี้ใช้แบบคุยสด ไม่ถูกส่งเป็น execution roles; รักษา Design System, handoff และ human UX sign-off
+`baan --init` ติดตั้งทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) ใน `.claude/agents/`
+บทบาทเหล่านี้ทำงานแบบคุยสด วางแผนก่อนทำเสมอ (`/plan` first) และใช้ Subagents ของแต่ละ CLI ช่วยสำรวจและเขียน Docs ตาม 3-Step Workflow ใน [LEARNING.md](LEARNING.md)
 `--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
 `baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--sweep "term" [--sweep-in <dir>]`
 `baan --commit` เก็บเอกสารเฉพาะ knowledge/memory Git repos ที่ตั้งใน config ไม่มี auto commit ของ run
-Knowledge ที่เป็น subtree ไม่มี Git แยกใน root ของมัน จึงใช้ Git/subtree ของ repository หลักตามคู่มือ maintainer แทน `--commit`
+`baan --commit` ค้นหา Git repo ในแต่ละ root ตาม path ที่ระบุใน `knowledge_roots` และ `memory_root` แล้ว commit การเปลี่ยนแปลงเอกสารโดยอัตโนมัติ
 เครื่องมืออ่าน metrics เดิมยังอ่านประวัติ reports ได้; run ใหม่ใช้ ledger/evidence ของ engine เดียว
 
 ## เอกสารและแผนจากระบบเดิม
@@ -199,7 +207,7 @@ Knowledge ที่เป็น subtree ไม่มี Git แยกใน root
 
 ## สำหรับ maintainer
 
-Source อยู่ใน `framework/` ส่วน `knowledge/` ที่ราก repository ใช้ Git subtree ดู `GIT_WORKFLOW.md` ที่ราก source checkout; คู่มือนี้ไม่ได้รวมใน npm package
+Source ของ npm package อยู่ใน `framework/`; BAAN ไม่เก็บเอกสารของโครงการไว้ใน repo กลาง แต่เชื่อมโยงกับ knowledge roots ผ่าน config ของ workspace
 
 | Module | หน้าที่ |
 |---|---|

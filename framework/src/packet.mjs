@@ -59,7 +59,7 @@ export function approvalBasis(p) {
 }
 export function readiness(p) {
   const reasons = [];
-  if (!p.acceptance.length || p.acceptance.some((a) => !a.text.trim() || !a.source.trim())) reasons.push("ต้องมี acceptance พร้อมแหล่งอ้างอิง: ทำขั้น 0 /pencil และ survey หากมีหน้าจอ");
+  if (!p.acceptance.length || p.acceptance.some((a) => !a.text.trim() || !a.source.trim())) reasons.push("ต้องมี acceptance พร้อมแหล่งอ้างอิง: ทำขั้น 0 spec และ survey หากมีหน้าจอ");
   if (p.requires_dirty_confirmation && !p.dirty_approved) reasons.push("completed scope/Git state changed; decide --allow-dirty before resume");
   if (!p.acceptance_approved || p.approved_by !== "user" || !Number.isFinite(Date.parse(p.approved_at)) || !p.approved_source?.trim()) reasons.push("รอผู้ใช้ยืนยัน acceptance ด้วย baan decide --approve");
   else if (p.approved_basis !== approvalBasis(p)) reasons.push("stale approval: acceptance/scope/commands/references เปลี่ยน ต้องยืนยันใหม่");

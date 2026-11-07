@@ -5,7 +5,7 @@ import path from "node:path";
 import { resolveRoleName } from "./config.mjs";
 
 const TEST_LEVELS = ["normal", "full"];
-const IMPLEMENT_ROLES = ["front", "sys"];
+const IMPLEMENT_ROLES = ["front", "sys", "build"];
 
 const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
 
@@ -22,7 +22,35 @@ export function extractJson(text) {
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
   if (start === -1 || end === -1) throw new Error("ไม่พบ JSON ในคำตอบของนักวางผัง");
-  return JSON.parse(raw.slice(start, end + 1));
+  try {
+    return JSON.parse(raw.slice(start, end + 1));
+  } catch (err) {
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    for (let i = start; i < raw.length; i++) {
+      const ch = raw[i];
+      if (inString) {
+        if (escape) escape = false;
+        else if (ch === "\\") escape = true;
+        else if (ch === '"') inString = false;
+      } else {
+        if (ch === '"') inString = true;
+        else if (ch === "{") depth++;
+        else if (ch === "}") {
+          depth--;
+          if (depth === 0) {
+            try {
+              return JSON.parse(raw.slice(start, i + 1));
+            } catch {
+              // Ignore partial JSON matches until balanced boundary is valid
+            }
+          }
+        }
+      }
+    }
+    throw err;
+  }
 }
 
 export function findDependencyCycle(tasks) {

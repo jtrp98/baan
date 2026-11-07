@@ -16,8 +16,9 @@ import { utility, utilityFlags } from "./utilities.mjs";
 import { moduleContext } from "./workspace.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide"].includes(argv[0]) ? argv.shift() : "run" };
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge"]);
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync"].includes(argv[0]) ? argv.shift() : "run" };
+  if (o.command === "sync") o.sync = true;
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update"]);
   const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "sweep", "sweep-in"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -33,11 +34,11 @@ export function parse(argv) {
     else throw new Error(`unknown option ${a}`);
   }
   const inputs = [o.goal, o["goal-file"], o.plan, o["plan-file"], o.packet].filter(Boolean);
-  if (utilityFlags.some((f) => o[f]) && (inputs.length || o.resume || o.cancel || o.command !== "run")) throw new Error("workspace utilities cannot be combined with execution commands");
+  if (utilityFlags.some((f) => o[f]) && (inputs.length || o.resume || o.cancel || (o.command !== "run" && o.command !== "sync"))) throw new Error("workspace utilities cannot be combined with execution commands");
   if (inputs.length > 1 || (o.resume && inputs.length) || (o.cancel && (inputs.length || o.resume))) throw new Error("choose one input: goal / plan / packet / resume / cancel");
   if (o.timeout !== undefined) validateTimeout(Number(o.timeout));
   if (o["max-parallel"] !== undefined && (!Number.isInteger(Number(o["max-parallel"])) || Number(o["max-parallel"]) < 1 || Number(o["max-parallel"]) > 64)) throw new Error("invalid --max-parallel (1–64)");
-  if (o["dry-run"] && (o.cancel || o.command === "decide" || utilityFlags.some((f) => o[f]))) throw new Error("--dry-run applies only to run/resume");
+  if (o["dry-run"] && (o.cancel || o.command === "decide" || (utilityFlags.some((f) => o[f]) && !o.sync))) throw new Error("--dry-run applies only to run/resume");
   if (o.command !== "decide" && (o.approve || o["allow-dirty"] || o.gate)) throw new Error("approvals require decide");
   if (o.subject && !["status", "report", "inbox", "decide"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
@@ -117,7 +118,7 @@ export async function cli(argv, options = {}) {
     integration = integration.map(({ command, packages }) => ({ command, packages }));
   } else {
     const goal = o.goal || (o["goal-file"] ? readFileSync(o["goal-file"], "utf8").trim() : "");
-    if (!goal) throw new Error("ระบุ --goal / --plan / --packet; ขั้น 0: /pencil เพื่อเตรียม acceptance");
+    if (!goal) throw new Error("ระบุ --goal / --plan / --packet; ขั้น 0: spec เพื่อเตรียม acceptance");
     const ac = o.acceptance || goal;
     const p = { id: "WP-1", title: goal.slice(0, 100), goal, tasks: [], repo: { path: repo },
       owns: o.owns?.split(",").map((g) => g.trim()) ?? ["**"], read_first: [], depends_on: [], risk: "low",

@@ -199,26 +199,28 @@ test("platform/os: module ไม่ระบุใช้ของ project · ค
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test("alias ชื่อเดิมของทีมออกแบบ: ruler/crayon/highlighter/pencil", () => {
+test("alias ชื่อเดิมของทีมออกแบบและทีมสร้าง: ruler/crayon/highlighter/pencil/dev", () => {
   assert.equal(LEGACY_ROLE_ALIASES.ruler, "survey");
   assert.equal(LEGACY_ROLE_ALIASES.crayon, "ui");
   assert.equal(LEGACY_ROLE_ALIASES.highlighter, "review");
   assert.equal(LEGACY_ROLE_ALIASES.pencil, "spec");
+  assert.equal(LEGACY_ROLE_ALIASES.dev, "build");
 });
 
-test("init: วาง agent survey/ui/review + /pencil + skill ของทีมออกแบบ · รันซ้ำทับเฉพาะของ baan · ของผู้ใช้ไม่แตะ", () => {
+test("init: วาง agents ของทีมสร้างและทีมออกแบบ (8 ตัว) + skill · ลบ pencil เดิม · รันซ้ำทับเฉพาะของ baan · ของผู้ใช้ไม่แตะ", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "baan-init-design-"));
   try {
     const res = performInit(dir, TEAM_DIR, () => {});
-    for (const id of ["survey", "ui", "review"]) {
+    for (const id of ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"]) {
       const f = path.join(dir, ".claude", "agents", `${id}.md`);
       assert.match(readFileSync(f, "utf8"), new RegExp(`^---\\nname: ${id}\\n`));
       assert.ok(readFileSync(f, "utf8").includes(path.join(TEAM_DIR, "roles", `${id}.md`)), "ชี้ role ตัวจริงใน package");
+      assert.ok(readFileSync(f, "utf8").includes(path.join(TEAM_DIR, "LEARNING.md")), "ชี้ LEARNING.md");
     }
-    assert.ok(existsSync(path.join(dir, ".claude", "commands", "pencil.md")));
+    assert.equal(existsSync(path.join(dir, ".claude", "commands", "pencil.md")), false, "ต้องไม่มี pencil.md");
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", "references", "rules.md")));
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed")));
-    assert.ok(res.design.length >= 5);
+    assert.ok(res.design.length >= 8);
     writeFileSync(path.join(dir, ".claude", "agents", "ui.md"), "ของผู้ใช้\n", "utf8");
     rmSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed"));
     const again = performInit(dir, TEAM_DIR, () => {});
