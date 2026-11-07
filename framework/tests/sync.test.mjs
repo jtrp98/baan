@@ -94,6 +94,23 @@ test("syncKnowledgeRoot dry-run: ตรวจนับไฟล์ค้าง�
   }
 });
 
+test("syncKnowledgeRoot: localOnly commit ในเครื่องได้โดยไม่พยายาม push/pull และไม่เตือนเรื่อง remote", () => {
+  const local = makeGitRepo("baan-sync-localonly-");
+  try {
+    writeFileSync(path.join(local.dir, "evidence.md"), "local run log");
+    const logs = [];
+    const res = syncKnowledgeRoot({ name: "my-memory", path: local.dir }, { localOnly: true }, (m) => logs.push(m));
+    assert.equal(res.ok, true);
+    assert.equal(res.localOnly, true);
+    assert.equal(res.commits.length, 1);
+    assert.equal(res.pulled, false);
+    assert.equal(res.pushed, false);
+    assert.equal(logs.some((l) => l.includes("ไม่มี remote")), false, "ต้องไม่เตือนเรื่องไม่มี remote");
+  } finally {
+    rmSync(local.dir, { recursive: true, force: true });
+  }
+});
+
 test("updateSelfFramework: ทำงานปลอดภัยกับไดเรกทอรีที่ไม่ใช่ git", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "baan-self-notgit-"));
   try {

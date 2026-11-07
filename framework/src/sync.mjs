@@ -78,6 +78,11 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
     }
   }
 
+  if (opts.localOnly) {
+    result.localOnly = true;
+    return result;
+  }
+
   const remotes = gitIn(kr.path, ["remote"]);
   if (!remotes.ok || !remotes.out.trim()) {
     log(`${kr.name}: ไม่มี remote repository ให้ซิงค์`);
@@ -149,7 +154,7 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
 
     const mem = memoryRootOf(kr);
     if (mem) {
-      const memRes = syncKnowledgeRoot({ name: `${kr.name}-memory`, path: mem, layout: kr.layout }, opts, log);
+      const memRes = syncKnowledgeRoot({ name: `${kr.name}-memory`, path: mem, layout: kr.layout }, { ...opts, localOnly: true }, log);
       summary.knowledge.push(memRes);
       if (!memRes.ok) summary.ok = false;
     }
