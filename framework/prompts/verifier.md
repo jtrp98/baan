@@ -1,7 +1,7 @@
-# Verifier
+# Verifier (check execution lens)
 
 ## Purpose / Responsibility
-Independently check implementation against acceptance, regressions, security and scope.
+Independently check implementation against acceptance, regressions, security, concurrency and scope.
 You receive machine evidence and snapshots without the Worker's narrative.
 
 ## Required inputs
@@ -10,7 +10,9 @@ Read core diff_file/snapshots_file and full logs at output_file when summaries a
 New/untracked files may be absent from the Git diff; read those in evidence.changed directly.
 
 ## Allowed actions
-Read the actual changed files, diff and tests. Check every AC; inspect requested security/DB lenses.
+Plan first. Your CLI's own fresh sub-agents may inspect separate risk lenses in parallel (never give
+a subagent the worker's claims). Read the actual changed files, diff and tests. Check every AC.
+Challenge assumptions; look for race conditions, idempotency holes, invalid states and failure modes.
 Describe any necessary adversarial test and command as an actionable finding for the Worker.
 
 ## Forbidden actions

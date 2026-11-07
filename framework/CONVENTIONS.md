@@ -1,21 +1,34 @@
 # CONVENTIONS — สัญญาร่วม
 
-ใช้กับ Orchestrator และทีมออกแบบที่คุยสด; execution roles ใช้ contract ใน `prompts/` และ structured schemas
+ใช้กับ Orchestrator, ทีมสร้าง (5 บทบาท) และทีมออกแบบ (3 บทบาท) ที่คุยสด; execution roles ใช้ contract ใน `prompts/` และ structured schemas
+ปฏิบัติตามสัญญาการเรียนรู้และการตัดสินใจทางวิศวกรรมใน [LEARNING.md](LEARNING.md)
 Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 
 ## ขอบเขตและหลักฐาน
 
+- วางแผนก่อนทำเสมอ (`/plan` first): สำรวจบริบท ตั้งคำถามเมื่อไม่ชัด และให้คนเห็นชอบแผนก่อนแก้ไขจริง
 - อ่าน INDEX ก่อน แล้วอ่าน source ที่งานอ้างถึงและไฟล์ที่จำเป็นต่อ scope เท่านั้น
 - Source จริงชนะความจำ แยกข้อเท็จจริง สมมติฐาน และ OQ ชัดเจน ห้ามแต่ง test results หรือ approval
 - เขียนเฉพาะส่วนที่ได้รับมอบหมาย เจ้าของไฟล์อื่นเสนอแก้ผ่าน OQ; ห้ามแก้ของคนอื่นเงียบ ๆ
 - ตอบภาษาไทย ยกเว้น code/identifiers และ convention ของ target; ใช้วันที่ของงานหรือวันที่ปัจจุบันของ session
-- การตรวจอิสระใช้ acceptance/contracts/diff/evidence โดยไม่ใช้คำอธิบายของ Worker เป็นข้อพิสูจน์
+- การตรวจอิสระใช้ acceptance/contracts/diff/evidence โดยไม่ใช้คำอธิบายของคนเขียนโค้ดเป็นข้อพิสูจน์
+- ห้ามเห็นด้วยกับผู้ใช้เพียงเพราะผู้ใช้เป็นผู้ตัดสินใจ; หากมีข้อผิดพลาดหรือความเสี่ยงต้องแย้งด้วยหลักฐาน
+- อย่าถือว่าการเห็นตรงกันของหลาย Agent เป็นหลักฐาน; ห้าม Overengineer เพื่อแก้ปัญหาที่ยังไม่มีหลักฐาน
 - ไม่เปิด role อื่นหรือเรียก BAAN ซ้อนจาก execution role; หนึ่ง writer ต่อ repository รวม linked worktrees
 
-## ประตูมนุษย์
+## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 
-การตัดสิน business, schema/migration/breaking contract, security, UX sign-off, deploy และ release scope
-เป็นของคน บันทึกใคร/เมื่อไร/source ตามคำตอบจริง งานที่ต้องใช้คำตอบนั้นรอ; งานอิสระทำต่อได้
+Subagents ของแต่ละ CLI (codex: `collaboration.spawn_agent` + `collaboration.wait_agent` · Claude Code: the `Agent` (`Task`) tool · agy: `invoke_subagent`) ได้รับอนุญาตทั้งในโหมดอ่านและโหมดเขียน เพื่อช่วยให้งานเสร็จเร็วขึ้นตาม 3-Step Workflow:
+- **ขั้นที่ 1 — สำรวจบริบท**: ใช้ Subagent (รุ่นเร็ว/ประหยัด เช่น sonnet/haiku บน Claude, flash บน agy) ค้นหาโค้ดหรือเอกสารขนานกัน แล้วส่งกลับเฉพาะข้อสรุปเพื่อรักษา Context ตัวหลักให้สะอาด
+- **ขั้นที่ 2 — ตัวหลักวางแผน (/plan first)**: ตัวหลักวิเคราะห์และทำข้อตกลง/สอน/ท้าทายกับผู้ใช้จนได้ Approved Plan
+- **ขั้นที่ 3 — เขียนเอกสาร/ลงมือทำ**: สั่ง Subagent ไปเขียน Docs ยาวๆ (`requirements.md`, `adr/`, `feasibility.md` ฯลฯ) หรือทำงานย่อยตามแผน
+- **กฎเหล็กการเขียน**: หนึ่ง writer ต่อ repository เสมอ — Subagent เขียนได้เฉพาะไฟล์ที่ไม่มีใครแตะ และ Subagent ที่ใช้ตรวจงานต้องได้รับเฉพาะ AC/สัญญา/path เท่านั้น ห้ามส่งคำอธิบายของคนทำไปให้ (ป้องกัน Shared-Assumption Bias)
+
+## ประตูมนุษย์และการตัดสินใจ
+
+การตัดสิน business, schema/migration/breaking contract, security, UX sign-off, deploy และ release scope เป็นของคน
+ทุกการตัดสินใจทางเทคนิคสำคัญต้องผ่าน **Learning Protocol (8 ขั้นตอน)** และ **Decision Quality Gate (8 คำถาม)** ตาม [LEARNING.md](LEARNING.md)
+บันทึกใคร/เมื่อไร/source ตามคำตอบจริง งานที่ต้องใช้คำตอบนั้นรอ; งานอิสระทำต่อได้
 Acceptance ต้องได้รับการยืนยันก่อน dispatch และยืนยันใหม่เมื่อ source/scope/commands เปลี่ยน
 Approval และแต่ละ human gate ผูกกับ basis ของ packet ปัจจุบัน; มติเดิมเป็น source ได้แต่ไม่เซ็น audit record ของ run ใหม่โดยอัตโนมัติ
 `DONE`/`PASS` ของโมเดลไม่ใช่ความสำเร็จของ run: core ตรวจ schema, machine evidence และ risk policy อีกชั้น
@@ -23,7 +36,8 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 
 ## Knowledge
 
-- Knowledge = สิ่งที่ทีมคนต้องใช้ตัดสินใจวันนี้: requirements, decisions, contracts, design, handoff, OQ
+- Knowledge = สิ่งที่ทีมคนต้องใช้ตัดสินใจวันนี้: requirements, decisions, contracts, design, handoff, OQ, gaps
+- บันทึกช่องว่างความรู้ใน `<project>/shared/knowledge-gaps.md` และบันทึกการตัดสินใจสถาปัตยกรรมใน `<project>/shared/adr/`
 - Memory เดิมเป็นประวัติ อย่าย้าย/เขียนทับ; หลักฐาน run ใหม่อยู่ `.baan/runs/<id>`
 - เขียนทั้งไฟล์ให้เป็นความจริงปัจจุบัน ไม่ append override ทับกติกาเก่า; ประวัติอยู่ Git และ changelog
 - ID ไม่ใช้ซ้ำ ไม่เปลี่ยนหมายเลข; เก็บ ID เก่าที่ถูกอ้างผ่าน `shared/id-map.md`
@@ -35,7 +49,7 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 ## Layout และเจ้าของ
 
 `layout: project`: `<project>/modules/<module>/{shared,design,build}` และ `INDEX.md`
-`shared` ระบุ owner ของเอกสาร, `design` เป็นทีมออกแบบ, `build` เป็นสัญญา/หลักฐานส่งมอบด้านพัฒนา
+`shared` ระบุ owner ของเอกสาร, `design` เป็นทีมออกแบบ UX/UI, `build` เป็นสัญญา/หลักฐานส่งมอบด้านพัฒนา
 `shared/requirements.md` จัด feature `F#` → requirement `R#` → AC; OQ อยู่ `shared/oq.md`
 หัว INDEX เป็นแหล่งจริงของ status/updated/depends_on/requested_by/target/platform/os
 สถานะ `draft → approved → designed → reviewed → built` ต้องสะท้อนหลักฐานและการเซ็นของคนจริง
@@ -48,4 +62,4 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 อ่าน Git ได้ ห้าม reset/revert/commit/push/เปลี่ยน branch ของ target โดยพลการ
 `baan --commit` เก็บเฉพาะเอกสารใน knowledge/memory roots ที่มี Git ของตัวเองตาม config
 ไม่รัน SQL/migration/deploy บนระบบร่วม ไม่มี network หรือ permission เพิ่มโดยอนุมานจากใบงาน
-ทีมออกแบบส่งผลสั้น ๆ: สิ่งที่ตัดสิน/ไฟล์ที่แก้/หลักฐาน/คำถามค้าง/ผู้รับต่อ; ห้ามอ้างว่าเซ็นแล้วถ้าคนยังไม่เซ็น
+ทีมส่งผลสั้น ๆ: สิ่งที่ตัดสิน/ไฟล์ที่แก้/หลักฐาน/คำถามค้าง/ผู้รับต่อ; ห้ามอ้างว่าเซ็นแล้วถ้าคนยังไม่เซ็น

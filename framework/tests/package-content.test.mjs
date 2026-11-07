@@ -8,8 +8,9 @@ const pkgPath = fileURLToPath(new URL("../package.json", import.meta.url));
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 const pkgDir = path.dirname(pkgPath);
 
-test('files รวม CONVENTIONS.md (สัญญาบังคับที่ทุก role ต้องได้รับ)', () => {
+test('files รวม CONVENTIONS.md และ LEARNING.md (สัญญาบังคับที่ทุก role ต้องได้รับ)', () => {
   assert.ok(pkg.files.includes("CONVENTIONS.md"), `files ปัจจุบัน: ${pkg.files.join(", ")}`);
+  assert.ok(pkg.files.includes("LEARNING.md"), "ต้องมี LEARNING.md");
 });
 
 test("package ห้ามมี config ของเครื่อง — มีแค่ template ตัวอย่าง", () => {
@@ -26,7 +27,7 @@ test("ไฟล์ประกาศใน files มีอยู่จริง�
 });
 
 test("entrypoints และโมดูลหลักอยู่ครบใน package", () => {
-  for (const f of ["bin/", "src/", "agents.json", "roles/", "CONVENTIONS.md", "BAAN.md", "README.md"]) {
+  for (const f of ["bin/", "src/", "agents.json", "roles/", "CONVENTIONS.md", "LEARNING.md", "BAAN.md", "README.md"]) {
     assert.ok(pkg.files.includes(f), `ขาด ${f}`);
   }
   assert.equal(pkg.bin.baan, "./bin/baan.mjs");

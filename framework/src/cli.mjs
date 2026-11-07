@@ -117,7 +117,7 @@ export async function cli(argv, options = {}) {
     integration = integration.map(({ command, packages }) => ({ command, packages }));
   } else {
     const goal = o.goal || (o["goal-file"] ? readFileSync(o["goal-file"], "utf8").trim() : "");
-    if (!goal) throw new Error("ระบุ --goal / --plan / --packet; ขั้น 0: /pencil เพื่อเตรียม acceptance");
+    if (!goal) throw new Error("ระบุ --goal / --plan / --packet; ขั้น 0: spec เพื่อเตรียม acceptance");
     const ac = o.acceptance || goal;
     const p = { id: "WP-1", title: goal.slice(0, 100), goal, tasks: [], repo: { path: repo },
       owns: o.owns?.split(",").map((g) => g.trim()) ?? ["**"], read_first: [], depends_on: [], risk: "low",

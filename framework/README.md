@@ -52,7 +52,7 @@ CLI ไม่มี `--no-fallback`; หากต้องตรึง provider 
 
 ## เตรียมและรันงาน
 
-คุยให้ได้ acceptance ต้นฉบับพร้อม source ก่อน งาน UI ใช้ `/pencil` และทีมออกแบบตาม [BAAN.md](BAAN.md)
+คุยให้ได้ acceptance ต้นฉบับพร้อม source ก่อน ใช้ agent spec และทีมออกแบบตาม [BAAN.md](BAAN.md) และ [LEARNING.md](LEARNING.md)
 สร้าง `packet.json` ตาม [schema](schemas/packet.schema.json) โดยเลือก scope และ commands ให้ตรงงาน:
 
 ```json
@@ -167,10 +167,10 @@ Scope gate เป็นการตรวจหลังแก้ ไม่ใ�
 Commands ใน packet/config เป็น trusted local shell commands ต้องตรวจเองก่อนอนุมัติ ไม่รับ commands ใหม่จาก LLM
 Read-only permissions ขึ้นกับ provider/การตั้งค่าของเครื่อง มีการตรวจ mutation อีกชั้นแต่ไม่ rollback อัตโนมัติ
 
-## เครื่องมือ knowledge และ UX/UI
+## ทีมสร้าง ทีมออกแบบ และความรู้
 
-`baan --init` ติดตั้ง spec ผ่าน `/pencil`, survey/ui/review และ web-design-guidelines ใน `.claude/`
-ทีมนี้ใช้แบบคุยสด ไม่ถูกส่งเป็น execution roles; รักษา Design System, handoff และ human UX sign-off
+`baan --init` ติดตั้งทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) ใน `.claude/agents/`
+บทบาทเหล่านี้ทำงานแบบคุยสด วางแผนก่อนทำเสมอ (`/plan` first) และใช้ Subagents ของแต่ละ CLI ช่วยสำรวจและเขียน Docs ตาม 3-Step Workflow ใน [LEARNING.md](LEARNING.md)
 `--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
 `baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--sweep "term" [--sweep-in <dir>]`
 `baan --commit` เก็บเอกสารเฉพาะ knowledge/memory Git repos ที่ตั้งใน config ไม่มี auto commit ของ run

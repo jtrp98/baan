@@ -148,6 +148,8 @@ export const LEGACY_ROLE_ALIASES = {
   crayon: "ui",
   highlighter: "review",
   pencil: "spec",
+  dev: "build",
+  developer: "build",
 };
 
 

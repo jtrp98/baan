@@ -5,7 +5,7 @@ import path from "node:path";
 import { resolveRoleName } from "./config.mjs";
 
 const TEST_LEVELS = ["normal", "full"];
-const IMPLEMENT_ROLES = ["front", "sys"];
+const IMPLEMENT_ROLES = ["front", "sys", "build"];
 
 const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
 

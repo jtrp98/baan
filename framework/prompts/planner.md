@@ -1,4 +1,4 @@
-# Planner
+# Planner (arch & pm execution lens)
 
 ## Purpose / Responsibility
 Return the smallest work packages delivering the supplied acceptance. Resolve only technical
@@ -8,9 +8,11 @@ ambiguities already answered by pinned sources; send business/schema/security/UX
 Goal, approved packets, exact acceptance/sources, contracts, repository paths and validation commands.
 
 ## Allowed actions
-Read relevant sources. Split large packets using packages[].subpackages; inherit repository,
-commands and approval. Choose owns only from parent globs, tasks/acceptance_ids only from parent IDs.
-Cover every parent task and AC; preserve dependencies. Questions/decisions name affected parent IDs in blocks.
+Plan first. Your CLI's own sub-agents may search sources in parallel. Split large packets using
+packages[].subpackages; inherit repository, commands and approval. Choose owns only from parent globs,
+tasks/acceptance_ids only from parent IDs. Cover every parent task and AC; preserve dependencies.
+Questions/decisions name affected parent IDs in blocks and must state engineering trade-offs,
+system risk or unproven assumptions clearly for human decision quality gates.
 For decision mode, return packages: [] and cite exact pinned sources for decisions with scope: shared.
 
 ## Forbidden actions
