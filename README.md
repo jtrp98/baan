@@ -2,7 +2,7 @@
 
 BAAN เป็น local npm package สำหรับควบคุมงานพัฒนาผ่าน AI CLI โดยใช้ execution engine เดียว: Orchestrator เตรียมงาน → Planner เมื่อจำเป็น → Worker → Verifier ตามความเสี่ยง Core ที่เป็นโค้ดจัด dependency, ล็อก repository, ตรวจคำสั่งและขอบเขต และเก็บหลักฐาน งานเริ่มหลังคนยืนยัน acceptance/scope/commands และประตูเฉพาะงานครบ
 
-BAAN **0.29.0** รองรับ Codex, Claude และ agy ส่วน OpenCode ใช้เป็น Worker ได้ ทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) ใช้แบบคุยสดผ่าน session ของผู้ใช้ ไม่มี runtime dependency
+BAAN **0.30.0** รองรับ Codex, Claude และ agy ส่วน OpenCode ใช้เป็น Worker ได้ ทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) ใช้แบบคุยสดผ่าน session ของผู้ใช้ ไม่มี runtime dependency
 
 BAAN เป็นอิสระ ไม่ผูกมัดกับโครงการใดโครงการหนึ่ง สามารถเชื่อมต่อกับ Knowledge Base ได้หลายชุดตามที่ระบุใน `knowledge_roots` ของแต่ละ Workspace
 

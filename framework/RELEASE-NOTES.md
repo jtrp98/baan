@@ -2,6 +2,25 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.30.0 — 2026-11-07 · แยก Knowledge เป็นอิสระ + คำสั่ง baan sync + ทีม 8 บทบาทและ LEARNING.md
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **Decouple Knowledge**: `knowledge/` ถูกแยกออกจาก repository ของ BAAN แล้วอย่างสมบูรณ์ BAAN กลายเป็น generic execution engine ที่เป็นอิสระ โดย workspace กำหนด `knowledge_roots` ชี้ไปยัง Git repo ภายนอกเองผ่าน `baan.config.json`
+- รัน `baan sync` หรือ `baan --init` ซ้ำใน workspace เพื่ออัปเดตไฟล์นำทาง `AGENTS.md`, `CLAUDE.md` และ role stubs ให้รู้จัก 2 ทีม 8 บทบาท (`spec`, `arch`, `pm`, `build`, `check`, `survey`, `ui`, `review`) และ `LEARNING.md`
+- ผู้ใช้และ AI ทุก role ทำงานแบบ **3-Step Plan-First & Subagent Workflow** วางแผนก่อนลงมือทำ (`/plan`) เสมอ และปฏิบัติตาม **LEARNING.md** ในการตัดสินใจทางวิศวกรรม
+
+### เพิ่ม
+
+- **คำสั่ง `baan sync`**: ตรวจและดึงอัปเดต BAAN framework อัตโนมัติ พร้อมตรวจสถานะ / pull / push ของ Git knowledge roots ตามที่ตั้งใน `knowledge_roots` รองรับ flags `--pull-only`, `--push-only`, `--framework-only`, `--knowledge-only`, `--subagent`, `--dry-run`
+- **LEARNING.md**: สัญญาการเรียนรู้และการพัฒนาการตัดสินใจทางวิศวกรรม (Priority 1–5, 3-Step Plan-First & Subagent Workflow, Learning Protocol 8 ขั้น, Decision Quality Gate 8 คำถาม, Knowledge Gap Tracking, ADR)
+- **GETTING-STARTED.md**: คู่มือเริ่มต้นใช้งาน BAAN ครอบคลุมการติดตั้ง, การตั้งค่า workspace, การใช้ 8 บทบาท, และคำสั่ง `baan sync`
+- **โครงสร้าง 2 ทีม 8 บทบาท**:
+  - ทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`)
+  - ทีมออกแบบ (`survey`, `ui`, `review`)
+  พร้อม prompt และ workflow ที่บังคับการวางแผนก่อนทำและใช้ Subagents เพื่อลด context pollution
+- **Robust JSON Parsing ใน Planner**: เพิ่มตัวแกะ JSON แบบ balanced bracket ใน `plan.mjs` รองรับผลลัพธ์ที่เป็น multi-turn agent output ได้อย่างแม่นยำ
+
 ## 0.29.0 — 2026-11-05 · ระบบเดียว
 
 รุ่นนี้รวมงานจาก 0.28.0 นับจาก tag ก่อนหน้า `v0.27.0` ใช้ขั้นตอนอัปเกรดของ 0.29.0 ด้านล่างสำหรับ CLI ปัจจุบัน
