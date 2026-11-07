@@ -15,6 +15,7 @@
     "schemas/",
     "setup/",
     "skills/",
+    "templates/",
     "ux-knowledge/",
     "agents.json",
     "baan.example.json",
