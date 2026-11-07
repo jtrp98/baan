@@ -66,5 +66,5 @@ Knowledge เก็บข้อเท็จจริงและสัญญา�
 Run ใหม่เก็บหลักฐานใน `.baan/runs` เท่านั้น ไม่ย้ายหรือเขียนทับประวัติเดิม
 หลังแก้เอกสาร knowledge ให้เรียก `baan --index` และ `baan --lint-knowledge` ตาม layout;
 `baan --commit` เป็นคำสั่งเก็บเอกสารใน configured knowledge/memory Git repos โดยชัดแจ้ง ไม่มี auto commit target
-ระบุ `--config`/`--workspace` ให้ตรง knowledge root ที่แก้; knowledge แบบ subtree ใช้ Git ของ repo หลักตาม workflow ของ checkout
+ระบุ `--config`/`--workspace` ให้ตรง workspace และ knowledge root ที่แก้; แต่ละ knowledge root มี Git repo แยกของตนเอง
 ชื่อผู้ทำงาน สถานะและหลักฐานในแผนเดิมเป็นประวัติ ไม่เปลี่ยนเป็น execution role, approval หรือผลตรวจของ run ใหม่

@@ -174,7 +174,7 @@ Read-only permissions ขึ้นกับ provider/การตั้งค่
 `--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
 `baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--sweep "term" [--sweep-in <dir>]`
 `baan --commit` เก็บเอกสารเฉพาะ knowledge/memory Git repos ที่ตั้งใน config ไม่มี auto commit ของ run
-Knowledge ที่เป็น subtree ไม่มี Git แยกใน root ของมัน จึงใช้ Git/subtree ของ repository หลักตามคู่มือ maintainer แทน `--commit`
+`baan --commit` ค้นหา Git repo ในแต่ละ root ตาม path ที่ระบุใน `knowledge_roots` และ `memory_root` แล้ว commit การเปลี่ยนแปลงเอกสารโดยอัตโนมัติ
 เครื่องมืออ่าน metrics เดิมยังอ่านประวัติ reports ได้; run ใหม่ใช้ ledger/evidence ของ engine เดียว
 
 ## เอกสารและแผนจากระบบเดิม
@@ -199,7 +199,7 @@ Knowledge ที่เป็น subtree ไม่มี Git แยกใน root
 
 ## สำหรับ maintainer
 
-Source อยู่ใน `framework/` ส่วน `knowledge/` ที่ราก repository ใช้ Git subtree ดู `GIT_WORKFLOW.md` ที่ราก source checkout; คู่มือนี้ไม่ได้รวมใน npm package
+Source ของ npm package อยู่ใน `framework/`; BAAN ไม่เก็บเอกสารของโครงการไว้ใน repo กลาง แต่เชื่อมโยงกับ knowledge roots ผ่าน config ของ workspace
 
 | Module | หน้าที่ |
 |---|---|
