@@ -2,6 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.31.0 — 2026-11-07 · ระบบสำรวจ Project Drift, Multi-Workspace Sync, แม่แบบ Folder-First และ Linter Knowledge
+
+### เพิ่ม
+
+- **ระบบสำรวจ Codebase และตรวจจับ Drift (`baan survey` / `baan scan`)**:
+  - วิเคราะห์ stack, entrypoints, components และ dependencies ของ target repositories จริง
+  - ตรวจจับความคลาดเคลื่อน (Drift Detection) ระหว่างโค้ดจริงกับเอกสารใน Knowledge (`mapped`, `unmappedCode`, `unmappedModules`)
+  - เครื่องมือช่วยสร้างโครงสร้าง Knowledge เริ่มต้นอัตโนมัติ (`scaffoldKnowledgeModule`, `scaffoldKnowledgeProject`)
+  - Skill สำหรับ Claude / AI Agent (`skills/project-survey/SKILL.md`) เพื่อสำรวจโปรเจกต์ผ่านบทสนทนาได้อย่างเป็นระบบ
+- **Multi-Workspace Sync (`baan sync --all` และ `local.json`)**:
+  - รองรับไฟล์ `local.json` สำหรับลงทะเบียน path ของ workspace ทั้งหมดในเครื่อง
+  - เพิ่มแฟล็ก `baan sync --all` เพื่อวนรอบตรวจและดึงอัปเดตทุก workspace ได้ในคำสั่งเดียว
+- **แม่แบบตั้งต้น Workspace (`templates/workspace`)**:
+  - เพิ่ม blueprint สำหรับสร้าง workspace ใหม่อย่างอิสระ มีโครงสร้างครบทั้ง `baan.config.json`, `knowledge/`, `memory/`, และ `target/`
+  - วางผัง Knowledge แบบ Folder-First (`<project>/modules/<module>/{shared,design,build}`) พร้อม sub-indexes ครบทุกระดับ
+- **อัปเกรด Linter ตรวจสอบ Knowledge Base (`lintKnowledge`)**:
+  - ดักจับไฟล์สารบัญ (`INDEX.md`) ที่ขนาดใหญ่เกิน 20 KB
+  - ดักจับไฟล์เนื้อหาที่ขนาดใหญ่เกิน 50 KB เพื่อกระตุ้นให้แตกเป็นโมดูลย่อย (ยกเว้นโฟลเดอร์ `changelog/` และ `resolved/`)
+  - ตรวจจับ anti-patterns เช่น dangling links หรือเอกสารที่อยู่นอกโครงสร้างมาตรฐาน
+
+### ปรับปรุงและแก้ไข
+
+- **ความทนทานของ `baan --init`**: สร้างโฟลเดอร์ `target/` อัตโนมัติ และตรวจลบ wrapper `baan.cmd` ที่อาจตกค้างจากการตั้งค่าเวอร์ชันเก่า
+- **การจัดการ Git Repository ใน Memory**: กำหนดให้ `memory/` เป็น local-only โดยสมบูรณ์ ไม่พยายามเชื่อมต่อหรือแจ้งเตือนเกี่ยวกับ Git remote
+- **การตรวจรับ Release (`scripts/release-check.mjs`)**: อนุญาตให้ไฟล์ตัวอย่างใน `templates/` ผ่านการตรวจสอบแพ็กเกจได้ถูกต้อง
+
 ## 0.30.0 — 2026-11-07 · แยก Knowledge เป็นอิสระ + คำสั่ง baan sync + ทีม 8 บทบาทและ LEARNING.md
 
 ### ⚠ ต้องทำตอนอัปเกรด

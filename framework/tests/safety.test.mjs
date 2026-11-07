@@ -120,7 +120,8 @@ test("invalid planning does not mutate trusted packages or accept unknown questi
 test("empty plans fail before creating a successful run and help/version work without workspace config", async (t) => {
   const { root } = fixture(t); const file = path.join(root, "empty.json"); save(file, { packages: [] });
   await assert.rejects(cli(["run", "--plan", file, "--workspace", root], { cfg }), /at least one/);
-  assert.match(await cli(["--help"]), /BAAN/); assert.equal(await cli(["--version"]), "0.30.0");
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  assert.match(await cli(["--help"]), /BAAN/); assert.equal(await cli(["--version"]), pkg.version);
 });
 
 test("completed evidence cannot be reused after external edits to owned files", async (t) => {
