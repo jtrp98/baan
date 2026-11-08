@@ -201,19 +201,19 @@ export function createPanels(doc = document) {
   let lastConn = "NO DATA";
   function renderHeader({ workspaceName, projects = [], scope = "all", conn = "NO DATA", activeCount = 0, animOn = true } = {}) {
     lastConn = conn;
-    if (dom.ws) dom.ws.textContent = `WORKSPACE: ${workspaceName || "…"}`;
+    if (dom.ws) dom.ws.textContent = workspaceName || "…";
     if (dom.conn) {
       dom.conn.textContent = conn;
       dom.conn.dataset.state = conn;
     }
     // null = no data yet; showing "0" would claim a known-idle state.
-    if (dom.count) dom.count.textContent = activeCount == null ? "— ACTIVE SESSIONS" : `${activeCount} ACTIVE SESSION${activeCount === 1 ? "" : "S"}`;
+    if (dom.count) dom.count.textContent = activeCount == null ? "— ACTIVE" : `${activeCount} ACTIVE`;
     if (dom.anim) {
-      dom.anim.textContent = `PIXEL ANIMATION: ${animOn ? "ON" : "OFF"}`;
+      dom.anim.textContent = `ANIMATION: ${animOn ? "ON" : "OFF"}`;
       dom.anim.setAttribute("aria-pressed", String(!!animOn));
     }
     if (dom.tabs && changed("tabs", { projects, scope })) {
-      const tabs = [{ id: "all", label: "🌐 ALL PROJECTS" }, ...projects.map((p) => ({ id: p, label: p }))];
+      const tabs = [{ id: "all", label: "🌐 ALL" }, ...projects.map((p) => ({ id: p, label: p }))];
       reconcile(dom.tabs, tabs, (t) => t.id, (t) => t.label, (t) => {
         const b = el("button", "px-btn tab-btn", t.label);
         b.type = "button";
@@ -261,7 +261,7 @@ export function createPanels(doc = document) {
     wrap.append(cells);
     const reset = resetLabel(win.resetsAt);
     if (reset) wrap.append(el("div", "energy-reset", `Resets: ${reset}`));
-    if (lvl === "low" || lvl === "warn") wrap.append(el("div", "low-warn", `⚠ ${win.label}: ONLY ${pct}% LEFT`));
+    if (lvl === "low" || lvl === "warn") wrap.append(el("div", "low-warn", `⚠ ONLY ${pct}% LEFT`));
     return wrap;
   }
 
@@ -275,13 +275,17 @@ export function createPanels(doc = document) {
   }
 
   const QUOTA_HINTS = {
-    claude: 'พร้อมตรวจจับโควตาจาก claude -p "/usage"',
+    claude: 'พร้อมตรวจจับโควตาจาก ~/.claude.json หรือ claude -p "/usage"',
     codex: "พร้อมตรวจจับโควตาจาก ~/.codex/auth.json",
     agy: 'พร้อมตรวจจับโควตาจาก agy -p "/usage"',
   };
 
   function planLine(p, q) {
-    if (p === "claude") return { plan: "SUBSCRIPTION", account: "Anthropic Subscription" };
+    if (p === "claude") {
+      const plan = q?.planType ? String(q.planType).replace(/_/g, " ").toUpperCase() : "SUBSCRIPTION";
+      const account = q?.accountLabel || "Anthropic Subscription";
+      return { plan, account };
+    }
     if (p === "codex") return { plan: q?.planType ? String(q.planType).toUpperCase() : "PLUS", account: q?.accountLabel || "ChatGPT Plus Account" };
     return { plan: "ANTIGRAVITY", account: "Google Antigravity / Gemini" };
   }
@@ -311,7 +315,7 @@ export function createPanels(doc = document) {
       ["CACHE READ", formatNumber(agent.cacheReadTokens)],
       ["TURNS", formatNumber(agent.turns)],
     ]));
-    if (scoped) card.append(el("div", "scope-note", "WORKSPACE-WIDE — per-project provider breakdown is not recorded"));
+    if (scoped) card.append(el("div", "scope-note", "Workspace-wide (not per-project)"));
 
     const qb = el("div", "quota-box");
     const { plan, account } = planLine(p, quota);
@@ -345,10 +349,10 @@ export function createPanels(doc = document) {
     const tot = el("article", "usage-card px-box");
     setColorVar(tot, "--pc", "#38BDF8");
     const title = el("h3", "card-title");
-    title.append(el("span", null, scoped ? `PROJECT: ${scope}` : "TOTAL WORKSPACE"));
+    title.append(el("span", null, scoped ? scope : "WORKSPACE TOTAL"));
     tot.append(title);
     tot.append(el("div", "card-big", formatCost(total?.costUsd)));
-    tot.append(el("div", "card-sub", `${formatNumber(total?.calls)} TOTAL CALLS`));
+    tot.append(el("div", "card-sub", `${formatNumber(total?.calls)} CALLS`));
     tot.append(statGrid([
       ["IN TOKENS", formatNumber(total?.inputTokens)],
       ["OUT TOKENS", formatNumber(total?.outputTokens)],
@@ -385,9 +389,9 @@ export function createPanels(doc = document) {
     card.append(head);
 
     const badges = el("div", "sc-badges");
-    const roleText = s.role ? `ROLE: ${ROLE_META[s.role].short}` : s.roleLabel ? `ROLE UNKNOWN (${truncate(s.roleLabel, 20)})` : "ROLE UNKNOWN";
+    const roleText = s.role ? ROLE_META[s.role].short : s.roleLabel ? truncate(s.roleLabel, 20) : "UNKNOWN ROLE";
     badges.append(badge(roleText, s.role ? "info" : "muted"));
-    const prov = badge(s.provider ? PROVIDER_META[s.provider].short : s.providerLabel ? `PROVIDER UNKNOWN (${truncate(s.providerLabel, 16)})` : "PROVIDER UNKNOWN",
+    const prov = badge(s.provider ? PROVIDER_META[s.provider].short : s.providerLabel ? truncate(s.providerLabel, 16) : "UNKNOWN PROVIDER",
       s.provider ? "provider" : "muted");
     if (s.provider) setColorVar(prov, "--pc", PROVIDER_META[s.provider].color);
     badges.append(prov);
@@ -411,7 +415,6 @@ export function createPanels(doc = document) {
     }
 
     const action = el("div", "sc-action");
-    action.append(el("div", "sc-action-label", "⚡ CURRENT ACTION"));
     const at = el("div", "sc-action-text");
     if (s.tool && (s.tool.name || s.tool.detail)) {
       at.append(el("span", "sc-tool", `[${s.tool.name || "tool"}] `));
@@ -430,7 +433,7 @@ export function createPanels(doc = document) {
     const u = s.usage;
     if (u && (u.inputTokens || u.outputTokens || u.costUsd)) {
       card.append(el("div", "sc-usage",
-        `LIVE USAGE · IN ${formatNumber(u.inputTokens)} · OUT ${formatNumber(u.outputTokens)} · CACHE ${formatNumber(u.cacheReadTokens)}` +
+        `IN ${formatNumber(u.inputTokens)} · OUT ${formatNumber(u.outputTokens)} · CACHE ${formatNumber(u.cacheReadTokens)}` +
         (u.turns ? ` · ${formatNumber(u.turns)} TURNS` : "") + (u.costUsd ? ` · ${formatCost(u.costUsd)}` : "")));
     }
 
@@ -438,7 +441,7 @@ export function createPanels(doc = document) {
     if (hist.length) {
       const det = el("details", "sc-history");
       det.open = historyOpen.get(s.key) ?? true;
-      det.append(el("summary", null, `RECENT ACTIVITY STREAM (${hist.length})`));
+      det.append(el("summary", null, `ACTIVITY (${hist.length})`));
       const feed = el("div", "feed");
       for (const h of hist) {
         const row = el("div", "feed-item");
@@ -547,10 +550,10 @@ export function createPanels(doc = document) {
     const frag = doc.createDocumentFragment();
     const row = el("div", "pipe-row");
     const stages = [
-      { on: !!p.orchestrator, name: "ORCHESTRATOR", sub: p.orchestrator ? `${p.activeRunCount ?? 1} ACTIVE RUN${(p.activeRunCount ?? 1) === 1 ? "" : "S"}` : "idle" },
-      { on: !!p.planner, name: "PLANNER", sub: p.planner ? "(optional) · active" : "(optional) skipped or not running" },
-      { on: !!p.worker, name: "WORKER", sub: p.worker ? "active" : "not running" },
-      { on: !!p.verifier, name: "VERIFIER", sub: p.verifier ? "(conditional) · active" : "(conditional) skipped or not running" },
+      { on: !!p.orchestrator, name: "ORCHESTRATOR", sub: p.orchestrator ? `${p.activeRunCount ?? 1} active` : "idle" },
+      { on: !!p.planner, name: "PLANNER", sub: p.planner ? "active" : "optional · idle" },
+      { on: !!p.worker, name: "WORKER", sub: p.worker ? "active" : "idle" },
+      { on: !!p.verifier, name: "VERIFIER", sub: p.verifier ? "active" : "conditional · idle" },
     ];
     stages.forEach((s, i) => {
       if (i) {
@@ -651,7 +654,7 @@ export function createPanels(doc = document) {
     seenRuns = new Set(runs.map((r) => String(r.id)));
     const visible = runs.filter((r) => !scope || scope === "all" || (r.projects ?? []).includes(scope));
     if (!visible.length) {
-      dom.quests.replaceChildren(el("div", "quest-empty px-box", scope === "all" ? "NO QUESTS YET — ยังไม่มีประวัติ run" : `NO QUESTS FOR ${scope}`));
+      dom.quests.replaceChildren(el("div", "quest-empty px-box", scope === "all" ? "NO RUNS YET — ยังไม่มีประวัติ run" : `NO RUNS FOR ${scope}`));
       return;
     }
     dom.quests.querySelector(".quest-empty")?.remove();

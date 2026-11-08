@@ -4,8 +4,80 @@ import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import http from "node:http";
-import { parseClaudeUsageText, parseAgyUsageText, parseCodexUsageResponse, fetchCodexQuotaFromAuth, getWorkspaceQuota } from "../src/quota-tracker.mjs";
+import { parseClaudeUsageText, parseAgyUsageText, parseCodexUsageResponse, fetchCodexQuotaFromAuth, getWorkspaceQuota, parseClaudeUtilization, fetchClaudeQuota, formatResetDate } from "../src/quota-tracker.mjs";
 import { startMonitor } from "../src/monitor.mjs";
+
+test("quota-tracker: parseClaudeUtilization extracts quota and account info from ~/.claude.json structure", () => {
+  const sample = {
+    oauthAccount: {
+      emailAddress: "developer@example.com",
+      seatTier: "team_standard",
+      billingType: "stripe_subscription",
+    },
+    cachedUsageUtilization: {
+      utilization: {
+        five_hour: { utilization: 0, resets_at: null },
+        seven_day: { utilization: 0.15, resets_at: "2026-11-15T11:00:00+00:00" },
+        limits: [
+          { kind: "session", group: "session", percent: 10, resets_at: null },
+          { kind: "weekly_all", group: "weekly", percent: 25, resets_at: "2026-11-15T11:00:00+00:00" },
+        ],
+      },
+    },
+  };
+
+  const parsed = parseClaudeUtilization(sample);
+  assert.equal(parsed.available, true);
+  assert.equal(parsed.email, "developer@example.com");
+  assert.equal(parsed.planType, "team_standard");
+  assert.equal(parsed.accountLabel, "developer@example.com (Team Standard)");
+  assert.equal(parsed.sessionUsedPct, 10);
+  assert.equal(parsed.sessionRemainingPct, 90);
+  assert.equal(parsed.weeklyUsedPct, 25);
+  assert.equal(parsed.weeklyRemainingPct, 75);
+  assert.ok(parsed.weeklyResetsAt.includes("15 Nov") || parsed.weeklyResetsAt.includes("Nov 15"));
+});
+
+test("quota-tracker: fetchClaudeQuota reads mock claude.json safely", async (t) => {
+  const notFound = await fetchClaudeQuota("C:/non/existent/path/claude.json");
+  assert.ok(notFound);
+
+  const root = mkdtempSync(path.join(tmpdir(), "baan-claude-test-"));
+  t.after(() => {
+    try { rmSync(root, { recursive: true, force: true }); } catch {}
+  });
+
+  const mockClaudeJsonPath = path.join(root, ".claude.json");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(mockClaudeJsonPath, JSON.stringify({
+    oauthAccount: { emailAddress: "test@company.com", seatTier: "pro" },
+    cachedUsageUtilization: {
+      utilization: {
+        limits: [
+          { kind: "session", percent: 5 },
+          { kind: "weekly_all", percent: 40, resets_at: "2026-11-20T00:00:00Z" },
+        ],
+      },
+    },
+  }));
+
+  const res = await fetchClaudeQuota(mockClaudeJsonPath);
+  assert.equal(res.available, true);
+  assert.equal(res.email, "test@company.com");
+  assert.equal(res.accountLabel, "test@company.com (Pro)");
+  assert.equal(res.sessionUsedPct, 5);
+  assert.equal(res.sessionRemainingPct, 95);
+  assert.equal(res.weeklyUsedPct, 40);
+  assert.equal(res.weeklyRemainingPct, 60);
+});
+
+test("quota-tracker: formatResetDate handles timestamps and date strings", () => {
+  assert.equal(formatResetDate(null), null);
+  assert.equal(formatResetDate(""), null);
+  assert.ok(formatResetDate(1794390214).includes("Nov"));
+  assert.ok(formatResetDate("2026-11-15T11:00:00+00:00").includes("Nov"));
+  assert.equal(formatResetDate("8:00 PM on Friday"), "8:00 PM on Friday");
+});
 
 test("quota-tracker: parseClaudeUsageText parses 5-hour session and weekly limits", () => {
   const sample = `You are currently using your subscription to power your Claude Code usage

@@ -2,6 +2,152 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+export function formatResetDate(raw) {
+  if (!raw) return null;
+  if (typeof raw === "number") {
+    const ms = raw < 1e11 ? raw * 1000 : raw;
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return String(raw);
+    return formatDateParts(d);
+  }
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    const parsed = Date.parse(trimmed);
+    if (!isNaN(parsed) && (trimmed.includes("T") || trimmed.includes("-") || trimmed.includes("Z"))) {
+      return formatDateParts(new Date(parsed));
+    }
+    return trimmed;
+  }
+  return String(raw);
+}
+
+function formatDateParts(d) {
+  try {
+    const timePart = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    const dayPart = d.getDate();
+    const monthPart = d.toLocaleDateString("en-US", { month: "short" });
+    return `${timePart} on ${dayPart} ${monthPart}`;
+  } catch {
+    return d.toISOString();
+  }
+}
+
+export function parseClaudeUtilization(claudeJson) {
+  const result = {
+    available: false,
+    email: null,
+    planType: null,
+    accountLabel: null,
+    sessionUsedPct: null,
+    sessionRemainingPct: null,
+    sessionResetsAt: null,
+    weeklyUsedPct: null,
+    weeklyRemainingPct: null,
+    weeklyResetsAt: null,
+    raw: claudeJson || null,
+  };
+  if (!claudeJson) return result;
+
+  const oauth = claudeJson.oauthAccount || {};
+  const util = claudeJson.cachedUsageUtilization?.utilization || claudeJson.utilization || {};
+  const limits = Array.isArray(util.limits) ? util.limits : [];
+
+  const sessionLimit = limits.find((l) => l.kind === "session" || l.group === "session");
+  const weeklyLimit = limits.find((l) => l.kind === "weekly_all" || l.group === "weekly");
+
+  let sessionUsedPct = sessionLimit?.percent != null ? Math.round(sessionLimit.percent) : null;
+  let sessionResetsAt = formatResetDate(sessionLimit?.resets_at);
+  if (sessionUsedPct == null && util.five_hour?.utilization != null) {
+    const v = util.five_hour.utilization;
+    sessionUsedPct = Math.min(100, Math.round(v <= 1 && v > 0 ? v * 100 : v));
+    sessionResetsAt = formatResetDate(util.five_hour.resets_at);
+  }
+
+  let weeklyUsedPct = weeklyLimit?.percent != null ? Math.round(weeklyLimit.percent) : null;
+  let weeklyResetsAt = formatResetDate(weeklyLimit?.resets_at);
+  if (weeklyUsedPct == null && util.seven_day?.utilization != null) {
+    const v = util.seven_day.utilization;
+    weeklyUsedPct = Math.min(100, Math.round(v <= 1 && v > 0 ? v * 100 : v));
+    weeklyResetsAt = formatResetDate(util.seven_day.resets_at);
+  }
+
+  const email = oauth.emailAddress || null;
+  const tierRaw = oauth.seatTier || oauth.billingType || null;
+  const tierFormatted = tierRaw
+    ? tierRaw.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : null;
+  const accountLabel = email
+    ? (tierFormatted ? `${email} (${tierFormatted})` : email)
+    : "Anthropic Subscription";
+  const planType = oauth.seatTier || oauth.billingType || "subscription";
+
+  result.email = email;
+  result.planType = planType;
+  result.accountLabel = accountLabel;
+
+  if (sessionUsedPct != null || weeklyUsedPct != null) {
+    result.available = true;
+    result.sessionUsedPct = sessionUsedPct;
+    result.sessionRemainingPct = sessionUsedPct != null ? Math.max(0, 100 - sessionUsedPct) : null;
+    result.sessionResetsAt = sessionResetsAt;
+    result.weeklyUsedPct = weeklyUsedPct;
+    result.weeklyRemainingPct = weeklyUsedPct != null ? Math.max(0, 100 - weeklyUsedPct) : null;
+    result.weeklyResetsAt = weeklyResetsAt;
+  }
+
+  return result;
+}
+
+export async function fetchClaudeQuota(claudeJsonPathOpt = null, credentialsPathOpt = null) {
+  try {
+    const isCustomPath = Boolean(claudeJsonPathOpt);
+    const home = process.env.USERPROFILE || process.env.HOME;
+    const claudeJsonPath = claudeJsonPathOpt || (home ? path.join(home, ".claude.json") : null);
+
+    if (claudeJsonPath && fs.existsSync(claudeJsonPath)) {
+      try {
+        const raw = fs.readFileSync(claudeJsonPath, "utf8");
+        const json = JSON.parse(raw);
+        const parsed = parseClaudeUtilization(json);
+        if (parsed.available) return parsed;
+      } catch {}
+    } else if (isCustomPath) {
+      return { available: false, error: `Claude config not found at ${claudeJsonPath}` };
+    }
+
+    const credPath = credentialsPathOpt || (home ? path.join(home, ".claude", ".credentials.json") : null);
+    if (credPath && fs.existsSync(credPath)) {
+      try {
+        const creds = JSON.parse(fs.readFileSync(credPath, "utf8"));
+        const token = creds.claudeAiOauth?.accessToken;
+        if (token) {
+          const res = await fetch("https://api.anthropic.com/api/oauth/usage", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "User-Agent": "claude-code/2.1.319",
+              "anthropic-client-version": "2.1.319",
+            },
+            signal: AbortSignal.timeout(3000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const parsed = parseClaudeUtilization({ cachedUsageUtilization: { utilization: data } });
+            if (parsed.available) return parsed;
+          }
+        }
+      } catch {}
+    }
+
+    const cliRes = await execCommandWithTimeout("claude", ["-p", "/usage"], 6000);
+    const parsedText = parseClaudeUsageText(cliRes.stdout || cliRes.stderr);
+    if (parsedText.available) return parsedText;
+
+    return { available: false, error: "Claude quota data not found in ~/.claude.json" };
+  } catch (err) {
+    return { available: false, error: err.message };
+  }
+}
+
 export function parseClaudeUsageText(text) {
   const result = {
     available: false,
@@ -136,15 +282,7 @@ export function parseCodexUsageResponse(data) {
     }
     result.weeklyWindowSeconds = primary.limit_window_seconds ?? null;
     if (primary.reset_at) {
-      try {
-        const d = new Date(primary.reset_at * 1000);
-        const timePart = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-        const dayPart = d.getDate();
-        const monthPart = d.toLocaleDateString("en-US", { month: "short" });
-        result.weeklyResetsAt = `${timePart} on ${dayPart} ${monthPart}`;
-      } catch {
-        result.weeklyResetsAt = String(primary.reset_at);
-      }
+      result.weeklyResetsAt = formatResetDate(primary.reset_at);
     }
   }
 
@@ -155,15 +293,7 @@ export function parseCodexUsageResponse(data) {
       result.sessionRemainingPct = Math.max(0, 100 - result.sessionUsedPct);
     }
     if (secondary.reset_at) {
-      try {
-        const d = new Date(secondary.reset_at * 1000);
-        const timePart = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-        const dayPart = d.getDate();
-        const monthPart = d.toLocaleDateString("en-US", { month: "short" });
-        result.sessionResetsAt = `${timePart} on ${dayPart} ${monthPart}`;
-      } catch {
-        result.sessionResetsAt = String(secondary.reset_at);
-      }
+      result.sessionResetsAt = formatResetDate(secondary.reset_at);
     }
   }
 
@@ -247,7 +377,11 @@ export function execCommandWithTimeout(cmd, args, timeoutMs = 8000) {
       actualArgs = ["/d", "/s", "/c", cmd, ...args];
     }
 
-    const child = spawn(actualCmd, actualArgs, { windowsHide: true, env: { ...process.env, CI: "1" } });
+    const child = spawn(actualCmd, actualArgs, {
+      windowsHide: true,
+      env: { ...process.env, CI: "1" },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
 
     const timer = setTimeout(() => {
       if (resolved) return;
@@ -285,13 +419,13 @@ export async function getWorkspaceQuota(forceRefresh = false) {
     return cachedQuota;
   }
 
-  const [claudeRes, agyRes, codexQuota] = await Promise.all([
-    execCommandWithTimeout("claude", ["-p", "/usage"], 8000),
+  const [claudeQuota, agyRes, codexQuota] = await Promise.all([
+    fetchClaudeQuota(),
     execCommandWithTimeout("agy", ["-p", "/usage"], 8000),
     fetchCodexQuotaFromAuth(),
   ]);
 
-  const claude = parseClaudeUsageText(claudeRes.stdout || claudeRes.stderr);
+  const claude = claudeQuota || { available: false };
   const agy = parseAgyUsageText(agyRes.stdout || agyRes.stderr);
   const codex = codexQuota || { available: false };
 
