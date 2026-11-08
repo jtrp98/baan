@@ -35,7 +35,8 @@
     "test": "node --test tests/*.test.mjs",
     "smoke:live": "node scripts/live-smoke.mjs",
     "validate:release": "node scripts/release-check.mjs",
-    "update:clis": "node scripts/update-clis.mjs"
+    "update:clis": "node scripts/update-clis.mjs",
+    "repair:mojibake": "node scripts/repair-mojibake.mjs"
   },
   "license": "UNLICENSED",
   "private": true
