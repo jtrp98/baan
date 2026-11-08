@@ -49,6 +49,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 Config discovery: `--config` → `BAAN_CONFIG` → เดินขึ้นจาก `--workspace`/`--cwd`/จุดที่เรียก
 ไม่มี config ใช้ defaults; config จริงอยู่นอก package
 Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุดด้วย `BAAN_AGENTS_FILE=<path>`
+`local.json` (ดูตัวอย่างที่ [local.example.json](local.example.json)) ใช้ตั้งค่าเฉพาะเครื่อง: กำหนด `auto_update`, ลงทะเบียน `workspaces`, และเปิด/ปิด AI Agents (`"claude": true`, `"codex": true`, `"agy": false` หรือใช้ string "open"/"close"); agent ที่ปิดจะถูกคัดออกจาก Fallback Chain, ข้ามใน `update-clis`, และแสดง `disabled_by_config` ใน `parity`
 `baan --list` แสดงชุดที่ใช้อยู่ ห้ามเดาชื่อ model จากเอกสารเก่า
 
 | ค่า | ค่าเริ่มต้น / ที่ตั้ง |

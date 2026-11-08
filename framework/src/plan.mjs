@@ -2,7 +2,7 @@ export const TASK_ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { resolveRoleName } from "./config.mjs";
+import { resolveRoleName, isAgentEnabled } from "./config.mjs";
 
 const TEST_LEVELS = ["normal", "full"];
 const IMPLEMENT_ROLES = ["front", "sys", "build"];
@@ -15,10 +15,10 @@ export function isTierLower(a, b) {
 
 const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
 
-export function fallbackChainFor(cfg, tierName, chosenAgent) {
+export function fallbackChainFor(cfg, tierName, chosenAgent, localConfig = null) {
   const tierConf = cfg.tiers[tierName] ?? {};
   const order = Array.isArray(tierConf._fallback) && tierConf._fallback.length ? tierConf._fallback : DEFAULT_AGENT_FALLBACK_ORDER;
-  const usable = (a) => a in cfg.agents && tierConf[a] !== null;
+  const usable = (a) => a in cfg.agents && tierConf[a] !== null && cfg.agents[a]?.enabled !== false && isAgentEnabled(a, localConfig);
   return [...new Set([chosenAgent, ...order].filter(usable))];
 }
 

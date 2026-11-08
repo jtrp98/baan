@@ -1,5 +1,5 @@
 import { getAdapter, listSupportedAdapters } from "./adapters/registry.mjs";
-import { loadAgentsConfig } from "./config.mjs";
+import { loadAgentsConfig, isAgentEnabled, applyLocalAgents } from "./config.mjs";
 
 export const PARITY_STATUS = {
   SUPPORTED: "supported",
@@ -179,12 +179,31 @@ export function formatParityReport(parity) {
   return lines.join("\n");
 }
 
-export async function runParityCommand({ agent, cwd = process.cwd(), workspaceRoot = "", json = false, cfg = null }) {
+export async function runParityCommand({ agent, cwd = process.cwd(), workspaceRoot = "", json = false, cfg = null, localConfig = null }) {
   const agentsCfg = cfg ?? loadAgentsConfig();
+  if (localConfig) applyLocalAgents(agentsCfg, localConfig);
   const agentsToProbe = agent ? [agent] : listSupportedAdapters();
   const results = [];
 
   for (const a of agentsToProbe) {
+    if (localConfig && !isAgentEnabled(a, localConfig)) {
+      if (agent) {
+        throw new Error(`agent '${a}' ถูกปิดการใช้งานใน local.json (close)`);
+      }
+      results.push({
+        agent: a,
+        label: a,
+        cliVersion: "disabled (local.json)",
+        mode: "headless",
+        role: "worker",
+        matrix: {
+          execution: { status: PARITY_STATUS.DISABLED_BY_CONFIG, reason: "Agent ถูกปิดใช้งานใน local.json (close)" },
+        },
+        deviations: ["Agent is closed in local.json"],
+        parentSandbox: { detected: false, type: "", warning: null },
+      });
+      continue;
+    }
     const adapter = getAdapter(a, agentsCfg);
     const def = agentsCfg.agents?.[a] ?? {};
     const probeResult = await adapter.probe(def, { cwd, workspaceRoot });

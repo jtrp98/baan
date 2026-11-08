@@ -67,6 +67,7 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
       defaults: ws?.defaults ?? {},
       knowledge_roots: (ws?.knowledge_roots ?? []).map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
       ...(local.workspaces.length ? { local_workspaces: local.workspaces } : {}),
+      ...(local.agents ? { local_agents: local.agents } : {}),
       execution_roles: ["planner", "worker", "verifier"],
       interactive_roles: listRoles(),
       tiers: tierMatrixText(cfg.tiers, cfg.agents),
