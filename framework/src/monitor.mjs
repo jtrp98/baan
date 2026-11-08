@@ -56,24 +56,29 @@ export function renderTui(state) {
   if (quota) {
     const { claude, codex, agy } = quota;
     lines.push(`\x1b[1mACCOUNT LIMITS & REMAINING QUOTA:\x1b[0m`);
+    const tuiRow = (label, used, reset) => {
+      if (used == null) return null;
+      const left = Math.max(0, 100 - Math.round(used));
+      const col = left > 40 ? "[32m" : left > 15 ? "[33m" : "[31m";
+      return `${label}: ${col}${Math.round(used)}% used (${left}% left)[0m${/[0-9]/.test(reset ?? "") ? ` [Resets: ${reset}]` : ""}`;
+    };
+    const usedOf = (used, remaining) => used ?? (remaining != null ? 100 - remaining : null);
+    const tuiLine = (name, ...rows) => lines.push(` ▶ ${name.padEnd(12)} ${rows.filter(Boolean).join(" | ")}`);
     if (claude?.available) {
-      const sess = claude.sessionUsedPct != null ? `${claude.sessionUsedPct}% used (${claude.sessionRemainingPct}% left)` : "N/A";
-      const week = claude.weeklyUsedPct != null ? `${claude.weeklyUsedPct}% used (${claude.weeklyRemainingPct}% left)` : "N/A";
-      const reset = claude.weeklyResetsAt ? ` [Resets: ${claude.weeklyResetsAt}]` : "";
-      lines.push(` ▶ Claude Code: 5-Hour: \x1b[33m${sess}\x1b[0m | Weekly: \x1b[31m${week}\x1b[0m${reset}`);
+      tuiLine("Claude Code",
+        tuiRow("5-Hour Limit", usedOf(claude.sessionUsedPct, claude.sessionRemainingPct), claude.sessionResetsAt),
+        tuiRow("Weekly Limit", usedOf(claude.weeklyUsedPct, claude.weeklyRemainingPct), claude.weeklyResetsAt));
     }
     if (codex?.available) {
-      const week = codex.weeklyUsedPct != null ? `${codex.weeklyUsedPct}% used (${codex.weeklyRemainingPct}% left)` : "N/A";
-      const reset = codex.weeklyResetsAt ? ` [Resets: ${codex.weeklyResetsAt}]` : "";
-      const label = codex.accountLabel ? ` (${codex.accountLabel})` : "";
-      const col = (codex.weeklyRemainingPct ?? 100) > 40 ? "\x1b[32m" : (codex.weeklyRemainingPct ?? 100) > 15 ? "\x1b[33m" : "\x1b[31m";
-      lines.push(` ▶ OpenAI Codex: Weekly Limit: ${col}${week}\x1b[0m${reset}${label}`);
+      tuiLine("OpenAI Codex",
+        tuiRow("5-Hour Limit", usedOf(codex.sessionUsedPct, codex.sessionRemainingPct), codex.sessionResetsAt),
+        tuiRow("Weekly Limit", usedOf(codex.weeklyUsedPct, codex.weeklyRemainingPct), codex.weeklyResetsAt));
     }
     if (agy?.available) {
-      const g5h = agy.gemini5hRemainingPct != null ? `${agy.gemini5hRemainingPct}% left` : "N/A";
-      const gWk = agy.geminiWeeklyRemainingPct != null ? `${agy.geminiWeeklyRemainingPct}% left` : "N/A";
-      const argon = agy.argonWeeklyRemainingPct != null ? `${agy.argonWeeklyRemainingPct}% left` : "N/A";
-      lines.push(` ▶ Google AGY:  Gemini 5h: \x1b[32m${g5h}\x1b[0m | Gemini Weekly: \x1b[32m${gWk}\x1b[0m | \x1b[1;35mArgon Weekly: ${argon}\x1b[0m`);
+      tuiLine("Google AGY",
+        tuiRow("5-Hour Limit", usedOf(null, agy.gemini5hRemainingPct), agy.gemini5hResetsAt),
+        tuiRow("Weekly Limit", usedOf(null, agy.geminiWeeklyRemainingPct), agy.geminiWeeklyResetsAt),
+        tuiRow("Argon Weekly Limit", usedOf(null, agy.argonWeeklyRemainingPct), agy.argonWeeklyResetsAt));
     }
     lines.push("");
   }
@@ -318,27 +323,6 @@ export function getHtmlDashboard() {
       align-items: center;
       gap: 4px;
     }
-    .highlight-slot {
-      min-height: 44px;
-      padding: 7px 9px;
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      font-size: 11px;
-    }
-    .highlight-slot.purple {
-      background: rgba(168, 85, 247, 0.08);
-      border: 1px solid rgba(168, 85, 247, 0.25);
-    }
-    .highlight-slot.orange {
-      background: rgba(249, 115, 22, 0.08);
-      border: 1px solid rgba(249, 115, 22, 0.25);
-    }
-    .highlight-slot.emerald {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-    }
 
     /* Live Session Area */
     .section-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -527,6 +511,38 @@ export function getHtmlDashboard() {
       if (btn) btn.textContent = '🔄 Refresh Quota';
     }
 
+    function resetLabel(v) {
+      const t = normalizeResetDate(v);
+      return /[0-9]/.test(t) ? t : '';
+    }
+
+    function quotaRow(label, usedPct, resetsAt) {
+      if (usedPct == null) return '';
+      const used = Math.round(usedPct);
+      const left = Math.max(0, 100 - used);
+      const low = left <= 15;
+      const reset = resetLabel(resetsAt);
+      return '<div class="slot-row">'
+        + '<div class="bar-label-line"><span>' + label + ':</span>'
+        + '<strong' + (low ? ' style="color: #ef4444;"' : '') + '>' + used + '% used (' + left + '% left)</strong></div>'
+        + '<div class="bar-track"><div class="bar-fill ' + getBarColor(left) + '" style="width: ' + left + '%"></div></div>'
+        + (reset ? '<div class="reset-subtext">Resets: ' + reset + '</div>' : '')
+        + (low ? '<div class="alert-pill">⚠️ ' + label + ': only ' + left + '% left</div>' : '')
+        + '</div>';
+    }
+
+    function quotaCard(plan, account, rows, emptyText) {
+      return '<div class="quota-box">'
+        + '<div class="quota-title"><span>Quota & Limits</span><span class="badge-plan">' + plan + '</span></div>'
+        + '<div class="account-line">👤 ' + account + '</div>'
+        + (rows || '<div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">' + emptyText + '</div>')
+        + '</div>';
+    }
+
+    function usedOf(used, remaining) {
+      return used ?? (remaining != null ? 100 - remaining : null);
+    }
+
     function renderDashboard() {
       if (!lastState) return;
       const { activeRuns, usage, quota, recentRuns, workspaceName } = lastState;
@@ -560,207 +576,35 @@ export function getHtmlDashboard() {
       const cAgy = displayUsage.agy ?? {};
       const cTot = displayTotal ?? {};
 
-      // Build Unified Quota HTML for Claude
       let claudeQuotaHtml = '';
-      if (quota?.claude?.available) {
-        const q = quota.claude;
-        const sessRem = q.sessionRemainingPct ?? (q.sessionUsedPct != null ? Math.max(0, 100 - q.sessionUsedPct) : 100);
-        const weekRem = q.weeklyRemainingPct ?? (q.weeklyUsedPct != null ? Math.max(0, 100 - q.weeklyUsedPct) : 0);
-        const sessColor = getBarColor(sessRem);
-        const weekColor = getBarColor(weekRem);
-        const isWeekLow = weekRem <= 15;
-        const isSessLow = sessRem <= 15;
-
-        claudeQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title">
-              <span>Quota & Limits</span>
-              <span class="badge-plan">SUBSCRIPTION</span>
-            </div>
-            <div class="account-line">👤 Anthropic Subscription</div>
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>5-Hour Session:</span>
-                <strong>\${q.sessionUsedPct ?? 0}% used (\${sessRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${sessColor}" style="width: \${sessRem}%"></div></div>
-              \${q.sessionResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.sessionResetsAt)}</div>\` : ''}
-              \${isSessLow ? \`<div class="alert-pill">⚠️ Session limit: only \${sessRem}% left</div>\` : ''}
-            </div>
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>Weekly Cap (All models):</span>
-                <strong style="\${isWeekLow ? 'color: #ef4444;' : ''}">\${q.weeklyUsedPct ?? 100}% used (\${weekRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${weekColor}" style="width: \${weekRem}%"></div></div>
-              \${q.weeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.weeklyResetsAt)}</div>\` : ''}
-              \${isWeekLow ? \`<div class="alert-pill">⚠️ Weekly limit: only \${weekRem}% left</div>\` : ''}
-            </div>
-            <div class="highlight-slot orange">
-              <div style="display: flex; justify-content: space-between; font-weight: 600; color: #fb923c;">
-                <span>📊 7-Day Activity:</span>
-                <span>\${formatNumber(q.requestsLast7d || 0)} requests</span>
-              </div>
-              <div style="font-size: 10px; color: #fdba74; margin-top: 2px;">
-                \${q.sessionsLast7d || 0} active sessions · Auto-optimizing prompts
-              </div>
-            </div>
-          </div>
-        \`;
+      const qc = quota?.claude;
+      if (qc?.available) {
+        claudeQuotaHtml = quotaCard('SUBSCRIPTION', 'Anthropic Subscription',
+          quotaRow('5-Hour Limit', usedOf(qc.sessionUsedPct, qc.sessionRemainingPct), qc.sessionResetsAt)
+          + quotaRow('Weekly Limit', usedOf(qc.weeklyUsedPct, qc.weeklyRemainingPct), qc.weeklyResetsAt));
       } else {
-        claudeQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">CLAUDE</span></div>
-            <div class="account-line">👤 Anthropic Subscription</div>
-            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
-              \${quota?.claude?.rawText ? 'Claude subscription active' : 'พร้อมตรวจจับโควตาจาก claude -p "/usage"'}
-            </div>
-          </div>
-        \`;
+        claudeQuotaHtml = quotaCard('SUBSCRIPTION', 'Anthropic Subscription', '', qc?.rawText ? 'Claude subscription active' : 'พร้อมตรวจจับโควตาจาก claude -p "/usage"');
       }
 
-      // Build Unified Quota HTML for Codex
       let codexQuotaHtml = '';
-      if (quota?.codex?.available) {
-        const q = quota.codex;
-        const weekRem = q.weeklyRemainingPct ?? (q.weeklyUsedPct != null ? Math.max(0, 100 - q.weeklyUsedPct) : 100);
-        const weekColor = getBarColor(weekRem);
-        const isWeekLow = weekRem <= 15;
-        const planName = q.planType ? q.planType.toUpperCase() : 'PLUS';
-
-        let sessionSlotHtml = '';
-        if (q.sessionUsedPct != null) {
-          const sessRem = q.sessionRemainingPct ?? Math.max(0, 100 - q.sessionUsedPct);
-          const sessColor = getBarColor(sessRem);
-          sessionSlotHtml = \`
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>5-Hour Session:</span>
-                <strong>\${q.sessionUsedPct}% used (\${sessRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${sessColor}" style="width: \${sessRem}%"></div></div>
-              \${q.sessionResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.sessionResetsAt)}</div>\` : ''}
-              \${sessRem <= 15 ? \`<div class="alert-pill">⚠️ Session limit: only \${sessRem}% left</div>\` : ''}
-            </div>
-          \`;
-        } else {
-          sessionSlotHtml = \`
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>5-Hour Session:</span>
-                <strong style="color: #34d399;">Standard (Active)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill green" style="width: 100%"></div></div>
-              <div class="reset-subtext">No session throttle active</div>
-            </div>
-          \`;
-        }
-
-        codexQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title">
-              <span>Quota & Limits</span>
-              <span class="badge-plan">\${planName}</span>
-            </div>
-            <div class="account-line">👤 \${q.accountLabel || 'ChatGPT Plus Account'}</div>
-            \${sessionSlotHtml}
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>Weekly Limit (GPT-6.1):</span>
-                <strong style="\${isWeekLow ? 'color: #ef4444;' : ''}">\${q.weeklyUsedPct ?? 0}% used (\${weekRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${weekColor}" style="width: \${weekRem}%"></div></div>
-              \${q.weeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.weeklyResetsAt)}</div>\` : ''}
-              \${isWeekLow ? \`<div class="alert-pill">⚠️ Weekly limit: only \${weekRem}% left</div>\` : ''}
-            </div>
-            <div class="highlight-slot emerald">
-              <div style="display: flex; justify-content: space-between; font-weight: 600; color: #34d399;">
-                <span>💳 Direct ChatGPT Quota:</span>
-                <span>\${planName}</span>
-              </div>
-              <div style="font-size: 10px; color: #a7f3d0; margin-top: 2px;">
-                \${q.credits?.hasCredits ? \`Balance: $\${q.credits.balance}\` : 'Credits: $0.00 · Unmetered CLI Quota'}
-              </div>
-            </div>
-          </div>
-        \`;
+      const qx = quota?.codex;
+      if (qx?.available) {
+        codexQuotaHtml = quotaCard(qx.planType ? qx.planType.toUpperCase() : 'PLUS', qx.accountLabel || 'ChatGPT Plus Account',
+          quotaRow('5-Hour Limit', usedOf(qx.sessionUsedPct, qx.sessionRemainingPct), qx.sessionResetsAt)
+          + quotaRow('Weekly Limit', usedOf(qx.weeklyUsedPct, qx.weeklyRemainingPct), qx.weeklyResetsAt));
       } else {
-        codexQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">CODEX</span></div>
-            <div class="account-line">👤 OpenAI Codex CLI</div>
-            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
-              \${quota?.codex?.error ? quota.codex.error : 'พร้อมตรวจจับโควตาจาก ~/.codex/auth.json'}
-            </div>
-          </div>
-        \`;
+        codexQuotaHtml = quotaCard('PLUS', 'OpenAI Codex CLI', '', qx?.error ? qx.error : 'พร้อมตรวจจับโควตาจาก ~/.codex/auth.json');
       }
 
-      // Build Unified Quota HTML for AGY (including Gemini 4 Argon Weekly)
       let agyQuotaHtml = '';
-      if (quota?.agy?.available) {
-        const q = quota.agy;
-        const g5hRem = q.gemini5hRemainingPct ?? 100;
-        const g5hUsed = 100 - g5hRem;
-        const gWkRem = q.geminiWeeklyRemainingPct ?? 100;
-        const gWkUsed = 100 - gWkRem;
-        const argRem = q.argonWeeklyRemainingPct ?? 100;
-        const argUsed = 100 - argRem;
-
-        const g5hColor = getBarColor(g5hRem);
-        const gWkColor = getBarColor(gWkRem);
-        const argColor = argRem > 40 ? 'purple' : argRem > 15 ? 'yellow' : 'red';
-
-        const is5hLow = g5hRem <= 15;
-        const isWkLow = gWkRem <= 15;
-        const isArgLow = argRem <= 15;
-
-        agyQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title">
-              <span>Quota & Limits</span>
-              <span class="badge-plan">ANTIGRAVITY</span>
-            </div>
-            <div class="account-line">👤 Google Antigravity / Gemini</div>
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>Gemini 5-Hour Limit:</span>
-                <strong style="\${is5hLow ? 'color: #ef4444;' : ''}">\${g5hUsed}% used (\${g5hRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${g5hColor}" style="width: \${g5hRem}%"></div></div>
-              \${q.gemini5hResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.gemini5hResetsAt)}</div>\` : ''}
-              \${is5hLow ? \`<div class="alert-pill">⚠️ Low 5-hour limit: only \${g5hRem}% left</div>\` : ''}
-            </div>
-            <div class="slot-row">
-              <div class="bar-label-line">
-                <span>Gemini Weekly Limit:</span>
-                <strong style="\${isWkLow ? 'color: #ef4444;' : ''}">\${gWkUsed}% used (\${gWkRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${gWkColor}" style="width: \${gWkRem}%"></div></div>
-              \${q.geminiWeeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.geminiWeeklyResetsAt)}</div>\` : ''}
-              \${isWkLow ? \`<div class="alert-pill">⚠️ Low weekly limit: only \${gWkRem}% left</div>\` : ''}
-            </div>
-            <div class="highlight-slot purple">
-              <div class="bar-label-line">
-                <span style="color: #c084fc; font-weight: 600;">🌟 Gemini 4 Argon Weekly:</span>
-                <strong style="color: #e9d5ff;">\${argUsed}% used (\${argRem}% left)</strong>
-              </div>
-              <div class="bar-track"><div class="bar-fill \${argColor}" style="width: \${argRem}%"></div></div>
-              \${q.argonWeeklyResetsAt ? \`<div class="reset-subtext" style="color: #d8b4fe;">Resets: \${normalizeResetDate(q.argonWeeklyResetsAt)}</div>\` : ''}
-              \${isArgLow ? \`<div class="alert-pill">⚠️ Argon weekly limit: only \${argRem}% left</div>\` : ''}
-            </div>
-          </div>
-        \`;
+      const qa = quota?.agy;
+      if (qa?.available) {
+        agyQuotaHtml = quotaCard('ANTIGRAVITY', 'Google Antigravity / Gemini',
+          quotaRow('5-Hour Limit', 100 - (qa.gemini5hRemainingPct ?? 100), qa.gemini5hResetsAt)
+          + quotaRow('Weekly Limit', 100 - (qa.geminiWeeklyRemainingPct ?? 100), qa.geminiWeeklyResetsAt)
+          + quotaRow('Argon Weekly Limit', 100 - (qa.argonWeeklyRemainingPct ?? 100), qa.argonWeeklyResetsAt));
       } else {
-        agyQuotaHtml = \`
-          <div class="quota-box">
-            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">ANTIGRAVITY</span></div>
-            <div class="account-line">👤 Google Antigravity</div>
-            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
-              พร้อมตรวจจับโควตาจาก agy -p "/usage"
-            </div>
-          </div>
-        \`;
+        agyQuotaHtml = quotaCard('ANTIGRAVITY', 'Google Antigravity / Gemini', '', 'พร้อมตรวจจับโควตาจาก agy -p "/usage"');
       }
 
       const usageCards = document.getElementById('usage-cards');
