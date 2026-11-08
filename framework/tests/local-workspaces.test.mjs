@@ -22,6 +22,7 @@ test("loadLocalConfig: คืน workspaces ว่างเมื่อไม่
   try {
     const res = loadLocalConfig(emptyDir);
     assert.equal(res.source, null);
+    assert.equal(res.auto_update, false);
     assert.deepEqual(res.workspaces, []);
   } finally {
     rmSync(emptyDir, { recursive: true, force: true });
@@ -41,11 +42,29 @@ test("loadLocalConfig: อ่านและ normalize ทั้ง workspaces �
 
     const res = loadLocalConfig(dir);
     assert.equal(res.source, file);
+    assert.equal(res.auto_update, true);
     assert.equal(res.workspaces.length, 2);
     assert.equal(res.workspaces[0].name, "company-a");
     assert.equal(res.workspaces[0].path, path.resolve("C:/src/company-a"));
     assert.equal(res.workspaces[1].name, "b-corp");
     assert.equal(res.workspaces[1].path, path.resolve("C:/src/company-b"));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("loadLocalConfig: เคารพการตั้งค่า auto_update: false", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-local-noauto-"));
+  try {
+    const file = path.join(dir, "local.json");
+    writeFileSync(file, JSON.stringify({
+      auto_update: false,
+      workspaces: ["C:/src/test-ws"]
+    }), "utf8");
+
+    const res = loadLocalConfig(dir);
+    assert.equal(res.auto_update, false);
+    assert.equal(res.workspaces.length, 1);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

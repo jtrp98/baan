@@ -55,7 +55,7 @@ export function findLocalConfig(teamDir = TEAM_DIR) {
 
 export function loadLocalConfig(teamDir = TEAM_DIR) {
   const file = findLocalConfig(teamDir);
-  if (!file) return { source: null, workspaces: [] };
+  if (!file) return { source: null, auto_update: false, workspaces: [] };
   try {
     const raw = JSON.parse(readFileSync(file, "utf8"));
     const list = Array.isArray(raw.workspaces) ? raw.workspaces : (Array.isArray(raw.companies) ? raw.companies : []);
@@ -63,7 +63,7 @@ export function loadLocalConfig(teamDir = TEAM_DIR) {
       if (typeof item === "string") return { name: path.basename(item), path: path.resolve(item) };
       return { name: item.name || path.basename(item.path), path: path.resolve(item.path) };
     });
-    return { source: file, workspaces };
+    return { source: file, auto_update: raw.auto_update ?? true, workspaces };
   } catch (e) {
     throw new Error(`อ่าน local.json ไม่ได้ (${file}): ${e.message}`);
   }

@@ -36,7 +36,8 @@
     "smoke:live": "node scripts/live-smoke.mjs",
     "validate:release": "node scripts/release-check.mjs",
     "update:clis": "node scripts/update-clis.mjs",
-    "repair:mojibake": "node scripts/repair-mojibake.mjs"
+    "repair:mojibake": "node scripts/repair-mojibake.mjs",
+    "setup:hooks": "node scripts/setup-hooks.mjs"
   },
   "license": "UNLICENSED",
   "private": true
