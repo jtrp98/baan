@@ -19,11 +19,11 @@ import { runParityCommand } from "./parity.mjs";
 import { runInteractiveCli } from "./runner.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (!a.startsWith("--")) { if (o.subject) throw new Error(`unexpected argument ${a}`); o.subject = a; continue; }
@@ -48,7 +48,7 @@ export function parse(argv) {
     o.target = o.subject;
     delete o.subject;
   }
-  if (o.subject && !["status", "report", "inbox", "decide", "attach"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
+  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
 }
 
@@ -85,6 +85,17 @@ export async function cli(argv, options = {}) {
   const root = path.resolve(o.workspace || (configFile ? path.dirname(configFile) : process.cwd()));
   const cfg = options.cfg ?? loadAgentsConfig();
   if (utilityFlags.some((f) => o[f])) return utility(o, ws, cfg, root);
+
+  if (o.command === "monitor" || o.command === "ui") {
+    const { startMonitor } = await import("./monitor.mjs");
+    return startMonitor({
+      workspaceRoot: root,
+      port: o.port ? Number(o.port) : 3456,
+      tui: Boolean(o.tui),
+      openBrowser: !o["no-open"] && !o.tui,
+      runId: o.run || o.subject || null,
+    });
+  }
 
   if (o.command === "update-clis") {
     const { updateClis } = await import("./update-clis.mjs");

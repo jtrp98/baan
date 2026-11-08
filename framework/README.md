@@ -17,7 +17,15 @@ baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
+baan monitor [--port 3456] [--no-open] [--tui]
 ```
+
+`baan monitor` (หรือ `baan ui`) มอนิเตอร์การทำงานสดและสรุป 3-CLI Usage แยกอิสระจากการสั่งงาน:
+- **Decoupled Architecture**: เปิดทิ้งไว้ในหน้าต่างแยกหรือเบราว์เซอร์ (`http://localhost:3456`) ขณะที่คุณสั่งงานใน session ตามปกติ (เช่น คุยกับ AI ใน `C:\src\schoolbright`)
+- **Real-time Process & Tool Calls**: แสดงสด ณ วินาทีนั้นว่า AI กำลังอ่านไฟล์ไหน (`read_file`), แก้ไฟล์อะไร (`edit_file`), หรือรันคำสั่งอะไร (`bash: npm test`) พร้อม Snippet ความคิดล่าสุด
+- **Used ทั้ง 3 CLI แบบสดๆ**: คำนวณ Token In/Out/Cache, Turns, และ Cost ($) ของ **Claude Code**, **Codex**, และ **Google Antigravity (AGY)**
+- **Multi-Session & Multi-Project**: สลับดูภาพรวมทุกโปรเจกต์ (Overview) หรือคลิกเลือกดูเฉพาะโปรเจกต์เดี่ยว (Single Project Focus) เช่น `school-bot`, `sb-api-gateway`
+- **TUI Mode**: เพิ่ม `--tui` เพื่อแสดงผลแบบ Dashboard ในเทอร์มินัลสไตล์ `htop` โดยไม่ต้องเปิดเบราว์เซอร์
 
 `baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
 - ตรวจจับ Tech Stacks (.NET, Next.js, Go, Python, React, ฯลฯ) และ Architecture Components (`features/`, `backend/src/`, `engines/`)

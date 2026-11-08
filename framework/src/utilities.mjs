@@ -13,6 +13,7 @@ import { repairFile } from "./mojibake.mjs";
 export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "repair-mojibake", "sweep", "sync", "survey", "scan"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
+  baan monitor | ui [--port <3456>] [--no-open] [--tui]
   baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
   baan update-clis
   baan attach <package> [--run <run>]
