@@ -23,7 +23,7 @@ export function parse(argv) {
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
   const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (!a.startsWith("--")) { if (o.subject) throw new Error(`unexpected argument ${a}`); o.subject = a; continue; }
@@ -42,7 +42,7 @@ export function parse(argv) {
   if (inputs.length > 1 || (o.resume && inputs.length) || (o.cancel && (inputs.length || o.resume))) throw new Error("choose one input: goal / plan / packet / resume / cancel");
   if (o.timeout !== undefined) validateTimeout(Number(o.timeout));
   if (o["max-parallel"] !== undefined && (!Number.isInteger(Number(o["max-parallel"])) || Number(o["max-parallel"]) < 1 || Number(o["max-parallel"]) > 64)) throw new Error("invalid --max-parallel (1–64)");
-  if (o["dry-run"] && (o.cancel || o.command === "decide" || (utilityFlags.some((f) => o[f]) && !o.sync))) throw new Error("--dry-run applies only to run/resume");
+  if (o["dry-run"] && (o.cancel || o.command === "decide" || (utilityFlags.some((f) => o[f]) && !o.sync && !o["repair-mojibake"]))) throw new Error("--dry-run applies only to run/resume");
   if (o.command !== "decide" && (o.approve || o["allow-dirty"] || o.gate)) throw new Error("approvals require decide");
   if (["survey", "scan"].includes(o.command) && o.subject && !o.target) {
     o.target = o.subject;

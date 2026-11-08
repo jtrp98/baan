@@ -8,8 +8,9 @@ import { commitKnowledge } from "./knowledge-commit.mjs";
 import { sweep, formatSweep } from "./sweep.mjs";
 import { syncWorkspace, syncAllWorkspaces } from "./sync.mjs";
 import { surveyProject } from "./survey.mjs";
+import { repairFile } from "./mojibake.mjs";
 
-export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep", "sync", "survey", "scan"];
+export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "repair-mojibake", "sweep", "sync", "survey", "scan"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
   baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
@@ -32,7 +33,7 @@ export function utility(o, ws, cfg, root) {
     [--approve] [--allow-dirty] [--gate <id>]
   baan run --resume <run> [--dry-run]
   baan run --cancel <package> --run <run>
-  baan --index | --lint-knowledge | --lint-plan <file> | --commit | --sync
+  baan --index | --lint-knowledge | --lint-plan <file> | --repair-mojibake <file> | --commit | --sync
   baan --sweep <term> [--sweep <term>] [--sweep-in <dir>] [--target <name>]
 See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.version) return JSON.parse(readFileSync(path.join(TEAM_DIR, "package.json"), "utf8")).version;
@@ -73,6 +74,9 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
     const messages = [];
     const code = lintPlanFile(path.resolve(o["lint-plan"]), (f) => readFileSync(f, "utf8"), (m) => messages.push(m));
     return { ok: code === 0, messages };
+  }
+  if (o["repair-mojibake"]) {
+    return repairFile(path.resolve(o["repair-mojibake"]), { write: !o["dry-run"], dryRun: Boolean(o["dry-run"]) });
   }
   if (o.commit) return { commits: commitKnowledge(ws) };
   if (o.index || o["lint-knowledge"]) {

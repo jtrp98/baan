@@ -2,6 +2,21 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.33.0 — 2026-11-08 · เพิ่มเครื่องมือซ่อมแซม Mojibake (CP874/Windows-1252) และคำสั่ง baan --repair-mojibake
+
+### เพิ่ม
+
+- **เครื่องมือถอดรหัสและซ่อมแซม Mojibake (`src/mojibake.mjs`)**:
+  - รองรับการกู้คืนข้อความภาษาไทยที่เกิดอาการ Mojibake จากการเปิด/บันทึกไฟล์ UTF-8 ผ่าน ANSI Codepage (Windows-874 / CP874 ร่วมกับ CP1252)
+  - ฟังก์ชัน `detectMojibake(text)` ตรวจจับความถี่และลักษณะเฉพาะของอักขระเพี้ยน โดยไม่รบกวนข้อความภาษาไทยปกติ
+  - ฟังก์ชัน `repairMojibake(text)` แปลงข้อความเพี้ยนกลับเป็น Buffer ไบต์ดั้งเดิมและถอดรหัสคืนเป็น UTF-8 แท้ 100%
+  - ฟังก์ชัน `repairFile(filePath, options)` ซ่อมแซมไฟล์ JSON และ Text โดยตรวจสอบความถูกต้องของโครงสร้าง JSON หลังถอดรหัสก่อนบันทึก
+- **คำสั่ง CLI และ npm script**:
+  - คำสั่งใน BAAN CLI: `baan --repair-mojibake <file> [--dry-run]`
+  - CLI Script: `scripts/repair-mojibake.mjs` พร้อม npm script: `npm run repair:mojibake -- <file> [--write] [--dry-run]`
+- **ชุดทดสอบครอบคลุม (`tests/mojibake.test.mjs`)**:
+  - เพิ่มการทดสอบการแปลงข้อความ, การ detect, การทำงานของ `repairFile` และ CLI รวม 4 ข้อ (ชุดทดสอบรวมเป็น 190 tests)
+
 ## 0.32.0 — 2026-11-08 · แยกนโยบาย Tier Flow ระหว่าง Code/Docs, Hybrid Verification, และปรับสมดุลโมเดลใน agents.json
 
 ### เพิ่ม
