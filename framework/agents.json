@@ -13,19 +13,23 @@
         "--effort",
         "<EFFORT>"
       ],
+      "workspaceDirArgs": [
+        "--add-dir",
+        "<WORKSPACE_ROOT>"
+      ],
       "readArgs": [
         "-p",
         "--output-format",
         "text",
-        "--allowedTools",
-        "Read,Grep,Glob,LS,Task,Agent,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),PowerShell(Get-Content:*),PowerShell(Get-ChildItem:*),PowerShell(Get-Location:*),PowerShell(Select-String:*),PowerShell(git status:*),PowerShell(git log:*),PowerShell(git diff:*),PowerShell(git show:*),PowerShell(git rev-parse:*),PowerShell(git ls-files:*)"
+        "--permission-mode",
+        "plan"
       ],
       "writeArgs": [
         "-p",
         "--output-format",
         "text",
         "--permission-mode",
-        "bypassPermissions"
+        "acceptEdits"
       ],
       "answerFrom": "stdout",
       "usage": {
@@ -52,6 +56,10 @@
         "-c",
         "model_reasoning_effort=<EFFORT>"
       ],
+      "workspaceDirArgs": [
+        "--add-dir",
+        "<WORKSPACE_ROOT>"
+      ],
       "readArgs": [
         "exec",
         "--skip-git-repo-check",
@@ -64,13 +72,13 @@
       "writeArgs": [
         "exec",
         "--skip-git-repo-check",
-        "--dangerously-bypass-approvals-and-sandbox",
+        "-s",
+        "workspace-write",
         "-o",
         "<ANSWER>",
         "-"
       ],
       "answerFrom": "answerFile",
-      "idleTimeoutSec": 1200,
       "usage": {
         "args": [
           "--json"
@@ -83,7 +91,7 @@
       "label": "Agy",
       "command": "agy",
       "useShell": false,
-      "promptVia": "arg",
+      "promptVia": "stdin",
       "modelArgs": [
         "--model",
         "<MODEL>"
@@ -97,13 +105,13 @@
         "<WORKSPACE_ROOT>"
       ],
       "readArgs": [
-        "--agent",
-        "baan-readonly",
+        "--mode",
+        "plan",
         "--print"
       ],
       "writeArgs": [
         "--mode",
-        "auto",
+        "accept-edits",
         "--print"
       ],
       "answerFrom": "stdout",
@@ -115,22 +123,6 @@
         "insertBefore": "--print",
         "format": "agy-json"
       }
-    },
-    "opencode": {
-      "label": "OpenCode (Z.AI Coding Plan)",
-      "command": "opencode",
-      "useShell": true,
-      "promptVia": "stdin",
-      "modelArgs": [
-        "run",
-        "-m",
-        "<MODEL>"
-      ],
-      "readArgs": [],
-      "writeArgs": [
-        "--auto"
-      ],
-      "answerFrom": "stdout"
     }
   },
   "tiers": {
@@ -138,8 +130,6 @@
       "_timeoutSec": 3600,
       "_fallback": [
         "codex",
-        "opencode",
-        "agy",
         "claude"
       ],
       "claude": {
@@ -150,13 +140,11 @@
         "model": "gpt-6-astra",
         "effort": "max"
       },
-      "agy": null,
-      "opencode": null
+      "agy": null
     },
     "t1": {
       "_fallback": [
         "codex",
-        "opencode",
         "agy",
         "claude"
       ],
@@ -169,14 +157,13 @@
         "effort": "high"
       },
       "agy": {
-        "model": "gemini-4-argon-high"
-      },
-      "opencode": null
+        "model": "gemini-4-argon",
+        "effort": "high"
+      }
     },
     "t2": {
       "_fallback": [
         "codex",
-        "opencode",
         "agy",
         "claude"
       ],
@@ -189,14 +176,13 @@
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-4-argon-medium"
-      },
-      "opencode": null
+        "model": "gemini-4-argon",
+        "effort": "medium"
+      }
     },
     "t3": {
       "_fallback": [
         "codex",
-        "opencode",
         "agy",
         "claude"
       ],
@@ -209,16 +195,13 @@
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-3.8-flash-medium"
-      },
-      "opencode": {
-        "model": "zai-coding-plan/glm-5.3-flash#high"
+        "model": "gemini-4-argon",
+        "effort": "low"
       }
     },
     "t4": {
       "_fallback": [
         "codex",
-        "opencode",
         "agy",
         "claude"
       ],
@@ -228,19 +211,16 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "medium"
+        "effort": "high"
       },
       "agy": {
-        "model": "gemini-3.8-flash-low"
-      },
-      "opencode": {
-        "model": "zai-coding-plan/glm-5.3-flash#low"
+        "model": "gemini-3.8-flash",
+        "effort": "low"
       }
     },
     "t5": {
       "_fallback": [
         "codex",
-        "opencode",
         "agy",
         "claude"
       ],
@@ -250,13 +230,11 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "low"
+        "effort": "medium"
       },
       "agy": {
-        "model": "gemini-3.8-flash-low"
-      },
-      "opencode": {
-        "model": "zai-coding-plan/glm-5.3-flash#low"
+        "model": "gemini-3.8-flash",
+        "effort": "low"
       }
     }
   }

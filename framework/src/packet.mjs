@@ -129,6 +129,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
     const normalized = tasksById.get(task.id);
     const similar = task.owns?.length && [...groups.values()].find((g) => g.module === task.module && task.module && JSON.stringify(g.owns) === JSON.stringify(task.owns) && g.repo.path === (task.repo?.path ?? repo) && JSON.stringify(g.commands) === JSON.stringify(task.commands ?? commands ?? plan.commands));
     const key = task.package ?? similar?.id ?? task.id;
+    const workerTierVal = task.worker_tier ?? task.workerTier ?? plan.worker_tier ?? plan.workerTier;
     const pkg = groups.get(key) ?? {
       id: assertId(key), title: task.title ?? task.name ?? task.id, goal: task.goal ?? task.task ?? task.description ?? plan.goal ?? task.id,
       tasks: [], repo: { path: task.repo?.path ?? repo }, owns: task.owns ?? plan.owns ?? [],
@@ -137,6 +138,8 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
       acceptance_approved: plan.acceptance_approved === true, approved_by: plan.approved_by ?? "", approved_at: plan.approved_at ?? "",
       module: task.module,
       human_gates: [],
+      kind: task.kind ?? plan.kind ?? normalized?.kind ?? "code",
+      ...(workerTierVal ? { worker_tier: workerTierVal } : {}),
     };
     pkg.tasks.push(task.id);
     if (JSON.stringify(pkg.owns) !== JSON.stringify(task.owns ?? plan.owns ?? []) || pkg.repo.path !== (task.repo?.path ?? repo) || JSON.stringify(pkg.commands) !== JSON.stringify(task.commands ?? commands ?? plan.commands)) throw new Error(`${task.id}: incompatible package scope/repo/commands`);

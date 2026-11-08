@@ -54,7 +54,7 @@ test("ติดประตูครึ่งพอดี = ผ่าน · เ�
 
 test("normalize อ่านฟิลด์ของแผนโปรเจกต์และชื่อ role เดิม", () => {
   const [t] = normalizeDagTasks([{ id: "FE-006", owner: "fe", depends_on: ["BE-1"], gate_ids: ["G-UX"], status: "Pending", ac_ids: ["AC-1"] }]);
-  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, tier: null, oracle: false, ref: false, level: null, slices: [] });
+  assert.deepEqual(t, { id: "FE-006", role: "front", dependsOn: ["BE-1"], gated: true, status: "pending", acIds: ["AC-1"], risk: null, wave: null, tier: null, workerTier: null, kind: "code", contracts: [], oracle: false, ref: false, level: null, slices: [] });
   assert.equal(normalizeDagTasks([{ id: "X", role: "sys", gate_ids: [] }])[0].gated, false, "gate_ids ว่าง = ไม่ติดประตู");
 });
 
@@ -245,4 +245,24 @@ test("task high ของ sys/front ที่ตั้ง tier ต่ำกว�
   assert.deepEqual(r.errors, []);
   assert.doesNotMatch(verify(chain({ "BE-1": { risk: "high", tier: "t2" } })).warnings.join(), /tier ต่ำกว่า t2/);
   assert.doesNotMatch(verify(chain({ "BE-1": { risk: "high", tier: "t3", status: "verified", oracle: "R1", ref: "c1" } })).warnings.join(), /tier ต่ำกว่า t2/);
+});
+
+test("งาน docs สามารถใช้ worker_tier t4/t5 ได้อย่างอิสระโดยไม่เตือน weakHigh", () => {
+  const r = verify(chain({
+    DOC1: { role: "spec", kind: "docs", risk: "high", tier: "t1", worker_tier: "t4", ac_ids: ["AC-1"] },
+    DOC2: { role: "arch", kind: "docs", risk: "low", tier: "t2", worker_tier: "t5", ac_ids: ["AC-2"] },
+  }));
+  assert.doesNotMatch(r.warnings.join("\n"), /tier ต่ำกว่า t2/);
+});
+
+test("งาน code ที่ step-down worker_tier ต่ำกว่า plan tier ต้องมี contract หรือ oracle กำกับ", () => {
+  const noContract = verify(chain({
+    "BE-1": { role: "build", kind: "code", risk: "low", tier: "t2", worker_tier: "t3", ac_ids: ["AC-1"] }
+  }));
+  assert.match(noContract.warnings.join("\n"), /ลด worker_tier ต่ำกว่า tier โดยไม่มี contract/);
+
+  const withContract = verify(chain({
+    "BE-1": { role: "build", kind: "code", risk: "low", tier: "t2", worker_tier: "t3", ac_ids: ["AC-1"], contracts: [{ ref: "api.md" }] }
+  }));
+  assert.doesNotMatch(withContract.warnings.join("\n"), /ลด worker_tier ต่ำกว่า tier/);
 });

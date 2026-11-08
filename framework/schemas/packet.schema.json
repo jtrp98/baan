@@ -127,6 +127,17 @@
         "high"
       ]
     },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "code",
+        "docs"
+      ]
+    },
+    "worker_tier": {
+      "type": "string",
+      "pattern": "^t[0-5]$"
+    },
     "acceptance_approved": {
       "type": "boolean"
     },

@@ -15,6 +15,7 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 - ห้ามเห็นด้วยกับผู้ใช้เพียงเพราะผู้ใช้เป็นผู้ตัดสินใจ; หากมีข้อผิดพลาดหรือความเสี่ยงต้องแย้งด้วยหลักฐาน
 - อย่าถือว่าการเห็นตรงกันของหลาย Agent เป็นหลักฐาน; ห้าม Overengineer เพื่อแก้ปัญหาที่ยังไม่มีหลักฐาน
 - ไม่เปิด role อื่นหรือเรียก BAAN ซ้อนจาก execution role; หนึ่ง writer ต่อ repository รวม linked worktrees
+- ใบงาน/Packet ระบุประเภทงานด้วย `"kind": "code"` หรือ `"kind": "docs"`: งาน Docs อนุญาตให้ Worker ใช้ Tier ประหยัด (t4/t5) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate, เอกสารวิกฤตใช้ LLM Verifier); งาน Code ควบคุมด้วย Contract-Gated Risk Policy (งาน high risk ล็อค Worker t2 ขึ้นไป และลด tier ได้เฉพาะเมื่อมี contracts)
 
 ## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 

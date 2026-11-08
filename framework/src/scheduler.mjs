@@ -81,7 +81,7 @@ async function processPackage(run, p, cfg, options) {
         const lenses = verification(p, run.packages);
         if (lenses.length) {
           transition(run, p, "verifying");
-          const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && a !== "opencode" && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
+          const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
           p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, forceAgent: verifierAgent, context: { lenses } }));
           validateResult(p.verdict, "verifier", p);
           const reviewed = snapshot(p.repo.path);

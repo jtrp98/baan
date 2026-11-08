@@ -76,7 +76,7 @@ test("linked worktrees share one writer lock", (t) => {
   try { assert.throws(() => repoLock(root, linked), /LOCK_BUSY/); } finally { release(); }
 });
 test("fallback drops the prior provider session and never retries after edits or Git state changes", async (t) => {
-  const { root, repo } = fixture(t); const p = packet(repo, "A", { session: { agent: "codex", id: "codex-thread" } }); const run = runAt(root, [p]);
+  const { root, repo } = fixture(t); const p = packet(repo, "A", { session: { agent: "codex", id: "codex-thread" } }); const run = runAt(root, [p]); run.allowFallback = true;
   const agents = { agents: Object.fromEntries(["codex", "claude"].map((name) => [name, { command: name, promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" }])), tiers: { t5: { codex: {}, claude: {}, _fallback: ["codex", "claude"] } } };
   const tried = [];
   await callSession(run, p, "worker", agents, { runner: async (def, args) => {
