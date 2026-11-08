@@ -13,6 +13,7 @@ export const utilityFlags = ["help", "version", "init", "list", "commit", "index
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
   baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
+  baan update-clis
   baan attach <package> [--run <run>]
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
   baan sync [--all] [--pull-only] [--push] [--dry-run] [--no-self-update]

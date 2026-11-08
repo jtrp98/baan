@@ -31,8 +31,8 @@ test("_fallback ของทุก tier ต้องเป็นลำดับ 
   }
 });
 
-test("agy: t0/t1/t2 = gemini-4-argon · t3–t5 = flash", () => {
-  assert.ok(cfg.tiers.t0.agy?.model.startsWith("gemini-4-argon"));
+test("agy: t0 = null (รักษา tier scale) · t1/t2 = gemini-4-argon · t3–t5 = flash", () => {
+  assert.equal(cfg.tiers.t0.agy, null, "t0 agy ต้องเป็น null เพราะเพดาน argon-high อยู่ที่ t1 แล้ว");
   for (const tier of ["t1", "t2"]) {
     assert.match(cfg.tiers[tier].agy.model, /^gemini-4-argon/, `tier ${tier}: agy ต้องใช้ gemini-4-argon`);
   }

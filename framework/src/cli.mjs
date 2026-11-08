@@ -19,7 +19,7 @@ import { runParityCommand } from "./parity.mjs";
 import { runInteractiveCli } from "./runner.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
   const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree"]);
@@ -85,6 +85,11 @@ export async function cli(argv, options = {}) {
   const root = path.resolve(o.workspace || (configFile ? path.dirname(configFile) : process.cwd()));
   const cfg = options.cfg ?? loadAgentsConfig();
   if (utilityFlags.some((f) => o[f])) return utility(o, ws, cfg, root);
+
+  if (o.command === "update-clis") {
+    const { updateClis } = await import("./update-clis.mjs");
+    return updateClis();
+  }
 
   if (o.command === "parity") {
     const repo = o.cwd ? path.resolve(o.cwd) : root;

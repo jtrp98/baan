@@ -130,7 +130,6 @@
       "_timeoutSec": 3600,
       "_fallback": [
         "codex",
-        "agy",
         "claude"
       ],
       "claude": {
@@ -141,10 +140,7 @@
         "model": "gpt-6-astra",
         "effort": "max"
       },
-      "agy": {
-        "model": "gemini-4-argon",
-        "effort": "xhigh"
-      }
+      "agy": null
     },
     "t1": {
       "_fallback": [
