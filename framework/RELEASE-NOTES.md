@@ -2,6 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.32.0 — 2026-11-08 · แยกนโยบาย Tier Flow ระหว่าง Code/Docs, Hybrid Verification, และปรับสมดุลโมเดลใน agents.json
+
+### เพิ่ม
+
+- **แยกนโยบาย Tier Flow ระหว่างงาน Code และ Docs (`kind: "code" | "docs"`)**:
+  - เพิ่มฟิลด์ `kind: "code" | "docs"` ใน `schemas/packet.schema.json` เพื่อความชัดเจนและโปร่งใสในการจัดประเภทงาน
+  - เพิ่มฟิลด์ `worker_tier: "t0".."t5"` ให้สามารถระบุระดับโมเดลของ Worker ได้อิสระ
+  - เพิ่มคู่มือ [MIGRATION.md](MIGRATION.md) แนะนำการกำหนด kind และการปรับปรุงแผนงานเดิม
+- **Docs Hierarchical Flow & Hybrid Verification**:
+  - งานเอกสารทั่วไป (`kind: "docs"`) อนุญาตให้ Worker ใช้ Tier ประหยัด (`t4`/`t5`) และข้าม LLM Verifier เพื่อประหยัด Token และเวลา โดยตรวจรับผ่าน `baan --lint-knowledge` + มนุษย์เซ็นอนุมัติ (`decide --approve`)
+  - เอกสารระดับวิกฤต (ADR, Contracts สัญญาร่วม, Security, Risk High) ยังคงมี LLM Verifier ค่ายคู่ขนานเข้าตรวจทานเนื้อหาเชิงลึก
+- **Code Contract-Gated Step-down**:
+  - งานพัฒนาโค้ด (`kind: "code"`) ควบคุมด้วยความเสี่ยง: งาน `risk: high` ล็อค Worker ไว้ที่ Tier 2 ขึ้นไปเสมอเพื่อป้องกัน Rework Penalty
+  - งานทั่วไปอนุญาตให้ Worker Step-down ลดระดับ Tier ได้ (เช่น `Plan t2 -> Work t3`) เฉพาะเมื่อมี `contracts` หรือสเปกที่ pin ชัดเจนกำกับไว้
+- **ปรับสมดุล Coding Intelligence Index ใน `agents.json`**:
+  - ขยับ `agy t3` เป็น `gemini-4-argon / low` เพื่อรักษาคะแนน fallback ให้เกาะกลุ่มกับ Sonnet High และ Terra
+  - ปรับ `codex t4/t5` เป็น `luna / high` และ `medium` ตามลำดับ เพื่อความต่อเนื่องของขั้นบันได
+  - กำหนด `agy t0 = null` เพื่อรักษา tier scale
+- **Native Harness Preservation และระบบอัปเดต CLI**:
+  - ปรับ runner ให้รักษา native CLI capabilities และเพิ่มระบบตรวจสอบ/อัปเดต CLI อัตโนมัติ (`npm run update:clis`)
+
+### ปรับปรุงและแก้ไข
+
+- ปรับ `lintPlanVerification` ให้ตรวจสอบความสอดคล้องของ `worker_tier` ตามประเภทงาน Code และ Docs
+- ขยายชุดทดสอบครอบคลุมการตรวจสอบ Code vs Docs Tier Resolution และ Hybrid Verification (186 tests ผ่าน 100%)
+
 ## 0.31.0 — 2026-11-07 · ระบบสำรวจ Project Drift, Multi-Workspace Sync, แม่แบบ Folder-First และ Linter Knowledge
 
 ### เพิ่ม

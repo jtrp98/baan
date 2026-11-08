@@ -4,7 +4,7 @@ Local npm package สำหรับควบคุมงานพัฒนา�
 Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
 Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-สิ่งที่เปลี่ยนใน **0.30.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
+สิ่งที่เปลี่ยนใน **0.32.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
 
 ## ติดตั้งและตั้งค่า
 
@@ -32,7 +32,7 @@ baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
 4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
 5. รีเฟรช `knowledge-index.json` อัตโนมัติ
 
-หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.30.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
+หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.32.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
 `--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)
 อัปเดตเฉพาะไฟล์ที่ BAAN สร้างไว้ ไม่ทับไฟล์ของผู้ใช้; รันซ้ำหลังอัปเกรดได้
 แก้ paths/targets ใน config ให้ตรงเครื่อง ตัวอย่างอยู่ [baan.example.json](baan.example.json)
@@ -110,7 +110,7 @@ Acceptance approval ไม่เซ็นประตูอื่นแทน �
 
 ระบุ `"kind": "code" | "docs"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
 - งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
-- งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [docs/migration-task-kind.md](docs/migration-task-kind.md)
+- งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
 
 งานใหม่ใช้ `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
 Core ใช้ข้อความ goal เป็น acceptance เริ่มต้นให้รอยืนยัน; กำหนดข้อความ/source เองด้วย `--acceptance`/`--source`

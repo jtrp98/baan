@@ -1,6 +1,6 @@
 {
   "name": "baan",
-  "version": "0.31.0",
+  "version": "0.32.0",
   "description": "BAAN: Planner, Senior Worker, Verifier และทีม UX/UI พร้อม core จัดคิวและเก็บหลักฐาน",
   "type": "module",
   "bin": {
@@ -17,7 +17,7 @@
     "skills/",
     "templates/",
     "ux-knowledge/",
-    "docs/",
+    "MIGRATION.md",
     "agents.json",
     "baan.example.json",
     "local.example.json",
