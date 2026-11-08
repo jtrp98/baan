@@ -40,7 +40,8 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.init) return performInit(root, TEAM_DIR, () => {}, { knowledgeGit: o["knowledge-git"], memoryGit: o["memory-git"] });
   if (o.sync) {
     const local = loadLocalConfig(TEAM_DIR);
-    if (o.all || (!ws?.source && local.workspaces.length > 0)) {
+    const shouldSyncAll = Boolean(o.all || (!ws?.source && local.workspaces.length > 0) || (local.auto_update && local.workspaces.length > 0 && !o.workspace));
+    if (shouldSyncAll) {
       return syncAllWorkspaces(local, TEAM_DIR, {
         push: !o["pull-only"] && (o.push || true),
         pullOnly: Boolean(o["pull-only"]),
