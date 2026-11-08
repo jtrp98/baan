@@ -31,12 +31,12 @@ test("_fallback ของทุก tier ต้องเป็นลำดับ 
   }
 });
 
-test("agy: t0 = null (รักษา tier scale) · t1/t2 = gemini-4-argon · t3–t5 = flash", () => {
+test("agy: t0 = null (รักษา tier scale) · t1–t3 = gemini-4-argon · t4–t5 = flash", () => {
   assert.equal(cfg.tiers.t0.agy, null, "t0 agy ต้องเป็น null เพราะเพดาน argon-high อยู่ที่ t1 แล้ว");
-  for (const tier of ["t1", "t2"]) {
+  for (const tier of ["t1", "t2", "t3"]) {
     assert.match(cfg.tiers[tier].agy.model, /^gemini-4-argon/, `tier ${tier}: agy ต้องใช้ gemini-4-argon`);
   }
-  for (const tier of ["t3", "t4", "t5"]) {
+  for (const tier of ["t4", "t5"]) {
     assert.match(cfg.tiers[tier].agy.model, /^gemini-3\.8-flash/, `tier ${tier}: agy คงเป็น flash`);
   }
 });

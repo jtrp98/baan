@@ -195,8 +195,8 @@
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-3.8-flash",
-        "effort": "medium"
+        "model": "gemini-4-argon",
+        "effort": "low"
       }
     },
     "t4": {
@@ -211,7 +211,7 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "medium"
+        "effort": "high"
       },
       "agy": {
         "model": "gemini-3.8-flash",
@@ -230,7 +230,7 @@
       },
       "codex": {
         "model": "gpt-6-luna",
-        "effort": "low"
+        "effort": "medium"
       },
       "agy": {
         "model": "gemini-3.8-flash",
