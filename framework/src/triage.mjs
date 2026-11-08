@@ -4,6 +4,10 @@ export const needsPlanning = (p) => !!p.needs_planning || !!p.contracts?.length 
 
 export function verification(p, packages = []) {
   const text = [p.goal, p.title, ...(p.risk_tags ?? [])].join(" ");
+  if (p.kind === "docs") {
+    const isCritical = p.risk === "high" || (p.contracts?.length ?? 0) > 0 || /adr|contract|security|auth|pii|password|token|สิทธิ์|สัญญาร่วม|สถาปัตยกรรม|database|schema/i.test(text);
+    return isCritical ? ["acceptance"] : [];
+  }
   const lenses = new Set();
   if (/auth|security|pii|password|token|สิทธิ์|ข้อมูลส่วนบุคคล/i.test(text)) lenses.add("security");
   if (/schema|migration|database|ฐานข้อมูล/i.test(text)) lenses.add("db");

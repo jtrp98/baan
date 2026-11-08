@@ -17,6 +17,7 @@
     "skills/",
     "templates/",
     "ux-knowledge/",
+    "docs/",
     "agents.json",
     "baan.example.json",
     "local.example.json",

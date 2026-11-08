@@ -7,6 +7,12 @@ import { resolveRoleName } from "./config.mjs";
 const TEST_LEVELS = ["normal", "full"];
 const IMPLEMENT_ROLES = ["front", "sys", "build"];
 
+export const TIER_LEVELS = { t0: 0, t1: 1, t2: 2, t3: 3, t4: 4, t5: 5 };
+export function isTierLower(a, b) {
+  if (!a || !b) return false;
+  return (TIER_LEVELS[a] ?? 99) > (TIER_LEVELS[b] ?? 99);
+}
+
 const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
 
 export function fallbackChainFor(cfg, tierName, chosenAgent) {
@@ -90,6 +96,9 @@ export function normalizeDagTasks(tasks) {
     risk: typeof t.risk === "string" ? t.risk.trim().toLowerCase() : (t.risk ?? null),
     wave: t.wave ?? null,
     tier: typeof t.tier === "string" ? t.tier.trim().toLowerCase() : null,
+    workerTier: typeof (t.worker_tier ?? t.workerTier) === "string" ? (t.worker_tier ?? t.workerTier).trim().toLowerCase() : null,
+    kind: typeof t.kind === "string" ? t.kind.trim().toLowerCase() : (IMPLEMENT_ROLES.includes(resolveRoleName(t.role ?? t.owner)) ? "code" : "docs"),
+    contracts: Array.isArray(t.contracts) ? t.contracts : [],
     oracle: nonEmpty(t.oracle),
     ref: nonEmpty(t.ref),
     level: level(t),
@@ -163,8 +172,10 @@ export function lintPlanVerification(tasks) {
   if (qaDependencies.length) warnings.push(`งานพัฒนาที่รอ QA ${qaDependencies.length} งาน — ทบทวน dependency: ถ้าใช้สัญญาตรึง + fake ได้ ให้แยกงานเชื่อมจริงไว้รอ verdict แล้วเดินงานพัฒนาต่อ; ห้ามข้ามการตรวจสิทธิ์จริง: ${listIds(qaDependencies)}`);
   const builtEarly = tasks.filter((t) => ["done-local", "verified"].includes(deriveTaskStatus(t)) && t.dependsOn.some(unchecked));
   if (builtEarly.length) warnings.push(`งานที่ต่อยอดจาก task high ที่ยังไม่ผ่านการตรวจ ${builtEarly.length} งาน — แยกงานพัฒนาบนสัญญา + fake ออกจากงานเชื่อมจริง และเก็บ QA ค้าง; งานที่ต้องใช้พฤติกรรมจริงยังต้องรอ verdict: ${labels(builtEarly.map((t) => `${t.id}←${t.dependsOn.filter(unchecked).join("+")}`))}`);
-  const weakHigh = open.filter((t) => t.risk === "high" && ["sys", "front"].includes(t.role) && /^t[3-5]$/.test(t.tier ?? ""));
-  if (weakHigh.length) warnings.push(`task high ที่ writer ใช้ tier ต่ำกว่า t2 ${weakHigh.length} งาน — ตกหนึ่งรอบเสีย writer + check บนคิวเดียว ตั้ง t2 ขึ้นไป: ${labels(weakHigh.map((t) => `${t.id}@${t.tier}`))}`);
+  const weakHigh = open.filter((t) => t.risk === "high" && (t.kind === "code" || IMPLEMENT_ROLES.includes(t.role)) && /^t[3-5]$/.test(t.workerTier ?? t.tier ?? ""));
+  if (weakHigh.length) warnings.push(`task high ที่ writer ใช้ tier ต่ำกว่า t2 ${weakHigh.length} งาน — ตกหนึ่งรอบเสีย writer + check บนคิวเดียว ตั้ง t2 ขึ้นไป: ${labels(weakHigh.map((t) => `${t.id}@${t.workerTier ?? t.tier}`))}`);
+  const uncontractedStepDown = open.filter((t) => (t.kind === "code" || IMPLEMENT_ROLES.includes(t.role)) && isTierLower(t.workerTier, t.tier) && !t.oracle && !t.ref && (!t.contracts || !t.contracts.length));
+  if (uncontractedStepDown.length) warnings.push(`task code ที่ลด worker_tier ต่ำกว่า tier โดยไม่มี contract/oracle/ref สเปกรองรับ ${uncontractedStepDown.length} งาน: ${labels(uncontractedStepDown.map((t) => `${t.id}(${t.tier}→${t.workerTier})`))}`);
   const waveSizes = new Map();
   for (const t of tasks) if (isWave(t.wave)) waveSizes.set(t.wave, (waveSizes.get(t.wave) ?? 0) + 1);
   const bigWaves = [...waveSizes].filter(([, n]) => n > 6).sort(([a], [b]) => a - b);

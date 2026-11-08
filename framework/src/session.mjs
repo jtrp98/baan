@@ -5,7 +5,7 @@ import path from "node:path";
 import { homedir } from "node:os";
 import { TEAM_DIR, collectWorkspaceAddDirs } from "./config.mjs";
 import { runCli } from "./runner.mjs";
-import { extractJson, fallbackChainFor } from "./plan.mjs";
+import { extractJson, fallbackChainFor, isTierLower } from "./plan.mjs";
 import { schemaFor, validateResult } from "./packet.mjs";
 import { save, event, persist } from "./store.mjs";
 import { roleSessionHeader } from "./role-guard.mjs";
@@ -80,8 +80,31 @@ function recordParity(runDir, parity) {
   } catch {}
 }
 
+export function resolveWorkerTier(run, p) {
+  const baseTier = p?.tier || run.tier;
+  const explicit = p?.worker_tier ?? p?.workerTier;
+  if (explicit) {
+    if (p.kind === "code" && p.risk === "high" && /^t[3-5]$/.test(explicit)) {
+      return "t2";
+    }
+    if (p.kind === "code" && isTierLower(explicit, baseTier)) {
+      const hasContract = (p.contracts?.length > 0) || (p.read_first?.some((r) => r.pin));
+      if (!hasContract) return baseTier;
+    }
+    return explicit;
+  }
+  if (p?.kind === "docs") {
+    const text = [p?.goal, p?.title, ...(p?.risk_tags ?? [])].join(" ");
+    const isCritical = (p.contracts?.length > 0) || p.risk === "high" || /adr|contract|security|auth|pii|password|token|สิทธิ์|สัญญาร่วม|สถาปัตยกรรม|database|schema/i.test(text);
+    if (!isCritical && /^t[0-3]$/.test(baseTier)) {
+      return "t4";
+    }
+  }
+  return baseTier;
+}
+
 export async function callSession(run, p, role, cfg, { runner = runCli, signal, context = {}, forceAgent, attempted = [] } = {}) {
-  const tier = role === "planner" ? run.plannerTier : run.tier;
+  const tier = role === "planner" ? run.plannerTier : role === "worker" ? resolveWorkerTier(run, p) : run.tier;
   if (!["worker", "planner", "verifier"].includes(role)) throw new Error(`unknown execution role: ${role}`);
   const choices = fallbackChainFor(cfg, tier, forceAgent ?? run.agent).filter((a) => !attempted.includes(a));
   const agent = p.session?.agent && choices.includes(p.session.agent) && role === "worker" ? p.session.agent : choices[0];

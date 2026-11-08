@@ -8,7 +8,7 @@ import { repoLock } from "../src/repolock.mjs";
 import { cli, decide } from "../src/cli.mjs";
 import { fromPlan, validatePacket, schemaFor } from "../src/packet.mjs";
 import { schedule } from "../src/scheduler.mjs";
-import { callSession } from "../src/session.mjs";
+import { callSession, resolveWorkerTier } from "../src/session.mjs";
 import { evidence, counts, testNames } from "../src/gate.mjs";
 import { persist, loadRun, save } from "../src/store.mjs";
 import { verification } from "../src/triage.mjs";
@@ -280,4 +280,35 @@ test("engine legacy grouping preserves task dependencies and does not extend inp
   assert.deepEqual(packages.map((p) => [p.id, p.tasks, p.depends_on]), [["A", ["T1", "T2"], []], ["B", ["T3"], ["A"]]]);
   assert.deepEqual(packages[0].read_first, [{ path: "first.md" }, { path: "second.md" }]);
   assert.deepEqual(plan, original);
+});
+
+test("engine docs hybrid verification skips LLM verifier for routine docs but requires it for critical docs", (t) => {
+  const { repo } = fixture(t);
+  const routineDocs = { ...packet(repo, "DOC-1"), kind: "docs", goal: "สรุปข้อมูลการประชุม", risk: "low" };
+  assert.deepEqual(verification(routineDocs, [routineDocs]), []);
+
+  const criticalDocs = { ...packet(repo, "DOC-2"), kind: "docs", goal: "ออกแบบ ADR Architecture และ DB Schema", risk: "high" };
+  assert.deepEqual(verification(criticalDocs, [criticalDocs]), ["acceptance"]);
+
+  const contractDocs = { ...packet(repo, "DOC-3"), kind: "docs", goal: "เขียนสัญญา API", risk: "low", contracts: [{ ref: "api.md" }] };
+  assert.deepEqual(verification(contractDocs, [contractDocs]), ["acceptance"]);
+});
+
+test("engine resolveWorkerTier respects code vs docs tier rules", () => {
+  const run = { tier: "t2", plannerTier: "t2" };
+  
+  // Docs routine defaults to t4
+  assert.equal(resolveWorkerTier(run, { kind: "docs", goal: "summary", risk: "low" }), "t4");
+
+  // Docs with explicit worker_tier
+  assert.equal(resolveWorkerTier(run, { kind: "docs", worker_tier: "t5", risk: "low" }), "t5");
+
+  // Code high risk cannot step-down below t2
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t3" }), "t2");
+
+  // Code low risk without contracts cannot step-down
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3" }), "t2");
+
+  // Code low risk with contracts allows step-down
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3", contracts: [{ ref: "api.md" }] }), "t3");
 });

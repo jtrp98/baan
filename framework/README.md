@@ -71,6 +71,7 @@ BAAN ยึดหลัก **Native First, Orchestrate Outside, Preserve Inside*
   "id": "WP-1",
   "title": "แก้ผลรวม",
   "goal": "คำนวณยอดรวมตาม requirement",
+  "kind": "code",
   "tasks": ["TASK-1"],
   "repo": {"path": "C:/src/project"},
   "owns": ["src/total.mjs", "tests/total.test.mjs"],
@@ -106,6 +107,10 @@ implementation files ที่อ่านเป็น context ไม่ทำ�
 บันทึกแยกด้วย `baan decide WP-1 --run <run-dir> --gate G-UX --by user --decision "..." --source "..."`
 Acceptance approval ไม่เซ็นประตูอื่นแทน ถ้า approval stale ต้องใช้ `--approve` อีกครั้ง; คำตอบทั่วไปไม่ refresh approval
 งานค้างที่ทับ owns ต้องให้คนยืนยันด้วย `--allow-dirty --by user` พร้อม decision/source
+
+ระบุ `"kind": "code" | "docs"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
+- งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
+- งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [docs/migration-task-kind.md](docs/migration-task-kind.md)
 
 งานใหม่ใช้ `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
 Core ใช้ข้อความ goal เป็น acceptance เริ่มต้นให้รอยืนยัน; กำหนดข้อความ/source เองด้วย `--acceptance`/`--source`
