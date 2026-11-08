@@ -1,5 +1,7 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+
+const STALE_ACTIVE_MS = 10 * 60 * 1000;
 
 export function readJsonSafe(file) {
   try {
@@ -41,6 +43,12 @@ export function scanActiveRuns(workspaceRoot) {
       }
 
       if (activePackages.length) {
+        const now = Date.now();
+        for (const act of activePackages) {
+          const t = Date.parse(act.updatedAt ?? "");
+          // A killed process can leave its active file behind; flag it instead of hiding or trusting it.
+          if (Number.isFinite(t) && now - t > STALE_ACTIVE_MS) act.stale = true;
+        }
         const primary = activePackages[0];
         activeRuns.push({
           runId: name,
@@ -48,8 +56,9 @@ export function scanActiveRuns(workspaceRoot) {
           title: primary.title ?? name,
           repoName: primary.repoName ?? (runJson.packages?.[0]?.repo?.path ? path.basename(runJson.packages[0].repo.path) : "unknown"),
           repoPath: primary.repoPath ?? runJson.packages?.[0]?.repo?.path ?? "",
-          role: primary.role ?? "worker",
-          agent: primary.agent ?? runJson.agent ?? "claude",
+          // Missing identity stays null so the UI reports UNKNOWN rather than guessing an assignment.
+          role: primary.role ?? null,
+          agent: primary.agent ?? runJson.agent ?? null,
           tier: primary.tier ?? runJson.tier ?? "t2",
           activePackages,
           runInfo: {
@@ -225,8 +234,39 @@ export function getRecentRuns(workspaceRoot, limit = 15) {
       totalPackages: run.packages?.length ?? 0,
       completedPackages: run.packages?.filter((p) => p.state === "done").length ?? 0,
       isDone,
+      packageStates: (run.packages ?? []).map((p) => ({ id: p.id, title: p.title ?? "", state: p.state ?? null, failureClass: p.failureClass ?? null })),
     });
   }
 
   return list;
+}
+
+// Only call_end from recently touched runs: the browser uses these to play a finish/error reaction
+// for a session it just watched disappear, never to replay history.
+export function getRecentCallEnds(workspaceRoot, { limit = 20, withinMs = 60 * 60 * 1000 } = {}) {
+  const runsDir = path.join(workspaceRoot, ".baan", "runs");
+  if (!existsSync(runsDir)) return [];
+  let entries = [];
+  try {
+    entries = readdirSync(runsDir);
+  } catch {
+    return [];
+  }
+  const cutoff = Date.now() - withinMs;
+  const out = [];
+  for (const name of entries) {
+    const ledgerFile = path.join(runsDir, name, "ledger.jsonl");
+    try {
+      if (statSync(ledgerFile).mtimeMs < cutoff) continue;
+      for (const line of readFileSync(ledgerFile, "utf8").split(/\r?\n/)) {
+        if (!line.includes('"call_end"')) continue;
+        let ev;
+        try { ev = JSON.parse(line); } catch { continue; }
+        const at = Date.parse(ev.at ?? "");
+        if (ev.type !== "call_end" || !Number.isFinite(at) || at < cutoff) continue;
+        out.push({ at: ev.at, runId: name, package: ev.package ?? null, role: ev.role ?? null, agent: ev.agent ?? null, ok: ev.ok === true });
+      }
+    } catch {}
+  }
+  return out.sort((a, b) => String(a.at).localeCompare(String(b.at))).slice(-limit);
 }

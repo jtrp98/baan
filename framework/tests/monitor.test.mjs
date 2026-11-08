@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import http from "node:http";
-import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns } from "../src/usage-aggregator.mjs";
+import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "../src/usage-aggregator.mjs";
 import { formatNumber, formatCost, renderTui, startMonitor } from "../src/monitor.mjs";
 import { parse } from "../src/cli.mjs";
 
@@ -189,4 +189,38 @@ test("monitor: HTTP server responds with HTML, stats, and stream endpoints", asy
   assert.equal(runsRes.statusCode, 200);
   const runs = JSON.parse(runsRes.body);
   assert.equal(runs.length, 2);
+  assert.equal(runs[0].packageStates[0].state, "running");
+
+  assert.ok(Array.isArray(stats.recentCallEnds));
+  assert.ok("agentsEnabled" in stats);
+
+  for (const f of ["app.js", "telemetry.js", "world.js", "pixel.css"]) {
+    const r = await fetchGet(`/ui/${f}`);
+    assert.equal(r.statusCode, 200, f);
+  }
+  assert.match((await fetchGet("/ui/app.js")).headers["content-type"], /javascript/);
+  for (const bad of ["/ui/../package.json", "/ui/..%2Fmonitor.mjs", "/ui/index.html", "/ui/", "/ui/nope.js"]) {
+    assert.equal((await fetchGet(bad)).statusCode, 404, bad);
+  }
+});
+
+test("monitor: recent call_end events and missing identity are reported truthfully", (t) => {
+  const { root, cleanup } = makeFixture();
+  t.after(cleanup);
+  const runDir = path.join(root, ".baan", "runs", "2026-11-08T10-10-00-run2");
+  const now = new Date().toISOString();
+  writeFileSync(path.join(runDir, "ledger.jsonl"), JSON.stringify({ at: now, type: "call_end", package: "WP-2", role: "planner", agent: "claude", ok: false }) + "\n");
+  writeFileSync(path.join(runDir, "active-WP-2.json"), JSON.stringify({ runId: "run2", packageId: "WP-2", title: "x", repoName: "sb-api-gateway", updatedAt: "2020-01-01T00:00:00.000Z" }));
+
+  const ends = getRecentCallEnds(root);
+  assert.equal(ends.length, 1);
+  assert.deepEqual([ends[0].role, ends[0].agent, ends[0].ok, ends[0].runId], ["planner", "claude", false, "2026-11-08T10-10-00-run2"]);
+
+  const [active] = scanActiveRuns(root);
+  assert.equal(active.role, null, "no fabricated role");
+  assert.equal(active.agent, null, "no fabricated provider");
+  assert.equal(active.activePackages[0].stale, true);
+
+  const tui = renderTui({ workspaceName: "w", activeRuns: [active], usage: { agents: {}, total: {} } });
+  assert.match(tui, /Role: .*unknown/);
 });
