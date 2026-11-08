@@ -16,7 +16,8 @@
   "defaults": {
     "agent": "codex",
     "planner_tier": "t2",
-    "timeout_sec": 1800,
-    "max_parallel": 3
+    "timeout_sec": 0,
+    "max_parallel": 3,
+    "permission_policy": "native-safe"
   }
 }

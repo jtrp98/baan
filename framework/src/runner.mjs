@@ -27,7 +27,7 @@ export function buildArgs(def, model, effort, write, answerFile, workspaceRoot =
   return [
     ...(model && def.modelArgs ? fill(def.modelArgs) : []),
     ...(effort && def.effortArgs ? fill(def.effortArgs) : []),
-    ...(!write && workspaceRoot && def.workspaceDirArgs ? fill(def.workspaceDirArgs) : []),
+    ...(workspaceRoot && def.workspaceDirArgs ? fill(def.workspaceDirArgs) : []),
     ...main,
   ];
 }
@@ -128,14 +128,20 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
     let timedOut = false;
     let idle = false;
     let settled = false;
-    const timer = setTimeout(() => { timedOut = true; killTree(child); }, timeoutSec * 1000);
+
+    // timeoutSec === 0 means unlimited execution time (never timeout by timer).
+    const timer = timeoutSec > 0 ? setTimeout(() => { timedOut = true; killTree(child); }, timeoutSec * 1000) : null;
     let idleTimer = null;
     const armIdle = () => {
-      if (!idleTimeoutSec) return;
-      clearTimeout(idleTimer);
+      if (!idleTimeoutSec || idleTimeoutSec <= 0) return;
+      if (idleTimer) clearTimeout(idleTimer);
       idleTimer = setTimeout(() => { timedOut = true; idle = true; killTree(child); }, idleTimeoutSec * 1000);
     };
-    const stopTimers = () => { clearTimeout(timer); clearTimeout(idleTimer); signal?.removeEventListener("abort", abort); };
+    const stopTimers = () => {
+      if (timer) clearTimeout(timer);
+      if (idleTimer) clearTimeout(idleTimer);
+      signal?.removeEventListener("abort", abort);
+    };
     armIdle();
 
     child.stdout.on("data", (d) => { stdout += d; armIdle(); onStdout?.(d.toString()); });
@@ -166,5 +172,59 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
     } else {
       child.stdin?.end();
     }
+  });
+}
+
+// Mode A: Native interactive session running directly in user's terminal with standard TTY inheritance.
+export function runInteractiveCli(command, args, cwd, env = {}) {
+  const started = Date.now();
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      stdio: "inherit",
+      windowsHide: false,
+      env: { ...process.env, ...env },
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      resolve({
+        ok: code === 0,
+        exitCode: code,
+        durationMs: Date.now() - started,
+      });
+    });
+  });
+}
+
+// Bidirectional protocol session runner (for Approval Bridge on stdio / NDJSON).
+export function runProtocolSession(def, args, cwd, { signal, onMessage, env = {} } = {}) {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    const child = spawn(def.command, args, { cwd, windowsHide: true, env: { ...process.env, ...env } });
+    const abort = () => killTree(child);
+    signal?.addEventListener("abort", abort, { once: true });
+
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+
+    child.stdout.on("data", (d) => {
+      const text = d.toString();
+      stdout += text;
+      onMessage?.(text, (reply) => {
+        try { child.stdin.write(reply); } catch {}
+      });
+    });
+    child.stderr.on("data", (d) => { stderr += d; });
+    child.on("error", (err) => {
+      if (settled) return;
+      settled = true;
+      resolve({ ok: false, exitCode: null, durationMs: Date.now() - started, stdout, stderr, error: err.message });
+    });
+    child.on("close", (code) => {
+      if (settled) return;
+      settled = true;
+      resolve({ ok: code === 0, exitCode: code, durationMs: Date.now() - started, stdout, stderr, error: stderr });
+    });
   });
 }

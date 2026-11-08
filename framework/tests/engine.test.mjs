@@ -251,10 +251,10 @@ test("engine session summaries preserve evidence paths and rework context withou
 test("engine native providers receive schemas once; other providers retain inline schemas and validation", async (t) => {
   const { root, repo } = fixture(t);
   const schema = schemaFor("worker.result");
-  for (const agent of ["codex", "claude", "agy", "opencode"]) {
+  for (const agent of ["codex", "claude", "agy", "custom-fixture"]) {
     const p = packet(repo), run = runAt(root, [p]); run.agent = agent;
     const agents = { agents: { [agent]: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { [agent]: {} } } };
-    const native = agent !== "opencode";
+    const native = ["codex", "claude", "agy"].includes(agent);
     const runner = async (def, args, via, prompt) => {
       assert.equal(prompt.includes(JSON.stringify(schema)), !native);
       if (native) {

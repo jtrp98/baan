@@ -29,7 +29,7 @@ for (const agent of opts.agents) {
   git("add", "."); git("commit", "-qm", "synthetic fixture");
   const head = git("rev-parse", "HEAD");
   const packet = { id: "SMOKE", title: "copy fixture nonce", goal: "Read secret.txt and export its exact text as value in value.mjs. Run the supplied checks.", tasks: [], repo: { path: repo }, owns: ["value.mjs"], read_first: [{ path: "secret.txt" }],
-    acceptance: [{ id: "AC-1", text: "value equals the nonce in secret.txt", source: "synthetic live fixture" }], depends_on: [], risk: agent === "opencode" ? "low" : "high",
+    acceptance: [{ id: "AC-1", text: "value equals the nonce in secret.txt", source: "synthetic live fixture" }], depends_on: [], risk: "high",
     commands: { build: "node --check value.mjs", test_targeted: "node --test value.test.mjs", test_full: "node --test value.test.mjs" } };
   const file = path.join(root, `${agent}.json`); writeFileSync(file, JSON.stringify(packet));
   const cfg = { agents: { [agent]: config.agents[agent] }, tiers: Object.fromEntries(Object.entries(config.tiers).map(([tier, row]) => [tier, { [agent]: row[agent], _fallback: [agent] }])) };
@@ -41,7 +41,7 @@ for (const agent of opts.agents) {
     git("diff", "--exit-code", "--", "secret.txt", "value.test.mjs");
     assert.equal(git("rev-parse", "HEAD"), head);
     assert.ok(readFileSync(path.join(repo, "value.mjs"), "utf8").includes(nonce));
-    results.push({ agent, ok: true, dir: result.dir, readonlyVerifier: agent !== "opencode" });
+    results.push({ agent, ok: true, dir: result.dir, readonlyVerifier: true });
   } catch (error) { results.push({ agent, ok: false, error: error.message }); }
 }
 console.log(JSON.stringify({ root, results }, null, 2));

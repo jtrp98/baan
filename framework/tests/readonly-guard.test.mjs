@@ -20,7 +20,7 @@ test("read-only guard denies shell/script evaluation, write/network/unknown tool
   for (const input of ["{", "null", "{}", '{"toolCall":{}}']) assert.equal(check(input), "deny");
 });
 test("read-only guard permits only file inspection and does not change worker/standalone permissions", () => {
-  for (const name of ["view_file", "grep_search", "find_by_name", "list_dir"]) assert.equal(check(JSON.stringify({ toolCall: { name } })), "allow");
+  for (const name of ["view_file", "grep_search", "find_by_name", "list_dir", "read_file", "invoke_subagent"]) assert.equal(check(JSON.stringify({ toolCall: { name } })), "allow");
   assert.equal(check('{"toolCall":{"name":"run_command"}}', "0"), "allow");
 });
 test("agy read-only setup must match shipped profile, guard and all-tool hook before dispatch", (t) => {

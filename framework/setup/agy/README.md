@@ -3,7 +3,7 @@
 Planner/Verifier ใช้ `agy --agent baan-readonly --print` ผ่าน core; Worker ใช้ write mode หลัง approval
 อัปเกรดเป็น 0.29.0 ต้องติดตั้ง profile/guard และอัปเดต hook ใหม่ เพราะชุดเดิมยังอนุญาต terminal
 
-Profile ใหม่นี้มีเฉพาะ view_file/grep_search/find_by_name/list_dir ไม่มี terminal, scripts, network หรือ write tools
+Profile ใหม่นี้มีเฉพาะ view_file/grep_search/find_by_name/list_dir/read_file และ invoke_subagent สำหรับส่ง subagent ตรวจงานขนานกัน ไม่มี terminal, scripts, network หรือ write tools
 Core สร้าง diff_file, snapshots_file และ command logs ให้ Verifier อ่าน ไม่ต้องรัน git/test เอง
 Guard ตรวจ `BAAN_READONLY=1` ที่ runner ตั้งให้ read-only call แล้วปฏิเสธ tool อื่นและ input ที่ parse ไม่ได้
 Worker ได้ `BAAN_READONLY=0`; standalone agy session ที่ไม่ได้เปิดผ่าน core ใช้ permissions ของตัวเอง

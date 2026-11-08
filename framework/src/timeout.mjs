@@ -1,6 +1,7 @@
 export const DEFAULT_TIMEOUT_SEC = 1800;
 
-export function validateTimeout(value, label = "--timeout") {
+export function validateTimeout(value, label = "--timeout", allowZero = false) {
+  if (allowZero && value === 0) return 0;
   if (!Number.isInteger(value) || value < 1 || value > 86400) {
     throw new Error(`${label} ต้องเป็นจำนวนเต็ม 1–86400 วินาที (ได้: ${value})`);
   }

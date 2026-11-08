@@ -84,8 +84,29 @@ export function loadWorkspace(configPath = null) {
       planner_tier: raw.defaults?.planner_tier ?? "t2",
       timeout_sec: Object.hasOwn(raw.defaults ?? {}, "timeout_sec") ? raw.defaults.timeout_sec : DEFAULT_TIMEOUT_SEC,
       max_parallel: raw.defaults?.max_parallel ?? 3,
+      permission_policy: raw.defaults?.permission_policy ?? "native-safe",
+      execution_mode: raw.defaults?.execution_mode ?? "headless",
+      allow_fallback: Boolean(raw.defaults?.allow_fallback),
+      worktree: Boolean(raw.defaults?.worktree),
+      model: raw.defaults?.model ?? null,
+      effort: raw.defaults?.effort ?? null,
+      providers: raw.defaults?.providers ?? {},
     },
   };
+}
+
+export function collectWorkspaceAddDirs(ws, p = null, workspaceRoot = "") {
+  const dirs = new Set();
+  if (workspaceRoot) dirs.add(path.resolve(workspaceRoot));
+  if (ws?.knowledge_roots) {
+    for (const kr of ws.knowledge_roots) {
+      if (kr.path) dirs.add(path.resolve(kr.path));
+      const mem = memoryRootOf(kr);
+      if (mem) dirs.add(path.resolve(mem));
+    }
+  }
+  if (p?.repo?.path) dirs.add(path.resolve(p.repo.path));
+  return Array.from(dirs);
 }
 
 export function memoryRootOf(kr) {

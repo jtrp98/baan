@@ -6,6 +6,8 @@ tools:
   - grep_search
   - find_by_name
   - list_dir
+  - read_file
+  - invoke_subagent
 ---
 Read files only. No terminal, scripts, network, task management or file-writing tools.
 Read machine-generated diff_file and evidence logs supplied by core; inspect changed/new files directly.

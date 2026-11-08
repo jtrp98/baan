@@ -12,6 +12,8 @@ import { surveyProject } from "./survey.mjs";
 export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "sweep", "sync", "survey", "scan"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
+  baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
+  baan attach <package> [--run <run>]
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
   baan sync [--all] [--pull-only] [--push] [--dry-run] [--no-self-update]
   baan survey [--target <name>] [--project <name>] [--cwd <path>]
@@ -21,7 +23,8 @@ export function utility(o, ws, cfg, root) {
     [--cwd <repo>] [--workspace <dir>] [--config <file>] [--target <name>] [--module <project/module>]
     [--owns <glob,glob>] [--acceptance <text>] [--source <reference>]
     [--build <cmd>] [--test <cmd>] [--test-full <cmd>] [--setup <cmd>]
-    [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <1..86400>] [--max-parallel <1..64>]
+    [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
+    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]
   baan decide <package> --run <run> --by user --decision <text> --source <reference>

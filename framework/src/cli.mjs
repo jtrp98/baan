@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules } from "./config.mjs";
+import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules, collectWorkspaceAddDirs } from "./config.mjs";
 import { fromPlan, validatePacket, assertId, readiness, documentBasis, approvalBasis } from "./packet.mjs";
 import { loadRun, save, persist, event, readJson } from "./store.mjs";
-import { callSession } from "./session.mjs";
+import { callSession, nativeCommand } from "./session.mjs";
 import { schedule } from "./scheduler.mjs";
 import { triage } from "./triage.mjs";
 import { lock, alive, repoLock } from "./repolock.mjs";
@@ -14,13 +14,16 @@ import { applyPlanning } from "./planner.mjs";
 import { validateTimeout, resolveTimeout } from "./timeout.mjs";
 import { utility, utilityFlags } from "./utilities.mjs";
 import { moduleContext } from "./workspace.mjs";
+import { getAdapter } from "./adapters/registry.mjs";
+import { runParityCommand } from "./parity.mjs";
+import { runInteractiveCli } from "./runner.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (!a.startsWith("--")) { if (o.subject) throw new Error(`unexpected argument ${a}`); o.subject = a; continue; }
@@ -29,7 +32,7 @@ export function parse(argv) {
     else if (values.has(name)) {
       if (!argv[i + 1] || argv[i + 1].startsWith("--")) throw new Error(`${a} requires a value`);
       const value = argv[++i];
-      if (["sweep", "sweep-in"].includes(name)) (o[name] ??= []).push(value);
+      if (["sweep", "sweep-in", "provider-arg", "provider-env"].includes(name)) (o[name] ??= []).push(value);
       else { if (Object.hasOwn(o, name)) throw new Error(`duplicate option ${a}`); o[name] = value; }
     }
     else throw new Error(`unknown option ${a}`);
@@ -45,14 +48,16 @@ export function parse(argv) {
     o.target = o.subject;
     delete o.subject;
   }
-  if (o.subject && !["status", "report", "inbox", "decide"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
+  if (o.subject && !["status", "report", "inbox", "decide", "attach"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
 }
+
 export function report(run) {
-  return { id: run.id, dir: run.dir, mode: run.mode, ok: run.packages.length > 0 && run.packages.every((p) => p.state === "done") && (run.integration ?? []).every((check) => check.evidence?.ok), integration: run.integration ?? [],
+  return { id: run.id, dir: run.dir, mode: run.mode, executionMode: run.executionMode ?? "headless", permissionPolicy: run.permissionPolicy ?? "native-safe", ok: run.packages.length > 0 && run.packages.every((p) => p.state === "done") && (run.integration ?? []).every((check) => check.evidence?.ok), integration: run.integration ?? [],
     packages: run.packages.map((p) => ({ id: p.id, tasks: p.tasks, state: p.state, failureClass: p.failureClass, durationMs: p.durationMs,
       evidence: p.gate?.evidence_file ?? (p.gate ? path.join(run.dir, `${p.id}.evidence.json`) : null), verdict: p.verdict, questions: p.questions ?? [], acceptance: p.acceptance })) };
 }
+
 export function decide(run, id, o) {
   const p = run.packages.find((p) => p.id === id);
   if (!p) throw new Error(`unknown package ${id}`);
@@ -70,6 +75,7 @@ export function decide(run, id, o) {
   if (existsSync(cancelFile)) unlinkSync(cancelFile);
   event(run, "decision", { package: p.id, ...p.decisions.at(-1), rev: p.rev }); persist(run);
 }
+
 export async function cli(argv, options = {}) {
   const o = parse([...argv]);
   if (!argv.length) o.help = true;
@@ -79,6 +85,37 @@ export async function cli(argv, options = {}) {
   const root = path.resolve(o.workspace || (configFile ? path.dirname(configFile) : process.cwd()));
   const cfg = options.cfg ?? loadAgentsConfig();
   if (utilityFlags.some((f) => o[f])) return utility(o, ws, cfg, root);
+
+  if (o.command === "parity") {
+    const repo = o.cwd ? path.resolve(o.cwd) : root;
+    return runParityCommand({ agent: o.agent, cwd: repo, workspaceRoot: root, json: o.json, cfg });
+  }
+
+  if (o.command === "attach") {
+    if (!o.subject) throw new Error("attach requires a package id");
+    const run = loadRun(root, o.run || o.resume || "");
+    const p = run.packages.find((pkg) => pkg.id === assertId(o.subject));
+    if (!p) throw new Error(`unknown package ${o.subject}`);
+    if (!p.session?.id) throw new Error(`package ${p.id} has no saved native session to attach to`);
+    const agent = p.session.agent || run.agent;
+    const adapter = getAdapter(agent, cfg);
+    const nativeDef = nativeCommand(cfg.agents[agent], agent).def;
+    const inv = adapter.buildInteractive({
+      def: nativeDef,
+      model: o.model ?? run.model ?? "",
+      effort: o.effort ?? run.effort ?? "",
+      permissionPolicy: run.permissionPolicy,
+      workspaceRoot: run.root,
+      addDirs: collectWorkspaceAddDirs(ws, p, run.root),
+      session: p.session,
+      providerArgs: o["provider-arg"],
+    });
+    const res = await runInteractiveCli(inv.command, inv.args, p.repo.path, inv.env);
+    p.after = snapshot(p.repo.path);
+    persist(run);
+    return { attached: p.id, sessionId: p.session.id, exitCode: res.exitCode, durationMs: res.durationMs };
+  }
+
   if (["status", "report", "inbox", "decide"].includes(o.command) || o.resume || o.cancel) {
     const run = loadRun(root, o.resume || o.run || (["status", "report", "inbox"].includes(o.command) ? o.subject : ""));
     if (o.cancel) {
@@ -106,6 +143,7 @@ export async function cli(argv, options = {}) {
     for (const key of ["tier", "agent", "timeout", "max-parallel", "planner-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
     return executeRun(run, cfg, options, o["dry-run"]);
   }
+
   const hit = o.target ? resolveTarget(ws, o.target) : null;
   if (o.target && !hit) throw new Error(`unknown target ${o.target}`);
   const modules = o.module ? resolveModules(ws, o.module) : [];
@@ -139,18 +177,33 @@ export async function cli(argv, options = {}) {
       if (existsSync(file) && !p.read_first.some((r) => r.path === file)) p.read_first.push({ path: file });
     }
   }
+
+  const executionMode = o["execution-mode"] || (o.interactive ? "interactive" : null) || ws.defaults.execution_mode || "headless";
+  const permissionPolicy = o["permission-policy"] || (o["allow-bypass"] ? "bypass" : null) || ws.defaults.permission_policy || "native-safe";
+  const allowFallback = Boolean(o["allow-fallback"] ?? ws.defaults.allow_fallback);
+  const worktree = Boolean(o.worktree ?? ws.defaults.worktree);
+
   const run = { version: 2, id: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`, root,
     packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: o.tier || "t2", plannerTier: o["planner-tier"] || ws.defaults.planner_tier,
     agent: o.agent || ws.defaults.agent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, cfg.tiers[o.tier || "t2"]), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
-    direct: !!o.direct, integration, createdAt: new Date().toISOString() };
+    direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree,
+    model: o.model ?? ws.defaults.model ?? null, effort: o.effort ?? ws.defaults.effort ?? null,
+    approvalPolicy: o["approval-policy"] ?? "auto-safe", providerArgs: o["provider-arg"] ?? [],
+    integration, createdAt: new Date().toISOString() };
+
+  if (run.permissionPolicy === "bypass") {
+    console.warn("WARNING: permission_policy is set to 'bypass'. Native security sandbox and approval checks are bypassed.");
+  }
+
   if (!cfg.agents[run.agent] || !cfg.tiers[run.tier] || !cfg.tiers[run.plannerTier]) throw new Error("unknown agent/tier");
-  if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64 || !(run.timeoutSec > 0)) throw new Error("invalid --max-parallel/--timeout");
+  if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64 || !(run.timeoutSec >= 0)) throw new Error("invalid --max-parallel/--timeout");
   run.dir = path.join(root, ".baan", "runs", run.id);
   if (o["dry-run"]) return { ...triage(packages, run.direct), packages: packages.map((p) => ({ ...p, readiness: readiness(p) })) };
   mkdirSync(run.dir, { recursive: true }); persist(run);
   event(run, "run_created");
   return executeRun(run, cfg, options);
 }
+
 async function executeRun(run, cfg, options, dry = false) {
   if (dry) return report(run);
   const release = lock(run.root, `run:${run.dir}`);

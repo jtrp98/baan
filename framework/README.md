@@ -49,21 +49,17 @@ Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุ�
 | Worker/Verifier tier | `t2`; override ด้วย `--tier` |
 | Planner tier | `defaults.planner_tier` (`t2`); override ด้วย `--planner-tier` |
 | งานขนานสูงสุด | `defaults.max_parallel` (`3`); override ด้วย `--max-parallel` |
-| Timeout | `--timeout` → tier `_timeoutSec` → `defaults.timeout_sec` (`1800` วินาที) |
+| Timeout | `--timeout` → tier `_timeoutSec` → `defaults.timeout_sec` (`0` วินาที = unlimited) |
+| นโยบายสิทธิ์ | `defaults.permission_policy` (`native-safe`); override ด้วย `--permission-policy` หรือ `--allow-bypass` |
 
 Tier เลือก model/effort และลำดับ fallback จาก agents config ไม่ใช่การผูก provider ถาวร
-CLI ไม่มี `--no-fallback`; หากต้องตรึง provider ให้เตรียม agents config ของตนผ่าน `BAAN_AGENTS_FILE`
-แล้วตรวจลำดับที่ใช้อยู่ด้วย `baan --list` ก่อนเริ่ม run
-
-- **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ `exec`, structured schema, read-only sandbox สำหรับ Planner/Verifier และ session resume สำหรับ Worker
-- **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ JSON schema/session และจำกัด Planner/Verifier ให้มีเฉพาะ Read/Grep/Glob โดยปิด MCP ของ call นั้น
-- **agy**: ลงชื่อเข้าใช้ CLI และติดตั้ง [read-only profile + guard](setup/agy/README.md) ที่ตรง package ก่อนใช้ Planner/Verifier; รองรับ schema/conversation resume
-- **OpenCode**: ใช้ Worker ได้ตาม tier ที่ประกาศ; ไม่มี read-only contract ที่ core ยืนยันได้ จึงข้ามเมื่อเลือก Planner/Verifier
-  Worker เริ่ม process ใหม่พร้อม context เมื่อไม่มี session ID; ไม่อ้างว่าเป็น native resume
+BAAN ยึดหลัก **Native First, Orchestrate Outside, Preserve Inside**:
+- **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ native `exec`, structured schema, native read-only sandbox สำหรับ Planner/Verifier และ native session resume สำหรับ Worker
+- **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ native `plan` mode สำหรับ Planner/Verifier โดยรักษา MCP, Skills และ Subagents; ใช้ `acceptEdits` หรือ Approval Bridge ใน Worker
+- **agy**: ลงชื่อเข้าใช้ CLI; ใช้ native `plan` mode และรองรับ `invoke_subagent` สำหรับ Planner/Verifier; Worker รองรับ `accept-edits` ใน safe mode และ opt-in bypass เมื่อต้องการ
 
 บน Windows core เรียก native executable หรือ Node entry ของ npm Codex โดยไม่ผ่าน shell
-รองรับ npm OpenCode ที่ `@opencode/cli/bin/opencode.exe`; wrapper แบบอื่นต้องตั้ง `command` เป็น executable จริง
-การเปลี่ยน CLI/model ของเครื่องต้องตรวจ `--help` และรัน live smoke อีกครั้ง
+ตรวจความพร้อมและ Parity ของเครื่องด้วย `baan parity` ก่อนเริ่มงานจริง
 
 ## เตรียมและรันงาน
 

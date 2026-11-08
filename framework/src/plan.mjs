@@ -7,7 +7,7 @@ import { resolveRoleName } from "./config.mjs";
 const TEST_LEVELS = ["normal", "full"];
 const IMPLEMENT_ROLES = ["front", "sys", "build"];
 
-const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "opencode", "agy", "claude"];
+const DEFAULT_AGENT_FALLBACK_ORDER = ["codex", "agy", "claude"];
 
 export function fallbackChainFor(cfg, tierName, chosenAgent) {
   const tierConf = cfg.tiers[tierName] ?? {};
@@ -17,6 +17,7 @@ export function fallbackChainFor(cfg, tierName, chosenAgent) {
 }
 
 export function extractJson(text) {
+  if (typeof text !== "string" || !text.trim()) throw new Error("ไม่พบข้อความ JSON ในคำตอบ");
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const raw = fenced ? fenced[1] : text;
   const start = raw.indexOf("{");
