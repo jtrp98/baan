@@ -2,6 +2,21 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.34.0 — 2026-11-08 · รองรับ auto_update ใน local.json, ซิงค์ทุก workspace อัตโนมัติ, และเพิ่ม Git hook post-merge
+
+### เพิ่ม
+
+- **ระบบ Auto-Update สำหรับ Workspaces ตาม `local.json`**:
+  - รองรับการตั้งค่า `"auto_update": true` ใน `local.json` และ `loadLocalConfig`
+  - ปรับคำสั่ง `baan sync` ให้ตรวจจับ `auto_update` และวนลูปอัปเดตทุก workspace ที่ลงทะเบียนไว้โดยอัตโนมัติ ไม่ต้องคอยใส่ `--all`
+- **Git Hook อัตโนมัติ (`post-merge`)**:
+  - เพิ่มสคริปต์ `scripts/setup-hooks.mjs` พร้อม npm script `npm run setup:hooks`
+  - ติดตั้ง `.git/hooks/post-merge` เพื่อสั่ง auto-update ทุก workspace ใน `local.json` ทันทีที่มีการ `git merge` หรือ `git pull`
+- **บรรจุขั้นตอนในพิธี Release (`AGENTS.md` & `CLAUDE.md`)**:
+  - เพิ่มขั้นตอนที่ 7 ในพิธีปล่อยรุ่น ให้ AI รัน auto-update ทุก workspace ทันทีหลังจบการปล่อยรุ่น
+- **ชุดทดสอบครอบคลุม (`tests/local-workspaces.test.mjs`)**:
+  - เพิ่มการทดสอบการตั้งค่า `auto_update` ทั้งกรณี default และ override (รวมเป็น 191 tests)
+
 ## 0.33.0 — 2026-11-08 · เพิ่มเครื่องมือซ่อมแซม Mojibake (CP874/Windows-1252) และคำสั่ง baan --repair-mojibake
 
 ### เพิ่ม

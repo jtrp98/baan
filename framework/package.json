@@ -1,6 +1,6 @@
 {
   "name": "baan",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "description": "BAAN: Planner, Senior Worker, Verifier และทีม UX/UI พร้อม core จัดคิวและเก็บหลักฐาน",
   "type": "module",
   "bin": {
