@@ -2,6 +2,7 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns } from "./usage-aggregator.mjs";
+import { getWorkspaceQuota } from "./quota-tracker.mjs";
 
 export function formatNumber(num) {
   if (num == null || isNaN(num)) return "0";
@@ -25,27 +26,57 @@ export function openBrowser(url) {
   } catch {}
 }
 
-export function getMonitorState(workspaceRoot) {
+export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) {
   const activeRuns = scanActiveRuns(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
+  let quota = null;
+  try {
+    quota = await getWorkspaceQuota(forceRefreshQuota);
+  } catch {}
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
     activeRuns,
     usage,
+    quota,
     recentRuns,
     timestamp: new Date().toISOString(),
   };
 }
 
 export function renderTui(state) {
-  const { activeRuns, usage, workspaceName } = state;
+  const { activeRuns, usage, quota, workspaceName } = state;
   const lines = [];
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${activeRuns.length} run(s)\x1b[0m`);
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push("");
+
+  if (quota) {
+    const { claude, codex, agy } = quota;
+    lines.push(`\x1b[1mACCOUNT LIMITS & REMAINING QUOTA:\x1b[0m`);
+    if (claude?.available) {
+      const sess = claude.sessionUsedPct != null ? `${claude.sessionUsedPct}% used (${claude.sessionRemainingPct}% left)` : "N/A";
+      const week = claude.weeklyUsedPct != null ? `${claude.weeklyUsedPct}% used (${claude.weeklyRemainingPct}% left)` : "N/A";
+      const reset = claude.weeklyResetsAt ? ` [Resets: ${claude.weeklyResetsAt}]` : "";
+      lines.push(` ▶ Claude Code: 5-Hour: \x1b[33m${sess}\x1b[0m | Weekly: \x1b[31m${week}\x1b[0m${reset}`);
+    }
+    if (codex?.available) {
+      const week = codex.weeklyUsedPct != null ? `${codex.weeklyUsedPct}% used (${codex.weeklyRemainingPct}% left)` : "N/A";
+      const reset = codex.weeklyResetsAt ? ` [Resets: ${codex.weeklyResetsAt}]` : "";
+      const label = codex.accountLabel ? ` (${codex.accountLabel})` : "";
+      const col = (codex.weeklyRemainingPct ?? 100) > 40 ? "\x1b[32m" : (codex.weeklyRemainingPct ?? 100) > 15 ? "\x1b[33m" : "\x1b[31m";
+      lines.push(` ▶ OpenAI Codex: Weekly Limit: ${col}${week}\x1b[0m${reset}${label}`);
+    }
+    if (agy?.available) {
+      const g5h = agy.gemini5hRemainingPct != null ? `${agy.gemini5hRemainingPct}% left` : "N/A";
+      const gWk = agy.geminiWeeklyRemainingPct != null ? `${agy.geminiWeeklyRemainingPct}% left` : "N/A";
+      const argon = agy.argonWeeklyRemainingPct != null ? `${agy.argonWeeklyRemainingPct}% left` : "N/A";
+      lines.push(` ▶ Google AGY:  Gemini 5h: \x1b[32m${g5h}\x1b[0m | Gemini Weekly: \x1b[32m${gWk}\x1b[0m | \x1b[1;35mArgon Weekly: ${argon}\x1b[0m`);
+    }
+    lines.push("");
+  }
 
   lines.push(`\x1b[1m3-CLI USAGE BREAKDOWN (WORKSPACE TOTALS):\x1b[0m`);
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
@@ -148,6 +179,22 @@ export function getHtmlDashboard() {
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 1.8s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } }
 
+    .btn-refresh {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-refresh:hover { background: #0369a1; }
+
     /* Tabs */
     .tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
     .tab-btn {
@@ -169,7 +216,7 @@ export function getHtmlDashboard() {
     }
 
     /* 3 CLI Usage Grid */
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -177,6 +224,8 @@ export function getHtmlDashboard() {
       padding: 16px 18px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     .card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
     .card.claude::before { background: var(--claude); }
@@ -189,6 +238,107 @@ export function getHtmlDashboard() {
     .card-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 12px; }
     .card-sub-grid span { color: var(--text-muted); }
     .card-sub-grid strong { color: var(--text); font-weight: 600; text-align: right; }
+
+    /* Quota section on cards */
+    .quota-box {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .quota-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-plan {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    .account-line {
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 16px;
+    }
+    .slot-row {
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .bar-label-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+    .bar-track {
+      background: #0f172a;
+      height: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .bar-fill.green { background: #22c55e; }
+    .bar-fill.yellow { background: #eab308; }
+    .bar-fill.red { background: #ef4444; }
+    .bar-fill.purple { background: #a855f7; }
+    .reset-subtext {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .alert-pill {
+      font-size: 10px;
+      color: #ef4444;
+      font-weight: 600;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .highlight-slot {
+      min-height: 44px;
+      padding: 7px 9px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .highlight-slot.purple {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+    .highlight-slot.orange {
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+    }
+    .highlight-slot.emerald {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
 
     /* Live Session Area */
     .section-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -259,9 +409,12 @@ export function getHtmlDashboard() {
         <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="ws-label">Workspace: ...</div>
       </div>
     </div>
-    <div class="status-badge">
-      <div class="status-dot"></div>
-      <span id="conn-status">Connected</span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-refresh" onclick="refreshQuota()" id="btn-refresh-quota">🔄 Refresh Quota</button>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span id="conn-status">Connected</span>
+      </div>
     </div>
   </header>
 
@@ -270,7 +423,7 @@ export function getHtmlDashboard() {
   </div>
 
   <!-- 3-CLI USAGE CARDS -->
-  <div class="section-title">📊 3-CLI Usage Overview (Tokens & Cost)</div>
+  <div class="section-title">📊 3-CLI Usage & Remaining Limits (5-Hour & Weekly)</div>
   <div class="grid-3" id="usage-cards">
     <!-- Rendered dynamically -->
   </div>
@@ -282,11 +435,6 @@ export function getHtmlDashboard() {
       <h3>พร้อมตรวจจับงาน (Standby)</h3>
       <p>เมื่อสั่งงานใน terminal (เช่น <code>baan WP-1</code> หรือคุยกับ agent ใน <code>C:\\src\\schoolbright</code>) ข้อมูลจะขึ้นที่นี่สดๆ ทันที</p>
     </div>
-  </div>
-
-  <!-- SINGLE PROJECT DRILL-DOWN (Hidden by default) -->
-  <div id="project-focus-area" style="display: none; margin-bottom: 30px;">
-    <!-- Rendered dynamically when a project tab is chosen -->
   </div>
 
   <!-- RECENT RUNS TABLE -->
@@ -322,6 +470,42 @@ export function getHtmlDashboard() {
       return "$" + Number(num).toFixed(3);
     }
 
+    function normalizeResetDate(input) {
+      if (!input) return '';
+      try {
+        if (typeof input === 'number' || (/^\d{10}$/.test(String(input).trim()))) {
+          const d = new Date(Number(input) * 1000);
+          return formatStandardDate(d);
+        }
+        if (/^\d{4}-\d{2}-\d{2}T/.test(String(input))) {
+          const d = new Date(input);
+          if (!isNaN(d.getTime())) return formatStandardDate(d);
+        }
+        const m = String(input).match(/([a-zA-Z]+ \d+)[,\s]+(\d+:\d+\s*[apmAPM]+)/i);
+        if (m) {
+          return m[1] + ', ' + m[2].toUpperCase().replace(/\s+/, ' ');
+        }
+        const d = new Date(input);
+        if (!isNaN(d.getTime())) return formatStandardDate(d);
+        return String(input).replace(/\s*\([^)]*\)/, '');
+      } catch {
+        return String(input);
+      }
+    }
+
+    function formatStandardDate(d) {
+      const m = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const t = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      return m + ', ' + t;
+    }
+
+    function getBarColor(remainingPct) {
+      if (remainingPct == null) return 'green';
+      if (remainingPct > 40) return 'green';
+      if (remainingPct > 15) return 'yellow';
+      return 'red';
+    }
+
     function selectTab(tabId) {
       currentTab = tabId;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -330,9 +514,22 @@ export function getHtmlDashboard() {
       renderDashboard();
     }
 
+    async function refreshQuota() {
+      const btn = document.getElementById('btn-refresh-quota');
+      if (btn) btn.textContent = '⏳ Checking...';
+      try {
+        const res = await fetch('/api/quota/refresh', { method: 'POST' });
+        if (res.ok) {
+          lastState = await res.json();
+          renderDashboard();
+        }
+      } catch (e) {}
+      if (btn) btn.textContent = '🔄 Refresh Quota';
+    }
+
     function renderDashboard() {
       if (!lastState) return;
-      const { activeRuns, usage, recentRuns, workspaceName } = lastState;
+      const { activeRuns, usage, quota, recentRuns, workspaceName } = lastState;
       document.getElementById('ws-label').textContent = 'Workspace: ' + workspaceName;
 
       // Update Tabs with active projects
@@ -356,15 +553,215 @@ export function getHtmlDashboard() {
       // Filter usage if single project tab
       let displayUsage = usage.agents;
       let displayTotal = usage.total;
-      if (currentTab !== 'all' && usage.projects?.[currentTab]) {
-        // Show project specific
-      }
 
       // Render 3-CLI Cards
       const cClaude = displayUsage.claude ?? {};
       const cCodex = displayUsage.codex ?? {};
       const cAgy = displayUsage.agy ?? {};
       const cTot = displayTotal ?? {};
+
+      // Build Unified Quota HTML for Claude
+      let claudeQuotaHtml = '';
+      if (quota?.claude?.available) {
+        const q = quota.claude;
+        const sessRem = q.sessionRemainingPct ?? (q.sessionUsedPct != null ? Math.max(0, 100 - q.sessionUsedPct) : 100);
+        const weekRem = q.weeklyRemainingPct ?? (q.weeklyUsedPct != null ? Math.max(0, 100 - q.weeklyUsedPct) : 0);
+        const sessColor = getBarColor(sessRem);
+        const weekColor = getBarColor(weekRem);
+        const isWeekLow = weekRem <= 15;
+        const isSessLow = sessRem <= 15;
+
+        claudeQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title">
+              <span>Quota & Limits</span>
+              <span class="badge-plan">SUBSCRIPTION</span>
+            </div>
+            <div class="account-line">👤 Anthropic Subscription</div>
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>5-Hour Session:</span>
+                <strong>\${q.sessionUsedPct ?? 0}% used (\${sessRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${sessColor}" style="width: \${sessRem}%"></div></div>
+              \${q.sessionResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.sessionResetsAt)}</div>\` : ''}
+              \${isSessLow ? \`<div class="alert-pill">⚠️ Session limit: only \${sessRem}% left</div>\` : ''}
+            </div>
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>Weekly Cap (All models):</span>
+                <strong style="\${isWeekLow ? 'color: #ef4444;' : ''}">\${q.weeklyUsedPct ?? 100}% used (\${weekRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${weekColor}" style="width: \${weekRem}%"></div></div>
+              \${q.weeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.weeklyResetsAt)}</div>\` : ''}
+              \${isWeekLow ? \`<div class="alert-pill">⚠️ Weekly limit: only \${weekRem}% left</div>\` : ''}
+            </div>
+            <div class="highlight-slot orange">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; color: #fb923c;">
+                <span>📊 7-Day Activity:</span>
+                <span>\${formatNumber(q.requestsLast7d || 0)} requests</span>
+              </div>
+              <div style="font-size: 10px; color: #fdba74; margin-top: 2px;">
+                \${q.sessionsLast7d || 0} active sessions · Auto-optimizing prompts
+              </div>
+            </div>
+          </div>
+        \`;
+      } else {
+        claudeQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">CLAUDE</span></div>
+            <div class="account-line">👤 Anthropic Subscription</div>
+            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
+              \${quota?.claude?.rawText ? 'Claude subscription active' : 'พร้อมตรวจจับโควตาจาก claude -p "/usage"'}
+            </div>
+          </div>
+        \`;
+      }
+
+      // Build Unified Quota HTML for Codex
+      let codexQuotaHtml = '';
+      if (quota?.codex?.available) {
+        const q = quota.codex;
+        const weekRem = q.weeklyRemainingPct ?? (q.weeklyUsedPct != null ? Math.max(0, 100 - q.weeklyUsedPct) : 100);
+        const weekColor = getBarColor(weekRem);
+        const isWeekLow = weekRem <= 15;
+        const planName = q.planType ? q.planType.toUpperCase() : 'PLUS';
+
+        let sessionSlotHtml = '';
+        if (q.sessionUsedPct != null) {
+          const sessRem = q.sessionRemainingPct ?? Math.max(0, 100 - q.sessionUsedPct);
+          const sessColor = getBarColor(sessRem);
+          sessionSlotHtml = \`
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>5-Hour Session:</span>
+                <strong>\${q.sessionUsedPct}% used (\${sessRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${sessColor}" style="width: \${sessRem}%"></div></div>
+              \${q.sessionResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.sessionResetsAt)}</div>\` : ''}
+              \${sessRem <= 15 ? \`<div class="alert-pill">⚠️ Session limit: only \${sessRem}% left</div>\` : ''}
+            </div>
+          \`;
+        } else {
+          sessionSlotHtml = \`
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>5-Hour Session:</span>
+                <strong style="color: #34d399;">Standard (Active)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill green" style="width: 100%"></div></div>
+              <div class="reset-subtext">No session throttle active</div>
+            </div>
+          \`;
+        }
+
+        codexQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title">
+              <span>Quota & Limits</span>
+              <span class="badge-plan">\${planName}</span>
+            </div>
+            <div class="account-line">👤 \${q.accountLabel || 'ChatGPT Plus Account'}</div>
+            \${sessionSlotHtml}
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>Weekly Limit (GPT-6.1):</span>
+                <strong style="\${isWeekLow ? 'color: #ef4444;' : ''}">\${q.weeklyUsedPct ?? 0}% used (\${weekRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${weekColor}" style="width: \${weekRem}%"></div></div>
+              \${q.weeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.weeklyResetsAt)}</div>\` : ''}
+              \${isWeekLow ? \`<div class="alert-pill">⚠️ Weekly limit: only \${weekRem}% left</div>\` : ''}
+            </div>
+            <div class="highlight-slot emerald">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; color: #34d399;">
+                <span>💳 Direct ChatGPT Quota:</span>
+                <span>\${planName}</span>
+              </div>
+              <div style="font-size: 10px; color: #a7f3d0; margin-top: 2px;">
+                \${q.credits?.hasCredits ? \`Balance: $\${q.credits.balance}\` : 'Credits: $0.00 · Unmetered CLI Quota'}
+              </div>
+            </div>
+          </div>
+        \`;
+      } else {
+        codexQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">CODEX</span></div>
+            <div class="account-line">👤 OpenAI Codex CLI</div>
+            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
+              \${quota?.codex?.error ? quota.codex.error : 'พร้อมตรวจจับโควตาจาก ~/.codex/auth.json'}
+            </div>
+          </div>
+        \`;
+      }
+
+      // Build Unified Quota HTML for AGY (including Gemini 4 Argon Weekly)
+      let agyQuotaHtml = '';
+      if (quota?.agy?.available) {
+        const q = quota.agy;
+        const g5hRem = q.gemini5hRemainingPct ?? 100;
+        const g5hUsed = 100 - g5hRem;
+        const gWkRem = q.geminiWeeklyRemainingPct ?? 100;
+        const gWkUsed = 100 - gWkRem;
+        const argRem = q.argonWeeklyRemainingPct ?? 100;
+        const argUsed = 100 - argRem;
+
+        const g5hColor = getBarColor(g5hRem);
+        const gWkColor = getBarColor(gWkRem);
+        const argColor = argRem > 40 ? 'purple' : argRem > 15 ? 'yellow' : 'red';
+
+        const is5hLow = g5hRem <= 15;
+        const isWkLow = gWkRem <= 15;
+        const isArgLow = argRem <= 15;
+
+        agyQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title">
+              <span>Quota & Limits</span>
+              <span class="badge-plan">ANTIGRAVITY</span>
+            </div>
+            <div class="account-line">👤 Google Antigravity / Gemini</div>
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>Gemini 5-Hour Limit:</span>
+                <strong style="\${is5hLow ? 'color: #ef4444;' : ''}">\${g5hUsed}% used (\${g5hRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${g5hColor}" style="width: \${g5hRem}%"></div></div>
+              \${q.gemini5hResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.gemini5hResetsAt)}</div>\` : ''}
+              \${is5hLow ? \`<div class="alert-pill">⚠️ Low 5-hour limit: only \${g5hRem}% left</div>\` : ''}
+            </div>
+            <div class="slot-row">
+              <div class="bar-label-line">
+                <span>Gemini Weekly Limit:</span>
+                <strong style="\${isWkLow ? 'color: #ef4444;' : ''}">\${gWkUsed}% used (\${gWkRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${gWkColor}" style="width: \${gWkRem}%"></div></div>
+              \${q.geminiWeeklyResetsAt ? \`<div class="reset-subtext">Resets: \${normalizeResetDate(q.geminiWeeklyResetsAt)}</div>\` : ''}
+              \${isWkLow ? \`<div class="alert-pill">⚠️ Low weekly limit: only \${gWkRem}% left</div>\` : ''}
+            </div>
+            <div class="highlight-slot purple">
+              <div class="bar-label-line">
+                <span style="color: #c084fc; font-weight: 600;">🌟 Gemini 4 Argon Weekly:</span>
+                <strong style="color: #e9d5ff;">\${argUsed}% used (\${argRem}% left)</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill \${argColor}" style="width: \${argRem}%"></div></div>
+              \${q.argonWeeklyResetsAt ? \`<div class="reset-subtext" style="color: #d8b4fe;">Resets: \${normalizeResetDate(q.argonWeeklyResetsAt)}</div>\` : ''}
+              \${isArgLow ? \`<div class="alert-pill">⚠️ Argon weekly limit: only \${argRem}% left</div>\` : ''}
+            </div>
+          </div>
+        \`;
+      } else {
+        agyQuotaHtml = \`
+          <div class="quota-box">
+            <div class="quota-title"><span>Quota & Limits</span> <span class="badge-plan">ANTIGRAVITY</span></div>
+            <div class="account-line">👤 Google Antigravity</div>
+            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; padding: 20px 0; text-align: center;">
+              พร้อมตรวจจับโควตาจาก agy -p "/usage"
+            </div>
+          </div>
+        \`;
+      }
 
       const usageCards = document.getElementById('usage-cards');
       usageCards.innerHTML = \`
@@ -377,6 +774,7 @@ export function getHtmlDashboard() {
             <span>Cache Read:</span><strong>\${formatNumber(cClaude.cacheReadTokens)}</strong>
             <span>Turns:</span><strong>\${cClaude.turns ?? 0}</strong>
           </div>
+          \${claudeQuotaHtml}
         </div>
         <div class="card codex">
           <div class="card-title"><span>Codex CLI (OpenAI)</span> <span>\${cCodex.calls ?? 0} calls</span></div>
@@ -387,6 +785,7 @@ export function getHtmlDashboard() {
             <span>Cache Read:</span><strong>\${formatNumber(cCodex.cacheReadTokens)}</strong>
             <span>Turns:</span><strong>\${cCodex.turns ?? 0}</strong>
           </div>
+          \${codexQuotaHtml}
         </div>
         <div class="card agy">
           <div class="card-title"><span>Antigravity (AGY)</span> <span>\${cAgy.calls ?? 0} calls</span></div>
@@ -397,6 +796,7 @@ export function getHtmlDashboard() {
             <span>Cache Read:</span><strong>\${formatNumber(cAgy.cacheReadTokens)}</strong>
             <span>Turns:</span><strong>\${cAgy.turns ?? 0}</strong>
           </div>
+          \${agyQuotaHtml}
         </div>
         <div class="card total">
           <div class="card-title"><span>Total Workspace Used</span> <span>\${cTot.calls ?? 0} total calls</span></div>
@@ -503,13 +903,20 @@ export function getHtmlDashboard() {
 export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true, runId = null }) {
   if (tui) {
     console.log(`Starting BAAN TUI Monitor for ${workspaceRoot}... (Press Ctrl+C to exit)`);
-    const render = () => {
-      const state = getMonitorState(workspaceRoot);
-      process.stdout.write("\x1b[2J\x1b[H");
-      process.stdout.write(renderTui(state));
+    let rendering = false;
+    const render = async () => {
+      if (rendering) return;
+      rendering = true;
+      try {
+        const state = await getMonitorState(workspaceRoot);
+        process.stdout.write("\x1b[2J\x1b[H");
+        process.stdout.write(renderTui(state));
+      } catch {} finally {
+        rendering = false;
+      }
     };
     render();
-    const interval = setInterval(render, 500);
+    const interval = setInterval(render, 1000);
     process.on("SIGINT", () => {
       clearInterval(interval);
       process.exit(0);
@@ -518,7 +925,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
   }
 
   return new Promise((resolve, reject) => {
-    const server = http.createServer((req, res) => {
+    const server = http.createServer(async (req, res) => {
       const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
       if (url.pathname === "/") {
@@ -527,8 +934,15 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
         return;
       }
 
+      if (url.pathname === "/api/quota/refresh" && req.method === "POST") {
+        const state = await getMonitorState(workspaceRoot, true);
+        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify(state));
+        return;
+      }
+
       if (url.pathname === "/api/stats") {
-        const state = getMonitorState(workspaceRoot);
+        const state = await getMonitorState(workspaceRoot);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state));
         return;
@@ -549,15 +963,20 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           "Access-Control-Allow-Origin": "*",
         });
 
-        const send = () => {
+        let sending = false;
+        const send = async () => {
+          if (sending) return;
+          sending = true;
           try {
-            const state = getMonitorState(workspaceRoot);
+            const state = await getMonitorState(workspaceRoot);
             res.write(`data: ${JSON.stringify(state)}\n\n`);
-          } catch {}
+          } catch {} finally {
+            sending = false;
+          }
         };
 
         send();
-        const timer = setInterval(send, 500);
+        const timer = setInterval(send, 1000);
         req.on("close", () => clearInterval(timer));
         return;
       }
