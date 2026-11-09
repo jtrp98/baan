@@ -54,8 +54,11 @@ function sessionInput(p, role, context) {
   const compactSnapshot = (s) => s ? { id: s.id, tracked: s.tracked, head: s.head } : undefined;
   const compactGate = p.gate ? { ...p.gate, results: p.gate.results.map(commandSummary) } : undefined;
   const { before, after, probe, session } = p;
-  const assignment = Object.fromEntries(["id", "title", "goal", "tasks", "repo", "owns", "read_first", "contracts", "acceptance", "commands", "decisions", "questions", "risk", "risk_tags", "budget", "knowledge_context", "rework", "verdict"]
+  const assignment = Object.fromEntries(["id", "title", "goal", "tasks", "repo", "owns", "read_first", "contracts", "acceptance", "commands", "decisions", "questions", "risk", "risk_tags", "budget", "knowledge_context", "rework", "verdict", "kind", "cross_cutting"]
     .filter((key) => p[key] !== undefined).map((key) => [key, p[key]]));
+  if (role === "worker" && p.kind === "bugfix") {
+    assignment.bugfix_policy = "MANDATORY: Write or identify a reproduction test that fails (Red) before modifying code, fix code in owns to make it pass (Green), and ensure full regression pass.";
+  }
   if (p.integrationFailure) assignment.integration_failure = commandSummary(p.integrationFailure);
   return role === "verifier" ? {
     id: p.id, goal: p.goal, acceptance: p.acceptance, repo: p.repo, owns: p.owns,
@@ -84,10 +87,10 @@ export function resolveWorkerTier(run, p) {
   const baseTier = p?.tier || run.tier;
   const explicit = p?.worker_tier ?? p?.workerTier;
   if (explicit) {
-    if (p.kind === "code" && p.risk === "high" && /^t[3-5]$/.test(explicit)) {
+    if ((p.kind === "code" || p.kind === "bugfix") && p.risk === "high" && /^t[3-5]$/.test(explicit)) {
       return "t2";
     }
-    if (p.kind === "code" && isTierLower(explicit, baseTier)) {
+    if ((p.kind === "code" || p.kind === "bugfix") && isTierLower(explicit, baseTier)) {
       const hasContract = (p.contracts?.length > 0) || (p.read_first?.some((r) => r.pin));
       if (!hasContract) return baseTier;
     }

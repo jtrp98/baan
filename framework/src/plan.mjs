@@ -243,7 +243,7 @@ export function lintPlanDag(tasks, { docsOnly } = {}) {
     blockedMemo.set(id, r);
     return r;
   };
-  const impl = tasks.filter((t) => IMPLEMENT_ROLES.includes(t.role)).map((t) => t.id);
+  const impl = tasks.filter((t) => IMPLEMENT_ROLES.includes(t.role) || t.kind === "bugfix").map((t) => t.id);
   const blocked = impl.filter((id) => isBlocked(id));
   const free = impl.filter((id) => !blocked.includes(id));
   if (impl.length === 0) {
@@ -278,10 +278,20 @@ export function lintPlanModules(rawTasks, file, isDirFn = (p) => existsSync(p)) 
   const root = path.dirname(projectDir);
   const missing = [];
   for (const t of rawTasks) {
-    if (!t || t.module === undefined) { missing.push(t?.id); continue; }
+    if (!t) continue;
+    const isCross = t.cross_cutting === true || t.crossCutting === true
+      || t.module === "_cross" || t.module === "cross-cutting"
+      || (t.module === null && (t.cross_cutting || t.crossCutting || t.kind === "bugfix"));
+    if (isCross) continue;
+
+    if (t.module === undefined || t.module === null) {
+      if (t.kind !== "bugfix") missing.push(t?.id);
+      continue;
+    }
     const mods = Array.isArray(t.module) ? t.module : [t.module];
     if (!mods.length || mods.some((m) => typeof m !== "string" || !m.trim())) { errors.push(`${t.id}: module ต้องเป็นชื่อ module หรือ array ของชื่อ`); continue; }
     for (const m of mods) {
+      if (m === "_cross" || m === "cross-cutting") continue;
       const [p, mod] = m.includes("/") ? m.split("/") : [project, m];
       if (!isDirFn(path.join(root, p, "modules", mod))) errors.push(`${t.id}: module "${m}" ไม่มีจริง (${p}/modules/${mod})`);
     }

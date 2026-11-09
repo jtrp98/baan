@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { scanTargetCodebase, detectKnowledgeDrift, scaffoldKnowledgeModule, scaffoldKnowledgeProject, surveyProject } from "../src/survey.mjs";
+import { scanTargetCodebase, detectKnowledgeDrift, scaffoldKnowledgeModule, scaffoldKnowledgeProject, surveyProject, evaluateModulePlacement, formatModuleEvaluation } from "../src/survey.mjs";
 import { parse } from "../src/cli.mjs";
 import { utility } from "../src/utilities.mjs";
 
@@ -159,4 +159,73 @@ test("survey: utility ส่งออก JSON ครบถ้วนตามโ�
   assert.equal(out.target.name, "demo");
   assert.ok(out.stacks.some((s) => s.frameworks.includes("Express")));
   assert.ok(out.components.some((c) => c.name === "dashboard"));
+});
+
+test("survey: evaluateModulePlacement จำแนก in-module, unmapped-code, และ cross-cutting แม่นยำ", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "survey-eval-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+
+  // โครงสร้างโค้ดจริง
+  mkdirSync(path.join(dir, "frontend", "features", "auth"), { recursive: true });
+  mkdirSync(path.join(dir, "frontend", "features", "chat"), { recursive: true });
+  mkdirSync(path.join(dir, "src", "utils"), { recursive: true });
+
+  writeFileSync(path.join(dir, "frontend", "package.json"), JSON.stringify({ name: "app", dependencies: { react: "18.0.0" } }), "utf8");
+  writeFileSync(path.join(dir, "frontend", "features", "auth", "login.ts"), "", "utf8");
+  writeFileSync(path.join(dir, "frontend", "features", "chat", "message.ts"), "", "utf8");
+  writeFileSync(path.join(dir, "src", "utils", "logger.ts"), "", "utf8");
+  writeFileSync(path.join(dir, "package.json"), "{}", "utf8");
+
+  // Knowledge Project มีโมดูล auth แต่ไม่มี chat
+  const project = {
+    name: "my-app",
+    modules: [
+      { module: "auth", status: "released" },
+    ],
+  };
+
+  // 1. เคสไฟล์อยู่ในโมดูลที่มีอยู่แล้ว (in-module)
+  const inMod = evaluateModulePlacement("frontend/features/auth/login.ts", { targetPath: dir, project });
+  assert.equal(inMod.classification, "in-module");
+  assert.equal(inMod.recommendedModule, "auth");
+  assert.equal(inMod.isInsideModule, true);
+
+  // 2. เคสไฟล์อยู่ในโค้ดคอมโพเนนต์ที่ยังไม่มีโมดูล (unmapped-code)
+  const unmapped = evaluateModulePlacement("frontend/features/chat/message.ts", { targetPath: dir, project });
+  assert.equal(unmapped.classification, "unmapped-code");
+  assert.equal(unmapped.recommendedModule, "chat");
+  assert.equal(unmapped.isInsideModule, false);
+
+  // 3. เคสไฟล์โครงสร้างพื้นฐาน/ส่วนกลาง (cross-cutting)
+  const cross = evaluateModulePlacement("src/utils/logger.ts", { targetPath: dir, project });
+  assert.equal(cross.classification, "cross-cutting");
+  assert.equal(cross.recommendedModule, "_cross");
+  assert.equal(cross.isInsideModule, false);
+
+  // 4. เคสหลายไฟล์ข้ามโมดูล
+  const multi = evaluateModulePlacement([
+    "frontend/features/auth/login.ts",
+    "src/utils/logger.ts",
+  ], { targetPath: dir, project });
+  assert.equal(multi.classification, "in-module");
+  assert.equal(multi.recommendedModule, "auth");
+
+  // 5. ทดสอบ formatModuleEvaluation
+  const formatted = formatModuleEvaluation(inMod);
+  assert.ok(formatted.includes("ผลการประเมินสังกัดโมดูล"));
+  assert.ok(formatted.includes("auth"));
+});
+
+test("survey: CLI --eval ส่งออกผลการประเมินผ่าน utility ได้", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "survey-cli-eval-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+
+  mkdirSync(path.join(dir, "src", "common"), { recursive: true });
+  writeFileSync(path.join(dir, "package.json"), "{}", "utf8");
+
+  const ws = { knowledge_roots: [{ name: "test-kr", path: dir, layout: "project", targets: [{ name: "demo", path: dir }] }] };
+  const res = utility({ survey: true, target: "demo", eval: "src/common/util.ts", json: true }, ws, {}, dir);
+
+  assert.equal(res.classification, "cross-cutting");
+  assert.equal(res.recommendedModule, "_cross");
 });

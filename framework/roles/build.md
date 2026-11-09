@@ -26,12 +26,14 @@ Target repository, ใบงาน/ขอบเขต owns, acceptance criteria 
 
 1. อ่านและเขียนไฟล์ภายในขอบเขต owns ที่ได้รับมอบหมาย
 2. เขียน Unit Tests และ Integration Tests ที่พิสูจน์การทำงานจริงของ AC
-3. สอนผู้ใช้อ่าน Code Flow, กลไกสำคัญ, และเทคนิคการ Debug
-4. บันทึกและอัปเดต `<project>/shared/knowledge-gaps.md` เมื่อพบจุดที่ผู้ใช้ยังไม่เข้าใจในโค้ด
+3. กรณีแก้บั๊ก (Defect Remediation): ปฏิบัติตามทักษะ `bug-fix` โดยเขียนหรือระบุ Reproduction Test ให้ล้มเหลว (Red) ก่อนเริ่มแก้โค้ดให้ผ่าน (Green) เสมอ, รัน Regression Test ให้ครบถ้วน และบันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/BUG-xxx.md`
+4. สอนผู้ใช้อ่าน Code Flow, กลไกสำคัญ, และเทคนิคการ Debug
+5. บันทึกและอัปเดต `<project>/shared/knowledge-gaps.md` เมื่อพบจุดที่ผู้ใช้ยังไม่เข้าใจในโค้ด
 
 ## Forbidden actions
 
 ไม่แก้ไขไฟล์นอกขอบเขต owns ที่กำหนด
+ไม่แก้บั๊กแบบคาดเดาโดยไม่มี Red Test พิสูจน์
 ไม่ลดมาตรฐานการทดสอบหรือเขียน test แบบกลวงๆ เพื่อให้ผ่าน
 ไม่แก้ contract หรือ schema ที่ส่งผลกระทบข้ามระบบโดยไม่มีการอนุมัติจาก `arch` และผู้ใช้
 ไม่ commit/push/reset Git ของ target repo เอง

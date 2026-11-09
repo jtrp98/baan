@@ -1,7 +1,7 @@
 import http from "node:http";
 import { spawn } from "node:child_process";
 import path from "node:path";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "./usage-aggregator.mjs";
 import { getWorkspaceQuota } from "./quota-tracker.mjs";
@@ -14,6 +14,28 @@ function readAgentsEnabled() {
   } catch {
     return null;
   }
+}
+
+export function getAvailableWorkspaces(currentWorkspaceRoot) {
+  const currentNormalized = path.resolve(currentWorkspaceRoot);
+  const result = [];
+  const seen = new Set();
+  try {
+    const local = loadLocalConfig();
+    for (const ws of local.workspaces || []) {
+      const p = path.resolve(ws.path);
+      if (!seen.has(p.toLowerCase()) && existsSync(p)) {
+        seen.add(p.toLowerCase());
+        result.push({ name: ws.name || path.basename(p), path: p });
+      }
+    }
+  } catch {}
+
+  if (!seen.has(currentNormalized.toLowerCase())) {
+    result.unshift({ name: path.basename(currentNormalized), path: currentNormalized });
+  }
+
+  return result;
 }
 
 export function formatNumber(num) {
@@ -42,6 +64,7 @@ export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) 
   const activeRuns = scanActiveRuns(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
+  const workspaces = getAvailableWorkspaces(workspaceRoot);
   let quota = null;
   try {
     quota = await getWorkspaceQuota(forceRefreshQuota);
@@ -49,6 +72,7 @@ export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) 
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
+    workspaces,
     activeRuns,
     usage,
     quota,
@@ -169,6 +193,7 @@ function serveUiFile(name, res) {
 }
 
 export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true, runId = null }) {
+  let currentWorkspaceRoot = workspaceRoot;
   if (tui) {
     console.log(`Starting BAAN TUI Monitor for ${workspaceRoot}... (Press Ctrl+C to exit)`);
     let rendering = false;
@@ -176,7 +201,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       if (rendering) return;
       rendering = true;
       try {
-        const state = await getMonitorState(workspaceRoot);
+        const state = await getMonitorState(currentWorkspaceRoot);
         process.stdout.write("\x1b[2J\x1b[H");
         process.stdout.write(renderTui(state));
       } catch {} finally {
@@ -205,21 +230,55 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       if (url.pathname.startsWith("/ui/") && serveUiFile(url.pathname.slice(4), res)) return;
 
       if (url.pathname === "/api/quota/refresh" && req.method === "POST") {
-        const state = await getMonitorState(workspaceRoot, true);
+        const state = await getMonitorState(currentWorkspaceRoot, true);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state));
         return;
       }
 
+      if (url.pathname === "/api/workspace/select") {
+        const switchWorkspace = async (target) => {
+          if (target) {
+            const available = getAvailableWorkspaces(currentWorkspaceRoot);
+            const found = available.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase())
+              || (existsSync(target) ? { path: path.resolve(target) } : null);
+            if (found) {
+              currentWorkspaceRoot = found.path;
+            }
+          }
+          const state = await getMonitorState(currentWorkspaceRoot);
+          res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify(state));
+        };
+
+        if (req.method === "POST") {
+          let body = "";
+          req.on("data", (chunk) => { body += chunk; });
+          req.on("end", async () => {
+            try {
+              const data = JSON.parse(body || "{}");
+              await switchWorkspace(data.path);
+            } catch (err) {
+              res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+              res.end(JSON.stringify({ error: err.message }));
+            }
+          });
+          return;
+        } else if (req.method === "GET") {
+          await switchWorkspace(url.searchParams.get("path"));
+          return;
+        }
+      }
+
       if (url.pathname === "/api/stats") {
-        const state = await getMonitorState(workspaceRoot);
+        const state = await getMonitorState(currentWorkspaceRoot);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state));
         return;
       }
 
       if (url.pathname === "/api/runs") {
-        const runs = getRecentRuns(workspaceRoot, 30);
+        const runs = getRecentRuns(currentWorkspaceRoot, 30);
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(runs));
         return;
@@ -238,7 +297,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           if (sending) return;
           sending = true;
           try {
-            const state = await getMonitorState(workspaceRoot);
+            const state = await getMonitorState(currentWorkspaceRoot);
             res.write(`data: ${JSON.stringify(state)}\n\n`);
           } catch {} finally {
             sending = false;

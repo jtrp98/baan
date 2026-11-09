@@ -131,8 +131,12 @@
       "type": "string",
       "enum": [
         "code",
-        "docs"
+        "docs",
+        "bugfix"
       ]
+    },
+    "cross_cutting": {
+      "type": "boolean"
     },
     "worker_tier": {
       "type": "string",

@@ -77,7 +77,7 @@ function conn() {
 function render() {
   const status = conn();
   if (!lastState) {
-    panels.renderHeader({ workspaceName: "", projects: [], scope, conn: status, activeCount: null, animOn });
+    panels.renderHeader({ workspaceName: "", workspaceRoot: "", workspaces: [], projects: [], scope, conn: status, activeCount: null, animOn });
     panels.renderWorkshop([], null, scope, status);
     return;
   }
@@ -104,6 +104,8 @@ function render() {
 
   panels.renderHeader({
     workspaceName: lastState.workspaceName,
+    workspaceRoot: lastState.workspaceRoot,
+    workspaces: lastState.workspaces,
     projects: telemetry.projectsOf(lastState),
     scope,
     conn: status,
@@ -116,6 +118,24 @@ function render() {
   panels.renderQuests(lastState.recentRuns ?? [], scope);
   if (director) panels.renderRoster(director.roster());
 }
+
+panels.on("selectWorkspace", async (workspacePath) => {
+  try {
+    const res = await fetch("/api/workspace/select", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: workspacePath }),
+    });
+    if (res.ok) {
+      lastState = await res.json();
+      scope = "all";
+      needsReconcile = true;
+      render();
+    }
+  } catch (err) {
+    console.error("Failed to switch workspace", err);
+  }
+});
 
 panels.on("scope", (next) => {
   if (next === scope) return;

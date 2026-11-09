@@ -16,7 +16,7 @@ baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
-baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
+baan survey [--target <name>] [--project <name>] [--cwd <path>] [--eval <path>] [--json]
 baan monitor [--port 3456] [--no-open] [--tui]
 ```
 
@@ -34,6 +34,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 `baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
 - ตรวจจับ Tech Stacks (.NET, Next.js, Go, Python, React, ฯลฯ) และ Architecture Components (`features/`, `backend/src/`, `engines/`)
 - วิเคราะห์ Drift: โค้ดที่เดินหน้าไปไกลกว่า Knowledge (Unmapped Code) หรือโมดูลใน Knowledge ที่หาโค้ดจริงไม่พบ
+- ประเมินสังกัดโมดูล (`--eval <path>`): วิเคราะห์ไฟล์หรือตำแหน่งบั๊กอัตโนมัติว่าสังกัดโมดูลใด หรือเป็นงานส่วนกลางนอกโมดูล (Cross-Cutting / `_cross`)
 - สร้างโครงสร้างโมดูล (`--scaffold-module <name>`) หรือโปรเจค (`--scaffold-project <name>`) ครบสัญญา 3-slot พร้อมอัปเดตสารบัญ `INDEX.md` อัตโนมัติ
 - **สั่งผ่าน AI ในแชทได้โดยตรง**: ผู้ใช้ไม่ต้องพิมพ์ CLI เอง สามารถสั่ง AI ในแชท (เช่น บทบาท `arch` หรือนายช่าง) AI จะใช้ skill `project-survey` สำรวจ วิเคราะห์ และสร้างโมดูลให้ทั้งหมด
 
@@ -121,7 +122,8 @@ implementation files ที่อ่านเป็น context ไม่ทำ�
 Acceptance approval ไม่เซ็นประตูอื่นแทน ถ้า approval stale ต้องใช้ `--approve` อีกครั้ง; คำตอบทั่วไปไม่ refresh approval
 งานค้างที่ทับ owns ต้องให้คนยืนยันด้วย `--allow-dirty --by user` พร้อม decision/source
 
-ระบุ `"kind": "code" | "docs"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
+ระบุ `"kind": "code" | "docs" | "bugfix"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
+- งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `shared/defects/`
 - งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
 - งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
 

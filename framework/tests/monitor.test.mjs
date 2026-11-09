@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import http from "node:http";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "../src/usage-aggregator.mjs";
-import { formatNumber, formatCost, renderTui, startMonitor } from "../src/monitor.mjs";
+import { formatNumber, formatCost, renderTui, startMonitor, getAvailableWorkspaces } from "../src/monitor.mjs";
 import { parse } from "../src/cli.mjs";
 
 function makeFixture() {
@@ -223,4 +223,56 @@ test("monitor: recent call_end events and missing identity are reported truthful
 
   const tui = renderTui({ workspaceName: "w", activeRuns: [active], usage: { agents: {}, total: {} } });
   assert.match(tui, /Role: .*unknown/);
+});
+
+test("monitor: workspace switcher updates active workspace and telemetry", async (t) => {
+  const f1 = makeFixture();
+  const f2 = makeFixture();
+  t.after(() => { f1.cleanup(); f2.cleanup(); });
+
+  const port = 34600 + Math.floor(Math.random() * 500);
+  const monitorInstance = await startMonitor({
+    workspaceRoot: f1.root,
+    port,
+    openBrowser: false,
+    tui: false,
+  });
+  t.after(() => monitorInstance.server.close());
+
+  const fetchGet = (urlPath) =>
+    new Promise((resolve, reject) => {
+      http.get(`http://localhost:${port}${urlPath}`, (res) => {
+        let body = "";
+        res.on("data", (chunk) => (body += chunk));
+        res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
+      }).on("error", reject);
+    });
+
+  const fetchPost = (urlPath, data) =>
+    new Promise((resolve, reject) => {
+      const payload = JSON.stringify(data);
+      const req = http.request(`http://localhost:${port}${urlPath}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) },
+      }, (res) => {
+        let body = "";
+        res.on("data", (chunk) => (body += chunk));
+        res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
+      });
+      req.on("error", reject);
+      req.write(payload);
+      req.end();
+    });
+
+  const initialStats = JSON.parse((await fetchGet("/api/stats")).body);
+  assert.equal(initialStats.workspaceRoot, f1.root);
+  assert.ok(initialStats.workspaces.length >= 1);
+
+  const switchRes = await fetchPost("/api/workspace/select", { path: f2.root });
+  assert.equal(switchRes.statusCode, 200);
+  const switchedState = JSON.parse(switchRes.body);
+  assert.equal(switchedState.workspaceRoot, f2.root);
+
+  const newStats = JSON.parse((await fetchGet("/api/stats")).body);
+  assert.equal(newStats.workspaceRoot, f2.root);
 });

@@ -9,6 +9,7 @@ export function verification(p, packages = []) {
     return isCritical ? ["acceptance"] : [];
   }
   const lenses = new Set();
+  if (p.kind === "bugfix") lenses.add("acceptance");
   if (/auth|security|pii|password|token|สิทธิ์|ข้อมูลส่วนบุคคล/i.test(text)) lenses.add("security");
   if (/schema|migration|database|ฐานข้อมูล/i.test(text)) lenses.add("db");
   const fanout = transitiveFanOut(packages.map((p) => ({ id: p.id, dependsOn: p.depends_on ?? [] }))).get(p.id) ?? 0;

@@ -2,6 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.36.0 — 2026-11-09 · ระบบแก้บั๊กและบำรุงรักษา (kind: bugfix), ประเมินสังกัดโมดูล (survey --eval), รองรับงานข้ามระบบ (_cross), ทักษะ bug-fix, Workspace Switcher บน Live Monitor, และหลักการ ToS Compliance 3 ค่าย
+
+### เพิ่ม
+
+- **ระบบแก้บั๊กและบำรุงรักษา (Defect Remediation & Maintenance)**:
+  - เพิ่มการจัดประเภทงาน `kind: "bugfix"` ใน `schemas/packet.schema.json` และระบบจัดสรรงาน (triage/dispatch) สำหรับงานแก้ไขข้อบกพร่องโดยเฉพาะ
+  - รองรับงานทั้งระดับโมดูลปกติ (`module: "<name>"`) และงานระดับข้ามโมดูลหรือรากฐานระบบ (`_cross` / `cross_cutting: true`) ใน `src/plan.mjs` และ `src/session.mjs`
+  - รองรับการบันทึกประวัติการแก้บั๊กและหลักฐานลงใน `shared/defects/` (หรือ `knowledge/<project>/_shared/defects/`) อย่างเป็นระบบ
+- **ประเมินสังกัดและจัดสรรโมดูล (`baan survey --eval <path>`)**:
+  - เพิ่มฟังก์ชัน `evaluateModulePlacement` และแฟล็ก `--eval <path>` ในคำสั่ง `baan survey`
+  - จำแนกความสัมพันธ์ของโค้ดอย่างแม่นยำ 3 สถานะ: `in-module` (สังกัดโมดูลชัดเจน), `unmapped-code` (มีโค้ดแต่ยังไม่มีโมดูลรองรับ), และ `cross-cutting` (งานร่วมระดับรากฐานหรือกระทบหลายโมดูล) พร้อมระบุ path ของ knowledge module ที่เกี่ยวข้องทันที
+- **ทักษะการแก้ปัญหาอย่างเป็นระบบ (`skills/bug-fix/SKILL.md`)**:
+  - เพิ่ม Skill สำหรับ AI Agent ให้ทำหน้าที่แก้บั๊กตาม 5 ขั้นตอนมาตรฐาน:
+    1. Triage & Module Evaluation (`baan survey --eval`)
+    2. Reproduce & Red Test (เขียน Red Test จับบั๊กให้ fail ก่อนแก้เสมอตาม Red-Green-Refactor)
+    3. Minimal Root-Cause Fix (แก้เฉพาะจุดที่เป็นสาเหตุรากเหง้า ไม่แตะโค้ดนอกขอบเขต)
+    4. Green Test & Regression Check (รันชุดทดสอบให้เขียว และยืนยันว่าไม่กระทบฟังก์ชันเดิม)
+    5. Record Defect History (บันทึกบทเรียนและหลักฐานลง `shared/defects/`)
+- **Workspace Switcher บน BAAN Live Monitor (`src/monitor-ui/`)**:
+  - เพิ่มตัวเลือกสลับ Workspace บนหน้าเว็บแดชบอร์ด Pixel HQ โดยตรง
+  - ดึงรายชื่อ Workspace จาก `local.json` ให้สลับดู telemetry แบบ realtime ได้สะดวกรวดเร็วโดยไม่ต้องรีสตาร์ตเซิร์ฟเวอร์ monitor
+- **ความปลอดภัยและปฏิบัติตาม ToS ของทั้ง 3 ค่าย 100% (Zero ToS Risk)**:
+  - บรรจุกฎเหล็ก ToS ทั้ง 5 ข้อของ OpenAI, Anthropic, และ Google ลงในสัญญาและกติกา (`AGENTS.md`, `CLAUDE.md`, `CONVENTIONS.md`, `LEARNING.md`) พร้อมหลักการวิศวกรรมข้อที่ 10
+  - ถอดระบบ internal quota tracking ออก เพื่อไม่ให้มีความเสี่ยงต่อการอ่านไฟล์ credential หรือ reverse-engineer private endpoints
+  - เพิ่มชุดทดสอบ `tests/tos-compliance.test.mjs` รับประกันความปลอดภัย 100% (รวมชุดทดสอบทั้งหมด 242 tests ผ่านครบถ้วน)
+
 ## 0.35.0 — 2026-11-09 · baan monitor, Pixel HQ Telemetry Dashboard, Quota Tracker 3 ค่าย, และรองรับการเปิด/ปิด AI agents ใน local.json
 
 ### เพิ่ม
