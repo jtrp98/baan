@@ -158,6 +158,10 @@ export function createPanels(doc = document) {
   }
 
   // ---------- event delegation on stable containers ----------
+  dom.ws?.addEventListener("change", (e) => {
+    const sel = e.target.closest?.("select.hq-ws-select");
+    if (sel) emit("selectWorkspace", sel.value);
+  });
   dom.tabs?.addEventListener("click", (e) => {
     const b = e.target.closest?.("[data-scope]");
     if (b) emit("scope", b.dataset.scope);
@@ -199,9 +203,40 @@ export function createPanels(doc = document) {
 
   // ---------- header ----------
   let lastConn = "NO DATA";
-  function renderHeader({ workspaceName, projects = [], scope = "all", conn = "NO DATA", activeCount = 0, animOn = true } = {}) {
+  function renderHeader({ workspaceName, workspaceRoot, workspaces = [], projects = [], scope = "all", conn = "NO DATA", activeCount = 0, animOn = true } = {}) {
     lastConn = conn;
-    if (dom.ws) dom.ws.textContent = workspaceName || "…";
+    if (dom.ws) {
+      if (workspaces && workspaces.length > 1) {
+        let select = dom.ws.querySelector("select.hq-ws-select");
+        if (!select) {
+          dom.ws.replaceChildren();
+          select = el("select", "hq-ws-select");
+          select.setAttribute("aria-label", "Switch workspace");
+          for (const w of workspaces) {
+            const opt = el("option", null, w.name);
+            opt.value = w.path;
+            select.appendChild(opt);
+          }
+          dom.ws.appendChild(select);
+        } else {
+          const currentValues = Array.from(select.options).map((o) => o.value);
+          const newValues = workspaces.map((w) => w.path);
+          if (JSON.stringify(currentValues) !== JSON.stringify(newValues)) {
+            select.replaceChildren();
+            for (const w of workspaces) {
+              const opt = el("option", null, w.name);
+              opt.value = w.path;
+              select.appendChild(opt);
+            }
+          }
+        }
+        if (workspaceRoot && select.value !== workspaceRoot) {
+          select.value = workspaceRoot;
+        }
+      } else {
+        dom.ws.textContent = workspaceName || "…";
+      }
+    }
     if (dom.conn) {
       dom.conn.textContent = conn;
       dom.conn.dataset.state = conn;
