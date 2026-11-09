@@ -25,7 +25,11 @@ test("init ครั้งแรก: สร้าง baan.config.json จาก�
       assert.ok(content.includes(path.join(TEAM_DIR, "BAAN.md")), `${name} ต้องชี้ path ของ charter`);
       assert.ok(content.includes(path.join(TEAM_DIR, "LEARNING.md")), `${name} ต้องชี้ path ของ learning contract`);
       assert.ok(content.includes("baan.config.json"), `${name} ต้องบอกตำแหน่ง config`);
+      assert.ok(content.includes("bug-fix"), `${name} ต้องมีคำสั่ง bug-fix`);
+      assert.ok(content.includes("เริ่มงานด้วย BAAN เสมอ"), `${name} ต้องมีคำสั่งเริ่มงานด้วย BAAN`);
     }
+    assert.ok(existsSync(path.join(dir, ".agents", "skills", "bug-fix", "SKILL.md")), "ต้องติดตั้ง skill ใน .agents/skills ด้วย");
+    assert.ok(existsSync(path.join(dir, ".claude", "skills", "bug-fix", "SKILL.md")), "ต้องติดตั้ง skill ใน .claude/skills ด้วย");
     assert.ok(logs.some((l) => l.includes("แก้ path")), "ต้องบอกผู้ใช้ให้แก้ config");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
