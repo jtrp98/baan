@@ -146,6 +146,11 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
    - **Strict High-Risk Guard**: งานที่เป็น `risk: "high"` ต้องใช้ Worker ระดับ **Tier 2** ขึ้นไปเสมอ ห้าม Step-down เพื่อป้องกัน Rework Penalty (ต้นทุนการแก้ซ้ำแพงกว่าส่วนต่างค่าโมเดล)
    - **Contract-Gated Step-down**: งานที่เป็น `risk: "low"` หรือ `"medium"` อนุญาตให้ลดระดับ Worker Tier ลงได้ (เช่น `Plan t2 -> Work t3`) **เฉพาะเมื่อมี `contracts` หรือสเปกที่ pin ชัดเจน** กำกับไว้เท่านั้น
    - หากงานตก (`FAIL: fix: code`) ระบบจะใช้บันได Rework ขยับ Tier ขึ้น 1 ขั้นในการแก้งานรอบถัดไปตามเดิม
+3. **งานแก้บั๊กและบำรุงรักษา (`kind: "bugfix"`) — Red-Green & Defect Logging Policy**:
+   - **Module Placement Assessment**: วิเคราะห์ตำแหน่งไฟล์ด้วย `evaluateModulePlacement` หากเป็นงานส่วนกลาง/โครงสร้างพื้นฐาน กำหนดเป็น `module: "_cross"` โดยไม่ต้องฝืนยัดเข้าโมดูลฟีเจอร์
+   - **Mandatory Red Test**: บังคับเขียนหรือระบุ automated test ที่จำลองบั๊กให้ fail (Red) ก่อนเริ่มแก้โค้ดเสมอ เพื่อเป็นหลักฐานว่าแก้ตรงจุด
+   - **Minimal Blast Radius**: จำกัด owns เฉพาะไฟล์ที่จำเป็น ห้ามทำ unrelated refactor
+   - **Defect History Logging**: บันทึกสรุป Root Cause, ไฟล์ที่แก้, และหลักฐานการทดสอบลง `<project>/shared/defects/BUG-xxx.md` และอัปเดต `INDEX.md` ประจำโฟลเดอร์
 
 ---
 

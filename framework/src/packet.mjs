@@ -139,6 +139,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
       module: task.module,
       human_gates: [],
       kind: task.kind ?? plan.kind ?? normalized?.kind ?? "code",
+      ...(task.cross_cutting !== undefined || task.crossCutting !== undefined ? { cross_cutting: Boolean(task.cross_cutting ?? task.crossCutting) } : {}),
       ...(workerTierVal ? { worker_tier: workerTierVal } : {}),
     };
     pkg.tasks.push(task.id);

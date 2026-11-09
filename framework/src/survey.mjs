@@ -537,6 +537,18 @@ export function surveyProject(o, ws, root, log = () => {}) {
     return o.json ? res : `✅ สร้างโปรเจค ${o["scaffold-project"]} ใน ${res.dir} เรียบร้อยแล้ว`;
   }
 
+  // 2.1 ถ้ามีคำสั่ง Evaluate / Eval ให้ประเมินสังกัดโมดูลของไฟล์
+  if (o.eval || o.evaluate) {
+    const targetFile = o.eval || o.evaluate;
+    const res = evaluateModulePlacement(targetFile, {
+      targetPath,
+      ws,
+      project,
+      kr,
+    });
+    return o.json ? res : formatModuleEvaluation(res);
+  }
+
   // 3. สแกน Target Codebase
   const surveyData = scanTargetCodebase(targetPath);
 
@@ -628,6 +640,157 @@ export function formatSurveyReport(res) {
     }
   } else {
     lines.push(`- โค้ดจริงและ Knowledge อยู่ในสถานะตรงกันเรียบร้อย ไม่ต้องดำเนินการเพิ่มเติม`);
+  }
+
+  return lines.join("\n");
+}
+
+export function evaluateModulePlacement(fileOrPaths, { targetPath, ws, project, kr } = {}) {
+  const rawList = Array.isArray(fileOrPaths) ? fileOrPaths : [fileOrPaths];
+  const list = rawList.filter((f) => typeof f === "string" && f.trim() !== "");
+  if (!list.length) throw new Error("ต้องระบุไฟล์หรือเส้นทางอย่างน้อย 1 รายการ");
+
+  const resolvedTarget = path.resolve(targetPath || (ws ? ws.root : null) || process.cwd());
+  const surveyData = scanTargetCodebase(resolvedTarget);
+
+  let proj = project;
+  if (!proj && kr && layoutOf(kr) === "project") {
+    const projects = scanProjects(kr.path);
+    const targetName = path.basename(resolvedTarget);
+    proj = projects.find((p) => p.header?.target === targetName || p.name === targetName) || null;
+  }
+  const drift = detectKnowledgeDrift(surveyData, proj);
+  const knownModules = proj?.modules || [];
+
+  const toRel = (p) => {
+    const abs = path.isAbsolute(p) ? p : path.resolve(resolvedTarget, p);
+    return path.relative(resolvedTarget, abs).split(path.sep).join("/");
+  };
+
+  const results = [];
+  for (const rawPath of list) {
+    const rel = toRel(rawPath);
+
+    // ตรวจสอบว่าไฟล์อยู่ใต้ Code Component ใดที่สแกนพบ
+    let matchedComp = null;
+    for (const comp of surveyData.components) {
+      const cPath = (comp.path.endsWith("/") ? comp.path.slice(0, -1) : comp.path).split(path.sep).join("/");
+      if (rel === cPath || rel.startsWith(`${cPath}/`)) {
+        matchedComp = comp;
+        break;
+      }
+    }
+
+    let matchedModule = null;
+    if (matchedComp) {
+      const m = drift.mapped.find((x) => x.codeComponent.path === matchedComp.path || x.codeComponent.name === matchedComp.name);
+      if (m) matchedModule = m.module;
+    }
+
+    // หากไม่พบจาก component ให้ตรวจจับจาก path segments เทียบกับชื่อโมดูลใน Knowledge
+    if (!matchedModule) {
+      const parts = rel.toLowerCase().split("/");
+      const found = knownModules.find((m) => parts.includes(m.module.toLowerCase()));
+      if (found) matchedModule = found.module;
+    }
+
+    if (matchedModule) {
+      results.push({
+        path: rel,
+        classification: "in-module",
+        module: matchedModule,
+        matchedComponent: matchedComp?.path || null,
+        reason: `สังกัดโมดูล '${matchedModule}' ใน Knowledge (ตรงกับโครงสร้างโมดูล)`,
+        isInsideModule: true,
+      });
+    } else if (matchedComp) {
+      results.push({
+        path: rel,
+        classification: "unmapped-code",
+        module: matchedComp.name,
+        matchedComponent: matchedComp.path,
+        reason: `อยู่ในโค้ดคอมโพเนนต์ '${matchedComp.name}' ที่ยังไม่ได้สร้างเป็นโมดูลใน Knowledge (Code Ahead of Knowledge)`,
+        isInsideModule: false,
+        scaffoldAvailable: true,
+      });
+    } else {
+      results.push({
+        path: rel,
+        classification: "cross-cutting",
+        module: "_cross",
+        matchedComponent: null,
+        reason: "อยู่ในส่วนโครงสร้างพื้นฐาน/ส่วนกลาง (Shared Infrastructure / Cross-Cutting) ไม่อยู่ในโมดูลใดเฉพาะเจาะจง",
+        isInsideModule: false,
+      });
+    }
+  }
+
+  const distinctModules = [...new Set(results.filter((r) => r.classification === "in-module").map((r) => r.module))];
+  const hasUnmapped = results.some((r) => r.classification === "unmapped-code");
+  const hasCross = results.some((r) => r.classification === "cross-cutting");
+
+  let overallClassification = "cross-cutting";
+  let recommendedModule = "_cross";
+  let overallReason = "";
+
+  if (distinctModules.length === 1 && !hasUnmapped && !hasCross) {
+    overallClassification = "in-module";
+    recommendedModule = distinctModules[0];
+    overallReason = `ไฟล์ทั้งหมดอยู่ในขอบเขตของโมดูล '${recommendedModule}'`;
+  } else if (distinctModules.length === 1 && hasCross) {
+    overallClassification = "in-module";
+    recommendedModule = distinctModules[0];
+    overallReason = `ไฟล์หลักสังกัดโมดูล '${recommendedModule}' โดยมีไฟล์ส่วนกลางร่วมด้วย (แนะนำผูกกับโมดูล ${recommendedModule})`;
+  } else if (distinctModules.length > 1) {
+    overallClassification = "cross-cutting";
+    recommendedModule = "_cross";
+    overallReason = `ขอบเขตไฟล์ครอบคลุมหลายโมดูล (${distinctModules.join(", ")}) จัดเป็นงานระดับข้ามระบบ (Cross-Module)`;
+  } else if (hasUnmapped) {
+    const unmappedNames = [...new Set(results.filter((r) => r.classification === "unmapped-code").map((r) => r.module))];
+    overallClassification = "unmapped-code";
+    recommendedModule = unmappedNames[0];
+    overallReason = `ไฟล์อยู่ในโค้ดส่วนที่ยังไม่มีโมดูลรองรับ (${unmappedNames.join(", ")}) สามารถพิจารณาสร้างโมดูลใหม่ หรือทำเป็นงาน _cross ชั่วคราว`;
+  } else {
+    overallClassification = "cross-cutting";
+    recommendedModule = "_cross";
+    overallReason = "ไฟล์ทั้งหมดอยู่ในส่วนกลางหรือโครงสร้างพื้นฐานนอกโมดูล (Cross-Cutting)";
+  }
+
+  return {
+    target: { path: resolvedTarget, name: path.basename(resolvedTarget) },
+    classification: overallClassification,
+    recommendedModule,
+    reason: overallReason,
+    isInsideModule: overallClassification === "in-module",
+    files: results,
+  };
+}
+
+export function formatModuleEvaluation(evalResult) {
+  const icon = evalResult.classification === "in-module" ? "📦" : evalResult.classification === "unmapped-code" ? "⚠️" : "🌐";
+  const typeText = evalResult.classification === "in-module" ? "อยู่ในโมดูล (In-Module)"
+    : evalResult.classification === "unmapped-code" ? "โค้ดยังไม่มีโมดูล (Unmapped Code)"
+    : "งานนอกโมดูล / ส่วนกลาง (Cross-Cutting)";
+
+  const lines = [
+    `# 🎯 ผลการประเมินสังกัดโมดูล (Module Placement Evaluation)`,
+    `**Target:** \`${evalResult.target.name}\` (${evalResult.target.path})`,
+    `**การจำแนก:** ${icon} **${typeText}**`,
+    `**โมดูลที่แนะนำ:** \`${evalResult.recommendedModule}\``,
+    `**เหตุผล:** ${evalResult.reason}`,
+    "",
+    `## รายการไฟล์ที่ตรวจสอบ (${evalResult.files.length} รายการ)`,
+  ];
+
+  for (const f of evalResult.files) {
+    const fIcon = f.classification === "in-module" ? "📦" : f.classification === "unmapped-code" ? "⚠️" : "🌐";
+    lines.push(`- ${fIcon} \`${f.path}\` → **${f.module}** (${f.reason})`);
+  }
+
+  if (evalResult.classification === "unmapped-code") {
+    lines.push("", `> 💡 แนะนำ: หากต้องการตั้งต้นโมดูลใหม่ สามารถสั่ง \`baan survey --scaffold-module ${evalResult.recommendedModule}\` ได้`);
+  } else if (evalResult.classification === "cross-cutting") {
+    lines.push("", `> 💡 แนะนำ: ในใบงานหรือแผนงาน สามารถใส่ \`"module": "_cross"\` หรือ \`"cross_cutting": true\` ได้โดยตรง`);
   }
 
   return lines.join("\n");

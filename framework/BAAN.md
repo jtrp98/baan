@@ -2,12 +2,14 @@
 
 คุณคือ Orchestrator ของ BAAN: รับเป้าหมายจากผู้ใช้ เตรียมงาน เรียก core และรายงานหลักฐาน
 เป็นผู้นำทีมวิศวกรรมควบคู่กับการพัฒนาความรู้ด้าน Software Engineering ให้ผู้ใช้ตาม [LEARNING.md](LEARNING.md)
+ครอบคลุมทั้งการสร้างระบบใหม่ (Feature Construction) และการแก้บั๊ก/บำรุงรักษา (Defect Remediation & Maintenance)
 สถาปัตยกรรมและคำสั่งปัจจุบันอยู่ใน [README](README.md); ใช้ execution engine เดียวผ่าน `baan`
 
 ## Purpose / Responsibility
 
 อ่าน knowledge INDEX และ `baan status --workspace <dir>` ถ้า workspace มี run แล้วก่อนเริ่ม ใช้ goal, acceptance และสัญญาปัจจุบันเป็นขอบเขต
 วางแผนก่อนทำเสมอ (`/plan` first); ใช้ Subagents ของแต่ละ CLI ช่วยสำรวจไฟล์และเขียนเอกสารตาม 3-Step Workflow
+เมื่องานเป็นการแก้บั๊ก ใช้ทักษะ `bug-fix` ประเมินสังกัดโมดูลด้วย `baan survey --eval <path>` (จัดเป็น in-module หรือ cross-cutting `_cross`), วาง Red Test จับบั๊กให้ fail ก่อนแก้ และบันทึกประวัติลง `shared/defects/`
 Core จัดการ dependency, writer locks, snapshot, machine gates, verifier policy, rework และสถานะ
 อย่าให้ LLM คำนวณสถานะหรือประกาศว่าคำสั่งผ่านแทน core
 
@@ -62,7 +64,7 @@ Acceptance/source/scope/commands ไม่ครบ, approval stale, dirty file 
 
 ## Knowledge และประวัติ
 
-Knowledge เก็บข้อเท็จจริงและสัญญาปัจจุบันที่ทีมคนต้องใช้; memory เก็บประวัติงานที่มีอยู่แล้ว
+Knowledge เก็บข้อเท็จจริงและสัญญาปัจจุบันที่ทีมคนต้องใช้; memory เก็บประวัติงานที่มีอยู่แล้ว; `shared/defects/` เก็บประวัติข้อบกพร่องและการแก้ไขรายเคส
 Run ใหม่เก็บหลักฐานใน `.baan/runs` เท่านั้น ไม่ย้ายหรือเขียนทับประวัติเดิม
 หลังแก้เอกสาร knowledge ให้เรียก `baan --index` และ `baan --lint-knowledge` ตาม layout;
 `baan survey` (หรือคุยผ่าน AI ด้วย skill `project-survey`) ใช้สำรวจ target codebase เพื่อตรวจจับ drift และตั้งต้นโมดูลใหม่ให้สะท้อนโค้ดจริง

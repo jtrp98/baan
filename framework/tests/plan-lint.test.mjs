@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanProgress, lintPlanVerification, normalizeDagTasks, transitiveFanOut } from "../src/plan.mjs";
+import { deriveTaskStatus, lintPlanDag, lintPlanFile, lintPlanModules, lintPlanProgress, lintPlanVerification, normalizeDagTasks, transitiveFanOut } from "../src/plan.mjs";
 
 const cfg = {
   roleNames: ["check", "spec", "front", "sys"],
@@ -265,4 +265,31 @@ test("งาน code ที่ step-down worker_tier ต่ำกว่า plan 
     "BE-1": { role: "build", kind: "code", risk: "low", tier: "t2", worker_tier: "t3", ac_ids: ["AC-1"], contracts: [{ ref: "api.md" }] }
   }));
   assert.doesNotMatch(withContract.warnings.join("\n"), /ลด worker_tier ต่ำกว่า tier/);
+});
+
+test("lintPlanModules: รองรับงานข้ามระบบ (_cross, cross-cutting, cross_cutting: true) และ kind: bugfix โดยไม่ error หรือเตือน", () => {
+  const rawTasks = [
+    { id: "T1", module: "_cross" },
+    { id: "T2", module: "cross-cutting" },
+    { id: "T3", cross_cutting: true },
+    { id: "T4", kind: "bugfix" },
+    { id: "T5", module: "auth" },
+  ];
+  const isDir = (p) => p.includes("auth") || p.includes("modules");
+  const r = lintPlanModules(rawTasks, "C:/project/build/plan/tasks.json", isDir);
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.warnings, []);
+});
+
+test("lintPlanModules: โมดูลที่ไม่มีจริงยังคงเป็น error และ task ทั่วไปที่ไม่ระบุโมดูลยังคงเตือน warning", () => {
+  const rawTasks = [
+    { id: "T1", module: "non-existent" },
+    { id: "T2" },
+  ];
+  const isDir = (p) => p.includes("modules") && !p.includes("non-existent");
+  const r = lintPlanModules(rawTasks, "C:/project/build/plan/tasks.json", isDir);
+  assert.equal(r.errors.length, 1);
+  assert.match(r.errors[0], /module "non-existent" ไม่มีจริง/);
+  assert.equal(r.warnings.length, 1);
+  assert.match(r.warnings[0], /task ที่ยังไม่ระบุ module 1 งาน/);
 });

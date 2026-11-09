@@ -62,6 +62,14 @@ test("packet validation rejects malformed budgets, duplicate AC, unsafe scopes a
   const [p] = fromPlan({ packages: [{ ...packet(repo), before: { head: "forged" }, result: good, rework: -999 }] });
   assert.equal(p.before, undefined); assert.equal(p.result, undefined); assert.equal(p.rework, undefined);
 });
+test("packet validation accepts kind: bugfix and cross_cutting", (t) => {
+  const { repo } = fixture(t);
+  const p = packet(repo, "WP-BUG", { kind: "bugfix", cross_cutting: true });
+  assert.doesNotThrow(() => validatePacket(p));
+  const [imported] = fromPlan({ packages: [p] });
+  assert.equal(imported.kind, "bugfix");
+  assert.equal(imported.cross_cutting, true);
+});
 test("cancelled queued packages never start, including after resume", async (t) => {
   const { root, repo } = fixture(t); const run = runAt(root, [packet(repo)]); save(path.join(run.dir, "cancel-WP-1.json"), {});
   let calls = 0;
