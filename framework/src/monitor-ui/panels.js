@@ -317,21 +317,13 @@ export function createPanels(doc = document) {
     ]));
     if (scoped) card.append(el("div", "scope-note", "Workspace-wide (not per-project)"));
 
-    const qb = el("div", "quota-box");
-    const { plan, account } = planLine(p, quota);
-    qb.append(el("div", "plan-line", `${plan} · 👤 ${account}`));
-    if (windows.length) {
+    if (quota && windows.length) {
+      const qb = el("div", "quota-box");
+      const { plan, account } = planLine(p, quota);
+      qb.append(el("div", "plan-line", `${plan} · 👤 ${account}`));
       for (const w of windows) qb.append(energyBar(w));
-    } else {
-      const empty = el("div", "energy lvl-unknown quota-empty");
-      const head = el("div", "energy-head");
-      head.append(el("span", null, "QUOTA"), el("strong", null, "UNAVAILABLE"));
-      const cells = el("div", "energy-cells", "QUOTA UNAVAILABLE");
-      empty.append(head, cells);
-      qb.append(empty);
-      qb.append(el("div", "quota-hint", quota?.error ? String(quota.error) : QUOTA_HINTS[p]));
+      card.append(qb);
     }
-    card.append(qb);
     return card;
   }
 
