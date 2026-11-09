@@ -2,6 +2,33 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.35.0 — 2026-11-09 · baan monitor, Pixel HQ Telemetry Dashboard, Quota Tracker 3 ค่าย, และรองรับการเปิด/ปิด AI agents ใน local.json
+
+### เพิ่ม
+
+- **คำสั่ง `baan monitor` และแดชบอร์ดตรวจสอบกระบวนการแบบ Realtime**:
+  - เพิ่มคำสั่ง `baan monitor [--port <n>] [--no-open] [--tui] [--web]` สำหรับเฝ้าติดตามสถานะของ BAAN runner, processes, subagents และ AI CLI ที่กำลังทำงาน
+  - โหมด TUI แบบ live stream ใน terminal แสดงผล realtime metrics และ process status
+  - สตรีม Telemetry ผ่าน Server-Sent Events (SSE) `/api/events` สำหรับส่งต่อกิจกรรมของ LLM (tools, thoughts, cost, tokens) สดจาก runner
+- **Pixel HQ Telemetry Web Dashboard (`src/monitor-ui/`)**:
+  - ออฟฟิศเสมือนจริง 2D Pixel-art สร้างด้วย pure HTML5 Canvas / ES modules (zero dependency)
+  - ตัวละคร 12 บทบาท (Roles) และ AI Providers (Claude, Codex, Agy) เดินด้วยอัลกอริทึม A* Pathfinding บน Tilemap
+  - ตัวแทน Provider จะเดินไปนั่งประกบคู่กับ Role ที่กำลังทำงานตามสถานะ `active-<pkg>.json` จริง
+  - แสดงความคิด (Thinking Bubble), การเรียกใช้ Tools, และผลการทำงาน (Pass/Fail) ตามเหตุการณ์จริงจาก ledger (`call_end`)
+- **Quota Tracker และ Usage Aggregator 3 ค่าย (`quota-tracker.mjs`, `usage-aggregator.mjs`)**:
+  - ติดตามโควตาคงเหลือจริงทั้งแบบ 5-Hour Limit และ Weekly Limit ของ 3 ค่ายใหญ่ (Claude Code, OpenAI Codex, Antigravity/Agy)
+  - ดึงข้อมูลโควตา Claude Code โดยตรงจาก `~/.claude.json` (`cachedUsageUtilization` และ `oauthAccount`) เพื่อความแม่นยำสูงและรวดเร็วระดับ millisecond
+  - รองรับการแปลงรูปแบบเวลา Reset ให้เป็นมาตรฐานเดียวกันและซ่อนแถวที่ไม่มีข้อมูลเพื่อความสะอาดตา
+- **รองรับการเปิด/ปิด AI agents ใน `local.json` (`src/config.mjs`)**:
+  - เพิ่มการตั้งค่า `"agents": { "claude": true, "codex": true, "agy": true }` ใน `local.json`
+  - ผูกการทำงานทั่วทั้งระบบ: หาก agent ใดถูกปิด (`false`) ระบบจะข้ามหรือ fallback ไปยัง agent อื่นที่เปิดใช้งานโดยอัตโนมัติ (ครอบคลุม `baan run`, `plan`, `parity`, `update-clis`)
+- **ชุดทดสอบใหม่ครอบคลุมทุกส่วนเพิ่มขึ้นเป็น 236 tests**:
+  - `tests/events-live.test.mjs`: ทดสอบ stream event parser และ activity extraction
+  - `tests/local-agents.test.mjs`: ทดสอบ agent toggling, fallback, และ configuration resolution
+  - `tests/monitor-ui.test.mjs`: ทดสอบ telemetry state, engine calculations, และ UI data mapping
+  - `tests/monitor.test.mjs`: ทดสอบ monitor HTTP server, SSE endpoint, และ lifecycle
+  - `tests/quota-tracker.test.mjs`: ทดสอบการดึงและ parse โควตาจากทั้ง 3 ค่าย
+
 ## 0.34.0 — 2026-11-08 · รองรับ auto_update ใน local.json, ซิงค์ทุก workspace อัตโนมัติ, และเพิ่ม Git hook post-merge
 
 ### เพิ่ม

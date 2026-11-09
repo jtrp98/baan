@@ -13,6 +13,7 @@ import { repairFile } from "./mojibake.mjs";
 export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "repair-mojibake", "sweep", "sync", "survey", "scan"];
 export function utility(o, ws, cfg, root) {
   if (o.help) return `BAAN — one execution engine
+  baan monitor | ui [--port <3456>] [--no-open] [--tui]
   baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
   baan update-clis
   baan attach <package> [--run <run>]
@@ -66,6 +67,7 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
       defaults: ws?.defaults ?? {},
       knowledge_roots: (ws?.knowledge_roots ?? []).map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
       ...(local.workspaces.length ? { local_workspaces: local.workspaces } : {}),
+      ...(local.agents ? { local_agents: local.agents } : {}),
       execution_roles: ["planner", "worker", "verifier"],
       interactive_roles: listRoles(),
       tiers: tierMatrixText(cfg.tiers, cfg.agents),

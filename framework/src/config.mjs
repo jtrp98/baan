@@ -43,6 +43,49 @@ export function reportsDirOf(workspaceRoot) {
   return workspaceRoot ? path.join(workspaceRoot, "reports", "baan") : REPORTS_DIR;
 }
 
+export function normalizeAgentStatus(val) {
+  if (typeof val === "boolean") return val;
+  if (typeof val === "string") {
+    const s = val.trim().toLowerCase();
+    if (["close", "closed", "disabled", "disable", "false", "off", "inactive"].includes(s)) return false;
+    if (["open", "opened", "enabled", "enable", "true", "on", "active"].includes(s)) return true;
+  }
+  if (typeof val === "object" && val !== null) {
+    if (typeof val.enabled === "boolean") return val.enabled;
+    if (typeof val.status === "string" || typeof val.status === "boolean") return normalizeAgentStatus(val.status);
+  }
+  return true;
+}
+
+export function normalizeLocalAgents(rawAgents) {
+  if (!rawAgents || typeof rawAgents !== "object") return null;
+  const result = {};
+  for (const [key, val] of Object.entries(rawAgents)) {
+    result[key.trim().toLowerCase()] = normalizeAgentStatus(val);
+  }
+  return result;
+}
+
+export function isAgentEnabled(agent, localConfig) {
+  if (!agent) return false;
+  if (!localConfig?.agents) return true;
+  const norm = String(agent).toLowerCase();
+  if (Object.hasOwn(localConfig.agents, norm)) {
+    return Boolean(localConfig.agents[norm]);
+  }
+  return true;
+}
+
+export function applyLocalAgents(cfg, localConfig) {
+  if (!cfg?.agents) return cfg;
+  for (const [name, def] of Object.entries(cfg.agents)) {
+    if (def && typeof def === "object") {
+      def.enabled = isAgentEnabled(name, localConfig);
+    }
+  }
+  return cfg;
+}
+
 export function findLocalConfig(teamDir = TEAM_DIR) {
   const env = process.env.BAAN_LOCAL_FILE;
   if (env && existsSync(env)) return path.resolve(env);
@@ -55,7 +98,7 @@ export function findLocalConfig(teamDir = TEAM_DIR) {
 
 export function loadLocalConfig(teamDir = TEAM_DIR) {
   const file = findLocalConfig(teamDir);
-  if (!file) return { source: null, auto_update: false, workspaces: [] };
+  if (!file) return { source: null, auto_update: false, workspaces: [], agents: null };
   try {
     const raw = JSON.parse(readFileSync(file, "utf8"));
     const list = Array.isArray(raw.workspaces) ? raw.workspaces : (Array.isArray(raw.companies) ? raw.companies : []);
@@ -63,7 +106,8 @@ export function loadLocalConfig(teamDir = TEAM_DIR) {
       if (typeof item === "string") return { name: path.basename(item), path: path.resolve(item) };
       return { name: item.name || path.basename(item.path), path: path.resolve(item.path) };
     });
-    return { source: file, auto_update: raw.auto_update ?? true, workspaces };
+    const agents = normalizeLocalAgents(raw.agents);
+    return { source: file, auto_update: raw.auto_update ?? true, workspaces, agents };
   } catch (e) {
     throw new Error(`อ่าน local.json ไม่ได้ (${file}): ${e.message}`);
   }

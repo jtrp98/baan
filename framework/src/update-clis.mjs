@@ -1,4 +1,5 @@
 import { execSync, spawnSync } from "node:child_process";
+import { loadLocalConfig, isAgentEnabled, TEAM_DIR } from "./config.mjs";
 
 export const SUPPORTED_CLIS = [
   {
@@ -21,11 +22,26 @@ export const SUPPORTED_CLIS = [
   },
 ];
 
-export async function updateClis({ clis = SUPPORTED_CLIS, onLog = console.log } = {}) {
+export async function updateClis({ clis = SUPPORTED_CLIS, localConfig = null, onLog = console.log } = {}) {
+  const local = localConfig ?? loadLocalConfig(TEAM_DIR);
   const results = [];
   onLog("🔄 Checking and updating AI CLIs (agy, claude, codex)...");
 
   for (const item of clis) {
+    if (!isAgentEnabled(item.name, local)) {
+      onLog(`\n[${item.label}] ⏭️ ข้าม: ปิดใช้งานใน local.json (close)`);
+      results.push({
+        name: item.name,
+        label: item.label,
+        ok: true,
+        skipped: true,
+        reason: "disabled_in_local_config",
+        beforeVersion: null,
+        afterVersion: null,
+      });
+      continue;
+    }
+
     onLog(`\n[${item.label}] Checking current version...`);
     let beforeVersion = "unknown";
     try {
@@ -76,8 +92,8 @@ export async function updateClis({ clis = SUPPORTED_CLIS, onLog = console.log } 
 
   onLog("\n📊 Summary:");
   for (const r of results) {
-    const status = !r.ok ? "❌ FAILED" : r.updated ? "✨ UPDATED" : "✓ OK";
-    onLog(`  ${r.label.padEnd(14, " ")}: ${status} (${r.afterVersion || "N/A"})`);
+    const status = r.skipped ? "⏭️ SKIPPED" : !r.ok ? "❌ FAILED" : r.updated ? "✨ UPDATED" : "✓ OK";
+    onLog(`  ${r.label.padEnd(14, " ")}: ${status} (${r.skipped ? "disabled in local.json" : r.afterVersion || "N/A"})`);
   }
 
   return { ok: results.every((r) => r.ok), results };

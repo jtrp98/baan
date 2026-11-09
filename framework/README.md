@@ -17,7 +17,19 @@ baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
+baan monitor [--port 3456] [--no-open] [--tui]
 ```
+
+`baan monitor` (หรือ `baan ui`) มอนิเตอร์การทำงานสดและสรุป 3-CLI Usage แยกอิสระจากการสั่งงาน:
+- **Decoupled Architecture**: เปิดทิ้งไว้ในหน้าต่างแยกหรือเบราว์เซอร์ (`http://localhost:3456`) ขณะที่คุณสั่งงานใน session ตามปกติ (เช่น คุยกับ AI ใน `C:\src\schoolbright`)
+- **Real-time Process & Tool Calls**: แสดงสด ณ วินาทีนั้นว่า AI กำลังอ่านไฟล์ไหน (`read_file`), แก้ไฟล์อะไร (`edit_file`), หรือรันคำสั่งอะไร (`bash: npm test`) พร้อม Snippet ความคิดล่าสุด
+- **Used ทั้ง 3 CLI แบบสดๆ**: คำนวณ Token In/Out/Cache, Turns, และ Cost ($) ของ **Claude Code**, **Codex**, และ **Google Antigravity (AGY)**
+- **Multi-Session & Multi-Project**: สลับดูภาพรวมทุกโปรเจกต์ (Overview) หรือคลิกเลือกดูเฉพาะโปรเจกต์เดี่ยว (Single Project Focus) เช่น `school-bot`, `sb-api-gateway`
+- **TUI Mode**: เพิ่ม `--tui` เพื่อแสดงผลแบบ Dashboard ในเทอร์มินัลสไตล์ `htop` โดยไม่ต้องเปิดเบราว์เซอร์
+- **Pixel HQ (หน้าเว็บ)**: ออฟฟิศ pixel-art ที่มีตัวละคร 12 บทบาท + 3 provider (Claude / Codex / AGY) แยกกันคนละตัว — provider เดินไปนั่งข้างโต๊ะของ role เมื่อ telemetry จริงบอกว่ากำลังทำงานคู่กัน (มาจาก `active-<pkg>.json` + `call_end` ใน ledger) คลิกตัวละคร/โต๊ะเพื่อดูรายละเอียด ปิดแอนิเมชันได้ด้วยปุ่ม `ANIMATION` (มอนิเตอร์ยังทำงานต่อ)
+  - ไม่เดาข้อมูล: role/provider ที่ไม่รู้จะขึ้น `ROLE UNKNOWN` / `PROVIDER UNKNOWN`, โควตาที่อ่านไม่ได้ขึ้น `UNAVAILABLE` (ไม่ใช่ 0%), การเชื่อมต่อหลุดขึ้น `RECONNECTING` ไม่ใช่ "ว่าง"
+  - บทบาทคุยสด (spec, arch, pm, build, check, survey, ui, review) ไม่มี runtime telemetry จึงเดินเล่นเป็นการตกแต่งเท่านั้น
+  - ไฟล์หน้าเว็บอยู่ที่ `src/monitor-ui/` (ES modules ล้วน ไม่มี dependency) เสิร์ฟผ่าน `/ui/<file>` แบบ whitelist
 
 `baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
 - ตรวจจับ Tech Stacks (.NET, Next.js, Go, Python, React, ฯลฯ) และ Architecture Components (`features/`, `backend/src/`, `engines/`)
@@ -41,6 +53,7 @@ baan survey [--target <name>] [--project <name>] [--cwd <path>] [--json]
 Config discovery: `--config` → `BAAN_CONFIG` → เดินขึ้นจาก `--workspace`/`--cwd`/จุดที่เรียก
 ไม่มี config ใช้ defaults; config จริงอยู่นอก package
 Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุดด้วย `BAAN_AGENTS_FILE=<path>`
+`local.json` (ดูตัวอย่างที่ [local.example.json](local.example.json)) ใช้ตั้งค่าเฉพาะเครื่อง: กำหนด `auto_update`, ลงทะเบียน `workspaces`, และเปิด/ปิด AI Agents (`"claude": true`, `"codex": true`, `"agy": false` หรือใช้ string "open"/"close"); agent ที่ปิดจะถูกคัดออกจาก Fallback Chain, ข้ามใน `update-clis`, และแสดง `disabled_by_config` ใน `parity`
 `baan --list` แสดงชุดที่ใช้อยู่ ห้ามเดาชื่อ model จากเอกสารเก่า
 
 | ค่า | ค่าเริ่มต้น / ที่ตั้ง |

@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { homedir } from "node:os";
@@ -176,6 +176,47 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   save(path.join(run.dir, `${name}.input.json`), packet);
   persist(run);
 
+  const activeFile = path.join(run.dir, `active-${p.id}.json`);
+  const activeMainFile = path.join(run.dir, "active.json");
+  const callStartedAt = new Date().toISOString();
+  const history = [];
+
+  function writeActiveState(act = null, liveUsage = null) {
+    try {
+      if (act && (act.type === "tool" || act.type === "thought")) {
+        history.push(act);
+        if (history.length > 25) history.shift();
+      }
+      const data = {
+        runId: run.id,
+        packageId: p.id,
+        title: p.title || p.id,
+        repoPath: p.repo.path,
+        repoName: path.basename(p.repo.path),
+        role,
+        agent,
+        tier,
+        startedAt: callStartedAt,
+        updatedAt: new Date().toISOString(),
+        recentActivity: act?.type === "tool" ? act : history.filter((h) => h.type === "tool").at(-1) ?? null,
+        recentThought: act?.type === "thought" ? act.thought : history.filter((h) => h.type === "thought").at(-1)?.thought ?? "",
+        history: [...history],
+        usage: liveUsage || { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, turns: 0, costUsd: 0 },
+      };
+      save(activeFile, data);
+      save(activeMainFile, data);
+    } catch {}
+  }
+
+  function clearActiveState() {
+    try {
+      if (existsSync(activeFile)) unlinkSync(activeFile);
+      if (existsSync(activeMainFile)) unlinkSync(activeMainFile);
+    } catch {}
+  }
+
+  writeActiveState();
+
   const beforeCall = snapshot(p.repo.path);
   const streamLogFile = path.join(run.dir, "streams", `${p.id}-${role}-${Date.now()}.jsonl`);
   const streamParser = createStreamParser(invocation.streamFormat, {
@@ -186,24 +227,32 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
         persist(run);
       }
     },
+    onActivity: (act, liveUsage) => {
+      writeActiveState(act, liveUsage);
+    },
   });
 
-  const r = await runner(
-    native.def,
-    [...native.prefix, ...invocation.args, ...(invocation.promptVia === "arg" ? [prompt] : [])],
-    invocation.promptVia,
-    prompt,
-    p.repo.path,
-    run.timeoutSec,
-    invocation.answerFrom === "answerFile" ? answer : undefined,
-    {
-      usage: true,
-      signal,
-      env: { ...invocation.env, BAAN_READONLY: role === "worker" ? "0" : "1" },
-      onSpawn: (pid) => { p.childPid = pid; persist(run); },
-      onStdout: (chunk) => streamParser.feed(chunk),
-    }
-  );
+  let r;
+  try {
+    r = await runner(
+      native.def,
+      [...native.prefix, ...invocation.args, ...(invocation.promptVia === "arg" ? [prompt] : [])],
+      invocation.promptVia,
+      prompt,
+      p.repo.path,
+      run.timeoutSec,
+      invocation.answerFrom === "answerFile" ? answer : undefined,
+      {
+        usage: true,
+        signal,
+        env: { ...invocation.env, BAAN_READONLY: role === "worker" ? "0" : "1" },
+        onSpawn: (pid) => { p.childPid = pid; persist(run); },
+        onStdout: (chunk) => streamParser.feed(chunk),
+      }
+    );
+  } finally {
+    clearActiveState();
+  }
 
   const parsedStream = streamParser.flush();
   delete p.childPid;
