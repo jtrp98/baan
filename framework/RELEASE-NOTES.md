@@ -2,6 +2,19 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.36.1 — 2026-11-09 · ปรับปรุง Stub Directives ชัดเจน ป้องกัน Negative Priming และติดตั้ง Skills ใน .agents/skills/ สำหรับ Antigravity และ Codex
+
+### แก้ไข
+
+- **แก้ปัญหา Negative Priming ใน Workspace Stubs (`AGENTS.md` / `CLAUDE.md`)**:
+  - สถาปนาบทบาท "นายช่าง (BAAN Controller)" ขึ้นเป็นบรรทัดแรกของไฟล์ นำเสนอตัวตนและอำนาจการบริหารงานทันที
+  - ย้ายข้อความยกเว้น `[baan: <role>]` ไปไว้ท้ายสุดในรูปแบบเงื่อนไขเสริม ป้องกันไม่ให้ AI สับสนคิดว่าตนเองเป็น subagent และถูกห้ามเรียก BAAN
+  - เพิ่มกฎปฏิบัติการหลัก (Operational Directives): บังคับเริ่มงานด้วย BAAN (`baan status` / `baan survey`), ระบุโหมดแก้บั๊กตามทักษะ `bug-fix`, โหมดส่งงาน (`baan sync`), และระบุกลไก subagents สำหรับแต่ละ CLI (Claude Code: `.claude/agents/`, Antigravity: `invoke_subagent`, Codex: `spawn_agent`)
+- **ติดตั้ง Workspace Skills ครอบคลุม Antigravity และ Codex (`.agents/skills/`)**:
+  - ปรับปรุง `installSkills` ใน `src/init.mjs` ให้คัดลอก skills ทั้งหมด (`bug-fix`, `project-survey`, `web-design-guidelines`) ลงทั้ง `.claude/skills/` และ `.agents/skills/`
+  - ทำให้ Antigravity (`agy`) และ Codex ตรวจพบและเปิดใช้ทักษะแก้บั๊กและสำรวจระบบได้โดยอัตโนมัติ
+- **ชุดทดสอบครอบคลุมครบถ้วน (242 tests passed)**
+
 ## 0.36.0 — 2026-11-09 · ระบบแก้บั๊กและบำรุงรักษา (kind: bugfix), ประเมินสังกัดโมดูล (survey --eval), รองรับงานข้ามระบบ (_cross), ทักษะ bug-fix, Workspace Switcher บน Live Monitor, และหลักการ ToS Compliance 3 ค่าย
 
 ### เพิ่ม
