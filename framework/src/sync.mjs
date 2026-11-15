@@ -159,6 +159,8 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       stubs: initRes.stubs,
     };
   }
+  // Used by the BAAN repo's post-merge hook: refreshing stubs must never commit or push a workspace's knowledge.
+  if (opts.stubsOnly) return summary;
 
   for (const kr of ws.knowledge_roots ?? []) {
     const krRes = syncKnowledgeRoot(kr, opts, log);
