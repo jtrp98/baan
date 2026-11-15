@@ -31,13 +31,17 @@ test("_fallback ของทุก tier ต้องเป็นลำดับ 
   }
 });
 
-test("agy: t0 = null (รักษา tier scale) · t1–t3 = gemini-4-argon · t4–t5 = flash", () => {
-  assert.equal(cfg.tiers.t0.agy, null, "t0 agy ต้องเป็น null เพราะเพดาน argon-high อยู่ที่ t1 แล้ว");
-  for (const tier of ["t1", "t2", "t3"]) {
-    assert.match(cfg.tiers[tier].agy.model, /^gemini-4-argon/, `tier ${tier}: agy ต้องใช้ gemini-4-argon`);
-  }
-  for (const tier of ["t4", "t5"]) {
-    assert.match(cfg.tiers[tier].agy.model, /^gemini-3\.8-flash/, `tier ${tier}: agy คงเป็น flash`);
+test("agy: t0 = null · t1–t4 = gemini-4-hydrogen (xhigh→low) · t5 = gemini-3.8-flash (low)", () => {
+  assert.equal(cfg.tiers.t0.agy, null, "t0 agy คงเป็น null");
+  const expected = {
+    t1: { model: "gemini-4-hydrogen", effort: "xhigh" },
+    t2: { model: "gemini-4-hydrogen", effort: "high" },
+    t3: { model: "gemini-4-hydrogen", effort: "medium" },
+    t4: { model: "gemini-4-hydrogen", effort: "low" },
+    t5: { model: "gemini-3.8-flash", effort: "low" },
+  };
+  for (const [tier, want] of Object.entries(expected)) {
+    assert.deepEqual(cfg.tiers[tier].agy, want, `tier ${tier}: agy ต้องตรงตามผัง Hydrogen/Flash`);
   }
 });
 
