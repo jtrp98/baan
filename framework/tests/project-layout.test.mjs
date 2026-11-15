@@ -138,6 +138,16 @@ test("brokenLinks: ข้าม anchor ล้วนและ mailto · ตัด
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test("brokenLinks: path ที่มีวงเล็บ (Next.js route group) ไม่ถูกตัดกลางทางจนกลายเป็นลิงก์เสีย", () => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-link-paren-"));
+  try {
+    write(root, "app/(teacher)/page.tsx", "");
+    const f = path.join(root, "notes.md");
+    assert.deepEqual(brokenLinks(f, "[t](app/(teacher)/page.tsx) [g](app/(admin)/page.tsx)"), ["app/(admin)/page.tsx"]);
+    assert.deepEqual(brokenLinks(f, "ข้อความ (ดู [t](app/(teacher)/page.tsx))"), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test("resolveModules + moduleContext: target จากหัวไฟล์ module ก่อน project · บอกขอบเขตเขียน/อ่าน · ไม่มี module = error ที่บอกของที่มี", () => {
   const root = fixture();
   try {

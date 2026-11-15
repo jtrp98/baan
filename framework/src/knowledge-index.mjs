@@ -175,7 +175,9 @@ function walkMarkdown(dir, out = []) {
 export function brokenLinks(file, text = readText(file)) {
   const body = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
   const bad = [];
-  for (const m of body.matchAll(/\]\((<[^>\r\n]+>|[^)\s]+)(?:\s+"[^"]*")?\)/g)) {
+  // Targets may contain balanced parentheses, e.g. Next.js route groups app/(teacher)/page.tsx; cutting at the
+  // first ")" reported those links as broken although the folder exists.
+  for (const m of body.matchAll(/\]\((<[^>\r\n]+>|(?:[^()\s]|\([^()\s]*\))+)(?:\s+"[^"]*")?\)/g)) {
     const target = m[1].replace(/^<|>$/g, "").split("#")[0];
     if (!target || (/^[a-z][a-z0-9+.-]*:/i.test(target) && !/^[a-z]:[\\/]/i.test(target))) continue;
     let p;
