@@ -13,10 +13,15 @@ export function formatNumber(n) {
   return Number.isFinite(v) ? v.toLocaleString("en-US") : "0";
 }
 
+// null = the provider reports no price (codex, agy): show that, never "$0.000" which reads as free.
 export function formatCost(n) {
+  if (n === null || n === undefined) return "n/a";
   const v = Number(n);
-  return "$" + (Number.isFinite(v) ? v.toFixed(3) : "0.000");
+  return Number.isFinite(v) ? "$" + v.toFixed(3) : "n/a";
 }
+
+// Some calls priced, some not: the dollar figure is a lower bound, so say how much of it is known.
+const costCoverage = (s) => (s?.calls > 0 && Number.isFinite(s.costCalls) && s.costCalls < s.calls ? ` · COST ${s.costCalls}/${s.calls}` : "");
 
 function formatStandardDate(d) {
   const m = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -343,7 +348,7 @@ export function createPanels(doc = document) {
     card.append(title);
 
     card.append(el("div", "card-big", formatCost(agent.costUsd)));
-    card.append(el("div", "card-sub", `${formatNumber(agent.calls)} CALLS`));
+    card.append(el("div", "card-sub", `${formatNumber(agent.calls)} CALLS${costCoverage(agent)}`));
     card.append(statGrid([
       ["INPUT", formatNumber(agent.inputTokens)],
       ["OUTPUT", formatNumber(agent.outputTokens)],
@@ -379,7 +384,7 @@ export function createPanels(doc = document) {
     title.append(el("span", null, scoped ? scope : "WORKSPACE TOTAL"));
     tot.append(title);
     tot.append(el("div", "card-big", formatCost(total?.costUsd)));
-    tot.append(el("div", "card-sub", `${formatNumber(total?.calls)} CALLS`));
+    tot.append(el("div", "card-sub", `${formatNumber(total?.calls)} CALLS${costCoverage(total)}`));
     tot.append(statGrid([
       ["IN TOKENS", formatNumber(total?.inputTokens)],
       ["OUT TOKENS", formatNumber(total?.outputTokens)],

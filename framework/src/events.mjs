@@ -1,6 +1,13 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
+// codex counts cached tokens inside input_tokens and reasoning inside output_tokens; Claude reports input
+// without cache reads. Normalise so each usage column means the same thing for every provider.
+export function codexTurnUsage(u = {}) {
+  const cached = u.cached_input_tokens ?? 0;
+  return { inputTokens: Math.max(0, (u.input_tokens ?? 0) - cached), cacheReadTokens: cached, cacheWriteTokens: u.cache_write_input_tokens ?? 0, outputTokens: u.output_tokens ?? 0 };
+}
+
 export function formatToolDetail(input) {
   if (!input) return "";
   if (typeof input === "string") return input.slice(0, 200);
@@ -113,7 +120,8 @@ export function parseLiveActivity(ev, format) {
 export function createStreamParser(format, opts = {}) {
   const { onSessionId, onEvent, onActivity, streamLogFile } = opts;
   let sessionId = null;
-  const usage = { inputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: 0, turns: 0, costUsd: 0 };
+  // costUsd stays null unless the provider reports one: codex/agy publish no price, and 0 read as "free".
+  const usage = { inputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: 0, turns: 0, costUsd: null };
   const errors = [];
   let answer = null;
   let buffer = "";
@@ -163,10 +171,8 @@ export function createStreamParser(format, opts = {}) {
       }
       if (ev.type === "turn.completed" && ev.usage) {
         usage.turns++;
-        usage.inputTokens += ev.usage.input_tokens ?? 0;
-        usage.cacheReadTokens += ev.usage.cached_input_tokens ?? 0;
-        usage.cacheWriteTokens += ev.usage.cache_write_input_tokens ?? 0;
-        usage.outputTokens += (ev.usage.output_tokens ?? 0) + (ev.usage.reasoning_output_tokens ?? 0);
+        const u = codexTurnUsage(ev.usage);
+        for (const key of ["inputTokens", "cacheReadTokens", "cacheWriteTokens", "outputTokens"]) usage[key] += u[key];
       }
       if (ev.type === "error" || ev.type === "turn.failed") {
         errors.push(ev.message ?? ev.error?.message ?? JSON.stringify(ev));

@@ -46,8 +46,9 @@ export function formatNumber(num) {
   return Number(num).toLocaleString();
 }
 
+// null = the provider reports no price (codex, agy); "$0.00" read as free.
 export function formatCost(num) {
-  if (num == null || isNaN(num)) return "$0.00";
+  if (num == null || isNaN(num)) return "n/a";
   return `$${Number(num).toFixed(3)}`;
 }
 
@@ -135,12 +136,12 @@ export function renderTui(state) {
     const inTok = formatNumber(s.inputTokens ?? 0).padStart(11);
     const outTok = formatNumber(s.outputTokens ?? 0).padStart(11);
     const cache = formatNumber(s.cacheReadTokens ?? 0).padStart(10);
-    const cost = formatCost(s.costUsd ?? 0).padStart(8);
+    const cost = formatCost(s.calls ? s.costUsd : 0).padStart(8);
     lines.push(`| ${cName} | ${calls} | ${inTok} | ${outTok} | ${cache} | ${cost} |`);
   }
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
   const tot = usage.total ?? {};
-  lines.push(`| TOTAL COMBINED   | ${String(tot.calls ?? 0).padStart(6)} | ${formatNumber(tot.inputTokens ?? 0).padStart(11)} | ${formatNumber(tot.outputTokens ?? 0).padStart(11)} | ${formatNumber(tot.cacheReadTokens ?? 0).padStart(10)} | ${formatCost(tot.costUsd ?? 0).padStart(8)} |`);
+  lines.push(`| TOTAL COMBINED   | ${String(tot.calls ?? 0).padStart(6)} | ${formatNumber(tot.inputTokens ?? 0).padStart(11)} | ${formatNumber(tot.outputTokens ?? 0).padStart(11)} | ${formatNumber(tot.cacheReadTokens ?? 0).padStart(10)} | ${formatCost(tot.calls ? tot.costUsd : 0).padStart(8)} |`);
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
   lines.push("");
 

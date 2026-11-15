@@ -334,3 +334,27 @@ test("monitor: run.json and ledgers are parsed again only when they change, into
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("monitor: usage credits each call to its own repo, and unknown cost stays unknown instead of $0", async () => {
+  const { aggregateWorkspaceUsage } = await import("../src/usage-aggregator.mjs");
+  const root = mkdtempSync(path.join(tmpdir(), "baan-usage-attr-"));
+  try {
+    const dir = path.join(root, ".baan", "runs", "r1");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "run.json"), JSON.stringify({ id: "r1", packages: [{ id: "A", state: "done", repo: { path: "C:/src/repoA" } }, { id: "B", state: "done", repo: { path: "C:/src/repoB" } }] }));
+    writeFileSync(path.join(dir, "ledger.jsonl"), [
+      { type: "call_end", package: "A", agent: "claude", ok: true, usage: { inputTokens: 10, outputTokens: 1, costUsd: 1 } },
+      { type: "call_end", package: "B", agent: "codex", ok: true, usage: { inputTokens: 20, outputTokens: 2, costUsd: null } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n");
+    const u = aggregateWorkspaceUsage(root);
+    assert.deepEqual([u.projects.repoA.calls, u.projects.repoA.costUsd], [1, 1]);
+    assert.deepEqual([u.projects.repoB.calls, u.projects.repoB.costUsd], [1, null]);
+    assert.equal(u.projects.repoA.calls + u.projects.repoB.calls, u.total.calls, "project totals must add up to the workspace total");
+    assert.equal(u.agents.codex.costUsd, null);
+    assert.equal(u.agents.agy.costUsd, 0, "an unused provider really cost nothing");
+    assert.deepEqual([u.total.costUsd, u.total.costCalls, u.total.calls], [1, 1, 2]);
+    assert.equal(formatCost(null), "n/a");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

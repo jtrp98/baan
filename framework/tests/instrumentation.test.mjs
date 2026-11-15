@@ -70,7 +70,8 @@ test("parseUsageOutput: รูปแบบจริงของ claude json แ�
   ].join("\n");
   const x = parseUsageOutput("codex-jsonl", lines);
   assert.equal(x.answer, null, "codex อ่านคำตอบจากไฟล์ -o เหมือนเดิม");
-  assert.deepEqual(x.usage, { inputTokens: 19345, cacheReadTokens: 11776, cacheWriteTokens: 0, outputTokens: 8, costUsd: null, turns: 1, sessionId: "t1" });
+  // codex input_tokens includes the cached part and output_tokens already includes reasoning; normalised to Claude's meaning.
+  assert.deepEqual(x.usage, { inputTokens: 19345 - 11776, cacheReadTokens: 11776, cacheWriteTokens: 0, outputTokens: 5, costUsd: null, turns: 1, sessionId: "t1" });
   assert.deepEqual(x.errors, ["You've hit your usage limit."]);
   assert.equal(parseUsageOutput("codex-jsonl", "plain text"), null);
 });

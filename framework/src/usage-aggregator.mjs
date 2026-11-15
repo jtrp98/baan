@@ -122,6 +122,7 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     cacheReadTokens: 0,
     cacheWriteTokens: 0,
     costUsd: 0,
+    costCalls: 0,
     turns: 0,
     durationMs: 0,
   });
@@ -142,6 +143,7 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
       cacheReadTokens: 0,
       cacheWriteTokens: 0,
       costUsd: 0,
+      costCalls: 0,
       durationMs: 0,
     },
   };
@@ -169,11 +171,15 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     }
 
     const projectsInRun = new Set();
+    const projectOfPackage = new Map();
     if (runJson?.packages) {
       for (const p of runJson.packages) {
-        if (p.repo?.path) projectsInRun.add(path.basename(p.repo.path));
+        if (!p.repo?.path) continue;
+        projectsInRun.add(path.basename(p.repo.path));
+        projectOfPackage.set(p.id, path.basename(p.repo.path));
       }
     }
+    const onlyProject = projectsInRun.size === 1 ? [...projectsInRun][0] : null;
 
     if (existsSync(ledgerFile)) {
       try {
@@ -186,11 +192,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
             else targetAgent.failedCalls++;
 
             const u = ev.usage ?? {};
+            // A provider that reports no price is unknown, not free: count priced calls separately.
+            const priced = Number.isFinite(u.costUsd);
             targetAgent.inputTokens += u.inputTokens ?? 0;
             targetAgent.outputTokens += u.outputTokens ?? 0;
             targetAgent.cacheReadTokens += u.cacheReadTokens ?? 0;
             targetAgent.cacheWriteTokens += u.cacheWriteTokens ?? 0;
-            targetAgent.costUsd += u.costUsd ?? 0;
+            if (priced) { targetAgent.costUsd += u.costUsd; targetAgent.costCalls++; }
             targetAgent.turns += u.turns ?? 0;
             targetAgent.durationMs += ev.durationMs ?? 0;
 
@@ -199,10 +207,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
             summary.total.outputTokens += u.outputTokens ?? 0;
             summary.total.cacheReadTokens += u.cacheReadTokens ?? 0;
             summary.total.cacheWriteTokens += u.cacheWriteTokens ?? 0;
-            summary.total.costUsd += u.costUsd ?? 0;
+            if (priced) { summary.total.costUsd += u.costUsd; summary.total.costCalls++; }
             summary.total.durationMs += ev.durationMs ?? 0;
 
-            for (const proj of projectsInRun) {
+            // Credit only the repo of the package that made the call; crediting every repo in a multi-repo run
+            // made project totals add up to more than the workspace total.
+            const proj = projectOfPackage.get(ev.package) ?? onlyProject;
+            if (proj) {
               const pStats = summary.projects[proj] ?? (summary.projects[proj] = {
                 runs: 0,
                 calls: 0,
@@ -210,12 +221,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
                 outputTokens: 0,
                 cacheReadTokens: 0,
                 costUsd: 0,
+                costCalls: 0,
               });
               pStats.calls++;
               pStats.inputTokens += u.inputTokens ?? 0;
               pStats.outputTokens += u.outputTokens ?? 0;
               pStats.cacheReadTokens += u.cacheReadTokens ?? 0;
-              pStats.costUsd += u.costUsd ?? 0;
+              if (priced) { pStats.costUsd += u.costUsd; pStats.costCalls++; }
             }
           }
         }
@@ -227,6 +239,9 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     }
   }
 
+  for (const stats of [...Object.values(summary.agents), ...Object.values(summary.projects), summary.total]) {
+    if (stats.calls > 0 && stats.costCalls === 0) stats.costUsd = null;
+  }
   return summary;
 }
 
