@@ -289,7 +289,9 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
     throw Object.assign(new Error(r.error || "CLI failed"), { failureClass: "ENVIRONMENT_FAILURE" });
   }
 
-  let result = adapter.extractFinalResult(r.stdout, answer);
+  // Stream-json stdout holds many JSON events; scanning it raw picks the first (init) event, not the answer.
+  const streamed = invocation.answerFrom === "answerFile" ? null : parsedStream.answer;
+  let result = streamed ? (typeof streamed === "object" ? streamed : extractJson(streamed)) : adapter.extractFinalResult(r.stdout, answer);
   if (!result && parsedStream.answer) {
     result = typeof parsedStream.answer === "object" ? parsedStream.answer : extractJson(parsedStream.answer);
   }

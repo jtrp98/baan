@@ -261,12 +261,29 @@ test("engine native providers receive schemas once; other providers retain inlin
         const flag = agent === "codex" ? "--output-schema" : "--json-schema";
         const supplied = args[args.indexOf(flag) + 1];
         assert.ok(args.includes(flag));
-        assert.deepEqual(agent === "claude" ? JSON.parse(supplied) : JSON.parse(readFileSync(supplied, "utf8")), schema);
+        const { $schema, ...withoutMeta } = schema;
+        assert.deepEqual(agent === "claude" ? JSON.parse(supplied) : JSON.parse(readFileSync(supplied, "utf8")), agent === "claude" ? withoutMeta : schema);
       }
       return { ok: true, answer: JSON.stringify(good), durationMs: 1 };
     };
     assert.deepEqual(await callSession(run, p, "worker", agents, { runner }), good);
     await assert.rejects(callSession(run, p, "worker", agents, { runner: async () => ({ ok: true, answer: '{"state":"DONE"}', durationMs: 1 }) }), /required/);
+  }
+});
+
+test("engine reads the final structured answer from Claude and agy stream-json, not the first stream event", async (t) => {
+  const { root, repo } = fixture(t);
+  const streams = {
+    claude: [{ type: "system", subtype: "init", session_id: "s1", tools: ["Read"] }, { type: "assistant", message: { content: [{ type: "text", text: "{\"note\":1}" }] } },
+      { type: "result", subtype: "success", is_error: false, result: JSON.stringify(good), structured_output: good, session_id: "s1" }],
+    agy: [{ type: "init", conversation_id: "c1" }, { status: "SUCCESS", response: JSON.stringify(good), conversation_id: "c1" }],
+  };
+  for (const [agent, events] of Object.entries(streams)) {
+    const p = packet(repo), run = runAt(root, [p]); run.agent = agent;
+    const agents = { agents: { [agent]: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { [agent]: {} } } };
+    const stdout = events.map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const runner = async (def, args, via, prompt, cwd, timeout, file, opts) => { opts.onStdout(stdout); return { ok: true, stdout, answer: stdout.trim(), durationMs: 1 }; };
+    assert.deepEqual(await callSession(run, p, "worker", agents, { runner }), good, agent);
   }
 });
 

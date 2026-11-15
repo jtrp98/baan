@@ -8,6 +8,21 @@ export function gitIn(root, args) {
   return { ok: r.status === 0, out: r.stdout ?? "", err: (r.stderr ?? "").trim() };
 }
 
+const UNMERGED = new Set(["DD", "AU", "UD", "UA", "DU", "AA", "UU"]);
+const IN_PROGRESS = ["rebase-merge", "rebase-apply", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"];
+
+export function unfinishedOperation(root) {
+  const gitDir = gitIn(root, ["rev-parse", "--git-dir"]);
+  if (!gitDir.ok) return null;
+  const dir = path.resolve(root, gitDir.out.trim());
+  return IN_PROGRESS.find((name) => existsSync(path.join(dir, name))) ?? null;
+}
+
+// `git add -A` marks conflicted files as resolved, so committing now would store the conflict markers.
+export function conflictState(root, changes) {
+  return unfinishedOperation(root) ?? (changes.some((c) => UNMERGED.has(c.code)) ? "unmerged files" : null);
+}
+
 export function parsePorcelain(raw) {
   const parts = raw.split("\0");
   const entries = [];
@@ -64,7 +79,13 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
     log(`⚠ ${kr.name}: อ่าน git status ไม่ได้ — ${status.err.split("\n")[0]}`);
     return { repo: true, commits: [], error: status.err };
   }
-  const plans = planCommits(parsePorcelain(status.out), kr.name, kr.layout === "project" ? "project" : "module");
+  const changes = parsePorcelain(status.out);
+  const blocked = conflictState(kr.path, changes);
+  if (blocked) {
+    log(`⚠ ${kr.name}: ค้าง ${blocked} — แก้ conflict ให้เสร็จก่อน จึงจะ commit อัตโนมัติ`);
+    return { repo: true, commits: [], blocked };
+  }
+  const plans = planCommits(changes, kr.name, kr.layout === "project" ? "project" : "module");
   const commits = [];
   for (const p of plans) {
     const scope = kr.layout === "project" ? p.paths : p.scope ? [p.scope] : p.paths;

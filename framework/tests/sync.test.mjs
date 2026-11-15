@@ -80,6 +80,43 @@ test("syncKnowledgeRoot: auto-commit ไฟล์ที่แก้ค้าง�
   }
 });
 
+test("syncKnowledgeRoot: pull ชน conflict ต้องยกเลิก rebase และไม่ commit conflict markers ทั้งรอบนี้และรอบถัดไป", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const a = makeGitRepo("baan-sync-a-");
+  const b = makeGitRepo("baan-sync-b-");
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    a.git(["remote", "add", "origin", bare]);
+    writeFileSync(path.join(a.dir, "doc.md"), "base\n");
+    a.git(["add", "."]); a.git(["commit", "-m", "base"]); a.git(["push", "-u", "origin", "main"]);
+    b.git(["remote", "add", "origin", bare]); b.git(["fetch", "-q", "origin"]); b.git(["reset", "-q", "--hard", "origin/main"]); b.git(["branch", "-q", "-u", "origin/main"]);
+
+    writeFileSync(path.join(b.dir, "doc.md"), "theirs\n");
+    b.git(["commit", "-qam", "theirs"]); b.git(["push", "-q"]);
+    writeFileSync(path.join(a.dir, "doc.md"), "ours\n");
+
+    const logs = [];
+    const first = syncKnowledgeRoot({ name: "kb", path: a.dir }, {}, (m) => logs.push(m));
+    assert.equal(first.ok, false);
+    assert.equal(first.rebaseAborted, true);
+    assert.equal(existsSync(path.join(a.dir, ".git", "rebase-merge")), false);
+    assert.match(logs.join("\n"), /ยกเลิก rebase/);
+    assert.equal(spawnSync("git", ["-C", bare, "log", "--oneline"], { encoding: "utf8" }).stdout.trim().split("\n").length, 2);
+
+    // A conflict the user left behind (here: a manual rebase) must block auto-commit instead of committing markers.
+    a.git(["rebase", "origin/main"]);
+    assert.ok(existsSync(path.join(a.dir, ".git", "rebase-merge")) || existsSync(path.join(a.dir, ".git", "rebase-apply")));
+    const head = a.git(["rev-parse", "HEAD"]).stdout;
+    const second = syncKnowledgeRoot({ name: "kb", path: a.dir }, {}, () => {});
+    assert.equal(second.ok, false);
+    assert.match(second.blocked, /rebase/);
+    assert.equal(a.git(["rev-parse", "HEAD"]).stdout, head);
+    assert.match(a.git(["status", "--porcelain"]).stdout, /^UU doc\.md/m);
+  } finally {
+    for (const dir of [bare, a.dir, b.dir]) rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("syncKnowledgeRoot dry-run: ตรวจนับไฟล์ค้างแต่ไม่ commit และไม่ pull/push", () => {
   const local = makeGitRepo("baan-sync-dry-");
   try {

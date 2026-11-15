@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { findWorkspaceConfig, layoutOf, loadWorkspace, memoryRootOf } from "./config.mjs";
-import { gitIn, parsePorcelain, commitKnowledgeRoot } from "./knowledge-commit.mjs";
+import { gitIn, parsePorcelain, commitKnowledgeRoot, conflictState, unfinishedOperation } from "./knowledge-commit.mjs";
 import { updateIndexes } from "./knowledge-index.mjs";
 import { performInit } from "./init.mjs";
 
@@ -68,6 +68,12 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
   }
 
   const changes = parsePorcelain(status.out);
+  const blocked = conflictState(kr.path, changes);
+  if (blocked) {
+    Object.assign(result, { ok: false, blocked });
+    log(`⚠ ${kr.name}: ค้าง ${blocked} — แก้ conflict ให้เสร็จก่อน แล้วค่อย sync (ข้าม commit/pull/push)`);
+    return result;
+  }
   if (changes.length > 0) {
     if (opts.dryRun) {
       result.dirty = changes.length;
@@ -95,7 +101,14 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
   if (!pull.ok) {
     result.ok = false;
     result.pullError = pull.err;
-    log(`⚠ ${kr.name}: pull ไม่สำเร็จ — ${pull.err.split("\n")[0]}`);
+    const reason = pull.err.split("\n").find((line) => /conflict|error|fatal/i.test(line)) ?? pull.err.split("\n")[0];
+    // The guard above proved nothing was in progress, so this rebase is ours to undo; the user merges by hand.
+    if (unfinishedOperation(kr.path)?.startsWith("rebase")) {
+      result.rebaseAborted = gitIn(kr.path, ["rebase", "--abort"]).ok;
+      log(`⚠ ${kr.name}: pull ชน conflict — ยกเลิก rebase คืนสภาพเดิมแล้ว ให้ pull/merge เอง — ${reason}`);
+    } else {
+      log(`⚠ ${kr.name}: pull ไม่สำเร็จ — ${reason}`);
+    }
   } else {
     result.pulled = true;
     if (!pull.out.includes("Already up to date")) {
@@ -159,7 +172,8 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       if (!memRes.ok) summary.ok = false;
     }
 
-    if (layoutOf(kr) === "project" && !opts.dryRun) {
+    // A failed or blocked root may hold a conflicted tree; regenerating INDEX.md there would mix both sides.
+    if (layoutOf(kr) === "project" && !opts.dryRun && krRes.ok) {
       const updated = updateIndexes(kr.path);
       summary.index.push({ name: kr.name, count: updated.length });
     }

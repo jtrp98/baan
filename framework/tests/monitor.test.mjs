@@ -167,7 +167,7 @@ test("monitor: HTTP server responds with HTML, stats, and stream endpoints", asy
 
   const fetchGet = (urlPath) =>
     new Promise((resolve, reject) => {
-      http.get(`http://localhost:${port}${urlPath}`, (res) => {
+      http.get(`http://127.0.0.1:${port}${urlPath}`, (res) => {
         let body = "";
         res.on("data", (chunk) => (body += chunk));
         res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
@@ -228,7 +228,13 @@ test("monitor: recent call_end events and missing identity are reported truthful
 test("monitor: workspace switcher updates active workspace and telemetry", async (t) => {
   const f1 = makeFixture();
   const f2 = makeFixture();
-  t.after(() => { f1.cleanup(); f2.cleanup(); });
+  const f3 = makeFixture();
+  t.after(() => { f1.cleanup(); f2.cleanup(); f3.cleanup(); });
+  const localFile = path.join(f1.root, "local.json");
+  writeFileSync(localFile, JSON.stringify({ workspaces: [{ name: "second", path: f2.root }] }));
+  const previousLocal = process.env.BAAN_LOCAL_FILE;
+  process.env.BAAN_LOCAL_FILE = localFile;
+  t.after(() => { if (previousLocal === undefined) delete process.env.BAAN_LOCAL_FILE; else process.env.BAAN_LOCAL_FILE = previousLocal; });
 
   const port = 34600 + Math.floor(Math.random() * 500);
   const monitorInstance = await startMonitor({
@@ -241,7 +247,7 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
 
   const fetchGet = (urlPath) =>
     new Promise((resolve, reject) => {
-      http.get(`http://localhost:${port}${urlPath}`, (res) => {
+      http.get(`http://127.0.0.1:${port}${urlPath}`, (res) => {
         let body = "";
         res.on("data", (chunk) => (body += chunk));
         res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
@@ -251,7 +257,7 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
   const fetchPost = (urlPath, data) =>
     new Promise((resolve, reject) => {
       const payload = JSON.stringify(data);
-      const req = http.request(`http://localhost:${port}${urlPath}`, {
+      const req = http.request(`http://127.0.0.1:${port}${urlPath}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) },
       }, (res) => {
@@ -275,4 +281,36 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
 
   const newStats = JSON.parse((await fetchGet("/api/stats")).body);
   assert.equal(newStats.workspaceRoot, f2.root);
+
+  // The starting workspace stays reachable even though local.json does not list it.
+  assert.equal(JSON.parse((await fetchPost("/api/workspace/select", { path: f1.root })).body).workspaceRoot, f1.root);
+  await fetchPost("/api/workspace/select", { path: f2.root });
+
+  const unlisted = await fetchPost("/api/workspace/select", { path: f3.root });
+  assert.equal(unlisted.statusCode, 403);
+  assert.equal((await fetchGet(`/api/workspace/select?path=${encodeURIComponent(f2.root)}`)).statusCode, 405);
+  assert.equal(JSON.parse((await fetchGet("/api/stats")).body).workspaceRoot, f2.root);
+});
+
+test("monitor: binds to loopback only, rejects foreign Host headers and survives malformed ones", async (t) => {
+  const f = makeFixture();
+  t.after(() => f.cleanup());
+  const port = 35100 + Math.floor(Math.random() * 500);
+  const { server } = await startMonitor({ workspaceRoot: f.root, port, openBrowser: false, tui: false });
+  t.after(() => server.close());
+  assert.equal(server.address().address, "127.0.0.1");
+
+  const request = (headers) => new Promise((resolve, reject) => {
+    const req = http.request({ host: "127.0.0.1", port, path: "/api/stats", headers }, (res) => { res.resume(); res.on("end", () => resolve(res)); });
+    req.on("error", reject); req.end();
+  });
+  assert.equal((await request({ Host: "evil.example" })).statusCode, 403);
+  assert.equal((await request({ Host: "a b" })).statusCode, 403);
+  assert.equal((await request({ Host: `localhost:${port}` })).statusCode, 200);
+
+  const stream = await new Promise((resolve, reject) => {
+    const req = http.get(`http://127.0.0.1:${port}/api/stream`, (res) => { resolve(res.headers); req.destroy(); });
+    req.on("error", (e) => { if (e.code !== "ECONNRESET") reject(e); });
+  });
+  assert.equal(stream["access-control-allow-origin"], undefined);
 });

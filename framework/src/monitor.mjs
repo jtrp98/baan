@@ -16,6 +16,9 @@ function readAgentsEnabled() {
   }
 }
 
+const LOCAL_HOST = /^(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i;
+const MAX_BODY = 64 * 1024;
+
 export function getAvailableWorkspaces(currentWorkspaceRoot) {
   const currentNormalized = path.resolve(currentWorkspaceRoot);
   const result = [];
@@ -218,8 +221,14 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
   }
 
   return new Promise((resolve, reject) => {
-    const server = http.createServer(async (req, res) => {
-      const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const handle = async (req, res) => {
+      // Telemetry carries commands, paths and model thoughts; only a local page may read it (blocks DNS rebinding).
+      if (!LOCAL_HOST.test(req.headers.host ?? "")) {
+        res.writeHead(403, { "Content-Type": "text/plain" });
+        res.end("Forbidden");
+        return;
+      }
+      const url = new URL(req.url, "http://localhost");
 
       if (url.pathname === "/") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -237,37 +246,44 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       }
 
       if (url.pathname === "/api/workspace/select") {
+        // POST only: a GET could be fired by any <img> tag on another site.
+        if (req.method !== "POST") {
+          res.writeHead(405, { "Content-Type": "text/plain", Allow: "POST" });
+          res.end("Method Not Allowed");
+          return;
+        }
         const switchWorkspace = async (target) => {
           if (target) {
-            const available = getAvailableWorkspaces(currentWorkspaceRoot);
-            const found = available.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase())
-              || (existsSync(target) ? { path: path.resolve(target) } : null);
-            if (found) {
-              currentWorkspaceRoot = found.path;
+            // Only known workspaces: probing an arbitrary path (e.g. a UNC share) leaks credentials on Windows.
+            const known = [...getAvailableWorkspaces(currentWorkspaceRoot), { path: path.resolve(workspaceRoot) }];
+            const found = typeof target === "string" && known.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase());
+            if (!found) {
+              res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+              res.end(JSON.stringify({ error: "workspace not registered in local.json" }));
+              return;
             }
+            currentWorkspaceRoot = found.path;
           }
           const state = await getMonitorState(currentWorkspaceRoot);
           res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
           res.end(JSON.stringify(state));
         };
 
-        if (req.method === "POST") {
-          let body = "";
-          req.on("data", (chunk) => { body += chunk; });
-          req.on("end", async () => {
-            try {
-              const data = JSON.parse(body || "{}");
-              await switchWorkspace(data.path);
-            } catch (err) {
-              res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
-              res.end(JSON.stringify({ error: err.message }));
-            }
-          });
-          return;
-        } else if (req.method === "GET") {
-          await switchWorkspace(url.searchParams.get("path"));
-          return;
-        }
+        let body = "";
+        req.on("data", (chunk) => {
+          body += chunk;
+          if (body.length > MAX_BODY) req.destroy();
+        });
+        req.on("end", async () => {
+          try {
+            const data = JSON.parse(body || "{}");
+            await switchWorkspace(data.path);
+          } catch (err) {
+            res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+            res.end(JSON.stringify({ error: err.message }));
+          }
+        });
+        return;
       }
 
       if (url.pathname === "/api/stats") {
@@ -289,7 +305,6 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache, no-transform",
           "Connection": "keep-alive",
-          "Access-Control-Allow-Origin": "*",
         });
 
         let sending = false;
@@ -312,6 +327,13 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
 
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not Found");
+    };
+
+    const server = http.createServer((req, res) => {
+      handle(req, res).catch((err) => {
+        if (!res.headersSent) res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: err.message }));
+      });
     });
 
     server.on("error", (err) => {
@@ -321,8 +343,8 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       reject(err);
     });
 
-    server.listen(port, () => {
-      const url = `http://localhost:${port}`;
+    server.listen(port, "127.0.0.1", () => {
+      const url = `http://127.0.0.1:${port}`;
       console.log(`\n======================================================`);
       console.log(`🏗️  BAAN Live Monitor Dashboard running at: ${url}`);
       console.log(`   Workspace: ${workspaceRoot}`);

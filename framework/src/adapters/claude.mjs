@@ -143,8 +143,9 @@ export class ClaudeAdapter extends BaseAdapter {
 
     // Output schema
     if (schema) {
-      const schemaStr = typeof schema === "string" ? schema : JSON.stringify(schema);
-      args.push("--json-schema", schemaStr);
+      // Claude CLI's validator has no 2020-12 meta-schema and rejects the whole call when "$schema" names it.
+      const { $schema, ...accepted } = typeof schema === "string" ? JSON.parse(schema) : schema;
+      args.push("--json-schema", JSON.stringify(accepted));
     }
 
     // Passthrough provider-specific arguments
