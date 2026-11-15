@@ -4,10 +4,6 @@ import {
   quotaWindows, quotaLevel, scopedUsage,
 } from "./telemetry.js";
 
-export function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
 export function formatNumber(n) {
   const v = Number(n);
   return Number.isFinite(v) ? v.toLocaleString("en-US") : "0";
@@ -100,7 +96,7 @@ export function questStatus(run) {
 export function createPanels(doc = document) {
   const $ = (id) => doc.getElementById(id);
   const dom = {
-    ws: $("ws-label"), tabs: $("tab-container"), refresh: $("btn-refresh-quota"), anim: $("btn-anim"),
+    ws: $("ws-label"), tabs: $("tab-container"), anim: $("btn-anim"),
     conn: $("conn-status"), count: $("active-count"), roster: $("roster"), pipeline: $("pipeline"),
     workshop: $("workshop"), usage: $("usage-cards"), quests: $("quest-log"), zones: $("zone-tabs"),
     dialog: $("detail-dialog"), dTitle: $("detail-title"), dBody: $("detail-body"), dClose: $("detail-close"),
@@ -171,7 +167,6 @@ export function createPanels(doc = document) {
     const b = e.target.closest?.("[data-scope]");
     if (b) emit("scope", b.dataset.scope);
   });
-  dom.refresh?.addEventListener("click", () => emit("refreshQuota"));
   dom.anim?.addEventListener("click", () => emit("toggleAnim"));
   dom.roster?.addEventListener("click", (e) => {
     const b = e.target.closest?.("[data-roster-id]");
@@ -265,13 +260,6 @@ export function createPanels(doc = document) {
     }
   }
 
-  function setRefreshing(on) {
-    if (!dom.refresh) return;
-    dom.refresh.disabled = !!on;
-    dom.refresh.setAttribute("aria-busy", String(!!on));
-    dom.refresh.textContent = on ? "⏳ CHECKING…" : "🔄 REFRESH QUOTA";
-  }
-
   // ---------- usage ----------
   function energyBar(win) {
     const pct = win.remainingPct;
@@ -313,12 +301,6 @@ export function createPanels(doc = document) {
     }
     return g;
   }
-
-  const QUOTA_HINTS = {
-    claude: 'พร้อมตรวจจับโควตาจาก ~/.claude.json หรือ claude -p "/usage"',
-    codex: "พร้อมตรวจจับโควตาจาก ~/.codex/auth.json",
-    agy: 'พร้อมตรวจจับโควตาจาก agy -p "/usage"',
-  };
 
   function planLine(p, q) {
     if (p === "claude") {
@@ -841,5 +823,5 @@ export function createPanels(doc = document) {
     return () => handlers.get(name)?.delete(fn);
   }
 
-  return { renderHeader, renderUsage, renderWorkshop, renderPipeline, renderQuests, renderRoster, openDetail, closeDetail, on, setRefreshing };
+  return { renderHeader, renderUsage, renderWorkshop, renderPipeline, renderQuests, renderRoster, openDetail, closeDetail, on };
 }

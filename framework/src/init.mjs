@@ -61,8 +61,6 @@ export const TEAM_AGENTS = {
   review: { tools: "Read, Glob, Grep, Edit, Write, Artifact, AskUserQuestion, Agent, Task", what: "ผู้ตรวจแบบหน้าจอ (QA for UX/UI) ตรวจ usability, WCAG AA, handoff และเทียบหน้าจอจริง (ชื่อเดิม highlighter)" },
 };
 
-export const DESIGN_AGENTS = TEAM_AGENTS; // Backward-compatibility alias for tests and scripts
-
 function agentStub(id, teamDir) {
   const a = TEAM_AGENTS[id];
   return `---

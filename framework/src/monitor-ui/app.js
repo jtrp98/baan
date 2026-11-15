@@ -144,18 +144,6 @@ panels.on("scope", (next) => {
   render();
 });
 
-panels.on("refreshQuota", async () => {
-  panels.setRefreshing(true);
-  try {
-    const res = await fetch("/api/quota/refresh", { method: "POST" });
-    if (res.ok) {
-      lastState = await res.json();
-      render();
-    }
-  } catch {}
-  panels.setRefreshing(false);
-});
-
 panels.on("toggleAnim", () => {
   animOn = !animOn;
   writePref(animOn);

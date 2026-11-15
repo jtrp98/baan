@@ -4,7 +4,6 @@ import path from "node:path";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "./usage-aggregator.mjs";
-import { getWorkspaceQuota } from "./quota-tracker.mjs";
 import { loadLocalConfig, isAgentEnabled } from "./config.mjs";
 
 function readAgentsEnabled() {
@@ -64,22 +63,20 @@ export function openBrowser(url) {
   } catch {}
 }
 
-export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) {
+export async function getMonitorState(workspaceRoot) {
   const activeRuns = scanActiveRuns(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
   const workspaces = getAvailableWorkspaces(workspaceRoot);
-  let quota = null;
-  try {
-    quota = await getWorkspaceQuota(forceRefreshQuota);
-  } catch {}
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
     workspaces,
     activeRuns,
     usage,
-    quota,
+    // Provider quotas are only readable from their private endpoints or auth files, which the ToS rules forbid;
+    // the UI shows null as UNAVAILABLE rather than a guessed 0%.
+    quota: null,
     recentRuns,
     recentCallEnds: getRecentCallEnds(workspaceRoot),
     agentsEnabled: readAgentsEnabled(),
@@ -88,42 +85,12 @@ export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) 
 }
 
 export function renderTui(state) {
-  const { activeRuns, usage, quota, workspaceName } = state;
+  const { activeRuns, usage, workspaceName } = state;
   const lines = [];
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${activeRuns.length} run(s)\x1b[0m`);
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push("");
-
-  if (quota) {
-    const { claude, codex, agy } = quota;
-    lines.push(`\x1b[1mACCOUNT LIMITS & REMAINING QUOTA:\x1b[0m`);
-    const tuiRow = (label, used, reset) => {
-      if (used == null) return null;
-      const left = Math.max(0, 100 - Math.round(used));
-      const col = left > 40 ? "[32m" : left > 15 ? "[33m" : "[31m";
-      return `${label}: ${col}${Math.round(used)}% used (${left}% left)[0m${/[0-9]/.test(reset ?? "") ? ` [Resets: ${reset}]` : ""}`;
-    };
-    const usedOf = (used, remaining) => used ?? (remaining != null ? 100 - remaining : null);
-    const tuiLine = (name, ...rows) => lines.push(` ▶ ${name.padEnd(12)} ${rows.filter(Boolean).join(" | ")}`);
-    if (claude?.available) {
-      tuiLine("Claude Code",
-        tuiRow("5-Hour Limit", usedOf(claude.sessionUsedPct, claude.sessionRemainingPct), claude.sessionResetsAt),
-        tuiRow("Weekly Limit", usedOf(claude.weeklyUsedPct, claude.weeklyRemainingPct), claude.weeklyResetsAt));
-    }
-    if (codex?.available) {
-      tuiLine("OpenAI Codex",
-        tuiRow("5-Hour Limit", usedOf(codex.sessionUsedPct, codex.sessionRemainingPct), codex.sessionResetsAt),
-        tuiRow("Weekly Limit", usedOf(codex.weeklyUsedPct, codex.weeklyRemainingPct), codex.weeklyResetsAt));
-    }
-    if (agy?.available) {
-      tuiLine("Google AGY",
-        tuiRow("5-Hour Limit", usedOf(null, agy.gemini5hRemainingPct), agy.gemini5hResetsAt),
-        tuiRow("Weekly Limit", usedOf(null, agy.geminiWeeklyRemainingPct), agy.geminiWeeklyResetsAt),
-        tuiRow("Argon Weekly Limit", usedOf(null, agy.argonWeeklyRemainingPct), agy.argonWeeklyResetsAt));
-    }
-    lines.push("");
-  }
 
   lines.push(`\x1b[1m3-CLI USAGE BREAKDOWN (WORKSPACE TOTALS):\x1b[0m`);
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
@@ -247,13 +214,6 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       }
 
       if (url.pathname.startsWith("/ui/") && serveUiFile(url.pathname.slice(4), res)) return;
-
-      if (url.pathname === "/api/quota/refresh" && req.method === "POST") {
-        const state = await getMonitorState(currentWorkspaceRoot, true);
-        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify(state));
-        return;
-      }
 
       if (url.pathname === "/api/workspace/select") {
         // POST only: a GET could be fired by any <img> tag on another site.
