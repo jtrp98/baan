@@ -429,3 +429,23 @@ test("engine a provider reply without JSON is tagged OUTPUT_CONTRACT, not ENVIRO
   await assert.rejects(callSession(run, p, "worker", agents, { runner: async () => ({ ok: true, answer: "I finished, all good!", durationMs: 1 }) }),
     (e) => e.failureClass === "OUTPUT_CONTRACT");
 });
+
+test("engine diff for the Verifier includes files the Worker created, without touching the index", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { owns: ["code.mjs", "tests/new.test.mjs"] })]);
+  const writer = async (r, p, role) => {
+    if (role !== "worker") return session(r, p, role);
+    writeFileSync(path.join(repo, "code.mjs"), "export const value = 2;\n");
+    mkdirSync(path.join(repo, "tests"), { recursive: true });
+    writeFileSync(path.join(repo, "tests", "new.test.mjs"), "NEW TEST BODY\n");
+    return structuredClone(good);
+  };
+  const index = git(repo, "write-tree");
+  await schedule(run, cfg, { session: writer, execute: passing });
+  const diff = readFileSync(run.packages[0].gate.diff_file, "utf8");
+  assert.match(diff, /code\.mjs/);
+  assert.match(diff, /tests\/new\.test\.mjs/);
+  assert.match(diff, /\+NEW TEST BODY/);
+  assert.equal(git(repo, "write-tree"), index);
+  assert.match(git(repo, "status", "--porcelain"), /\?\? tests\//);
+});

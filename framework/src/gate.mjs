@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
@@ -75,6 +75,14 @@ export async function evidence(run, repo, cmd, { execute = command, signal, basi
   if (["id", "head", "branch", "index", "stash"].every((k) => after[k] === before[k]) && result.ok && !signal?.aborted) save(file, record);
   return result;
 }
+// `git diff <commit>` never lists untracked files, so new code and new tests were invisible to the Verifier.
+// --no-index writes nothing to the index (Core must not stage) and exits 1 whenever the files differ.
+export function untrackedDiff(repo, changed, after) {
+  const untracked = new Set(after.untracked);
+  return changed.filter((f) => untracked.has(f)).map((f) => spawnSync("git", ["-C", repo, "diff", "--no-index", "--binary", "--", "/dev/null", f],
+    { encoding: "utf8", windowsHide: true, maxBuffer: 32 * 1024 * 1024 }).stdout ?? "").join("");
+}
+
 export async function gate(run, p, options) {
   const results = [];
   for (const cmd of [...new Set([p.commands.build, p.commands.test_targeted, p.commands.test_full])]) {
@@ -101,7 +109,7 @@ export async function gate(run, p, options) {
   const diff_file = path.join(run.dir, `${attempt}.diff.txt`);
   const snapshots_file = path.join(run.dir, `${attempt}.snapshots.json`);
   const evidence_file = path.join(run.dir, `${attempt}.evidence.json`);
-  writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--"));
+  writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--") + untrackedDiff(p.repo.path, changed, after));
   save(snapshots_file, { before: p.before, after });
   const result = { ok: !failureClass, failureClass, results, changed, outside, unmapped, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
