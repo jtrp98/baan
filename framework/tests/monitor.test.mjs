@@ -92,6 +92,21 @@ test("monitor: scanActiveRuns detects in-flight package state", (t) => {
   assert.equal(active[0].activePackages[0].recentActivity.name, "bash");
 });
 
+test("monitor: active files left by a runner killed with Ctrl+C are not shown as live sessions", (t) => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-orphan-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const now = new Date().toISOString();
+  const make = (id, pid) => {
+    const dir = path.join(root, ".baan", "runs", id);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "run.json"), JSON.stringify({ id, pid, packages: [{ id: "A", state: "running", repo: { path: "C:/r" } }] }));
+    writeFileSync(path.join(dir, "active-A.json"), JSON.stringify({ runId: id, packageId: "A", role: "worker", agent: "codex", updatedAt: now }));
+  };
+  make("live", process.pid);
+  make("killed", 2 ** 22 + 12345);
+  assert.deepEqual(scanActiveRuns(root).map((r) => r.runId), ["live"]);
+});
+
 test("monitor: aggregateWorkspaceUsage computes multi-CLI metrics across runs", (t) => {
   const { root, cleanup } = makeFixture();
   t.after(cleanup);

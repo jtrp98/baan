@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { alive } from "./repolock.mjs";
 
 const STALE_ACTIVE_MS = 10 * 60 * 1000;
 
@@ -28,7 +29,7 @@ function readProjected(file, project) {
 export function readRunSummary(file) {
   return readProjected(file, (text) => {
     const run = JSON.parse(text);
-    return { id: run.id, createdAt: run.createdAt, mode: run.mode, executionMode: run.executionMode,
+    return { id: run.id, pid: run.pid, createdAt: run.createdAt, mode: run.mode, executionMode: run.executionMode,
       packages: (run.packages ?? []).map((p) => ({ id: p.id, title: p.title ?? "", state: p.state ?? null, failureClass: p.failureClass ?? null, repo: { path: p.repo?.path } })) };
   });
 }
@@ -64,6 +65,9 @@ export function scanActiveRuns(workspaceRoot) {
       if (!activeFiles.length) continue;
 
       const runJson = readRunSummary(path.join(runDir, "run.json")) ?? {};
+      // Ctrl+C kills the runner before its finally block deletes active-*.json, and the run keeps the dead
+      // runner's pid; those files showed as "1 ACTIVE" for days. A run whose runner is gone has no live session.
+      if (Number.isInteger(runJson.pid) && !alive(runJson.pid)) continue;
       const activePackages = [];
 
       for (const af of activeFiles) {
