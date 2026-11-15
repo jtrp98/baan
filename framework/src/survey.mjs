@@ -274,6 +274,10 @@ export function surveyProject(o, ws, root, log = () => {}) {
       const known = (ws?.knowledge_roots ?? []).flatMap((kr) => (kr.targets ?? []).map((t) => t.name));
       throw new Error(`ไม่พบ target "${o.target}" ใน baan.config.json — ที่มี: ${known.join(", ") || "(ไม่มี)"}`);
     }
+    // A moved repo would otherwise be scanned as an empty codebase and reported as "all modules missing".
+    if (!statSync(hit.target.path, { throwIfNoEntry: false })?.isDirectory()) {
+      throw new Error(`target "${hit.target.name}" ชี้ไปที่ ${hit.target.path} ซึ่งไม่มีอยู่ — แก้ path ใน baan.config.json หรือดูด้วย baan target check`);
+    }
     targetPath = hit.target.path;
     targetName = hit.target.name;
     kr = hit.knowledgeRoot;

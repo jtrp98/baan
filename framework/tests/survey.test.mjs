@@ -279,3 +279,10 @@ test("survey: --eval ไม่เดาโมดูลจากชื่อโ�
   assert.equal(outside.recommendedModule, null);
   assert.match(formatModuleEvaluation(outside), /นอก target/);
 });
+
+test("survey: target ที่ path หายไปแล้วบอกชัด แทนการรายงานว่าโมดูลหายหมด", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "survey-gone-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const ws = { knowledge_roots: [{ name: "kb", path: dir, layout: "project", targets: [{ name: "gateway", path: path.join(dir, "moved-away") }] }] };
+  assert.throws(() => surveyProject({ target: "gateway" }, ws, dir), /gateway.*ไม่มีอยู่.*baan target check/);
+});

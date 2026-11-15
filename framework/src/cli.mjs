@@ -229,6 +229,10 @@ export async function cli(argv, options = {}) {
   const hit = o.target ? resolveTarget(ws, o.target) : null;
   if (o.target && !hit) throw new Error(`unknown target ${o.target}`);
   const modules = o.module ? resolveModules(ws, o.module) : [];
+  // A moved or deleted repo used to surface as a raw git error ("cannot change to …") from deep inside packet checks.
+  for (const t of [hit?.target, ...modules.map((m) => m.target)].filter(Boolean)) {
+    if (!existsSync(t.path)) throw new Error(`target "${t.name}" ชี้ไปที่ ${t.path} ซึ่งไม่มีอยู่ — แก้ path ใน baan.config.json หรือดูด้วย baan target check`);
+  }
   const moduleTargets = [...new Set(modules.map((m) => m.target?.path).filter(Boolean))];
   if (!o.target && !o.cwd && moduleTargets.length > 1 && !o.plan && !o.packet) throw new Error("หลาย repo: เตรียม --plan ที่ระบุ repo ของแต่ละ package ก่อน");
   const repo = path.resolve(hit?.target.path || o.cwd || moduleTargets[0] || process.cwd());

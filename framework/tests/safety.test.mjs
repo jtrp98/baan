@@ -182,3 +182,13 @@ test("report cannot claim success before required integration evidence exists", 
   run.integration[0].evidence = { ok: true };
   assert.equal(report(run).ok, true);
 });
+
+test("run --target that points at a repo which no longer exists gives a clear message, not a raw git error", async (t) => {
+  const { root } = fixture(t);
+  const gone = path.join(root, "target", "sb-api-gateway");
+  writeFileSync(path.join(root, "baan.config.json"), JSON.stringify({ knowledge_roots: [{ name: "kb", path: root, targets: [{ name: "sb-api-gateway", path: gone }] }] }));
+  await assert.rejects(
+    cli(["run", "--goal", "x", "--target", "sb-api-gateway", "--owns", "a.cs", "--build", "b", "--test", "t", "--workspace", root, "--agent", "codex", "--dry-run"], { cfg: structuredClone(cfg), localConfig: { agents: null } }),
+    /sb-api-gateway.*ไม่มีอยู่/,
+  );
+});
