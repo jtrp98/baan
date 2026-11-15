@@ -84,8 +84,13 @@ export async function getMonitorState(workspaceRoot) {
   };
 }
 
+// Telemetry carries text from models, commands and file names; an ESC sequence in it would drive the terminal
+// (clear the screen, write the clipboard via OSC 52). Only BAAN's own colour codes may reach the TTY.
+export const plain = (value) => String(value ?? "").replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
+
 export function renderTui(state) {
-  const { activeRuns, usage, workspaceName } = state;
+  const { activeRuns, usage } = state;
+  const workspaceName = plain(state.workspaceName);
   const lines = [];
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${activeRuns.length} run(s)\x1b[0m`);
@@ -116,11 +121,11 @@ export function renderTui(state) {
     lines.push(`\x1b[1;32mACTIVE RUNS & LIVE ACTIVITY:\x1b[0m`);
     for (const r of activeRuns) {
       const p = r.activePackages?.[0] ?? {};
-      const act = p.recentActivity ? `[${p.recentActivity.name}] ${p.recentActivity.detail}` : "Starting...";
-      lines.push(` ▶ \x1b[1m[${r.repoName}]\x1b[0m Run: ${r.runId.slice(0, 16)} | Role: \x1b[33m${r.role ?? "unknown"}\x1b[0m (${r.agent ?? "unknown"})`);
-      lines.push(`   Task: ${r.title.slice(0, 60)}`);
+      const act = p.recentActivity ? `[${plain(p.recentActivity.name)}] ${plain(p.recentActivity.detail)}` : "Starting...";
+      lines.push(` ▶ \x1b[1m[${plain(r.repoName)}]\x1b[0m Run: ${plain(r.runId).slice(0, 16)} | Role: \x1b[33m${plain(r.role ?? "unknown")}\x1b[0m (${plain(r.agent ?? "unknown")})`);
+      lines.push(`   Task: ${plain(r.title).slice(0, 60)}`);
       lines.push(`   Live Tool: \x1b[36m${act}\x1b[0m`);
-      if (p.recentThought) lines.push(`   Thought: \x1b[90m${p.recentThought.slice(0, 70)}\x1b[0m`);
+      if (p.recentThought) lines.push(`   Thought: \x1b[90m${plain(p.recentThought).slice(0, 70)}\x1b[0m`);
       lines.push("");
     }
   } else {

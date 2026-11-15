@@ -358,3 +358,17 @@ test("monitor: usage credits each call to its own repo, and unknown cost stays u
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("monitor: TUI never forwards control characters from telemetry to the terminal", () => {
+  const evil = "x\u001b]52;c;cHduZWQ=\u0007\u001b[2Jy";
+  const tui = renderTui({
+    workspaceName: evil,
+    activeRuns: [{ runId: evil, repoName: evil, title: evil, role: evil, agent: evil,
+      activePackages: [{ recentActivity: { name: evil, detail: evil }, recentThought: evil }] }],
+    usage: { agents: {}, total: {} },
+  });
+  assert.ok(!tui.includes("\u0007"), "BEL from telemetry must not reach the terminal");
+  assert.ok(!tui.includes("\u001b]52"), "OSC 52 (clipboard write) must not reach the terminal");
+  assert.ok(!tui.includes("\u001b[2J"), "screen clear from telemetry must not reach the terminal");
+  assert.ok(tui.includes("\u001b[1;36m"), "BAAN's own colours still render");
+});
