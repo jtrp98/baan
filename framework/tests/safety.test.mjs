@@ -21,6 +21,20 @@ test("CLI rejects ambiguous inputs, invalid bounds, missing values and discarded
   assert.equal(resolveTimeout({ timeoutSec: 100 }, { _timeoutSec: 200 }), 200);
   assert.equal(resolveTimeout({ timeoutSec: 100, timeoutSet: true }, { _timeoutSec: 200 }), 100);
 });
+test("timeout_sec 0 from config means unlimited: a workspace made from baan.example.json can run, and commands are not killed", async (t) => {
+  assert.equal(resolveTimeout({ timeoutSec: 0 }), 0);
+  assert.equal(resolveTimeout({ timeoutSec: 100 }, { _timeoutSec: 0 }), 0);
+  assert.throws(() => resolveTimeout({ timeoutSec: 0, timeoutSet: true }), /1–86400/);
+
+  const { root, repo } = fixture(t);
+  writeFileSync(path.join(root, "baan.config.json"), readFileSync(new URL("../baan.example.json", import.meta.url), "utf8"));
+  const dry = await cli(["run", "--goal", "x", "--cwd", repo, "--owns", "code.mjs", "--build", "b", "--test", "t", "--workspace", root, "--agent", "codex", "--dry-run"], { cfg: structuredClone(cfg), localConfig: { agents: null } });
+  assert.ok(dry.packages?.length, "dry-run must not throw on timeout_sec: 0");
+
+  const run = runAt(root, [packet(repo)]); run.timeoutSec = 0;
+  const r = await evidence(run, repo, `node -e "setTimeout(() => {}, 300)"`);
+  assert.equal(r.timedOut, false); assert.equal(r.ok, true);
+});
 test("provider fallback classifiers ignore success, timeouts, answer-only CLI errors and late startup failures", () => {
   assert.equal(looksLikeLimitError({ ok: false, error: "rate limit" }), true);
   assert.equal(looksLikeLimitError({ ok: true, answer: "rate limit" }), false);

@@ -16,7 +16,8 @@ export function command(command, cwd, timeoutSec = 600, signal) {
       if (process.platform === "win32") spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" });
       else child.kill("SIGKILL");
     };
-    const timer = setTimeout(() => { timedOut = true; abort(); }, timeoutSec * 1000);
+    // 0 = unlimited; setTimeout(fn, 0) would kill every build/test command at once.
+    const timer = timeoutSec > 0 ? setTimeout(() => { timedOut = true; abort(); }, timeoutSec * 1000) : null;
     signal?.addEventListener("abort", abort, { once: true });
     if (signal?.aborted) abort();
     const done = (code, error = "") => {

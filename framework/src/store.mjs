@@ -29,7 +29,7 @@ export function loadRun(root, name) {
   const run = readJson(path.join(dir, "run.json"));
   if (run.version !== 2) throw new Error("unsupported run format: ใช้ BAAN รุ่นที่สร้าง run นี้; ไม่แก้ประวัติเดิม");
   if (!Array.isArray(run.packages) || !run.packages.length) throw new Error("run ไม่มี packages");
-  validateTimeout(run.timeoutSec, "run.timeoutSec");
+  validateTimeout(run.timeoutSec, "run.timeoutSec", true);
   if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64) throw new Error("invalid run.maxParallel");
   run.packages.forEach(validatePacket); checkDag(run.packages);
   run.dir = dir;

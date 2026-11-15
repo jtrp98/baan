@@ -10,6 +10,7 @@ export function validateTimeout(value, label = "--timeout", allowZero = false) {
 
 export function resolveTimeout(opts, tier = {}) {
   if (opts.timeoutSet || opts.explicit?.has("timeoutSec")) return validateTimeout(opts.timeoutSec);
-  if (Object.hasOwn(tier, "_timeoutSec")) return validateTimeout(tier._timeoutSec, "tier._timeoutSec");
-  return validateTimeout(opts.timeoutSec === undefined ? DEFAULT_TIMEOUT_SEC : opts.timeoutSec, "defaults.timeout_sec");
+  // Configured values may be 0 (= unlimited, as documented and as baan.example.json ships); only --timeout must be 1–86400.
+  if (Object.hasOwn(tier, "_timeoutSec")) return validateTimeout(tier._timeoutSec, "tier._timeoutSec", true);
+  return validateTimeout(opts.timeoutSec === undefined ? DEFAULT_TIMEOUT_SEC : opts.timeoutSec, "defaults.timeout_sec", true);
 }
