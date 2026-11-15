@@ -121,19 +121,13 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
     const rev = gitIn(kr.path, ["rev-list", "--count", "@{u}..HEAD"]);
     const hasUnpushed = rev.ok && Number(rev.out.trim()) > 0;
     if (hasUnpushed || result.commits.length > 0) {
+      // No "push -u origin <branch>" retry: pull already proved an upstream exists, so a failed push means the
+      // branch does not match it (e.g. main tracking master) and a retry would create a stray remote branch.
       const push = gitIn(kr.path, ["push"]);
       if (!push.ok) {
-        const branch = gitIn(kr.path, ["rev-parse", "--abbrev-ref", "HEAD"]);
-        const currentBranch = branch.ok ? branch.out.trim() : "main";
-        const pushSetUpstream = gitIn(kr.path, ["push", "-u", "origin", currentBranch]);
-        if (!pushSetUpstream.ok) {
-          result.ok = false;
-          result.pushError = pushSetUpstream.err;
-          log(`⚠ ${kr.name}: push ไม่สำเร็จ — ${pushSetUpstream.err.split("\n")[0]}`);
-        } else {
-          result.pushed = true;
-          log(`${kr.name}: ส่งงานขึ้น remote (${currentBranch}) เรียบร้อย`);
-        }
+        result.ok = false;
+        result.pushError = push.err;
+        log(`⚠ ${kr.name}: push ไม่สำเร็จ — ${push.err.split("\n").find((l) => /error|fatal|rejected/i.test(l)) ?? push.err.split("\n")[0]}`);
       } else {
         result.pushed = true;
         log(`${kr.name}: ส่งงานขึ้น remote เรียบร้อย`);

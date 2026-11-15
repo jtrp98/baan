@@ -189,3 +189,26 @@ test("syncWorkspace: ซิงค์ knowledge roots, รีเฟรช stubs �
     rmSync(kr.dir, { recursive: true, force: true });
   }
 });
+
+test("syncKnowledgeRoot: push ที่ล้มเพราะชื่อ branch ไม่ตรง upstream ต้องไม่สร้าง branch ใหม่บน remote", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const seed = makeGitRepo("baan-sync-seed-");
+  const local = mkdtempSync(path.join(tmpdir(), "baan-sync-clone-"));
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "master", bare], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "a.md"), "a\n");
+    seed.git(["add", "."]); seed.git(["commit", "-qm", "a"]); seed.git(["push", "-q", bare, "HEAD:master"]);
+    const git = (args) => spawnSync("git", ["-C", local, ...args], { encoding: "utf8" });
+    spawnSync("git", ["clone", "-q", bare, local], { encoding: "utf8" });
+    git(["config", "user.email", "t@invalid"]); git(["config", "user.name", "t"]); git(["config", "push.default", "simple"]);
+    git(["checkout", "-q", "-b", "main", "--track", "origin/master"]);
+    writeFileSync(path.join(local, "b.md"), "b\n");
+
+    const res = syncKnowledgeRoot({ name: "kb", path: local }, {}, () => {});
+    assert.equal(res.pushed, false);
+    assert.equal(res.ok, false);
+    assert.equal(spawnSync("git", ["-C", bare, "branch", "--list", "main"], { encoding: "utf8" }).stdout.trim(), "");
+  } finally {
+    for (const dir of [bare, seed.dir, local]) rmSync(dir, { recursive: true, force: true });
+  }
+});

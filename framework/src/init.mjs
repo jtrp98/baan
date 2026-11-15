@@ -82,14 +82,43 @@ ${STUB_MARKER}
 `;
 }
 
+const END_MARKER = "<!-- baan:end — เขียนต่อใต้บรรทัดนี้ได้ baan sync / --init จะเก็บส่วนนี้ไว้ -->";
+
+// Claude Code's "#" memory and people append to these files; a refresh may replace only the generated part.
+function userTail(current, generated) {
+  const at = current.indexOf(END_MARKER);
+  if (at >= 0) return current.slice(at + END_MARKER.length).replace(/^\r?\n/, "");
+  // Stubs from before the end marker: keep whatever follows the generated text's last line.
+  const lastLine = generated.trimEnd().split("\n").at(-1).slice(0, 20);
+  const lines = current.split(/\r?\n/);
+  const i = lines.findLastIndex((l) => l.startsWith(lastLine));
+  return i >= 0 ? lines.slice(i + 1).join("\n").replace(/^\n+/, "") : null;
+}
+
+// Returns "created" | "updated" | "skipped"; never loses text a person wrote into a managed file.
+function writeStub(file, generated, log) {
+  if (!existsSync(file)) {
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, `${generated}${END_MARKER}\n`, "utf8");
+    return "created";
+  }
+  const current = readFileSync(file, "utf8");
+  if (!current.includes(STUB_MARKER)) return "skipped";
+  const tail = userTail(current, generated);
+  if (tail === null) {
+    writeFileSync(`${file}.baan-backup`, current, "utf8");
+    log(`สำรอง ${file} เดิมไว้ที่ ${file}.baan-backup — หาส่วนที่ผู้ใช้เขียนเพิ่มไม่เจอ`);
+  }
+  writeFileSync(file, `${generated}${END_MARKER}\n${tail ?? ""}`, "utf8");
+  return "updated";
+}
+
 function writeManaged(file, content, results, log) {
-  if (existsSync(file) && !readFileSync(file, "utf8").includes(STUB_MARKER)) {
+  if (writeStub(file, content, log) === "skipped") {
     results.skipped.push(file);
     log(`ข้าม ${file} — มีอยู่แล้วและไม่ได้สร้างโดย baan`);
     return;
   }
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, content, "utf8");
   results.design.push(file);
 }
 
@@ -130,14 +159,15 @@ function removeObsoletePencil(targetDir, log) {
   }
 }
 
+// Only an old wrapper that launched BAAN is obsolete; any other baan.cmd belongs to the user.
 function removeObsoleteBaanCmd(targetDir, log) {
   const cmd = path.join(targetDir, "baan.cmd");
-  if (existsSync(cmd)) {
-    try {
-      rmSync(cmd, { force: true });
-      log("ลบ baan.cmd เดิม (ใช้คำสั่ง baan กลางจาก PATH ได้โดยตรง)");
-    } catch { /* ignore */ }
-  }
+  if (!existsSync(cmd)) return;
+  try {
+    if (!/baan[\\/]+(?:framework[\\/]+)?bin[\\/]+baan\.mjs|baan\.mjs/i.test(readFileSync(cmd, "utf8"))) return;
+    rmSync(cmd, { force: true });
+    log("ลบ baan.cmd เดิม (ใช้คำสั่ง baan กลางจาก PATH ได้โดยตรง)");
+  } catch { /* ignore */ }
 }
 
 export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
@@ -180,22 +210,14 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
   const charterPath = path.join(teamDir, "BAAN.md");
   const learningPath = path.join(teamDir, "LEARNING.md");
   for (const name of ["CLAUDE.md", "AGENTS.md"]) {
-    const file = path.join(targetDir, name);
-    if (existsSync(file)) {
-      const current = readFileSync(file, "utf8");
-      if (current.includes(STUB_MARKER)) {
-        writeFileSync(file, stubContent(charterPath, learningPath), "utf8");
-        results.stubs.push(name);
-        log(`อัปเดต ${name} ใหม่ (เป็นไฟล์ที่ baan --init สร้างไว้)`);
-      } else {
-        results.skipped.push(name);
-        log(`ข้าม ${name} — มีอยู่แล้วและไม่ได้สร้างโดย baan (เพิ่มบรรทัดชี้ไป ${charterPath} เองถ้าต้องการ)`);
-      }
-    } else {
-      writeFileSync(file, stubContent(charterPath, learningPath), "utf8");
-      results.stubs.push(name);
-      log(`สร้าง ${name} — AI session ที่เปิดที่นี่จะสวมบท นายช่าง เองโดยอัตโนมัติ`);
+    const outcome = writeStub(path.join(targetDir, name), stubContent(charterPath, learningPath), log);
+    if (outcome === "skipped") {
+      results.skipped.push(name);
+      log(`ข้าม ${name} — มีอยู่แล้วและไม่ได้สร้างโดย baan (เพิ่มบรรทัดชี้ไป ${charterPath} เองถ้าต้องการ)`);
+      continue;
     }
+    results.stubs.push(name);
+    log(outcome === "created" ? `สร้าง ${name} — AI session ที่เปิดที่นี่จะสวมบท นายช่าง เองโดยอัตโนมัติ` : `อัปเดต ${name} ใหม่ (เก็บข้อความที่เขียนต่อท้ายไว้)`);
   }
   return results;
 }
