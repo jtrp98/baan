@@ -212,3 +212,28 @@ test("syncKnowledgeRoot: push ที่ล้มเพราะชื่อ bran
     for (const dir of [bare, seed.dir, local]) rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("syncWorkspace: ตาราง INDEX.md ที่อัปเดตถูก commit และ push ในรอบเดียวกัน ไม่ทิ้ง repo ค้าง dirty", () => {
+  const wsDir = mkdtempSync(path.join(tmpdir(), "baan-ws-index-"));
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const kr = makeGitRepo("baan-ws-kr-index-");
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    kr.git(["remote", "add", "origin", bare]);
+    mkdirSync(path.join(kr.dir, "p", "modules", "m1"), { recursive: true });
+    writeFileSync(path.join(kr.dir, "p", "INDEX.md"), "---\nproject: p\n---\n# p\n");
+    writeFileSync(path.join(kr.dir, "p", "modules", "m1", "INDEX.md"), "---\nmodule: m1\nstatus: draft\n---\n# m1\n");
+    kr.git(["add", "."]); kr.git(["commit", "-qm", "init"]); kr.git(["push", "-q", "-u", "origin", "main"]);
+
+    mkdirSync(path.join(kr.dir, "p", "modules", "m2"), { recursive: true });
+    writeFileSync(path.join(kr.dir, "p", "modules", "m2", "INDEX.md"), "---\nmodule: m2\nstatus: draft\n---\n# m2\n");
+    const ws = { source: path.join(wsDir, "baan.config.json"), knowledge_roots: [{ name: "kb", path: kr.dir, layout: "project", targets: [] }] };
+    const res = syncWorkspace(ws, wsDir, TEAM_DIR, { noSelfUpdate: true }, () => {});
+    assert.equal(res.ok, true);
+    assert.equal(kr.git(["status", "--porcelain"]).stdout.trim(), "", "INDEX.md must not be left modified after sync");
+    const pushedIndex = spawnSync("git", ["-C", bare, "show", "main:p/INDEX.md"], { encoding: "utf8" }).stdout;
+    assert.match(pushedIndex, /m2/, "the refreshed table reached the remote in this sync");
+  } finally {
+    for (const dir of [wsDir, bare, kr.dir]) rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -157,6 +157,17 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
   if (opts.stubsOnly) return summary;
 
   for (const kr of ws.knowledge_roots ?? []) {
+    // Refresh INDEX.md before committing so the new table goes out in this same sync; doing it afterwards left
+    // every repo dirty until the next sync. Never inside an unfinished rebase/merge (it would mix both sides).
+    if (layoutOf(kr) === "project" && !opts.dryRun && kr.path && existsSync(kr.path)) {
+      const isRepo = existsSync(path.join(kr.path, ".git"));
+      const status = isRepo ? gitIn(kr.path, ["status", "--porcelain", "-z"]) : null;
+      if (!isRepo || (status.ok && !conflictState(kr.path, parsePorcelain(status.out)))) {
+        const updated = updateIndexes(kr.path);
+        summary.index.push({ name: kr.name, count: updated.length });
+      }
+    }
+
     const krRes = syncKnowledgeRoot(kr, opts, log);
     summary.knowledge.push(krRes);
     if (!krRes.ok) summary.ok = false;
@@ -166,12 +177,6 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       const memRes = syncKnowledgeRoot({ name: `${kr.name}-memory`, path: mem, layout: kr.layout }, { ...opts, localOnly: true }, log);
       summary.knowledge.push(memRes);
       if (!memRes.ok) summary.ok = false;
-    }
-
-    // A failed or blocked root may hold a conflicted tree; regenerating INDEX.md there would mix both sides.
-    if (layoutOf(kr) === "project" && !opts.dryRun && krRes.ok) {
-      const updated = updateIndexes(kr.path);
-      summary.index.push({ name: kr.name, count: updated.length });
     }
   }
 
