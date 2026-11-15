@@ -18,7 +18,7 @@ function readAgentsEnabled() {
 const LOCAL_HOST = /^(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i;
 const MAX_BODY = 64 * 1024;
 
-export function getAvailableWorkspaces(currentWorkspaceRoot) {
+export function getAvailableWorkspaces(currentWorkspaceRoot, homeRoot = null) {
   const currentNormalized = path.resolve(currentWorkspaceRoot);
   const result = [];
   const seen = new Set();
@@ -35,6 +35,12 @@ export function getAvailableWorkspaces(currentWorkspaceRoot) {
 
   if (!seen.has(currentNormalized.toLowerCase())) {
     result.unshift({ name: path.basename(currentNormalized), path: currentNormalized });
+    seen.add(currentNormalized.toLowerCase());
+  }
+  // The workspace the monitor was started in stays selectable even when local.json does not list it;
+  // otherwise switching away once left no way back without restarting the monitor.
+  if (homeRoot && !seen.has(path.resolve(homeRoot).toLowerCase())) {
+    result.unshift({ name: path.basename(path.resolve(homeRoot)), path: path.resolve(homeRoot) });
   }
 
   return result;
@@ -63,11 +69,11 @@ export function openBrowser(url) {
   } catch {}
 }
 
-export async function getMonitorState(workspaceRoot) {
+export async function getMonitorState(workspaceRoot, { homeRoot = null } = {}) {
   const activeRuns = scanActiveRuns(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
-  const workspaces = getAvailableWorkspaces(workspaceRoot);
+  const workspaces = getAvailableWorkspaces(workspaceRoot, homeRoot);
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
@@ -197,7 +203,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
   let shared = { root: null, at: 0, promise: null };
   const sharedState = () => {
     if (shared.root !== currentWorkspaceRoot || Date.now() - shared.at >= 900) {
-      shared = { root: currentWorkspaceRoot, at: Date.now(), promise: getMonitorState(currentWorkspaceRoot) };
+      shared = { root: currentWorkspaceRoot, at: Date.now(), promise: getMonitorState(currentWorkspaceRoot, { homeRoot: workspaceRoot }) };
     }
     return shared.promise;
   };
@@ -230,7 +236,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
         const switchWorkspace = async (target) => {
           if (target) {
             // Only known workspaces: probing an arbitrary path (e.g. a UNC share) leaks credentials on Windows.
-            const known = [...getAvailableWorkspaces(currentWorkspaceRoot), { path: path.resolve(workspaceRoot) }];
+            const known = getAvailableWorkspaces(currentWorkspaceRoot, workspaceRoot);
             const found = typeof target === "string" && known.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase());
             if (!found) {
               res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
@@ -239,7 +245,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
             }
             currentWorkspaceRoot = found.path;
           }
-          const state = await getMonitorState(currentWorkspaceRoot);
+          const state = await getMonitorState(currentWorkspaceRoot, { homeRoot: workspaceRoot });
           res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
           res.end(JSON.stringify(state));
         };

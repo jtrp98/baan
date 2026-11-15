@@ -296,6 +296,7 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
 
   const newStats = JSON.parse((await fetchGet("/api/stats")).body);
   assert.equal(newStats.workspaceRoot, f2.root);
+  assert.ok(newStats.workspaces.some((w) => w.path === path.resolve(f1.root)), "the starting workspace stays in the dropdown after switching away");
 
   // The starting workspace stays reachable even though local.json does not list it.
   assert.equal(JSON.parse((await fetchPost("/api/workspace/select", { path: f1.root })).body).workspaceRoot, f1.root);
