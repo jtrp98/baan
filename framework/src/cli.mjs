@@ -10,6 +10,7 @@ import { triage } from "./triage.mjs";
 import { lock, alive, repoLock } from "./repolock.mjs";
 import { snapshot, sameState, changedFiles, matches } from "./snapshot.mjs";
 import { integrate } from "./integrate.mjs";
+import { commandWarnings } from "./gate.mjs";
 import { applyPlanning } from "./planner.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { validateTimeout, resolveTimeout } from "./timeout.mjs";
@@ -237,7 +238,7 @@ export async function cli(argv, options = {}) {
   }
   if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64 || !(run.timeoutSec >= 0)) throw new Error("invalid --max-parallel/--timeout");
   run.dir = path.join(root, ".baan", "runs", run.id);
-  if (o["dry-run"]) return { ...triage(packages, run.direct), packages: packages.map((p) => ({ ...p, readiness: readiness(p) })) };
+  if (o["dry-run"]) return { ...triage(packages, run.direct), packages: packages.map((p) => ({ ...p, readiness: readiness(p), warnings: commandWarnings(p) })) };
   mkdirSync(run.dir, { recursive: true }); persist(run);
   event(run, "run_created");
   return executeRun(run, cfg, options);

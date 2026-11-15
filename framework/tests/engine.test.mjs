@@ -449,3 +449,17 @@ test("engine diff for the Verifier includes files the Worker created, without to
   assert.equal(git(repo, "write-tree"), index);
   assert.match(git(repo, "status", "--porcelain"), /\?\? tests\//);
 });
+
+test("engine warns about dotnet test without per-test names, at dry-run and when mapping fails", async (t) => {
+  const { commandWarnings } = await import("../src/gate.mjs");
+  assert.equal(commandWarnings({ commands: { test_targeted: "dotnet test src/X.Tests", test_full: "dotnet test src/X.Tests" } }).length, 1);
+  assert.deepEqual(commandWarnings({ commands: { test_targeted: 'dotnet test --logger "console;verbosity=normal"', test_full: "npm test" } }), []);
+
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { commands: { build: "dotnet build", test_targeted: "dotnet test", test_full: "dotnet test" } })]);
+  const summaryOnly = async (cmd) => ({ command: cmd, code: 0, ok: true, output: "Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12\n", timedOut: false });
+  await schedule(run, cfg, { session, execute: summaryOnly });
+  const gateResult = run.packages[0].gate;
+  assert.deepEqual(gateResult.unmapped, ["AC-1"]);
+  assert.match(gateResult.unmapped_hint, /verbosity=normal/);
+});

@@ -75,6 +75,13 @@ export async function evidence(run, repo, cmd, { execute = command, signal, basi
   if (["id", "head", "branch", "index", "stash"].every((k) => after[k] === before[k]) && result.ok && !signal?.aborted) save(file, record);
   return result;
 }
+// dotnet's default console logger prints only a summary, so no acceptance can be mapped to a test name.
+export function commandWarnings(p) {
+  return [...new Set([p.commands?.test_targeted, p.commands?.test_full])]
+    .filter((c) => /\bdotnet\s+test\b/i.test(c ?? "") && !/(?:--logger|\s-l)\b/i.test(c))
+    .map((c) => `"${c}" ใช้ console logger ค่าเริ่มต้นที่ไม่พิมพ์ชื่อ test — เพิ่ม --logger "console;verbosity=normal"`);
+}
+
 // `git diff <commit>` never lists untracked files, so new code and new tests were invisible to the Verifier.
 // --no-index writes nothing to the index (Core must not stage) and exits 1 whenever the files differ.
 export function untrackedDiff(repo, changed, after) {
@@ -104,14 +111,17 @@ export async function gate(run, p, options) {
   }).map((a) => a.id);
   const failures = results.filter((r) => !r.ok);
   const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some(looksLikeCommandEnvironmentFailure) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
-  const test_changes = ownChanges.filter((f) => p.before.files[f] != null &&/(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
+  const test_changes = ownChanges.filter((f) => p.before.files[f] != null && /(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
   const attempt = `${p.id}-${randomUUID()}`;
   const diff_file = path.join(run.dir, `${attempt}.diff.txt`);
   const snapshots_file = path.join(run.dir, `${attempt}.snapshots.json`);
   const evidence_file = path.join(run.dir, `${attempt}.evidence.json`);
   writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--") + untrackedDiff(p.repo.path, changed, after));
   save(snapshots_file, { before: p.before, after });
-  const result = { ok: !failureClass, failureClass, results, changed, outside, unmapped, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
+  // Tests ran and passed yet no names were printed: say why, or the Worker guesses CONTRACT_MISMATCH and a human must explain BAAN.
+  const ranTests = results.some((r) => r.counts?.passed > 0);
+  const unmapped_hint = unmapped.length && ranTests && !names.size ? `test runner ไม่พิมพ์ชื่อ test ราย test จึง map AC ไม่ได้ — ${commandWarnings(p).join(" ") || "ให้คำสั่ง test พิมพ์ชื่อ test ที่ผ่าน"}` : undefined;
+  const result = { ok: !failureClass, failureClass, results, changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
   save(evidence_file, { ...result, results: results.map(({ output, ...summary }) => summary) });
   return result;

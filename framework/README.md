@@ -191,6 +191,7 @@ Machine gates รัน build/targeted/full, ตรวจ diff นอก owns, h
 ขาด test mapping, แก้ existing tests, high risk, security/auth/PII, DB/schema, เงิน/คะแนน, public contract,
 fan-out, milestone หรือ release ต้องมี Verifier ใหม่ที่ไม่รับคำเล่าของ Worker; Verifier อ่านอย่างเดียว
 ถ้าไม่มี mapping ที่ parser รู้จัก ให้ Verifier ตรวจหลักฐานแทน ไม่ถือว่าคำว่า AC ใน stdout เป็น test proof
+.NET: ใช้ `dotnet test --logger "console;verbosity=normal"` เพื่อให้พิมพ์ชื่อ test ราย test (logger ค่าเริ่มต้นพิมพ์แค่สรุป จึง map AC ไม่ได้; `--dry-run` และ gate จะเตือน)
 Cache เฉพาะคำสั่งผ่านบน snapshot/Git state/command เดิม; integration รวม snapshot ทุก repo
 
 Snapshot เก็บ tracked recovery object (`git stash create`) และ untracked blobs โดยไม่เปลี่ยน working tree,
