@@ -19,16 +19,22 @@ import { moduleContext } from "./workspace.mjs";
 import { getAdapter } from "./adapters/registry.mjs";
 import { runParityCommand } from "./parity.mjs";
 import { runInteractiveCli } from "./runner.mjs";
+import { listTargets, registerTarget, removeTarget, scanTargets } from "./targets.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui", "target"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open", "prune"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (!a.startsWith("--")) { if (o.subject) throw new Error(`unexpected argument ${a}`); o.subject = a; continue; }
+    if (!a.startsWith("--")) {
+      if (o.command === "target" && o.subject && !o.arg) { o.arg = a; continue; }
+      if (o.subject) throw new Error(`unexpected argument ${a}`);
+      o.subject = a;
+      continue;
+    }
     const name = a.slice(2);
     if (flags.has(name)) o[name] = true;
     else if (values.has(name)) {
@@ -38,6 +44,10 @@ export function parse(argv) {
       else { if (Object.hasOwn(o, name)) throw new Error(`duplicate option ${a}`); o[name] = value; }
     }
     else throw new Error(`unknown option ${a}`);
+  }
+  if (o.command === "target") {
+    if (o.list && !o.subject) { o.subject = "list"; delete o.list; }
+    if (o.scan && !o.subject) { o.subject = "scan"; delete o.scan; }
   }
   const inputs = [o.goal, o["goal-file"], o.plan, o["plan-file"], o.packet].filter(Boolean);
   if (utilityFlags.some((f) => o[f]) && (inputs.length || o.resume || o.cancel || (!["run", "sync", "survey", "scan"].includes(o.command)))) throw new Error("workspace utilities cannot be combined with execution commands");
@@ -50,7 +60,7 @@ export function parse(argv) {
     o.target = o.subject;
     delete o.subject;
   }
-  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
+  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui", "target"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
 }
 
@@ -109,6 +119,35 @@ export async function cli(argv, options = {}) {
   if (o.command === "parity") {
     const repo = o.cwd ? path.resolve(o.cwd) : root;
     return runParityCommand({ agent: o.agent, cwd: repo, workspaceRoot: root, json: o.json, cfg, localConfig: local });
+  }
+
+  if (o.command === "target") {
+    const action = o.subject || "list";
+    if (action === "list") return listTargets(ws);
+    if (action === "scan") {
+      return scanTargets(ws?.source, {
+        scanDir: o.path || o.arg || o.cwd,
+        root: o.root,
+        prune: Boolean(o.prune),
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    if (action === "add") {
+      return registerTarget(ws?.source, {
+        path: o.path || o.arg || o.cwd,
+        name: o.name || o.target,
+        root: o.root,
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    if (action === "remove" || action === "rm") {
+      return removeTarget(ws?.source, {
+        name: o.name || o.arg || o.target,
+        root: o.root,
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    throw new Error(`คำสั่งย่อยของ target ไม่ถูกต้อง: ${action} (ใช้ list | scan | add | remove)`);
   }
 
   if (o.command === "attach") {

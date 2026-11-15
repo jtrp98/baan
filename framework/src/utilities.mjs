@@ -28,6 +28,7 @@ export function utility(o, ws, cfg, root, local) {
   baan update-clis
   baan attach <package> [--run <run>]
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
+  baan target [list | scan [<dir>] [--prune] | add <dir> [--name <name>] | remove <name>] [--root <kr>] [--dry-run]
   baan sync [--all] [--stubs-only] [--pull-only] [--push] [--dry-run] [--no-self-update]
   baan survey [--target <name>] [--project <name>] [--cwd <path>]
     [--scaffold-module <name>] [--scaffold-project <name>] [--json]

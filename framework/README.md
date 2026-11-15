@@ -15,6 +15,7 @@ baan --version
 baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
+baan target [list | scan [<dir>] [--prune] | add <dir> [--name <name>] | remove <name>] [--workspace <dir>] [--dry-run]
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 baan survey [--target <name>] [--project <name>] [--cwd <path>] [--eval <path>] [--json]
 baan monitor [--port 3456] [--no-open] [--tui]
