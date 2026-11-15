@@ -4,7 +4,7 @@ Local npm package สำหรับควบคุมงานพัฒนา�
 Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
 Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-สิ่งที่เปลี่ยนใน **0.34.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
+สิ่งที่เปลี่ยนใน **0.37.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
 
 ## ติดตั้งและตั้งค่า
 
@@ -48,7 +48,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 
 ขอบเขต: รันในโฟลเดอร์ workspace = ซิงค์เฉพาะ workspace นั้น · `--all` = ทุก workspace ใน `local.json` (รันนอก workspace ได้ผลเดียวกันเมื่อ `auto_update` เปิด) · นอก workspace โดยไม่มี workspace ลงทะเบียนจะ error แทนการ init ในโฟลเดอร์นั้น · `--stubs-only` รีเฟรช stubs อย่างเดียว ไม่ commit/pull/push (ใช้ใน post-merge hook จาก `npm run setup:hooks`)
 
-หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.34.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
+หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.37.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
 `--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)
 อัปเดตเฉพาะไฟล์ที่ BAAN สร้างไว้ ไม่ทับไฟล์ของผู้ใช้; รันซ้ำหลังอัปเกรดได้
 แก้ paths/targets ใน config ให้ตรงเครื่อง ตัวอย่างอยู่ [baan.example.json](baan.example.json)
