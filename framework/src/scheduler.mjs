@@ -8,7 +8,7 @@ import { readiness, documentBasis, validate, schemaFor, validateResult } from ".
 import { evidence, gate } from "./gate.mjs";
 import { callSession } from "./session.mjs";
 import { verification, needsPlanning } from "./triage.mjs";
-import { looksLikeEnvironmentFailure } from "./failure-class.mjs";
+import { looksLikeCommandEnvironmentFailure } from "./failure-class.mjs";
 
 const complete = (p) => p?.state === "done";
 export function transition(run, p, state, data = {}) {
@@ -45,45 +45,58 @@ async function processPackage(run, p, cfg, options) {
       transition(run, p, "stale", { questions: ["เอกสาร/สัญญาเปลี่ยน ต้องยืนยัน acceptance ใหม่"], acceptance_approved: false }); return;
     }
     p.basis = { repo_sha: current.head, snapshot: current.id, docs };
-    transition(run, p, "probing");
+    // A resumed attempt starts clean: the last attempt's failure and probe would otherwise show as current.
+    transition(run, p, "probing", { failureClass: "", probe: undefined });
     for (const cmd of [...new Set([p.commands.setup, p.commands.build, p.commands.test_targeted].filter(Boolean))]) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
       const r = await evidence(run, p.repo.path, cmd, options);
-      if (!r.ok && (r.timedOut || looksLikeEnvironmentFailure(r.output) || r.code === null)) {
+      if (!r.ok && looksLikeCommandEnvironmentFailure(r)) {
         transition(run, p, "env_failed", { failureClass: "ENVIRONMENT_FAILURE", probe: r }); return;
       }
     }
     const probed = snapshot(p.repo.path);
-    if (["head", "branch", "index", "stash"].some((k) => p.before[k] !== probed[k])) {
+    // Judge this attempt from its own start: people and sibling packages may change the repo while it waits.
+    if (["head", "branch", "index", "stash"].some((k) => current[k] !== probed[k])) {
       p.failureClass = "SCOPE_VIOLATION"; waiting(run, p, ["probe/setup changed Git state; inspect evidence before resume"]); return;
     }
+    // Work that passed the gate but whose Verifier crashed or answered garbage only needs verifying again, not a new Worker run.
+    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameState(p.after, probed));
     for (;;) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
-      for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
-      transition(run, p, "running", { restarted: !!p.session, questions: [] });
-      p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
-      if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
-      validateResult(p.result, "worker", p);
-      if (p.result.state !== "DONE") {
-        p.failureClass = p.result.failure_class;
-        if (p.result.state === "NEEDS_DECISION") {
-          if (await sharedDecision(run, p, cfg, options, { questions: p.result.questions })) continue;
-          return;
+      if (resumeVerification) {
+        resumeVerification = false;
+        event(run, "resume_verification", { package: p.id });
+      } else {
+        for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
+        delete p.verification_pending;
+        transition(run, p, "running", { restarted: !!p.session, questions: [], failureClass: "" });
+        p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
+        if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
+        validateResult(p.result, "worker", p);
+        if (p.result.state !== "DONE") {
+          p.failureClass = p.result.failure_class;
+          if (p.result.state === "NEEDS_DECISION") {
+            if (await sharedDecision(run, p, cfg, options, { questions: p.result.questions })) continue;
+            return;
+          }
+          waiting(run, p, p.result.questions?.length ? p.result.questions : [p.result.summary]); return;
         }
-        waiting(run, p, p.result.questions?.length ? p.result.questions : [p.result.summary]); return;
-      }
-      transition(run, p, "gating");
-      p.gate = await gate(run, p, options);
-      if (readiness(p).some((r) => r.startsWith("stale approval"))) {
-        transition(run, p, "stale", { acceptance_approved: false, questions: ["references changed during execution; confirm acceptance again"] }); return;
+        transition(run, p, "gating");
+        p.gate = await gate(run, p, { ...options, since: probed });
+        if (readiness(p).some((r) => r.startsWith("stale approval"))) {
+          transition(run, p, "stale", { acceptance_approved: false, questions: ["references changed during execution; confirm acceptance again"] }); return;
+        }
       }
       if (p.gate.ok) {
         const lenses = verification(p, run.packages);
         if (lenses.length) {
-          transition(run, p, "verifying");
-          const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
+          transition(run, p, "verifying", { verification_pending: true });
+          // An agent switched off in local.json must not be picked as the independent Verifier (the call would
+          // silently fall back to the Worker's own agent and lose the independence it exists for).
+          const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && cfg.agents[a]?.enabled !== false && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
           p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, forceAgent: verifierAgent, context: { lenses } }));
           validateResult(p.verdict, "verifier", p);
+          delete p.verification_pending;
           const reviewed = snapshot(p.repo.path);
           if (!sameState(reviewed, p.after)) {
             waiting(run, p, ["Verifier เปลี่ยน working tree/Git state: ต้องตรวจหลักฐานใหม่"]);
@@ -96,8 +109,8 @@ async function processPackage(run, p, cfg, options) {
               if (await sharedDecision(run, p, cfg, options, { findings: p.verdict.findings })) continue;
               return;
             }
-          } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "", durationMs: Date.now() - started }); return; }
-        } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "", durationMs: Date.now() - started }); return; }
+          } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "" }); return; }
+        } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "" }); return; }
       } else p.failureClass = p.gate.failureClass;
       if (p.failureClass === "SCOPE_VIOLATION") { waiting(run, p, ["เปลี่ยนไฟล์นอก scope หรือ Git state: ตรวจหลักฐานและแก้ก่อน resume"]); return; }
       if (["ENVIRONMENT_FAILURE", "TEST_DEFECT"].includes(p.failureClass)) { waiting(run, p, [`${p.failureClass}: แก้สภาพแวดล้อม/test ก่อน resume`]); return; }
@@ -108,8 +121,10 @@ async function processPackage(run, p, cfg, options) {
     const failureClass = e.failureClass ?? "ENVIRONMENT_FAILURE";
     transition(run, p, options.signal?.aborted ? "cancelled" : failureClass === "ENVIRONMENT_FAILURE" ? "env_failed" : "waiting_human", { failureClass, questions: [e.message] });
   } finally {
-    p.durationMs = (p.durationMs ?? 0) || Date.now() - started;
-    event(run, "duration", { package: p.id, expected_minutes: p.budget?.expected_minutes ?? null, actualMs: p.durationMs });
+    // Accumulate across resumes; keeping only the first attempt reported 6.7 s for a package that took 18 h.
+    const attemptMs = Date.now() - started;
+    p.durationMs = (p.durationMs ?? 0) + attemptMs;
+    event(run, "duration", { package: p.id, expected_minutes: p.budget?.expected_minutes ?? null, actualMs: p.durationMs, attemptMs });
     release?.(); persist(run);
   }
 }
@@ -125,7 +140,8 @@ export async function schedule(run, cfg, options = {}) {
     try { return await work(); } finally { verifiers--; verifierQueue.shift()?.(); }
   } };
   run.baselines ??= {};
-  for (const repo of new Set(run.packages.map((p) => p.repo.path))) run.baselines[repo] ??= snapshot(repo);
+  // Only the list of files already dirty at the start is ever read; the full file map cost MBs in run.json.
+  for (const repo of new Set(run.packages.map((p) => p.repo.path))) run.baselines[repo] ??= { preexisting_changes: snapshot(repo).preexisting_changes };
   const fanout = transitiveFanOut(run.packages.map((p) => ({ id: p.id, dependsOn: p.depends_on })));
   // Validate all known questions before the first dispatch, instead of discovering them one by one.
   for (const p of run.packages) {

@@ -157,8 +157,8 @@
         "effort": "high"
       },
       "agy": {
-        "model": "gemini-4-argon",
-        "effort": "high"
+        "model": "gemini-4-hydrogen",
+        "effort": "xhigh"
       }
     },
     "t2": {
@@ -176,8 +176,8 @@
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-4-argon",
-        "effort": "medium"
+        "model": "gemini-4-hydrogen",
+        "effort": "high"
       }
     },
     "t3": {
@@ -195,8 +195,8 @@
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-4-argon",
-        "effort": "low"
+        "model": "gemini-4-hydrogen",
+        "effort": "medium"
       }
     },
     "t4": {
@@ -214,7 +214,7 @@
         "effort": "high"
       },
       "agy": {
-        "model": "gemini-3.8-flash",
+        "model": "gemini-4-hydrogen",
         "effort": "low"
       }
     },

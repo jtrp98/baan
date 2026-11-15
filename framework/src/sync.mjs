@@ -1,8 +1,7 @@
-import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { findWorkspaceConfig, layoutOf, loadWorkspace, memoryRootOf } from "./config.mjs";
-import { gitIn, parsePorcelain, commitKnowledgeRoot } from "./knowledge-commit.mjs";
+import { gitIn, parsePorcelain, commitKnowledgeRoot, conflictState, unfinishedOperation } from "./knowledge-commit.mjs";
 import { updateIndexes } from "./knowledge-index.mjs";
 import { performInit } from "./init.mjs";
 
@@ -19,12 +18,14 @@ export function updateSelfFramework(teamDir, log = () => {}) {
     return { ok: false, updated: false, error: fetch.err };
   }
 
+  // A branch without upstream (e.g. a local feature branch) has nothing to fast-forward to. The old fallback
+  // compared with origin/dev/golf, then `pull --ff-only` failed, so every sync on such a branch reported ok:false.
   const rev = gitIn(teamDir, ["rev-list", "--count", "HEAD..@{u}"]);
-  let behind = rev.ok ? Number(rev.out.trim()) : 0;
   if (!rev.ok) {
-    const revFallback = gitIn(teamDir, ["rev-list", "--count", "HEAD..origin/dev/golf"]);
-    if (revFallback.ok) behind = Number(revFallback.out.trim());
+    log("BAAN self-update: branch นี้ไม่มี upstream — ข้ามการอัปเดตตัวเอง");
+    return { ok: true, updated: false, reason: "no_upstream" };
   }
+  const behind = Number(rev.out.trim());
 
   if (behind <= 0) return { ok: true, updated: false, reason: "up_to_date" };
 
@@ -38,10 +39,6 @@ export function updateSelfFramework(teamDir, log = () => {}) {
     log(`⚠ BAAN self-update: pull ไม่สำเร็จ — ${pull.err.split("\n")[0]}`);
     return { ok: false, updated: false, error: pull.err };
   }
-
-  try {
-    spawnSync("npm", ["link"], { cwd: teamDir, encoding: "utf8", windowsHide: true });
-  } catch { /* ignore */ }
 
   let newVersion = oldVersion;
   try {
@@ -68,6 +65,12 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
   }
 
   const changes = parsePorcelain(status.out);
+  const blocked = conflictState(kr.path, changes);
+  if (blocked) {
+    Object.assign(result, { ok: false, blocked });
+    log(`⚠ ${kr.name}: ค้าง ${blocked} — แก้ conflict ให้เสร็จก่อน แล้วค่อย sync (ข้าม commit/pull/push)`);
+    return result;
+  }
   if (changes.length > 0) {
     if (opts.dryRun) {
       result.dirty = changes.length;
@@ -95,7 +98,14 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
   if (!pull.ok) {
     result.ok = false;
     result.pullError = pull.err;
-    log(`⚠ ${kr.name}: pull ไม่สำเร็จ — ${pull.err.split("\n")[0]}`);
+    const reason = pull.err.split("\n").find((line) => /conflict|error|fatal/i.test(line)) ?? pull.err.split("\n")[0];
+    // The guard above proved nothing was in progress, so this rebase is ours to undo; the user merges by hand.
+    if (unfinishedOperation(kr.path)?.startsWith("rebase")) {
+      result.rebaseAborted = gitIn(kr.path, ["rebase", "--abort"]).ok;
+      log(`⚠ ${kr.name}: pull ชน conflict — ยกเลิก rebase คืนสภาพเดิมแล้ว ให้ pull/merge เอง — ${reason}`);
+    } else {
+      log(`⚠ ${kr.name}: pull ไม่สำเร็จ — ${reason}`);
+    }
   } else {
     result.pulled = true;
     if (!pull.out.includes("Already up to date")) {
@@ -108,19 +118,13 @@ export function syncKnowledgeRoot(kr, opts = {}, log = () => {}) {
     const rev = gitIn(kr.path, ["rev-list", "--count", "@{u}..HEAD"]);
     const hasUnpushed = rev.ok && Number(rev.out.trim()) > 0;
     if (hasUnpushed || result.commits.length > 0) {
+      // No "push -u origin <branch>" retry: pull already proved an upstream exists, so a failed push means the
+      // branch does not match it (e.g. main tracking master) and a retry would create a stray remote branch.
       const push = gitIn(kr.path, ["push"]);
       if (!push.ok) {
-        const branch = gitIn(kr.path, ["rev-parse", "--abbrev-ref", "HEAD"]);
-        const currentBranch = branch.ok ? branch.out.trim() : "main";
-        const pushSetUpstream = gitIn(kr.path, ["push", "-u", "origin", currentBranch]);
-        if (!pushSetUpstream.ok) {
-          result.ok = false;
-          result.pushError = pushSetUpstream.err;
-          log(`⚠ ${kr.name}: push ไม่สำเร็จ — ${pushSetUpstream.err.split("\n")[0]}`);
-        } else {
-          result.pushed = true;
-          log(`${kr.name}: ส่งงานขึ้น remote (${currentBranch}) เรียบร้อย`);
-        }
+        result.ok = false;
+        result.pushError = push.err;
+        log(`⚠ ${kr.name}: push ไม่สำเร็จ — ${push.err.split("\n").find((l) => /error|fatal|rejected/i.test(l)) ?? push.err.split("\n")[0]}`);
       } else {
         result.pushed = true;
         log(`${kr.name}: ส่งงานขึ้น remote เรียบร้อย`);
@@ -146,8 +150,21 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       stubs: initRes.stubs,
     };
   }
+  // Used by the BAAN repo's post-merge hook: refreshing stubs must never commit or push a workspace's knowledge.
+  if (opts.stubsOnly) return summary;
 
   for (const kr of ws.knowledge_roots ?? []) {
+    // Refresh INDEX.md before committing so the new table goes out in this same sync; doing it afterwards left
+    // every repo dirty until the next sync. Never inside an unfinished rebase/merge (it would mix both sides).
+    if (layoutOf(kr) === "project" && !opts.dryRun && kr.path && existsSync(kr.path)) {
+      const isRepo = existsSync(path.join(kr.path, ".git"));
+      const status = isRepo ? gitIn(kr.path, ["status", "--porcelain", "-z"]) : null;
+      if (!isRepo || (status.ok && !conflictState(kr.path, parsePorcelain(status.out)))) {
+        const updated = updateIndexes(kr.path);
+        summary.index.push({ name: kr.name, count: updated.length });
+      }
+    }
+
     const krRes = syncKnowledgeRoot(kr, opts, log);
     summary.knowledge.push(krRes);
     if (!krRes.ok) summary.ok = false;
@@ -157,11 +174,6 @@ export function syncWorkspace(ws, targetDir, teamDir, opts = {}, log = console.l
       const memRes = syncKnowledgeRoot({ name: `${kr.name}-memory`, path: mem, layout: kr.layout }, { ...opts, localOnly: true }, log);
       summary.knowledge.push(memRes);
       if (!memRes.ok) summary.ok = false;
-    }
-
-    if (layoutOf(kr) === "project" && !opts.dryRun) {
-      const updated = updateIndexes(kr.path);
-      summary.index.push({ name: kr.name, count: updated.length });
     }
   }
 

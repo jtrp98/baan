@@ -16,7 +16,7 @@ function stubContent(charterPath, learningPath) {
 2. **เมื่องานเป็นการแก้บั๊ก / เกิด error / พบบัญชีไม่ได้รับสิทธิ์ (เช่น 401, 500, curl error, "พบบั๊ก", "แก้บั๊ก")**: ให้เข้าโหมดแก้บั๊กตามทักษะ \`bug-fix\`:
    - ประเมินสังกัดโมดูลทันที: \`baan survey --target <targetName> --eval <filePath> --json\`
    - ทำ \`/plan\` นำเสนอ Root Cause Hypothesis, AC-BUG, Red Test, และขอบเขต \`owns\` ที่แคบที่สุดให้ผู้ใช้เห็นชอบก่อนแตะโค้ด
-   - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`shared/defects/\`
+   - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`<project>/shared/defects/BUG-xxx.md\` ใน knowledge root ของ project ที่บั๊กสังกัด (เช่น \`knowledge/<project>/shared/defects/\`) — ไม่ใช่ \`shared/\` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
 3. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\`
 4. **วางแผนก่อนทำเสมอ (/plan first)**: ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol (8 ขั้น) และ Decision Quality Gate (8 คำถาม)
 5. **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: \`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\` ใช้ผ่าน subagents (Claude Code: Agent/Task ใน \`.claude/agents/\` · Antigravity: \`invoke_subagent\` · Codex: \`spawn_agent\`) ตาม 3-Step Workflow เสมอ
@@ -61,8 +61,6 @@ export const TEAM_AGENTS = {
   review: { tools: "Read, Glob, Grep, Edit, Write, Artifact, AskUserQuestion, Agent, Task", what: "ผู้ตรวจแบบหน้าจอ (QA for UX/UI) ตรวจ usability, WCAG AA, handoff และเทียบหน้าจอจริง (ชื่อเดิม highlighter)" },
 };
 
-export const DESIGN_AGENTS = TEAM_AGENTS; // Backward-compatibility alias for tests and scripts
-
 function agentStub(id, teamDir) {
   const a = TEAM_AGENTS[id];
   return `---
@@ -82,14 +80,43 @@ ${STUB_MARKER}
 `;
 }
 
+const END_MARKER = "<!-- baan:end — เขียนต่อใต้บรรทัดนี้ได้ baan sync / --init จะเก็บส่วนนี้ไว้ -->";
+
+// Claude Code's "#" memory and people append to these files; a refresh may replace only the generated part.
+function userTail(current, generated) {
+  const at = current.indexOf(END_MARKER);
+  if (at >= 0) return current.slice(at + END_MARKER.length).replace(/^\r?\n/, "");
+  // Stubs from before the end marker: keep whatever follows the generated text's last line.
+  const lastLine = generated.trimEnd().split("\n").at(-1).slice(0, 20);
+  const lines = current.split(/\r?\n/);
+  const i = lines.findLastIndex((l) => l.startsWith(lastLine));
+  return i >= 0 ? lines.slice(i + 1).join("\n").replace(/^\n+/, "") : null;
+}
+
+// Returns "created" | "updated" | "skipped"; never loses text a person wrote into a managed file.
+function writeStub(file, generated, log) {
+  if (!existsSync(file)) {
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, `${generated}${END_MARKER}\n`, "utf8");
+    return "created";
+  }
+  const current = readFileSync(file, "utf8");
+  if (!current.includes(STUB_MARKER)) return "skipped";
+  const tail = userTail(current, generated);
+  if (tail === null) {
+    writeFileSync(`${file}.baan-backup`, current, "utf8");
+    log(`สำรอง ${file} เดิมไว้ที่ ${file}.baan-backup — หาส่วนที่ผู้ใช้เขียนเพิ่มไม่เจอ`);
+  }
+  writeFileSync(file, `${generated}${END_MARKER}\n${tail ?? ""}`, "utf8");
+  return "updated";
+}
+
 function writeManaged(file, content, results, log) {
-  if (existsSync(file) && !readFileSync(file, "utf8").includes(STUB_MARKER)) {
+  if (writeStub(file, content, log) === "skipped") {
     results.skipped.push(file);
     log(`ข้าม ${file} — มีอยู่แล้วและไม่ได้สร้างโดย baan`);
     return;
   }
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, content, "utf8");
   results.design.push(file);
 }
 
@@ -130,14 +157,15 @@ function removeObsoletePencil(targetDir, log) {
   }
 }
 
+// Only an old wrapper that launched BAAN is obsolete; any other baan.cmd belongs to the user.
 function removeObsoleteBaanCmd(targetDir, log) {
   const cmd = path.join(targetDir, "baan.cmd");
-  if (existsSync(cmd)) {
-    try {
-      rmSync(cmd, { force: true });
-      log("ลบ baan.cmd เดิม (ใช้คำสั่ง baan กลางจาก PATH ได้โดยตรง)");
-    } catch { /* ignore */ }
-  }
+  if (!existsSync(cmd)) return;
+  try {
+    if (!/baan[\\/]+(?:framework[\\/]+)?bin[\\/]+baan\.mjs|baan\.mjs/i.test(readFileSync(cmd, "utf8"))) return;
+    rmSync(cmd, { force: true });
+    log("ลบ baan.cmd เดิม (ใช้คำสั่ง baan กลางจาก PATH ได้โดยตรง)");
+  } catch { /* ignore */ }
 }
 
 export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
@@ -180,22 +208,14 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
   const charterPath = path.join(teamDir, "BAAN.md");
   const learningPath = path.join(teamDir, "LEARNING.md");
   for (const name of ["CLAUDE.md", "AGENTS.md"]) {
-    const file = path.join(targetDir, name);
-    if (existsSync(file)) {
-      const current = readFileSync(file, "utf8");
-      if (current.includes(STUB_MARKER)) {
-        writeFileSync(file, stubContent(charterPath, learningPath), "utf8");
-        results.stubs.push(name);
-        log(`อัปเดต ${name} ใหม่ (เป็นไฟล์ที่ baan --init สร้างไว้)`);
-      } else {
-        results.skipped.push(name);
-        log(`ข้าม ${name} — มีอยู่แล้วและไม่ได้สร้างโดย baan (เพิ่มบรรทัดชี้ไป ${charterPath} เองถ้าต้องการ)`);
-      }
-    } else {
-      writeFileSync(file, stubContent(charterPath, learningPath), "utf8");
-      results.stubs.push(name);
-      log(`สร้าง ${name} — AI session ที่เปิดที่นี่จะสวมบท นายช่าง เองโดยอัตโนมัติ`);
+    const outcome = writeStub(path.join(targetDir, name), stubContent(charterPath, learningPath), log);
+    if (outcome === "skipped") {
+      results.skipped.push(name);
+      log(`ข้าม ${name} — มีอยู่แล้วและไม่ได้สร้างโดย baan (เพิ่มบรรทัดชี้ไป ${charterPath} เองถ้าต้องการ)`);
+      continue;
     }
+    results.stubs.push(name);
+    log(outcome === "created" ? `สร้าง ${name} — AI session ที่เปิดที่นี่จะสวมบท นายช่าง เองโดยอัตโนมัติ` : `อัปเดต ${name} ใหม่ (เก็บข้อความที่เขียนต่อท้ายไว้)`);
   }
   return results;
 }

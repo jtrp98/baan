@@ -6,6 +6,11 @@ const DIR_STAMP = /^(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})/;
 const REWORK_HEAD_CHARS = 300;
 const REWORK_RE = /rework|re-check|รอบแก้|ตรวจซ้ำ|รันซ้ำ|รอบ ?2|r1|r2/i;
 
+const parseMs = (value) => {
+  const ms = value ? Date.parse(value) : NaN;
+  return Number.isFinite(ms) ? ms : null;
+};
+
 export function dirStartMs(name) {
   const m = DIR_STAMP.exec(name);
   return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : null;
@@ -18,10 +23,11 @@ export function loadReports(dir) {
     if (!existsSync(file) || !statSync(path.join(dir, name)).isDirectory()) continue;
     let r;
     try { r = JSON.parse(readFileSync(file, "utf8")); } catch { continue; }
-    const reportStart = r.startedAt ? Date.parse(r.startedAt) : dirStartMs(name);
+    // One unparsable timestamp gave NaN, and toISOString() on it threw RangeError for the whole report.
+    const reportStart = parseMs(r.startedAt) ?? dirStartMs(name);
     for (const x of r.results ?? []) {
       const state = x.state ?? (x.ok ? "completed" : "failed");
-      const start = x.startedAt && (r.results ?? []).length > 1 ? Date.parse(x.startedAt) : reportStart;
+      const start = x.startedAt && (r.results ?? []).length > 1 ? parseMs(x.startedAt) ?? reportStart : reportStart;
       rows.push({
         dir: name,
         role: r.role ?? "adhoc",

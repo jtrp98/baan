@@ -11,14 +11,25 @@ import { surveyProject } from "./survey.mjs";
 import { repairFile } from "./mojibake.mjs";
 
 export const utilityFlags = ["help", "version", "init", "list", "commit", "index", "lint-knowledge", "lint-plan", "repair-mojibake", "sweep", "sync", "survey", "scan"];
-export function utility(o, ws, cfg, root) {
+// Inside a workspace sync only that one: fanning out committed and pushed half-written work of every other workspace.
+// Outside any workspace (e.g. the BAAN repo during a release) the registered workspaces are the only sensible target.
+// Never fall back to the cwd: that ran a full --init in whatever folder sync was called from.
+export function syncScope(o, ws, local) {
+  if (o.all) return "all";
+  if (ws?.source) return "current";
+  if (!o.workspace && local.auto_update && local.workspaces.length) return "all";
+  throw new Error("ไม่พบ baan.config.json — รัน baan sync ในโฟลเดอร์ workspace, ใช้ --all เพื่อซิงค์ทุก workspace ใน local.json หรือสร้าง workspace ด้วย baan --init ก่อน");
+}
+
+export function utility(o, ws, cfg, root, local) {
   if (o.help) return `BAAN — one execution engine
   baan monitor | ui [--port <3456>] [--no-open] [--tui]
   baan parity [--agent <claude|codex|agy>] [--cwd <repo>] [--json]
   baan update-clis
   baan attach <package> [--run <run>]
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
-  baan sync [--all] [--pull-only] [--push] [--dry-run] [--no-self-update]
+  baan target [list | check [<name>] | scan [<dir>] [--prune] [--pin-branch] [--update-branch] | add <dir> [--name <name>] [--branch <branch> | --pin-branch] | branch <name> [<branch> | --clear] | remove <name>] [--root <kr>] [--dry-run]
+  baan sync [--all] [--stubs-only] [--pull-only] [--push] [--dry-run] [--no-self-update]
   baan survey [--target <name>] [--project <name>] [--cwd <path>]
     [--scaffold-module <name>] [--scaffold-project <name>] [--json]
   baan --list | --version | --help
@@ -27,7 +38,7 @@ export function utility(o, ws, cfg, root) {
     [--owns <glob,glob>] [--acceptance <text>] [--source <reference>]
     [--build <cmd>] [--test <cmd>] [--test-full <cmd>] [--setup <cmd>]
     [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
-    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback]
+    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback] [--allow-branch-mismatch]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]
   baan decide <package> --run <run> --by user --decision <text> --source <reference>
@@ -40,22 +51,17 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.version) return JSON.parse(readFileSync(path.join(TEAM_DIR, "package.json"), "utf8")).version;
   if (o.init) return performInit(root, TEAM_DIR, () => {}, { knowledgeGit: o["knowledge-git"], memoryGit: o["memory-git"] });
   if (o.sync) {
-    const local = loadLocalConfig(TEAM_DIR);
-    const shouldSyncAll = Boolean(o.all || (!ws?.source && local.workspaces.length > 0) || (local.auto_update && local.workspaces.length > 0 && !o.workspace));
-    if (shouldSyncAll) {
-      return syncAllWorkspaces(local, TEAM_DIR, {
-        push: !o["pull-only"] && (o.push || true),
-        pullOnly: Boolean(o["pull-only"]),
-        dryRun: Boolean(o["dry-run"]),
-        noSelfUpdate: Boolean(o["no-self-update"]),
-      }, (m) => console.log(m));
-    }
-    return syncWorkspace(ws, root, TEAM_DIR, {
-      push: !o["pull-only"] && (o.push || true),
+    const localConfig = local ?? loadLocalConfig(TEAM_DIR);
+    const opts = {
+      // Sync always pushes unless --pull-only; --push stays accepted for old scripts but changes nothing.
+      push: !o["pull-only"],
       pullOnly: Boolean(o["pull-only"]),
       dryRun: Boolean(o["dry-run"]),
       noSelfUpdate: Boolean(o["no-self-update"]),
-    }, (m) => console.log(m));
+      stubsOnly: Boolean(o["stubs-only"]),
+    };
+    if (syncScope(o, ws, localConfig) === "all") return syncAllWorkspaces(localConfig, TEAM_DIR, opts, (m) => console.log(m));
+    return syncWorkspace(ws, root, TEAM_DIR, opts, (m) => console.log(m));
   }
   if (o.survey || o.scan) {
     return surveyProject(o, ws, root, (m) => console.log(m));

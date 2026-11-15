@@ -230,3 +230,42 @@ test("commitKnowledge: ตั้ง memory_root = commit ทั้ง knowledge 
     rmSync(m.dir, { recursive: true, force: true });
   }
 });
+
+test("commitKnowledgeRoot: ไม่ auto-commit ไฟล์ลับ ไฟล์ใหญ่ และ repo ซ้อน แม้อยู่ใน module เดียวกับไฟล์ปกติ", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const mod = path.join(dir, "school-bot");
+    mkdirSync(mod, { recursive: true });
+    writeFileSync(path.join(mod, "screen.md"), "# ok\n");
+    writeFileSync(path.join(mod, ".env"), "DB_PASSWORD=x\n");
+    writeFileSync(path.join(mod, "notes.md"), `token: ghp_${"a".repeat(36)}\n`);
+    writeFileSync(path.join(mod, "video.bin"), Buffer.alloc(11 * 1024 * 1024));
+    const nested = path.join(dir, "vendor-repo"); mkdirSync(nested);
+    spawnSync("git", ["-C", nested, "init", "-q"]); writeFileSync(path.join(nested, "x.md"), "x\n");
+
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, (m) => logs.push(m));
+    assert.deepEqual(res.commits, ["school-bot: add screen.md"]);
+    assert.deepEqual(res.skipped.map((s) => s.file).sort(), ["school-bot/.env", "school-bot/notes.md", "school-bot/video.bin", "vendor-repo/"]);
+    assert.deepEqual(git(["show", "--name-only", "--format=", "HEAD"]).stdout.trim().split("\n"), ["school-bot/screen.md"]);
+    assert.equal(logs.filter((l) => l.includes("ไม่ auto-commit")).length, 4);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("commitKnowledgeRoot: module ที่มีไฟล์ชื่อยาวหลายร้อยไฟล์ commit ได้ (ไม่ชนเพดาน command line ของ Windows)", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const shared = path.join(dir, "school-bot", "modules", "grades", "shared");
+    mkdirSync(shared, { recursive: true });
+    writeFileSync(path.join(dir, "school-bot", "INDEX.md"), "---\nproject: school-bot\n---\n");
+    git(["add", "."]); git(["commit", "-qm", "init"]);
+    const longName = "บันทึกการประชุมเรื่องเกณฑ์การให้คะแนนรายวิชาภาษาไทยระดับประถมศึกษาตอนปลาย";
+    for (let i = 0; i < 400; i++) writeFileSync(path.join(shared, `${longName}-${String(i).padStart(3, "0")}.md`), `# ${i}\n`);
+
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir, layout: "project" }, (m) => logs.push(m));
+    assert.equal(res.commits.length, 1, logs.join("\n"));
+    assert.equal(git(["status", "--porcelain"]).stdout.trim(), "");
+    assert.equal(git(["show", "--name-only", "--format=", "HEAD"]).stdout.trim().split("\n").length, 400);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

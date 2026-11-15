@@ -229,3 +229,60 @@ test("survey: CLI --eval ส่งออกผลการประเมิน�
   assert.equal(res.classification, "cross-cutting");
   assert.equal(res.recommendedModule, "_cross");
 });
+
+test("survey: scaffold รับ os แบบค่าเดียว, ไม่ยอม project นอก knowledge root, และ project INDEX มีหัว Modules เดียว", (t) => {
+  const kDir = mkdtempSync(path.join(tmpdir(), "survey-kr-fix-"));
+  t.after(() => rmSync(kDir, { recursive: true, force: true }));
+  const kr = { path: kDir, layout: "project" };
+
+  const proj = scaffoldKnowledgeProject(kr, "mobile-app", "mobile-app", { platform: "mobile", os: "ios" });
+  assert.equal(proj.ok, true);
+  const index = readFileSync(path.join(kDir, "mobile-app", "INDEX.md"), "utf8");
+  assert.match(index, /^os: \[ios\]$/m);
+  assert.equal(index.match(/^## Modules$/gm).length, 1, "the module table must land under the template's heading");
+
+  const mod = scaffoldKnowledgeModule(kr, "mobile-app", "login", { os: "ios" });
+  assert.equal(mod.ok, true, "a scalar os from front matter must not crash");
+  assert.equal(scaffoldKnowledgeModule(kr, "mobile-app", "login", {}).reason, "already_exists");
+
+  mkdirSync(path.join(kDir, "..", path.basename(kDir) + "-outside", "modules"), { recursive: true });
+  t.after(() => rmSync(path.join(kDir, "..", path.basename(kDir) + "-outside"), { recursive: true, force: true }));
+  assert.throws(() => scaffoldKnowledgeModule(kr, "..\\" + path.basename(kDir) + "-outside", "evil", {}), /ไม่ถูกต้อง/);
+  assert.throws(() => scaffoldKnowledgeModule(kr, `../${path.basename(kDir)}-outside`, "evil", {}), /ไม่ถูกต้อง/);
+});
+
+test("survey: CLI แจ้งชัดเมื่อโมดูลมีอยู่แล้ว และ --target ที่ไม่รู้จักไม่ไปสแกน cwd แทน", (t) => {
+  const kDir = mkdtempSync(path.join(tmpdir(), "survey-cli-fix-"));
+  t.after(() => rmSync(kDir, { recursive: true, force: true }));
+  const kr = { name: "kb", path: kDir, layout: "project", targets: [{ name: "app", path: kDir }] };
+  const ws = { source: path.join(kDir, "baan.config.json"), knowledge_roots: [kr] };
+  scaffoldKnowledgeProject(kr, "app", "app");
+  assert.match(surveyProject({ "scaffold-module": "grades", project: "app" }, ws, kDir), /^✅/);
+  assert.match(surveyProject({ "scaffold-module": "grades", project: "app" }, ws, kDir), /อยู่แล้ว/);
+  assert.throws(() => surveyProject({ target: "ap" }, ws, kDir), /ไม่พบ target "ap".*app/);
+});
+
+test("survey: --eval ไม่เดาโมดูลจากชื่อโฟลเดอร์เมื่อไฟล์อยู่ใน component อื่น และแยกไฟล์นอก target", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "survey-eval-fix-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  mkdirSync(path.join(dir, "backend", "src", "payments", "auth"), { recursive: true });
+  mkdirSync(path.join(dir, "backend", "src", "auth"), { recursive: true });
+  writeFileSync(path.join(dir, "backend", "src", "payments", "auth", "token.cs"), "", "utf8");
+  const project = { name: "app", modules: [{ module: "auth", status: "released" }] };
+
+  const nested = evaluateModulePlacement("backend/src/payments/auth/token.cs", { targetPath: dir, project });
+  assert.equal(nested.files[0].classification, "unmapped-code");
+  assert.equal(nested.files[0].module, "payments");
+
+  const outside = evaluateModulePlacement(path.join(dir, "..", "elsewhere", "x.cs"), { targetPath: dir, project });
+  assert.equal(outside.classification, "outside-target");
+  assert.equal(outside.recommendedModule, null);
+  assert.match(formatModuleEvaluation(outside), /นอก target/);
+});
+
+test("survey: target ที่ path หายไปแล้วบอกชัด แทนการรายงานว่าโมดูลหายหมด", (t) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "survey-gone-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const ws = { knowledge_roots: [{ name: "kb", path: dir, layout: "project", targets: [{ name: "gateway", path: path.join(dir, "moved-away") }] }] };
+  assert.throws(() => surveyProject({ target: "gateway" }, ws, dir), /gateway.*ไม่มีอยู่.*baan target check/);
+});

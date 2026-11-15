@@ -4,7 +4,6 @@ import path from "node:path";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "./usage-aggregator.mjs";
-import { getWorkspaceQuota } from "./quota-tracker.mjs";
 import { loadLocalConfig, isAgentEnabled } from "./config.mjs";
 
 function readAgentsEnabled() {
@@ -16,7 +15,10 @@ function readAgentsEnabled() {
   }
 }
 
-export function getAvailableWorkspaces(currentWorkspaceRoot) {
+const LOCAL_HOST = /^(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i;
+const MAX_BODY = 64 * 1024;
+
+export function getAvailableWorkspaces(currentWorkspaceRoot, homeRoot = null) {
   const currentNormalized = path.resolve(currentWorkspaceRoot);
   const result = [];
   const seen = new Set();
@@ -33,6 +35,12 @@ export function getAvailableWorkspaces(currentWorkspaceRoot) {
 
   if (!seen.has(currentNormalized.toLowerCase())) {
     result.unshift({ name: path.basename(currentNormalized), path: currentNormalized });
+    seen.add(currentNormalized.toLowerCase());
+  }
+  // The workspace the monitor was started in stays selectable even when local.json does not list it;
+  // otherwise switching away once left no way back without restarting the monitor.
+  if (homeRoot && !seen.has(path.resolve(homeRoot).toLowerCase())) {
+    result.unshift({ name: path.basename(path.resolve(homeRoot)), path: path.resolve(homeRoot) });
   }
 
   return result;
@@ -43,8 +51,9 @@ export function formatNumber(num) {
   return Number(num).toLocaleString();
 }
 
+// null = the provider reports no price (codex, agy); "$0.00" read as free.
 export function formatCost(num) {
-  if (num == null || isNaN(num)) return "$0.00";
+  if (num == null || isNaN(num)) return "n/a";
   return `$${Number(num).toFixed(3)}`;
 }
 
@@ -60,22 +69,20 @@ export function openBrowser(url) {
   } catch {}
 }
 
-export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) {
+export async function getMonitorState(workspaceRoot, { homeRoot = null } = {}) {
   const activeRuns = scanActiveRuns(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
-  const workspaces = getAvailableWorkspaces(workspaceRoot);
-  let quota = null;
-  try {
-    quota = await getWorkspaceQuota(forceRefreshQuota);
-  } catch {}
+  const workspaces = getAvailableWorkspaces(workspaceRoot, homeRoot);
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
     workspaces,
     activeRuns,
     usage,
-    quota,
+    // Provider quotas are only readable from their private endpoints or auth files, which the ToS rules forbid;
+    // the UI shows null as UNAVAILABLE rather than a guessed 0%.
+    quota: null,
     recentRuns,
     recentCallEnds: getRecentCallEnds(workspaceRoot),
     agentsEnabled: readAgentsEnabled(),
@@ -83,43 +90,18 @@ export async function getMonitorState(workspaceRoot, forceRefreshQuota = false) 
   };
 }
 
+// Telemetry carries text from models, commands and file names; an ESC sequence in it would drive the terminal
+// (clear the screen, write the clipboard via OSC 52). Only BAAN's own colour codes may reach the TTY.
+export const plain = (value) => String(value ?? "").replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
+
 export function renderTui(state) {
-  const { activeRuns, usage, quota, workspaceName } = state;
+  const { activeRuns, usage } = state;
+  const workspaceName = plain(state.workspaceName);
   const lines = [];
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${activeRuns.length} run(s)\x1b[0m`);
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push("");
-
-  if (quota) {
-    const { claude, codex, agy } = quota;
-    lines.push(`\x1b[1mACCOUNT LIMITS & REMAINING QUOTA:\x1b[0m`);
-    const tuiRow = (label, used, reset) => {
-      if (used == null) return null;
-      const left = Math.max(0, 100 - Math.round(used));
-      const col = left > 40 ? "[32m" : left > 15 ? "[33m" : "[31m";
-      return `${label}: ${col}${Math.round(used)}% used (${left}% left)[0m${/[0-9]/.test(reset ?? "") ? ` [Resets: ${reset}]` : ""}`;
-    };
-    const usedOf = (used, remaining) => used ?? (remaining != null ? 100 - remaining : null);
-    const tuiLine = (name, ...rows) => lines.push(` ▶ ${name.padEnd(12)} ${rows.filter(Boolean).join(" | ")}`);
-    if (claude?.available) {
-      tuiLine("Claude Code",
-        tuiRow("5-Hour Limit", usedOf(claude.sessionUsedPct, claude.sessionRemainingPct), claude.sessionResetsAt),
-        tuiRow("Weekly Limit", usedOf(claude.weeklyUsedPct, claude.weeklyRemainingPct), claude.weeklyResetsAt));
-    }
-    if (codex?.available) {
-      tuiLine("OpenAI Codex",
-        tuiRow("5-Hour Limit", usedOf(codex.sessionUsedPct, codex.sessionRemainingPct), codex.sessionResetsAt),
-        tuiRow("Weekly Limit", usedOf(codex.weeklyUsedPct, codex.weeklyRemainingPct), codex.weeklyResetsAt));
-    }
-    if (agy?.available) {
-      tuiLine("Google AGY",
-        tuiRow("5-Hour Limit", usedOf(null, agy.gemini5hRemainingPct), agy.gemini5hResetsAt),
-        tuiRow("Weekly Limit", usedOf(null, agy.geminiWeeklyRemainingPct), agy.geminiWeeklyResetsAt),
-        tuiRow("Argon Weekly Limit", usedOf(null, agy.argonWeeklyRemainingPct), agy.argonWeeklyResetsAt));
-    }
-    lines.push("");
-  }
 
   lines.push(`\x1b[1m3-CLI USAGE BREAKDOWN (WORKSPACE TOTALS):\x1b[0m`);
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
@@ -132,12 +114,12 @@ export function renderTui(state) {
     const inTok = formatNumber(s.inputTokens ?? 0).padStart(11);
     const outTok = formatNumber(s.outputTokens ?? 0).padStart(11);
     const cache = formatNumber(s.cacheReadTokens ?? 0).padStart(10);
-    const cost = formatCost(s.costUsd ?? 0).padStart(8);
+    const cost = formatCost(s.calls ? s.costUsd : 0).padStart(8);
     lines.push(`| ${cName} | ${calls} | ${inTok} | ${outTok} | ${cache} | ${cost} |`);
   }
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
   const tot = usage.total ?? {};
-  lines.push(`| TOTAL COMBINED   | ${String(tot.calls ?? 0).padStart(6)} | ${formatNumber(tot.inputTokens ?? 0).padStart(11)} | ${formatNumber(tot.outputTokens ?? 0).padStart(11)} | ${formatNumber(tot.cacheReadTokens ?? 0).padStart(10)} | ${formatCost(tot.costUsd ?? 0).padStart(8)} |`);
+  lines.push(`| TOTAL COMBINED   | ${String(tot.calls ?? 0).padStart(6)} | ${formatNumber(tot.inputTokens ?? 0).padStart(11)} | ${formatNumber(tot.outputTokens ?? 0).padStart(11)} | ${formatNumber(tot.cacheReadTokens ?? 0).padStart(10)} | ${formatCost(tot.calls ? tot.costUsd : 0).padStart(8)} |`);
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
   lines.push("");
 
@@ -145,11 +127,11 @@ export function renderTui(state) {
     lines.push(`\x1b[1;32mACTIVE RUNS & LIVE ACTIVITY:\x1b[0m`);
     for (const r of activeRuns) {
       const p = r.activePackages?.[0] ?? {};
-      const act = p.recentActivity ? `[${p.recentActivity.name}] ${p.recentActivity.detail}` : "Starting...";
-      lines.push(` ▶ \x1b[1m[${r.repoName}]\x1b[0m Run: ${r.runId.slice(0, 16)} | Role: \x1b[33m${r.role ?? "unknown"}\x1b[0m (${r.agent ?? "unknown"})`);
-      lines.push(`   Task: ${r.title.slice(0, 60)}`);
+      const act = p.recentActivity ? `[${plain(p.recentActivity.name)}] ${plain(p.recentActivity.detail)}` : "Starting...";
+      lines.push(` ▶ \x1b[1m[${plain(r.repoName)}]\x1b[0m Run: ${plain(r.runId).slice(0, 16)} | Role: \x1b[33m${plain(r.role ?? "unknown")}\x1b[0m (${plain(r.agent ?? "unknown")})`);
+      lines.push(`   Task: ${plain(r.title).slice(0, 60)}`);
       lines.push(`   Live Tool: \x1b[36m${act}\x1b[0m`);
-      if (p.recentThought) lines.push(`   Thought: \x1b[90m${p.recentThought.slice(0, 70)}\x1b[0m`);
+      if (p.recentThought) lines.push(`   Thought: \x1b[90m${plain(p.recentThought).slice(0, 70)}\x1b[0m`);
       lines.push("");
     }
   } else {
@@ -192,7 +174,7 @@ function serveUiFile(name, res) {
   }
 }
 
-export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true, runId = null }) {
+export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true }) {
   let currentWorkspaceRoot = workspaceRoot;
   if (tui) {
     console.log(`Starting BAAN TUI Monitor for ${workspaceRoot}... (Press Ctrl+C to exit)`);
@@ -217,9 +199,24 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
     return new Promise(() => {}); // Keep alive in terminal
   }
 
+  // Every open tab polls each second; build the state once per tick and share it instead of once per client.
+  let shared = { root: null, at: 0, promise: null };
+  const sharedState = () => {
+    if (shared.root !== currentWorkspaceRoot || Date.now() - shared.at >= 900) {
+      shared = { root: currentWorkspaceRoot, at: Date.now(), promise: getMonitorState(currentWorkspaceRoot, { homeRoot: workspaceRoot }) };
+    }
+    return shared.promise;
+  };
+
   return new Promise((resolve, reject) => {
-    const server = http.createServer(async (req, res) => {
-      const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const handle = async (req, res) => {
+      // Telemetry carries commands, paths and model thoughts; only a local page may read it (blocks DNS rebinding).
+      if (!LOCAL_HOST.test(req.headers.host ?? "")) {
+        res.writeHead(403, { "Content-Type": "text/plain" });
+        res.end("Forbidden");
+        return;
+      }
+      const url = new URL(req.url, "http://localhost");
 
       if (url.pathname === "/") {
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -229,49 +226,49 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
 
       if (url.pathname.startsWith("/ui/") && serveUiFile(url.pathname.slice(4), res)) return;
 
-      if (url.pathname === "/api/quota/refresh" && req.method === "POST") {
-        const state = await getMonitorState(currentWorkspaceRoot, true);
-        res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify(state));
-        return;
-      }
-
       if (url.pathname === "/api/workspace/select") {
+        // POST only: a GET could be fired by any <img> tag on another site.
+        if (req.method !== "POST") {
+          res.writeHead(405, { "Content-Type": "text/plain", Allow: "POST" });
+          res.end("Method Not Allowed");
+          return;
+        }
         const switchWorkspace = async (target) => {
           if (target) {
-            const available = getAvailableWorkspaces(currentWorkspaceRoot);
-            const found = available.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase())
-              || (existsSync(target) ? { path: path.resolve(target) } : null);
-            if (found) {
-              currentWorkspaceRoot = found.path;
+            // Only known workspaces: probing an arbitrary path (e.g. a UNC share) leaks credentials on Windows.
+            const known = getAvailableWorkspaces(currentWorkspaceRoot, workspaceRoot);
+            const found = typeof target === "string" && known.find((w) => path.resolve(w.path).toLowerCase() === path.resolve(target).toLowerCase());
+            if (!found) {
+              res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+              res.end(JSON.stringify({ error: "workspace not registered in local.json" }));
+              return;
             }
+            currentWorkspaceRoot = found.path;
           }
-          const state = await getMonitorState(currentWorkspaceRoot);
+          const state = await getMonitorState(currentWorkspaceRoot, { homeRoot: workspaceRoot });
           res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
           res.end(JSON.stringify(state));
         };
 
-        if (req.method === "POST") {
-          let body = "";
-          req.on("data", (chunk) => { body += chunk; });
-          req.on("end", async () => {
-            try {
-              const data = JSON.parse(body || "{}");
-              await switchWorkspace(data.path);
-            } catch (err) {
-              res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
-              res.end(JSON.stringify({ error: err.message }));
-            }
-          });
-          return;
-        } else if (req.method === "GET") {
-          await switchWorkspace(url.searchParams.get("path"));
-          return;
-        }
+        let body = "";
+        req.on("data", (chunk) => {
+          body += chunk;
+          if (body.length > MAX_BODY) req.destroy();
+        });
+        req.on("end", async () => {
+          try {
+            const data = JSON.parse(body || "{}");
+            await switchWorkspace(data.path);
+          } catch (err) {
+            res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+            res.end(JSON.stringify({ error: err.message }));
+          }
+        });
+        return;
       }
 
       if (url.pathname === "/api/stats") {
-        const state = await getMonitorState(currentWorkspaceRoot);
+        const state = await sharedState();
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state));
         return;
@@ -289,7 +286,6 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache, no-transform",
           "Connection": "keep-alive",
-          "Access-Control-Allow-Origin": "*",
         });
 
         let sending = false;
@@ -297,7 +293,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           if (sending) return;
           sending = true;
           try {
-            const state = await getMonitorState(currentWorkspaceRoot);
+            const state = await sharedState();
             res.write(`data: ${JSON.stringify(state)}\n\n`);
           } catch {} finally {
             sending = false;
@@ -312,6 +308,13 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
 
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not Found");
+    };
+
+    const server = http.createServer((req, res) => {
+      handle(req, res).catch((err) => {
+        if (!res.headersSent) res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: err.message }));
+      });
     });
 
     server.on("error", (err) => {
@@ -321,8 +324,8 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       reject(err);
     });
 
-    server.listen(port, () => {
-      const url = `http://localhost:${port}`;
+    server.listen(port, "127.0.0.1", () => {
+      const url = `http://127.0.0.1:${port}`;
       console.log(`\n======================================================`);
       console.log(`🏗️  BAAN Live Monitor Dashboard running at: ${url}`);
       console.log(`   Workspace: ${workspaceRoot}`);

@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { alive } from "./repolock.mjs";
 
 const STALE_ACTIVE_MS = 10 * 60 * 1000;
 
@@ -9,6 +10,35 @@ export function readJsonSafe(file) {
   } catch {
     return null;
   }
+}
+
+// The monitor re-reads every run every second; run.json holds MBs of snapshots, so parse a file only when it
+// changed and keep just the small projection the monitor uses (holding whole runs would grow memory per run).
+const projections = new Map();
+function readProjected(file, project) {
+  let st;
+  try { st = statSync(file); } catch { projections.delete(file); return null; }
+  const hit = projections.get(file);
+  if (hit && hit.mtimeMs === st.mtimeMs && hit.size === st.size) return hit.value;
+  let value = null;
+  try { value = project(readFileSync(file, "utf8")); } catch { /* half-written file: retry on the next change */ }
+  projections.set(file, { mtimeMs: st.mtimeMs, size: st.size, value });
+  return value;
+}
+
+export function readRunSummary(file) {
+  return readProjected(file, (text) => {
+    const run = JSON.parse(text);
+    return { id: run.id, pid: run.pid, createdAt: run.createdAt, mode: run.mode, executionMode: run.executionMode,
+      packages: (run.packages ?? []).map((p) => ({ id: p.id, title: p.title ?? "", state: p.state ?? null, failureClass: p.failureClass ?? null, repo: { path: p.repo?.path } })) };
+  });
+}
+
+export function readCallEnds(file) {
+  return readProjected(file, (text) => text.split(/\r?\n/).flatMap((line) => {
+    if (!line.includes('"call_end"')) return [];
+    try { const ev = JSON.parse(line); return ev.type === "call_end" ? [ev] : []; } catch { return []; }
+  })) ?? [];
 }
 
 export function scanActiveRuns(workspaceRoot) {
@@ -34,7 +64,10 @@ export function scanActiveRuns(workspaceRoot) {
 
       if (!activeFiles.length) continue;
 
-      const runJson = readJsonSafe(path.join(runDir, "run.json")) ?? {};
+      const runJson = readRunSummary(path.join(runDir, "run.json")) ?? {};
+      // Ctrl+C kills the runner before its finally block deletes active-*.json, and the run keeps the dead
+      // runner's pid; those files showed as "1 ACTIVE" for days. A run whose runner is gone has no live session.
+      if (Number.isInteger(runJson.pid) && !alive(runJson.pid)) continue;
       const activePackages = [];
 
       for (const af of activeFiles) {
@@ -93,6 +126,7 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     cacheReadTokens: 0,
     cacheWriteTokens: 0,
     costUsd: 0,
+    costCalls: 0,
     turns: 0,
     durationMs: 0,
   });
@@ -113,6 +147,7 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
       cacheReadTokens: 0,
       cacheWriteTokens: 0,
       costUsd: 0,
+      costCalls: 0,
       durationMs: 0,
     },
   };
@@ -134,27 +169,26 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     if (!existsSync(ledgerFile) && !existsSync(runJsonFile)) continue;
     summary.total.runs++;
 
-    const runJson = readJsonSafe(runJsonFile);
+    const runJson = readRunSummary(runJsonFile);
     if (runJson && runJson.packages?.length && runJson.packages.every((p) => p.state === "done")) {
       summary.total.completedRuns++;
     }
 
     const projectsInRun = new Set();
+    const projectOfPackage = new Map();
     if (runJson?.packages) {
       for (const p of runJson.packages) {
-        if (p.repo?.path) projectsInRun.add(path.basename(p.repo.path));
+        if (!p.repo?.path) continue;
+        projectsInRun.add(path.basename(p.repo.path));
+        projectOfPackage.set(p.id, path.basename(p.repo.path));
       }
     }
+    const onlyProject = projectsInRun.size === 1 ? [...projectsInRun][0] : null;
 
     if (existsSync(ledgerFile)) {
       try {
-        const text = readFileSync(ledgerFile, "utf8");
-        for (const line of text.split(/\r?\n/)) {
-          if (!line.trim().startsWith("{")) continue;
-          let ev;
-          try { ev = JSON.parse(line); } catch { continue; }
-
-          if (ev.type === "call_end" && ev.agent) {
+        for (const ev of readCallEnds(ledgerFile)) {
+          if (ev.agent) {
             const agent = ev.agent.toLowerCase();
             const targetAgent = summary.agents[agent] ?? (summary.agents[agent] = initialAgentStats());
             targetAgent.calls++;
@@ -162,11 +196,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
             else targetAgent.failedCalls++;
 
             const u = ev.usage ?? {};
+            // A provider that reports no price is unknown, not free: count priced calls separately.
+            const priced = Number.isFinite(u.costUsd);
             targetAgent.inputTokens += u.inputTokens ?? 0;
             targetAgent.outputTokens += u.outputTokens ?? 0;
             targetAgent.cacheReadTokens += u.cacheReadTokens ?? 0;
             targetAgent.cacheWriteTokens += u.cacheWriteTokens ?? 0;
-            targetAgent.costUsd += u.costUsd ?? 0;
+            if (priced) { targetAgent.costUsd += u.costUsd; targetAgent.costCalls++; }
             targetAgent.turns += u.turns ?? 0;
             targetAgent.durationMs += ev.durationMs ?? 0;
 
@@ -175,10 +211,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
             summary.total.outputTokens += u.outputTokens ?? 0;
             summary.total.cacheReadTokens += u.cacheReadTokens ?? 0;
             summary.total.cacheWriteTokens += u.cacheWriteTokens ?? 0;
-            summary.total.costUsd += u.costUsd ?? 0;
+            if (priced) { summary.total.costUsd += u.costUsd; summary.total.costCalls++; }
             summary.total.durationMs += ev.durationMs ?? 0;
 
-            for (const proj of projectsInRun) {
+            // Credit only the repo of the package that made the call; crediting every repo in a multi-repo run
+            // made project totals add up to more than the workspace total.
+            const proj = projectOfPackage.get(ev.package) ?? onlyProject;
+            if (proj) {
               const pStats = summary.projects[proj] ?? (summary.projects[proj] = {
                 runs: 0,
                 calls: 0,
@@ -186,12 +225,13 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
                 outputTokens: 0,
                 cacheReadTokens: 0,
                 costUsd: 0,
+                costCalls: 0,
               });
               pStats.calls++;
               pStats.inputTokens += u.inputTokens ?? 0;
               pStats.outputTokens += u.outputTokens ?? 0;
               pStats.cacheReadTokens += u.cacheReadTokens ?? 0;
-              pStats.costUsd += u.costUsd ?? 0;
+              if (priced) { pStats.costUsd += u.costUsd; pStats.costCalls++; }
             }
           }
         }
@@ -203,6 +243,9 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     }
   }
 
+  for (const stats of [...Object.values(summary.agents), ...Object.values(summary.projects), summary.total]) {
+    if (stats.calls > 0 && stats.costCalls === 0) stats.costUsd = null;
+  }
   return summary;
 }
 
@@ -220,7 +263,7 @@ export function getRecentRuns(workspaceRoot, limit = 15) {
   const list = [];
   for (const name of entries.sort().reverse().slice(0, limit)) {
     const runDir = path.join(runsDir, name);
-    const run = readJsonSafe(path.join(runDir, "run.json"));
+    const run = readRunSummary(path.join(runDir, "run.json"));
     if (!run) continue;
 
     const projects = [...new Set((run.packages ?? []).map((p) => p.repo?.path ? path.basename(p.repo.path) : "").filter(Boolean))];
@@ -258,12 +301,9 @@ export function getRecentCallEnds(workspaceRoot, { limit = 20, withinMs = 60 * 6
     const ledgerFile = path.join(runsDir, name, "ledger.jsonl");
     try {
       if (statSync(ledgerFile).mtimeMs < cutoff) continue;
-      for (const line of readFileSync(ledgerFile, "utf8").split(/\r?\n/)) {
-        if (!line.includes('"call_end"')) continue;
-        let ev;
-        try { ev = JSON.parse(line); } catch { continue; }
+      for (const ev of readCallEnds(ledgerFile)) {
         const at = Date.parse(ev.at ?? "");
-        if (ev.type !== "call_end" || !Number.isFinite(at) || at < cutoff) continue;
+        if (!Number.isFinite(at) || at < cutoff) continue;
         out.push({ at: ev.at, runId: name, package: ev.package ?? null, role: ev.role ?? null, agent: ev.agent ?? null, ok: ev.ok === true });
       }
     } catch {}

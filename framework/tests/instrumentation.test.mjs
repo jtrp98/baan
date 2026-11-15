@@ -70,7 +70,8 @@ test("parseUsageOutput: รูปแบบจริงของ claude json แ�
   ].join("\n");
   const x = parseUsageOutput("codex-jsonl", lines);
   assert.equal(x.answer, null, "codex อ่านคำตอบจากไฟล์ -o เหมือนเดิม");
-  assert.deepEqual(x.usage, { inputTokens: 19345, cacheReadTokens: 11776, cacheWriteTokens: 0, outputTokens: 8, costUsd: null, turns: 1, sessionId: "t1" });
+  // codex input_tokens includes the cached part and output_tokens already includes reasoning; normalised to Claude's meaning.
+  assert.deepEqual(x.usage, { inputTokens: 19345 - 11776, cacheReadTokens: 11776, cacheWriteTokens: 0, outputTokens: 5, costUsd: null, turns: 1, sessionId: "t1" });
   assert.deepEqual(x.errors, ["You've hit your usage limit."]);
   assert.equal(parseUsageOutput("codex-jsonl", "plain text"), null);
 });
@@ -139,4 +140,19 @@ test("runCli: มี startedAt เสมอ · โหมด usage แกะค�
   const plain = await runCli(def, args, "stdin", "prompt", tmpdir(), 30);
   assert.equal(plain.usage, null, "ไม่เปิด usage = ไม่แกะ JSON");
   assert.equal(plain.answer, out);
+});
+
+test("metrics: report ที่ timestamp เสียไม่ทำให้ทั้งสรุปพัง (ใช้เวลาจากชื่อโฟลเดอร์แทน)", () => {
+  const dir = tmp("baan-reports-bad-");
+  try {
+    const put = (name, report) => { mkdirSync(path.join(dir, name)); writeFileSync(path.join(dir, name, "report.json"), JSON.stringify(report)); };
+    put("2026-11-03-02-00-00-sys-tier-t2-1agents-CCCCCC", { role: "sys", startedAt: "garbage", results: [{ agent: "codex", state: "completed", durationMs: 1000 }] });
+    put("no-stamp-dir", { role: "check", startedAt: "also garbage", results: [{ agent: "agy", state: "completed", durationMs: 1000, startedAt: "x" }, { agent: "agy", state: "completed", durationMs: 1000 }] });
+    const rows = loadReports(dir);
+    assert.equal(rows.find((r) => r.role === "sys").startMs, Date.UTC(2026, 10, 3, 2, 0, 0));
+    assert.ok(rows.filter((r) => r.role === "check").every((r) => r.startMs === null));
+    const s = summarize(rows, { tzOffsetMin: -420 });
+    assert.equal(s.total, 3);
+    assert.deepEqual(Object.keys(s.days), ["2026-11-03"]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

@@ -1,6 +1,6 @@
 import { repoLock } from "./repolock.mjs";
 import { evidence } from "./gate.mjs";
-import { event, persist } from "./store.mjs";
+import { event, persist, previousAttempt } from "./store.mjs";
 import { snapshot, sameState } from "./snapshot.mjs";
 
 export async function integrate(run, options = {}) {
@@ -28,7 +28,7 @@ export async function integrate(run, options = {}) {
         p.questions = p.state === "waiting_human" ? ["integration test ยังไม่ผ่านหลังถึงเพดานแก้"] : [];
         if (p.state === "pending") {
           // Start the next attempt from the integrated tree; preserve the prior recovery snapshot as evidence.
-          (p.previous_attempts ??= []).push({ before: p.before, after: p.after, gate: p.gate, verdict: p.verdict });
+          (p.previous_attempts ??= []).push(previousAttempt(p));
           delete p.before; delete p.after; delete p.gate; delete p.verdict;
         }
       }

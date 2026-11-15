@@ -2,6 +2,62 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.37.0 — 2026-11-15 · คำสั่ง `baan target` + Branch Guard, ปรับขอบเขต `baan sync`, อัปเกรด `agy` เป็น `gemini-4-hydrogen`, และแก้เสถียรภาพ/ความปลอดภัยทั้ง Engine และ Monitor
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **อัปเดต Git hook `post-merge`**: เครื่องที่เคยรัน `npm run setup:hooks` ไว้ก่อนรุ่นนี้ ต้องรัน `cd framework && npm run setup:hooks` ใหม่ เพื่อเปลี่ยนคำสั่งใน hook เป็น `baan sync --all --stubs-only --no-self-update` (ไม่เช่นนั้นการ pull/merge ใน repo BAAN จะไป commit/push knowledge ของทุก workspace)
+- **Run ที่ค้างอยู่ก่อนอัปเกรด (`stale` / `OUTPUT_CONTRACT`)**:
+  - package ที่ `owns` เอกสารที่ถูก pin ใน `documentBasis` จะ `stale` หนึ่งครั้ง — ต้อง `baan decide <pkg> --approve ...` ใหม่ก่อน `--resume`
+  - คำตอบ provider ที่อ่าน JSON ไม่ได้เปลี่ยนการจัดกลุ่มจาก `ENVIRONMENT_FAILURE` เป็น `OUTPUT_CONTRACT` — ต้อง `baan decide` ก่อน `--resume` (เดิม `env_failed` resume เองได้)
+- **Stub path สำหรับบันทึก defect**: เมื่อรัน `baan sync` รอบถัดไป stubs (`AGENTS.md`, `CLAUDE.md`) ใน workspace จะอัปเดต path บันทึก defect เป็น `<project>/shared/defects/` ใน knowledge root และเพิ่ม end marker เพื่อรักษาข้อความต่อท้ายของผู้ใช้ไว้
+
+### เพิ่ม
+
+- **คำสั่ง `baan target` และระบบลงทะเบียน Branch (`src/targets.mjs`)**:
+  - รองรับ `baan target [list | check | scan | add | branch | remove]` พร้อมซ่อม path ที่ย้ายตำแหน่ง คง alias เดิม ข้ามโฟลเดอร์ non-git และรองรับการผูก/ตรวจสอบ branch (`--pin-branch`, `--update-branch`, `--branch`, `--clear`)
+  - ตรวจจับ branch mismatch ใน `baan target`, `baan survey`, และ `baan run` เพื่อป้องกันการแก้โค้ดผิด branch (override ได้ด้วย `--allow-branch-mismatch`)
+- **แยกโมดูล Knowledge Scaffold (`src/knowledge-scaffold.mjs`)**:
+  - แยก `scaffoldKnowledgeModule` / `scaffoldKnowledgeProject` ออกจาก `src/survey.mjs` (คง re-export เดิมเพื่อความเข้ากันได้) และรองรับ `os` แบบค่าเดียว พร้อมป้องกัน path traversal ในชื่อโปรเจกต์
+- **ปรับขอบเขต `baan sync` และแฟล็ก `--stubs-only`**:
+  - รันใน workspace = ซิงค์เฉพาะ workspace ปัจจุบัน (ใช้ `--all` เพื่อซิงค์ทุก workspace ใน `local.json`) · รันนอก workspace = ซิงค์ทั้งหมดเมื่อ `auto_update` เปิดอยู่ · เพิ่ม `--stubs-only` สำหรับรีเฟรช stubs อย่างเดียว และ `setup:hooks` ไม่เขียนทับ hook ที่ BAAN ไม่ได้สร้าง
+- **ตัวกรองความปลอดภัยและประสิทธิภาพ**:
+  - **Snapshot Hash Cache (`src/snapshot.mjs`)**: ข้ามการอ่านและ hash ไฟล์ซ้ำเมื่อ `size`/`mtime`/`ctime`/`mode` ไม่เปลี่ยน (พร้อม racy window 2 วินาที)
+  - **ลดขนาด State ของ Run และแคชฝั่ง Monitor (`src/store.mjs`, `src/monitor.mjs`)**: ลดการเขียน snapshot ซ้ำใน `baselines`/`previous_attempts`/`packets/*.json` และให้ monitor parse ไฟล์เฉพาะเมื่อ `mtime`/`size` เปลี่ยน
+  - **กรอง Auto-Commit ใน Knowledge (`src/knowledge-commit.mjs`)**: ข้ามไฟล์ลับ, ไฟล์ที่พบรูปแบบ secret/token, ไฟล์ขนาดเกิน 10 MB, และ repo ซ้อน พร้อมส่งรายชื่อไฟล์ผ่าน stdin (`--pathspec-from-file=- --pathspec-file-nul`) เพื่อไม่ชนขีดจำกัดความยาวคำสั่งของ Windows
+
+### ปรับปรุง / เปลี่ยนแปลง
+
+- **ปรับโมเดล `agy` (`agents.json`)**: ปรับ `agy` tiers `t1`–`t4` ไปใช้ `gemini-4-hydrogen` (ความพยายาม `xhigh` / `high` / `medium` / `low` ตามลำดับ; `t5` ยังคงใช้ `gemini-3.8-flash`)
+- **คุณภาพ Diff และ Gate**:
+  - รวม diff ของไฟล์ untracked ที่ Worker สร้างส่งให้ Verifier (`git diff --no-index /dev/null <file>`) โดยไม่แตะ git index
+  - แจ้งเตือนใน `--dry-run` และใส่ `unmapped_hint` เมื่อ `dotnet test` รันผ่านแต่ไม่พิมพ์ชื่อราย test
+  - แก้ `timeout_sec: 0` ให้หมายถึงไม่จำกัดเวลาจริง (ไม่ `setTimeout(fn, 0)` จนฆ่า build/test)
+- **ความสอดคล้องและการปฏิบัติตาม ToS**:
+  - ข้าม agent ที่ `enabled === false` ใน `local.json` เมื่อเลือก Verifier อิสระ
+  - เก็บข้อความต่อท้ายใต้ end marker ใน stubs (`AGENTS.md`, `CLAUDE.md`, `.claude/agents/*.md`), ลบ `baan.cmd` เฉพาะ wrapper ของ BAAN เท่านั้น, และตัด fallback `git push -u origin <branch>` ที่อาจสร้าง branch ผิดชื่อบน remote
+  - ปรับ path บันทึก defect เป็น `<project>/shared/defects/` ใน knowledge root ตรงกันทุกเอกสาร/ทักษะ
+  - ลบ `src/quota-tracker.mjs`, `tests/quota-tracker.test.mjs`, และ `/api/quota/refresh` ที่เป็น stub คืน `null` ตามกฎ ToS (UI ยังแสดง `UNAVAILABLE` ตามเดิม)
+- **จัดตาราง `INDEX.md` ก่อน commit/push**: รีเฟรช `INDEX.md` ก่อนขั้น commit/push เพื่อไม่ให้ไฟล์ modified ค้าง และไม่แก้ไฟล์ที่ marker ไม่ครบคู่ (พร้อมแจ้ง error ใน `--lint-knowledge`)
+
+### แก้ไข
+
+- **แก้จุดวิกฤตของ Provider, Monitor และ Sync**:
+  - ตัด `"$schema"` (draft 2020-12) ก่อนส่ง `--json-schema` ให้ Claude/agy และให้ `session.mjs` ใช้ผลจาก stream parser ก่อนสำหรับ provider ที่ตอบทาง stdout
+  - ล็อก `baan monitor` ให้ฟังเฉพาะ `127.0.0.1`, ตรวจ `Host` เป็น `localhost`, ลบ `CORS *`, บังคับ `POST` และตรวจสิทธิ์ workspace ที่ลงทะเบียนใน `local.json` หรือ workspace ตั้งต้นตอนเปิด, จำกัด body 64 KB
+  - ข้าม knowledge root ที่ค้างสถานะ rebase/merge/cherry-pick/revert หรือมีไฟล์ unmerged และ `rebase --abort` คืนสภาพเมื่อ pull ชน conflict
+- **แก้ปัญหา package ค้างและรันซ้ำเกินจำเป็น**:
+  - ตรวจ scope จาก snapshot หลัง probe, verify ซ้ำโดยไม่เปิด Worker ใหม่เมื่อ repo ยังตรงกับ `p.after`, จำกัดคำตัดสิน `env_failed` เฉพาะระดับ OS/toolchain, และไม่ pin ไฟล์ที่ package เป็นเจ้าของใน `documentBasis`
+- **แก้ Monitor, Usage/Cost และ TUI**:
+  - อ่าน live stream format จริงของ Codex (`item.started`/`item.completed`) และ Claude (`assistant` message content blocks)
+  - แก้การนับ token ของ Codex (ไม่นับ `reasoning`/cached ซ้ำ), แสดง `"n/a"` แทน `"$0.000"` เมื่อไม่รู้ราคา, และนับ call ให้ repo ของ package ที่เรียกเท่านั้น
+  - แก้ปุ่ม `INSPECT` บนการ์ด session, กรอง control characters ก่อนพิมพ์ใน TUI, ข้าม active file ที่ pid ของ runner ตายแล้ว, คง workspace ตั้งต้นใน dropdown, และตัด option `runId`/`--push` ที่ไม่มีผล
+- **แก้ข้อผิดพลาดและ Edge Cases อื่นๆ**:
+  - ปรับ `repolock.mjs` บน Windows ให้บันทึกชื่อ runtime กัน PID reuse และไม่ throw ทับ error จริงตอน `release`
+  - นับ `durationMs` สะสมข้ามการ resume และล้างสถานะความล้มเหลวเก่าเมื่อเริ่มรอบใหม่
+  - แจ้งชื่อ package/target และ path ชัดเจนใน `run`/`resume`/`survey` เมื่อ target repo ถูกย้ายหรือลบ
+  - รองรับ path ที่มีวงเล็บ (เช่น Next.js route group) ใน knowledge link linter, แก้ `self-update` ข้าม branch ที่ไม่มี upstream อย่างปลอดภัยพร้อมตัด `npm link` บน Windows, ให้ `metrics.mjs` ไม่พังเมื่อเจอ timestamp เก่าที่ parse ไม่ได้, และให้ ToS test ข้ามเมื่อไม่มีไฟล์ local ที่ gitignore
+
 ## 0.36.1 — 2026-11-09 · ปรับปรุง Stub Directives ชัดเจน ป้องกัน Negative Priming และติดตั้ง Skills ใน .agents/skills/ สำหรับ Antigravity และ Codex
 
 ### แก้ไข

@@ -131,3 +131,64 @@ test("syncAllWorkspaces: วนลูปอัปเดต stubs ให้ทุ
     rmSync(base, { recursive: true, force: true });
   }
 });
+
+test("syncScope: ใน workspace ซิงค์เฉพาะตัวเอง, นอก workspace ไล่ทุกตัวเมื่อ auto_update, ไม่เคย init ใน cwd", async () => {
+  const { syncScope } = await import("../src/utilities.mjs");
+  const ws = { source: "C:/ws/baan.config.json" };
+  const registered = { auto_update: true, workspaces: [{ name: "a", path: "C:/a" }] };
+  assert.equal(syncScope({}, ws, registered), "current", "auto_update ต้องไม่ลากทุก workspace มาด้วยเมื่ออยู่ใน workspace");
+  assert.equal(syncScope({ all: true }, ws, registered), "all");
+  assert.equal(syncScope({}, { source: null }, registered), "all");
+  assert.throws(() => syncScope({}, { source: null }, { ...registered, auto_update: false }), /--all/);
+  assert.throws(() => syncScope({}, { source: null }, { auto_update: true, workspaces: [] }), /baan --init/);
+  assert.throws(() => syncScope({ workspace: "C:/x" }, { source: null }, registered), /baan.config.json/);
+});
+
+test("baan sync ในโฟลเดอร์ที่ไม่ใช่ workspace ต้องไม่สร้างไฟล์ใดๆ", async () => {
+  const { cli } = await import("../src/cli.mjs");
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-not-ws-"));
+  try {
+    await assert.rejects(cli(["sync", "--workspace", dir, "--no-self-update"], { localConfig: { auto_update: true, workspaces: [], agents: null } }), /baan.config.json/);
+    assert.equal(existsSync(path.join(dir, "baan.config.json")), false);
+    assert.equal(existsSync(path.join(dir, "CLAUDE.md")), false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("sync --stubs-only รีเฟรช stubs แต่ไม่ commit knowledge ที่ค้าง", async () => {
+  const { syncWorkspace } = await import("../src/sync.mjs");
+  const { spawnSync } = await import("node:child_process");
+  const base = mkdtempSync(path.join(tmpdir(), "baan-stubs-only-"));
+  try {
+    const kr = path.join(base, "knowledge"); mkdirSync(kr);
+    const git = (...args) => spawnSync("git", ["-C", kr, ...args], { encoding: "utf8" });
+    git("init", "-q"); git("config", "user.email", "t@invalid"); git("config", "user.name", "t");
+    writeFileSync(path.join(kr, "a.md"), "a\n"); git("add", "."); git("commit", "-qm", "init");
+    writeFileSync(path.join(kr, "draft.md"), "half written\n");
+    const ws = { source: path.join(base, "baan.config.json"), knowledge_roots: [{ name: "kb", path: kr }] };
+    const res = syncWorkspace(ws, base, TEAM_DIR, { noSelfUpdate: true, stubsOnly: true }, () => {});
+    assert.ok(existsSync(path.join(base, "CLAUDE.md")));
+    assert.deepEqual(res.knowledge, []);
+    assert.match(git("status", "--porcelain").stdout, /\?\? draft\.md/);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("setup-hooks: hook รีเฟรชเฉพาะ stubs และไม่เขียนทับ hook ที่ BAAN ไม่ได้สร้าง", async () => {
+  const { installPostMergeHook, POST_MERGE_HOOK } = await import("../scripts/setup-hooks.mjs");
+  const { readFileSync } = await import("node:fs");
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-hooks-"));
+  try {
+    assert.match(POST_MERGE_HOOK, /sync --all --stubs-only --no-self-update/);
+    writeFileSync(path.join(dir, "post-merge"), "#!/bin/sh\necho mine\n");
+    assert.equal(installPostMergeHook(dir).installed, false);
+    assert.equal(readFileSync(path.join(dir, "post-merge"), "utf8"), "#!/bin/sh\necho mine\n");
+    writeFileSync(path.join(dir, "post-merge"), "#!/bin/sh\n# ติดตั้งโดย BAAN setup:hooks — old\nnode framework/bin/baan.mjs sync\n");
+    assert.equal(installPostMergeHook(dir).installed, true);
+    assert.equal(readFileSync(path.join(dir, "post-merge"), "utf8"), POST_MERGE_HOOK);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

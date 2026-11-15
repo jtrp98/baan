@@ -2,7 +2,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { TEAM_DIR } from "./config.mjs";
 import { TASK_ID_RE, findDependencyCycle, normalizeDagTasks } from "./plan.mjs";
-import { fileHash, repoRoot, hash } from "./snapshot.mjs";
+import { fileHash, repoRoot, hash, matches } from "./snapshot.mjs";
 
 export function validate(value, schema, location = "result") {
   if (schema.enum && !schema.enum.includes(value)) throw new Error(`${location}: expected ${schema.enum.join("/")}`);
@@ -49,6 +49,8 @@ export function validatePacket(p) {
   p.tasks.forEach(assertId);
   if (p.depends_on.includes(p.id)) throw new Error(`${p.id}: self dependency`);
   for (const name of ["build", "test_targeted", "test_full"]) if (!p.commands[name]?.trim()) throw new Error(`${p.id}: commands.${name} required`);
+  // Resuming a run whose repo was moved used to fail with a raw git "cannot change to …" message.
+  if (!existsSync(p.repo.path)) throw new Error(`${p.id}: repo ${p.repo.path} ไม่มีอยู่ — ถูกย้ายหรือลบ? ตรวจด้วย baan target check (run เดิมยังอ้าง path เก่า)`);
   p.repo = { ...p.repo, path: repoRoot(p.repo.path) };
   return p;
 }
@@ -75,8 +77,13 @@ export function readiness(p) {
 export function documentBasis(p) {
   const sources = p.acceptance.map((a) => a.source.split("#")[0]).filter((f) => existsSync(path.resolve(p.repo.path, f)));
   const pinned = p.read_first.filter((r) => r.pin || /\.(?:md|mdx|dbml)$/i.test(r.path.split("#")[0]));
+  // A file the package itself edits is its output, not a reference; pinning it made every finished attempt "stale".
+  const owned = (full) => {
+    const rel = path.relative(p.repo.path, full);
+    return !rel.startsWith("..") && !path.isAbsolute(rel) && (p.owns ?? []).some((g) => matches(rel, g));
+  };
   return Object.fromEntries([...pinned.map((r) => r.path), ...(p.contracts ?? []).map((c) => c.ref).filter(Boolean), ...sources]
-    .map((f) => { const full = path.resolve(p.repo.path, f.split("#")[0]); return [full, fileHash(full)]; }));
+    .map((f) => path.resolve(p.repo.path, f.split("#")[0])).filter((full) => !owned(full)).map((full) => [full, fileHash(full)]));
 }
 export function checkDag(packages, externalDone = []) {
   const ids = new Set(packages.map((p) => p.id));

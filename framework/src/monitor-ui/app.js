@@ -144,18 +144,6 @@ panels.on("scope", (next) => {
   render();
 });
 
-panels.on("refreshQuota", async () => {
-  panels.setRefreshing(true);
-  try {
-    const res = await fetch("/api/quota/refresh", { method: "POST" });
-    if (res.ok) {
-      lastState = await res.json();
-      render();
-    }
-  } catch {}
-  panels.setRefreshing(false);
-});
-
 panels.on("toggleAnim", () => {
   animOn = !animOn;
   writePref(animOn);
@@ -168,10 +156,10 @@ panels.on("inspect", (id) => {
 });
 
 panels.on("inspectSession", (key) => {
-  const fromDirector = director?.inspectSession?.(key);
-  const session = telemetry.toSessions(lastState, "all").find((s) => s.key === key);
-  const info = fromDirector ?? (session ? { kind: "session", session } : null);
-  if (info) panels.openDetail(info);
+  // The director returns the bare session (plus its characters); openDetail needs it wrapped as kind "session",
+  // otherwise every INSPECT showed "Nothing to show." whenever the office view was running.
+  const session = director?.inspectSession?.(key) ?? telemetry.toSessions(lastState, "all").find((s) => s.key === key);
+  if (session) panels.openDetail({ kind: "session", session });
 });
 
 panels.on("zone", (zoneId) => {

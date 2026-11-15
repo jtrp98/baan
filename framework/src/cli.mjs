@@ -3,13 +3,14 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules, collectWorkspaceAddDirs, loadLocalConfig, isAgentEnabled, applyLocalAgents, TEAM_DIR } from "./config.mjs";
 import { fromPlan, validatePacket, assertId, readiness, documentBasis, approvalBasis } from "./packet.mjs";
-import { loadRun, save, persist, event, readJson } from "./store.mjs";
+import { loadRun, save, persist, event, readJson, previousAttempt } from "./store.mjs";
 import { callSession, nativeCommand } from "./session.mjs";
 import { schedule } from "./scheduler.mjs";
 import { triage } from "./triage.mjs";
 import { lock, alive, repoLock } from "./repolock.mjs";
 import { snapshot, sameState, changedFiles, matches } from "./snapshot.mjs";
 import { integrate } from "./integrate.mjs";
+import { commandWarnings } from "./gate.mjs";
 import { applyPlanning } from "./planner.mjs";
 import { fallbackChainFor } from "./plan.mjs";
 import { validateTimeout, resolveTimeout } from "./timeout.mjs";
@@ -18,16 +19,26 @@ import { moduleContext } from "./workspace.mjs";
 import { getAdapter } from "./adapters/registry.mjs";
 import { runParityCommand } from "./parity.mjs";
 import { runInteractiveCli } from "./runner.mjs";
+import { checkPackageBranches, checkTargets, formatBranchMismatchError, listTargets, registerTarget, removeTarget, scanTargets, setTargetBranch } from "./targets.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui", "target"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open", "prune", "pin-branch", "update-branch", "clear", "allow-branch-mismatch"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root", "branch"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (!a.startsWith("--")) { if (o.subject) throw new Error(`unexpected argument ${a}`); o.subject = a; continue; }
+    if (!a.startsWith("--")) {
+      if (o.command === "target" && o.subject && (o.args?.length ?? 0) < 2) {
+        if (!o.arg) o.arg = a;
+        (o.args ??= []).push(a);
+        continue;
+      }
+      if (o.subject) throw new Error(`unexpected argument ${a}`);
+      o.subject = a;
+      continue;
+    }
     const name = a.slice(2);
     if (flags.has(name)) o[name] = true;
     else if (values.has(name)) {
@@ -37,6 +48,10 @@ export function parse(argv) {
       else { if (Object.hasOwn(o, name)) throw new Error(`duplicate option ${a}`); o[name] = value; }
     }
     else throw new Error(`unknown option ${a}`);
+  }
+  if (o.command === "target") {
+    if (o.list && !o.subject) { o.subject = "list"; delete o.list; }
+    if (o.scan && !o.subject) { o.subject = "scan"; delete o.scan; }
   }
   const inputs = [o.goal, o["goal-file"], o.plan, o["plan-file"], o.packet].filter(Boolean);
   if (utilityFlags.some((f) => o[f]) && (inputs.length || o.resume || o.cancel || (!["run", "sync", "survey", "scan"].includes(o.command)))) throw new Error("workspace utilities cannot be combined with execution commands");
@@ -49,7 +64,7 @@ export function parse(argv) {
     o.target = o.subject;
     delete o.subject;
   }
-  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
+  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui", "target"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
 }
 
@@ -87,17 +102,18 @@ export async function cli(argv, options = {}) {
   const local = options.localConfig ?? loadLocalConfig(TEAM_DIR);
   const cfg = options.cfg ?? loadAgentsConfig();
   applyLocalAgents(cfg, local);
-  if (utilityFlags.some((f) => o[f])) return utility(o, ws, cfg, root);
+  if (utilityFlags.some((f) => o[f])) return utility(o, ws, cfg, root, local);
 
   if (o.command === "monitor" || o.command === "ui") {
     const { startMonitor } = await import("./monitor.mjs");
-    return startMonitor({
+    // bin/baan.mjs prints whatever comes back; the http.Server object used to be dumped to the console.
+    const { url } = await startMonitor({
       workspaceRoot: root,
       port: o.port ? Number(o.port) : 3456,
       tui: Boolean(o.tui),
       openBrowser: !o["no-open"] && !o.tui,
-      runId: o.run || o.subject || null,
     });
+    return `BAAN monitor: ${url} (Ctrl+C เพื่อหยุด)`;
   }
 
   if (o.command === "update-clis") {
@@ -108,6 +124,49 @@ export async function cli(argv, options = {}) {
   if (o.command === "parity") {
     const repo = o.cwd ? path.resolve(o.cwd) : root;
     return runParityCommand({ agent: o.agent, cwd: repo, workspaceRoot: root, json: o.json, cfg, localConfig: local });
+  }
+
+  if (o.command === "target") {
+    const action = o.subject || "list";
+    if (action === "list") return listTargets(ws);
+    if (action === "check") return checkTargets(ws, { name: o.name || o.arg || o.target });
+    if (action === "scan") {
+      return scanTargets(ws?.source, {
+        scanDir: o.path || o.arg || o.cwd,
+        root: o.root,
+        prune: Boolean(o.prune),
+        pinBranch: Boolean(o["pin-branch"]),
+        updateBranch: Boolean(o["update-branch"]),
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    if (action === "add") {
+      return registerTarget(ws?.source, {
+        path: o.path || o.arg || o.cwd,
+        name: o.name || o.target,
+        branch: o.branch,
+        pinBranch: Boolean(o["pin-branch"]),
+        root: o.root,
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    if (action === "branch") {
+      return setTargetBranch(ws?.source, {
+        name: o.name || o.args?.[0] || o.target,
+        branch: o.branch ?? o.args?.[1],
+        clear: Boolean(o.clear),
+        root: o.root,
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    if (action === "remove" || action === "rm") {
+      return removeTarget(ws?.source, {
+        name: o.name || o.arg || o.target,
+        root: o.root,
+        dryRun: Boolean(o["dry-run"]),
+      });
+    }
+    throw new Error(`คำสั่งย่อยของ target ไม่ถูกต้อง: ${action} (ใช้ list | check | scan | add | branch | remove)`);
   }
 
   if (o.command === "attach") {
@@ -160,12 +219,20 @@ export async function cli(argv, options = {}) {
     if (o.command === "inbox") return report(run).packages.filter((p) => p.questions.length || p.state === "waiting_human");
     if (!o.resume) return report(run);
     for (const key of ["tier", "agent", "timeout", "max-parallel", "planner-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
+    if (!o["dry-run"] && !o["allow-branch-mismatch"] && !run.allowBranchMismatch) {
+      const mismatches = checkPackageBranches(ws, run.packages);
+      if (mismatches.length) throw new Error(formatBranchMismatchError(mismatches));
+    }
     return executeRun(run, cfg, options, o["dry-run"]);
   }
 
   const hit = o.target ? resolveTarget(ws, o.target) : null;
   if (o.target && !hit) throw new Error(`unknown target ${o.target}`);
   const modules = o.module ? resolveModules(ws, o.module) : [];
+  // A moved or deleted repo used to surface as a raw git error ("cannot change to …") from deep inside packet checks.
+  for (const t of [hit?.target, ...modules.map((m) => m.target)].filter(Boolean)) {
+    if (!existsSync(t.path)) throw new Error(`target "${t.name}" ชี้ไปที่ ${t.path} ซึ่งไม่มีอยู่ — แก้ path ใน baan.config.json หรือดูด้วย baan target check`);
+  }
   const moduleTargets = [...new Set(modules.map((m) => m.target?.path).filter(Boolean))];
   if (!o.target && !o.cwd && moduleTargets.length > 1 && !o.plan && !o.packet) throw new Error("หลาย repo: เตรียม --plan ที่ระบุ repo ของแต่ละ package ก่อน");
   const repo = path.resolve(hit?.target.path || o.cwd || moduleTargets[0] || process.cwd());
@@ -222,7 +289,7 @@ export async function cli(argv, options = {}) {
   const run = { version: 2, id: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`, root,
     packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: o.tier || "t2", plannerTier: o["planner-tier"] || ws.defaults.planner_tier,
     agent: selectedAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, cfg.tiers[o.tier || "t2"]), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
-    direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree,
+    direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree, allowBranchMismatch: Boolean(o["allow-branch-mismatch"]),
     model: o.model ?? ws.defaults.model ?? null, effort: o.effort ?? ws.defaults.effort ?? null,
     approvalPolicy: o["approval-policy"] ?? "auto-safe", providerArgs: o["provider-arg"] ?? [],
     integration, createdAt: new Date().toISOString() };
@@ -236,8 +303,18 @@ export async function cli(argv, options = {}) {
     throw new Error(`ไม่มี agent ที่เปิดใช้งานสำหรับ tier ${run.tier} หรือ ${run.plannerTier}`);
   }
   if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64 || !(run.timeoutSec >= 0)) throw new Error("invalid --max-parallel/--timeout");
+  const branchMismatches = checkPackageBranches(ws, packages);
+  if (!o["dry-run"] && !o["allow-branch-mismatch"] && branchMismatches.length) {
+    throw new Error(formatBranchMismatchError(branchMismatches));
+  }
   run.dir = path.join(root, ".baan", "runs", run.id);
-  if (o["dry-run"]) return { ...triage(packages, run.direct), packages: packages.map((p) => ({ ...p, readiness: readiness(p) })) };
+  if (o["dry-run"]) {
+    return {
+      ...triage(packages, run.direct),
+      ...(branchMismatches.length ? { branch_warnings: branchMismatches } : {}),
+      packages: packages.map((p) => ({ ...p, readiness: readiness(p), warnings: commandWarnings(p) })),
+    };
+  }
   mkdirSync(run.dir, { recursive: true }); persist(run);
   event(run, "run_created");
   return executeRun(run, cfg, options);
@@ -254,7 +331,7 @@ async function executeRun(run, cfg, options, dry = false) {
       const current = snapshot(p.repo.path);
       const changed = changedFiles(p.after, current).some((f) => p.owns.some((g) => matches(f, g)));
       if (changed || ["head", "branch", "index", "stash"].some((k) => p.after[k] !== current[k])) {
-        (p.previous_attempts ??= []).push({ before: p.before, after: p.after, gate: p.gate, verdict: p.verdict });
+        (p.previous_attempts ??= []).push(previousAttempt(p));
         Object.assign(p, { state: "waiting_human", before: current, requires_dirty_confirmation: true, dirty_approved: false,
           questions: ["completed scope/Git state changed since evidence; inspect and confirm with decide --allow-dirty"] });
       }

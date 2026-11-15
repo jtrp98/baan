@@ -80,6 +80,43 @@ test("syncKnowledgeRoot: auto-commit ไฟล์ที่แก้ค้าง�
   }
 });
 
+test("syncKnowledgeRoot: pull ชน conflict ต้องยกเลิก rebase และไม่ commit conflict markers ทั้งรอบนี้และรอบถัดไป", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const a = makeGitRepo("baan-sync-a-");
+  const b = makeGitRepo("baan-sync-b-");
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    a.git(["remote", "add", "origin", bare]);
+    writeFileSync(path.join(a.dir, "doc.md"), "base\n");
+    a.git(["add", "."]); a.git(["commit", "-m", "base"]); a.git(["push", "-u", "origin", "main"]);
+    b.git(["remote", "add", "origin", bare]); b.git(["fetch", "-q", "origin"]); b.git(["reset", "-q", "--hard", "origin/main"]); b.git(["branch", "-q", "-u", "origin/main"]);
+
+    writeFileSync(path.join(b.dir, "doc.md"), "theirs\n");
+    b.git(["commit", "-qam", "theirs"]); b.git(["push", "-q"]);
+    writeFileSync(path.join(a.dir, "doc.md"), "ours\n");
+
+    const logs = [];
+    const first = syncKnowledgeRoot({ name: "kb", path: a.dir }, {}, (m) => logs.push(m));
+    assert.equal(first.ok, false);
+    assert.equal(first.rebaseAborted, true);
+    assert.equal(existsSync(path.join(a.dir, ".git", "rebase-merge")), false);
+    assert.match(logs.join("\n"), /ยกเลิก rebase/);
+    assert.equal(spawnSync("git", ["-C", bare, "log", "--oneline"], { encoding: "utf8" }).stdout.trim().split("\n").length, 2);
+
+    // A conflict the user left behind (here: a manual rebase) must block auto-commit instead of committing markers.
+    a.git(["rebase", "origin/main"]);
+    assert.ok(existsSync(path.join(a.dir, ".git", "rebase-merge")) || existsSync(path.join(a.dir, ".git", "rebase-apply")));
+    const head = a.git(["rev-parse", "HEAD"]).stdout;
+    const second = syncKnowledgeRoot({ name: "kb", path: a.dir }, {}, () => {});
+    assert.equal(second.ok, false);
+    assert.match(second.blocked, /rebase/);
+    assert.equal(a.git(["rev-parse", "HEAD"]).stdout, head);
+    assert.match(a.git(["status", "--porcelain"]).stdout, /^UU doc\.md/m);
+  } finally {
+    for (const dir of [bare, a.dir, b.dir]) rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("syncKnowledgeRoot dry-run: ตรวจนับไฟล์ค้างแต่ไม่ commit และไม่ pull/push", () => {
   const local = makeGitRepo("baan-sync-dry-");
   try {
@@ -150,5 +187,75 @@ test("syncWorkspace: ซิงค์ knowledge roots, รีเฟรช stubs �
   } finally {
     rmSync(wsDir, { recursive: true, force: true });
     rmSync(kr.dir, { recursive: true, force: true });
+  }
+});
+
+test("syncKnowledgeRoot: push ที่ล้มเพราะชื่อ branch ไม่ตรง upstream ต้องไม่สร้าง branch ใหม่บน remote", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const seed = makeGitRepo("baan-sync-seed-");
+  const local = mkdtempSync(path.join(tmpdir(), "baan-sync-clone-"));
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "master", bare], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "a.md"), "a\n");
+    seed.git(["add", "."]); seed.git(["commit", "-qm", "a"]); seed.git(["push", "-q", bare, "HEAD:master"]);
+    const git = (args) => spawnSync("git", ["-C", local, ...args], { encoding: "utf8" });
+    spawnSync("git", ["clone", "-q", bare, local], { encoding: "utf8" });
+    git(["config", "user.email", "t@invalid"]); git(["config", "user.name", "t"]); git(["config", "push.default", "simple"]);
+    git(["checkout", "-q", "-b", "main", "--track", "origin/master"]);
+    writeFileSync(path.join(local, "b.md"), "b\n");
+
+    const res = syncKnowledgeRoot({ name: "kb", path: local }, {}, () => {});
+    assert.equal(res.pushed, false);
+    assert.equal(res.ok, false);
+    assert.equal(spawnSync("git", ["-C", bare, "branch", "--list", "main"], { encoding: "utf8" }).stdout.trim(), "");
+  } finally {
+    for (const dir of [bare, seed.dir, local]) rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("syncWorkspace: ตาราง INDEX.md ที่อัปเดตถูก commit และ push ในรอบเดียวกัน ไม่ทิ้ง repo ค้าง dirty", () => {
+  const wsDir = mkdtempSync(path.join(tmpdir(), "baan-ws-index-"));
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-sync-bare-"));
+  const kr = makeGitRepo("baan-ws-kr-index-");
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    kr.git(["remote", "add", "origin", bare]);
+    mkdirSync(path.join(kr.dir, "p", "modules", "m1"), { recursive: true });
+    writeFileSync(path.join(kr.dir, "p", "INDEX.md"), "---\nproject: p\n---\n# p\n");
+    writeFileSync(path.join(kr.dir, "p", "modules", "m1", "INDEX.md"), "---\nmodule: m1\nstatus: draft\n---\n# m1\n");
+    kr.git(["add", "."]); kr.git(["commit", "-qm", "init"]); kr.git(["push", "-q", "-u", "origin", "main"]);
+
+    mkdirSync(path.join(kr.dir, "p", "modules", "m2"), { recursive: true });
+    writeFileSync(path.join(kr.dir, "p", "modules", "m2", "INDEX.md"), "---\nmodule: m2\nstatus: draft\n---\n# m2\n");
+    const ws = { source: path.join(wsDir, "baan.config.json"), knowledge_roots: [{ name: "kb", path: kr.dir, layout: "project", targets: [] }] };
+    const res = syncWorkspace(ws, wsDir, TEAM_DIR, { noSelfUpdate: true }, () => {});
+    assert.equal(res.ok, true);
+    assert.equal(kr.git(["status", "--porcelain"]).stdout.trim(), "", "INDEX.md must not be left modified after sync");
+    const pushedIndex = spawnSync("git", ["-C", bare, "show", "main:p/INDEX.md"], { encoding: "utf8" }).stdout;
+    assert.match(pushedIndex, /m2/, "the refreshed table reached the remote in this sync");
+  } finally {
+    for (const dir of [wsDir, bare, kr.dir]) rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("updateSelfFramework: branch ที่ไม่มี upstream ข้ามอย่างปลอดภัย ไม่รายงานล้มทุกรอบ และไม่ pull", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-self-bare-"));
+  const seed = makeGitRepo("baan-self-seed-");
+  const clone = mkdtempSync(path.join(tmpdir(), "baan-self-clone-"));
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "package.json"), '{"version":"1.0.0"}');
+    seed.git(["add", "."]); seed.git(["commit", "-qm", "v1"]); seed.git(["push", "-q", bare, "HEAD:main"]);
+    spawnSync("git", ["clone", "-q", bare, clone], { encoding: "utf8" });
+    spawnSync("git", ["-C", clone, "checkout", "-q", "-b", "my-local-work"], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "package.json"), '{"version":"1.1.0"}');
+    seed.git(["commit", "-qam", "v1.1"]); seed.git(["push", "-q", bare, "HEAD:main"]);
+
+    const head = spawnSync("git", ["-C", clone, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout;
+    const res = updateSelfFramework(clone);
+    assert.deepEqual([res.ok, res.updated, res.reason], [true, false, "no_upstream"]);
+    assert.equal(spawnSync("git", ["-C", clone, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout, head);
+  } finally {
+    for (const dir of [bare, seed.dir, clone]) rmSync(dir, { recursive: true, force: true });
   }
 });

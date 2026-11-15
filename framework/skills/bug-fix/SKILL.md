@@ -1,6 +1,6 @@
 ---
 name: bug-fix
-description: วินิจฉัย ประเมินสังกัดโมดูล และแก้ไขข้อบกพร่อง (Defect Remediation & Bug Fixing) อย่างเป็นระบบตามหลัก Plan-First, Red-Green Test Proof และบันทึกประวัติลง shared/defects/
+description: วินิจฉัย ประเมินสังกัดโมดูล และแก้ไขข้อบกพร่อง (Defect Remediation & Bug Fixing) อย่างเป็นระบบตามหลัก Plan-First, Red-Green Test Proof และบันทึกประวัติลง <project>/shared/defects/ ใน knowledge root
 metadata:
   author: baan
   version: "1.0.0"
@@ -58,13 +58,14 @@ metadata:
    - รันคำสั่ง `test_full` ของโปรเจกต์ ต้องเขียวทั้งหมด 100%
 4. **ช่างตรวจรับ (check / QA) ท้าทายและตรวจทาน**:
    - ตรวจสอบว่า Test ที่เขียนครอบคลุม Boundary Conditions และไม่มี Flaky Test
-5. **บันทึกประวัติข้อบกพร่องลง `shared/defects/`**:
+5. **บันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/`**:
+   - `<project>` คือโฟลเดอร์ project ใน knowledge root (เช่น `knowledge/school-bot/`) ไม่ใช่ `shared/` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
    - สร้างไฟล์บันทึก `<project>/shared/defects/BUG-xxx.md` (นับรหัสถัดไป เช่น `BUG-001.md`)
    - อัปเดตตารางสรุปใน `<project>/shared/defects/INDEX.md`
 
 ---
 
-## รูปแบบเอกสารบันทึกประวัติบั๊ก (`shared/defects/`)
+## รูปแบบเอกสารบันทึกประวัติบั๊ก (`<project>/shared/defects/`)
 
 ### 1. โครงสร้างไฟล์ `<project>/shared/defects/BUG-xxx.md`
 ```markdown
@@ -104,4 +105,4 @@ metadata:
 ## กฎเหล็กสำหรับการแก้บั๊ก
 - **Red Test First**: ต้องพิสูจน์ว่า Test แดงก่อนลงมือแก้เสมอ ห้ามอ้างว่าแก้เสร็จแล้วโดยไม่มี Test Proof
 - **Minimal Blast Radius**: แก้เฉพาะไฟล์ที่จำเป็นใน `owns` ไม่ปรับแต่งโค้ดส่วนอื่นโดยไม่เกี่ยวข้อง
-- **Preserve Knowledge Integrity**: ทุกครั้งที่มีการแก้บั๊ก ต้องบันทึกลง `shared/defects/` เสมอ เพื่อให้ทีมและ AI รุ่นต่อไปเรียนรู้
+- **Preserve Knowledge Integrity**: ทุกครั้งที่มีการแก้บั๊ก ต้องบันทึกลง `<project>/shared/defects/` เสมอ เพื่อให้ทีมและ AI รุ่นต่อไปเรียนรู้

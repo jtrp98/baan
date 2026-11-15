@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { codexTurnUsage } from "./events.mjs";
 
 function killTree(child) {
   // Providers may leave grandchildren alive after the direct process exits.
@@ -86,10 +87,8 @@ export function parseUsageOutput(format, stdout) {
       if (ev.type === "thread.started") usage.sessionId = ev.thread_id ?? null;
       if (ev.type === "turn.completed" && ev.usage) {
         usage.turns++;
-        usage.inputTokens += ev.usage.input_tokens ?? 0;
-        usage.cacheReadTokens += ev.usage.cached_input_tokens ?? 0;
-        usage.cacheWriteTokens += ev.usage.cache_write_input_tokens ?? 0;
-        usage.outputTokens += (ev.usage.output_tokens ?? 0) + (ev.usage.reasoning_output_tokens ?? 0);
+        const u = codexTurnUsage(ev.usage);
+        for (const key of ["inputTokens", "cacheReadTokens", "cacheWriteTokens", "outputTokens"]) usage[key] += u[key];
       }
       if (ev.type === "error" || ev.type === "turn.failed") errors.push(ev.message ?? ev.error?.message ?? JSON.stringify(ev));
     }

@@ -92,6 +92,21 @@ test("monitor: scanActiveRuns detects in-flight package state", (t) => {
   assert.equal(active[0].activePackages[0].recentActivity.name, "bash");
 });
 
+test("monitor: active files left by a runner killed with Ctrl+C are not shown as live sessions", (t) => {
+  const root = mkdtempSync(path.join(tmpdir(), "baan-orphan-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const now = new Date().toISOString();
+  const make = (id, pid) => {
+    const dir = path.join(root, ".baan", "runs", id);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "run.json"), JSON.stringify({ id, pid, packages: [{ id: "A", state: "running", repo: { path: "C:/r" } }] }));
+    writeFileSync(path.join(dir, "active-A.json"), JSON.stringify({ runId: id, packageId: "A", role: "worker", agent: "codex", updatedAt: now }));
+  };
+  make("live", process.pid);
+  make("killed", 2 ** 22 + 12345);
+  assert.deepEqual(scanActiveRuns(root).map((r) => r.runId), ["live"]);
+});
+
 test("monitor: aggregateWorkspaceUsage computes multi-CLI metrics across runs", (t) => {
   const { root, cleanup } = makeFixture();
   t.after(cleanup);
@@ -167,7 +182,7 @@ test("monitor: HTTP server responds with HTML, stats, and stream endpoints", asy
 
   const fetchGet = (urlPath) =>
     new Promise((resolve, reject) => {
-      http.get(`http://localhost:${port}${urlPath}`, (res) => {
+      http.get(`http://127.0.0.1:${port}${urlPath}`, (res) => {
         let body = "";
         res.on("data", (chunk) => (body += chunk));
         res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
@@ -228,7 +243,13 @@ test("monitor: recent call_end events and missing identity are reported truthful
 test("monitor: workspace switcher updates active workspace and telemetry", async (t) => {
   const f1 = makeFixture();
   const f2 = makeFixture();
-  t.after(() => { f1.cleanup(); f2.cleanup(); });
+  const f3 = makeFixture();
+  t.after(() => { f1.cleanup(); f2.cleanup(); f3.cleanup(); });
+  const localFile = path.join(f1.root, "local.json");
+  writeFileSync(localFile, JSON.stringify({ workspaces: [{ name: "second", path: f2.root }] }));
+  const previousLocal = process.env.BAAN_LOCAL_FILE;
+  process.env.BAAN_LOCAL_FILE = localFile;
+  t.after(() => { if (previousLocal === undefined) delete process.env.BAAN_LOCAL_FILE; else process.env.BAAN_LOCAL_FILE = previousLocal; });
 
   const port = 34600 + Math.floor(Math.random() * 500);
   const monitorInstance = await startMonitor({
@@ -241,7 +262,7 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
 
   const fetchGet = (urlPath) =>
     new Promise((resolve, reject) => {
-      http.get(`http://localhost:${port}${urlPath}`, (res) => {
+      http.get(`http://127.0.0.1:${port}${urlPath}`, (res) => {
         let body = "";
         res.on("data", (chunk) => (body += chunk));
         res.on("end", () => resolve({ statusCode: res.statusCode, headers: res.headers, body }));
@@ -251,7 +272,7 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
   const fetchPost = (urlPath, data) =>
     new Promise((resolve, reject) => {
       const payload = JSON.stringify(data);
-      const req = http.request(`http://localhost:${port}${urlPath}`, {
+      const req = http.request(`http://127.0.0.1:${port}${urlPath}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) },
       }, (res) => {
@@ -275,4 +296,95 @@ test("monitor: workspace switcher updates active workspace and telemetry", async
 
   const newStats = JSON.parse((await fetchGet("/api/stats")).body);
   assert.equal(newStats.workspaceRoot, f2.root);
+  assert.ok(newStats.workspaces.some((w) => w.path === path.resolve(f1.root)), "the starting workspace stays in the dropdown after switching away");
+
+  // The starting workspace stays reachable even though local.json does not list it.
+  assert.equal(JSON.parse((await fetchPost("/api/workspace/select", { path: f1.root })).body).workspaceRoot, f1.root);
+  await fetchPost("/api/workspace/select", { path: f2.root });
+
+  const unlisted = await fetchPost("/api/workspace/select", { path: f3.root });
+  assert.equal(unlisted.statusCode, 403);
+  assert.equal((await fetchGet(`/api/workspace/select?path=${encodeURIComponent(f2.root)}`)).statusCode, 405);
+  assert.equal(JSON.parse((await fetchGet("/api/stats")).body).workspaceRoot, f2.root);
+});
+
+test("monitor: binds to loopback only, rejects foreign Host headers and survives malformed ones", async (t) => {
+  const f = makeFixture();
+  t.after(() => f.cleanup());
+  const port = 35100 + Math.floor(Math.random() * 500);
+  const { server } = await startMonitor({ workspaceRoot: f.root, port, openBrowser: false, tui: false });
+  t.after(() => server.close());
+  assert.equal(server.address().address, "127.0.0.1");
+
+  const request = (headers) => new Promise((resolve, reject) => {
+    const req = http.request({ host: "127.0.0.1", port, path: "/api/stats", headers }, (res) => { res.resume(); res.on("end", () => resolve(res)); });
+    req.on("error", reject); req.end();
+  });
+  assert.equal((await request({ Host: "evil.example" })).statusCode, 403);
+  assert.equal((await request({ Host: "a b" })).statusCode, 403);
+  assert.equal((await request({ Host: `localhost:${port}` })).statusCode, 200);
+
+  const stream = await new Promise((resolve, reject) => {
+    const req = http.get(`http://127.0.0.1:${port}/api/stream`, (res) => { resolve(res.headers); req.destroy(); });
+    req.on("error", (e) => { if (e.code !== "ECONNRESET") reject(e); });
+  });
+  assert.equal(stream["access-control-allow-origin"], undefined);
+});
+
+test("monitor: run.json and ledgers are parsed again only when they change, into a small projection", async () => {
+  const { readRunSummary, readCallEnds } = await import("../src/usage-aggregator.mjs");
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-monitor-cache-"));
+  try {
+    const runFile = path.join(dir, "run.json");
+    writeFileSync(runFile, JSON.stringify({ id: "r1", packages: [{ id: "A", state: "running", repo: { path: "C:/repo" }, before: { files: { "a.cs": "h" } } }] }));
+    const first = readRunSummary(runFile);
+    assert.equal(readRunSummary(runFile), first, "unchanged file must not be parsed again");
+    assert.equal(first.packages[0].before, undefined, "snapshot maps are not kept in memory");
+    writeFileSync(runFile, JSON.stringify({ id: "r1", packages: [{ id: "A", state: "done", repo: { path: "C:/repo" } }] }));
+    assert.equal(readRunSummary(runFile).packages[0].state, "done");
+
+    const ledger = path.join(dir, "ledger.jsonl");
+    writeFileSync(ledger, `${JSON.stringify({ type: "state", package: "A" })}\n${JSON.stringify({ type: "call_end", agent: "codex", ok: true })}\nnot json\n`);
+    assert.deepEqual(readCallEnds(ledger).map((e) => e.agent), ["codex"]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("monitor: usage credits each call to its own repo, and unknown cost stays unknown instead of $0", async () => {
+  const { aggregateWorkspaceUsage } = await import("../src/usage-aggregator.mjs");
+  const root = mkdtempSync(path.join(tmpdir(), "baan-usage-attr-"));
+  try {
+    const dir = path.join(root, ".baan", "runs", "r1");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "run.json"), JSON.stringify({ id: "r1", packages: [{ id: "A", state: "done", repo: { path: "C:/src/repoA" } }, { id: "B", state: "done", repo: { path: "C:/src/repoB" } }] }));
+    writeFileSync(path.join(dir, "ledger.jsonl"), [
+      { type: "call_end", package: "A", agent: "claude", ok: true, usage: { inputTokens: 10, outputTokens: 1, costUsd: 1 } },
+      { type: "call_end", package: "B", agent: "codex", ok: true, usage: { inputTokens: 20, outputTokens: 2, costUsd: null } },
+    ].map((e) => JSON.stringify(e)).join("\n") + "\n");
+    const u = aggregateWorkspaceUsage(root);
+    assert.deepEqual([u.projects.repoA.calls, u.projects.repoA.costUsd], [1, 1]);
+    assert.deepEqual([u.projects.repoB.calls, u.projects.repoB.costUsd], [1, null]);
+    assert.equal(u.projects.repoA.calls + u.projects.repoB.calls, u.total.calls, "project totals must add up to the workspace total");
+    assert.equal(u.agents.codex.costUsd, null);
+    assert.equal(u.agents.agy.costUsd, 0, "an unused provider really cost nothing");
+    assert.deepEqual([u.total.costUsd, u.total.costCalls, u.total.calls], [1, 1, 2]);
+    assert.equal(formatCost(null), "n/a");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("monitor: TUI never forwards control characters from telemetry to the terminal", () => {
+  const evil = "x\u001b]52;c;cHduZWQ=\u0007\u001b[2Jy";
+  const tui = renderTui({
+    workspaceName: evil,
+    activeRuns: [{ runId: evil, repoName: evil, title: evil, role: evil, agent: evil,
+      activePackages: [{ recentActivity: { name: evil, detail: evil }, recentThought: evil }] }],
+    usage: { agents: {}, total: {} },
+  });
+  assert.ok(!tui.includes("\u0007"), "BEL from telemetry must not reach the terminal");
+  assert.ok(!tui.includes("\u001b]52"), "OSC 52 (clipboard write) must not reach the terminal");
+  assert.ok(!tui.includes("\u001b[2J"), "screen clear from telemetry must not reach the terminal");
+  assert.ok(tui.includes("\u001b[1;36m"), "BAAN's own colours still render");
 });

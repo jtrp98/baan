@@ -15,6 +15,7 @@ import { verification } from "../src/triage.mjs";
 import { integrate } from "../src/integrate.mjs";
 import { approvalBasis, documentBasis } from "../src/packet.mjs";
 import { applyPlanning } from "../src/planner.mjs";
+import { looksLikeCommandEnvironmentFailure } from "../src/failure-class.mjs";
 
 import { fixture, cfg, packet, runAt, good, passing, session } from "./helpers.mjs";
 
@@ -261,12 +262,29 @@ test("engine native providers receive schemas once; other providers retain inlin
         const flag = agent === "codex" ? "--output-schema" : "--json-schema";
         const supplied = args[args.indexOf(flag) + 1];
         assert.ok(args.includes(flag));
-        assert.deepEqual(agent === "claude" ? JSON.parse(supplied) : JSON.parse(readFileSync(supplied, "utf8")), schema);
+        const { $schema, ...withoutMeta } = schema;
+        assert.deepEqual(agent === "claude" ? JSON.parse(supplied) : JSON.parse(readFileSync(supplied, "utf8")), agent === "claude" ? withoutMeta : schema);
       }
       return { ok: true, answer: JSON.stringify(good), durationMs: 1 };
     };
     assert.deepEqual(await callSession(run, p, "worker", agents, { runner }), good);
     await assert.rejects(callSession(run, p, "worker", agents, { runner: async () => ({ ok: true, answer: '{"state":"DONE"}', durationMs: 1 }) }), /required/);
+  }
+});
+
+test("engine reads the final structured answer from Claude and agy stream-json, not the first stream event", async (t) => {
+  const { root, repo } = fixture(t);
+  const streams = {
+    claude: [{ type: "system", subtype: "init", session_id: "s1", tools: ["Read"] }, { type: "assistant", message: { content: [{ type: "text", text: "{\"note\":1}" }] } },
+      { type: "result", subtype: "success", is_error: false, result: JSON.stringify(good), structured_output: good, session_id: "s1" }],
+    agy: [{ type: "init", conversation_id: "c1" }, { status: "SUCCESS", response: JSON.stringify(good), conversation_id: "c1" }],
+  };
+  for (const [agent, events] of Object.entries(streams)) {
+    const p = packet(repo), run = runAt(root, [p]); run.agent = agent;
+    const agents = { agents: { [agent]: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { [agent]: {} } } };
+    const stdout = events.map((e) => JSON.stringify(e)).join("\n") + "\n";
+    const runner = async (def, args, via, prompt, cwd, timeout, file, opts) => { opts.onStdout(stdout); return { ok: true, stdout, answer: stdout.trim(), durationMs: 1 }; };
+    assert.deepEqual(await callSession(run, p, "worker", agents, { runner }), good, agent);
   }
 });
 
@@ -311,4 +329,232 @@ test("engine resolveWorkerTier respects code vs docs tier rules", () => {
 
   // Code low risk with contracts allows step-down
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3", contracts: [{ ref: "api.md" }] }), "t3");
+});
+
+const commitFile = (repo, name, text) => { writeFileSync(path.join(repo, name), text); git(repo, "add", name); git(repo, "commit", "-m", `add ${name}`); };
+
+test("engine judges scope from the attempt start: a human fix made while the package waited is not the Worker's", async (t) => {
+  const { root, repo } = fixture(t); commitFile(repo, "other.txt", "v1\n");
+  const run = runAt(root, [packet(repo)]);
+  await schedule(run, cfg, { session, execute: async (cmd) => ({ command: cmd, code: null, ok: false, output: "spawn dotnet ENOENT", timedOut: false }) });
+  assert.equal(run.packages[0].state, "env_failed");
+  writeFileSync(path.join(repo, "other.txt"), "fixed by a human\n");
+  await schedule(run, cfg, { session, execute: passing });
+  assert.equal(run.packages[0].state, "done", run.packages[0].questions?.join(" "));
+  assert.deepEqual(run.packages[0].gate.outside, []);
+});
+
+test("engine a sibling package finishing in the same repo while another waits does not count against the waiting one", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "B", { owns: ["b.txt"], budget: { expected_minutes: 50 } }), packet(repo, "A")]);
+  let asked = false;
+  const work = async (r, p, role) => {
+    if (role === "planner") return { packages: [], questions: [{ text: "which payload?", blocks: ["B"] }], decisions: [] };
+    if (role === "worker" && p.id === "B" && !asked) { asked = true; return { ...structuredClone(good), state: "NEEDS_DECISION", acceptance: [{ id: "AC-1", proof: [] }], questions: ["which payload?"] }; }
+    if (role === "worker" && p.id === "B") { writeFileSync(path.join(repo, "b.txt"), "b\n"); return structuredClone(good); }
+    return session(r, p, role);
+  };
+  await schedule(run, cfg, { session: work, execute: passing });
+  assert.deepEqual(run.packages.map((p) => p.state), ["waiting_human", "done"]);
+  decide(run, "B", { by: "user", decision: "use payload v2", source: "chat" });
+  await schedule(run, cfg, { session: work, execute: passing });
+  const b = run.packages.find((p) => p.id === "B");
+  assert.equal(b.state, "done", b.questions?.join(" "));
+  assert.ok(b.gate.changed.includes("code.mjs"), "the recovery diff still spans the whole package history");
+  assert.deepEqual(b.gate.outside, []);
+});
+
+test("engine a docs package that edits a markdown file it also reads first finishes instead of going stale", async (t) => {
+  const { root, repo } = fixture(t); commitFile(repo, "doc.md", "# v1\n");
+  const run = runAt(root, [packet(repo, "D", { kind: "docs", owns: ["doc.md"], read_first: [{ path: "doc.md" }] })]);
+  const writer = async (r, p, role) => role === "worker" ? (writeFileSync(path.join(repo, "doc.md"), "# v2\n"), structuredClone(good)) : session(r, p, role);
+  await schedule(run, cfg, { session: writer, execute: passing });
+  assert.equal(run.packages[0].state, "done", run.packages[0].questions?.join(" "));
+  assert.ok(!Object.keys(run.packages[0].basis.docs).some((f) => f.endsWith("doc.md")));
+});
+
+test("engine environment failure means toolchain/OS errors, not domain words in test or compiler output", async (t) => {
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Access is denied." }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Requested registry access is not allowed." }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: null, output: "" }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "", timedOut: true }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "error CS0246: The type or namespace name 'PermissionService' could not be found", counts: {} }), false);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Access is denied in the permission test", counts: { passed: 3, failed: 1 } }), false);
+
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { budget: { max_rework: 0 } })]);
+  let workerCalls = 0;
+  const red = async (cmd) => cmd === "build" ? { command: cmd, code: 0, ok: true, output: "built", timedOut: false }
+    : { command: cmd, code: 1, ok: false, output: "# Subtest: ครูที่ไม่มีสิทธิ์แก้คะแนนไม่ได้\nnot ok 1 - ครูที่ไม่มีสิทธิ์แก้คะแนนไม่ได้ (permission)\n# pass 0\n# fail 1\n", timedOut: false };
+  await schedule(run, cfg, { session: async (r, p, role) => { if (role === "worker") workerCalls++; return session(r, p, role); }, execute: red });
+  assert.equal(workerCalls, 1, "a red test before implementation must not stop the Worker");
+  assert.equal(run.packages[0].failureClass, "IMPLEMENTATION_FAILURE");
+});
+
+test("engine an unreadable Verifier reply is an output-contract failure and resume re-verifies without a new Worker run", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { risk: "high" })]);
+  let workerCalls = 0, verifierCalls = 0;
+  const flaky = async (r, p, role) => {
+    if (role === "worker") workerCalls++;
+    if (role === "verifier" && ++verifierCalls === 1) throw Object.assign(new Error("ไม่พบ JSON ในคำตอบของผู้ให้บริการ"), { failureClass: "OUTPUT_CONTRACT" });
+    return session(r, p, role);
+  };
+  await schedule(run, cfg, { session: flaky, execute: passing });
+  assert.equal(run.packages[0].state, "waiting_human");
+  assert.equal(run.packages[0].failureClass, "OUTPUT_CONTRACT");
+  decide(run, "A", { by: "user", decision: "retry verification", source: "chat" });
+  await schedule(run, cfg, { session: flaky, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.deepEqual([workerCalls, verifierCalls], [1, 2]);
+
+  // If the tree moved since the gate, the old evidence is void and the Worker runs again.
+  const again = runAt(root, [packet(repo, "B", { risk: "high", owns: ["b.txt"] })]);
+  let againWorker = 0, againVerifier = 0;
+  const flaky2 = async (r, p, role) => {
+    if (role === "worker") { againWorker++; writeFileSync(path.join(repo, "b.txt"), `b${againWorker}\n`); return structuredClone(good); }
+    if (++againVerifier === 1) throw Object.assign(new Error("garbled"), { failureClass: "OUTPUT_CONTRACT" });
+    return session(r, p, role);
+  };
+  await schedule(again, cfg, { session: flaky2, execute: passing });
+  writeFileSync(path.join(repo, "b.txt"), "edited by a human\n");
+  decide(again, "B", { by: "user", decision: "retry", source: "chat", "allow-dirty": true });
+  await schedule(again, cfg, { session: flaky2, execute: passing });
+  assert.equal(againWorker, 2);
+});
+
+test("engine a provider reply without JSON is tagged OUTPUT_CONTRACT, not ENVIRONMENT_FAILURE", async (t) => {
+  const { root, repo } = fixture(t); const p = packet(repo); const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "answerFile" } }, tiers: { t5: { codex: {} } } };
+  await assert.rejects(callSession(run, p, "worker", agents, { runner: async () => ({ ok: true, answer: "I finished, all good!", durationMs: 1 }) }),
+    (e) => e.failureClass === "OUTPUT_CONTRACT");
+});
+
+test("engine diff for the Verifier includes files the Worker created, without touching the index", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { owns: ["code.mjs", "tests/new.test.mjs"] })]);
+  const writer = async (r, p, role) => {
+    if (role !== "worker") return session(r, p, role);
+    writeFileSync(path.join(repo, "code.mjs"), "export const value = 2;\n");
+    mkdirSync(path.join(repo, "tests"), { recursive: true });
+    writeFileSync(path.join(repo, "tests", "new.test.mjs"), "NEW TEST BODY\n");
+    return structuredClone(good);
+  };
+  const index = git(repo, "write-tree");
+  await schedule(run, cfg, { session: writer, execute: passing });
+  const diff = readFileSync(run.packages[0].gate.diff_file, "utf8");
+  assert.match(diff, /code\.mjs/);
+  assert.match(diff, /tests\/new\.test\.mjs/);
+  assert.match(diff, /\+NEW TEST BODY/);
+  assert.equal(git(repo, "write-tree"), index);
+  assert.match(git(repo, "status", "--porcelain"), /\?\? tests\//);
+});
+
+test("engine warns about dotnet test without per-test names, at dry-run and when mapping fails", async (t) => {
+  const { commandWarnings } = await import("../src/gate.mjs");
+  assert.equal(commandWarnings({ commands: { test_targeted: "dotnet test src/X.Tests", test_full: "dotnet test src/X.Tests" } }).length, 1);
+  assert.deepEqual(commandWarnings({ commands: { test_targeted: 'dotnet test --logger "console;verbosity=normal"', test_full: "npm test" } }), []);
+
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { commands: { build: "dotnet build", test_targeted: "dotnet test", test_full: "dotnet test" } })]);
+  const summaryOnly = async (cmd) => ({ command: cmd, code: 0, ok: true, output: "Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12\n", timedOut: false });
+  await schedule(run, cfg, { session, execute: summaryOnly });
+  const gateResult = run.packages[0].gate;
+  assert.deepEqual(gateResult.unmapped, ["AC-1"]);
+  assert.match(gateResult.unmapped_hint, /verbosity=normal/);
+});
+
+test("engine persisted state keeps snapshot maps and raw command output out of run.json copies", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo)]);
+  const noisy = async (cmd) => ({ command: cmd, code: 0, ok: true, output: `# Subtest: value test\n${"LOG ".repeat(5000)}\n# pass 1\n# fail 0\n`, timedOut: false });
+  await schedule(run, cfg, { session, execute: noisy });
+  const saved = JSON.parse(readFileSync(path.join(run.dir, "run.json"), "utf8"));
+  const p = saved.packages[0];
+  assert.equal(p.state, "done");
+  assert.deepEqual(Object.keys(saved.baselines[p.repo.path]), ["preexisting_changes"]);
+  assert.ok(p.gate.results.every((r) => r.output === undefined && r.output_file), "output stays in output_file only");
+  const packetCopy = JSON.parse(readFileSync(path.join(run.dir, "packets", "WP-1.json"), "utf8"));
+  assert.equal(packetCopy.before.files, undefined); assert.equal(packetCopy.after.files, undefined);
+  assert.ok(packetCopy.before.tracked, "the recovery point is still referenced");
+  assert.ok(existsSync(p.gate.snapshots_file));
+});
+
+test("engine snapshot hash cache never hides a change: same size and restored mtime are still detected", async (t) => {
+  const { fileHash } = await import("../src/snapshot.mjs");
+  const { utimesSync, statSync } = await import("node:fs");
+  const { repo } = fixture(t);
+  const file = path.join(repo, "code.mjs");
+  const old = new Date(Date.now() - 60_000);
+  utimesSync(file, old, old);
+  const first = snapshot(repo);
+  assert.equal(snapshot(repo).id, first.id, "unchanged repo gives the same snapshot");
+
+  const before = statSync(file);
+  writeFileSync(file, "export const value = 9;\n");
+  assert.equal(statSync(file).size, before.size, "the trick needs an edit of the same size");
+  utimesSync(file, before.atime, before.mtime);
+  assert.notEqual(snapshot(repo).id, first.id, "ctime still changes, so the cached hash is not reused");
+
+  // Files touched within the racy window are always re-read.
+  writeFileSync(file, "export const value = 8;\n");
+  const h1 = fileHash(file);
+  writeFileSync(file, "export const value = 7;\n");
+  assert.notEqual(fileHash(file), h1);
+});
+
+test("engine lock left by a crashed run is recovered when its PID now belongs to another program", async (t) => {
+  const { lock } = await import("../src/repolock.mjs");
+  const { spawn } = await import("node:child_process");
+  const { createHash } = await import("node:crypto");
+  const { root } = fixture(t);
+  const other = process.platform === "win32" ? spawn("ping", ["-n", "30", "127.0.0.1"], { stdio: "ignore", windowsHide: true }) : spawn("sleep", ["30"], { stdio: "ignore" });
+  t.after(() => other.kill());
+  await new Promise((resolve) => other.once("spawn", resolve));
+  mkdirSync(path.join(root, ".baan", "locks"), { recursive: true });
+  const file = path.join(root, ".baan", "locks", `${createHash("sha256").update("run:x").digest("hex")}.lock`);
+
+  writeFileSync(file, JSON.stringify({ pid: other.pid, token: "crashed", key: "run:x" }));
+  const release = lock(root, "run:x");
+  release();
+
+  writeFileSync(file, JSON.stringify({ pid: process.pid, exe: path.basename(process.execPath), token: "live", key: "run:x" }));
+  assert.throws(() => lock(root, "run:x"), /LOCK_BUSY/, "a live BAAN owner still holds the lock");
+
+  rmSync(file);
+  const again = lock(root, "run:x");
+  rmSync(file);
+  assert.doesNotThrow(again, "releasing a lock file that is already gone must not throw from a finally block");
+});
+
+test("engine package duration adds up across resumes and a resumed attempt does not show the old failure", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo)]);
+  const slowEnvFail = async (cmd) => { await new Promise((r) => setTimeout(r, 60)); return { command: cmd, code: null, ok: false, output: "Access is denied", timedOut: false }; };
+  await schedule(run, cfg, { session, execute: slowEnvFail });
+  const first = run.packages[0].durationMs;
+  assert.ok(first >= 60);
+  let seen;
+  const watch = async (r, p, role) => { if (role === "worker") seen = { state: p.state, failureClass: p.failureClass, probe: p.probe }; return session(r, p, role); };
+  await schedule(run, cfg, { session: watch, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.ok(run.packages[0].durationMs > first, "the second attempt's time is added, not dropped");
+  assert.deepEqual(seen, { state: "running", failureClass: "", probe: undefined });
+  const ledger = readFileSync(path.join(run.dir, "ledger.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l)).filter((e) => e.type === "duration");
+  assert.equal(ledger.at(-1).actualMs, run.packages[0].durationMs);
+});
+
+test("engine never picks an agent switched off in local.json as the independent Verifier", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { risk: "high" })]);
+  const agents = { agents: { claude: { enabled: false }, codex: {}, agy: {} }, tiers: { t5: { claude: {}, codex: {}, agy: {} }, t2: { claude: {}, codex: {}, agy: {} } } };
+  let verifier;
+  const spy = async (r, p, role, c, opts) => {
+    if (role === "worker") p.workerAgent = "codex";
+    if (role === "verifier") verifier = opts.forceAgent;
+    return session(r, p, role);
+  };
+  await schedule(run, agents, { session: spy, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.equal(verifier, "agy");
 });

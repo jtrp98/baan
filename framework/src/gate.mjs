@@ -1,10 +1,10 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { changedFiles, hash, matches, snapshot, git } from "./snapshot.mjs";
 import { save } from "./store.mjs";
-import { looksLikeEnvironmentFailure } from "./failure-class.mjs";
+import { looksLikeCommandEnvironmentFailure } from "./failure-class.mjs";
 
 export function command(command, cwd, timeoutSec = 600, signal) {
   return new Promise((resolve) => {
@@ -16,7 +16,8 @@ export function command(command, cwd, timeoutSec = 600, signal) {
       if (process.platform === "win32") spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" });
       else child.kill("SIGKILL");
     };
-    const timer = setTimeout(() => { timedOut = true; abort(); }, timeoutSec * 1000);
+    // 0 = unlimited; setTimeout(fn, 0) would kill every build/test command at once.
+    const timer = timeoutSec > 0 ? setTimeout(() => { timedOut = true; abort(); }, timeoutSec * 1000) : null;
     signal?.addEventListener("abort", abort, { once: true });
     if (signal?.aborted) abort();
     const done = (code, error = "") => {
@@ -74,6 +75,21 @@ export async function evidence(run, repo, cmd, { execute = command, signal, basi
   if (["id", "head", "branch", "index", "stash"].every((k) => after[k] === before[k]) && result.ok && !signal?.aborted) save(file, record);
   return result;
 }
+// dotnet's default console logger prints only a summary, so no acceptance can be mapped to a test name.
+export function commandWarnings(p) {
+  return [...new Set([p.commands?.test_targeted, p.commands?.test_full])]
+    .filter((c) => /\bdotnet\s+test\b/i.test(c ?? "") && !/(?:--logger|\s-l)\b/i.test(c))
+    .map((c) => `"${c}" ใช้ console logger ค่าเริ่มต้นที่ไม่พิมพ์ชื่อ test — เพิ่ม --logger "console;verbosity=normal"`);
+}
+
+// `git diff <commit>` never lists untracked files, so new code and new tests were invisible to the Verifier.
+// --no-index writes nothing to the index (Core must not stage) and exits 1 whenever the files differ.
+export function untrackedDiff(repo, changed, after) {
+  const untracked = new Set(after.untracked);
+  return changed.filter((f) => untracked.has(f)).map((f) => spawnSync("git", ["-C", repo, "diff", "--no-index", "--binary", "--", "/dev/null", f],
+    { encoding: "utf8", windowsHide: true, maxBuffer: 32 * 1024 * 1024 }).stdout ?? "").join("");
+}
+
 export async function gate(run, p, options) {
   const results = [];
   for (const cmd of [...new Set([p.commands.build, p.commands.test_targeted, p.commands.test_full])]) {
@@ -82,8 +98,11 @@ export async function gate(run, p, options) {
   }
   const after = snapshot(p.repo.path);
   const changed = changedFiles(p.before, after);
-  const outside = changed.filter((f) => !p.owns.some((g) => matches(f, g)));
-  for (const key of ["head", "branch", "index", "stash"]) if (p.before[key] !== after[key]) outside.push(`.git/${key}`);
+  // p.before stays the recovery point; scope is judged only on what changed since this attempt began.
+  const since = options.since ?? p.before;
+  const ownChanges = changedFiles(since, after);
+  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)));
+  for (const key of ["head", "branch", "index", "stash"]) if (since[key] !== after[key]) outside.push(`.git/${key}`);
   const output = results.map((r) => r.output).join("\n");
   const names = testNames(output);
   const unmapped = p.acceptance.filter((a) => {
@@ -91,16 +110,21 @@ export async function gate(run, p, options) {
     return !mapping?.proof?.length || mapping.proof.some((proof) => typeof proof !== "string" || !names.has(proof.trim()));
   }).map((a) => a.id);
   const failures = results.filter((r) => !r.ok);
-  const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some((r) => r.timedOut || r.code === null || looksLikeEnvironmentFailure(r.output)) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
-  const test_changes = changed.filter((f) => p.before.files[f] != null && /(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
+  const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some(looksLikeCommandEnvironmentFailure) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
+  const test_changes = ownChanges.filter((f) => p.before.files[f] != null && /(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
   const attempt = `${p.id}-${randomUUID()}`;
   const diff_file = path.join(run.dir, `${attempt}.diff.txt`);
   const snapshots_file = path.join(run.dir, `${attempt}.snapshots.json`);
   const evidence_file = path.join(run.dir, `${attempt}.evidence.json`);
-  writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--"));
+  writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--") + untrackedDiff(p.repo.path, changed, after));
   save(snapshots_file, { before: p.before, after });
-  const result = { ok: !failureClass, failureClass, results, changed, outside, unmapped, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
+  // Tests ran and passed yet no names were printed: say why, or the Worker guesses CONTRACT_MISMATCH and a human must explain BAAN.
+  const ranTests = results.some((r) => r.counts?.passed > 0);
+  const unmapped_hint = unmapped.length && ranTests && !names.size ? `test runner ไม่พิมพ์ชื่อ test ราย test จึง map AC ไม่ได้ — ${commandWarnings(p).join(" ") || "ให้คำสั่ง test พิมพ์ชื่อ test ที่ผ่าน"}` : undefined;
+  // Raw output (up to 4 MB per command) already lives in each output_file; keeping it here bloated run.json,
+  // which is rewritten on every state change.
+  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
-  save(evidence_file, { ...result, results: results.map(({ output, ...summary }) => summary) });
+  save(evidence_file, result);
   return result;
 }

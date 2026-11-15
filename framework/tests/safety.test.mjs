@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFileSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fixture, packet, runAt, cfg, good, passing, session } from "./helpers.mjs";
 import { approvalBasis, readiness, fromPlan, validatePacket } from "../src/packet.mjs";
@@ -20,6 +20,20 @@ test("CLI rejects ambiguous inputs, invalid bounds, missing values and discarded
   for (const argv of [["--timeout", "0"], ["--timeout", "Infinity"], ["--timeout", "1.5"], ["--max-parallel", "0"], ["--goal"], ["--write"], ["--packet", "a", "--plan", "b"], ["run", "oops"], ["--init", "--goal", "x"], ["--cancel", "A", "--dry-run"]]) assert.throws(() => parse(argv));
   assert.equal(resolveTimeout({ timeoutSec: 100 }, { _timeoutSec: 200 }), 200);
   assert.equal(resolveTimeout({ timeoutSec: 100, timeoutSet: true }, { _timeoutSec: 200 }), 100);
+});
+test("timeout_sec 0 from config means unlimited: a workspace made from baan.example.json can run, and commands are not killed", async (t) => {
+  assert.equal(resolveTimeout({ timeoutSec: 0 }), 0);
+  assert.equal(resolveTimeout({ timeoutSec: 100 }, { _timeoutSec: 0 }), 0);
+  assert.throws(() => resolveTimeout({ timeoutSec: 0, timeoutSet: true }), /1–86400/);
+
+  const { root, repo } = fixture(t);
+  writeFileSync(path.join(root, "baan.config.json"), readFileSync(new URL("../baan.example.json", import.meta.url), "utf8"));
+  const dry = await cli(["run", "--goal", "x", "--cwd", repo, "--owns", "code.mjs", "--build", "b", "--test", "t", "--workspace", root, "--agent", "codex", "--dry-run"], { cfg: structuredClone(cfg), localConfig: { agents: null } });
+  assert.ok(dry.packages?.length, "dry-run must not throw on timeout_sec: 0");
+
+  const run = runAt(root, [packet(repo)]); run.timeoutSec = 0;
+  const r = await evidence(run, repo, `node -e "setTimeout(() => {}, 300)"`);
+  assert.equal(r.timedOut, false); assert.equal(r.ok, true);
 });
 test("provider fallback classifiers ignore success, timeouts, answer-only CLI errors and late startup failures", () => {
   assert.equal(looksLikeLimitError({ ok: false, error: "rate limit" }), true);
@@ -167,4 +181,22 @@ test("report cannot claim success before required integration evidence exists", 
   assert.equal(report(run).ok, false);
   run.integration[0].evidence = { ok: true };
   assert.equal(report(run).ok, true);
+});
+
+test("run --target that points at a repo which no longer exists gives a clear message, not a raw git error", async (t) => {
+  const { root } = fixture(t);
+  const gone = path.join(root, "target", "sb-api-gateway");
+  writeFileSync(path.join(root, "baan.config.json"), JSON.stringify({ knowledge_roots: [{ name: "kb", path: root, targets: [{ name: "sb-api-gateway", path: gone }] }] }));
+  await assert.rejects(
+    cli(["run", "--goal", "x", "--target", "sb-api-gateway", "--owns", "a.cs", "--build", "b", "--test", "t", "--workspace", root, "--agent", "codex", "--dry-run"], { cfg: structuredClone(cfg), localConfig: { agents: null } }),
+    /sb-api-gateway.*ไม่มีอยู่/,
+  );
+});
+
+test("resuming a run whose repo was moved explains which package and path, not a raw git error", (t) => {
+  const { root, repo, makeRepo } = fixture(t);
+  const moved = makeRepo("will-move");
+  const run = runAt(root, [packet(moved, "LESSONS-GATEWAY")]);
+  rmSync(moved, { recursive: true, force: true });
+  assert.throws(() => loadRun(root, run.dir), /LESSONS-GATEWAY: repo .*will-move ไม่มีอยู่/);
 });

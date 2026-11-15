@@ -4,7 +4,7 @@ Local npm package สำหรับควบคุมงานพัฒนา�
 Core ที่เป็นโค้ดจัดคิว ล็อก repository เก็บ snapshot รัน machine gates และเก็บหลักฐาน
 Node.js ≥18, Git และ provider CLI ที่ติดตั้ง/ลงชื่อเข้าใช้แล้ว; ไม่มี runtime dependency
 
-สิ่งที่เปลี่ยนใน **0.34.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
+สิ่งที่เปลี่ยนใน **0.37.0** และขั้นตอนอัปเกรดอยู่ใน [Release notes](RELEASE-NOTES.md)
 
 ## ติดตั้งและตั้งค่า
 
@@ -15,6 +15,7 @@ baan --version
 baan --help
 baan --init --workspace C:/src/workspace
 baan --list --workspace C:/src/workspace
+baan target [list | check [<name>] | scan [<dir>] [--prune] [--pin-branch] [--update-branch] | add <dir> [--name <name>] [--branch <b> | --pin-branch] | branch <name> [<b> | --clear] | remove <name>] [--workspace <dir>] [--dry-run]
 baan sync [--push] [--pull-only] [--dry-run] [--no-self-update]
 baan survey [--target <name>] [--project <name>] [--cwd <path>] [--eval <path>] [--json]
 baan monitor [--port 3456] [--no-open] [--tui]
@@ -45,7 +46,9 @@ baan monitor [--port 3456] [--no-open] [--tui]
 4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
 5. รีเฟรช `knowledge-index.json` อัตโนมัติ
 
-หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.34.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
+ขอบเขต: รันในโฟลเดอร์ workspace = ซิงค์เฉพาะ workspace นั้น · `--all` = ทุก workspace ใน `local.json` (รันนอก workspace ได้ผลเดียวกันเมื่อ `auto_update` เปิด) · นอก workspace โดยไม่มี workspace ลงทะเบียนจะ error แทนการ init ในโฟลเดอร์นั้น · `--stubs-only` รีเฟรช stubs อย่างเดียว ไม่ commit/pull/push (ใช้ใน post-merge hook จาก `npm run setup:hooks`)
+
+หากมี artifact ที่ pack จากรุ่นนี้แล้ว ติดตั้งได้ด้วย `npm install -g <path>/baan-0.37.0.tgz` (ไม่ได้หมายถึงมีรุ่นนี้เผยแพร่บน npm)
 `--init` สร้าง `baan.config.json` และทางเข้า AGENTS.md/CLAUDE.md ไปยัง [BAAN.md](BAAN.md)
 อัปเดตเฉพาะไฟล์ที่ BAAN สร้างไว้ ไม่ทับไฟล์ของผู้ใช้; รันซ้ำหลังอัปเกรดได้
 แก้ paths/targets ใน config ให้ตรงเครื่อง ตัวอย่างอยู่ [baan.example.json](baan.example.json)
@@ -123,7 +126,7 @@ Acceptance approval ไม่เซ็นประตูอื่นแทน �
 งานค้างที่ทับ owns ต้องให้คนยืนยันด้วย `--allow-dirty --by user` พร้อม decision/source
 
 ระบุ `"kind": "code" | "docs" | "bugfix"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
-- งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `shared/defects/`
+- งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/` ใน knowledge root
 - งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
 - งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
 
@@ -189,6 +192,7 @@ Machine gates รัน build/targeted/full, ตรวจ diff นอก owns, h
 ขาด test mapping, แก้ existing tests, high risk, security/auth/PII, DB/schema, เงิน/คะแนน, public contract,
 fan-out, milestone หรือ release ต้องมี Verifier ใหม่ที่ไม่รับคำเล่าของ Worker; Verifier อ่านอย่างเดียว
 ถ้าไม่มี mapping ที่ parser รู้จัก ให้ Verifier ตรวจหลักฐานแทน ไม่ถือว่าคำว่า AC ใน stdout เป็น test proof
+.NET: ใช้ `dotnet test --logger "console;verbosity=normal"` เพื่อให้พิมพ์ชื่อ test ราย test (logger ค่าเริ่มต้นพิมพ์แค่สรุป จึง map AC ไม่ได้; `--dry-run` และ gate จะเตือน)
 Cache เฉพาะคำสั่งผ่านบน snapshot/Git state/command เดิม; integration รวม snapshot ทุก repo
 
 Snapshot เก็บ tracked recovery object (`git stash create`) และ untracked blobs โดยไม่เปลี่ยน working tree,
