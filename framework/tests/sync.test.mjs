@@ -237,3 +237,25 @@ test("syncWorkspace: ตาราง INDEX.md ที่อัปเดตถู�
     for (const dir of [wsDir, bare, kr.dir]) rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("updateSelfFramework: branch ที่ไม่มี upstream ข้ามอย่างปลอดภัย ไม่รายงานล้มทุกรอบ และไม่ pull", () => {
+  const bare = mkdtempSync(path.join(tmpdir(), "baan-self-bare-"));
+  const seed = makeGitRepo("baan-self-seed-");
+  const clone = mkdtempSync(path.join(tmpdir(), "baan-self-clone-"));
+  try {
+    spawnSync("git", ["init", "--bare", "-q", "-b", "main", bare], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "package.json"), '{"version":"1.0.0"}');
+    seed.git(["add", "."]); seed.git(["commit", "-qm", "v1"]); seed.git(["push", "-q", bare, "HEAD:main"]);
+    spawnSync("git", ["clone", "-q", bare, clone], { encoding: "utf8" });
+    spawnSync("git", ["-C", clone, "checkout", "-q", "-b", "my-local-work"], { encoding: "utf8" });
+    writeFileSync(path.join(seed.dir, "package.json"), '{"version":"1.1.0"}');
+    seed.git(["commit", "-qam", "v1.1"]); seed.git(["push", "-q", bare, "HEAD:main"]);
+
+    const head = spawnSync("git", ["-C", clone, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout;
+    const res = updateSelfFramework(clone);
+    assert.deepEqual([res.ok, res.updated, res.reason], [true, false, "no_upstream"]);
+    assert.equal(spawnSync("git", ["-C", clone, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout, head);
+  } finally {
+    for (const dir of [bare, seed.dir, clone]) rmSync(dir, { recursive: true, force: true });
+  }
+});

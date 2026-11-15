@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { findWorkspaceConfig, layoutOf, loadWorkspace, memoryRootOf } from "./config.mjs";
@@ -19,12 +18,14 @@ export function updateSelfFramework(teamDir, log = () => {}) {
     return { ok: false, updated: false, error: fetch.err };
   }
 
+  // A branch without upstream (e.g. a local feature branch) has nothing to fast-forward to. The old fallback
+  // compared with origin/dev/golf, then `pull --ff-only` failed, so every sync on such a branch reported ok:false.
   const rev = gitIn(teamDir, ["rev-list", "--count", "HEAD..@{u}"]);
-  let behind = rev.ok ? Number(rev.out.trim()) : 0;
   if (!rev.ok) {
-    const revFallback = gitIn(teamDir, ["rev-list", "--count", "HEAD..origin/dev/golf"]);
-    if (revFallback.ok) behind = Number(revFallback.out.trim());
+    log("BAAN self-update: branch นี้ไม่มี upstream — ข้ามการอัปเดตตัวเอง");
+    return { ok: true, updated: false, reason: "no_upstream" };
   }
+  const behind = Number(rev.out.trim());
 
   if (behind <= 0) return { ok: true, updated: false, reason: "up_to_date" };
 
@@ -38,10 +39,6 @@ export function updateSelfFramework(teamDir, log = () => {}) {
     log(`⚠ BAAN self-update: pull ไม่สำเร็จ — ${pull.err.split("\n")[0]}`);
     return { ok: false, updated: false, error: pull.err };
   }
-
-  try {
-    spawnSync("npm", ["link"], { cwd: teamDir, encoding: "utf8", windowsHide: true });
-  } catch { /* ignore */ }
 
   let newVersion = oldVersion;
   try {
