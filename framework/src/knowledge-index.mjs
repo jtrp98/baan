@@ -135,7 +135,16 @@ export function applyModuleTable(text, table, projectName) {
   const s = text.indexOf(START);
   const e = text.indexOf(END);
   if (s >= 0 && e > s) return text.slice(0, s) + t + text.slice(e + END.length);
+  // A lone marker: appending a second table here made the next run replace everything from the old start
+  // marker to the new end marker, deleting what the person wrote in between. Leave it for lint to report.
+  if (s >= 0 || e >= 0) return text;
   return `${text.replace(/\s*$/, "")}${eol}${eol}## Modules${eol}${eol}${t}${eol}`;
+}
+
+export function moduleMarkersBroken(text) {
+  const s = text.indexOf(START);
+  const e = text.indexOf(END);
+  return (s >= 0 || e >= 0) && !(s >= 0 && e > s);
 }
 
 export function updateIndexes(root, { write = true } = {}) {
@@ -223,7 +232,9 @@ export function lintKnowledge(root) {
       }
     }
     const idx = p.indexFile ? readText(p.indexFile) : "";
-    if (applyModuleTable(idx, renderModuleTable(p, projects), p.name) !== idx) {
+    if (moduleMarkersBroken(idx)) {
+      errors.push(`${p.name}/INDEX.md: marker ตาราง module ไม่ครบคู่ (${START} … ${END}) — แก้ให้ครบก่อน baan --index จึงจะอัปเดตตาราง`);
+    } else if (applyModuleTable(idx, renderModuleTable(p, projects), p.name) !== idx) {
       errors.push(`${p.name}/INDEX.md: ตาราง module ไม่ตรงหัวไฟล์ของ module — รัน baan --index`);
     }
     for (const f of walkMarkdown(p.dir)) {

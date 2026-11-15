@@ -95,6 +95,23 @@ test("applyModuleTable: แทนเฉพาะช่วง marker · คง CR
   assert.equal(applyModuleTable(before, t, "p"), "# p\r\n\r\n<!-- baan:modules:start -->\r\nใหม่\r\n<!-- baan:modules:end -->\r\nท้าย\r\n");
 });
 
+test("applyModuleTable: marker ไม่ครบคู่ต้องไม่แตะไฟล์ (เดิมรอบที่สองลบข้อความระหว่าง marker) และ lint รายงาน", () => {
+  const t = "<!-- baan:modules:start -->\nตาราง\n<!-- baan:modules:end -->";
+  const lone = "# p\n\n<!-- baan:modules:start -->\n\n## บันทึกของทีม\nห้ามหาย\n";
+  assert.equal(applyModuleTable(lone, t, "p"), lone);
+  assert.equal(applyModuleTable(applyModuleTable(lone, t, "p"), t, "p"), lone);
+  const endOnly = "# p\nห้ามหาย\n<!-- baan:modules:end -->\n";
+  assert.equal(applyModuleTable(endOnly, t, "p"), endOnly);
+
+  const root = mkdtempSync(path.join(tmpdir(), "baan-markers-"));
+  try {
+    mkdirSync(path.join(root, "p", "modules"), { recursive: true });
+    writeFileSync(path.join(root, "p", "INDEX.md"), `---\nproject: p\n---\n${lone}`);
+    assert.deepEqual(updateIndexes(root), []);
+    assert.ok(lintKnowledge(root).errors.some((e) => e.includes("ไม่ครบคู่")));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test("lintKnowledge: depends_on/requested_by ที่ไม่มีจริง · ตารางไม่ตรง · ลิงก์เสีย = error · ไฟล์นอกช่องทีม = เตือน", () => {
   const root = fixture();
   try {
