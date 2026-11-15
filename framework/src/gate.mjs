@@ -121,8 +121,10 @@ export async function gate(run, p, options) {
   // Tests ran and passed yet no names were printed: say why, or the Worker guesses CONTRACT_MISMATCH and a human must explain BAAN.
   const ranTests = results.some((r) => r.counts?.passed > 0);
   const unmapped_hint = unmapped.length && ranTests && !names.size ? `test runner ไม่พิมพ์ชื่อ test ราย test จึง map AC ไม่ได้ — ${commandWarnings(p).join(" ") || "ให้คำสั่ง test พิมพ์ชื่อ test ที่ผ่าน"}` : undefined;
-  const result = { ok: !failureClass, failureClass, results, changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
+  // Raw output (up to 4 MB per command) already lives in each output_file; keeping it here bloated run.json,
+  // which is rewritten on every state change.
+  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
-  save(evidence_file, { ...result, results: results.map(({ output, ...summary }) => summary) });
+  save(evidence_file, result);
   return result;
 }

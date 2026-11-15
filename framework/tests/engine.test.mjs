@@ -463,3 +463,19 @@ test("engine warns about dotnet test without per-test names, at dry-run and when
   assert.deepEqual(gateResult.unmapped, ["AC-1"]);
   assert.match(gateResult.unmapped_hint, /verbosity=normal/);
 });
+
+test("engine persisted state keeps snapshot maps and raw command output out of run.json copies", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo)]);
+  const noisy = async (cmd) => ({ command: cmd, code: 0, ok: true, output: `# Subtest: value test\n${"LOG ".repeat(5000)}\n# pass 1\n# fail 0\n`, timedOut: false });
+  await schedule(run, cfg, { session, execute: noisy });
+  const saved = JSON.parse(readFileSync(path.join(run.dir, "run.json"), "utf8"));
+  const p = saved.packages[0];
+  assert.equal(p.state, "done");
+  assert.deepEqual(Object.keys(saved.baselines[p.repo.path]), ["preexisting_changes"]);
+  assert.ok(p.gate.results.every((r) => r.output === undefined && r.output_file), "output stays in output_file only");
+  const packetCopy = JSON.parse(readFileSync(path.join(run.dir, "packets", "WP-1.json"), "utf8"));
+  assert.equal(packetCopy.before.files, undefined); assert.equal(packetCopy.after.files, undefined);
+  assert.ok(packetCopy.before.tracked, "the recovery point is still referenced");
+  assert.ok(existsSync(p.gate.snapshots_file));
+});

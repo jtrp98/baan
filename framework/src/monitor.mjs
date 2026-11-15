@@ -220,6 +220,15 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
     return new Promise(() => {}); // Keep alive in terminal
   }
 
+  // Every open tab polls each second; build the state once per tick and share it instead of once per client.
+  let shared = { root: null, at: 0, promise: null };
+  const sharedState = () => {
+    if (shared.root !== currentWorkspaceRoot || Date.now() - shared.at >= 900) {
+      shared = { root: currentWorkspaceRoot, at: Date.now(), promise: getMonitorState(currentWorkspaceRoot) };
+    }
+    return shared.promise;
+  };
+
   return new Promise((resolve, reject) => {
     const handle = async (req, res) => {
       // Telemetry carries commands, paths and model thoughts; only a local page may read it (blocks DNS rebinding).
@@ -287,7 +296,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
       }
 
       if (url.pathname === "/api/stats") {
-        const state = await getMonitorState(currentWorkspaceRoot);
+        const state = await sharedState();
         res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify(state));
         return;
@@ -312,7 +321,7 @@ export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrow
           if (sending) return;
           sending = true;
           try {
-            const state = await getMonitorState(currentWorkspaceRoot);
+            const state = await sharedState();
             res.write(`data: ${JSON.stringify(state)}\n\n`);
           } catch {} finally {
             sending = false;

@@ -11,6 +11,35 @@ export function readJsonSafe(file) {
   }
 }
 
+// The monitor re-reads every run every second; run.json holds MBs of snapshots, so parse a file only when it
+// changed and keep just the small projection the monitor uses (holding whole runs would grow memory per run).
+const projections = new Map();
+function readProjected(file, project) {
+  let st;
+  try { st = statSync(file); } catch { projections.delete(file); return null; }
+  const hit = projections.get(file);
+  if (hit && hit.mtimeMs === st.mtimeMs && hit.size === st.size) return hit.value;
+  let value = null;
+  try { value = project(readFileSync(file, "utf8")); } catch { /* half-written file: retry on the next change */ }
+  projections.set(file, { mtimeMs: st.mtimeMs, size: st.size, value });
+  return value;
+}
+
+export function readRunSummary(file) {
+  return readProjected(file, (text) => {
+    const run = JSON.parse(text);
+    return { id: run.id, createdAt: run.createdAt, mode: run.mode, executionMode: run.executionMode,
+      packages: (run.packages ?? []).map((p) => ({ id: p.id, title: p.title ?? "", state: p.state ?? null, failureClass: p.failureClass ?? null, repo: { path: p.repo?.path } })) };
+  });
+}
+
+export function readCallEnds(file) {
+  return readProjected(file, (text) => text.split(/\r?\n/).flatMap((line) => {
+    if (!line.includes('"call_end"')) return [];
+    try { const ev = JSON.parse(line); return ev.type === "call_end" ? [ev] : []; } catch { return []; }
+  })) ?? [];
+}
+
 export function scanActiveRuns(workspaceRoot) {
   const runsDir = path.join(workspaceRoot, ".baan", "runs");
   if (!existsSync(runsDir)) return [];
@@ -34,7 +63,7 @@ export function scanActiveRuns(workspaceRoot) {
 
       if (!activeFiles.length) continue;
 
-      const runJson = readJsonSafe(path.join(runDir, "run.json")) ?? {};
+      const runJson = readRunSummary(path.join(runDir, "run.json")) ?? {};
       const activePackages = [];
 
       for (const af of activeFiles) {
@@ -134,7 +163,7 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
     if (!existsSync(ledgerFile) && !existsSync(runJsonFile)) continue;
     summary.total.runs++;
 
-    const runJson = readJsonSafe(runJsonFile);
+    const runJson = readRunSummary(runJsonFile);
     if (runJson && runJson.packages?.length && runJson.packages.every((p) => p.state === "done")) {
       summary.total.completedRuns++;
     }
@@ -148,13 +177,8 @@ export function aggregateWorkspaceUsage(workspaceRoot) {
 
     if (existsSync(ledgerFile)) {
       try {
-        const text = readFileSync(ledgerFile, "utf8");
-        for (const line of text.split(/\r?\n/)) {
-          if (!line.trim().startsWith("{")) continue;
-          let ev;
-          try { ev = JSON.parse(line); } catch { continue; }
-
-          if (ev.type === "call_end" && ev.agent) {
+        for (const ev of readCallEnds(ledgerFile)) {
+          if (ev.agent) {
             const agent = ev.agent.toLowerCase();
             const targetAgent = summary.agents[agent] ?? (summary.agents[agent] = initialAgentStats());
             targetAgent.calls++;
@@ -220,7 +244,7 @@ export function getRecentRuns(workspaceRoot, limit = 15) {
   const list = [];
   for (const name of entries.sort().reverse().slice(0, limit)) {
     const runDir = path.join(runsDir, name);
-    const run = readJsonSafe(path.join(runDir, "run.json"));
+    const run = readRunSummary(path.join(runDir, "run.json"));
     if (!run) continue;
 
     const projects = [...new Set((run.packages ?? []).map((p) => p.repo?.path ? path.basename(p.repo.path) : "").filter(Boolean))];
@@ -258,12 +282,9 @@ export function getRecentCallEnds(workspaceRoot, { limit = 20, withinMs = 60 * 6
     const ledgerFile = path.join(runsDir, name, "ledger.jsonl");
     try {
       if (statSync(ledgerFile).mtimeMs < cutoff) continue;
-      for (const line of readFileSync(ledgerFile, "utf8").split(/\r?\n/)) {
-        if (!line.includes('"call_end"')) continue;
-        let ev;
-        try { ev = JSON.parse(line); } catch { continue; }
+      for (const ev of readCallEnds(ledgerFile)) {
         const at = Date.parse(ev.at ?? "");
-        if (ev.type !== "call_end" || !Number.isFinite(at) || at < cutoff) continue;
+        if (!Number.isFinite(at) || at < cutoff) continue;
         out.push({ at: ev.at, runId: name, package: ev.package ?? null, role: ev.role ?? null, agent: ev.agent ?? null, ok: ev.ok === true });
       }
     } catch {}

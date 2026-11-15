@@ -3,7 +3,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules, collectWorkspaceAddDirs, loadLocalConfig, isAgentEnabled, applyLocalAgents, TEAM_DIR } from "./config.mjs";
 import { fromPlan, validatePacket, assertId, readiness, documentBasis, approvalBasis } from "./packet.mjs";
-import { loadRun, save, persist, event, readJson } from "./store.mjs";
+import { loadRun, save, persist, event, readJson, previousAttempt } from "./store.mjs";
 import { callSession, nativeCommand } from "./session.mjs";
 import { schedule } from "./scheduler.mjs";
 import { triage } from "./triage.mjs";
@@ -255,7 +255,7 @@ async function executeRun(run, cfg, options, dry = false) {
       const current = snapshot(p.repo.path);
       const changed = changedFiles(p.after, current).some((f) => p.owns.some((g) => matches(f, g)));
       if (changed || ["head", "branch", "index", "stash"].some((k) => p.after[k] !== current[k])) {
-        (p.previous_attempts ??= []).push({ before: p.before, after: p.after, gate: p.gate, verdict: p.verdict });
+        (p.previous_attempts ??= []).push(previousAttempt(p));
         Object.assign(p, { state: "waiting_human", before: current, requires_dirty_confirmation: true, dirty_approved: false,
           questions: ["completed scope/Git state changed since evidence; inspect and confirm with decide --allow-dirty"] });
       }

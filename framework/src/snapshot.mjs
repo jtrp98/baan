@@ -42,6 +42,8 @@ export function snapshot(repo) {
     preexisting_changes: [...new Set([...changes, ...untracked])],
     id: hash(JSON.stringify(Object.entries(files).sort())) };
 }
+// Enough to identify and recover a snapshot (tracked = recovery commit); the full file map stays in *.snapshots.json.
+export const snapshotRef = (s) => s && { id: s.id, head: s.head, branch: s.branch, index: s.index, stash: s.stash, tracked: s.tracked };
 export function sameState(a, b) { return ["id", "head", "branch", "index", "stash"].every((key) => a[key] === b[key]); }
 export function changedFiles(before, after) {
   return [...new Set([...Object.keys(before.files), ...Object.keys(after.files)])].filter((f) => before.files[f] !== after.files[f]);

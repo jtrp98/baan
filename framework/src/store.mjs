@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { validatePacket, checkDag } from "./packet.mjs";
 import { validateTimeout } from "./timeout.mjs";
+import { snapshotRef } from "./snapshot.mjs";
 
 export const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
 export function writeAtomic(file, data) {
@@ -14,13 +15,18 @@ export function save(file, data) { mkdirSync(path.dirname(file), { recursive: tr
 export function event(run, type, data = {}) {
   appendFileSync(path.join(run.dir, "ledger.jsonl"), JSON.stringify({ at: new Date().toISOString(), type, ...data }) + "\n");
 }
+// Earlier attempts keep their recovery points by reference; the full file maps are in the gate's snapshots_file.
+export const previousAttempt = (p) => ({ before: snapshotRef(p.before), after: snapshotRef(p.after), snapshots_file: p.gate?.snapshots_file, gate: p.gate, verdict: p.verdict });
+// packets/ is a readable copy for people; repeating every snapshot's file map there doubled each persist.
+const packetView = (p) => ({ ...p, before: snapshotRef(p.before), after: snapshotRef(p.after) });
+
 export function persist(run) {
   save(path.join(run.dir, "run.json"), run);
   const rows = run.packages.map((p) => `| ${p.id} | ${p.state} | ${p.failureClass || ""} | ${p.durationMs ?? 0} |`);
   // Generated state is kept in the run, so existing memory files remain historical evidence.
   writeAtomic(path.join(run.dir, "status.md"), `# BAAN ${run.id}\n\n| Package | State | Failure | ms |\n|---|---|---|---|\n${rows.join("\n")}\n`);
   for (const p of run.packages) {
-    save(path.join(run.dir, "packets", `${p.id}.json`), p);
+    save(path.join(run.dir, "packets", `${p.id}.json`), packetView(p));
     writeAtomic(path.join(run.dir, `task-${p.id}.md`), `# ${p.title}\n\n${p.goal}\n\n${p.acceptance.map((a) => `- ${a.id}: ${a.text} (${a.source})`).join("\n")}\n`);
   }
 }

@@ -314,3 +314,23 @@ test("monitor: binds to loopback only, rejects foreign Host headers and survives
   });
   assert.equal(stream["access-control-allow-origin"], undefined);
 });
+
+test("monitor: run.json and ledgers are parsed again only when they change, into a small projection", async () => {
+  const { readRunSummary, readCallEnds } = await import("../src/usage-aggregator.mjs");
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-monitor-cache-"));
+  try {
+    const runFile = path.join(dir, "run.json");
+    writeFileSync(runFile, JSON.stringify({ id: "r1", packages: [{ id: "A", state: "running", repo: { path: "C:/repo" }, before: { files: { "a.cs": "h" } } }] }));
+    const first = readRunSummary(runFile);
+    assert.equal(readRunSummary(runFile), first, "unchanged file must not be parsed again");
+    assert.equal(first.packages[0].before, undefined, "snapshot maps are not kept in memory");
+    writeFileSync(runFile, JSON.stringify({ id: "r1", packages: [{ id: "A", state: "done", repo: { path: "C:/repo" } }] }));
+    assert.equal(readRunSummary(runFile).packages[0].state, "done");
+
+    const ledger = path.join(dir, "ledger.jsonl");
+    writeFileSync(ledger, `${JSON.stringify({ type: "state", package: "A" })}\n${JSON.stringify({ type: "call_end", agent: "codex", ok: true })}\nnot json\n`);
+    assert.deepEqual(readCallEnds(ledger).map((e) => e.agent), ["codex"]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

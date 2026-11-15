@@ -135,7 +135,8 @@ export async function schedule(run, cfg, options = {}) {
     try { return await work(); } finally { verifiers--; verifierQueue.shift()?.(); }
   } };
   run.baselines ??= {};
-  for (const repo of new Set(run.packages.map((p) => p.repo.path))) run.baselines[repo] ??= snapshot(repo);
+  // Only the list of files already dirty at the start is ever read; the full file map cost MBs in run.json.
+  for (const repo of new Set(run.packages.map((p) => p.repo.path))) run.baselines[repo] ??= { preexisting_changes: snapshot(repo).preexisting_changes };
   const fanout = transitiveFanOut(run.packages.map((p) => ({ id: p.id, dependsOn: p.depends_on })));
   // Validate all known questions before the first dispatch, instead of discovering them one by one.
   for (const p of run.packages) {
