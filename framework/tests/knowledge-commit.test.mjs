@@ -251,3 +251,21 @@ test("commitKnowledgeRoot: ไม่ auto-commit ไฟล์ลับ ไฟล
     assert.equal(logs.filter((l) => l.includes("ไม่ auto-commit")).length, 4);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("commitKnowledgeRoot: module ที่มีไฟล์ชื่อยาวหลายร้อยไฟล์ commit ได้ (ไม่ชนเพดาน command line ของ Windows)", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const shared = path.join(dir, "school-bot", "modules", "grades", "shared");
+    mkdirSync(shared, { recursive: true });
+    writeFileSync(path.join(dir, "school-bot", "INDEX.md"), "---\nproject: school-bot\n---\n");
+    git(["add", "."]); git(["commit", "-qm", "init"]);
+    const longName = "บันทึกการประชุมเรื่องเกณฑ์การให้คะแนนรายวิชาภาษาไทยระดับประถมศึกษาตอนปลาย";
+    for (let i = 0; i < 400; i++) writeFileSync(path.join(shared, `${longName}-${String(i).padStart(3, "0")}.md`), `# ${i}\n`);
+
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir, layout: "project" }, (m) => logs.push(m));
+    assert.equal(res.commits.length, 1, logs.join("\n"));
+    assert.equal(git(["status", "--porcelain"]).stdout.trim(), "");
+    assert.equal(git(["show", "--name-only", "--format=", "HEAD"]).stdout.trim().split("\n").length, 400);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

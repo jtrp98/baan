@@ -3,9 +3,10 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { memoryRootOf } from "./config.mjs";
 
-export function gitIn(root, args) {
-  const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", windowsHide: true });
-  return { ok: r.status === 0, out: r.stdout ?? "", err: (r.stderr ?? "").trim() };
+export function gitIn(root, args, input) {
+  const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", windowsHide: true, input, maxBuffer: 64 * 1024 * 1024 });
+  // r.error (spawn failed, e.g. command line too long) leaves stderr empty; without it the log line was blank.
+  return { ok: r.status === 0, out: r.stdout ?? "", err: [r.error?.message, (r.stderr ?? "").trim()].filter(Boolean).join("\n") };
 }
 
 const UNMERGED = new Set(["DD", "AU", "UD", "UA", "DU", "AA", "UU"]);
@@ -115,8 +116,12 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
     // A whole-folder `git add -A` would sweep the skipped files back in, so list the kept files instead.
     const holdsSkipped = p.scope && skipped.some((s) => s.file === p.scope || s.file.startsWith(`${p.scope}/`));
     const scope = kr.layout === "project" || !p.scope || holdsSkipped ? p.paths : [p.scope];
-    const add = gitIn(kr.path, ["add", "-A", "--", ...scope]);
-    const commit = add.ok ? gitIn(kr.path, ["commit", "-m", p.message, "--", ...scope]) : add;
+    // Paths go through stdin: a module with a few hundred long (Thai) file names exceeds Windows' ~32K command line,
+    // the spawn failed and that module never auto-committed.
+    const spec = scope.join("\0");
+    const fromStdin = ["--pathspec-from-file=-", "--pathspec-file-nul"];
+    const add = gitIn(kr.path, ["add", "-A", ...fromStdin], spec);
+    const commit = add.ok ? gitIn(kr.path, ["commit", "-m", p.message, ...fromStdin], spec) : add;
     if (!commit.ok) {
       log(`⚠ ${kr.name}: commit "${p.message}" ไม่สำเร็จ — ${commit.err.split("\n")[0]}`);
       continue;
