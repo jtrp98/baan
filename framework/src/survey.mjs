@@ -5,7 +5,7 @@ import { scanProjects } from "./knowledge-index.mjs";
 import { scaffoldKnowledgeModule, scaffoldKnowledgeProject } from "./knowledge-scaffold.mjs";
 
 export { scaffoldKnowledgeModule, scaffoldKnowledgeProject };
-import { layoutOf, resolveTarget } from "./config.mjs";
+import { layoutOf, resolveTarget, resolveTargetByPath } from "./config.mjs";
 
 const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
 const isFile = (p) => { try { return statSync(p).isFile(); } catch { return false; } };
@@ -264,6 +264,7 @@ export function surveyProject(o, ws, root, log = () => {}) {
   let targetName = o.target || null;
   let kr = null;
   let project = null;
+  let registeredTarget = null;
 
   // 1. ระบุ Target และ Knowledge Root
   if (o.target) {
@@ -276,12 +277,22 @@ export function surveyProject(o, ws, root, log = () => {}) {
     targetPath = hit.target.path;
     targetName = hit.target.name;
     kr = hit.knowledgeRoot;
+    registeredTarget = hit.target;
   }
 
   if (!targetPath && o.cwd) {
     targetPath = path.resolve(o.cwd);
   } else if (!targetPath) {
     targetPath = process.cwd();
+  }
+
+  if (!registeredTarget && ws) {
+    const byPathHit = resolveTargetByPath(ws, targetPath);
+    if (byPathHit) {
+      registeredTarget = byPathHit.target;
+      if (!o.target) targetName ??= byPathHit.target.name;
+      kr ??= byPathHit.knowledgeRoot;
+    }
   }
 
   // หากยังไม่พบ kr ให้ค้นหาจาก knowledge_roots ทั้งหมด
@@ -347,6 +358,16 @@ export function surveyProject(o, ws, root, log = () => {}) {
   // 4. วิเคราะห์ Drift กับ Knowledge
   const drift = detectKnowledgeDrift(surveyData, project);
 
+  const registeredBranch = typeof registeredTarget?.branch === "string" && registeredTarget.branch.trim()
+    ? registeredTarget.branch.trim()
+    : null;
+  const currentBranch = surveyData.git?.branch || null;
+  const branchStatus = {
+    registered: registeredBranch,
+    current: currentBranch,
+    match: registeredBranch ? currentBranch === registeredBranch : null,
+  };
+
   const result = {
     target: { name: targetName, path: targetPath },
     knowledge: {
@@ -354,6 +375,7 @@ export function surveyProject(o, ws, root, log = () => {}) {
       project: projectName,
       status: project ? "found" : "not_found",
     },
+    branchStatus,
     stacks: surveyData.stacks,
     components: surveyData.components,
     git: surveyData.git,
@@ -368,6 +390,9 @@ export function formatSurveyReport(res) {
   const lines = [
     `# 🔍 รายงานการสำรวจโปรเจค (Project Survey & Drift Report)`,
     `**Target:** \`${res.target.name}\` (${res.target.path})`,
+    ...(res.branchStatus?.registered
+      ? [`**Branch:** \`${res.branchStatus.current || "unknown"}\` (ลงทะเบียน: \`${res.branchStatus.registered}\`)${res.branchStatus.match === false ? " — ⚠️ **Branch Mismatch!**" : " ✅"}`]
+      : []),
     `**Knowledge:** ${res.knowledge.project ? `\`${res.knowledge.project}\`` : "⚠️ ยังไม่มี project ใน knowledge"} (Root: ${res.knowledge.root || "-"})`,
     `**Drift Status:** ${res.drift.driftLevel.toUpperCase()} — ${res.drift.summary}`,
     "",

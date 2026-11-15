@@ -28,7 +28,7 @@ export function utility(o, ws, cfg, root, local) {
   baan update-clis
   baan attach <package> [--run <run>]
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
-  baan target [list | scan [<dir>] [--prune] | add <dir> [--name <name>] | remove <name>] [--root <kr>] [--dry-run]
+  baan target [list | check [<name>] | scan [<dir>] [--prune] [--pin-branch] [--update-branch] | add <dir> [--name <name>] [--branch <branch> | --pin-branch] | branch <name> [<branch> | --clear] | remove <name>] [--root <kr>] [--dry-run]
   baan sync [--all] [--stubs-only] [--pull-only] [--push] [--dry-run] [--no-self-update]
   baan survey [--target <name>] [--project <name>] [--cwd <path>]
     [--scaffold-module <name>] [--scaffold-project <name>] [--json]
@@ -38,7 +38,7 @@ export function utility(o, ws, cfg, root, local) {
     [--owns <glob,glob>] [--acceptance <text>] [--source <reference>]
     [--build <cmd>] [--test <cmd>] [--test-full <cmd>] [--setup <cmd>]
     [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
-    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback]
+    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback] [--allow-branch-mismatch]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]
   baan decide <package> --run <run> --by user --decision <text> --source <reference>

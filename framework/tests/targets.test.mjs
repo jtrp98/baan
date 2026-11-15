@@ -1,11 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { cli, parse } from "../src/cli.mjs";
-import { discoverGitRepos, listTargets, registerTarget, removeTarget, scanTargets } from "../src/targets.mjs";
+import { checkTargets, discoverGitRepos, listTargets, registerTarget, removeTarget, scanTargets, setTargetBranch } from "../src/targets.mjs";
 import { loadWorkspace } from "../src/config.mjs";
+
+function initGitRepo(dir, branch = "main") {
+  mkdirSync(dir, { recursive: true });
+  execFileSync("git", ["-C", dir, "init", "-b", branch], { windowsHide: true });
+  writeFileSync(path.join(dir, "README.md"), "# repo\n", "utf8");
+  execFileSync("git", ["-C", dir, "add", "README.md"], { windowsHide: true });
+  execFileSync("git", ["-C", dir, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "init"], { windowsHide: true });
+}
 
 function makeTempWorkspace(config) {
   const root = mkdtempSync(path.join(tmpdir(), "baan-targets-"));
@@ -192,4 +201,111 @@ test("cli และ parse รองรับคำสั่ง baan target [list
   assert.equal(rmRes.removed.name, "demo-alias");
 
   await assert.rejects(() => cli(["target", "unknown", "--workspace", root]), /คำสั่งย่อยของ target ไม่ถูกต้อง/);
+});
+
+test("branch registration: pin, check, scan --pin-branch/--update-branch และ --clear", async (t) => {
+  const { root, cfgPath } = makeTempWorkspace(null);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const repo = path.join(root, "target", "svc-a");
+  initGitRepo(repo, "dev/golf");
+  writeFileSync(cfgPath, JSON.stringify({
+    knowledge_roots: [{ name: "kr", path: root, targets: [] }],
+  }), "utf8");
+
+  // 1. scan --pin-branch จับ branch ปัจจุบันลง config
+  const scanPinned = await cli(["target", "scan", "--pin-branch", "--workspace", root]);
+  assert.equal(scanPinned.added[0].branch, "dev/golf");
+
+  // 2. check ผ่านเมื่ออยู่ตรง branch
+  const okCheck = await cli(["target", "check", "--workspace", root]);
+  assert.equal(okCheck.ok, true);
+  assert.equal(okCheck.branchMismatches, 0);
+
+  // 3. สลับไป branch อื่น + มีไฟล์แก้ค้าง: check ต้องจับ mismatch (ok=false) และ scan ปกติต้องไม่ทับ branch เดิม
+  execFileSync("git", ["-C", repo, "checkout", "-b", "feature/other"], { windowsHide: true });
+  writeFileSync(path.join(repo, "dirty.txt"), "wip\n", "utf8");
+
+  const scanKeep = scanTargets(cfgPath, { pinBranch: true });
+  assert.equal(scanKeep.branchUpdated.length, 0, "scan --pin-branch ต้องไม่ทับ branch ที่เคยลงทะเบียนไว้แล้ว");
+  assert.equal(scanKeep.branchMismatches.length, 1);
+
+  const badCheck = checkTargets(loadWorkspace(cfgPath));
+  assert.equal(badCheck.ok, false);
+  assert.equal(badCheck.branchMismatches, 1);
+  assert.equal(badCheck.dirtyTargets, 1);
+  assert.equal(badCheck.mismatches[0].registeredBranch, "dev/golf");
+  assert.equal(badCheck.mismatches[0].currentBranch, "feature/other");
+
+  // 4. baan target branch <name> (auto-pin จาก HEAD), ระบุชื่อเอง, และ --clear
+  const repinned = await cli(["target", "branch", "svc-a", "--workspace", root]);
+  assert.equal(repinned.action, "pinned");
+  assert.equal(repinned.target.branch, "feature/other");
+
+  const explicit = await cli(["target", "branch", "svc-a", "main", "--workspace", root]);
+  assert.equal(explicit.action, "pinned");
+  assert.equal(explicit.target.branch, "main");
+
+  const cleared = setTargetBranch(cfgPath, { name: "svc-a", clear: true });
+  assert.equal(cleared.action, "cleared");
+  assert.equal(cleared.target.branch, undefined);
+});
+
+test("branch guard: บล็อก baan run และ --resume เมื่ออยู่ผิด branch และรายงานใน baan survey", async (t) => {
+  const { root, cfgPath } = makeTempWorkspace(null);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const repo = path.join(root, "target", "app-one");
+  initGitRepo(repo, "dev/golf");
+  writeFileSync(cfgPath, JSON.stringify({
+    knowledge_roots: [{
+      name: "kr",
+      path: path.join(root, "knowledge").replace(/\\/g, "/"),
+      layout: "project",
+      targets: [{ name: "app-one", path: repo.replace(/\\/g, "/"), branch: "dev/golf" }],
+    }],
+  }), "utf8");
+
+  // สร้าง run ค้างไว้บน branch ที่ถูกต้องก่อน (ยังไม่อนุมัติ -> waiting_human/pending)
+  const created = await cli([
+    "run", "--direct", "--workspace", root, "--target", "app-one",
+    "--goal", "ทดสอบ branch guard", "--build", "node -v", "--test", "node -v",
+  ]);
+  assert.ok(created.id);
+
+  // สลับไปอยู่ branch อื่นโดยไม่ได้ตั้งใจ
+  execFileSync("git", ["-C", repo, "checkout", "-b", "wrong-branch"], { windowsHide: true });
+
+  // 1. baan run ใหม่ต้องถูกบล็อกทันที
+  await assert.rejects(
+    () => cli(["run", "--direct", "--workspace", root, "--target", "app-one", "--goal", "งานใหม่", "--build", "node -v", "--test", "node -v"]),
+    /อยู่ผิด branch ที่ลงทะเบียนไว้/,
+  );
+
+  // 2. --dry-run ไม่ throw แต่เตือน branch_warnings
+  const dry = await cli([
+    "run", "--direct", "--dry-run", "--workspace", root, "--target", "app-one",
+    "--goal", "งานใหม่", "--build", "node -v", "--test", "node -v",
+  ]);
+  assert.equal(dry.branch_warnings.length, 1);
+  assert.equal(dry.branch_warnings[0].expectedBranch, "dev/golf");
+  assert.equal(dry.branch_warnings[0].currentBranch, "wrong-branch");
+
+  // 3. --resume ต้องถูกบล็อกเช่นกัน เว้นแต่ส่ง --allow-branch-mismatch
+  await assert.rejects(
+    () => cli(["run", "--resume", created.id, "--workspace", root]),
+    /อยู่ผิด branch ที่ลงทะเบียนไว้/,
+  );
+
+  const resumedOverride = await cli(["run", "--resume", created.id, "--workspace", root, "--allow-branch-mismatch"]);
+  assert.equal(resumedOverride.id, created.id);
+
+  // 4. baan survey รายงาน branch mismatch ทั้ง JSON และ Markdown
+  const surveyJson = await cli(["survey", "--target", "app-one", "--workspace", root, "--json"]);
+  assert.equal(surveyJson.branchStatus.registered, "dev/golf");
+  assert.equal(surveyJson.branchStatus.current, "wrong-branch");
+  assert.equal(surveyJson.branchStatus.match, false);
+
+  const surveyMd = await cli(["survey", "--target", "app-one", "--workspace", root]);
+  assert.match(surveyMd, /Branch Mismatch/);
 });

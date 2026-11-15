@@ -182,6 +182,26 @@ export function resolveTarget(ws, name) {
   return null;
 }
 
+export function resolveTargetByPath(ws, repoPath) {
+  if (!repoPath) return null;
+  const resolved = path.resolve(repoPath);
+  const norm = (p) => (process.platform === "win32" ? path.resolve(p).toLowerCase() : path.resolve(p));
+  const targetKey = norm(resolved);
+  let nestedHit = null;
+  for (const kr of ws?.knowledge_roots ?? []) {
+    for (const tg of kr.targets ?? []) {
+      if (!tg.path) continue;
+      if (norm(tg.path) === targetKey) return { knowledgeRoot: kr, target: tg };
+      if (isInside(tg.path, resolved)) {
+        if (!nestedHit || path.resolve(tg.path).length > path.resolve(nestedHit.target.path).length) {
+          nestedHit = { knowledgeRoot: kr, target: tg };
+        }
+      }
+    }
+  }
+  return nestedHit;
+}
+
 export function layoutOf(kr) {
   return kr?.layout === "project" ? "project" : "module";
 }
