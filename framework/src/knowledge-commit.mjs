@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { memoryRootOf } from "./config.mjs";
 
@@ -21,6 +21,28 @@ export function unfinishedOperation(root) {
 // `git add -A` marks conflicted files as resolved, so committing now would store the conflict markers.
 export function conflictState(root, changes) {
   return unfinishedOperation(root) ?? (changes.some((c) => UNMERGED.has(c.code)) ? "unmerged files" : null);
+}
+
+const MAX_AUTO_COMMIT_BYTES = 10 * 1024 * 1024;
+const SECRET_NAME = /(?:^|\/)(?:\.env(?:\..*)?|[^/]*\.(?:pem|key|p12|pfx|keystore)|id_(?:rsa|dsa|ecdsa|ed25519)|\.?credentials(?:\.json)?|\.npmrc|\.netrc)$/i;
+const SECRET_TEXT = /-----BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----|(?:gh[pousr]_|github_pat_)[A-Za-z0-9_]{30,}|sk-(?:proj-|ant-)?[A-Za-z0-9_-]{40,}|AKIA[0-9A-Z]{16}/;
+
+// Sync pushes whatever it commits, so anything that looks like a secret, a huge file or another repository stays for a human.
+export function screenChanges(root, entries) {
+  const kept = [], skipped = [];
+  for (const e of entries) {
+    const full = path.join(root, e.file);
+    let reason = null;
+    if (e.code === "??" && e.file.endsWith("/")) reason = "เป็น git repo ซ้อนหรือโฟลเดอร์ที่ git ไม่เปิดดู";
+    else if (SECRET_NAME.test(e.file)) reason = "ชื่อไฟล์เหมือนไฟล์ลับ";
+    else if (classifyChange(e.code) !== "remove" && existsSync(full)) {
+      const size = statSync(full).size;
+      if (size > MAX_AUTO_COMMIT_BYTES) reason = `ใหญ่ ${(size / 1024 / 1024).toFixed(1)} MB เกินเพดาน auto-commit`;
+      else if (statSync(full).isFile() && SECRET_TEXT.test(readFileSync(full, "latin1"))) reason = "เนื้อหามีรูปแบบ key/token";
+    }
+    (reason ? skipped : kept).push(reason ? { ...e, reason } : e);
+  }
+  return { kept, skipped };
 }
 
 export function parsePorcelain(raw) {
@@ -85,10 +107,14 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
     log(`⚠ ${kr.name}: ค้าง ${blocked} — แก้ conflict ให้เสร็จก่อน จึงจะ commit อัตโนมัติ`);
     return { repo: true, commits: [], blocked };
   }
-  const plans = planCommits(changes, kr.name, kr.layout === "project" ? "project" : "module");
+  const { kept, skipped } = screenChanges(kr.path, changes);
+  for (const s of skipped) log(`⚠ ${kr.name}: ไม่ auto-commit ${s.file} — ${s.reason} (ตรวจแล้ว commit เองหรือใส่ .gitignore)`);
+  const plans = planCommits(kept, kr.name, kr.layout === "project" ? "project" : "module");
   const commits = [];
   for (const p of plans) {
-    const scope = kr.layout === "project" ? p.paths : p.scope ? [p.scope] : p.paths;
+    // A whole-folder `git add -A` would sweep the skipped files back in, so list the kept files instead.
+    const holdsSkipped = p.scope && skipped.some((s) => s.file === p.scope || s.file.startsWith(`${p.scope}/`));
+    const scope = kr.layout === "project" || !p.scope || holdsSkipped ? p.paths : [p.scope];
     const add = gitIn(kr.path, ["add", "-A", "--", ...scope]);
     const commit = add.ok ? gitIn(kr.path, ["commit", "-m", p.message, "--", ...scope]) : add;
     if (!commit.ok) {
@@ -98,7 +124,7 @@ export function commitKnowledgeRoot(kr, log = () => {}) {
     commits.push(p.message);
     log(`${kr.name}: ${p.message}`);
   }
-  return { repo: true, commits };
+  return { repo: true, commits, skipped: skipped.map(({ file, reason }) => ({ file, reason })) };
 }
 
 export function commitKnowledge(ws, log = () => {}) {

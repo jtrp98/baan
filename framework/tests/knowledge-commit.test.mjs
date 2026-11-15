@@ -230,3 +230,24 @@ test("commitKnowledge: ตั้ง memory_root = commit ทั้ง knowledge 
     rmSync(m.dir, { recursive: true, force: true });
   }
 });
+
+test("commitKnowledgeRoot: ไม่ auto-commit ไฟล์ลับ ไฟล์ใหญ่ และ repo ซ้อน แม้อยู่ใน module เดียวกับไฟล์ปกติ", () => {
+  const { dir, git } = makeRepo();
+  try {
+    const mod = path.join(dir, "school-bot");
+    mkdirSync(mod, { recursive: true });
+    writeFileSync(path.join(mod, "screen.md"), "# ok\n");
+    writeFileSync(path.join(mod, ".env"), "DB_PASSWORD=x\n");
+    writeFileSync(path.join(mod, "notes.md"), `token: ghp_${"a".repeat(36)}\n`);
+    writeFileSync(path.join(mod, "video.bin"), Buffer.alloc(11 * 1024 * 1024));
+    const nested = path.join(dir, "vendor-repo"); mkdirSync(nested);
+    spawnSync("git", ["-C", nested, "init", "-q"]); writeFileSync(path.join(nested, "x.md"), "x\n");
+
+    const logs = [];
+    const res = commitKnowledgeRoot({ name: "kr", path: dir }, (m) => logs.push(m));
+    assert.deepEqual(res.commits, ["school-bot: add screen.md"]);
+    assert.deepEqual(res.skipped.map((s) => s.file).sort(), ["school-bot/.env", "school-bot/notes.md", "school-bot/video.bin", "vendor-repo/"]);
+    assert.deepEqual(git(["show", "--name-only", "--format=", "HEAD"]).stdout.trim().split("\n"), ["school-bot/screen.md"]);
+    assert.equal(logs.filter((l) => l.includes("ไม่ auto-commit")).length, 4);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
