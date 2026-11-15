@@ -17,11 +17,31 @@ export function formatToolDetail(input) {
   return String(input).slice(0, 200);
 }
 
+// Codex launches every command through its own shell wrapper; show the command the model actually asked for.
+export function shellCommand(command) {
+  const text = String(command ?? "")
+    .replace(/^(?:"[^"]*"|\S+)\s+(?:-(?:NoProfile|NonInteractive|NoLogo)\s+)*(?:-Command|-lc|-c|\/d\s+\/s\s+\/c|\/c)\s+/i, "")
+    .replace(/^(["'])([\s\S]*)\1$/, "$2");
+  return formatToolDetail(text);
+}
+
+// Claude -p --output-format stream-json emits whole messages; one message may hold text, thinking and tool_use blocks.
+function claudeMessageActivity(content, at) {
+  const blocks = Array.isArray(content) ? content : [];
+  const tool = blocks.findLast((b) => b?.type === "tool_use");
+  if (tool) return { type: "tool", name: tool.name ?? "tool", detail: formatToolDetail(tool.input), at };
+  const thinking = blocks.findLast((b) => b?.type === "thinking" && b.thinking?.trim());
+  if (thinking) return { type: "thought", thought: thinking.thinking.trim().slice(0, 250), at };
+  const text = blocks.findLast((b) => b?.type === "text" && b.text?.trim().length > 5);
+  return text ? { type: "thought", thought: text.text.trim().slice(0, 250), at } : null;
+}
+
 export function parseLiveActivity(ev, format) {
   if (!ev || typeof ev !== "object") return null;
 
   // Claude streaming format
   if (format === "claude-stream-json" || format === "claude-json") {
+    if (ev.type === "assistant" && ev.message) return claudeMessageActivity(ev.message.content, new Date().toISOString());
     if (ev.type === "tool_use" || (ev.type === "content_block_start" && ev.content_block?.type === "tool_use")) {
       const block = ev.content_block ?? ev;
       const name = block.name ?? "tool";
@@ -43,6 +63,21 @@ export function parseLiveActivity(ev, format) {
 
   // Codex JSONL format
   if (format === "codex-jsonl") {
+    // Real `codex exec --json` items: tools announce on item.started, reasoning/messages arrive on item.completed.
+    const at = new Date().toISOString();
+    const item = ev.item ?? {};
+    if (ev.type === "item.started") {
+      if (item.type === "command_execution") return { type: "tool", name: "shell", detail: shellCommand(item.command), at };
+      if (item.type === "file_change") {
+        const paths = (item.changes ?? []).map((c) => c?.path).filter(Boolean);
+        return { type: "tool", name: "edit_file", detail: formatToolDetail(paths.length > 1 ? `${paths[0]} +${paths.length - 1} more` : paths[0] ?? ""), at };
+      }
+      if (item.type === "mcp_tool_call") return { type: "tool", name: `${item.server ?? "mcp"}.${item.tool ?? "tool"}`, detail: formatToolDetail(item.arguments), at };
+      if (item.type === "web_search") return { type: "tool", name: "web_search", detail: formatToolDetail(item.query), at };
+    }
+    if (ev.type === "item.completed" && ["reasoning", "agent_message"].includes(item.type) && item.text?.trim()) {
+      return { type: "thought", thought: item.text.trim().slice(0, 250), at };
+    }
     if (ev.type === "item.created") {
       const item = ev.item ?? {};
       if (item.type === "tool_call" || item.type === "function_call") {
