@@ -479,3 +479,26 @@ test("engine persisted state keeps snapshot maps and raw command output out of r
   assert.ok(packetCopy.before.tracked, "the recovery point is still referenced");
   assert.ok(existsSync(p.gate.snapshots_file));
 });
+
+test("engine snapshot hash cache never hides a change: same size and restored mtime are still detected", async (t) => {
+  const { fileHash } = await import("../src/snapshot.mjs");
+  const { utimesSync, statSync } = await import("node:fs");
+  const { repo } = fixture(t);
+  const file = path.join(repo, "code.mjs");
+  const old = new Date(Date.now() - 60_000);
+  utimesSync(file, old, old);
+  const first = snapshot(repo);
+  assert.equal(snapshot(repo).id, first.id, "unchanged repo gives the same snapshot");
+
+  const before = statSync(file);
+  writeFileSync(file, "export const value = 9;\n");
+  assert.equal(statSync(file).size, before.size, "the trick needs an edit of the same size");
+  utimesSync(file, before.atime, before.mtime);
+  assert.notEqual(snapshot(repo).id, first.id, "ctime still changes, so the cached hash is not reused");
+
+  // Files touched within the racy window are always re-read.
+  writeFileSync(file, "export const value = 8;\n");
+  const h1 = fileHash(file);
+  writeFileSync(file, "export const value = 7;\n");
+  assert.notEqual(fileHash(file), h1);
+});

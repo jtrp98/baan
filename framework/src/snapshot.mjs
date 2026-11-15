@@ -9,6 +9,11 @@ export function git(repo, ...args) {
 }
 export function repoRoot(repo) { return realpathSync(git(repo, "rev-parse", "--show-toplevel").trim()); }
 const runtime = (f) => /^(?:\.baan|reports\/baan)(?:\/|$)/.test(f);
+// Re-reading every file cost ~2 s per snapshot on a 3,000-file repo, about 20 snapshots per package attempt.
+// A hash is reused only while size, mtime, ctime and mode all match, and never for a file touched within the
+// last RACY_MS (an edit in the same timestamp tick could otherwise keep its old stat; git guards the same way).
+const hashCache = new Map();
+const RACY_MS = 2000;
 export function fileHash(file) {
   try {
     const stat = lstatSync(file);
@@ -16,8 +21,15 @@ export function fileHash(file) {
       const nested = snapshot(file);
       return hash(JSON.stringify([nested.id, nested.head, nested.branch, nested.index, nested.stash]));
     }
-    return hash(`${stat.mode & 0o777}:` + (stat.isSymbolicLink() ? readlinkSync(file) : readFileSync(file).toString("base64")));
-  } catch (e) { if (e.code === "ENOENT") return null; throw e; }
+    const key = `${stat.size}:${stat.mtimeMs}:${stat.ctimeMs}:${stat.mode}`;
+    const hit = hashCache.get(file);
+    if (hit?.key === key) return hit.value;
+    // Format unchanged on purpose: approvals store these digests, so a new format would make every approval stale.
+    const value = hash(`${stat.mode & 0o777}:` + (stat.isSymbolicLink() ? readlinkSync(file) : readFileSync(file).toString("base64")));
+    if (Date.now() - Math.max(stat.mtimeMs, stat.ctimeMs) > RACY_MS) hashCache.set(file, { key, value });
+    else hashCache.delete(file);
+    return value;
+  } catch (e) { if (e.code === "ENOENT") { hashCache.delete(file); return null; } throw e; }
 }
 export function snapshot(repo) {
   repo = repoRoot(repo);
