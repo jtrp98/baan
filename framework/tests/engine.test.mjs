@@ -543,3 +543,18 @@ test("engine package duration adds up across resumes and a resumed attempt does 
   const ledger = readFileSync(path.join(run.dir, "ledger.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l)).filter((e) => e.type === "duration");
   assert.equal(ledger.at(-1).actualMs, run.packages[0].durationMs);
 });
+
+test("engine never picks an agent switched off in local.json as the independent Verifier", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { risk: "high" })]);
+  const agents = { agents: { claude: { enabled: false }, codex: {}, agy: {} }, tiers: { t5: { claude: {}, codex: {}, agy: {} }, t2: { claude: {}, codex: {}, agy: {} } } };
+  let verifier;
+  const spy = async (r, p, role, c, opts) => {
+    if (role === "worker") p.workerAgent = "codex";
+    if (role === "verifier") verifier = opts.forceAgent;
+    return session(r, p, role);
+  };
+  await schedule(run, agents, { session: spy, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.equal(verifier, "agy");
+});
