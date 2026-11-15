@@ -526,3 +526,20 @@ test("engine lock left by a crashed run is recovered when its PID now belongs to
   rmSync(file);
   assert.doesNotThrow(again, "releasing a lock file that is already gone must not throw from a finally block");
 });
+
+test("engine package duration adds up across resumes and a resumed attempt does not show the old failure", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo)]);
+  const slowEnvFail = async (cmd) => { await new Promise((r) => setTimeout(r, 60)); return { command: cmd, code: null, ok: false, output: "Access is denied", timedOut: false }; };
+  await schedule(run, cfg, { session, execute: slowEnvFail });
+  const first = run.packages[0].durationMs;
+  assert.ok(first >= 60);
+  let seen;
+  const watch = async (r, p, role) => { if (role === "worker") seen = { state: p.state, failureClass: p.failureClass, probe: p.probe }; return session(r, p, role); };
+  await schedule(run, cfg, { session: watch, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.ok(run.packages[0].durationMs > first, "the second attempt's time is added, not dropped");
+  assert.deepEqual(seen, { state: "running", failureClass: "", probe: undefined });
+  const ledger = readFileSync(path.join(run.dir, "ledger.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l)).filter((e) => e.type === "duration");
+  assert.equal(ledger.at(-1).actualMs, run.packages[0].durationMs);
+});

@@ -45,7 +45,8 @@ async function processPackage(run, p, cfg, options) {
       transition(run, p, "stale", { questions: ["เอกสาร/สัญญาเปลี่ยน ต้องยืนยัน acceptance ใหม่"], acceptance_approved: false }); return;
     }
     p.basis = { repo_sha: current.head, snapshot: current.id, docs };
-    transition(run, p, "probing");
+    // A resumed attempt starts clean: the last attempt's failure and probe would otherwise show as current.
+    transition(run, p, "probing", { failureClass: "", probe: undefined });
     for (const cmd of [...new Set([p.commands.setup, p.commands.build, p.commands.test_targeted].filter(Boolean))]) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
       const r = await evidence(run, p.repo.path, cmd, options);
@@ -68,7 +69,7 @@ async function processPackage(run, p, cfg, options) {
       } else {
         for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
         delete p.verification_pending;
-        transition(run, p, "running", { restarted: !!p.session, questions: [] });
+        transition(run, p, "running", { restarted: !!p.session, questions: [], failureClass: "" });
         p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
         if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
         validateResult(p.result, "worker", p);
@@ -106,8 +107,8 @@ async function processPackage(run, p, cfg, options) {
               if (await sharedDecision(run, p, cfg, options, { findings: p.verdict.findings })) continue;
               return;
             }
-          } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "", durationMs: Date.now() - started }); return; }
-        } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "", durationMs: Date.now() - started }); return; }
+          } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "" }); return; }
+        } else { transition(run, p, options.signal?.aborted ? "cancelled" : "done", { failureClass: "" }); return; }
       } else p.failureClass = p.gate.failureClass;
       if (p.failureClass === "SCOPE_VIOLATION") { waiting(run, p, ["เปลี่ยนไฟล์นอก scope หรือ Git state: ตรวจหลักฐานและแก้ก่อน resume"]); return; }
       if (["ENVIRONMENT_FAILURE", "TEST_DEFECT"].includes(p.failureClass)) { waiting(run, p, [`${p.failureClass}: แก้สภาพแวดล้อม/test ก่อน resume`]); return; }
@@ -118,8 +119,10 @@ async function processPackage(run, p, cfg, options) {
     const failureClass = e.failureClass ?? "ENVIRONMENT_FAILURE";
     transition(run, p, options.signal?.aborted ? "cancelled" : failureClass === "ENVIRONMENT_FAILURE" ? "env_failed" : "waiting_human", { failureClass, questions: [e.message] });
   } finally {
-    p.durationMs = (p.durationMs ?? 0) || Date.now() - started;
-    event(run, "duration", { package: p.id, expected_minutes: p.budget?.expected_minutes ?? null, actualMs: p.durationMs });
+    // Accumulate across resumes; keeping only the first attempt reported 6.7 s for a package that took 18 h.
+    const attemptMs = Date.now() - started;
+    p.durationMs = (p.durationMs ?? 0) + attemptMs;
+    event(run, "duration", { package: p.id, expected_minutes: p.budget?.expected_minutes ?? null, actualMs: p.durationMs, attemptMs });
     release?.(); persist(run);
   }
 }
