@@ -126,7 +126,7 @@ Acceptance approval ไม่เซ็นประตูอื่นแทน �
 งานค้างที่ทับ owns ต้องให้คนยืนยันด้วย `--allow-dirty --by user` พร้อม decision/source
 
 ระบุ `"kind": "code" | "docs" | "bugfix"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
-- งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `shared/defects/`
+- งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/` ใน knowledge root
 - งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
 - งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
 

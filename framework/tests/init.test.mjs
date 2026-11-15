@@ -104,3 +104,20 @@ test("init ซ้ำ: เก็บข้อความที่ผู้ใช�
     assert.ok(logs.some((l) => l.includes(".baan-backup")));
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("defect records always point at the knowledge project, never a bare shared/ at the workspace root", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-init-defects-"));
+  try {
+    performInit(dir, TEAM_DIR, () => {});
+    const sources = {
+      "CLAUDE.md (generated)": readFileSync(path.join(dir, "CLAUDE.md"), "utf8"),
+      ...Object.fromEntries(["skills/bug-fix/SKILL.md", "README.md", "BAAN.md", "CONVENTIONS.md", "roles/build.md"].map((f) => [f, readFileSync(path.join(TEAM_DIR, f), "utf8")])),
+    };
+    for (const [name, text] of Object.entries(sources)) {
+      for (const m of text.matchAll(/shared\/defects/g)) {
+        assert.match(text.slice(Math.max(0, m.index - 10), m.index), /<project>\/$/, `${name}: "shared/defects" must be written as <project>/shared/defects`);
+      }
+    }
+    assert.match(sources["CLAUDE.md (generated)"], /<project>\/shared\/defects\//);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

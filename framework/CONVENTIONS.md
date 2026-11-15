@@ -16,7 +16,7 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 - อย่าถือว่าการเห็นตรงกันของหลาย Agent เป็นหลักฐาน; ห้าม Overengineer เพื่อแก้ปัญหาที่ยังไม่มีหลักฐาน
 - ไม่เปิด role อื่นหรือเรียก BAAN ซ้อนจาก execution role; หนึ่ง writer ต่อ repository รวม linked worktrees
 - ขอบเขตเครื่องมือภายนอกและ ToS ของ 3 ค่าย (OpenAI, Anthropic, Google): เชื่อมต่อผ่าน official CLIs (`codex`, `claude`, `agy`) แบบ sanctioned subprocess adapters เท่านั้น ห้ามส่อง credentials/tokens ส่วนตัวของ CLI อื่น (เช่น `.credentials.json`, `auth.json`), ห้ามยิง private/internal web APIs (เช่น backend web chat APIs), ไม่ทำ User-Agent spoofing, ไม่ bypass rate limits/quotas, ไม่ทำ cross-provider distillation และยึดหลัก Account Safety First เสมอ
-- ใบงาน/Packet ระบุประเภทงานด้วย `"kind": "code"`, `"kind": "docs"`, หรือ `"kind": "bugfix"`: งาน Docs อนุญาตให้ Worker ใช้ Tier ประหยัด (t4/t5) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate, เอกสารวิกฤตใช้ LLM Verifier); งาน Bugfix บังคับ Red Test First ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `shared/defects/`; งาน Code ควบคุมด้วย Contract-Gated Risk Policy (งาน high risk ล็อค Worker t2 ขึ้นไป และลด tier ได้เฉพาะเมื่อมี contracts)
+- ใบงาน/Packet ระบุประเภทงานด้วย `"kind": "code"`, `"kind": "docs"`, หรือ `"kind": "bugfix"`: งาน Docs อนุญาตให้ Worker ใช้ Tier ประหยัด (t4/t5) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate, เอกสารวิกฤตใช้ LLM Verifier); งาน Bugfix บังคับ Red Test First ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/`; งาน Code ควบคุมด้วย Contract-Gated Risk Policy (งาน high risk ล็อค Worker t2 ขึ้นไป และลด tier ได้เฉพาะเมื่อมี contracts)
 
 ## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 

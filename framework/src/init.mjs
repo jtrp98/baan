@@ -16,7 +16,7 @@ function stubContent(charterPath, learningPath) {
 2. **เมื่องานเป็นการแก้บั๊ก / เกิด error / พบบัญชีไม่ได้รับสิทธิ์ (เช่น 401, 500, curl error, "พบบั๊ก", "แก้บั๊ก")**: ให้เข้าโหมดแก้บั๊กตามทักษะ \`bug-fix\`:
    - ประเมินสังกัดโมดูลทันที: \`baan survey --target <targetName> --eval <filePath> --json\`
    - ทำ \`/plan\` นำเสนอ Root Cause Hypothesis, AC-BUG, Red Test, และขอบเขต \`owns\` ที่แคบที่สุดให้ผู้ใช้เห็นชอบก่อนแตะโค้ด
-   - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`shared/defects/\`
+   - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`<project>/shared/defects/BUG-xxx.md\` ใน knowledge root ของ project ที่บั๊กสังกัด (เช่น \`knowledge/<project>/shared/defects/\`) — ไม่ใช่ \`shared/\` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
 3. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\`
 4. **วางแผนก่อนทำเสมอ (/plan first)**: ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol (8 ขั้น) และ Decision Quality Gate (8 คำถาม)
 5. **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: \`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\` ใช้ผ่าน subagents (Claude Code: Agent/Task ใน \`.claude/agents/\` · Antigravity: \`invoke_subagent\` · Codex: \`spawn_agent\`) ตาม 3-Step Workflow เสมอ
