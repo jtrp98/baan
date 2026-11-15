@@ -53,7 +53,8 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
   if (o.sync) {
     const localConfig = local ?? loadLocalConfig(TEAM_DIR);
     const opts = {
-      push: !o["pull-only"] && (o.push || true),
+      // Sync always pushes unless --pull-only; --push stays accepted for old scripts but changes nothing.
+      push: !o["pull-only"],
       pullOnly: Boolean(o["pull-only"]),
       dryRun: Boolean(o["dry-run"]),
       noSelfUpdate: Boolean(o["no-self-update"]),

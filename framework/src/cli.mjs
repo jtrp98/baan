@@ -102,13 +102,14 @@ export async function cli(argv, options = {}) {
 
   if (o.command === "monitor" || o.command === "ui") {
     const { startMonitor } = await import("./monitor.mjs");
-    return startMonitor({
+    // bin/baan.mjs prints whatever comes back; the http.Server object used to be dumped to the console.
+    const { url } = await startMonitor({
       workspaceRoot: root,
       port: o.port ? Number(o.port) : 3456,
       tui: Boolean(o.tui),
       openBrowser: !o["no-open"] && !o.tui,
-      runId: o.run || o.subject || null,
     });
+    return `BAAN monitor: ${url} (Ctrl+C เพื่อหยุด)`;
   }
 
   if (o.command === "update-clis") {

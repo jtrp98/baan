@@ -163,7 +163,7 @@ function serveUiFile(name, res) {
   }
 }
 
-export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true, runId = null }) {
+export function startMonitor({ workspaceRoot, port = 3456, tui = false, openBrowser: shouldOpen = true }) {
   let currentWorkspaceRoot = workspaceRoot;
   if (tui) {
     console.log(`Starting BAAN TUI Monitor for ${workspaceRoot}... (Press Ctrl+C to exit)`);
