@@ -15,6 +15,7 @@ import { verification } from "../src/triage.mjs";
 import { integrate } from "../src/integrate.mjs";
 import { approvalBasis, documentBasis } from "../src/packet.mjs";
 import { applyPlanning } from "../src/planner.mjs";
+import { looksLikeCommandEnvironmentFailure } from "../src/failure-class.mjs";
 
 import { fixture, cfg, packet, runAt, good, passing, session } from "./helpers.mjs";
 
@@ -328,4 +329,103 @@ test("engine resolveWorkerTier respects code vs docs tier rules", () => {
 
   // Code low risk with contracts allows step-down
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3", contracts: [{ ref: "api.md" }] }), "t3");
+});
+
+const commitFile = (repo, name, text) => { writeFileSync(path.join(repo, name), text); git(repo, "add", name); git(repo, "commit", "-m", `add ${name}`); };
+
+test("engine judges scope from the attempt start: a human fix made while the package waited is not the Worker's", async (t) => {
+  const { root, repo } = fixture(t); commitFile(repo, "other.txt", "v1\n");
+  const run = runAt(root, [packet(repo)]);
+  await schedule(run, cfg, { session, execute: async (cmd) => ({ command: cmd, code: null, ok: false, output: "spawn dotnet ENOENT", timedOut: false }) });
+  assert.equal(run.packages[0].state, "env_failed");
+  writeFileSync(path.join(repo, "other.txt"), "fixed by a human\n");
+  await schedule(run, cfg, { session, execute: passing });
+  assert.equal(run.packages[0].state, "done", run.packages[0].questions?.join(" "));
+  assert.deepEqual(run.packages[0].gate.outside, []);
+});
+
+test("engine a sibling package finishing in the same repo while another waits does not count against the waiting one", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "B", { owns: ["b.txt"], budget: { expected_minutes: 50 } }), packet(repo, "A")]);
+  let asked = false;
+  const work = async (r, p, role) => {
+    if (role === "planner") return { packages: [], questions: [{ text: "which payload?", blocks: ["B"] }], decisions: [] };
+    if (role === "worker" && p.id === "B" && !asked) { asked = true; return { ...structuredClone(good), state: "NEEDS_DECISION", acceptance: [{ id: "AC-1", proof: [] }], questions: ["which payload?"] }; }
+    if (role === "worker" && p.id === "B") { writeFileSync(path.join(repo, "b.txt"), "b\n"); return structuredClone(good); }
+    return session(r, p, role);
+  };
+  await schedule(run, cfg, { session: work, execute: passing });
+  assert.deepEqual(run.packages.map((p) => p.state), ["waiting_human", "done"]);
+  decide(run, "B", { by: "user", decision: "use payload v2", source: "chat" });
+  await schedule(run, cfg, { session: work, execute: passing });
+  const b = run.packages.find((p) => p.id === "B");
+  assert.equal(b.state, "done", b.questions?.join(" "));
+  assert.ok(b.gate.changed.includes("code.mjs"), "the recovery diff still spans the whole package history");
+  assert.deepEqual(b.gate.outside, []);
+});
+
+test("engine a docs package that edits a markdown file it also reads first finishes instead of going stale", async (t) => {
+  const { root, repo } = fixture(t); commitFile(repo, "doc.md", "# v1\n");
+  const run = runAt(root, [packet(repo, "D", { kind: "docs", owns: ["doc.md"], read_first: [{ path: "doc.md" }] })]);
+  const writer = async (r, p, role) => role === "worker" ? (writeFileSync(path.join(repo, "doc.md"), "# v2\n"), structuredClone(good)) : session(r, p, role);
+  await schedule(run, cfg, { session: writer, execute: passing });
+  assert.equal(run.packages[0].state, "done", run.packages[0].questions?.join(" "));
+  assert.ok(!Object.keys(run.packages[0].basis.docs).some((f) => f.endsWith("doc.md")));
+});
+
+test("engine environment failure means toolchain/OS errors, not domain words in test or compiler output", async (t) => {
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Access is denied." }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Requested registry access is not allowed." }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: null, output: "" }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "", timedOut: true }), true);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "error CS0246: The type or namespace name 'PermissionService' could not be found", counts: {} }), false);
+  assert.equal(looksLikeCommandEnvironmentFailure({ code: 1, output: "Access is denied in the permission test", counts: { passed: 3, failed: 1 } }), false);
+
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { budget: { max_rework: 0 } })]);
+  let workerCalls = 0;
+  const red = async (cmd) => cmd === "build" ? { command: cmd, code: 0, ok: true, output: "built", timedOut: false }
+    : { command: cmd, code: 1, ok: false, output: "# Subtest: ครูที่ไม่มีสิทธิ์แก้คะแนนไม่ได้\nnot ok 1 - ครูที่ไม่มีสิทธิ์แก้คะแนนไม่ได้ (permission)\n# pass 0\n# fail 1\n", timedOut: false };
+  await schedule(run, cfg, { session: async (r, p, role) => { if (role === "worker") workerCalls++; return session(r, p, role); }, execute: red });
+  assert.equal(workerCalls, 1, "a red test before implementation must not stop the Worker");
+  assert.equal(run.packages[0].failureClass, "IMPLEMENTATION_FAILURE");
+});
+
+test("engine an unreadable Verifier reply is an output-contract failure and resume re-verifies without a new Worker run", async (t) => {
+  const { root, repo } = fixture(t);
+  const run = runAt(root, [packet(repo, "A", { risk: "high" })]);
+  let workerCalls = 0, verifierCalls = 0;
+  const flaky = async (r, p, role) => {
+    if (role === "worker") workerCalls++;
+    if (role === "verifier" && ++verifierCalls === 1) throw Object.assign(new Error("ไม่พบ JSON ในคำตอบของผู้ให้บริการ"), { failureClass: "OUTPUT_CONTRACT" });
+    return session(r, p, role);
+  };
+  await schedule(run, cfg, { session: flaky, execute: passing });
+  assert.equal(run.packages[0].state, "waiting_human");
+  assert.equal(run.packages[0].failureClass, "OUTPUT_CONTRACT");
+  decide(run, "A", { by: "user", decision: "retry verification", source: "chat" });
+  await schedule(run, cfg, { session: flaky, execute: passing });
+  assert.equal(run.packages[0].state, "done");
+  assert.deepEqual([workerCalls, verifierCalls], [1, 2]);
+
+  // If the tree moved since the gate, the old evidence is void and the Worker runs again.
+  const again = runAt(root, [packet(repo, "B", { risk: "high", owns: ["b.txt"] })]);
+  let againWorker = 0, againVerifier = 0;
+  const flaky2 = async (r, p, role) => {
+    if (role === "worker") { againWorker++; writeFileSync(path.join(repo, "b.txt"), `b${againWorker}\n`); return structuredClone(good); }
+    if (++againVerifier === 1) throw Object.assign(new Error("garbled"), { failureClass: "OUTPUT_CONTRACT" });
+    return session(r, p, role);
+  };
+  await schedule(again, cfg, { session: flaky2, execute: passing });
+  writeFileSync(path.join(repo, "b.txt"), "edited by a human\n");
+  decide(again, "B", { by: "user", decision: "retry", source: "chat", "allow-dirty": true });
+  await schedule(again, cfg, { session: flaky2, execute: passing });
+  assert.equal(againWorker, 2);
+});
+
+test("engine a provider reply without JSON is tagged OUTPUT_CONTRACT, not ENVIRONMENT_FAILURE", async (t) => {
+  const { root, repo } = fixture(t); const p = packet(repo); const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "answerFile" } }, tiers: { t5: { codex: {} } } };
+  await assert.rejects(callSession(run, p, "worker", agents, { runner: async () => ({ ok: true, answer: "I finished, all good!", durationMs: 1 }) }),
+    (e) => e.failureClass === "OUTPUT_CONTRACT");
 });

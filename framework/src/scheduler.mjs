@@ -8,7 +8,7 @@ import { readiness, documentBasis, validate, schemaFor, validateResult } from ".
 import { evidence, gate } from "./gate.mjs";
 import { callSession } from "./session.mjs";
 import { verification, needsPlanning } from "./triage.mjs";
-import { looksLikeEnvironmentFailure } from "./failure-class.mjs";
+import { looksLikeCommandEnvironmentFailure } from "./failure-class.mjs";
 
 const complete = (p) => p?.state === "done";
 export function transition(run, p, state, data = {}) {
@@ -49,41 +49,51 @@ async function processPackage(run, p, cfg, options) {
     for (const cmd of [...new Set([p.commands.setup, p.commands.build, p.commands.test_targeted].filter(Boolean))]) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
       const r = await evidence(run, p.repo.path, cmd, options);
-      if (!r.ok && (r.timedOut || looksLikeEnvironmentFailure(r.output) || r.code === null)) {
+      if (!r.ok && looksLikeCommandEnvironmentFailure(r)) {
         transition(run, p, "env_failed", { failureClass: "ENVIRONMENT_FAILURE", probe: r }); return;
       }
     }
     const probed = snapshot(p.repo.path);
-    if (["head", "branch", "index", "stash"].some((k) => p.before[k] !== probed[k])) {
+    // Judge this attempt from its own start: people and sibling packages may change the repo while it waits.
+    if (["head", "branch", "index", "stash"].some((k) => current[k] !== probed[k])) {
       p.failureClass = "SCOPE_VIOLATION"; waiting(run, p, ["probe/setup changed Git state; inspect evidence before resume"]); return;
     }
+    // Work that passed the gate but whose Verifier crashed or answered garbage only needs verifying again, not a new Worker run.
+    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameState(p.after, probed));
     for (;;) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
-      for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
-      transition(run, p, "running", { restarted: !!p.session, questions: [] });
-      p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
-      if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
-      validateResult(p.result, "worker", p);
-      if (p.result.state !== "DONE") {
-        p.failureClass = p.result.failure_class;
-        if (p.result.state === "NEEDS_DECISION") {
-          if (await sharedDecision(run, p, cfg, options, { questions: p.result.questions })) continue;
-          return;
+      if (resumeVerification) {
+        resumeVerification = false;
+        event(run, "resume_verification", { package: p.id });
+      } else {
+        for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
+        delete p.verification_pending;
+        transition(run, p, "running", { restarted: !!p.session, questions: [] });
+        p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
+        if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
+        validateResult(p.result, "worker", p);
+        if (p.result.state !== "DONE") {
+          p.failureClass = p.result.failure_class;
+          if (p.result.state === "NEEDS_DECISION") {
+            if (await sharedDecision(run, p, cfg, options, { questions: p.result.questions })) continue;
+            return;
+          }
+          waiting(run, p, p.result.questions?.length ? p.result.questions : [p.result.summary]); return;
         }
-        waiting(run, p, p.result.questions?.length ? p.result.questions : [p.result.summary]); return;
-      }
-      transition(run, p, "gating");
-      p.gate = await gate(run, p, options);
-      if (readiness(p).some((r) => r.startsWith("stale approval"))) {
-        transition(run, p, "stale", { acceptance_approved: false, questions: ["references changed during execution; confirm acceptance again"] }); return;
+        transition(run, p, "gating");
+        p.gate = await gate(run, p, { ...options, since: probed });
+        if (readiness(p).some((r) => r.startsWith("stale approval"))) {
+          transition(run, p, "stale", { acceptance_approved: false, questions: ["references changed during execution; confirm acceptance again"] }); return;
+        }
       }
       if (p.gate.ok) {
         const lenses = verification(p, run.packages);
         if (lenses.length) {
-          transition(run, p, "verifying");
+          transition(run, p, "verifying", { verification_pending: true });
           const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
           p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, forceAgent: verifierAgent, context: { lenses } }));
           validateResult(p.verdict, "verifier", p);
+          delete p.verification_pending;
           const reviewed = snapshot(p.repo.path);
           if (!sameState(reviewed, p.after)) {
             waiting(run, p, ["Verifier เปลี่ยน working tree/Git state: ต้องตรวจหลักฐานใหม่"]);

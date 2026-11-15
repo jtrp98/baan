@@ -4,7 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { changedFiles, hash, matches, snapshot, git } from "./snapshot.mjs";
 import { save } from "./store.mjs";
-import { looksLikeEnvironmentFailure } from "./failure-class.mjs";
+import { looksLikeCommandEnvironmentFailure } from "./failure-class.mjs";
 
 export function command(command, cwd, timeoutSec = 600, signal) {
   return new Promise((resolve) => {
@@ -82,8 +82,11 @@ export async function gate(run, p, options) {
   }
   const after = snapshot(p.repo.path);
   const changed = changedFiles(p.before, after);
-  const outside = changed.filter((f) => !p.owns.some((g) => matches(f, g)));
-  for (const key of ["head", "branch", "index", "stash"]) if (p.before[key] !== after[key]) outside.push(`.git/${key}`);
+  // p.before stays the recovery point; scope is judged only on what changed since this attempt began.
+  const since = options.since ?? p.before;
+  const ownChanges = changedFiles(since, after);
+  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)));
+  for (const key of ["head", "branch", "index", "stash"]) if (since[key] !== after[key]) outside.push(`.git/${key}`);
   const output = results.map((r) => r.output).join("\n");
   const names = testNames(output);
   const unmapped = p.acceptance.filter((a) => {
@@ -91,8 +94,8 @@ export async function gate(run, p, options) {
     return !mapping?.proof?.length || mapping.proof.some((proof) => typeof proof !== "string" || !names.has(proof.trim()));
   }).map((a) => a.id);
   const failures = results.filter((r) => !r.ok);
-  const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some((r) => r.timedOut || r.code === null || looksLikeEnvironmentFailure(r.output)) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
-  const test_changes = changed.filter((f) => p.before.files[f] != null && /(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
+  const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some(looksLikeCommandEnvironmentFailure) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
+  const test_changes = ownChanges.filter((f) => p.before.files[f] != null &&/(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
   const attempt = `${p.id}-${randomUUID()}`;
   const diff_file = path.join(run.dir, `${attempt}.diff.txt`);
   const snapshots_file = path.join(run.dir, `${attempt}.snapshots.json`);

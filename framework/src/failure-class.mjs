@@ -17,6 +17,17 @@ export function looksLikeEnvironmentFailure(text) {
   return ENV_PATTERNS.test(String(text ?? ""));
 }
 
+// Build/test output quotes domain words ("PermissionService", "ไม่มีสิทธิ์", "socket"), so only OS/toolchain phrases count.
+const COMMAND_ENV_PATTERNS = /access is denied|permission denied|operation not permitted|\bEACCES\b|\bEPERM\b|read-only file system|requested registry access is not allowed|\bsandbox\b|NU1900|NU1301|unable to load the service index|getaddrinfo|ENOTFOUND|ECONNREFUSED|socket hang up|no data of the requested type|failed to write file|command not found|is not recognized as an internal or external command/i;
+
+// Once a test runner reported pass/fail counts it ran; a red result is the code's, never the environment's.
+export function looksLikeCommandEnvironmentFailure(r) {
+  if (r.timedOut || r.code === null) return true;
+  const c = r.counts ?? {};
+  if (c.passed != null || c.failed != null || c.goPassed > 0) return false;
+  return COMMAND_ENV_PATTERNS.test(String(r.output ?? ""));
+}
+
 export function classifyFailure({ state, answer = "", error = "" } = {}) {
   if (!state || state === "completed") return null;
   if (state === "timeout") return "TIMEOUT";

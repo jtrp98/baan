@@ -289,16 +289,22 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
     throw Object.assign(new Error(r.error || "CLI failed"), { failureClass: "ENVIRONMENT_FAILURE" });
   }
 
-  // Stream-json stdout holds many JSON events; scanning it raw picks the first (init) event, not the answer.
-  const streamed = invocation.answerFrom === "answerFile" ? null : parsedStream.answer;
-  let result = streamed ? (typeof streamed === "object" ? streamed : extractJson(streamed)) : adapter.extractFinalResult(r.stdout, answer);
-  if (!result && parsedStream.answer) {
-    result = typeof parsedStream.answer === "object" ? parsedStream.answer : extractJson(parsedStream.answer);
+  let result;
+  try {
+    // Stream-json stdout holds many JSON events; scanning it raw picks the first (init) event, not the answer.
+    const streamed = invocation.answerFrom === "answerFile" ? null : parsedStream.answer;
+    result = streamed ? (typeof streamed === "object" ? streamed : extractJson(streamed)) : adapter.extractFinalResult(r.stdout, answer);
+    if (!result && parsedStream.answer) {
+      result = typeof parsedStream.answer === "object" ? parsedStream.answer : extractJson(parsedStream.answer);
+    }
+    if (!result && r.answer) {
+      result = typeof r.answer === "object" ? r.answer : extractJson(r.answer);
+    }
+    if (!result) throw new Error("ไม่พบ JSON ในคำตอบของผู้ให้บริการ");
+  } catch (e) {
+    // An unreadable reply breaks the output contract; tagged as environment it sent resume into a full Worker re-run.
+    throw Object.assign(e, { failureClass: "OUTPUT_CONTRACT" });
   }
-  if (!result && r.answer) {
-    result = typeof r.answer === "object" ? r.answer : extractJson(r.answer);
-  }
-  if (!result) throw new Error("ไม่พบ JSON ในคำตอบของผู้ให้บริการ");
   validateResult(result, role, p);
   return result;
 }
