@@ -49,6 +49,8 @@ export function validatePacket(p) {
   p.tasks.forEach(assertId);
   if (p.depends_on.includes(p.id)) throw new Error(`${p.id}: self dependency`);
   for (const name of ["build", "test_targeted", "test_full"]) if (!p.commands[name]?.trim()) throw new Error(`${p.id}: commands.${name} required`);
+  // Resuming a run whose repo was moved used to fail with a raw git "cannot change to …" message.
+  if (!existsSync(p.repo.path)) throw new Error(`${p.id}: repo ${p.repo.path} ไม่มีอยู่ — ถูกย้ายหรือลบ? ตรวจด้วย baan target check (run เดิมยังอ้าง path เก่า)`);
   p.repo = { ...p.repo, path: repoRoot(p.repo.path) };
   return p;
 }

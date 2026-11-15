@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { writeFileSync, readFileSync } from "node:fs";
+import { writeFileSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fixture, packet, runAt, cfg, good, passing, session } from "./helpers.mjs";
 import { approvalBasis, readiness, fromPlan, validatePacket } from "../src/packet.mjs";
@@ -191,4 +191,12 @@ test("run --target that points at a repo which no longer exists gives a clear me
     cli(["run", "--goal", "x", "--target", "sb-api-gateway", "--owns", "a.cs", "--build", "b", "--test", "t", "--workspace", root, "--agent", "codex", "--dry-run"], { cfg: structuredClone(cfg), localConfig: { agents: null } }),
     /sb-api-gateway.*ไม่มีอยู่/,
   );
+});
+
+test("resuming a run whose repo was moved explains which package and path, not a raw git error", (t) => {
+  const { root, repo, makeRepo } = fixture(t);
+  const moved = makeRepo("will-move");
+  const run = runAt(root, [packet(moved, "LESSONS-GATEWAY")]);
+  rmSync(moved, { recursive: true, force: true });
+  assert.throws(() => loadRun(root, run.dir), /LESSONS-GATEWAY: repo .*will-move ไม่มีอยู่/);
 });
