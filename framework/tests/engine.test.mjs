@@ -502,3 +502,27 @@ test("engine snapshot hash cache never hides a change: same size and restored mt
   writeFileSync(file, "export const value = 7;\n");
   assert.notEqual(fileHash(file), h1);
 });
+
+test("engine lock left by a crashed run is recovered when its PID now belongs to another program", async (t) => {
+  const { lock } = await import("../src/repolock.mjs");
+  const { spawn } = await import("node:child_process");
+  const { createHash } = await import("node:crypto");
+  const { root } = fixture(t);
+  const other = process.platform === "win32" ? spawn("ping", ["-n", "30", "127.0.0.1"], { stdio: "ignore", windowsHide: true }) : spawn("sleep", ["30"], { stdio: "ignore" });
+  t.after(() => other.kill());
+  await new Promise((resolve) => other.once("spawn", resolve));
+  mkdirSync(path.join(root, ".baan", "locks"), { recursive: true });
+  const file = path.join(root, ".baan", "locks", `${createHash("sha256").update("run:x").digest("hex")}.lock`);
+
+  writeFileSync(file, JSON.stringify({ pid: other.pid, token: "crashed", key: "run:x" }));
+  const release = lock(root, "run:x");
+  release();
+
+  writeFileSync(file, JSON.stringify({ pid: process.pid, exe: path.basename(process.execPath), token: "live", key: "run:x" }));
+  assert.throws(() => lock(root, "run:x"), /LOCK_BUSY/, "a live BAAN owner still holds the lock");
+
+  rmSync(file);
+  const again = lock(root, "run:x");
+  rmSync(file);
+  assert.doesNotThrow(again, "releasing a lock file that is already gone must not throw from a finally block");
+});
