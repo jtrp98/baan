@@ -2,6 +2,30 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.38.0 — 2026-11-19 · Role-Owned Tiers (12 บทบาท), Provider-Aware Prompt & Role Compilers, Live-Chat Telemetry Hooks, และ Monitor UI P0–P3
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **รีเฟรช stubs, subagent definitions และ telemetry hooks ใน workspace**: หลังอัปเกรดให้รัน `baan sync` เพื่ออัปเดต stubs (`AGENTS.md`, `CLAUDE.md`, `.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`) และ live-telemetry hooks (`.claude/settings.json`, `.codex/hooks.json`) ให้ตรงกับโครงสร้าง `0.38.0`
+- **หากเคย override `agents.json` หรือ `baan.config.json` เอง**: `agents.json` เปลี่ยนมาใช้โครงสร้าง `roles` (Role-Owned Tiers 12 บทบาท × 3 ค่าย) แทน `tiers` แบบเดิม — สำหรับ workspace ที่ไม่ได้ override `agents.json` จะทำงานต่อเนื่องได้ทันที
+
+### เพิ่ม
+
+- **Role-Owned Tiers Routing (`src/routing.mjs`, `agents.json`, `MODEL-POLICY.md`)**:
+  - จัดโครงสร้าง `agents.json` ใหม่เป็น Role-Owned Tiers ครบ 12 บทบาท (`planner`, `worker`, `verifier`, `docs`, `spec`, `arch`, `pm`, `build`, `check`, `survey`, `ui`, `review`) × 3 ค่าย (`codex`, `claude`, `agy`) พร้อมรองรับ cross-provider verifier, `docs` routing, และ Policy Guard ใน `tests/agents-config.test.mjs`
+  - เพิ่ม `MODEL-POLICY.md` กำหนดกติกาคัดเลือกโมเดล (เฉพาะแพ็กเกจ \$20/เดือน + Pareto Intelligence Index vs Cost per Task) พร้อมตาราง Benchmark Snapshot และ Prompt สำหรับอัปเดตรอบถัดไป
+- **Provider-Aware Prompt & Role Compilers (`src/prompt-compiler.mjs`, `src/role-compiler.mjs`)**:
+  - แยก execution prompts เป็น `prompts/_core/` และ provider overlays (`prompts/agy/`, `prompts/claude/`, `prompts/codex/`) พร้อม `models.json` คำแนะนำเฉพาะตระกูลโมเดล
+  - เพิ่ม `role-compiler.mjs` และ `roles/providers/` สำหรับ compile บทบาทและ stubs ให้เหมาะกับรูปแบบของแต่ละค่าย
+- **Live-Chat & Subagent Telemetry Hooks (`setup/hooks/baan-live-telemetry.mjs`, `src/live-telemetry.mjs`)**:
+  - ติดตามสถานะ live-chat และ subagent hooks ของทั้ง 3 ค่าย (`claude`, `codex`, `agy`) แสดงผลบน Monitor พร้อมแก้ `findPendingMatch` ให้จับคู่ด้วย timestamp ของ event
+
+### ปรับปรุง / เปลี่ยนแปลง
+
+- **Monitor UI (P0–P3)**: ยกระดับ UX/UI และแก้บั๊ก DOM reconcile ครบ P0–P3 — Office 6 ห้อง, Usage Tokens, Contrast/A11y, Modal Back, และ Search/Filter
+- **อัปเดตโมเดลใน `agents.json`**: ปรับโมเดลตาม `MODEL-POLICY.md` (`codex` ใช้ `gpt-6.2-astra` / `gpt-6.2-sol` / `gpt-6.1-terra`, `agy` ใช้ `gemini-4-neon` / `gemini-4-hydrogen` / `gemini-3.8-flash`, `claude` ใช้ `opus` / `sonnet` / `haiku`)
+- **ปรับปรุง Engine, CLI, Init และเอกสาร**: อัปเดต `cli.mjs`, `scheduler.mjs`, `session.mjs`, `init.mjs`, `role-guard.mjs`, `adapters/*.mjs`, `baan.example.json` และเอกสาร (`BAAN.md`, `CONVENTIONS.md`, `LEARNING.md`, `README.md`) ให้สอดคล้องกับ Role-Owned Tiers และ Prompt/Role Compilers
+
 ## 0.37.0 — 2026-11-15 · คำสั่ง `baan target` + Branch Guard, ปรับขอบเขต `baan sync`, อัปเกรด `agy` เป็น `gemini-4-hydrogen`, และแก้เสถียรภาพ/ความปลอดภัยทั้ง Engine และ Monitor
 
 ### ⚠ ต้องทำตอนอัปเกรด
