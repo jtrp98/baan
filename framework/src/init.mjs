@@ -17,10 +17,11 @@ function stubContent(charterPath, learningPath) {
    - ประเมินสังกัดโมดูลทันที: \`baan survey --target <targetName> --eval <filePath> --json\`
    - ทำ \`/plan\` นำเสนอ Root Cause Hypothesis, AC-BUG, Red Test, และขอบเขต \`owns\` ที่แคบที่สุดให้ผู้ใช้เห็นชอบก่อนแตะโค้ด
    - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`<project>/shared/defects/BUG-xxx.md\` ใน knowledge root ของ project ที่บั๊กสังกัด (เช่น \`knowledge/<project>/shared/defects/\`) — ไม่ใช่ \`shared/\` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
-3. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\`
+3. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\` (หรือ \`baan sync --all\` เพื่ออัปเดตทุก workspace ใน \`local.json\`)
 4. **วางแผนก่อนทำเสมอ (/plan first)**: ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol (8 ขั้น) และ Decision Quality Gate (8 คำถาม)
 5. **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: \`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\` ใช้ผ่าน subagents (Claude Code: Agent/Task ใน \`.claude/agents/\` · Antigravity: \`invoke_subagent\` · Codex: \`spawn_agent\`) ตาม 3-Step Workflow เสมอ
 6. **config**: \`./baan.config.json\`
+7. **ห้ามติดตั้งลงใน \`target/\`**: config, agent stubs, skills, telemetry hooks (\`.agents/\`, \`.claude/\`, \`.codex/\`) และสถานะรัน (\`.baan/\`) ติดตั้งที่ราก workspace เท่านั้น ห้ามสร้างหรือติดตั้งลงใน \`target/*\` โดยตรง — และเมื่ออัปเดต BAAN ให้ซิงค์ทุก workspace ผ่าน \`baan sync\`
 
 > **ข้อยกเว้น:** เฉพาะกรณีที่มีบรรทัด \`[baan: <role>]\` ปรากฏใน prompt ของ session นั้น (การ dispatch ภายในของ BAAN) ให้สวมบทบาทตาม role นั้นแทน ไม่ใช่ นายช่าง — ${ROLE_SESSION_RULE}
 `;
@@ -168,8 +169,100 @@ function removeObsoleteBaanCmd(targetDir, log) {
   } catch { /* ignore */ }
 }
 
+const HOOK_MARKER = "baan-live-telemetry.mjs";
+
+function mergeJsonSafe(file, mergeFn, log) {
+  let current = {};
+  const existed = existsSync(file);
+  if (existed) {
+    try {
+      const parsed = JSON.parse(readFileSync(file, "utf8"));
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        log(`⚠ ข้าม ${file} — โครงสร้าง JSON เดิมไม่ใช่วัตถุ`);
+        return "skipped";
+      }
+      current = parsed;
+    } catch {
+      log(`⚠ ข้าม ${file} — JSON เดิมเสียรูป (ไม่เขียนทับ)`);
+      return "skipped";
+    }
+  }
+  const next = mergeFn(structuredClone(current));
+  const nextText = JSON.stringify(next, null, 2) + "\n";
+  if (existed && readFileSync(file, "utf8") === nextText) return "kept";
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, nextText, "utf8");
+  return existed ? "updated" : "created";
+}
+
+function mergeHookEvents(current, events) {
+  const next = { ...current };
+  const hooks = next.hooks && typeof next.hooks === "object" && !Array.isArray(next.hooks) ? { ...next.hooks } : {};
+  for (const [eventName, ourEntries] of Object.entries(events)) {
+    const existing = Array.isArray(hooks[eventName]) ? hooks[eventName] : [];
+    const kept = existing.filter((entry) => !Array.isArray(entry?.hooks) || !entry.hooks.some((h) => String(h?.command ?? "").includes(HOOK_MARKER)));
+    hooks[eventName] = [...kept, ...ourEntries];
+  }
+  next.hooks = hooks;
+  return next;
+}
+
+export function installTelemetryHooks(workspaceDir, teamDir, results = { hooks: [], skipped: [] }, log = () => {}) {
+  const srcScript = path.join(teamDir, "setup", "hooks", HOOK_MARKER);
+  if (!existsSync(srcScript)) return results;
+
+  const destScript = path.join(workspaceDir, ".agents", "hooks", HOOK_MARKER);
+  mkdirSync(path.dirname(destScript), { recursive: true });
+  const scriptText = readFileSync(srcScript, "utf8");
+  if (!existsSync(destScript) || readFileSync(destScript, "utf8") !== scriptText) {
+    writeFileSync(destScript, scriptText, "utf8");
+    results.hooks.push(destScript);
+  }
+
+  const agyCmd = `node ./hooks/${HOOK_MARKER} --provider=agy`;
+  const agyHook = {
+    SessionStart: [{ type: "command", command: agyCmd, timeout: 5 }],
+    PreInvocation: [{ type: "command", command: agyCmd, timeout: 5 }],
+    PreToolUse: [{ matcher: "invoke_subagent", hooks: [{ type: "command", command: agyCmd, timeout: 5 }] }],
+    PostToolUse: [{ matcher: ".*", hooks: [{ type: "command", command: agyCmd, timeout: 5 }] }],
+    Stop: [{ type: "command", command: agyCmd, timeout: 5 }],
+  };
+
+  const makeEntry = (cmd, matcher = null) => ({
+    ...(matcher ? { matcher } : {}),
+    hooks: [{ type: "command", command: cmd, timeout: 5 }],
+  });
+  const claudeCmd = `node .agents/hooks/${HOOK_MARKER} --provider=claude`;
+  const codexCmd = `node .agents/hooks/${HOOK_MARKER} --provider=codex`;
+
+  const targets = [
+    [path.join(workspaceDir, ".agents", "hooks.json"), (cur) => ({ ...cur, "baan-live-telemetry": agyHook })],
+    [path.join(workspaceDir, ".claude", "settings.json"), (cur) => mergeHookEvents(cur, {
+      SessionStart: [makeEntry(claudeCmd)],
+      PreToolUse: [makeEntry(claudeCmd, ".*")],
+      PostToolUse: [makeEntry(claudeCmd, ".*")],
+      SubagentStart: [makeEntry(claudeCmd)],
+      SubagentStop: [makeEntry(claudeCmd)],
+      Stop: [makeEntry(claudeCmd)],
+    })],
+    [path.join(workspaceDir, ".codex", "hooks.json"), (cur) => mergeHookEvents(cur, {
+      SessionStart: [makeEntry(codexCmd)],
+      PreToolUse: [makeEntry(codexCmd, ".*")],
+      PostToolUse: [makeEntry(codexCmd, ".*")],
+      Stop: [makeEntry(codexCmd)],
+    })],
+  ];
+
+  for (const [file, mergeFn] of targets) {
+    const outcome = mergeJsonSafe(file, mergeFn, log);
+    if (outcome === "skipped") results.skipped.push(file);
+    else if (outcome === "created" || outcome === "updated") results.hooks.push(file);
+  }
+  return results;
+}
+
 export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
-  const results = { config: "", stubs: [], skipped: [], design: [], cloned: [] };
+  const results = { config: "", stubs: [], skipped: [], design: [], hooks: [], cloned: [] };
   mkdirSync(targetDir, { recursive: true });
   mkdirSync(path.join(targetDir, "target"), { recursive: true });
 
@@ -203,7 +296,9 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
   removeObsoletePencil(targetDir, log);
   removeObsoleteBaanCmd(targetDir, log);
   installSkills(teamDir, targetDir, results, log);
+  installTelemetryHooks(targetDir, teamDir, results, log);
   if (results.design.length) log(`วาง agents ของทีม ${results.design.length} รายการ (spec/arch/pm/build/check · survey/ui/review · skills)`);
+  if (results.hooks.length) log(`ติดตั้ง/อัปเดต live telemetry hooks ${results.hooks.length} ไฟล์ที่ราก workspace (agy · claude · codex)`);
 
   const charterPath = path.join(teamDir, "BAAN.md");
   const learningPath = path.join(teamDir, "LEARNING.md");

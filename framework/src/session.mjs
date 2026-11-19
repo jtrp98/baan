@@ -248,7 +248,7 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
       {
         usage: true,
         signal,
-        env: { ...invocation.env, BAAN_READONLY: role === "worker" ? "0" : "1" },
+        env: { ...invocation.env, BAAN_READONLY: role === "worker" ? "0" : "1", BAAN_HEADLESS: "1" },
         onSpawn: (pid) => { p.childPid = pid; persist(run); },
         onStdout: (chunk) => streamParser.feed(chunk),
       }

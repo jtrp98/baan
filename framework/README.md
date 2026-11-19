@@ -27,9 +27,10 @@ baan monitor [--port 3456] [--no-open] [--tui]
 - **Used ทั้ง 3 CLI แบบสดๆ**: คำนวณ Token In/Out/Cache, Turns, และ Cost ($) ของ **Claude Code**, **Codex**, และ **Google Antigravity (AGY)**
 - **Multi-Session & Multi-Project**: สลับดูภาพรวมทุกโปรเจกต์ (Overview) หรือคลิกเลือกดูเฉพาะโปรเจกต์เดี่ยว (Single Project Focus) เช่น `school-bot`, `sb-api-gateway`
 - **TUI Mode**: เพิ่ม `--tui` เพื่อแสดงผลแบบ Dashboard ในเทอร์มินัลสไตล์ `htop` โดยไม่ต้องเปิดเบราว์เซอร์
-- **Pixel HQ (หน้าเว็บ)**: ออฟฟิศ pixel-art ที่มีตัวละคร 12 บทบาท + 3 provider (Claude / Codex / AGY) แยกกันคนละตัว — provider เดินไปนั่งข้างโต๊ะของ role เมื่อ telemetry จริงบอกว่ากำลังทำงานคู่กัน (มาจาก `active-<pkg>.json` + `call_end` ใน ledger) คลิกตัวละคร/โต๊ะเพื่อดูรายละเอียด ปิดแอนิเมชันได้ด้วยปุ่ม `ANIMATION` (มอนิเตอร์ยังทำงานต่อ)
+- **Pixel HQ (หน้าเว็บ)**: ออฟฟิศ pixel-art ที่มีตัวละคร 12 บทบาท + 3 provider (Claude / Codex / AGY) แยกกันคนละตัว — provider เดินไปนั่งข้างโต๊ะของ role เมื่อ telemetry จริงบอกว่ากำลังทำงานคู่กัน (มาจาก `active-<pkg>.json` + `call_end` ใน ledger สำหรับ BAAN run และ `.baan/live/*.json` จาก workspace hooks สำหรับ live-chat / subagents) คลิกตัวละคร/โต๊ะเพื่อดูรายละเอียด ปิดแอนิเมชันได้ด้วยปุ่ม `ANIMATION` (มอนิเตอร์ยังทำงานต่อ)
   - ไม่เดาข้อมูล: role/provider ที่ไม่รู้จะขึ้น `ROLE UNKNOWN` / `PROVIDER UNKNOWN`, โควตาที่อ่านไม่ได้ขึ้น `UNAVAILABLE` (ไม่ใช่ 0%), การเชื่อมต่อหลุดขึ้น `RECONNECTING` ไม่ใช่ "ว่าง"
-  - บทบาทคุยสด (spec, arch, pm, build, check, survey, ui, review) ไม่มี runtime telemetry จึงเดินเล่นเป็นการตกแต่งเท่านั้น
+  - บทบาทคุยสด (spec, arch, pm, build, check, survey, ui, review) แสดงสถานะจริงเมื่อ workspace มี telemetry hooks จาก `baan --init` / `baan sync` (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) และเดินเล่นเป็น IDLE เมื่อไม่มี session
+  - แสดงตัวเลข active ของ workspace อื่นใน `local.json` ที่ header เพื่อให้คลิกสลับได้ทันที
   - ไฟล์หน้าเว็บอยู่ที่ `src/monitor-ui/` (ES modules ล้วน ไม่มี dependency) เสิร์ฟผ่าน `/ui/<file>` แบบ whitelist
 
 `baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
@@ -41,7 +42,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 
 `baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
 1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
-2. รีเฟรชไฟล์ stubs (`.claude/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`) ใน workspace ให้ตรงกับ BAAN รุ่นล่าสุด
+2. รีเฟรชไฟล์ stubs (`.claude/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`) และ live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ที่ราก workspace ให้ตรงกับ BAAN รุ่นล่าสุด (ไม่ติดตั้งลงใน `target/*`)
 3. ทำ Safe Auto-Commit สำหรับการแก้ไขค้างใน `knowledge_roots` และ `memory`
 4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
 5. รีเฟรช `knowledge-index.json` อัตโนมัติ

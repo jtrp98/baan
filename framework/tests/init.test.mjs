@@ -121,3 +121,37 @@ test("defect records always point at the knowledge project, never a bare shared/
     assert.match(sources["CLAUDE.md (generated)"], /<project>\/shared\/defects\//);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("init ติดตั้ง telemetry hooks (agy, claude, codex) ที่ราก workspace โดยไม่แตะ target/ และ merge อย่างปลอดภัย", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "baan-init-hooks-"));
+  try {
+    mkdirSync(path.join(dir, ".agents"), { recursive: true });
+    mkdirSync(path.join(dir, ".claude"), { recursive: true });
+    mkdirSync(path.join(dir, ".codex"), { recursive: true });
+    writeFileSync(path.join(dir, ".agents", "hooks.json"), JSON.stringify({ "user-hook": { Stop: [{ command: "echo ok" }] } }), "utf8");
+    writeFileSync(path.join(dir, ".claude", "settings.json"), JSON.stringify({ model: "sonnet", hooks: { Stop: [{ hooks: [{ type: "command", command: "echo user" }] }] } }), "utf8");
+    writeFileSync(path.join(dir, ".codex", "hooks.json"), "{broken-json", "utf8");
+
+    const logs = [];
+    const res = performInit(dir, TEAM_DIR, (m) => logs.push(m));
+    assert.ok(existsSync(path.join(dir, ".agents", "hooks", "baan-live-telemetry.mjs")));
+    assert.equal(existsSync(path.join(dir, "target", ".agents")), false, "ห้ามติดตั้งลงใน target/");
+    assert.match(readFileSync(path.join(dir, "CLAUDE.md"), "utf8"), /ห้ามติดตั้งลงใน `target\/`/);
+
+    const agyHooks = JSON.parse(readFileSync(path.join(dir, ".agents", "hooks.json"), "utf8"));
+    assert.ok(agyHooks["user-hook"], "ต้องรักษา user hook เดิม");
+    assert.ok(agyHooks["baan-live-telemetry"].PreToolUse[0].matcher === "invoke_subagent");
+
+    const claudeSettings = JSON.parse(readFileSync(path.join(dir, ".claude", "settings.json"), "utf8"));
+    assert.equal(claudeSettings.model, "sonnet");
+    assert.equal(claudeSettings.hooks.Stop.length, 2, "ต้องเก็บ user Stop hook เดิมไว้ร่วมกับ BAAN hook");
+
+    assert.equal(readFileSync(path.join(dir, ".codex", "hooks.json"), "utf8"), "{broken-json", "JSON เสียรูปต้องไม่ถูกเขียนทับ");
+    assert.ok(res.skipped.includes(path.join(dir, ".codex", "hooks.json")));
+
+    // Idempotent second run: no duplicate entries in Claude settings.
+    performInit(dir, TEAM_DIR, () => {});
+    const claudeAgain = JSON.parse(readFileSync(path.join(dir, ".claude", "settings.json"), "utf8"));
+    assert.equal(claudeAgain.hooks.Stop.length, 2);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
