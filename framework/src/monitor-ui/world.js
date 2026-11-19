@@ -6,12 +6,12 @@ export const ROWS = 24;
 
 // Floor kinds per tile; walls are "wall". Corridor = cols 19-20, walls at cols 18/21 and rows 8/16 with doors.
 export const ZONES = {
-  management: { name: "MANAGEMENT", x: 1, y: 1, w: 17, h: 7, floor: "wood" },
-  planning: { name: "PLANNING", x: 22, y: 1, w: 17, h: 7, floor: "carpet_blue" },
-  development: { name: "DEVELOPMENT", x: 1, y: 9, w: 17, h: 7, floor: "tile_dark" },
-  qa: { name: "QUALITY ASSURANCE", x: 22, y: 9, w: 17, h: 7, floor: "tile_light" },
-  design: { name: "DESIGN & RESEARCH", x: 1, y: 17, w: 17, h: 6, floor: "carpet_purple" },
-  lounge: { name: "AI PROVIDER LOUNGE", x: 22, y: 17, w: 17, h: 6, floor: "carpet_warm" },
+  management: { name: "MANAGEMENT", shortSign: "MGMT", x: 1, y: 1, w: 17, h: 7, floor: "wood" },
+  planning: { name: "PLANNING", shortSign: "PLANNING", x: 22, y: 1, w: 17, h: 7, floor: "carpet_blue" },
+  development: { name: "DEVELOPMENT", shortSign: "DEV", x: 1, y: 9, w: 17, h: 7, floor: "tile_dark" },
+  qa: { name: "QUALITY ASSURANCE", shortSign: "QA", x: 22, y: 9, w: 17, h: 7, floor: "tile_light" },
+  design: { name: "DESIGN & RESEARCH", shortSign: "DESIGN", x: 1, y: 17, w: 17, h: 6, floor: "carpet_purple" },
+  lounge: { name: "AI PROVIDER LOUNGE", shortSign: "AI LOUNGE", x: 22, y: 17, w: 17, h: 6, floor: "carpet_warm" },
   corridor: { name: "MAIN WALKWAY", x: 19, y: 1, w: 2, h: 22, floor: "corridor" },
 };
 
@@ -71,17 +71,17 @@ export const FURNITURE = [
 // dir = facing while working. Seats sit directly above a desk so the desk overlaps the legs (y-sort).
 export const STATIONS = {
   orchestrator: { label: "COMMAND CENTER", zone: "management", roleSeat: { x: 8, y: 3, dir: "down" }, providerSeats: [{ x: 9, y: 3, dir: "down" }, { x: 10, y: 3, dir: "down" }, { x: 7, y: 3, dir: "down" }] },
-  pm: { label: "PROJECT BOARD", zone: "management", roleSeat: { x: 14, y: 4, dir: "down" }, providerSeats: [] },
+  pm: { label: "PROJECT BOARD", zone: "management", roleSeat: { x: 14, y: 4, dir: "down" }, providerSeats: [{ x: 13, y: 4, dir: "down" }, { x: 15, y: 4, dir: "down" }] },
   planner: { label: "WHITEBOARD", zone: "planning", roleSeat: { x: 27, y: 1, dir: "up" }, providerSeats: [{ x: 28, y: 1, dir: "up" }, { x: 29, y: 1, dir: "up" }, { x: 26, y: 1, dir: "up" }, { x: 30, y: 1, dir: "up" }] },
-  spec: { label: "REQUIREMENT DESK", zone: "planning", roleSeat: { x: 35, y: 3, dir: "down" }, providerSeats: [] },
+  spec: { label: "REQUIREMENT DESK", zone: "planning", roleSeat: { x: 35, y: 3, dir: "down" }, providerSeats: [{ x: 34, y: 3, dir: "down" }, { x: 36, y: 3, dir: "down" }] },
   worker: { label: "CODING DESK", zone: "development", roleSeat: { x: 5, y: 10, dir: "down" }, providerSeats: [{ x: 6, y: 10, dir: "down" }, { x: 7, y: 10, dir: "down" }, { x: 4, y: 10, dir: "down" }, { x: 8, y: 10, dir: "down" }, { x: 3, y: 10, dir: "down" }, { x: 9, y: 10, dir: "down" }] },
-  build: { label: "BUILD STATION", zone: "development", roleSeat: { x: 14, y: 13, dir: "down" }, providerSeats: [] },
+  build: { label: "BUILD STATION", zone: "development", roleSeat: { x: 14, y: 13, dir: "down" }, providerSeats: [{ x: 13, y: 13, dir: "down" }, { x: 15, y: 13, dir: "down" }] },
   verifier: { label: "QA CONSOLE", zone: "qa", roleSeat: { x: 27, y: 10, dir: "down" }, providerSeats: [{ x: 28, y: 10, dir: "down" }, { x: 29, y: 10, dir: "down" }, { x: 26, y: 10, dir: "down" }, { x: 30, y: 10, dir: "down" }, { x: 25, y: 10, dir: "down" }] },
-  check: { label: "TEST DESK", zone: "qa", roleSeat: { x: 35, y: 10, dir: "down" }, providerSeats: [] },
-  review: { label: "REVIEW DESK", zone: "qa", roleSeat: { x: 35, y: 13, dir: "down" }, providerSeats: [] },
-  arch: { label: "ARCHITECTURE BOARD", zone: "design", roleSeat: { x: 4, y: 17, dir: "up" }, providerSeats: [] },
-  survey: { label: "RESEARCH DESK", zone: "design", roleSeat: { x: 10, y: 19, dir: "down" }, providerSeats: [] },
-  ui: { label: "DESIGN STUDIO", zone: "design", roleSeat: { x: 15, y: 18, dir: "down" }, providerSeats: [] },
+  check: { label: "TEST DESK", zone: "qa", roleSeat: { x: 35, y: 10, dir: "down" }, providerSeats: [{ x: 34, y: 10, dir: "down" }, { x: 36, y: 10, dir: "down" }] },
+  review: { label: "REVIEW DESK", zone: "qa", roleSeat: { x: 35, y: 13, dir: "down" }, providerSeats: [{ x: 34, y: 13, dir: "down" }, { x: 36, y: 13, dir: "down" }] },
+  arch: { label: "ARCHITECTURE BOARD", zone: "design", roleSeat: { x: 4, y: 17, dir: "up" }, providerSeats: [{ x: 3, y: 17, dir: "up" }, { x: 5, y: 17, dir: "up" }] },
+  survey: { label: "RESEARCH DESK", zone: "design", roleSeat: { x: 10, y: 19, dir: "down" }, providerSeats: [{ x: 9, y: 19, dir: "down" }, { x: 11, y: 19, dir: "down" }] },
+  ui: { label: "DESIGN STUDIO", zone: "design", roleSeat: { x: 15, y: 18, dir: "down" }, providerSeats: [{ x: 14, y: 18, dir: "down" }, { x: 16, y: 18, dir: "down" }] },
   // ROLE UNKNOWN sessions: provider works here, no role character joins.
   cli: { label: "GENERAL CLI DESK", zone: "lounge", roleSeat: null, providerSeats: [{ x: 24, y: 18, dir: "down" }, { x: 26, y: 18, dir: "down" }, { x: 23, y: 18, dir: "down" }, { x: 25, y: 18, dir: "down" }, { x: 27, y: 18, dir: "down" }] },
 };

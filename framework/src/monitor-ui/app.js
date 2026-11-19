@@ -17,6 +17,7 @@ let scope = "all";
 // First state after load/reconnect/scope change must not replay reactions for things we never watched.
 let needsReconcile = true;
 let animOn = readPref() ?? !reducedMotion;
+document.body.dataset.anim = animOn ? "on" : "off";
 let engine = null;
 let director = null;
 let scale = 1;
@@ -34,6 +35,24 @@ function writePref(on) {
   try { localStorage.setItem(PREF_KEY, on ? "on" : "off"); } catch {}
 }
 
+function resolveHighlight(hit) {
+  if (!hit || !director) return { rosterIds: [], sessionKeys: [] };
+  const detail = director.inspect(hit);
+  const sessionKeys = (detail?.sessions ?? []).map((s) => s.key);
+  const rosterIds = [];
+  if (hit.kind === "character") {
+    if (hit.id.startsWith("prov:")) rosterIds.push(`prov:${hit.id.slice(5).split("#")[0]}#1`);
+    else rosterIds.push(hit.id);
+  } else if (hit.kind === "station" && world.STATIONS[hit.id]?.roleSeat) {
+    rosterIds.push(`role:${hit.id}`);
+  } else if (hit.kind === "zone") {
+    for (const [stId, st] of Object.entries(world.STATIONS)) {
+      if (st.zone === hit.id && st.roleSeat) rosterIds.push(`role:${stId}`);
+    }
+  }
+  return { rosterIds, sessionKeys };
+}
+
 // The office is a visualization layer: if it fails to start, monitoring panels must keep working.
 try {
   engine = new Engine(canvas, { sprites, world });
@@ -41,8 +60,14 @@ try {
   director.init({ agentsEnabled: null });
   engine.setAnimationEnabled(animOn);
   engine.start?.();
+  engine.onHover = (hit) => {
+    panels.setHighlight?.(resolveHighlight(hit));
+  };
   engine.onPick = (hit) => {
-    if (hit) panels.openDetail(director.inspect(hit));
+    if (!hit) return;
+    if (hit.kind === "character") engine.select(hit.id);
+    else engine.select(null);
+    panels.openDetail(director.inspect(hit));
   };
 } catch (err) {
   console.error("BAAN Pixel HQ: office failed to start", err);
@@ -111,6 +136,7 @@ function render() {
     conn: status,
     activeCount: sessions.length,
     animOn,
+    timestamp: lastState.timestamp ?? null,
   });
   panels.renderPipeline(pipeline);
   panels.renderWorkshop(sessions, lastState, scope, status);
@@ -146,26 +172,38 @@ panels.on("scope", (next) => {
 
 panels.on("toggleAnim", () => {
   animOn = !animOn;
+  document.body.dataset.anim = animOn ? "on" : "off";
   writePref(animOn);
   engine?.setAnimationEnabled(animOn);
   render();
 });
 
 panels.on("inspect", (id) => {
-  if (director) panels.openDetail(director.inspect({ kind: "character", id }));
+  if (director) {
+    engine?.select(id);
+    panels.openDetail(director.inspect({ kind: "character", id }));
+  }
 });
 
 panels.on("inspectSession", (key) => {
   // The director returns the bare session (plus its characters); openDetail needs it wrapped as kind "session",
   // otherwise every INSPECT showed "Nothing to show." whenever the office view was running.
   const session = director?.inspectSession?.(key) ?? telemetry.toSessions(lastState, "all").find((s) => s.key === key);
-  if (session) panels.openDetail({ kind: "session", session });
+  if (session) {
+    const ch = session.characters?.role || session.characters?.provider;
+    if (ch) engine?.select(ch);
+    panels.openDetail({ kind: "session", session });
+  }
+});
+
+panels.on("detailClosed", () => {
+  engine?.select(null);
 });
 
 panels.on("zone", (zoneId) => {
   const z = world.ZONES[zoneId];
   if (!z) return;
-  wrap.scrollTo({ left: Math.max(0, (z.x - 1) * world.TILE * scale), top: Math.max(0, (z.y - 1) * world.TILE * scale), behavior: reducedMotion ? "auto" : "smooth" });
+  wrap.scrollTo({ left: Math.max(0, (z.x - 1) * world.TILE * scale), top: Math.max(0, (z.y - 1) * world.TILE * scale), behavior: !animOn || reducedMotion ? "auto" : "smooth" });
 });
 
 function connect() {

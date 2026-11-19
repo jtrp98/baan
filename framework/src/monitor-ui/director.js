@@ -5,10 +5,15 @@ const ROLE_IDS = ["orchestrator", "pm", "planner", "spec", "worker", "build", "v
 const EXEC_ROLES = ["planner", "worker", "verifier"];
 const PROVIDERS = ["claude", "codex", "agy"];
 const MAX_VISIBLE = 3;
-const ROLE_VERB = { planner: "PLANNING...", worker: "CODING...", verifier: "VERIFYING..." };
+const ROLE_VERB = {
+  planner: "PLANNING...", worker: "CODING...", verifier: "VERIFYING...",
+  spec: "GATHERING SPEC...", arch: "DESIGNING ARCH...", pm: "SCOPING...",
+  build: "BUILDING...", check: "CHECKING...", survey: "SURVEYING...",
+  ui: "DESIGNING UI...", review: "REVIEWING...",
+};
 const UI_VERB = {
   READING: "READING FILE", CODING: "EDITING CODE", EXECUTING: "RUNNING COMMAND", THINKING: "THINKING",
-  PLANNING: "PLANNING", VERIFYING: "VERIFYING", PROCESSING: "PROCESSING",
+  PLANNING: "PLANNING", VERIFYING: "VERIFYING", PROCESSING: "PROCESSING", DELEGATING: "SUBAGENT",
 };
 const ROLE_COLORS = {
   orchestrator: "#FACC15", planner: "#38BDF8", worker: "#F472B6", verifier: "#34D399",
@@ -17,8 +22,10 @@ const ROLE_COLORS = {
 };
 
 function roleAnim(role, s) {
-  if (role === "planner") return "write";
-  if (role === "worker") return s.uiState === "READING" ? "read" : s.uiState === "THINKING" ? "think" : "type";
+  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "ui" || role === "survey") {
+    return s.uiState === "READING" ? "read" : "write";
+  }
+  if (role === "worker" || role === "build") return s.uiState === "READING" ? "read" : s.uiState === "THINKING" ? "think" : "type";
   return s.uiState === "THINKING" ? "think" : "read";
 }
 
@@ -310,27 +317,22 @@ export class Director {
       } else this._apply(orch, { where: "idle", zone: W.ROLE_HOME.orchestrator });
     }
 
-    for (const r of EXEC_ROLES) {
+    for (const r of [...EXEC_ROLES, ...this.t.CHAT_ROLES]) {
       const c = E.getCharacter(`role:${r}`);
       if (!c) continue;
       const list = this._sessionsWhere((s) => s.role === r);
-      if (list.length) {
-        const seat = W.STATIONS[r].roleSeat;
+      const seat = W.STATIONS[r]?.roleSeat;
+      if (list.length && seat) {
         let bubble;
         let kind = "real";
         if (list.every((s) => s.stale)) { bubble = "NO UPDATE"; kind = "warn"; }
         else if (list.some((s) => !s.provider)) bubble = "PROVIDER UNKNOWN";
-        else bubble = ROLE_VERB[r] + (list.length > 1 ? ` ×${list.length}` : "");
+        else bubble = (ROLE_VERB[r] ?? "WORKING...") + (list.length > 1 ? ` ×${list.length}` : "");
         this._apply(c, { where: "seat", tile: seat, dir: seat.dir, anim: roleAnim(r, list[0]), bubble, kind });
       } else if (!this.rolePending.get(r).size) {
-        this._apply(c, { where: "idle", zone: W.ROLE_HOME[r] });
+        const extra = this.t.CHAT_ROLES.includes(r) && seat ? [[seat.x, seat.y]] : [];
+        this._apply(c, { where: "idle", zone: W.ROLE_HOME[r], extra });
       }
-    }
-
-    for (const r of this.t.CHAT_ROLES) {
-      const c = E.getCharacter(`role:${r}`);
-      const seat = W.STATIONS[r]?.roleSeat;
-      if (c) this._apply(c, { where: "idle", zone: W.ROLE_HOME[r], extra: seat ? [[seat.x, seat.y]] : [] });
     }
 
     for (const inst of [...this.instances.values()]) {
@@ -344,7 +346,7 @@ export class Director {
         let bubble = s.bubble;
         let kind = "real";
         if (s.stale) { bubble = "NO UPDATE"; kind = "warn"; }
-        else if (!s.role) bubble = `ROLE UNKNOWN — ${UI_VERB[s.uiState] ?? s.uiState}`;
+        else if (!s.role) bubble = `${s.isSubagent ? "SUBAGENT" : s.source === "hook" ? "LIVE CHAT" : "ROLE UNKNOWN"} — ${UI_VERB[s.uiState] ?? s.uiState}`;
         this._apply(c, { where: "seat", tile: seat, dir: seat.dir, anim: providerAnim(s), bubble, kind });
       } else if (inst.pendingKeys.size) {
         // Waiting for the call_end verdict: stay at the desk instead of guessing an outcome.
@@ -379,6 +381,7 @@ export class Director {
   // ---- inspection (plain data for dialogs / a11y strip) ----
   inspect(hit) {
     if (!hit) return null;
+    if (hit.kind === "zone") return this._inspectZone(hit.id);
     if (hit.kind === "station") return this._inspectStation(hit.id);
     if (hit.kind === "role") return this._inspectRole(hit.id);
     if (hit.kind === "provider") return this._inspectProvider(hit.id);
@@ -398,9 +401,10 @@ export class Director {
     const meta = this.t.ROLE_META[r];
     if (!meta) return null;
     const sessions = r === "orchestrator" ? [] : this._sessionsWhere((s) => s.role === r);
+    const isChat = this.t.CHAT_ROLES.includes(r);
     const out = {
       kind: "role", id: r, characterId: `role:${r}`, name: meta.name, duty: meta.duty,
-      telemetry: this.t.CHAT_ROLES.includes(r) ? "none" : "live",
+      telemetry: sessions.length ? "live" : (isChat ? "hook" : "live"),
       status: this._roleStatus(r),
       sessions,
       providers: [...new Set(sessions.map((s) => s.provider ?? "unknown"))],
@@ -432,7 +436,18 @@ export class Director {
     const st = this.world.STATIONS[id];
     if (!st) return null;
     const sessions = id === "orchestrator" ? [...this.current.values()] : this._sessionsWhere((s) => s.station === id);
-    return { kind: "station", id, label: st.label, zone: st.zone, telemetry: this.t.CHAT_ROLES.includes(id) ? "none" : "live", sessions };
+    return { kind: "station", id, label: st.label, zone: st.zone, telemetry: sessions.length ? "live" : (this.t.CHAT_ROLES.includes(id) ? "hook" : "live"), sessions };
+  }
+
+  _inspectZone(zoneId) {
+    const z = this.world.ZONES[zoneId];
+    if (!z || zoneId === "corridor") return null;
+    const stations = Object.entries(this.world.STATIONS).filter(([, s]) => s.zone === zoneId).map(([id, s]) => ({ id, label: s.label }));
+    const stationIds = new Set(stations.map((s) => s.id));
+    const sessions = zoneId === "management" && this.pipeline?.orchestrator
+      ? [...this.current.values()]
+      : this._sessionsWhere((s) => stationIds.has(s.station));
+    return { kind: "zone", id: zoneId, label: z.name, stations, sessions };
   }
 
   inspectSession(key) {
@@ -444,14 +459,14 @@ export class Director {
 
   roster() {
     const out = ROLE_IDS.map((r) => ({
-      id: `role:${r}`, kind: "role", label: this.t.ROLE_META[r].name.toUpperCase(),
+      id: `role:${r}`, kind: "role", label: this.t.ROLE_META[r].name.toUpperCase(), fullName: this.t.ROLE_META[r].name,
       status: this._roleStatus(r), color: ROLE_COLORS[r], spriteId: r,
     }));
     for (const p of PROVIDERS) {
       const n = this._sessionsWhere((s) => s.provider === p).length;
       const short = this._meta(p).short;
       out.push({
-        id: `prov:${p}#1`, kind: "provider", label: n > 1 ? `${short} ×${n}` : short,
+        id: `prov:${p}#1`, kind: "provider", label: n > 1 ? `${short} ×${n}` : short, fullName: this._meta(p).name,
         status: this.agentsEnabled?.[p] === false && !n ? "OFF" : n ? `${n} ACTIVE` : "IDLE",
         color: this._meta(p).color, spriteId: p,
       });

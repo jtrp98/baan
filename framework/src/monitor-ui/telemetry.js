@@ -3,8 +3,9 @@
 
 export const PROVIDERS = ["claude", "codex", "agy"];
 export const EXEC_ROLES = ["planner", "worker", "verifier"];
-// Live-chat roles from roles/*.md: BAAN writes no runtime telemetry for them.
+// Live-chat roles from roles/*.md: tracked via workspace IDE/CLI hooks when configured.
 export const CHAT_ROLES = ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"];
+export const ALL_ROLES = [...EXEC_ROLES, ...CHAT_ROLES];
 
 export const PROVIDER_META = {
   claude: { name: "Claude Code", short: "CLAUDE", color: "#F97316" },
@@ -53,34 +54,36 @@ export function normalizeProvider(agent) {
 
 export function normalizeRole(role) {
   const r = typeof role === "string" ? role.trim().toLowerCase() : "";
-  return EXEC_ROLES.includes(r) ? r : null;
+  return ALL_ROLES.includes(r) ? r : null;
 }
 
 const READ_TOOLS = /^(read|view|cat|grep|glob|ls|list|search|find|web_?fetch|web_?search|read_file|open)/i;
 const EDIT_TOOLS = /(edit|write|patch|apply|create|replace|multi_?edit|notebook)/i;
 const EXEC_TOOLS = /^(bash|shell|exec|command|run|powershell|terminal|local_shell)/i;
+const SUBAGENT_TOOLS = /^(invoke_subagent|agent|task|spawn_agent|collaboration\.spawn_agent|subagent)$/i;
 
-// UI animation states (not BAAN statuses): IDLE WALKING READING CODING EXECUTING PLANNING VERIFYING THINKING
+// UI animation states (not BAAN statuses): IDLE WALKING READING CODING EXECUTING PLANNING VERIFYING THINKING DELEGATING
 export function activityToUiState(activity, thought, role) {
   const name = activity?.name ?? "";
   if (name) {
+    if (SUBAGENT_TOOLS.test(name)) return "DELEGATING";
     if (EXEC_TOOLS.test(name)) return "EXECUTING";
     if (EDIT_TOOLS.test(name)) return "CODING";
     if (READ_TOOLS.test(name)) return "READING";
   }
   if (thought && !name) return "THINKING";
-  if (role === "planner") return "PLANNING";
-  if (role === "verifier") return "VERIFYING";
-  if (role === "worker") return "CODING";
+  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "ui" || role === "survey") return "PLANNING";
+  if (role === "verifier" || role === "check" || role === "review") return "VERIFYING";
+  if (role === "worker" || role === "build") return "CODING";
   return "PROCESSING";
 }
 
 export function bubbleFor(session) {
   const p = session.provider ? PROVIDER_META[session.provider].short : "CLI";
-  const r = session.role ? ROLE_META[session.role].short : "ROLE UNKNOWN";
+  const r = session.role ? ROLE_META[session.role].short : session.isSubagent ? "SUBAGENT" : session.source === "hook" ? "CHAT" : "ROLE UNKNOWN";
   const verb = {
     READING: "READING FILE", CODING: "EDITING CODE", EXECUTING: "RUNNING COMMAND", THINKING: "THINKING",
-    PLANNING: "PLANNING", VERIFYING: "VERIFYING", PROCESSING: "PROCESSING",
+    PLANNING: "PLANNING", VERIFYING: "VERIFYING", PROCESSING: "PROCESSING", DELEGATING: "SUBAGENT",
   }[session.uiState] ?? session.uiState;
   return `${r} + ${p} — ${verb}`;
 }
@@ -94,6 +97,9 @@ export function projectsOf(state) {
   for (const r of state?.activeRuns ?? []) if (r.repoName) names.add(r.repoName);
   for (const p of Object.keys(state?.usage?.projects ?? {})) names.add(p);
   for (const run of state?.recentRuns ?? []) for (const p of run.projects ?? []) names.add(p);
+  for (const ls of state?.liveSessions ?? []) {
+    if (ls.repoName && ls.repoName !== state?.workspaceName) names.add(ls.repoName);
+  }
   names.delete("unknown");
   return [...names].filter(Boolean).sort();
 }
@@ -102,7 +108,7 @@ export function inScope(project, scope) {
   return !scope || scope === "all" || project === scope;
 }
 
-// One entry per in-flight CLI call (= one active-<pkg>.json), which is BAAN's only live session record.
+// Combines BAAN headless active-<pkg>.json sessions and hook-based live-chat/subagent sessions.
 export function toSessions(state, scope = "all") {
   const out = [];
   for (const run of state?.activeRuns ?? []) {
@@ -118,6 +124,9 @@ export function toSessions(state, scope = "all") {
       const pkgInfo = run.runInfo?.packages?.find((x) => x.id === p.packageId);
       const s = {
         key: sessionKey(p.runId ?? run.runId, p.packageId, rawRole),
+        source: "baan",
+        isSubagent: false,
+        parentSessionId: null,
         runId: run.runId,
         packageId: p.packageId ?? null,
         title: p.title ?? run.title ?? "",
@@ -127,6 +136,7 @@ export function toSessions(state, scope = "all") {
         roleLabel: rawRole ? String(rawRole) : null,
         provider,
         providerLabel: p.agent ? String(p.agent) : null,
+        model: p.model ?? null,
         tier: p.tier ?? run.tier ?? null,
         tool: activity ? { name: activity.name ?? "", detail: activity.detail ?? "" } : null,
         thought,
@@ -143,7 +153,53 @@ export function toSessions(state, scope = "all") {
       out.push(s);
     }
   }
-  return out.sort((a, b) => a.key.localeCompare(b.key));
+
+  for (const ls of state?.liveSessions ?? []) {
+    const project = ls.repoName ?? null;
+    if (!inScope(project, scope)) continue;
+    const rawRole = ls.role ?? null;
+    const role = normalizeRole(rawRole);
+    const provider = normalizeProvider(ls.provider);
+    const activity = ls.recentActivity ?? null;
+    const s = {
+      key: `hook|${ls.provider ?? "?"}|${ls.sessionId ?? "?"}`,
+      source: "hook",
+      isSubagent: ls.isSubagent === true,
+      parentSessionId: ls.parentSessionId ?? null,
+      sessionId: ls.sessionId ?? null,
+      runId: ls.parentSessionId || ls.sessionId || "live",
+      packageId: ls.isSubagent ? "SUBAGENT" : "LIVE CHAT",
+      title: ls.title ?? (ls.isSubagent ? "Subagent" : "Live chat session"),
+      project,
+      repoPath: ls.repoPath ?? "",
+      role,
+      roleLabel: ls.roleLabel ? String(ls.roleLabel) : (rawRole ? String(rawRole) : null),
+      provider,
+      providerLabel: ls.provider ? String(ls.provider) : null,
+      model: ls.model ?? null,
+      tier: null,
+      tool: activity ? { name: activity.name ?? "", detail: activity.detail ?? "" } : null,
+      thought: "",
+      history: Array.isArray(ls.history) ? ls.history : [],
+      usage: null,
+      packageState: null,
+      startedAt: ls.startedAt ?? null,
+      updatedAt: ls.updatedAt ?? null,
+      stale: ls.stale === true,
+      station: role ?? "cli",
+    };
+    s.uiState = activityToUiState(activity, "", role);
+    s.bubble = bubbleFor(s);
+    out.push(s);
+  }
+
+  return out.sort((a, b) => {
+    const ga = a.parentSessionId || a.sessionId || a.key;
+    const gb = b.parentSessionId || b.sessionId || b.key;
+    if (ga !== gb) return String(ga).localeCompare(String(gb));
+    if (a.isSubagent !== b.isSubagent) return a.isSubagent ? 1 : -1;
+    return a.key.localeCompare(b.key);
+  });
 }
 
 // Only these fields decide whether a character must change what it is doing (Rule 5: no flicker).
@@ -263,6 +319,7 @@ export function pipelineView(state, sessions, scope = "all") {
     worker: activeRoles.has("worker"),
     verifier: activeRoles.has("verifier"),
     unknownRole: sessions.some((s) => !s.role),
+    liveChatOnlyUnknown: sessions.some((s) => !s.role) && sessions.every((s) => s.role || s.source === "hook"),
     states,
   };
 }
