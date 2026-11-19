@@ -95,6 +95,14 @@ test("engine external_paths: verifier call tolerates concurrent external writes 
     writeFileSync(path.join(repo, "code.mjs"), "verifier wrote this"); return { ok: true, answer: pass, durationMs: 1 };
   } }), /verifier changed repository\/Git state: code\.mjs/);
 });
+test("engine external_paths: scheduler accepts verifier verdict when only external files moved meanwhile", async (t) => {
+  const { root, repo } = fixture(t); const run = runAt(root, [packet(repo, "A", { external_paths: ["ext/**"], budget: { max_rework: 0 } })]);
+  await schedule(run, cfg, { execute: passing, session: async (r, p, role) => {
+    if (role === "verifier") { mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "late.ts"), "other session during verify"); }
+    return session(r, p, role);
+  } });
+  assert.equal(run.packages[0].state, "done");
+});
 test("engine external_paths must be relative and must not overlap owns", (t) => {
   const { repo } = fixture(t);
   assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["../x/**"] })), /external_paths/);

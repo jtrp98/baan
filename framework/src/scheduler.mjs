@@ -3,7 +3,7 @@ import path from "node:path";
 import { event, persist } from "./store.mjs";
 import { transitiveFanOut } from "./plan.mjs";
 import { alive, repoLock } from "./repolock.mjs";
-import { snapshot, matches, fileHash, sameState } from "./snapshot.mjs";
+import { snapshot, matches, fileHash, sameState, sameStateOutside } from "./snapshot.mjs";
 import { readiness, documentBasis, validate, schemaFor, validateResult } from "./packet.mjs";
 import { evidence, gate } from "./gate.mjs";
 import { callSession } from "./session.mjs";
@@ -60,7 +60,7 @@ async function processPackage(run, p, cfg, options) {
       p.failureClass = "SCOPE_VIOLATION"; waiting(run, p, ["probe/setup changed Git state; inspect evidence before resume"]); return;
     }
     // Work that passed the gate but whose Verifier crashed or answered garbage only needs verifying again, not a new Worker run.
-    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameState(p.after, probed));
+    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameStateOutside(p.after, probed, p.external_paths));
     for (;;) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
       if (resumeVerification) {
@@ -95,7 +95,7 @@ async function processPackage(run, p, cfg, options) {
           validateResult(p.verdict, "verifier", p);
           delete p.verification_pending;
           const reviewed = snapshot(p.repo.path);
-          if (!sameState(reviewed, p.after)) {
+          if (!sameStateOutside(p.after, reviewed, p.external_paths)) {
             waiting(run, p, ["Verifier เปลี่ยน working tree/Git state: ต้องตรวจหลักฐานใหม่"]);
             p.failureClass = "SCOPE_VIOLATION"; persist(run); return;
           }
