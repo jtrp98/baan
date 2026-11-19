@@ -9,7 +9,7 @@ import { extractJson, isTierLower } from "./plan.mjs";
 import { schemaFor, validateResult } from "./packet.mjs";
 import { save, event, persist } from "./store.mjs";
 import { looksLikeLimitError, looksLikeMissingCli, looksLikeStartupError, looksLikeCapacityError } from "./failure-class.mjs";
-import { snapshot, sameState } from "./snapshot.mjs";
+import { snapshot, sameState, changedFiles, matches } from "./snapshot.mjs";
 import { getAdapter } from "./adapters/registry.mjs";
 import { createStreamParser } from "./events.mjs";
 import { evaluateParity } from "./parity.mjs";
@@ -345,7 +345,15 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
 
   const afterCall = snapshot(p.repo.path);
   if (role !== "worker" && !sameState(beforeCall, afterCall)) {
-    throw Object.assign(new Error(`${role} changed repository/Git state`), { failureClass: "SCOPE_VIOLATION" });
+    // Changes confined to external_paths come from another writer, not from this read-only role.
+    const external = Array.isArray(p.external_paths) ? p.external_paths : [];
+    const gitMoved = ["head", "branch", "index", "stash"].some((key) => beforeCall[key] !== afterCall[key]);
+    const changed = changedFiles(beforeCall, afterCall);
+    const ownChange = changed.filter((f) => !external.some((g) => matches(f, g)));
+    if (gitMoved || ownChange.length) {
+      throw Object.assign(new Error(`${role} changed repository/Git state${ownChange.length ? `: ${ownChange.slice(0, 10).join(", ")}` : ""}`), { failureClass: "SCOPE_VIOLATION" });
+    }
+    if (changed.length) event(run, "external_changes", { package: p.id, role, files: changed.slice(0, 50) });
   }
 
   if (signal?.aborted) throw new Error("cancelled");

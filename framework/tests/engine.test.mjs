@@ -82,6 +82,19 @@ test("engine external_paths: concurrent writer outside owns is reported, not a s
   assert.deepEqual(run.packages[0].gate.external_changes, ["ext/other.ts"]);
   assert.deepEqual(run.packages[0].gate.outside, []);
 });
+test("engine external_paths: verifier call tolerates concurrent external writes but not its own", async (t) => {
+  const { root, repo } = fixture(t);
+  const localCfg = { agents: { codex: { command: "fake", promptVia: "stdin", readArgs: ["exec", "-"], writeArgs: [], answerFrom: "answerFile", usage: { args: [], format: "codex-jsonl" } } }, tiers: { t5: { codex: {} } } };
+  const pass = JSON.stringify({ verdict: "PASS", failure_class: "", findings: [], acceptance: [] });
+  const p = packet(repo, "A", { external_paths: ["ext/**"] }); const run = runAt(root, [p]);
+  await callSession(run, p, "verifier", localCfg, { runner: async () => {
+    mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "other.ts"), "other session");
+    return { ok: true, answer: pass, durationMs: 1 };
+  } });
+  await assert.rejects(callSession(run, p, "verifier", localCfg, { runner: async () => {
+    writeFileSync(path.join(repo, "code.mjs"), "verifier wrote this"); return { ok: true, answer: pass, durationMs: 1 };
+  } }), /verifier changed repository\/Git state: code\.mjs/);
+});
 test("engine external_paths must be relative and must not overlap owns", (t) => {
   const { repo } = fixture(t);
   assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["../x/**"] })), /external_paths/);
