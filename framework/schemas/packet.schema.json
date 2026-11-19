@@ -142,6 +142,10 @@
       "type": "string",
       "pattern": "^t[0-5]$"
     },
+    "verifier_tier": {
+      "type": "string",
+      "pattern": "^t[0-5]$"
+    },
     "acceptance_approved": {
       "type": "boolean"
     },

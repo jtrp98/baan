@@ -64,7 +64,7 @@ Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุ�
 | ค่า | ค่าเริ่มต้น / ที่ตั้ง |
 |---|---|
 | Provider Routing | **Availability-Driven Specialist Routing** จาก `roles` ใน [agents.json](agents.json) อิงค่ายที่เปิดใช้งานจริงใน `local.json` (บังคับค่ายเดียวด้วย `--agent`) · **Strict No-Impersonation**: ติดลิมิต/โควตาระหว่างรันจะหยุดแจ้ง `waiting_human` (`PROVIDER_LIMIT`) ไม่แอบสลับค่ายหรือลดรุ่นแทน |
-| Role-Owned Tiers | แต่ละบทบาทมีบันได tier ของตัวเอง: `planner` (`t1`–`t4`, default `t3`) · `worker` (`t1`–`t4`, default `t3`) · `verifier` (`t1`–`t3`, default `t2`) · `docs` (`t1`–`t3`, default `t2`) · override ด้วย `--tier` / `--planner-tier` |
+| Role-Owned Tiers | แต่ละบทบาทมีบันได tier ของตัวเอง: `planner` (`t1`–`t4`, default `t3`) · `worker` (`t1`–`t4`, default `t3`) · `verifier` (`t1`–`t3`, default `t2`) · `docs` (`t1`–`t3`, default `t2`) · override ด้วย `--tier` / `--planner-tier` / `--verifier-tier` หรือ `verifier_tier` ราย packet (ยกได้อิสระ ลดได้เฉพาะงานที่ไม่ใช่ `risk: high`) |
 | งานขนานสูงสุด | `defaults.max_parallel` (`3`); override ด้วย `--max-parallel` |
 | Timeout | `--timeout` → tier `_timeoutSec` (`t1` overdrive = `3600s`) → `defaults.timeout_sec` (`0` วินาที = unlimited) |
 | นโยบายสิทธิ์ | `defaults.permission_policy` (`native-safe`); override ด้วย `--permission-policy` หรือ `--allow-bypass` |

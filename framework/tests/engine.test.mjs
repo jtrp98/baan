@@ -8,7 +8,7 @@ import { repoLock } from "../src/repolock.mjs";
 import { cli, decide } from "../src/cli.mjs";
 import { fromPlan, validatePacket, schemaFor } from "../src/packet.mjs";
 import { schedule } from "../src/scheduler.mjs";
-import { callSession, resolveWorkerTier } from "../src/session.mjs";
+import { callSession, resolveWorkerTier, resolveVerifierTier } from "../src/session.mjs";
 import { evidence, counts, testNames } from "../src/gate.mjs";
 import { persist, loadRun, save } from "../src/store.mjs";
 import { verification } from "../src/triage.mjs";
@@ -332,6 +332,32 @@ test("engine resolveWorkerTier respects code vs docs tier rules", () => {
 
   // Code low risk with contracts allows step-down
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4", contracts: [{ ref: "api.md" }] }), "t4");
+});
+
+test("engine resolveVerifierTier: packet raises freely, lowers only outside risk high, CLI flags win", () => {
+  const run = { tier: "t3", verifierTier: "t2" };
+  assert.equal(resolveVerifierTier(run, { risk: "high" }), "t2");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "t1" }), "t1");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifierTier: "T1" }), "t1");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "t3" }), "t2");
+  assert.equal(resolveVerifierTier(run, { risk: "low", verifier_tier: "t3" }), "t3");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "bogus" }), "t2");
+  assert.equal(resolveVerifierTier({ ...run, explicitTier: true }, { verifier_tier: "t1" }), "t3");
+  assert.equal(resolveVerifierTier({ ...run, verifierTier: "t3", explicitVerifierTier: true, explicitTier: true }, { verifier_tier: "t1" }), "t3");
+});
+
+test("engine dry-run shows per-package verifier route from packet verifier_tier", async (t) => {
+  const { root, repo } = fixture(t); const file = path.join(root, "plan.json");
+  save(file, { packages: [packet(repo, "A", { risk: "high", verifier_tier: "t1" }), packet(repo, "B", { risk: "high" })] });
+  const local = { agents: { codex: true, claude: false, agy: false } };
+  const result = await cli(["run", "--plan", file, "--workspace", root, "--dry-run"], { localConfig: local });
+  const byId = Object.fromEntries(result.packages.map((p) => [p.id, p.verifier_route]));
+  assert.equal(byId.A.role, "verifier"); assert.equal(byId.A.tier, "t1");
+  assert.equal(byId.B.tier, "t2");
+  const forced = await cli(["run", "--plan", file, "--workspace", root, "--verifier-tier", "t3", "--dry-run"], { localConfig: local });
+  assert.equal(forced.resolved_routes.verifier.tier, "t3");
+  assert.ok(forced.packages.every((p) => p.verifier_route.tier === "t3"));
+  assert.ok(!existsSync(path.join(root, ".baan", "runs")));
 });
 
 const commitFile = (repo, name, text) => { writeFileSync(path.join(repo, name), text); git(repo, "add", name); git(repo, "commit", "-m", `add ${name}`); };

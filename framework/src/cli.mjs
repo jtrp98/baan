@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules, collectWorkspaceAddDirs, loadLocalConfig, isAgentEnabled, applyLocalAgents, TEAM_DIR } from "./config.mjs";
 import { fromPlan, validatePacket, assertId, readiness, documentBasis, approvalBasis } from "./packet.mjs";
 import { loadRun, save, persist, event, readJson, previousAttempt } from "./store.mjs";
-import { callSession, nativeCommand } from "./session.mjs";
+import { callSession, nativeCommand, resolveVerifierTier } from "./session.mjs";
 import { schedule } from "./scheduler.mjs";
 import { triage } from "./triage.mjs";
 import { lock, alive, repoLock } from "./repolock.mjs";
@@ -26,7 +26,7 @@ export function parse(argv) {
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
   const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open", "prune", "pin-branch", "update-branch", "clear", "allow-branch-mismatch"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root", "branch"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "verifier-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root", "branch"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (!a.startsWith("--")) {
@@ -218,7 +218,7 @@ export async function cli(argv, options = {}) {
     }
     if (o.command === "inbox") return report(run).packages.filter((p) => p.questions.length || p.state === "waiting_human");
     if (!o.resume) return report(run);
-    for (const key of ["tier", "agent", "timeout", "max-parallel", "planner-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
+    for (const key of ["tier", "agent", "timeout", "max-parallel", "planner-tier", "verifier-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
     if (!o["dry-run"] && !o["allow-branch-mismatch"] && !run.allowBranchMismatch) {
       const mismatches = checkPackageBranches(ws, run.packages);
       if (mismatches.length) throw new Error(formatBranchMismatchError(mismatches));
@@ -280,7 +280,7 @@ export async function cli(argv, options = {}) {
   const hasRoles = Boolean(cfg.roles);
   const workerTier = o.tier || (hasRoles ? (ws.defaults.worker_tier || cfg.roles?.worker?.defaultTier || "t3") : "t2");
   const plannerTier = o["planner-tier"] || (hasRoles ? (ws.defaults.planner_tier || cfg.roles?.planner?.defaultTier || "t3") : "t2");
-  const verifierTier = o.tier || (hasRoles ? (ws.defaults.verifier_tier || cfg.roles?.verifier?.defaultTier || "t2") : "t2");
+  const verifierTier = o["verifier-tier"] || o.tier || (hasRoles ? (ws.defaults.verifier_tier || cfg.roles?.verifier?.defaultTier || "t2") : "t2");
 
   if (!hasRoles && (!cfg.tiers?.[workerTier] || !cfg.tiers?.[plannerTier])) {
     throw new Error("unknown agent/tier");
@@ -292,7 +292,7 @@ export async function cli(argv, options = {}) {
   const selectedAgent = workerRoute.agent;
 
   const run = { version: 2, id: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`, root,
-    packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: workerTier, explicitTier: Boolean(o.tier), plannerTier, verifierTier,
+    packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: workerTier, explicitTier: Boolean(o.tier), plannerTier, verifierTier, explicitVerifierTier: Boolean(o["verifier-tier"]),
     agent: selectedAgent, explicitAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, workerRoute.timeoutSec != null ? { _timeoutSec: workerRoute.timeoutSec } : undefined), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
     direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree, allowBranchMismatch: Boolean(o["allow-branch-mismatch"]),
     model: o.model ?? ws.defaults.model ?? null, effort: o.effort ?? ws.defaults.effort ?? null,
@@ -320,7 +320,10 @@ export async function cli(argv, options = {}) {
         verifier: summarizeRoute(verifierRoute),
       },
       ...(branchMismatches.length ? { branch_warnings: branchMismatches } : {}),
-      packages: packages.map((p) => ({ ...p, readiness: readiness(p), warnings: commandWarnings(p) })),
+      packages: packages.map((p) => ({
+        ...p, readiness: readiness(p), warnings: commandWarnings(p),
+        verifier_route: summarizeRoute(resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitAgent, tier: resolveVerifierTier(run, p, cfg), localConfig: local, workerAgent: workerRoute.agent, packet: p })),
+      })),
     };
   }
   mkdirSync(run.dir, { recursive: true }); persist(run);

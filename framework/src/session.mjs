@@ -121,13 +121,26 @@ export function resolveWorkerTier(run, p, cfg = null) {
   return chosen;
 }
 
+// Precedence: --verifier-tier > --tier > packet verifier_tier > workspace/role default.
+// A packet may raise the verifier tier freely, but may only lower it when the packet is not risk: high.
+export function resolveVerifierTier(run, p, cfg = null) {
+  if (run?.explicitVerifierTier && run.verifierTier) return run.verifierTier;
+  if (run?.explicitTier && run.tier) return run.tier;
+  const base = run?.verifierTier || cfg?.roles?.verifier?.defaultTier || "t2";
+  const raw = p?.verifier_tier ?? p?.verifierTier;
+  const explicit = typeof raw === "string" && /^t[0-5]$/i.test(raw.trim()) ? raw.trim().toLowerCase() : null;
+  if (!explicit) return base;
+  if (p?.risk === "high" && isTierLower(explicit, base)) return base;
+  return explicit;
+}
+
 export async function callSession(run, p, role, cfg, { runner = runCli, signal, context = {}, forceAgent, localConfig = null } = {}) {
   if (!["worker", "planner", "verifier"].includes(role)) throw new Error(`unknown execution role: ${role}`);
   const requestedTier = role === "planner"
     ? (run.plannerTier || cfg?.roles?.planner?.defaultTier || "t3")
     : role === "worker"
       ? resolveWorkerTier(run, p, cfg)
-      : (run.verifierTier || (run.explicitTier ? run.tier : null) || cfg?.roles?.verifier?.defaultTier || "t2");
+      : resolveVerifierTier(run, p, cfg);
 
   // Keep a worker bound to its resumed session provider rather than silently switching mid-session.
   const pinnedSessionAgent = role === "worker" && p.session?.agent ? p.session.agent : null;

@@ -38,7 +38,7 @@ export function utility(o, ws, cfg, root, local) {
     [--cwd <repo>] [--workspace <dir>] [--config <file>] [--target <name>] [--module <project/module>]
     [--owns <glob,glob>] [--acceptance <text>] [--source <reference>]
     [--build <cmd>] [--test <cmd>] [--test-full <cmd>] [--setup <cmd>]
-    [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
+    [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--verifier-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
     [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback] [--allow-branch-mismatch]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]

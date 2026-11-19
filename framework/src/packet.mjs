@@ -137,6 +137,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
     const similar = task.owns?.length && [...groups.values()].find((g) => g.module === task.module && task.module && JSON.stringify(g.owns) === JSON.stringify(task.owns) && g.repo.path === (task.repo?.path ?? repo) && JSON.stringify(g.commands) === JSON.stringify(task.commands ?? commands ?? plan.commands));
     const key = task.package ?? similar?.id ?? task.id;
     const workerTierVal = task.worker_tier ?? task.workerTier ?? plan.worker_tier ?? plan.workerTier;
+    const verifierTierVal = task.verifier_tier ?? task.verifierTier ?? plan.verifier_tier ?? plan.verifierTier;
     const pkg = groups.get(key) ?? {
       id: assertId(key), title: task.title ?? task.name ?? task.id, goal: task.goal ?? task.task ?? task.description ?? plan.goal ?? task.id,
       tasks: [], repo: { path: task.repo?.path ?? repo }, owns: task.owns ?? plan.owns ?? [],
@@ -148,6 +149,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
       kind: task.kind ?? plan.kind ?? normalized?.kind ?? "code",
       ...(task.cross_cutting !== undefined || task.crossCutting !== undefined ? { cross_cutting: Boolean(task.cross_cutting ?? task.crossCutting) } : {}),
       ...(workerTierVal ? { worker_tier: workerTierVal } : {}),
+      ...(verifierTierVal ? { verifier_tier: verifierTierVal } : {}),
     };
     pkg.tasks.push(task.id);
     if (JSON.stringify(pkg.owns) !== JSON.stringify(task.owns ?? plan.owns ?? []) || pkg.repo.path !== (task.repo?.path ?? repo) || JSON.stringify(pkg.commands) !== JSON.stringify(task.commands ?? commands ?? plan.commands)) throw new Error(`${task.id}: incompatible package scope/repo/commands`);
