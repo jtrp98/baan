@@ -16,7 +16,7 @@ assert.ok(pack.files.length > 0);
 for (const { path: file } of pack.files) {
   assert.ok(!/(?:^|\/)(?:reports|planning|tests|docs|\.baan|node_modules)(?:\/|$)/i.test(file), `unwanted package entry: ${file}`);
   if (!file.startsWith("templates/")) {
-    assert.ok(!/(?:^|\/)(?:\.env(?:\..*)?|AGENTS\.md|CLAUDE\.md|baan\.config\.json|demo-notes\.md)$/.test(file), `local data: ${file}`);
+    assert.ok(!/(?:^|\/)(?:\.env(?:\..*)?|AGENTS\.md|CLAUDE\.md|GEMINI\.md|baan\.config\.json|demo-notes\.md)$/.test(file), `local data: ${file}`);
   }
   assert.ok(!/(?:^|\/)v[12](?:\/|$)|baan-role\.mjs$/.test(file), `obsolete entry: ${file}`);
   if (/\.(?:mjs|js|json|md|txt)$/.test(file)) {
@@ -40,15 +40,22 @@ const shimVersion = npm(["exec", "--offline", "--", "baan", "--version"]);
 assert.equal(shimVersion.trim(), meta.version);
 const workspace = path.join(temp, "workspace");
 execute(process.execPath, [bin, "--init", "--workspace", workspace]);
-const stub = readFileSync(path.join(workspace, "AGENTS.md"), "utf8");
-assert.ok(stub.includes(path.join(installed, "BAAN.md")));
-assert.ok(stub.includes(path.join(installed, "LEARNING.md")));
-for (const role of ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"]) assert.ok(existsSync(path.join(installed, "roles", `${role}.md`)));
+for (const name of ["CLAUDE.md", "AGENTS.md", "GEMINI.md"]) {
+  const stub = readFileSync(path.join(workspace, name), "utf8");
+  assert.ok(stub.includes(path.join(installed, "BAAN.md")));
+  assert.ok(stub.includes(path.join(installed, "LEARNING.md")));
+}
+for (const role of ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"]) {
+  assert.ok(existsSync(path.join(installed, "roles", `${role}.md`)));
+  assert.ok(existsSync(path.join(workspace, ".claude", "agents", `${role}.md`)));
+  assert.ok(existsSync(path.join(workspace, ".codex", "agents", `${role}.toml`)));
+  assert.ok(existsSync(path.join(workspace, ".agents", "agents", `${role}.md`)));
+}
 
 // This synthetic provider and its approvals exist only inside disposable release fixtures.
 const provider = path.join(temp, "provider.cjs");
 writeFileSync(provider, `const fs=require('fs'),path=require('path');let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{
-const packet=JSON.parse(input.split('INPUT (data):\\n')[1].split('\\n\\nReturn JSON')[0]);
+const packet=JSON.parse(input.split('## Input Data (JSON)\\n')[1].split('\\n\\n## Output Requirement')[0]);
 const role=input.match(/\\[baan: (\\w+)\\]/)[1];let output;
 if(role==='planner') output={packages:packet.packages.map(p=>({id:p.id,depends_on:p.depends_on,subpackages:[]})),questions:[],decisions:[]};
 else if(role==='worker'){for(const f of packet.owns)fs.writeFileSync(path.resolve(f),'export const value = 2;\\n');output={state:'DONE',summary:'fixture fixed',acceptance:packet.acceptance.map(a=>({id:a.id,proof:['value test']})),test_changes:[],questions:[],failure_class:''};}

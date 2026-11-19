@@ -234,7 +234,7 @@ test("engine session summaries preserve evidence paths and rework context withou
   const run = runAt(root, [p]);
   const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "answerFile" } }, tiers: { t5: { codex: {} } } };
   await callSession(run, p, "worker", agents, { runner: async (def, args, via, prompt) => {
-    const input = JSON.parse(prompt.split("INPUT (data):\n")[1].split("\n\nReturn JSON")[0]);
+    const input = JSON.parse(prompt.split("## Input Data (JSON)\n")[1].split("\n\n## Output Requirement")[0]);
     assert.ok(!prompt.includes(raw));
     assert.equal(input.probe.output_file, result.output_file);
     assert.equal(input.gate.results[0].output_file, result.output_file);
@@ -313,22 +313,25 @@ test("engine docs hybrid verification skips LLM verifier for routine docs but re
 });
 
 test("engine resolveWorkerTier respects code vs docs tier rules", () => {
-  const run = { tier: "t2", plannerTier: "t2" };
+  const run = { tier: "t3", plannerTier: "t3" };
   
-  // Docs routine defaults to t4
-  assert.equal(resolveWorkerTier(run, { kind: "docs", goal: "summary", risk: "low" }), "t4");
+  // Docs routine defaults to docs t2
+  assert.equal(resolveWorkerTier(run, { kind: "docs", goal: "summary", risk: "low" }), "t2");
+
+  // Docs critical defaults to docs t1
+  assert.equal(resolveWorkerTier(run, { kind: "docs", goal: "ADR for auth schema", risk: "low" }), "t1");
 
   // Docs with explicit worker_tier
-  assert.equal(resolveWorkerTier(run, { kind: "docs", worker_tier: "t5", risk: "low" }), "t5");
+  assert.equal(resolveWorkerTier(run, { kind: "docs", worker_tier: "t3", risk: "low" }), "t3");
 
   // Code high risk cannot step-down below t2
-  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t3" }), "t2");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t4" }), "t2");
 
   // Code low risk without contracts cannot step-down
-  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3" }), "t2");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4" }), "t3");
 
   // Code low risk with contracts allows step-down
-  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t3", contracts: [{ ref: "api.md" }] }), "t3");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4", contracts: [{ ref: "api.md" }] }), "t4");
 });
 
 const commitFile = (repo, name, text) => { writeFileSync(path.join(repo, name), text); git(repo, "add", name); git(repo, "commit", "-m", `add ${name}`); };
@@ -546,15 +549,23 @@ test("engine package duration adds up across resumes and a resumed attempt does 
 
 test("engine never picks an agent switched off in local.json as the independent Verifier", async (t) => {
   const { root, repo } = fixture(t);
-  const run = runAt(root, [packet(repo, "A", { risk: "high" })]);
-  const agents = { agents: { claude: { enabled: false }, codex: {}, agy: {} }, tiers: { t5: { claude: {}, codex: {}, agy: {} }, t2: { claude: {}, codex: {}, agy: {} } } };
-  let verifier;
-  const spy = async (r, p, role, c, opts) => {
-    if (role === "worker") p.workerAgent = "codex";
-    if (role === "verifier") verifier = opts.forceAgent;
-    return session(r, p, role);
+  const p = packet(repo, "A", { risk: "high" });
+  const run = runAt(root, [p]);
+  p.workerAgent = "codex";
+  const agents = {
+    agents: {
+      claude: { command: "claude", enabled: false, promptVia: "stdin", readArgs: ["-p"], answerFrom: "stdout" },
+      codex: { command: "codex", promptVia: "stdin", readArgs: ["exec", "-"], answerFrom: "answerFile" },
+      agy: { command: "agy", promptVia: "stdin", readArgs: ["--print"], answerFrom: "stdout" },
+    },
+    tiers: { t5: { claude: {}, codex: {}, agy: {} }, t2: { claude: {}, codex: {}, agy: {} } },
   };
-  await schedule(run, agents, { session: spy, execute: passing });
-  assert.equal(run.packages[0].state, "done");
-  assert.equal(verifier, "agy");
+  let verifierCmd = "";
+  await callSession(run, p, "verifier", agents, {
+    runner: async (def) => {
+      verifierCmd = def.command;
+      return { ok: true, answer: JSON.stringify({ verdict: "PASS", findings: [], failure_class: "", acceptance: p.acceptance.map((a) => ({ id: a.id, passed: true, proof: ["value test"] })) }), durationMs: 1 };
+    },
+  });
+  assert.equal(verifierCmd, "agy");
 });

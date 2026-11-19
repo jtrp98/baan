@@ -97,21 +97,26 @@ test("linked worktrees share one writer lock", (t) => {
   const release = repoLock(root, repo);
   try { assert.throws(() => repoLock(root, linked), /LOCK_BUSY/); } finally { release(); }
 });
-test("fallback drops the prior provider session and never retries after edits or Git state changes", async (t) => {
+test("strict no-impersonation: rate limit never silently switches providers or drops the prior session", async (t) => {
   const { root, repo } = fixture(t); const p = packet(repo, "A", { session: { agent: "codex", id: "codex-thread" } }); const run = runAt(root, [p]); run.allowFallback = true;
   const agents = { agents: Object.fromEntries(["codex", "claude"].map((name) => [name, { command: name, promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" }])), tiers: { t5: { codex: {}, claude: {}, _fallback: ["codex", "claude"] } } };
   const tried = [];
-  await callSession(run, p, "worker", agents, { runner: async (def, args) => {
-    tried.push(def.command);
-    if (def.command === "codex") return { ok: false, error: "rate limit" };
-    assert.ok(!args.includes("codex-thread")); assert.ok(args.includes("--session-id"));
-    return { ok: true, answer: JSON.stringify(good) };
-  } });
-  assert.deepEqual(tried, ["codex", "claude"]);
+  await assert.rejects(
+    callSession(run, p, "worker", agents, { runner: async (def) => {
+      tried.push(def.command);
+      return { ok: false, error: "rate limit" };
+    } }),
+    (err) => err.failureClass === "PROVIDER_LIMIT" && /ไม่สวมรอย/.test(err.message)
+  );
+  assert.deepEqual(tried, ["codex"]);
+  assert.equal(p.session?.id, "codex-thread");
   delete p.session; tried.length = 0;
-  await assert.rejects(callSession(run, p, "worker", agents, { runner: async (def) => {
-    tried.push(def.command); writeFileSync(path.join(repo, "code.mjs"), "partial"); return { ok: false, error: "rate limit" };
-  } }));
+  await assert.rejects(
+    callSession(run, p, "worker", agents, { runner: async (def) => {
+      tried.push(def.command); writeFileSync(path.join(repo, "code.mjs"), "partial"); return { ok: false, error: "rate limit" };
+    } }),
+    (err) => err.failureClass === "PROVIDER_LIMIT"
+  );
   assert.deepEqual(tried, ["codex"]);
 });
 test("read-only verifier mutations cannot pass and rework receives verifier findings", async (t) => {

@@ -93,6 +93,7 @@ export class ClaudeAdapter extends BaseAdapter {
       addDirs = [],
       session,
       schema,
+      systemPromptFile = "",
       providerArgs = [],
     } = spec;
 
@@ -103,6 +104,7 @@ export class ClaudeAdapter extends BaseAdapter {
     // Model and effort (Native Config First: only supply flags when explicitly configured).
     if (model) args.push("--model", model);
     if (effort) args.push("--effort", effort);
+    if (systemPromptFile) args.push("--append-system-prompt-file", systemPromptFile);
 
     // Permission mode
     if (isWorker) {
@@ -163,6 +165,7 @@ export class ClaudeAdapter extends BaseAdapter {
       answerFrom: "stdout",
       deviations,
       sessionId,
+      usesSystemPromptChannel: Boolean(systemPromptFile),
     };
   }
 

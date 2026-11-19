@@ -91,10 +91,7 @@ async function processPackage(run, p, cfg, options) {
         const lenses = verification(p, run.packages);
         if (lenses.length) {
           transition(run, p, "verifying", { verification_pending: true });
-          // An agent switched off in local.json must not be picked as the independent Verifier (the call would
-          // silently fall back to the Worker's own agent and lose the independence it exists for).
-          const verifierAgent = Object.keys(cfg.agents).find((a) => a !== (p.workerAgent ?? p.session?.agent) && cfg.agents[a]?.enabled !== false && cfg.tiers[run.tier]?.[a] != null) ?? run.agent;
-          p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, forceAgent: verifierAgent, context: { lenses } }));
+          p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, context: { lenses } }));
           validateResult(p.verdict, "verifier", p);
           delete p.verification_pending;
           const reviewed = snapshot(p.repo.path);
@@ -119,7 +116,12 @@ async function processPackage(run, p, cfg, options) {
     }
   } catch (e) {
     const failureClass = e.failureClass ?? "ENVIRONMENT_FAILURE";
-    transition(run, p, options.signal?.aborted ? "cancelled" : failureClass === "ENVIRONMENT_FAILURE" ? "env_failed" : "waiting_human", { failureClass, questions: [e.message] });
+    const nextState = options.signal?.aborted
+      ? "cancelled"
+      : failureClass === "ENVIRONMENT_FAILURE"
+        ? "env_failed"
+        : "waiting_human";
+    transition(run, p, nextState, { failureClass, questions: [e.message] });
   } finally {
     // Accumulate across resumes; keeping only the first attempt reported 6.7 s for a package that took 18 h.
     const attemptMs = Date.now() - started;

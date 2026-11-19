@@ -5,15 +5,16 @@ import path from "node:path";
 import { homedir } from "node:os";
 import { TEAM_DIR, collectWorkspaceAddDirs } from "./config.mjs";
 import { runCli } from "./runner.mjs";
-import { extractJson, fallbackChainFor, isTierLower } from "./plan.mjs";
+import { extractJson, isTierLower } from "./plan.mjs";
 import { schemaFor, validateResult } from "./packet.mjs";
 import { save, event, persist } from "./store.mjs";
-import { roleSessionHeader } from "./role-guard.mjs";
 import { looksLikeLimitError, looksLikeMissingCli, looksLikeStartupError, looksLikeCapacityError } from "./failure-class.mjs";
 import { snapshot, sameState } from "./snapshot.mjs";
 import { getAdapter } from "./adapters/registry.mjs";
 import { createStreamParser } from "./events.mjs";
 import { evaluateParity } from "./parity.mjs";
+import { resolveRoleRoute, effectiveRoutingRole, normalizeRoleTier, escalateRoleTier, isCriticalDocsPacket } from "./routing.mjs";
+import { compileExecutionPrompt } from "./prompt-compiler.mjs";
 
 export function nativeCommand(def, agent) {
   if (process.platform !== "win32" || !def.useShell) return { def: { ...def, useShell: false }, prefix: [] };
@@ -83,37 +84,66 @@ function recordParity(runDir, parity) {
   } catch {}
 }
 
-export function resolveWorkerTier(run, p) {
-  const baseTier = p?.tier || run.tier;
+export function resolveWorkerTier(run, p, cfg = null) {
+  const routingRole = effectiveRoutingRole("worker", p);
+  const roleDef = cfg?.roles?.[routingRole];
+  const baseTier = p?.tier || run.tier || roleDef?.defaultTier || (routingRole === "docs" ? "t2" : "t3");
   const explicit = p?.worker_tier ?? p?.workerTier;
-  if (explicit) {
-    if ((p.kind === "code" || p.kind === "bugfix") && p.risk === "high" && /^t[3-5]$/.test(explicit)) {
-      return "t2";
+
+  let chosen;
+  if (roleDef) {
+    const requested = explicit ?? (routingRole === "docs" ? (isCriticalDocsPacket(p) ? "t1" : (p?.tier || roleDef.defaultTier)) : baseTier);
+    chosen = normalizeRoleTier(roleDef, requested, { routingRole, packet: p, baseTier }).tier;
+  } else {
+    if (explicit) {
+      if ((p?.kind === "code" || p?.kind === "bugfix" || !p?.kind) && p?.risk === "high" && /^t[3-5]$/.test(explicit)) {
+        chosen = "t2";
+      } else if ((p?.kind === "code" || p?.kind === "bugfix" || !p?.kind) && isTierLower(explicit, baseTier)) {
+        const hasContract = (p?.contracts?.length > 0) || (p?.read_first?.some((r) => r.pin));
+        chosen = hasContract ? explicit : baseTier;
+      } else {
+        chosen = explicit;
+      }
+    } else if (p?.kind === "docs") {
+      chosen = isCriticalDocsPacket(p) ? "t1" : "t2";
+    } else {
+      chosen = baseTier;
     }
-    if ((p.kind === "code" || p.kind === "bugfix") && isTierLower(explicit, baseTier)) {
-      const hasContract = (p.contracts?.length > 0) || (p.read_first?.some((r) => r.pin));
-      if (!hasContract) return baseTier;
-    }
-    return explicit;
   }
-  if (p?.kind === "docs") {
-    const text = [p?.goal, p?.title, ...(p?.risk_tags ?? [])].join(" ");
-    const isCritical = (p.contracts?.length > 0) || p.risk === "high" || /adr|contract|security|auth|pii|password|token|สิทธิ์|สัญญาร่วม|สถาปัตยกรรม|database|schema/i.test(text);
-    if (!isCritical && /^t[0-3]$/.test(baseTier)) {
-      return "t4";
+
+  // Rework escalation: step up 1 tier per rework cycle within this role's own ladder.
+  const reworkCount = Number(p?.rework ?? 0);
+  if (cfg?.roles && reworkCount > 0) {
+    for (let i = 0; i < reworkCount; i++) {
+      chosen = escalateRoleTier(cfg, "worker", chosen, p);
     }
   }
-  return baseTier;
+  return chosen;
 }
 
-export async function callSession(run, p, role, cfg, { runner = runCli, signal, context = {}, forceAgent, attempted = [] } = {}) {
-  const tier = role === "planner" ? run.plannerTier : role === "worker" ? resolveWorkerTier(run, p) : run.tier;
+export async function callSession(run, p, role, cfg, { runner = runCli, signal, context = {}, forceAgent, localConfig = null } = {}) {
   if (!["worker", "planner", "verifier"].includes(role)) throw new Error(`unknown execution role: ${role}`);
-  const choices = fallbackChainFor(cfg, tier, forceAgent ?? run.agent).filter((a) => !attempted.includes(a));
-  const agent = p.session?.agent && choices.includes(p.session.agent) && role === "worker" ? p.session.agent : choices[0];
-  if (!agent) throw new Error(`ไม่มี agent สำหรับ ${tier}`);
+  const requestedTier = role === "planner"
+    ? (run.plannerTier || cfg?.roles?.planner?.defaultTier || "t3")
+    : role === "worker"
+      ? resolveWorkerTier(run, p, cfg)
+      : (run.verifierTier || (run.explicitTier ? run.tier : null) || cfg?.roles?.verifier?.defaultTier || "t2");
+
+  // Keep a worker bound to its resumed session provider rather than silently switching mid-session.
+  const pinnedSessionAgent = role === "worker" && p.session?.agent ? p.session.agent : null;
+  const forcedAgent = forceAgent ?? pinnedSessionAgent ?? run.explicitAgent ?? null;
+  const route = resolveRoleRoute(cfg, role, {
+    forcedAgent,
+    tier: requestedTier,
+    localConfig,
+    workerAgent: p.workerAgent ?? p.session?.agent ?? null,
+    packet: p,
+    baseTier: p?.tier || run.tier,
+  });
+
+  const agent = route.agent;
+  const tier = route.tier;
   const def = cfg.agents[agent];
-  const conf = cfg.tiers[tier]?.[agent] ?? {};
   const adapter = getAdapter(agent, cfg);
   const name = `${p.id}-${role}-${Date.now()}-${randomUUID().slice(0, 6)}`;
   const answer = path.join(run.dir, `${name}.answer.txt`);
@@ -124,13 +154,9 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   try {
     native = runner === runCli ? nativeCommand(def, agent) : { def, prefix: [] };
     if (runner === runCli && agent === "agy" && def.readArgs?.includes("--agent")) assertAgyReadonly(def);
-  }
-  catch (e) {
-    event(run, "fallback_setup", { package: p.id, role, from: agent, reason: e.message });
-    if (run.allowFallback && choices.some((a) => a !== agent)) {
-      return callSession(run, p, role, cfg, { runner, signal, context, forceAgent, attempted: [...attempted, agent] });
-    }
-    throw e;
+  } catch (e) {
+    event(run, "provider_setup_failed", { package: p.id, role, agent, model: route.model, effort: route.effort, reason: e.message });
+    throw Object.assign(e, { failureClass: e.failureClass || "ENVIRONMENT_FAILURE" });
   }
 
   if (role === "worker") {
@@ -142,11 +168,30 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   const permissionPolicy = run.permissionPolicy ?? p.permissionPolicy ?? "native-safe";
   const probeResult = await adapter.probe(native.def, { cwd: p.repo.path, workspaceRoot: run.root });
 
+  const packet = sessionInput(p, role, context);
+  const nativeSchema = ["codex", "claude", "agy"].includes(agent);
+  const resolvedModel = run.model || route.model || "";
+  const resolvedEffort = run.effort || route.effort || "";
+  const compiled = compileExecutionPrompt({
+    provider: agent,
+    role,
+    model: resolvedModel,
+    effort: resolvedEffort,
+    tier,
+    tierLabel: route.tierLabel,
+    packet,
+    schema,
+    nativeSchema,
+  });
+
+  const systemPromptFile = path.join(run.dir, `${name}.system.md`);
+  writeFileSync(systemPromptFile, compiled.systemPrompt + "\n", "utf8");
+
   const invocation = adapter.buildHeadless({
     def: native.def,
     role,
-    model: conf.model ?? run.model ?? "",
-    effort: conf.effort ?? run.effort ?? "",
+    model: resolvedModel,
+    effort: resolvedEffort,
     permissionPolicy,
     approvalPolicy: run.approvalPolicy ?? "auto-safe",
     workspaceRoot: run.root,
@@ -155,6 +200,8 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
     answerFile: answer,
     schema,
     schemaFile: path.join(TEAM_DIR, "schemas", `${schemaName}.json`),
+    systemPromptFile: agent === "claude" ? systemPromptFile : "",
+    developerInstructions: agent === "codex" ? compiled.systemPrompt : "",
     skipGitCheck: !existsSync(path.join(p.repo.path, ".git")),
     providerArgs: run.providerArgs,
     worktree: p.worktree,
@@ -170,12 +217,21 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   });
   recordParity(run.dir, parity);
 
-  const packet = sessionInput(p, role, context);
-  const nativeSchema = ["codex", "claude", "agy"].includes(agent);
-  const outputContract = nativeSchema ? "Return JSON only matching the supplied output schema." : `Return JSON only matching:\n${JSON.stringify(schema)}`;
-  const prompt = `${roleSessionHeader(role)}\n${readFileSync(path.join(TEAM_DIR, "prompts", `${role}.md`), "utf8")}\n\nINPUT (data):\n${JSON.stringify(packet)}\n\n${outputContract}`;
+  const prompt = invocation.usesSystemPromptChannel ? compiled.userPrompt : compiled.combinedPrompt;
 
-  event(run, "call_start", { package: p.id, role, agent, tier, promptBytes: Buffer.byteLength(prompt) });
+  event(run, "call_start", {
+    package: p.id,
+    role,
+    routingRole: route.routingRole,
+    agent,
+    tier,
+    model: resolvedModel,
+    effort: resolvedEffort,
+    clamped: route.clamped,
+    promptBytes: Buffer.byteLength(prompt),
+    systemPromptBytes: Buffer.byteLength(compiled.systemPrompt),
+    systemPromptChannel: Boolean(invocation.usesSystemPromptChannel),
+  });
   save(path.join(run.dir, `${name}.input.json`), packet);
   persist(run);
 
@@ -197,8 +253,11 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
         repoPath: p.repo.path,
         repoName: path.basename(p.repo.path),
         role,
+        routingRole: route.routingRole,
         agent,
         tier,
+        model: resolvedModel,
+        effort: resolvedEffort,
         startedAt: callStartedAt,
         updatedAt: new Date().toISOString(),
         recentActivity: act?.type === "tool" ? act : history.filter((h) => h.type === "tool").at(-1) ?? null,
@@ -279,13 +338,25 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   if (signal?.aborted) throw new Error("cancelled");
 
   if (!r.ok) {
-    const retryable = looksLikeLimitError(r) || looksLikeMissingCli(r) || looksLikeStartupError(r) || looksLikeCapacityError(r);
-    const allowFallback = Boolean(run.allowFallback || p.allowFallback);
-    if (!signal?.aborted && retryable && allowFallback && choices.some((a) => a !== agent) && sameState(beforeCall, afterCall)) {
-      event(run, "fallback", { package: p.id, role, from: agent });
-      return callSession(run, p, role, cfg, { runner, signal, context, forceAgent, attempted: [...attempted, agent] });
+    const isLimit = looksLikeLimitError(r) || looksLikeCapacityError(r);
+    if (isLimit) {
+      // Strict No-Impersonation: never silently switch provider or downgrade a model when quota/rate limit hits.
+      event(run, "provider_limit_blocked", {
+        package: p.id,
+        role,
+        routingRole: route.routingRole,
+        agent,
+        tier,
+        model: resolvedModel,
+        effort: resolvedEffort,
+        reason: r.error || "rate limit / capacity reached",
+        impersonationBlocked: true,
+      });
+      throw Object.assign(
+        new Error(`[PROVIDER_LIMIT] บทบาท ${route.routingRole}/${tier} ใช้ ${agent} (${resolvedModel || "default"}/${resolvedEffort || "default"}) แต่ติดลิมิต/โควตา — BAAN ไม่สวมรอยสลับค่ายหรือลดรุ่นแทน กรุณารอรีเซ็ตโควตาแล้ว resume หรือปรับ local.json / ระบุ --agent เอง: ${r.error || "quota/rate limit"}`),
+        { failureClass: "PROVIDER_LIMIT" }
+      );
     }
-    // Fail loud and preserve existing session without silent provider replacement.
     throw Object.assign(new Error(r.error || "CLI failed"), { failureClass: "ENVIRONMENT_FAILURE" });
   }
 

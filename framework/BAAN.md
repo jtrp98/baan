@@ -52,7 +52,7 @@ Acceptance/source/scope/commands ไม่ครบ, approval stale, dirty file 
 
 ## การแบ่ง 2 ทีม (8 บทบาท) ใน workspace
 
-`baan --init` / `baan sync` ติดตั้ง 8 บทบาทไว้ใน `.claude/agents/` และติดตั้ง live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ไว้ที่**ราก workspace เท่านั้น** (ห้ามติดตั้งลงใน `target/*`) เพื่อให้คุยสดได้โดยตรงและติดตามสถานะบน `baan monitor`:
+`baan --init` / `baan sync` ติดตั้ง 8 บทบาทแบบ native ครบทั้ง 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md` พร้อม root stubs `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และติดตั้ง live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ไว้ที่**ราก workspace เท่านั้น** (ห้ามติดตั้งลงใน `target/*`) เพื่อให้คุยสดได้โดยตรงและติดตามสถานะบน `baan monitor`:
 1. **ทีมสร้าง / วิศวกรรม (อ่าน Code, DB, API, Logs, Tests)**:
    - `spec` (BA) เก็บ requirement → `arch` (SA) ออกแบบ API/DB และทำ ADR → `pm` (PM) คุม scope/risk/ROI →
    - `build` (Dev / Worker) เขียนโค้ดและ tests → `check` (QA / Verifier) ตรวจสอบความถูกต้องและท้าทายระบบ

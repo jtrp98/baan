@@ -123,6 +123,7 @@ export class CodexAdapter extends BaseAdapter {
       session,
       answerFile,
       schemaFile,
+      developerInstructions = "",
       providerArgs = [],
     } = spec;
 
@@ -130,6 +131,11 @@ export class CodexAdapter extends BaseAdapter {
     const isResume = isWorker && Boolean(session?.id && session?.started);
     const deviations = [];
     const allDirs = [...new Set([workspaceRoot, ...addDirs].filter(Boolean))];
+    // Keep inline -c developer_instructions within Windows CreateProcess arg limits.
+    const canPassDeveloperInstructions = Boolean(developerInstructions) && Buffer.byteLength(developerInstructions, "utf8") <= 4096;
+    if (developerInstructions && !canPassDeveloperInstructions) {
+      deviations.push("developer_instructions exceeded 4KB Windows CLI limit; delivered via stdin instead");
+    }
 
     if (!isResume) {
       const args = ["exec"];
@@ -140,6 +146,7 @@ export class CodexAdapter extends BaseAdapter {
 
       if (model) args.push("-m", model);
       if (effort) args.push("-c", `model_reasoning_effort=${effort}`);
+      if (canPassDeveloperInstructions) args.push("-c", `developer_instructions=${JSON.stringify(developerInstructions)}`);
 
       if (isWorker) {
         if (permissionPolicy === "bypass") {
@@ -189,6 +196,7 @@ export class CodexAdapter extends BaseAdapter {
         answerFrom: "answerFile",
         deviations,
         sessionId: session?.id ?? null,
+        usesSystemPromptChannel: canPassDeveloperInstructions,
       };
     }
 
@@ -201,6 +209,7 @@ export class CodexAdapter extends BaseAdapter {
 
     if (model) args.push("-m", model);
     if (effort) args.push("-c", `model_reasoning_effort=${effort}`);
+    if (canPassDeveloperInstructions) args.push("-c", `developer_instructions=${JSON.stringify(developerInstructions)}`);
 
     if (permissionPolicy === "bypass") {
       args.push("--dangerously-bypass-approvals-and-sandbox");
@@ -239,6 +248,7 @@ export class CodexAdapter extends BaseAdapter {
       answerFrom: "answerFile",
       deviations,
       sessionId: session.id,
+      usesSystemPromptChannel: canPassDeveloperInstructions,
     };
   }
 

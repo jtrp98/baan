@@ -81,6 +81,7 @@ export class AgyAdapter extends BaseAdapter {
       addDirs = [],
       session,
       schemaFile,
+      agentProfile = "",
       providerArgs = [],
     } = spec;
 
@@ -88,6 +89,7 @@ export class AgyAdapter extends BaseAdapter {
     const deviations = [];
     const args = ["--input-format", "stream-json", "--output-format", "stream-json"];
 
+    if (agentProfile) args.push("--agent", agentProfile);
     if (model) args.push("--model", model);
     if (effort) args.push("--effort", effort);
 
@@ -134,6 +136,7 @@ export class AgyAdapter extends BaseAdapter {
       answerFrom: "stdout",
       deviations,
       sessionId: session?.id ?? null,
+      usesSystemPromptChannel: false,
     };
   }
 

@@ -125,7 +125,9 @@ export function loadWorkspace(configPath = null) {
     knowledge_roots: Array.isArray(raw.knowledge_roots) ? raw.knowledge_roots : [],
     defaults: {
       agent: raw.defaults?.agent ?? "codex",
-      planner_tier: raw.defaults?.planner_tier ?? "t2",
+      planner_tier: raw.defaults?.planner_tier ?? "t3",
+      worker_tier: raw.defaults?.worker_tier ?? "t3",
+      verifier_tier: raw.defaults?.verifier_tier ?? "t2",
       timeout_sec: Object.hasOwn(raw.defaults ?? {}, "timeout_sec") ? raw.defaults.timeout_sec : DEFAULT_TIMEOUT_SEC,
       max_parallel: raw.defaults?.max_parallel ?? 3,
       permission_policy: raw.defaults?.permission_policy ?? "native-safe",

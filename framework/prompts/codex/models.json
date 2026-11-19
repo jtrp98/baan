@@ -1,0 +1,14 @@
+{
+  "gpt-6.2-astra": {
+    "label": "GPT-6.2 Astra",
+    "guidance": "Trace deep causal chains, concurrency/locking interactions, and cross-module invariants thoroughly before acting. Enforce strict logical precision and zero unverified assumptions."
+  },
+  "gpt-6.2-sol": {
+    "label": "GPT-6.2 Sol",
+    "guidance": "Execute a tight, deterministic read -> edit -> test loop strictly within `owns`. Follow pinned contracts literally and verify every AC with concrete command output."
+  },
+  "gpt-6.1-terra": {
+    "label": "GPT-6.1 Terra",
+    "guidance": "Handle only tightly scoped documentation, summaries, or mechanical edits strictly following the supplied outline and schema."
+  }
+}

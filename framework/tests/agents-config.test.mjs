@@ -1,95 +1,88 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const cfg = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "agents.json"), "utf8"));
 const AGENTS = ["claude", "codex", "agy"];
+const EXPECTED_ROLES = ["planner", "worker", "verifier", "docs", "arch", "spec", "pm", "build", "check", "survey", "ui", "review"];
+const NEON_PINNED_ROLES = ["planner", "arch", "survey", "ui", "review"];
 
-test("ทุก tier ประกาศครบทั้ง 3 native agents และรูปแบบถูกต้อง", () => {
-  for (const [tier, conf] of Object.entries(cfg.tiers)) {
-    for (const a of AGENTS) {
-      assert.ok(a in conf, `tier ${tier} ต้องประกาศ ${a} ไว้เสมอ`);
-      if (conf[a] !== null) {
-        assert.equal(typeof conf[a].model, "string", `tier ${tier}/${a}: ต้องมี model เป็น string`);
-        assert.ok(conf[a].model.length > 0);
+test("agents.json ใช้โครงสร้าง Role-Owned Tiers ครบ 12 บทบาท และทุก tier ประกาศครบทั้ง 3 ค่าย", () => {
+  assert.equal(cfg.tiers, undefined, "เลิกใช้ global tiers กลางแล้ว — ทุกบทบาทต้องประกาศ tiers ของตัวเองใน roles");
+  for (const role of EXPECTED_ROLES) {
+    const def = cfg.roles?.[role];
+    assert.ok(def, `ต้องมีบทบาท ${role} ใน agents.json.roles`);
+    assert.equal(def.strict, true, `บทบาท ${role} ต้องเปิด strict: true (Strict No-Impersonation)`);
+    assert.ok(Array.isArray(def.preference) && def.preference.length === 3, `บทบาท ${role} ต้องประกาศ preference ครบ 3 ค่าย`);
+    assert.equal(new Set(def.preference).size, 3, `บทบาท ${role}: preference ห้ามซ้ำ`);
+    for (const a of def.preference) assert.ok(AGENTS.includes(a), `บทบาท ${role}: preference มีค่ายที่ไม่รู้จัก (${a})`);
+    assert.ok(def.defaultTier && def.tiers?.[def.defaultTier], `บทบาท ${role}: defaultTier (${def.defaultTier}) ต้องมีจริงใน tiers`);
+
+    for (const [tier, td] of Object.entries(def.tiers)) {
+      for (const a of AGENTS) {
+        assert.ok(a in td, `${role}/${tier} ต้องประกาศ ${a} ไว้เสมอ`);
+        assert.equal(typeof td[a]?.model, "string", `${role}/${tier}/${a} ต้องมี model`);
+        assert.ok(td[a].model.length > 0);
+        assert.equal(typeof td[a]?.effort, "string", `${role}/${tier}/${a} ต้องมี effort`);
       }
     }
   }
+  assert.equal(cfg.roles.verifier.mustDifferFromWorker, true, "verifier ต้องตั้ง mustDifferFromWorker: true");
 });
 
-test("_fallback ของทุก tier ต้องเป็นลำดับ native agent ที่รู้จัก ไม่ซ้ำ ไม่ว่าง", () => {
-  for (const [tier, conf] of Object.entries(cfg.tiers)) {
-    const fb = conf._fallback;
-    assert.ok(Array.isArray(fb) && fb.length > 0, `tier ${tier}: ต้องมี _fallback`);
-    for (const a of fb) assert.ok(AGENTS.includes(a), `tier ${tier}: _fallback มี agent ที่ไม่รู้จัก (${a})`);
-    assert.equal(new Set(fb).size, fb.length, `tier ${tier}: _fallback ห้ามซ้ำ`);
-    for (const a of AGENTS) {
-      if (conf[a] !== null) assert.ok(fb.includes(a), `tier ${tier}: ${a} ใช้ได้แต่ไม่อยู่ใน _fallback`);
+test("งานออกแบบระบบและ UX/UI บน agy ยึด gemini-4-neon ทุก tier (ปรับเฉพาะ effort) และ docs t2 ใช้ hydrogen low", () => {
+  for (const role of NEON_PINNED_ROLES) {
+    for (const [tier, td] of Object.entries(cfg.roles[role].tiers)) {
+      assert.equal(td.agy.model, "gemini-4-neon", `${role}/${tier}/agy ต้องยึด gemini-4-neon เสมอ`);
     }
+    assert.equal(cfg.roles[role].preference[0], "agy", `${role} ต้องมี agy เป็น specialist อันดับ 1`);
   }
+  assert.deepEqual(cfg.roles.docs.tiers.t2.agy, { model: "gemini-4-hydrogen", effort: "low" });
+  assert.deepEqual(cfg.roles.docs.tiers.t3.agy, { model: "gemini-3.8-flash", effort: "low" });
+  assert.deepEqual(cfg.roles.docs.tiers.t1.preference, ["claude", "agy", "codex"]);
+  assert.deepEqual(cfg.roles.docs.tiers.t2.preference, ["codex", "claude", "agy"]);
 });
 
-test("agy: t0–t3 = gemini-4-neon (xhigh→low) · t4 = gemini-4-hydrogen (low) · t5 = gemini-3.8-flash (low)", () => {
-  const expected = {
-    t0: { model: "gemini-4-neon", effort: "xhigh" },
-    t1: { model: "gemini-4-neon", effort: "high" },
-    t2: { model: "gemini-4-neon", effort: "medium" },
-    t3: { model: "gemini-4-neon", effort: "low" },
-    t4: { model: "gemini-4-hydrogen", effort: "low" },
-    t5: { model: "gemini-3.8-flash", effort: "low" },
-  };
-  for (const [tier, want] of Object.entries(expected)) {
-    assert.deepEqual(cfg.tiers[tier].agy, want, `tier ${tier}: agy ต้องตรงตามผัง Neon/Hydrogen/Flash`);
-  }
-  assert.deepEqual(cfg.tiers.t0._fallback, ["codex", "agy", "claude"], "t0 _fallback ต้องรวม agy ด้วย");
-});
-
-test("codex & claude: ตรงตามผังแพ็กเกจ $20 บนเส้น Pareto (MODEL-POLICY.md)", () => {
-  const expectedCodex = {
-    t0: { model: "gpt-6.2-astra", effort: "xhigh" },
-    t1: { model: "gpt-6.2-astra", effort: "high" },
-    t2: { model: "gpt-6.2-sol", effort: "xhigh" },
-    t3: { model: "gpt-6.2-sol", effort: "medium" },
-    t4: { model: "gpt-6.2-sol", effort: "low" },
-    t5: { model: "gpt-6.1-terra", effort: "low" },
-  };
-  const expectedClaude = {
-    t0: { model: "opus", effort: "xhigh" },
-    t1: { model: "opus", effort: "high" },
-    t2: { model: "opus", effort: "medium" },
-    t3: { model: "sonnet", effort: "high" },
-    t4: { model: "haiku", effort: "high" },
-    t5: { model: "haiku", effort: "low" },
-  };
-  for (const [tier, want] of Object.entries(expectedCodex)) {
-    assert.deepEqual(cfg.tiers[tier].codex, want, `tier ${tier}: codex ต้องตรงตามผัง Pareto`);
-  }
-  for (const [tier, want] of Object.entries(expectedClaude)) {
-    assert.deepEqual(cfg.tiers[tier].claude, want, `tier ${tier}: claude ต้องตรงตามผัง Claude Pro $20`);
-  }
-  for (const tier of ["t4", "t5"]) {
-    assert.deepEqual(cfg.tiers[tier]._fallback, ["codex", "claude", "agy"], `${tier} _fallback ต้องเรียงตามความคุ้มค่า`);
-  }
-});
-
-test("Policy Guard: ห้ามใส่โมเดลนอกแพ็กเกจ $20 หรือ effort ที่ตกหน้าผาความคุ้มค่า และต้องมี MODEL-POLICY.md", async () => {
-  const { existsSync } = await import("node:fs");
+test("Policy Guard: เฉพาะแพ็กเกจ $20/เดือน, ห้าม effort ที่ตกหน้าผาความคุ้มค่า, และต้องมี MODEL-POLICY.md ครบ 11 เกณฑ์", () => {
   const policyPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "MODEL-POLICY.md");
   assert.ok(existsSync(policyPath), "ต้องมี framework/MODEL-POLICY.md คู่กับ agents.json");
+  const policyText = readFileSync(policyPath, "utf8");
+  assert.match(policyText, /Quality & Accuracy/);
+  assert.match(policyText, /Speed & Latency/);
+  assert.match(policyText, /Cost per Successful Task/);
+  assert.match(policyText, /Risk & Verification/);
 
-  const forbiddenModels = new Set(["fable", "gemini-4-carbon"]);
-  for (const [tier, conf] of Object.entries(cfg.tiers)) {
-    for (const agent of AGENTS) {
-      const entry = conf[agent];
-      if (!entry) continue;
-      assert.ok(!forbiddenModels.has(entry.model), `tier ${tier}/${agent}: ห้ามใช้โมเดลนอกแพ็กเกจ $20 (${entry.model})`);
-      if ((entry.model.startsWith("gpt-6.2-") || entry.model === "opus") && entry.effort === "max") {
-        assert.fail(`tier ${tier}/${agent}: ห้ามใช้ effort 'max' บน ${entry.model} (ผลตอบแทนไม่คุ้มต้นทุน)`);
-      }
-      if (tier !== "t0" && entry.model === "gemini-4-neon" && entry.effort === "xhigh") {
-        assert.fail(`tier ${tier}/agy: สงวน gemini-4-neon xhigh ไว้เฉพาะ t0 เท่านั้น`);
+  const forbiddenModels = new Set(["fable", "gemini-4-carbon", "gpt-6-luna"]);
+  const allowedXhighRoles = new Set(["planner", "arch", "worker", "build", "verifier", "check"]);
+
+  for (const [role, def] of Object.entries(cfg.roles)) {
+    for (const [tier, td] of Object.entries(def.tiers)) {
+      for (const agent of AGENTS) {
+        const entry = td[agent];
+        assert.ok(!forbiddenModels.has(entry.model), `${role}/${tier}/${agent}: ห้ามใช้โมเดลนอกแพ็กเกจ $20 หรือถูกครอบงำ (${entry.model})`);
+        if ((entry.model.startsWith("gpt-6.2-") || entry.model === "opus" || entry.model === "sonnet" || entry.model === "haiku") && entry.effort === "max") {
+          assert.fail(`${role}/${tier}/${agent}: ห้ามใช้ effort 'max' บน ${entry.model} (ผลตอบแทนไม่คุ้มต้นทุน)`);
+        }
+        if (entry.model === "gemini-4-neon" && entry.effort === "xhigh") {
+          assert.fail(`${role}/${tier}/agy: ห้ามใช้ gemini-4-neon xhigh (ลดเพดาน AGY ลงมาที่ high เพื่อความคุ้มค่าและเวลาตอบสนอง)`);
+        }
+        if (entry.model === "gpt-6.2-sol" && entry.effort === "xhigh") {
+          assert.fail(`${role}/${tier}/codex: ห้ามใช้ gpt-6.2-sol xhigh (+5.7% แลก +59% — ให้ใช้ medium หรือ low)`);
+        }
+        if (entry.model === "sonnet" && entry.effort === "xhigh") {
+          assert.fail(`${role}/${tier}/claude: ห้ามใช้ sonnet xhigh (ถูกครอบงำโดย opus high)`);
+        }
+        if (entry.effort === "xhigh") {
+          assert.ok(tier === "t1" && allowedXhighRoles.has(role), `${role}/${tier}/${agent}: สงวน xhigh ไว้เฉพาะ t1 Overdrive ของสายวิศวกรรม/ตรวจรับเท่านั้น`);
+        }
+        if (entry.model === "gemini-4-hydrogen" && entry.effort !== "low") {
+          assert.fail(`${role}/${tier}/agy: ห้ามใช้ gemini-4-hydrogen ที่ effort '${entry.effort}' (ถูกครอบงำโดย gemini-4-neon)`);
+        }
+        if (entry.model === "gpt-6.1-terra" && entry.effort !== "low") {
+          assert.fail(`${role}/${tier}/codex: ห้ามใช้ gpt-6.1-terra ที่ effort '${entry.effort}' (ถูกครอบงำโดย gpt-6.2-sol)`);
+        }
       }
     }
   }

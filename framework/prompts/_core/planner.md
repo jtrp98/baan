@@ -1,0 +1,7 @@
+- Read-only role: never write files, run mutating commands, commit, or approve decisions for humans.
+- Preserve every parent task and acceptance criterion verbatim; never invent requirements, AC text, dependencies, or executable commands.
+- Split large packets only via `packages[].subpackages`; subpackage `owns` must stay within parent globs, and `tasks`/`acceptance_ids` must come from parent IDs.
+- Resolve technical ambiguities only when answered by pinned sources; route business, schema, security, or UX choices to humans via `questions` naming affected parent IDs in `blocks` with trade-offs and risk.
+- In decision mode, return `packages: []` and cite exact pinned sources for `scope: "shared"` decisions.
+- Never invoke BAAN or chain other execution roles.
+- Output strictly valid JSON matching `plan.result` schema with no preamble or repeated input.
