@@ -31,17 +31,67 @@ test("_fallback ของทุก tier ต้องเป็นลำดับ 
   }
 });
 
-test("agy: t0 = null · t1–t4 = gemini-4-hydrogen (xhigh→low) · t5 = gemini-3.8-flash (low)", () => {
-  assert.equal(cfg.tiers.t0.agy, null, "t0 agy คงเป็น null");
+test("agy: t0–t3 = gemini-4-neon (xhigh→low) · t4 = gemini-4-hydrogen (low) · t5 = gemini-3.8-flash (low)", () => {
   const expected = {
-    t1: { model: "gemini-4-hydrogen", effort: "xhigh" },
-    t2: { model: "gemini-4-hydrogen", effort: "high" },
-    t3: { model: "gemini-4-hydrogen", effort: "medium" },
+    t0: { model: "gemini-4-neon", effort: "xhigh" },
+    t1: { model: "gemini-4-neon", effort: "high" },
+    t2: { model: "gemini-4-neon", effort: "medium" },
+    t3: { model: "gemini-4-neon", effort: "low" },
     t4: { model: "gemini-4-hydrogen", effort: "low" },
     t5: { model: "gemini-3.8-flash", effort: "low" },
   };
   for (const [tier, want] of Object.entries(expected)) {
-    assert.deepEqual(cfg.tiers[tier].agy, want, `tier ${tier}: agy ต้องตรงตามผัง Hydrogen/Flash`);
+    assert.deepEqual(cfg.tiers[tier].agy, want, `tier ${tier}: agy ต้องตรงตามผัง Neon/Hydrogen/Flash`);
+  }
+  assert.deepEqual(cfg.tiers.t0._fallback, ["codex", "agy", "claude"], "t0 _fallback ต้องรวม agy ด้วย");
+});
+
+test("codex & claude: ตรงตามผังแพ็กเกจ $20 บนเส้น Pareto (MODEL-POLICY.md)", () => {
+  const expectedCodex = {
+    t0: { model: "gpt-6.2-astra", effort: "xhigh" },
+    t1: { model: "gpt-6.2-astra", effort: "high" },
+    t2: { model: "gpt-6.2-sol", effort: "xhigh" },
+    t3: { model: "gpt-6.2-sol", effort: "medium" },
+    t4: { model: "gpt-6.2-sol", effort: "low" },
+    t5: { model: "gpt-6.1-terra", effort: "low" },
+  };
+  const expectedClaude = {
+    t0: { model: "opus", effort: "xhigh" },
+    t1: { model: "opus", effort: "high" },
+    t2: { model: "opus", effort: "medium" },
+    t3: { model: "sonnet", effort: "high" },
+    t4: { model: "haiku", effort: "high" },
+    t5: { model: "haiku", effort: "low" },
+  };
+  for (const [tier, want] of Object.entries(expectedCodex)) {
+    assert.deepEqual(cfg.tiers[tier].codex, want, `tier ${tier}: codex ต้องตรงตามผัง Pareto`);
+  }
+  for (const [tier, want] of Object.entries(expectedClaude)) {
+    assert.deepEqual(cfg.tiers[tier].claude, want, `tier ${tier}: claude ต้องตรงตามผัง Claude Pro $20`);
+  }
+  for (const tier of ["t4", "t5"]) {
+    assert.deepEqual(cfg.tiers[tier]._fallback, ["codex", "claude", "agy"], `${tier} _fallback ต้องเรียงตามความคุ้มค่า`);
+  }
+});
+
+test("Policy Guard: ห้ามใส่โมเดลนอกแพ็กเกจ $20 หรือ effort ที่ตกหน้าผาความคุ้มค่า และต้องมี MODEL-POLICY.md", async () => {
+  const { existsSync } = await import("node:fs");
+  const policyPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "MODEL-POLICY.md");
+  assert.ok(existsSync(policyPath), "ต้องมี framework/MODEL-POLICY.md คู่กับ agents.json");
+
+  const forbiddenModels = new Set(["fable", "gemini-4-carbon"]);
+  for (const [tier, conf] of Object.entries(cfg.tiers)) {
+    for (const agent of AGENTS) {
+      const entry = conf[agent];
+      if (!entry) continue;
+      assert.ok(!forbiddenModels.has(entry.model), `tier ${tier}/${agent}: ห้ามใช้โมเดลนอกแพ็กเกจ $20 (${entry.model})`);
+      if ((entry.model.startsWith("gpt-6.2-") || entry.model === "opus") && entry.effort === "max") {
+        assert.fail(`tier ${tier}/${agent}: ห้ามใช้ effort 'max' บน ${entry.model} (ผลตอบแทนไม่คุ้มต้นทุน)`);
+      }
+      if (tier !== "t0" && entry.model === "gemini-4-neon" && entry.effort === "xhigh") {
+        assert.fail(`tier ${tier}/agy: สงวน gemini-4-neon xhigh ไว้เฉพาะ t0 เท่านั้น`);
+      }
+    }
   }
 });
 

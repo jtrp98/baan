@@ -18,6 +18,7 @@
     "templates/",
     "ux-knowledge/",
     "MIGRATION.md",
+    "MODEL-POLICY.md",
     "agents.json",
     "baan.example.json",
     "local.example.json",

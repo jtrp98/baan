@@ -130,6 +130,7 @@
       "_timeoutSec": 3600,
       "_fallback": [
         "codex",
+        "agy",
         "claude"
       ],
       "claude": {
@@ -137,10 +138,13 @@
         "effort": "xhigh"
       },
       "codex": {
-        "model": "gpt-6-astra",
-        "effort": "max"
+        "model": "gpt-6.2-astra",
+        "effort": "xhigh"
       },
-      "agy": null
+      "agy": {
+        "model": "gemini-4-neon",
+        "effort": "xhigh"
+      }
     },
     "t1": {
       "_fallback": [
@@ -153,12 +157,12 @@
         "effort": "high"
       },
       "codex": {
-        "model": "gpt-6.1-sol",
+        "model": "gpt-6.2-astra",
         "effort": "high"
       },
       "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "xhigh"
+        "model": "gemini-4-neon",
+        "effort": "high"
       }
     },
     "t2": {
@@ -172,12 +176,12 @@
         "effort": "medium"
       },
       "codex": {
-        "model": "gpt-6.1-sol",
-        "effort": "medium"
+        "model": "gpt-6.2-sol",
+        "effort": "xhigh"
       },
       "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "high"
+        "model": "gemini-4-neon",
+        "effort": "medium"
       }
     },
     "t3": {
@@ -191,27 +195,27 @@
         "effort": "high"
       },
       "codex": {
-        "model": "gpt-6.1-terra",
+        "model": "gpt-6.2-sol",
         "effort": "medium"
       },
       "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "medium"
+        "model": "gemini-4-neon",
+        "effort": "low"
       }
     },
     "t4": {
       "_fallback": [
         "codex",
-        "agy",
-        "claude"
+        "claude",
+        "agy"
       ],
       "claude": {
         "model": "haiku",
-        "effort": "medium"
+        "effort": "high"
       },
       "codex": {
-        "model": "gpt-6-luna",
-        "effort": "high"
+        "model": "gpt-6.2-sol",
+        "effort": "low"
       },
       "agy": {
         "model": "gemini-4-hydrogen",
@@ -221,16 +225,16 @@
     "t5": {
       "_fallback": [
         "codex",
-        "agy",
-        "claude"
+        "claude",
+        "agy"
       ],
       "claude": {
         "model": "haiku",
         "effort": "low"
       },
       "codex": {
-        "model": "gpt-6-luna",
-        "effort": "medium"
+        "model": "gpt-6.1-terra",
+        "effort": "low"
       },
       "agy": {
         "model": "gemini-3.8-flash",
