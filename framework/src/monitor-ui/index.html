@@ -18,6 +18,7 @@
     </div>
     <div class="hq-controls">
       <span class="conn-badge" id="conn-status" data-state="NO DATA" role="status" aria-live="polite">NO DATA</span>
+      <span class="last-sync" id="last-sync" aria-live="off"></span>
       <span class="active-count" id="active-count" aria-live="polite">0 ACTIVE</span>
       <button type="button" class="px-btn" id="btn-anim" aria-pressed="true">ANIMATION: ON</button>
     </div>
@@ -59,12 +60,21 @@
   </main>
 
   <section class="hq-usage" aria-labelledby="usage-heading">
-    <h2 class="section-title" id="usage-heading">📊 USAGE &amp; QUOTA</h2>
+    <h2 class="section-title" id="usage-heading">📊 USAGE &amp; TELEMETRY</h2>
     <div class="usage-cards" id="usage-cards"></div>
   </section>
 
   <section class="hq-quests" aria-labelledby="quest-heading">
     <h2 class="section-title" id="quest-heading">📜 RUN HISTORY</h2>
+    <div class="quest-toolbar" id="quest-toolbar">
+      <div class="quest-filters" id="quest-filters" role="group" aria-label="Filter runs by status">
+        <button type="button" class="px-btn px-btn-sm quest-filter" data-qfilter="all" aria-pressed="true">ALL</button>
+        <button type="button" class="px-btn px-btn-sm quest-filter" data-qfilter="human" aria-pressed="false">⚑ NEEDS DECISION</button>
+        <button type="button" class="px-btn px-btn-sm quest-filter" data-qfilter="done" aria-pressed="false">✓ DONE</button>
+        <button type="button" class="px-btn px-btn-sm quest-filter" data-qfilter="failed" aria-pressed="false">⚠ FAILED / BLOCKED</button>
+      </div>
+      <input type="search" class="quest-search" id="quest-search" placeholder="Search run, project, or package…" aria-label="Search run history">
+    </div>
     <div class="quest-log" id="quest-log"></div>
   </section>
 
@@ -72,7 +82,10 @@
     <div class="rpg-box detail-box">
       <div class="detail-head">
         <h2 class="detail-title" id="detail-title">DETAILS</h2>
-        <button type="button" class="px-btn px-btn-sm" id="detail-close" aria-label="Close details">✕ CLOSE</button>
+        <div class="detail-actions">
+          <button type="button" class="px-btn px-btn-sm" id="detail-back" hidden aria-label="Back to previous details">← BACK</button>
+          <button type="button" class="px-btn px-btn-sm" id="detail-close" aria-label="Close details">✕ CLOSE</button>
+        </div>
       </div>
       <div class="detail-body" id="detail-body"></div>
     </div>

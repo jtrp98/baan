@@ -1,0 +1,14 @@
+{
+  "gemini-4-neon": {
+    "label": "Gemini 4 Neon",
+    "guidance": "Use holistic cross-file reasoning, state-machine precision, and architectural synthesis. For UI/UX or visual specs, enforce design-system consistency and complete UI states (loading/empty/error/disabled/success)."
+  },
+  "gemini-4-hydrogen": {
+    "label": "Gemini 4 Hydrogen",
+    "guidance": "Operate as a fast, deterministic executor following the approved outline and pinned contracts strictly. Keep edits focused and avoid speculative refactors."
+  },
+  "gemini-3.8-flash": {
+    "label": "Gemini 3.8 Flash",
+    "guidance": "Perform lightweight summaries, indexing, or strictly bounded mechanical documentation updates without exceeding the provided outline."
+  }
+}

@@ -12,7 +12,7 @@ import { snapshot, sameState, changedFiles, matches } from "./snapshot.mjs";
 import { integrate } from "./integrate.mjs";
 import { commandWarnings } from "./gate.mjs";
 import { applyPlanning } from "./planner.mjs";
-import { fallbackChainFor } from "./plan.mjs";
+import { resolveRoleRoute } from "./routing.mjs";
 import { validateTimeout, resolveTimeout } from "./timeout.mjs";
 import { utility, utilityFlags } from "./utilities.mjs";
 import { moduleContext } from "./workspace.mjs";
@@ -223,7 +223,7 @@ export async function cli(argv, options = {}) {
       const mismatches = checkPackageBranches(ws, run.packages);
       if (mismatches.length) throw new Error(formatBranchMismatchError(mismatches));
     }
-    return executeRun(run, cfg, options, o["dry-run"]);
+    return executeRun(run, cfg, { ...options, localConfig: local }, o["dry-run"]);
   }
 
   const hit = o.target ? resolveTarget(ws, o.target) : null;
@@ -269,26 +269,31 @@ export async function cli(argv, options = {}) {
   const allowFallback = Boolean(o["allow-fallback"] ?? ws.defaults.allow_fallback);
   const worktree = Boolean(o.worktree ?? ws.defaults.worktree);
 
-  let selectedAgent = o.agent;
-  if (selectedAgent) {
-    if (!isAgentEnabled(selectedAgent, local)) {
-      throw new Error(`agent '${selectedAgent}' ถูกปิดการใช้งานใน local.json (close)`);
-    }
-  } else {
-    if (isAgentEnabled(ws.defaults.agent, local)) {
-      selectedAgent = ws.defaults.agent;
-    } else {
-      const choices = fallbackChainFor(cfg, o.tier || "t2", ws.defaults.agent, local);
-      if (!choices.length) {
-        throw new Error("ไม่มี agent ใดเปิดใช้งานใน local.json สำหรับ tier นี้");
-      }
-      selectedAgent = choices[0];
+  const explicitAgent = o.agent || null;
+  if (explicitAgent) {
+    if (!cfg.agents?.[explicitAgent]) throw new Error(`unknown agent ${explicitAgent}`);
+    if (!isAgentEnabled(explicitAgent, local)) {
+      throw new Error(`agent '${explicitAgent}' ถูกปิดการใช้งานใน local.json (close) — BAAN ไม่สวมรอยสลับค่ายแทน`);
     }
   }
 
+  const hasRoles = Boolean(cfg.roles);
+  const workerTier = o.tier || (hasRoles ? (ws.defaults.worker_tier || cfg.roles?.worker?.defaultTier || "t3") : "t2");
+  const plannerTier = o["planner-tier"] || (hasRoles ? (ws.defaults.planner_tier || cfg.roles?.planner?.defaultTier || "t3") : "t2");
+  const verifierTier = o.tier || (hasRoles ? (ws.defaults.verifier_tier || cfg.roles?.verifier?.defaultTier || "t2") : "t2");
+
+  if (!hasRoles && (!cfg.tiers?.[workerTier] || !cfg.tiers?.[plannerTier])) {
+    throw new Error("unknown agent/tier");
+  }
+
+  const workerRoute = resolveRoleRoute(cfg, "worker", { forcedAgent: explicitAgent, tier: workerTier, localConfig: local, packet: packages[0] });
+  const plannerRoute = resolveRoleRoute(cfg, "planner", { forcedAgent: explicitAgent, tier: plannerTier, localConfig: local });
+  const verifierRoute = resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitAgent, tier: verifierTier, localConfig: local, workerAgent: workerRoute.agent });
+  const selectedAgent = workerRoute.agent;
+
   const run = { version: 2, id: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`, root,
-    packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: o.tier || "t2", plannerTier: o["planner-tier"] || ws.defaults.planner_tier,
-    agent: selectedAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, cfg.tiers[o.tier || "t2"]), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
+    packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: workerTier, explicitTier: Boolean(o.tier), plannerTier, verifierTier,
+    agent: selectedAgent, explicitAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, workerRoute.timeoutSec != null ? { _timeoutSec: workerRoute.timeoutSec } : undefined), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
     direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree, allowBranchMismatch: Boolean(o["allow-branch-mismatch"]),
     model: o.model ?? ws.defaults.model ?? null, effort: o.effort ?? ws.defaults.effort ?? null,
     approvalPolicy: o["approval-policy"] ?? "auto-safe", providerArgs: o["provider-arg"] ?? [],
@@ -298,10 +303,6 @@ export async function cli(argv, options = {}) {
     console.warn("WARNING: permission_policy is set to 'bypass'. Native security sandbox and approval checks are bypassed.");
   }
 
-  if (!cfg.agents[run.agent] || !cfg.tiers[run.tier] || !cfg.tiers[run.plannerTier]) throw new Error("unknown agent/tier");
-  if (!fallbackChainFor(cfg, run.plannerTier, run.agent, local).length || !fallbackChainFor(cfg, run.tier, run.agent, local).length) {
-    throw new Error(`ไม่มี agent ที่เปิดใช้งานสำหรับ tier ${run.tier} หรือ ${run.plannerTier}`);
-  }
   if (!Number.isInteger(run.maxParallel) || run.maxParallel < 1 || run.maxParallel > 64 || !(run.timeoutSec >= 0)) throw new Error("invalid --max-parallel/--timeout");
   const branchMismatches = checkPackageBranches(ws, packages);
   if (!o["dry-run"] && !o["allow-branch-mismatch"] && branchMismatches.length) {
@@ -309,15 +310,22 @@ export async function cli(argv, options = {}) {
   }
   run.dir = path.join(root, ".baan", "runs", run.id);
   if (o["dry-run"]) {
+    const summarizeRoute = (r) => ({ agent: r.agent, role: r.routingRole, tier: r.tier, model: r.model, effort: r.effort, clamped: r.clamped, tierLabel: r.tierLabel });
     return {
       ...triage(packages, run.direct),
+      enabled_providers: workerRoute.availablePool,
+      resolved_routes: {
+        planner: summarizeRoute(plannerRoute),
+        worker: summarizeRoute(workerRoute),
+        verifier: summarizeRoute(verifierRoute),
+      },
       ...(branchMismatches.length ? { branch_warnings: branchMismatches } : {}),
       packages: packages.map((p) => ({ ...p, readiness: readiness(p), warnings: commandWarnings(p) })),
     };
   }
   mkdirSync(run.dir, { recursive: true }); persist(run);
   event(run, "run_created");
-  return executeRun(run, cfg, options);
+  return executeRun(run, cfg, { ...options, localConfig: local });
 }
 
 async function executeRun(run, cfg, options, dry = false) {

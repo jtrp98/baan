@@ -716,6 +716,11 @@ export class Engine {
     for (const f of this._wallFurn) {
       if (f.station && x >= f.x * T && x < (f.x + f.w) * T && y >= f.y * T && y < (f.y + f.h) * T) return { kind: "station", id: f.station };
     }
+    for (const [zoneId, z] of Object.entries(this.world.ZONES ?? {})) {
+      if (zoneId === "corridor") continue;
+      const r = this._roomSignRect(zoneId, z);
+      if (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h) return { kind: "zone", id: zoneId };
+    }
     return null;
   }
 
@@ -802,6 +807,96 @@ export class Engine {
     });
   }
 
+  _zoneIsActive(zoneId) {
+    for (const [stId, st] of Object.entries(this.world.STATIONS ?? {})) {
+      if (st.zone === zoneId && this._activeStations.has(stId)) return true;
+    }
+    return false;
+  }
+
+  _roomSignRect(zoneId, z) {
+    const T = this.world.TILE;
+    const label = normalizeText(z.shortSign || z.name || zoneId);
+    // 3px left pad + 2px status dot + 2px gap + text + 3px right pad.
+    const w = textWidth(label) + 10;
+    const h = GLYPH_H + 4;
+    return { x: z.x * T + 2, y: (z.y - 1) * T + 2, w, h, label };
+  }
+
+  _drawRoomSigns(ctx) {
+    for (const [zoneId, z] of Object.entries(this.world.ZONES ?? {})) {
+      if (zoneId === "corridor") continue;
+      const r = this._roomSignRect(zoneId, z);
+      const active = this._zoneIsActive(zoneId);
+      const hovered = this.hover?.kind === "zone" && this.hover.id === zoneId;
+      ctx.fillStyle = hovered ? "#38BDF8" : active ? "#38BDF8" : "#475569";
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.fillStyle = active ? "#082F49" : "#0B1222";
+      ctx.fillRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
+      ctx.fillStyle = active ? "#22C55E" : "#64748B";
+      ctx.fillRect(r.x + 3, r.y + 3, 2, 2);
+      drawGlyphs(ctx, r.label, r.x + 7, r.y + 2, hovered ? "#FACC15" : active ? "#38BDF8" : "#CBD5E1");
+    }
+  }
+
+  _hoverInfo(hit) {
+    if (!hit) return null;
+    if (hit.kind === "character") {
+      const c = this._chars.get(hit.id);
+      if (!c) return null;
+      const status = c.dimmed ? "OFFLINE" : c.bubble?.text || (c.mode === "work" ? "WORKING" : "IDLE");
+      return {
+        text: `${c.label || c.id} - ${status} - CLICK`,
+        ax: c.px,
+        ay: c.py + 3 + (c.badge ? GLYPH_H + 3 : 0),
+        above: false,
+      };
+    }
+    if (hit.kind === "station") {
+      const st = this.world.STATIONS?.[hit.id];
+      const active = this._activeStations.has(hit.id);
+      const furn = this.world.FURNITURE?.find((f) => f.station === hit.id);
+      const T = this.world.TILE;
+      const ax = furn ? (furn.x + furn.w / 2) * T : this.width / 2;
+      const ay = furn ? (furn.layer === "wall" ? (furn.y + furn.h) * T + 2 : (furn.y - 1) * T - 2) : this.height / 2;
+      return {
+        text: `${st?.label ?? hit.id} - ${active ? "ACTIVE" : "IDLE"} - CLICK`,
+        ax,
+        ay,
+        above: furn ? furn.layer !== "wall" : true,
+      };
+    }
+    if (hit.kind === "zone") {
+      const z = this.world.ZONES?.[hit.id];
+      if (!z) return null;
+      const r = this._roomSignRect(hit.id, z);
+      const active = this._zoneIsActive(hit.id);
+      return {
+        text: `${z.name} - ${active ? "ACTIVE" : "IDLE"} - CLICK`,
+        ax: r.x + r.w / 2,
+        ay: r.y + r.h + 2,
+        above: false,
+      };
+    }
+    return null;
+  }
+
+  _drawHoverTooltip(ctx) {
+    const info = this._hoverInfo(this.hover);
+    if (!info) return;
+    const text = clip(normalizeText(info.text), 42);
+    const w = textWidth(text) + 8;
+    const h = GLYPH_H + 6;
+    const x = this._clampX(Math.round(info.ax - w / 2), w);
+    let y = info.above ? Math.round(info.ay - h) : Math.round(info.ay);
+    y = Math.max(2, Math.min(this.height - h - 2, y));
+    ctx.fillStyle = "#38BDF8";
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = "#0B1222";
+    ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+    drawGlyphs(ctx, text, x + 4, y + 3, "#FACC15");
+  }
+
   render() {
     if (this._destroyed) return;
     const ctx = this.ctx;
@@ -812,6 +907,7 @@ export class Engine {
     for (const f of this._wallFurn) {
       if (f.station && this._activeStations.has(f.station)) ctx.drawImage(this._furn(f, true), f.x * T, f.y * T);
     }
+    this._drawRoomSigns(ctx);
     const list = this._drawList;
     list.length = 0;
     for (const o of this._objects) list.push(o);
@@ -824,6 +920,7 @@ export class Engine {
     }
     for (const c of this._chars.values()) this._drawOverlays(c);
     this._drawBubbles();
+    this._drawHoverTooltip(ctx);
     this.stats.frames++;
   }
 
@@ -856,7 +953,7 @@ export class Engine {
       ctx.drawImage(b, this._clampX(Math.round(c.px - b.width / 2), b.width), Math.min(y, this.height - b.height));
       y += b.height + 1;
     }
-    const showLabel = this.selectedId === c.id || (this.hover?.kind === "character" && this.hover.id === c.id);
+    const showLabel = this.selectedId === c.id;
     if (showLabel && c.label) {
       const l = this._tagCanvas(c.label, "#ffffff", "rgba(0,0,0,0.75)");
       ctx.drawImage(l, this._clampX(Math.round(c.px - l.width / 2), l.width), Math.min(y, this.height - l.height));
@@ -873,12 +970,25 @@ export class Engine {
     }
   }
 
-  _clampX(x, w) { return Math.max(1, Math.min(this.width - w - 1, x)); }
+  _clampX(x, w) { return Math.max(2, Math.min(this.width - w - 2, x)); }
+
+  _clampBubbleX(c, x, w) {
+    const tx = c?.tile?.x;
+    const T = this.world.TILE;
+    if (tx >= 1 && tx <= 17 && w <= 18 * T - 4) {
+      return Math.max(2, Math.min(18 * T - w - 2, x));
+    }
+    if (tx >= 22 && tx <= 38 && w <= this.width - 22 * T - 4) {
+      return Math.max(22 * T + 2, Math.min(this.width - w - 2, x));
+    }
+    return this._clampX(x, w);
+  }
 
   _drawBubbles() {
     const ctx = this.ctx;
     const placed = this._placed;
     placed.length = 0;
+    const overlaps = (x, y, w, h) => placed.some((r) => x < r.x + r.w && x + w > r.x && y < r.y + r.h && y + h > r.y);
     for (const c of this._chars.values()) {
       const b = c.flash ?? c.bubble;
       if (!b) continue;
@@ -886,14 +996,29 @@ export class Engine {
       const w = img.width;
       const h = img.height;
       const headTop = Math.round(c.py + 2 - this.charH);
-      let x = this._clampX(Math.round(c.px - w / 2), w);
+      let x = this._clampBubbleX(c, Math.round(c.px - w / 2), w);
       let y = headTop - 3 - h;
-      const below = y < 1;
+      let below = y < 2;
       if (below) y = Math.round(c.py + 5);
-      for (let i = 0; i < 6 && placed.some((r) => x < r.x + r.w && x + w > r.x && y < r.y + r.h && y + h > r.y); i++) {
-        y += below ? h + 1 : -(h + 1);
+      for (let i = 0; i < 6 && overlaps(x, y, w, h); i++) {
+        if (!below) {
+          if (y - (h + 1) >= 2) y -= (h + 1);
+          else {
+            below = true;
+            y = Math.round(c.py + 5);
+          }
+        } else if (y + (h + 1) <= this.height - h - 2) {
+          y += (h + 1);
+        } else {
+          // If vertical space is exhausted near the bottom, step horizontally inside bounds instead of stacking.
+          const alt = this._clampBubbleX(c, x + (i % 2 === 0 ? w + 2 : -(w + 2)), w);
+          if (alt !== x) x = alt;
+          else break;
+        }
       }
-      y = Math.max(0, Math.min(this.height - h, y));
+      const minY = below ? 5 : 2;
+      const maxY = below ? this.height - h - 2 : this.height - h - 5;
+      y = Math.max(minY, Math.min(maxY, y));
       placed.push({ x, y, w, h });
       ctx.drawImage(img, x, y);
       const st = BUBBLE_STYLE[b.kind] ?? BUBBLE_STYLE.real;

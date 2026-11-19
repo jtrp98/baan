@@ -125,116 +125,783 @@
       }
     }
   },
-  "tiers": {
-    "t0": {
-      "_timeoutSec": 3600,
-      "_fallback": [
-        "codex",
-        "claude"
-      ],
-      "claude": {
-        "model": "opus",
-        "effort": "xhigh"
-      },
-      "codex": {
-        "model": "gpt-6-astra",
-        "effort": "max"
-      },
-      "agy": null
-    },
-    "t1": {
-      "_fallback": [
-        "codex",
+  "roles": {
+    "planner": {
+      "label": "วางแผน/แตกงาน/สัญญา",
+      "kind": "execution",
+      "preference": [
         "agy",
+        "codex",
         "claude"
       ],
-      "claude": {
-        "model": "opus",
-        "effort": "high"
-      },
-      "codex": {
-        "model": "gpt-6.1-sol",
-        "effort": "high"
-      },
-      "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "xhigh"
+      "defaultTier": "t3",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "สถาปัตยกรรมข้ามระบบ / Critical / Overdrive",
+          "_timeoutSec": 3600,
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "วางแผนโมดูลใหญ่ / Multi-Repo / Contracts ซับซ้อน",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "วางแผนฟีเจอร์มาตรฐาน / API Contract โมดูลเดียว",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        },
+        "t4": {
+          "label": "ปรับโครงสร้างเล็ก / แตกงานย่อยในโมดูลเดิม",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        }
       }
     },
-    "t2": {
-      "_fallback": [
+    "worker": {
+      "label": "พัฒนาโค้ดและแก้บั๊ก (Execution)",
+      "kind": "execution",
+      "preference": [
         "codex",
         "agy",
         "claude"
       ],
-      "claude": {
-        "model": "opus",
-        "effort": "medium"
-      },
-      "codex": {
-        "model": "gpt-6.1-sol",
-        "effort": "medium"
-      },
-      "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "high"
+      "defaultTier": "t3",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Principal Dev: งานโคตรยาก / Concurrency / Security / Escalation",
+          "_timeoutSec": 3600,
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "Senior Dev: งานยาก / High-Risk Code / Complex Bugfix",
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "Standard Dev: งานปกติ / Multi-File Feature / Bugfix มาตรฐาน",
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        },
+        "t4": {
+          "label": "Contracted Dev: งานมีสเปก+Contract ชัด / Unit Tests / Refactor เล็ก",
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        }
       }
     },
-    "t3": {
-      "_fallback": [
-        "codex",
+    "verifier": {
+      "label": "ตรวจรับโค้ดอิสระและท้าทายระบบ (Execution)",
+      "kind": "execution",
+      "preference": [
+        "claude",
         "agy",
-        "claude"
+        "codex"
       ],
-      "claude": {
-        "model": "sonnet",
-        "effort": "high"
-      },
-      "codex": {
-        "model": "gpt-6.1-terra",
-        "effort": "medium"
-      },
-      "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "medium"
+      "defaultTier": "t2",
+      "strict": true,
+      "mustDifferFromWorker": true,
+      "tiers": {
+        "t1": {
+          "label": "Critical Audit: Security / Auth / PII / DB Migration / Money / Release",
+          "_timeoutSec": 3600,
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "Senior QA: ตรวจรับอิสระมาตรฐาน / High-Risk / Bugfix / Multi-File",
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "Focused QA: ตรวจงาน Low-Risk / Contracted Feature / Test-Mapping",
+          "claude": {
+            "model": "opus",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        }
       }
     },
-    "t4": {
-      "_fallback": [
+    "docs": {
+      "label": "เอกสารและ Knowledge (kind: docs / Subagent Writer)",
+      "kind": "execution",
+      "preference": [
         "codex",
-        "agy",
-        "claude"
+        "claude",
+        "agy"
       ],
-      "claude": {
-        "model": "haiku",
-        "effort": "medium"
-      },
-      "codex": {
-        "model": "gpt-6-luna",
-        "effort": "high"
-      },
-      "agy": {
-        "model": "gemini-4-hydrogen",
-        "effort": "low"
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Critical Docs: ADR / API & DB Contracts / Security Spec",
+          "preference": [
+            "claude",
+            "agy",
+            "codex"
+          ],
+          "claude": {
+            "model": "opus",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t2": {
+          "label": "Standard Docs: REQ / OQ / Handoff / Defect / Runbook ตามแผนที่อนุมัติ",
+          "preference": [
+            "codex",
+            "claude",
+            "agy"
+          ],
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "haiku",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-hydrogen",
+            "effort": "low"
+          }
+        },
+        "t3": {
+          "label": "Light / Micro Docs: INDEX / Changelog / สรุป / Subagent สำรวจ",
+          "preference": [
+            "codex",
+            "claude",
+            "agy"
+          ],
+          "codex": {
+            "model": "gpt-6.1-terra",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "haiku",
+            "effort": "low"
+          },
+          "agy": {
+            "model": "gemini-3.8-flash",
+            "effort": "low"
+          }
+        }
       }
     },
-    "t5": {
-      "_fallback": [
+    "arch": {
+      "label": "สถาปนิกระบบ (SA — Arch for Dev)",
+      "kind": "interactive",
+      "preference": [
+        "agy",
+        "codex",
+        "claude"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "สถาปัตยกรรมข้ามระบบ / Core Foundation / Overdrive",
+          "_timeoutSec": 3600,
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "ออกแบบโมดูลใหม่ / ADR / Multi-Repo Architecture",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "ออกแบบฟีเจอร์มาตรฐาน / API & DB Contract โมดูลเดียว",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        },
+        "t4": {
+          "label": "ปรับโครงสร้างเล็ก / ตรวจ Drift ย่อยในโมดูลเดิม",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        }
+      }
+    },
+    "spec": {
+      "label": "คนเก็บโจทย์ (BA — Business Analyst)",
+      "kind": "interactive",
+      "preference": [
+        "claude",
+        "agy",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead BA: โดเมนซับซ้อน / กฎธุรกิจข้ามโมดูล / High-Stakes",
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard BA: เก็บ Requirement / AC ฟีเจอร์มาตรฐาน",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "Quick Refinement: ปรับแก้ AC / เคลียร์ OQ ย่อย",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
+      }
+    },
+    "pm": {
+      "label": "นายงาน (PM — Scope / Risk / ROI)",
+      "kind": "interactive",
+      "preference": [
+        "claude",
+        "agy",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead PM: วาง Roadmap / ตัดสิน Trade-offs ใหญ่ / High-Risk Scope",
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard PM: ประเมิน Scope & Priority ฟีเจอร์มาตรฐาน",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "Quick PM: จัดลำดับ Backlog ย่อย / เช็กสถานะงาน",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
+      }
+    },
+    "build": {
+      "label": "ช่างก่อสร้าง (Dev — คู่คุยสดของ Worker)",
+      "kind": "interactive",
+      "preference": [
         "codex",
         "agy",
         "claude"
       ],
-      "claude": {
-        "model": "haiku",
-        "effort": "low"
-      },
-      "codex": {
-        "model": "gpt-6-luna",
-        "effort": "medium"
-      },
-      "agy": {
-        "model": "gemini-3.8-flash",
-        "effort": "low"
+      "defaultTier": "t3",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Principal Dev: งานโคตรยาก / Concurrency / Security / Escalation",
+          "_timeoutSec": 3600,
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "Senior Dev: งานยาก / High-Risk Feature / Complex Bugfix",
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "Standard Dev: งานปกติ / Multi-File Feature / Bugfix มาตรฐาน",
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        },
+        "t4": {
+          "label": "Contracted Dev: งานมี Contract ชัด / Unit Tests / Refactor เล็ก",
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        }
+      }
+    },
+    "check": {
+      "label": "ช่างตรวจรับระบบ (QA for Dev — คู่คุยสดของ Verifier)",
+      "kind": "interactive",
+      "preference": [
+        "claude",
+        "agy",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Critical Audit: Security / Auth / PII / DB Migration / Money / Release",
+          "_timeoutSec": 3600,
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "Senior QA: ตรวจรับอิสระมาตรฐาน / High-Risk / Bugfix / Multi-File",
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "Focused QA: ตรวจงาน Low-Risk / Contracted Feature / Test-Mapping",
+          "claude": {
+            "model": "opus",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        }
+      }
+    },
+    "survey": {
+      "label": "ช่างสำรวจหน้าจอ (Arch for UX/UI)",
+      "kind": "interactive",
+      "preference": [
+        "agy",
+        "claude",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead UX Arch: Flow ซับซ้อนข้ามหลายหน้าจอ / Role-Permission สูง",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard UX Arch: ตรวจ Feasibility โมดูลมาตรฐาน",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "Quick UX Check: ตรวจหน้าจอย่อย / ปรับ State เพิ่มเติม",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
+      }
+    },
+    "ui": {
+      "label": "ช่างเขียนแบบหน้าจอ (UI Designer)",
+      "kind": "interactive",
+      "preference": [
+        "agy",
+        "claude",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead Designer: วาง Design System / หน้าจอหลักซับซ้อน / Multi-State Flow",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard Designer: ออกแบบหน้าจอมาตรฐานตาม Design System",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "UI Polish: ปรับ Component ย่อย / Copy / เพิ่ม State",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
+      }
+    },
+    "review": {
+      "label": "ผู้ตรวจแบบหน้าจอ (QA for UX/UI)",
+      "kind": "interactive",
+      "preference": [
+        "agy",
+        "claude",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead UX QA: Full Visual Diff + WCAG AA Audit ก่อน Release",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard UX QA: ตรวจแบบและจัดทำ Handoff มาตรฐาน",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "Quick UX QA: ตรวจ Component ย่อย / แก้ไขเล็กน้อย",
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
       }
     }
   }

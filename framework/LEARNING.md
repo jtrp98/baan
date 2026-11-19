@@ -113,7 +113,7 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
 
 ## 4. กติกา 3-Step Plan-First & Subagent Workflow ในทุก Role และทุก Tier
 
-ไม่ว่าบทบาทจะรันอยู่บน **Tier 2** (`Opus` / `Argon` / `Sol`) หรือ **Tier 3** (`Sonnet` / `3.8 Flash` / `Terra`) ทุกตัวจะปฏิบัติตาม **3 ขั้นตอน** เดียวกันเสมอ เพื่อรักษา Context ให้สะอาดและประหยัด Output Tokens:
+ไม่ว่าบทบาทจะรันอยู่บนค่ายใดหรือ Tier ใดในตาราง Role-Owned Tiers ของ [MODEL-POLICY.md](MODEL-POLICY.md) (`gemini-4-neon` / `gpt-6.2-astra` / `gpt-6.2-sol` / `opus` / `sonnet`) ทุกตัวจะปฏิบัติตาม **3 ขั้นตอน** เดียวกันเสมอ เพื่อรักษา Context ให้สะอาดและประหยัด Output Tokens:
 
 ```
 [ขั้น 1: Subagent สำรวจ]  -->  [ขั้น 2: ตัวหลักทำ /plan & คุย/สอน]  -->  [ขั้น 3: Subagent เขียน Docs]
@@ -138,14 +138,14 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
 
 ระบบจัดสรรความสามารถของโมเดล (Tier) ให้สอดคล้องกับธรรมชาติและความเสี่ยงของงาน:
 
-1. **งาน Docs (`kind: "docs"`) — Hierarchical Flow**:
-   - ขั้นคิดและวางแผน (Plan): ใช้โมเดลความฉลาดสูง (**Tier 1–2** เช่น `Opus`, `Argon`, `Sol`) วิเคราะห์สถาปัตยกรรมและเคาะโครงร่าง
-   - ขั้นเขียนเอกสาร (Work): อนุญาตให้ใช้ Subagent หรือโมเดลระดับประหยัด (**Tier 4–5** เช่น `Flash`, `Haiku`) เป็น Writer พิมพ์เอกสารยาวตามโครงร่างที่อนุมัติแล้ว
+1. **งาน Docs (`kind: "docs"`) — Role `docs` (3 Tiers)**:
+   - ขั้นคิดและวางแผน (Plan): ใช้ตัวหลักของสายงาน (`arch`/`planner`/`spec` บน `gemini-4-neon` / `opus` / `gpt-6.2-astra`) วิเคราะห์และเคาะโครงร่าง
+   - ขั้นเขียนเอกสาร (Work): วิ่งเข้าตารางบทบาท `docs` (`t1` Critical ADR/Contracts/Security → `opus`/`neon`/`sol medium`; `t2` Standard Docs ตามโครงร่างที่อนุมัติ → `gpt-6.2-sol low` / `haiku high` / `gemini-4-hydrogen low`; `t3` Light/Index/Subagent Explore → `gpt-6.1-terra low` / `haiku low` / `gemini-3.8-flash low`)
    - **Hybrid Verification Policy**: เอกสารทั่วไปตรวจรับผ่าน `baan --lint-knowledge` ร่วมกับประตูคนเซ็น (`decide --approve`) โดยข้าม LLM Verifier เพื่อประหยัด Token และเวลา; ยกเว้นเอกสารระดับวิกฤต (ADR, Contracts สัญญาร่วม, Security) ที่ยังคงมี LLM Verifier ตรวจทานเนื้อหาเชิงลึก
-2. **งาน Code (`kind: "code"`) — Contract-Gated Risk Policy**:
-   - **Strict High-Risk Guard**: งานที่เป็น `risk: "high"` ต้องใช้ Worker ระดับ **Tier 2** ขึ้นไปเสมอ ห้าม Step-down เพื่อป้องกัน Rework Penalty (ต้นทุนการแก้ซ้ำแพงกว่าส่วนต่างค่าโมเดล)
-   - **Contract-Gated Step-down**: งานที่เป็น `risk: "low"` หรือ `"medium"` อนุญาตให้ลดระดับ Worker Tier ลงได้ (เช่น `Plan t2 -> Work t3`) **เฉพาะเมื่อมี `contracts` หรือสเปกที่ pin ชัดเจน** กำกับไว้เท่านั้น
-   - หากงานตก (`FAIL: fix: code`) ระบบจะใช้บันได Rework ขยับ Tier ขึ้น 1 ขั้นในการแก้งานรอบถัดไปตามเดิม
+2. **งาน Code (`kind: "code"`) — Role `worker` (4 Tiers) + Contract-Gated Risk Policy**:
+   - **Strict High-Risk Guard**: งานที่เป็น `risk: "high"` บังคับใช้ `worker` ระดับ **`t2`** (Senior Dev) ขึ้นไปเสมอ ห้ามลดไป `t3`/`t4` เพื่อป้องกัน Rework Penalty
+   - **Contract-Gated Step-down**: งาน `risk: "low"` อนุญาตให้ลดลงไป **`worker.t4`** (Contracted Dev) **เฉพาะเมื่อมี `contracts` หรือสเปกที่ pin ชัดเจน** กำกับไว้เท่านั้น
+   - หากงานตก (`FAIL: fix: code`) ระบบจะไต่ Tier ขึ้น 1 ขั้นในบทบาทเดิม (`t4 → t3 → t2 → t1`) อัตโนมัติในการแก้งานรอบถัดไป
 3. **งานแก้บั๊กและบำรุงรักษา (`kind: "bugfix"`) — Red-Green & Defect Logging Policy**:
    - **Module Placement Assessment**: วิเคราะห์ตำแหน่งไฟล์ด้วย `evaluateModulePlacement` หากเป็นงานส่วนกลาง/โครงสร้างพื้นฐาน กำหนดเป็น `module: "_cross"` โดยไม่ต้องฝืนยัดเข้าโมดูลฟีเจอร์
    - **Mandatory Red Test**: บังคับเขียนหรือระบุ automated test ที่จำลองบั๊กให้ fail (Red) ก่อนเริ่มแก้โค้ดเสมอ เพื่อเป็นหลักฐานว่าแก้ตรงจุด

@@ -73,7 +73,9 @@ test("loadWorkspace อ่านจากไฟล์ที่ระบุได
     assert.equal(ws.source, path.resolve(configFile));
     assert.equal(ws.defaults.agent, "claude");
     assert.equal(ws.defaults.timeout_sec, 99);
-    assert.equal(ws.defaults.planner_tier, "t2", "field ที่ไม่ระบุใช้ default");
+    assert.equal(ws.defaults.planner_tier, "t3", "field ที่ไม่ระบุใช้ default");
+    assert.equal(ws.defaults.worker_tier, "t3", "field ที่ไม่ระบุใช้ default");
+    assert.equal(ws.defaults.verifier_tier, "t2", "field ที่ไม่ระบุใช้ default");
     assert.deepEqual(ws.knowledge_roots[0].targets[0], { name: "t1", path: "C:/t1" });
 
     const fallback = loadWorkspace(null);

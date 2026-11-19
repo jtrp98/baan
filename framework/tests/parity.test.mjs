@@ -55,12 +55,15 @@ test("claude adapter: safe defaults vs opt-in bypass", () => {
   assert.equal(bypass.args[bypass.args.indexOf("--permission-mode") + 1], "bypassPermissions");
   assert.ok(bypass.deviations.some((d) => d.includes("bypass active")));
 
-  // Read-only role (verifier) uses plan mode
+  // Read-only role (verifier) uses plan mode and native --append-system-prompt-file when provided
   const readOnly = adapter.buildHeadless({
     def: { command: "claude" },
     role: "verifier",
+    systemPromptFile: "C:/ws/.baan/runs/r1/WP-1-verifier.system.md",
   });
   assert.equal(readOnly.args[readOnly.args.indexOf("--permission-mode") + 1], "plan");
+  assert.equal(readOnly.args[readOnly.args.indexOf("--append-system-prompt-file") + 1], "C:/ws/.baan/runs/r1/WP-1-verifier.system.md");
+  assert.equal(readOnly.usesSystemPromptChannel, true);
   assert.ok(!readOnly.args.includes("--strict-mcp-config"));
 });
 
@@ -108,12 +111,23 @@ test("codex adapter: safe defaults vs opt-in bypass and resume grammar", () => {
   assert.ok(resumeSafe.args.includes('sandbox_mode="workspace-write"'));
   assert.ok(resumeSafe.args.includes("01a1aefd-9adb-7480-a326-9ea15566bd9e"));
 
-  // Verifier read-only
+  // Verifier read-only with native developer_instructions channel + 4KB Windows guard
   const verifier = adapter.buildHeadless({
     def: { command: "codex" },
     role: "verifier",
+    developerInstructions: "# BAAN Verifier\nRead-only.",
   });
   assert.equal(verifier.args[verifier.args.indexOf("-s") + 1], "read-only");
+  assert.equal(verifier.usesSystemPromptChannel, true);
+  assert.ok(verifier.args.some((a) => a.startsWith("developer_instructions=")));
+
+  const oversized = adapter.buildHeadless({
+    def: { command: "codex" },
+    role: "worker",
+    developerInstructions: "x".repeat(5000),
+  });
+  assert.equal(oversized.usesSystemPromptChannel, false);
+  assert.ok(oversized.deviations.some((d) => d.includes("4KB")));
 });
 
 test("agy adapter: safe defaults vs opt-in bypass and subagent support", () => {

@@ -4,6 +4,7 @@ import path from "node:path";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { scanActiveRuns, aggregateWorkspaceUsage, getRecentRuns, getRecentCallEnds } from "./usage-aggregator.mjs";
+import { scanLiveSessions } from "./live-telemetry.mjs";
 import { loadLocalConfig, isAgentEnabled } from "./config.mjs";
 
 function readAgentsEnabled() {
@@ -71,14 +72,23 @@ export function openBrowser(url) {
 
 export async function getMonitorState(workspaceRoot, { homeRoot = null } = {}) {
   const activeRuns = scanActiveRuns(workspaceRoot);
+  const liveSessions = scanLiveSessions(workspaceRoot);
   const usage = aggregateWorkspaceUsage(workspaceRoot);
   const recentRuns = getRecentRuns(workspaceRoot, 10);
-  const workspaces = getAvailableWorkspaces(workspaceRoot, homeRoot);
+  const currentNorm = path.resolve(workspaceRoot).toLowerCase();
+  const workspaces = getAvailableWorkspaces(workspaceRoot, homeRoot).map((w) => {
+    const isCurrent = path.resolve(w.path).toLowerCase() === currentNorm;
+    const count = isCurrent
+      ? activeRuns.length + liveSessions.length
+      : scanActiveRuns(w.path).length + scanLiveSessions(w.path).length;
+    return { ...w, activeCount: count };
+  });
   return {
     workspaceRoot,
     workspaceName: path.basename(workspaceRoot),
     workspaces,
     activeRuns,
+    liveSessions,
     usage,
     // Provider quotas are only readable from their private endpoints or auth files, which the ToS rules forbid;
     // the UI shows null as UNAVAILABLE rather than a guessed 0%.
@@ -95,11 +105,12 @@ export async function getMonitorState(workspaceRoot, { homeRoot = null } = {}) {
 export const plain = (value) => String(value ?? "").replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
 
 export function renderTui(state) {
-  const { activeRuns, usage } = state;
+  const { activeRuns = [], liveSessions = [], usage } = state;
   const workspaceName = plain(state.workspaceName);
+  const totalActive = activeRuns.length + liveSessions.length;
   const lines = [];
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
-  lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${activeRuns.length} run(s)\x1b[0m`);
+  lines.push(`\x1b[1;32m 🏗️  BAAN MONITOR  \x1b[0m — Workspace: \x1b[1m${workspaceName}\x1b[0m | Active: \x1b[1;33m${totalActive} session(s)\x1b[0m`);
   lines.push(`\x1b[1;36m========================================================================\x1b[0m`);
   lines.push("");
 
@@ -123,7 +134,7 @@ export function renderTui(state) {
   lines.push(`+------------------+--------+-------------+-------------+------------+----------+`);
   lines.push("");
 
-  if (activeRuns.length) {
+  if (activeRuns.length || liveSessions.length) {
     lines.push(`\x1b[1;32mACTIVE RUNS & LIVE ACTIVITY:\x1b[0m`);
     for (const r of activeRuns) {
       const p = r.activePackages?.[0] ?? {};
@@ -132,6 +143,14 @@ export function renderTui(state) {
       lines.push(`   Task: ${plain(r.title).slice(0, 60)}`);
       lines.push(`   Live Tool: \x1b[36m${act}\x1b[0m`);
       if (p.recentThought) lines.push(`   Thought: \x1b[90m${plain(p.recentThought).slice(0, 70)}\x1b[0m`);
+      lines.push("");
+    }
+    for (const s of liveSessions) {
+      const kind = s.isSubagent ? "SUBAGENT" : "LIVE CHAT";
+      const act = s.recentActivity ? `[${plain(s.recentActivity.name)}] ${plain(s.recentActivity.detail)}` : "Active...";
+      lines.push(` ⚡ \x1b[1m[${kind}]\x1b[0m ${plain(s.repoName || state.workspaceName)} | Role: \x1b[33m${plain(s.role ?? s.roleLabel ?? "unknown")}\x1b[0m (${plain(s.provider ?? "unknown")})`);
+      lines.push(`   Task: ${plain(s.title).slice(0, 60)}`);
+      lines.push(`   Live Tool: \x1b[36m${act}\x1b[0m`);
       lines.push("");
     }
   } else {

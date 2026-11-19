@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { TEAM_DIR, listRoles, tierMatrixText, resolveTarget, layoutOf, memoryRootIssues, loadLocalConfig } from "./config.mjs";
+import { formatRoleMatrix } from "./routing.mjs";
 import { performInit } from "./init.mjs";
 import { lintKnowledge, updateIndexes } from "./knowledge-index.mjs";
 import { lintPlanFile } from "./plan.mjs";
@@ -67,16 +68,17 @@ See README.md for approval, provider setup, evidence and security boundaries.`;
     return surveyProject(o, ws, root, (m) => console.log(m));
   }
   if (o.list) {
-    const local = loadLocalConfig(TEAM_DIR);
+    const localCfg = local ?? loadLocalConfig(TEAM_DIR);
     return {
       config: ws?.source ?? null,
       defaults: ws?.defaults ?? {},
       knowledge_roots: (ws?.knowledge_roots ?? []).map((kr) => ({ ...kr, issues: memoryRootIssues(kr, root) })),
-      ...(local.workspaces.length ? { local_workspaces: local.workspaces } : {}),
-      ...(local.agents ? { local_agents: local.agents } : {}),
-      execution_roles: ["planner", "worker", "verifier"],
+      ...(localCfg.workspaces.length ? { local_workspaces: localCfg.workspaces } : {}),
+      ...(localCfg.agents ? { local_agents: localCfg.agents } : {}),
+      execution_roles: ["planner", "worker", "verifier", "docs"],
       interactive_roles: listRoles(),
-      tiers: tierMatrixText(cfg.tiers, cfg.agents),
+      role_routing: cfg.roles ? formatRoleMatrix(cfg, localCfg) : tierMatrixText(cfg.tiers ?? {}, cfg.agents),
+      tiers: cfg.roles ? formatRoleMatrix(cfg, localCfg) : tierMatrixText(cfg.tiers ?? {}, cfg.agents),
     };
   }
   if (o["lint-plan"]) {

@@ -1,0 +1,14 @@
+{
+  "opus": {
+    "label": "Claude Opus 5.5",
+    "guidance": "Leverage deep multi-file reasoning, nuanced edge-case analysis, and autonomous long-horizon synthesis. Prioritize root-cause accuracy, subtle state/concurrency invariants, and concise high-signal output without redundant re-checking loops."
+  },
+  "sonnet": {
+    "label": "Claude Sonnet 5.5",
+    "guidance": "Anchor tightly to pinned contracts and explicit AC checklists. Keep edits narrowly scoped within `owns` and confirm every AC maps to concrete executed test evidence before reporting completion."
+  },
+  "haiku": {
+    "label": "Claude Haiku 5.5",
+    "guidance": "Follow the approved outline and JSON schema strictly. Focus on fast, accurate, clean documentation or bounded mechanical edits without expanding scope or speculating beyond supplied sources."
+  }
+}

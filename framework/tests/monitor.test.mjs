@@ -388,3 +388,32 @@ test("monitor: TUI never forwards control characters from telemetry to the termi
   assert.ok(!tui.includes("\u001b[2J"), "screen clear from telemetry must not reach the terminal");
   assert.ok(tui.includes("\u001b[1;36m"), "BAAN's own colours still render");
 });
+
+test("monitor: getMonitorState reports liveSessions and cross-workspace activeCount", async (t) => {
+  const { getMonitorState } = await import("../src/monitor.mjs");
+  const f1 = makeFixture();
+  const f2 = makeFixture();
+  t.after(() => { f1.cleanup(); f2.cleanup(); });
+
+  const localFile = path.join(f1.root, "local.json");
+  writeFileSync(localFile, JSON.stringify({ workspaces: [{ name: "ws1", path: f1.root }, { name: "ws2", path: f2.root }] }));
+  const prev = process.env.BAAN_LOCAL_FILE;
+  process.env.BAAN_LOCAL_FILE = localFile;
+  t.after(() => { if (prev === undefined) delete process.env.BAAN_LOCAL_FILE; else process.env.BAAN_LOCAL_FILE = prev; });
+
+  const liveDir = path.join(f2.root, ".baan", "live");
+  mkdirSync(liveDir, { recursive: true });
+  writeFileSync(path.join(liveDir, "sess-1.json"), JSON.stringify({
+    source: "hook", sessionId: "conv-live", provider: "agy", role: "spec",
+    title: "Gather spec", repoName: "ws2", startedAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+  }));
+
+  const st1 = await getMonitorState(f1.root);
+  assert.equal(st1.liveSessions.length, 0);
+  const ws2Info = st1.workspaces.find((w) => w.name === "ws2");
+  assert.equal(ws2Info.activeCount, 2, "ws2 has 1 activeRun + 1 liveSession");
+
+  const st2 = await getMonitorState(f2.root);
+  assert.equal(st2.liveSessions.length, 1);
+  assert.equal(st2.liveSessions[0].role, "spec");
+});

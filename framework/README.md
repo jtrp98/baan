@@ -27,9 +27,10 @@ baan monitor [--port 3456] [--no-open] [--tui]
 - **Used ทั้ง 3 CLI แบบสดๆ**: คำนวณ Token In/Out/Cache, Turns, และ Cost ($) ของ **Claude Code**, **Codex**, และ **Google Antigravity (AGY)**
 - **Multi-Session & Multi-Project**: สลับดูภาพรวมทุกโปรเจกต์ (Overview) หรือคลิกเลือกดูเฉพาะโปรเจกต์เดี่ยว (Single Project Focus) เช่น `school-bot`, `sb-api-gateway`
 - **TUI Mode**: เพิ่ม `--tui` เพื่อแสดงผลแบบ Dashboard ในเทอร์มินัลสไตล์ `htop` โดยไม่ต้องเปิดเบราว์เซอร์
-- **Pixel HQ (หน้าเว็บ)**: ออฟฟิศ pixel-art ที่มีตัวละคร 12 บทบาท + 3 provider (Claude / Codex / AGY) แยกกันคนละตัว — provider เดินไปนั่งข้างโต๊ะของ role เมื่อ telemetry จริงบอกว่ากำลังทำงานคู่กัน (มาจาก `active-<pkg>.json` + `call_end` ใน ledger) คลิกตัวละคร/โต๊ะเพื่อดูรายละเอียด ปิดแอนิเมชันได้ด้วยปุ่ม `ANIMATION` (มอนิเตอร์ยังทำงานต่อ)
+- **Pixel HQ (หน้าเว็บ)**: ออฟฟิศ pixel-art ที่มีตัวละคร 12 บทบาท + 3 provider (Claude / Codex / AGY) แยกกันคนละตัว — provider เดินไปนั่งข้างโต๊ะของ role เมื่อ telemetry จริงบอกว่ากำลังทำงานคู่กัน (มาจาก `active-<pkg>.json` + `call_end` ใน ledger สำหรับ BAAN run และ `.baan/live/*.json` จาก workspace hooks สำหรับ live-chat / subagents) คลิกตัวละคร/โต๊ะเพื่อดูรายละเอียด ปิดแอนิเมชันได้ด้วยปุ่ม `ANIMATION` (มอนิเตอร์ยังทำงานต่อ)
   - ไม่เดาข้อมูล: role/provider ที่ไม่รู้จะขึ้น `ROLE UNKNOWN` / `PROVIDER UNKNOWN`, โควตาที่อ่านไม่ได้ขึ้น `UNAVAILABLE` (ไม่ใช่ 0%), การเชื่อมต่อหลุดขึ้น `RECONNECTING` ไม่ใช่ "ว่าง"
-  - บทบาทคุยสด (spec, arch, pm, build, check, survey, ui, review) ไม่มี runtime telemetry จึงเดินเล่นเป็นการตกแต่งเท่านั้น
+  - บทบาทคุยสด (spec, arch, pm, build, check, survey, ui, review) แสดงสถานะจริงเมื่อ workspace มี telemetry hooks จาก `baan --init` / `baan sync` (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) และเดินเล่นเป็น IDLE เมื่อไม่มี session
+  - แสดงตัวเลข active ของ workspace อื่นใน `local.json` ที่ header เพื่อให้คลิกสลับได้ทันที
   - ไฟล์หน้าเว็บอยู่ที่ `src/monitor-ui/` (ES modules ล้วน ไม่มี dependency) เสิร์ฟผ่าน `/ui/<file>` แบบ whitelist
 
 `baan survey` สำรวจ target codebase และตรวจจับความคลาดเคลื่อน (Drift Detection) เทียบกับ Knowledge:
@@ -41,7 +42,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 
 `baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
 1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
-2. รีเฟรชไฟล์ stubs (`.claude/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`) ใน workspace ให้ตรงกับ BAAN รุ่นล่าสุด
+2. รีเฟรชไฟล์ stubs ครบทั้ง 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และ live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ที่ราก workspace ให้ตรงกับ BAAN รุ่นล่าสุด (ไม่ติดตั้งลงใน `target/*`)
 3. ทำ Safe Auto-Commit สำหรับการแก้ไขค้างใน `knowledge_roots` และ `memory`
 4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
 5. รีเฟรช `knowledge-index.json` อัตโนมัติ
@@ -62,18 +63,17 @@ Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุ�
 
 | ค่า | ค่าเริ่มต้น / ที่ตั้ง |
 |---|---|
-| Worker/Verifier agent | `defaults.agent` ใน workspace config; ไม่ตั้งใช้ `codex`; override ด้วย `--agent` |
-| Worker/Verifier tier | `t2`; override ด้วย `--tier` |
-| Planner tier | `defaults.planner_tier` (`t2`); override ด้วย `--planner-tier` |
+| Provider Routing | **Availability-Driven Specialist Routing** จาก `roles` ใน [agents.json](agents.json) อิงค่ายที่เปิดใช้งานจริงใน `local.json` (บังคับค่ายเดียวด้วย `--agent`) · **Strict No-Impersonation**: ติดลิมิต/โควตาระหว่างรันจะหยุดแจ้ง `waiting_human` (`PROVIDER_LIMIT`) ไม่แอบสลับค่ายหรือลดรุ่นแทน |
+| Role-Owned Tiers | แต่ละบทบาทมีบันได tier ของตัวเอง: `planner` (`t1`–`t4`, default `t3`) · `worker` (`t1`–`t4`, default `t3`) · `verifier` (`t1`–`t3`, default `t2`) · `docs` (`t1`–`t3`, default `t2`) · override ด้วย `--tier` / `--planner-tier` |
 | งานขนานสูงสุด | `defaults.max_parallel` (`3`); override ด้วย `--max-parallel` |
-| Timeout | `--timeout` → tier `_timeoutSec` → `defaults.timeout_sec` (`0` วินาที = unlimited) |
+| Timeout | `--timeout` → tier `_timeoutSec` (`t1` overdrive = `3600s`) → `defaults.timeout_sec` (`0` วินาที = unlimited) |
 | นโยบายสิทธิ์ | `defaults.permission_policy` (`native-safe`); override ด้วย `--permission-policy` หรือ `--allow-bypass` |
 
-Tier เลือก model/effort และลำดับ fallback จาก agents config ไม่ใช่การผูก provider ถาวร
+Execution Prompts แยกแบบ Hybrid 3 ค่าย (`prompts/_core/` + `prompts/{claude,codex,agy}/` + `models.json`) และส่งผ่าน native system-prompt channel ของแต่ละ CLI:
 BAAN ยึดหลัก **Native First, Orchestrate Outside, Preserve Inside**:
-- **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ native `exec`, structured schema, native read-only sandbox สำหรับ Planner/Verifier และ native session resume สำหรับ Worker
-- **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ native `plan` mode สำหรับ Planner/Verifier โดยรักษา MCP, Skills และ Subagents; ใช้ `acceptEdits` หรือ Approval Bridge ใน Worker
-- **agy**: ลงชื่อเข้าใช้ CLI; ใช้ native `plan` mode และรองรับ `invoke_subagent` สำหรับ Planner/Verifier; Worker รองรับ `accept-edits` ใน safe mode และ opt-in bypass เมื่อต้องการ
+- **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ native `exec`, `-c developer_instructions=...` (4-Part Action-Biased), structured schema, native read-only sandbox สำหรับ Planner/Verifier และ native session resume สำหรับ Worker
+- **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ `--append-system-prompt-file` (XML + Positive Rationale), native `plan` mode สำหรับ Planner/Verifier โดยรักษา MCP, Skills และ Subagents; ใช้ `acceptEdits` หรือ Approval Bridge ใน Worker
+- **agy**: ลงชื่อเข้าใช้ CLI; ใช้ Explore→Plan→Execute prompt + native `plan` mode และรองรับ `invoke_subagent` สำหรับ Planner/Verifier; Worker รองรับ `accept-edits` ใน safe mode และ opt-in bypass เมื่อต้องการ; งานออกแบบระบบ/UX-UI ยึด `gemini-4-neon` ทุก tier
 
 บน Windows core เรียก native executable หรือ Node entry ของ npm Codex โดยไม่ผ่าน shell
 ตรวจความพร้อมและ Parity ของเครื่องด้วย `baan parity` ก่อนเริ่มงานจริง
@@ -204,7 +204,7 @@ Read-only permissions ขึ้นกับ provider/การตั้งค่
 
 ## ทีมสร้าง ทีมออกแบบ และความรู้
 
-`baan --init` ติดตั้งทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) ใน `.claude/agents/`
+`baan --init` ติดตั้งทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) แบบ native ครบ 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`) พร้อม root stubs (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) ที่ราก workspace เท่านั้น
 บทบาทเหล่านี้ทำงานแบบคุยสด วางแผนก่อนทำเสมอ (`/plan` first) และใช้ Subagents ของแต่ละ CLI ช่วยสำรวจและเขียน Docs ตาม 3-Step Workflow ใน [LEARNING.md](LEARNING.md)
 `--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
 `baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--repair-mojibake <file>`, `--sweep "term" [--sweep-in <dir>]`

@@ -229,7 +229,7 @@ test("CLI: ปฏิเสธเมื่อไม่มี agent ใดเป�
   const local = { agents: { codex: false, claude: false, agy: false } };
   await assert.rejects(
     cli(["run", "--goal", "test goal", "--build", "echo build", "--test", "echo test", "--dry-run"], { localConfig: local }),
-    /ไม่มี agent ใดเปิดใช้งานใน local\.json สำหรับ tier นี้/
+    /ไม่มี agent ใดเปิดใช้งานใน local\.json/
   );
 });
 
