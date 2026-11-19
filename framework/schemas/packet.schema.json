@@ -146,6 +146,10 @@
       "type": "string",
       "pattern": "^t[0-5]$"
     },
+    "external_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "acceptance_approved": {
       "type": "boolean"
     },

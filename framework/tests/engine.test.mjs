@@ -72,6 +72,22 @@ test("engine scope violation is reworked, never automatically reverted", async (
   await schedule(run, cfg, { execute: passing, session: async () => { writeFileSync(path.join(repo, "outside.txt"), "keep"); return structuredClone(good); } });
   assert.equal(run.packages[0].failureClass, "SCOPE_VIOLATION"); assert.equal(run.packages[0].state, "waiting_human"); assert.equal(readFileSync(path.join(repo, "outside.txt"), "utf8"), "keep");
 });
+test("engine external_paths: concurrent writer outside owns is reported, not a scope violation", async (t) => {
+  const { root, repo } = fixture(t); const run = runAt(root, [packet(repo, "A", { external_paths: ["ext/**"], budget: { max_rework: 0 } })]);
+  await schedule(run, cfg, { execute: passing, session: async (r, p, role) => {
+    if (role === "worker") { mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "other.ts"), "other session"); }
+    return session(r, p, role);
+  } });
+  assert.equal(run.packages[0].state, "done");
+  assert.deepEqual(run.packages[0].gate.external_changes, ["ext/other.ts"]);
+  assert.deepEqual(run.packages[0].gate.outside, []);
+});
+test("engine external_paths must be relative and must not overlap owns", (t) => {
+  const { repo } = fixture(t);
+  assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["../x/**"] })), /external_paths/);
+  assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["*.mjs"] })), /overlap owns/);
+  assert.ok(validatePacket(packet(repo, "A", { external_paths: ["frontend/**"] })));
+});
 test("engine one writer per repo; cross-repo writers overlap; dependencies start after done", async (t) => {
   const { root, repo, makeRepo } = fixture(t), other = makeRepo("other");
   const packages = [packet(repo, "A"), packet(other, "B"), packet(repo, "C", { depends_on: ["A"], dirty_approved: true })];

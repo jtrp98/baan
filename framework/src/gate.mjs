@@ -101,7 +101,12 @@ export async function gate(run, p, options) {
   // p.before stays the recovery point; scope is judged only on what changed since this attempt began.
   const since = options.since ?? p.before;
   const ownChanges = changedFiles(since, after);
-  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)));
+  // external_paths: globs another writer (another session/tool) is editing concurrently in the same repo.
+  // They are never the worker's scope, so changes there are reported but not treated as a scope violation.
+  const external = Array.isArray(p.external_paths) ? p.external_paths : [];
+  const isExternal = (f) => external.some((g) => matches(f, g));
+  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)) && !isExternal(f));
+  const external_changes = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)) && isExternal(f));
   for (const key of ["head", "branch", "index", "stash"]) if (since[key] !== after[key]) outside.push(`.git/${key}`);
   const output = results.map((r) => r.output).join("\n");
   const names = testNames(output);
@@ -123,7 +128,7 @@ export async function gate(run, p, options) {
   const unmapped_hint = unmapped.length && ranTests && !names.size ? `test runner ไม่พิมพ์ชื่อ test ราย test จึง map AC ไม่ได้ — ${commandWarnings(p).join(" ") || "ให้คำสั่ง test พิมพ์ชื่อ test ที่ผ่าน"}` : undefined;
   // Raw output (up to 4 MB per command) already lives in each output_file; keeping it here bloated run.json,
   // which is rewritten on every state change.
-  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
+  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, ...(external_changes.length ? { external_changes } : {}), unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
   save(evidence_file, result);
   return result;

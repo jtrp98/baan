@@ -6,6 +6,7 @@
 
 - **Verifier tier ราย packet**: เพิ่มฟิลด์ `verifier_tier` ใน packet schema (และส่งต่อจาก plan tasks) กับ flag `--verifier-tier` ลำดับความสำคัญ `--verifier-tier` > `--tier` > packet > `defaults.verifier_tier` ยกได้อิสระ ลดได้เฉพาะงานที่ไม่ใช่ `risk: high` (`src/session.mjs` `resolveVerifierTier`, `src/cli.mjs`, `schemas/packet.schema.json`)
 - **Dry-run**: แต่ละ package แสดง `verifier_route` ของตัวเอง
+- **`external_paths` ราย packet**: glob ของส่วนที่ผู้เขียนคนอื่น (session/เครื่องมืออื่น) กำลังแก้พร้อมกันใน repo เดียวกัน การเปลี่ยนแปลงตรงนั้นไม่นับเป็น `SCOPE_VIOLATION` แต่รายงานใน `gate.external_changes`; ต้องเป็น path สัมพัทธ์ ห้ามทับ `owns` และรวมอยู่ใน approval basis (เปลี่ยนแล้วต้องอนุมัติใหม่) (`src/gate.mjs`, `src/packet.mjs`)
 - **เอกสาร**: README รากไม่ระบุเลขรุ่นตายตัวแล้ว ให้ดูที่ `framework/package.json`
 
 ## 0.38.0 — 2026-11-19 · Role-Owned Tiers (12 บทบาท), Provider-Aware Prompt & Role Compilers, Live-Chat Telemetry Hooks, และ Monitor UI P0–P3

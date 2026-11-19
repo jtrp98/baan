@@ -43,6 +43,11 @@ export function validatePacket(p) {
   validate(p, schemaFor("packet.schema"), "packet");
   assertId(p.id);
   if (!p.owns.length || p.owns.some((f) => typeof f !== "string" || !f.trim() || path.isAbsolute(f) || f.includes(":") || f.split(/[\\/]/).some((s) => ["..", ".", ".git", ".baan"].includes(s.toLowerCase())) || /[\0\r\n]/.test(f))) throw new Error(`${p.id}: owns must be repository-relative globs`);
+  if (p.external_paths !== undefined) {
+    if (!Array.isArray(p.external_paths) || p.external_paths.some((f) => typeof f !== "string" || !f.trim() || path.isAbsolute(f) || f.includes(":") || f.split(/[\\/]/).some((s) => ["..", ".", ".git", ".baan"].includes(s.toLowerCase())) || /[\0\r\n]/.test(f))) throw new Error(`${p.id}: external_paths must be repository-relative globs`);
+    const clash = p.external_paths.filter((g) => p.owns.some((o) => o === g || matches(o, g) || matches(g, o)));
+    if (clash.length) throw new Error(`${p.id}: external_paths overlap owns: ${clash.join(", ")}`);
+  }
   if (new Set(p.acceptance.map((a) => a.id)).size !== p.acceptance.length) throw new Error(`${p.id}: duplicate acceptance id`);
   if (p.acceptance.some((a) => !a.text.trim() || !a.source.trim())) throw new Error(`${p.id}: empty acceptance text/source`);
   p.depends_on.forEach(assertId);
@@ -57,7 +62,7 @@ export function validatePacket(p) {
 export function approvalBasis(p) {
   return hash(JSON.stringify({ repo: p.repo, goal: p.goal, owns: p.owns, acceptance: p.acceptance,
     commands: p.commands, depends_on: p.depends_on, contracts: p.contracts ?? [], human_gates: p.human_gates ?? [], risk: p.risk,
-    risk_tags: p.risk_tags ?? [], docs: documentBasis(p) }));
+    risk_tags: p.risk_tags ?? [], docs: documentBasis(p), ...(p.external_paths?.length ? { external_paths: p.external_paths } : {}) }));
 }
 export function readiness(p) {
   const reasons = [];
