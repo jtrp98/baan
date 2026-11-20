@@ -43,6 +43,11 @@ export function validatePacket(p) {
   validate(p, schemaFor("packet.schema"), "packet");
   assertId(p.id);
   if (!p.owns.length || p.owns.some((f) => typeof f !== "string" || !f.trim() || path.isAbsolute(f) || f.includes(":") || f.split(/[\\/]/).some((s) => ["..", ".", ".git", ".baan"].includes(s.toLowerCase())) || /[\0\r\n]/.test(f))) throw new Error(`${p.id}: owns must be repository-relative globs`);
+  if (p.external_paths !== undefined) {
+    if (!Array.isArray(p.external_paths) || p.external_paths.some((f) => typeof f !== "string" || !f.trim() || path.isAbsolute(f) || f.includes(":") || f.split(/[\\/]/).some((s) => ["..", ".", ".git", ".baan"].includes(s.toLowerCase())) || /[\0\r\n]/.test(f))) throw new Error(`${p.id}: external_paths must be repository-relative globs`);
+    const clash = p.external_paths.filter((g) => p.owns.some((o) => o === g || matches(o, g) || matches(g, o)));
+    if (clash.length) throw new Error(`${p.id}: external_paths overlap owns: ${clash.join(", ")}`);
+  }
   if (new Set(p.acceptance.map((a) => a.id)).size !== p.acceptance.length) throw new Error(`${p.id}: duplicate acceptance id`);
   if (p.acceptance.some((a) => !a.text.trim() || !a.source.trim())) throw new Error(`${p.id}: empty acceptance text/source`);
   p.depends_on.forEach(assertId);
@@ -57,7 +62,7 @@ export function validatePacket(p) {
 export function approvalBasis(p) {
   return hash(JSON.stringify({ repo: p.repo, goal: p.goal, owns: p.owns, acceptance: p.acceptance,
     commands: p.commands, depends_on: p.depends_on, contracts: p.contracts ?? [], human_gates: p.human_gates ?? [], risk: p.risk,
-    risk_tags: p.risk_tags ?? [], docs: documentBasis(p) }));
+    risk_tags: p.risk_tags ?? [], docs: documentBasis(p), ...(p.external_paths?.length ? { external_paths: p.external_paths } : {}) }));
 }
 export function readiness(p) {
   const reasons = [];
@@ -137,6 +142,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
     const similar = task.owns?.length && [...groups.values()].find((g) => g.module === task.module && task.module && JSON.stringify(g.owns) === JSON.stringify(task.owns) && g.repo.path === (task.repo?.path ?? repo) && JSON.stringify(g.commands) === JSON.stringify(task.commands ?? commands ?? plan.commands));
     const key = task.package ?? similar?.id ?? task.id;
     const workerTierVal = task.worker_tier ?? task.workerTier ?? plan.worker_tier ?? plan.workerTier;
+    const verifierTierVal = task.verifier_tier ?? task.verifierTier ?? plan.verifier_tier ?? plan.verifierTier;
     const pkg = groups.get(key) ?? {
       id: assertId(key), title: task.title ?? task.name ?? task.id, goal: task.goal ?? task.task ?? task.description ?? plan.goal ?? task.id,
       tasks: [], repo: { path: task.repo?.path ?? repo }, owns: task.owns ?? plan.owns ?? [],
@@ -148,6 +154,7 @@ export function fromPlan(plan, { repo, commands, select = "", baseDir = process.
       kind: task.kind ?? plan.kind ?? normalized?.kind ?? "code",
       ...(task.cross_cutting !== undefined || task.crossCutting !== undefined ? { cross_cutting: Boolean(task.cross_cutting ?? task.crossCutting) } : {}),
       ...(workerTierVal ? { worker_tier: workerTierVal } : {}),
+      ...(verifierTierVal ? { verifier_tier: verifierTierVal } : {}),
     };
     pkg.tasks.push(task.id);
     if (JSON.stringify(pkg.owns) !== JSON.stringify(task.owns ?? plan.owns ?? []) || pkg.repo.path !== (task.repo?.path ?? repo) || JSON.stringify(pkg.commands) !== JSON.stringify(task.commands ?? commands ?? plan.commands)) throw new Error(`${task.id}: incompatible package scope/repo/commands`);

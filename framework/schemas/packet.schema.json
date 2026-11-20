@@ -142,6 +142,14 @@
       "type": "string",
       "pattern": "^t[0-5]$"
     },
+    "verifier_tier": {
+      "type": "string",
+      "pattern": "^t[0-5]$"
+    },
+    "external_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "acceptance_approved": {
       "type": "boolean"
     },
@@ -179,6 +187,11 @@
           "type": "number",
           "minimum": 0,
           "maximum": 10080
+        },
+        "max_commands": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
         }
       },
       "additionalProperties": false

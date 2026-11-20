@@ -1,6 +1,6 @@
 # 📘 สัญญาการเรียนรู้และการพัฒนาการตัดสินใจทางวิศวกรรม (Engineering Learning & Decision-Making)
 
-เอกสารสัญญากลางสำหรับ **BAAN (นายช่าง)**, ทีมวิศวกรรม/ทีมสร้าง (5 บทบาท) และทีมออกแบบ UX/UI (3 บทบาท)
+เอกสารสัญญากลางสำหรับ **BAAN (นายช่าง)**, ทีมวิศวกรรม/ทีมสร้าง (7 บทบาท) และทีมออกแบบ UX/UI (3 บทบาท)
 ใช้ในการพัฒนาทักษะวิศวกรรมซอฟต์แวร์และการตัดสินใจของผู้ใช้ระหว่างการทำงานจริง
 
 ---
@@ -65,46 +65,52 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
 
 ---
 
-## 3. หน้าที่ของแต่ละบทบาทใน 2 ทีม (8 บทบาท)
+## 3. หน้าที่ของแต่ละบทบาทใน 2 ทีม (10 บทบาท)
 
-### ทีมสร้าง / วิศวกรรม (Build & Engineering Team — 5 บทบาท)
+### ทีมสร้าง / วิศวกรรม (Build & Engineering Team — 7 บทบาท)
 อ่านจาก **Code จริง, Database Schema, API Contracts, Logs และ Test Results**:
 1. **`spec` (คนเก็บโจทย์ / BA Agent)**:
-   - สอนการวิเคราะห์ Business Rules และแยก Business Logic ออกจาก Implementation
+   - สอนการวิเคราะห์ Business Rules และแยก Business Logic ออกจาก Implementation ด้วยทักษะ `req-grill`
    - อธิบาย Requirement ที่ยังไม่ชัด พร้อมชี้ผลกระทบทางเทคนิคหากปล่อยให้คลุมเครือ
-   - ช่วยค้นหา Edge Cases, ข้อขัดแย้งทางธุรกิจ และเงื่อนไขการส่งคำสั่งซ้ำ (Idempotency)
+   - ช่วยค้นหา Edge Cases, ข้อขัดแย้งทางธุรกิจ, เงื่อนไข Idempotency และตรวจ `knowledge_impact`
    - บันทึกช่องว่างความรู้ที่พบลง `<project>/shared/knowledge-gaps.md`
 2. **`arch` (สถาปนิกระบบ / SA Agent — Arch for Dev)**:
-   - สอนหลักการ System Design จากปัญหาจริงของระบบ
+   - สอนหลักการ System Design จากปัญหาจริงของระบบ (2 รอบ: Survey โค้ดปัจจุบัน → ออกแบบ/DBML)
    - เสนอทางเลือกเชิงสถาปัตยกรรมพร้อม Trade-offs และอธิบายศัพท์เทคนิคเป็นภาษาง่าย
-   - ระบุผลกระทบต่อระบบเดิมและต้นทุนการดูแลรักษา (Maintainability)
+   - ระบุผลกระทบต่อระบบเดิมและต้นทุนการดูแลรักษา (Maintainability) และรวบคำถาม Logic เป็น Ticket ชุดเดียว
    - จัดทำ Architecture Decision Record (ADR) ใน `<project>/shared/adr/` (หรือ `build/adr/`)
-3. **`pm` (นายงาน / PM Agent)**:
+3. **`dba` (ช่างฐานราก / DBA Agent — Database Architect)**:
+   - ตรวจ DBML จาก `arch`, วิเคราะห์ Normalization, Indexing, Foreign Keys และ Lock/Concurrency impact
+   - สร้างสคริปต์ SQL DDL, Migration และ Rollback Plan ลง `build/db/` (ไม่รันบนฐานข้อมูลจริงโดยพลการ)
+4. **`pm` (นายงาน / PM Agent)**:
    - สอนการประเมิน Scope, Risk, Cost และ Priority
    - ช่วยตรวจว่าการพัฒนาคุ้มค่ากับเป้าหมายธุรกิจหรือไม่
-   - ป้องกัน Overengineering และ Scope Creep โดยท้าทายด้วย Decision Quality Gate
-4. **`build` (ช่างก่อสร้าง / Dev Agent — คู่กับ `worker` ใน `baan run`)**:
+   - ป้องกัน Overengineering และ Scope Creep โดยท้าทายด้วย Decision Quality Gate และแตกงานเป็น Waves (`build/waves/`) ด้วยทักษะ `wave-plan` (ห้ามแก้ wave ที่ `done` แล้ว)
+5. **`build` (ช่างก่อสร้าง / Dev Agent — คู่กับ `worker` ใน `baan run`)**:
    - อธิบายโค้ดและกลไกสำคัญที่ใช้ (Code Flow)
    - สอนการ Debug และอ่านการทำงานของระบบ
    - ระบุ Dependency และผลกระทบจากการแก้ไข
-   - เขียน Tests และแสดงหลักฐานการทำงานจริง
+   - เขียนโค้ดและ Unit Tests ของตัวเองทีละ Wave (หรือ Repair Wave จาก Test Case ที่พัง)
    - อธิบายสิ่งที่ผู้ใช้จำเป็นต้องเข้าใจเพื่อกลับมาดูแลหรือแก้ไขระบบด้วยตัวเองในอีก 6 เดือน
-5. **`check` (ช่างตรวจรับระบบ / QA Agent — QA for Dev — คู่กับ `verifier` ใน `baan run`)**:
+6. **`testplan` (คนวางแผนทดสอบ / Test Planner Agent)**:
+   - วางแผน System, Integration และ E2E Test เป็นโฟลเดอร์ `build/test-plan/` แบบ Folder-First (ไม่แก้แผนที่ `done` แล้ว)
+   - เชื่อมโยงทุก AC, DB/API Contracts และ Failure Scenarios ให้ `check` เขียน Autotest ต่อได้ทันที
+7. **`check` (ช่างตรวจรับระบบ / QA Agent — QA for Dev — คู่กับ `verifier` ใน `baan run`)**:
    - ตั้งคำถามท้าทาย Architecture และ Implementation
    - ค้นหา Edge Cases, Concurrency/Race Conditions และ Failure Scenarios
-   - ออกแบบการทดลองเพื่อตรวจสอบสมมติฐาน และกำหนดเกณฑ์ผ่าน/ไม่ผ่านที่ตรวจสอบได้
+   - เขียนและรัน Automated Tests ตาม Test Plan (ใน `baan flow`) ออกแบบการทดลองเพื่อตรวจสอบสมมติฐาน
    - แยกผลทดสอบจริงออกจากการคาดการณ์ และไม่อนุมัติคุณภาพจากการเห็นพ้องของ Agents เพียงอย่างเดียว
 
-### ทีมออกแบบหน้าจอ (UX/UI Design Team — 3 บทบาท)
+### ทีมออกแบบหน้าจอ (UX/UI Design Team — 3 บทบาท — แยกต่างหากสำหรับคุยสด)
 อ่านจาก **Docs, UX Knowledge, Design System และ Canvas/Artifact**:
-6. **`survey` (ช่างสำรวจหน้าจอ — Arch for UX/UI)**:
+8. **`survey` (ช่างสำรวจหน้าจอ — Arch for UX/UI)**:
    - ตรวจว่า requirement ทำเป็น UI ได้จริงตาม Design System หรือไม่
    - ชี้ช่องโหว่ของ User Flow, Permissions บนหน้าจอ, และ UI States (`loading/empty/error/disabled`)
    - บันทึกความเสี่ยงและเงื่อนไขลง `design/feasibility.md`
-7. **`ui` (ช่างเขียนแบบหน้าจอ — Builder for UX/UI)**:
+9. **`ui` (ช่างเขียนแบบหน้าจอ — Builder for UX/UI)**:
    - ออกแบบหน้าจอบน Canvas/Artifact โดยดึง component/token จาก Design System ของโปรเจกต์
    - ออกแบบ flow และครอบคลุมทุก state เชื่อมโยงกับ State Machine และ Error Handling ของระบบ
-8. **`review` (ผู้ตรวจแบบหน้าจอ — QA for UX/UI)**:
+10. **`review` (ผู้ตรวจแบบหน้าจอ — QA for UX/UI)**:
    - ตรวจงานออกแบบบน Artifact/Canvas (Usability, WCAG AA, Design System)
    - ทำ `design/handoff.md` เชื่อมโยงกับ Component/Tokens/States
    - เปรียบเทียบหน้าจอจริงที่สร้างแล้วกับแบบที่คนเซ็นอนุมัติ

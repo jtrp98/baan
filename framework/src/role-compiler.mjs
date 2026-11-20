@@ -18,20 +18,30 @@ export const TEAM_AGENTS = {
     agyTools: ["read_file", "write_file", "edit_file", "run_command", "ask_question", "invoke_subagent"],
     what: "สถาปนิกระบบ (SA / Arch for Dev) วิเคราะห์สถาปัตยกรรมโค้ดจริง สอน System Design และทำ ADR",
   },
+  dba: {
+    claudeTools: "Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion, Agent, Task",
+    agyTools: ["read_file", "write_file", "edit_file", "run_command", "ask_question", "invoke_subagent"],
+    what: "ช่างฐานราก (DBA) ตรวจ DBML ออกแบบ Index/Constraint และสร้าง SQL/Migration ลง build/db/",
+  },
   pm: {
     claudeTools: "Read, Glob, Grep, Edit, Write, AskUserQuestion, Agent, Task",
     agyTools: ["read_file", "write_file", "edit_file", "ask_question", "invoke_subagent"],
-    what: "นายงาน (PM) ประเมิน scope/risk/cost/priority และป้องกัน overengineering",
+    what: "นายงาน (PM) ประเมิน scope/risk/cost/priority และแตก Wave แบบ Folder-First",
   },
   build: {
     claudeTools: "Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion, Agent, Task",
     agyTools: ["read_file", "write_file", "edit_file", "run_command", "ask_question", "invoke_subagent"],
-    what: "ช่างก่อสร้าง (Dev) เขียนโค้ดและ tests สอนอ่าน code flow และวิธี debug",
+    what: "ช่างก่อสร้าง (Dev) เขียนโค้ดและ unit tests ทีละ Wave สอนอ่าน code flow และวิธี debug",
+  },
+  testplan: {
+    claudeTools: "Read, Glob, Grep, Edit, Write, AskUserQuestion, Agent, Task",
+    agyTools: ["read_file", "write_file", "edit_file", "ask_question", "invoke_subagent"],
+    what: "คนวางแผนทดสอบ (Test Planner) แตกแผนทดสอบระบบเป็นโฟลเดอร์ build/test-plan/ พร้อม INDEX",
   },
   check: {
-    claudeTools: "Read, Glob, Grep, AskUserQuestion, Agent, Task",
+    claudeTools: "Read, Glob, Grep, Edit, Write, Bash, AskUserQuestion, Agent, Task",
     agyTools: ["read_file", "ask_question", "invoke_subagent"],
-    what: "ช่างตรวจรับระบบ (QA for Dev) ท้าทาย implementation ตรวจ race condition และ failure scenarios (อ่านอย่างเดียว)",
+    what: "ช่างตรวจรับระบบ (QA for Dev) เขียน/รัน automated tests ท้าทาย implementation และตรวจ failure scenarios",
   },
   survey: {
     claudeTools: "Read, Glob, Grep, Edit, Write, AskUserQuestion, Agent, Task",
@@ -81,16 +91,17 @@ function roleProviderConfig(cfg, id, provider) {
 
 function sharedControllerRules(charterPath, learningPath) {
   return [
-    `1. **เริ่มงานด้วย BAAN เสมอ**: ตรวจสอบสถานะด้วย \`baan status\` หรือสำรวจโค้ดด้วย \`baan survey\` ห้ามลงมือค้นหาหรือแก้ไฟล์ใน \`target/\` เองโดยตรงโดยไม่ผ่านกระบวนการของ BAAN`,
-    `2. **เมื่องานเป็นการแก้บั๊ก / เกิด error / พบบัญชีไม่ได้รับสิทธิ์ (เช่น 401, 500, curl error, "พบบั๊ก", "แก้บั๊ก")**: ให้เข้าโหมดแก้บั๊กตามทักษะ \`bug-fix\`:`,
+    `1. **เริ่มงานด้วย BAAN เสมอ**: ตรวจสอบสถานะด้วย \`baan status\` หรือ \`baan flow status --module <project>/<module>\` หรือสำรวจโค้ดด้วย \`baan survey\` ห้ามลงมือค้นหาหรือแก้ไฟล์ใน \`target/\` เองโดยตรงโดยไม่ผ่านกระบวนการของ BAAN`,
+    `2. **เมื่อผู้ใช้สั่ง "เริ่มทำ module <x>" หรือ "ทำต่อตาม flow"**: ให้ใช้ทักษะ \`feature-flow\` เพื่อตรวจสถานะด้วย \`baan flow status\`, ถามตอบ Ticket ค้างในแชทนี้แล้วบันทึกด้วย \`baan flow answer\`, อนุมัติ Gate ด้วย \`baan flow approve\`, และสั่ง \`baan flow start\` เปิดหน้าต่าง Grid ทำงานทีละขั้นอัตโนมัติ`,
+    `3. **เมื่องานเป็นการแก้บั๊ก / เกิด error / พบบัญชีไม่ได้รับสิทธิ์ (เช่น 401, 500, curl error, "พบบั๊ก", "แก้บั๊ก")**: ให้เข้าโหมดแก้บั๊กตามทักษะ \`bug-fix\`:`,
     `   - ประเมินสังกัดโมดูลทันที: \`baan survey --target <targetName> --eval <filePath> --json\``,
     `   - ทำ \`/plan\` นำเสนอ Root Cause Hypothesis, AC-BUG, Red Test, และขอบเขต \`owns\` ที่แคบที่สุดให้ผู้ใช้เห็นชอบก่อนแตะโค้ด`,
     `   - พิสูจน์ผลด้วย Red Test ให้ fail ก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง \`<project>/shared/defects/BUG-xxx.md\` ใน knowledge root ของ project ที่บั๊กสังกัด (เช่น \`knowledge/<project>/shared/defects/\`) — ไม่ใช่ \`shared/\` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git`,
-    `3. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\` (หรือ \`baan sync --all\` เพื่ออัปเดตทุก workspace ใน \`local.json\`)`,
-    `4. **วางแผนก่อนทำเสมอ (/plan first)**: ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol (8 ขั้น) และ Decision Quality Gate (8 คำถาม) ใน ${learningPath}`,
-    `5. **Availability-Driven Specialist Routing & No-Impersonation**: แต่ละบทบาทมี tier และโมเดลประจำสายงานใน \`agents.json\` อิงค่ายที่เปิดใช้งานจริงใน \`local.json\` — หากค่าย/โมเดลติดลิมิต ให้หยุดแจ้งผู้ใช้ทันที ห้ามสวมรอยสลับค่ายหรือลดรุ่นแทน`,
-    `6. **config**: \`./baan.config.json\` · charter: ${charterPath}`,
-    `7. **ห้ามติดตั้งลงใน \`target/\`**: config, agent stubs, skills, telemetry hooks (\`.agents/\`, \`.claude/\`, \`.codex/\`) และสถานะรัน (\`.baan/\`) ติดตั้งที่ราก workspace เท่านั้น ห้ามสร้างหรือติดตั้งลงใน \`target/*\` โดยตรง — และเมื่ออัปเดต BAAN ให้ซิงค์ทุก workspace ผ่าน \`baan sync\``,
+    `4. **เมื่อสั่งซิงค์ / ส่งงาน**: เมื่อผู้ใช้สั่ง "ซิงค์", "อัปเดต", "pull ล่าสุด", หรือ "ส่งงาน" ให้เรียกใช้ \`baan sync\` (หรือ \`baan sync --all\` เพื่ออัปเดตทุก workspace ใน \`local.json\`)`,
+    `5. **วางแผนก่อนทำเสมอ (/plan first)**: ทุกครั้งที่มีการตัดสินใจทางเทคนิคสำคัญให้ผ่าน Learning Protocol (8 ขั้น) และ Decision Quality Gate (8 คำถาม) ใน ${learningPath}`,
+    `6. **Availability-Driven Specialist Routing & No-Impersonation**: แต่ละบทบาทมี tier และโมเดลประจำสายงานใน \`agents.json\` อิงค่ายที่เปิดใช้งานจริงใน \`local.json\` — หากค่าย/โมเดลติดลิมิต ให้หยุดแจ้งผู้ใช้ทันที ห้ามสวมรอยสลับค่ายหรือลดรุ่นแทน`,
+    `7. **config**: \`./baan.config.json\` · charter: ${charterPath}`,
+    `8. **ห้ามติดตั้งลงใน \`target/\`**: config, agent stubs, skills, telemetry hooks (\`.agents/\`, \`.claude/\`, \`.codex/\`) และสถานะรัน (\`.baan/\`) ติดตั้งที่ราก workspace เท่านั้น ห้ามสร้างหรือติดตั้งลงใน \`target/*\` โดยตรง — และเมื่ออัปเดต BAAN ให้ซิงค์ทุก workspace ผ่าน \`baan sync\``,
   ].join("\n");
 }
 
@@ -109,7 +120,7 @@ export function compileWorkspaceStub(provider, charterPath, learningPath) {
 
 <rules>
 ${rules}
-- **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: เรียกใช้ native agents ใน \`.claude/agents/\` (\`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\`) ผ่าน \`Agent\` (\`Task\`) tool ตาม 3-Step Workflow เสมอ
+- **ทีมสร้าง (7 บทบาท) และทีมออกแบบ (3 บทบาท)**: เรียกใช้ native agents ใน \`.claude/agents/\` (\`spec\`, \`arch\`, \`dba\`, \`pm\`, \`build\`, \`testplan\`, \`check\` และ \`survey\`, \`ui\`, \`review\`) ผ่าน \`Agent\` (\`Task\`) tool ตาม 3-Step Workflow เสมอ
 </rules>
 
 <role_override>
@@ -128,7 +139,7 @@ ${rules}
 
 ## Rules & Permissions
 ${rules}
-- **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: ใช้ native agents ใน \`.codex/agents/*.toml\` (\`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\`) ผ่าน \`collaboration.spawn_agent\` + \`collaboration.wait_agent\` ตาม 3-Step Workflow เสมอ
+- **ทีมสร้าง (7 บทบาท) และทีมออกแบบ (3 บทบาท)**: ใช้ native agents ใน \`.codex/agents/*.toml\` (\`spec\`, \`arch\`, \`dba\`, \`pm\`, \`build\`, \`testplan\`, \`check\` และ \`survey\`, \`ui\`, \`review\`) ผ่าน \`collaboration.spawn_agent\` + \`collaboration.wait_agent\` ตาม 3-Step Workflow เสมอ
 
 ## Role Dispatch Override
 > เฉพาะกรณีที่มีบรรทัด \`[baan: <role>]\` ปรากฏใน prompt ของ session นั้น (การ dispatch ภายในของ BAAN) ให้สวมบทบาทตาม role นั้นแทน ไม่ใช่ นายช่าง — ${overrideRule}
@@ -145,7 +156,7 @@ ${rules}
 
 ## Core Directives
 ${rules}
-- **ทีมวิศวกรรมและทีมออกแบบ (8 บทบาท)**: ใช้ native agents ใน \`.agents/agents/*.md\` (\`spec\`, \`arch\`, \`pm\`, \`build\`, \`check\`, \`survey\`, \`ui\`, \`review\`) ผ่าน \`invoke_subagent\` ตาม 3-Step Workflow เสมอ (งานออกแบบระบบและ UX/UI ยึด \`gemini-4-neon\`, งาน docs/explore ย่อยใช้ \`gemini-4-hydrogen\` / \`gemini-3.8-flash\`)
+- **ทีมสร้าง (7 บทบาท) และทีมออกแบบ (3 บทบาท)**: ใช้ native agents ใน \`.agents/agents/*.md\` (\`spec\`, \`arch\`, \`dba\`, \`pm\`, \`build\`, \`testplan\`, \`check\` และ \`survey\`, \`ui\`, \`review\`) ผ่าน \`invoke_subagent\` ตาม 3-Step Workflow เสมอ (งานออกแบบระบบและ UX/UI ยึด \`gemini-4-neon\`, งาน docs/explore ย่อยใช้ \`gemini-4-hydrogen\` / \`gemini-3.8-flash\`)
 
 ## Role Dispatch Override
 > เฉพาะกรณีที่มีบรรทัด \`[baan: <role>]\` ปรากฏใน prompt ของ session นั้น (การ dispatch ภายในของ BAAN) ให้สวมบทบาทตาม role นั้นแทน ไม่ใช่ นายช่าง — ${overrideRule}

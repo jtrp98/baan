@@ -175,7 +175,7 @@ export function runCli(def, args, promptVia, prompt, cwd, timeoutSec, answerFile
 }
 
 // Mode A: Native interactive session running directly in user's terminal with standard TTY inheritance.
-export function runInteractiveCli(command, args, cwd, env = {}) {
+export function runInteractiveCli(command, args, cwd, env = {}, { signal, onSpawn } = {}) {
   const started = Date.now();
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
@@ -184,10 +184,18 @@ export function runInteractiveCli(command, args, cwd, env = {}) {
       windowsHide: false,
       env: { ...process.env, ...env },
     });
-    child.on("error", reject);
+    onSpawn?.(child.pid);
+    const abort = () => killTree(child);
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
+    child.on("error", (err) => {
+      signal?.removeEventListener("abort", abort);
+      reject(err);
+    });
     child.on("close", (code) => {
+      signal?.removeEventListener("abort", abort);
       resolve({
-        ok: code === 0,
+        ok: code === 0 && !signal?.aborted,
         exitCode: code,
         durationMs: Date.now() - started,
       });

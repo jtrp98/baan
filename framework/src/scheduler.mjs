@@ -3,12 +3,14 @@ import path from "node:path";
 import { event, persist } from "./store.mjs";
 import { transitiveFanOut } from "./plan.mjs";
 import { alive, repoLock } from "./repolock.mjs";
-import { snapshot, matches, fileHash, sameState } from "./snapshot.mjs";
+import { snapshot, matches, fileHash, sameState, sameStateOutside } from "./snapshot.mjs";
 import { readiness, documentBasis, validate, schemaFor, validateResult } from "./packet.mjs";
 import { evidence, gate } from "./gate.mjs";
 import { callSession } from "./session.mjs";
 import { verification, needsPlanning } from "./triage.mjs";
 import { looksLikeCommandEnvironmentFailure } from "./failure-class.mjs";
+import { createWindowSlotPool } from "./window-launcher.mjs";
+import { createPackageWorktree, lockWorktree } from "./worktree.mjs";
 
 const complete = (p) => p?.state === "done";
 export function transition(run, p, state, data = {}) {
@@ -33,8 +35,11 @@ async function processPackage(run, p, cfg, options) {
   let release;
   const started = Date.now();
   try {
-    release = repoLock(run.root, p.repo.path);
-    const current = snapshot(p.repo.path);
+    const workRepo = run.worktree ? createPackageWorktree(run.dir, p.id, p.repo.path) : p.repo.path;
+    if (run.worktree) p.worktreePath = workRepo;
+    else delete p.worktreePath;
+    release = run.worktree ? lockWorktree(run.root, workRepo) : repoLock(run.root, p.repo.path);
+    const current = snapshot(workRepo);
     if (p.childPid && alive(p.childPid)) throw new Error(`previous CLI still running: ${p.childPid}`);
     delete p.childPid;
     if (!p.before) p.before = current;
@@ -49,18 +54,18 @@ async function processPackage(run, p, cfg, options) {
     transition(run, p, "probing", { failureClass: "", probe: undefined });
     for (const cmd of [...new Set([p.commands.setup, p.commands.build, p.commands.test_targeted].filter(Boolean))]) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
-      const r = await evidence(run, p.repo.path, cmd, options);
+      const r = await evidence(run, workRepo, cmd, options);
       if (!r.ok && looksLikeCommandEnvironmentFailure(r)) {
         transition(run, p, "env_failed", { failureClass: "ENVIRONMENT_FAILURE", probe: r }); return;
       }
     }
-    const probed = snapshot(p.repo.path);
+    const probed = snapshot(workRepo);
     // Judge this attempt from its own start: people and sibling packages may change the repo while it waits.
     if (["head", "branch", "index", "stash"].some((k) => current[k] !== probed[k])) {
       p.failureClass = "SCOPE_VIOLATION"; waiting(run, p, ["probe/setup changed Git state; inspect evidence before resume"]); return;
     }
     // Work that passed the gate but whose Verifier crashed or answered garbage only needs verifying again, not a new Worker run.
-    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameState(p.after, probed));
+    let resumeVerification = Boolean(p.verification_pending && p.gate?.ok && p.after && sameStateOutside(p.after, probed, p.external_paths));
     for (;;) {
       if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
       if (resumeVerification) {
@@ -69,6 +74,7 @@ async function processPackage(run, p, cfg, options) {
       } else {
         for (const check of run.integration ?? []) if (check.packages.includes(p.id)) delete check.evidence;
         delete p.verification_pending;
+        delete p.interactiveSession;
         transition(run, p, "running", { restarted: !!p.session, questions: [], failureClass: "" });
         p.result = await (options.session ?? callSession)(run, p, "worker", cfg, options);
         if (options.signal?.aborted) { transition(run, p, "cancelled"); return; }
@@ -82,7 +88,7 @@ async function processPackage(run, p, cfg, options) {
           waiting(run, p, p.result.questions?.length ? p.result.questions : [p.result.summary]); return;
         }
         transition(run, p, "gating");
-        p.gate = await gate(run, p, { ...options, since: probed });
+        p.gate = await gate(run, p, { ...options, repoPath: workRepo, since: probed });
         if (readiness(p).some((r) => r.startsWith("stale approval"))) {
           transition(run, p, "stale", { acceptance_approved: false, questions: ["references changed during execution; confirm acceptance again"] }); return;
         }
@@ -94,8 +100,8 @@ async function processPackage(run, p, cfg, options) {
           p.verdict = await options.withVerifier(() => (options.session ?? callSession)(run, p, "verifier", cfg, { ...options, context: { lenses } }));
           validateResult(p.verdict, "verifier", p);
           delete p.verification_pending;
-          const reviewed = snapshot(p.repo.path);
-          if (!sameState(reviewed, p.after)) {
+          const reviewed = snapshot(workRepo);
+          if (!sameStateOutside(p.after, reviewed, p.external_paths)) {
             waiting(run, p, ["Verifier เปลี่ยน working tree/Git state: ต้องตรวจหลักฐานใหม่"]);
             p.failureClass = "SCOPE_VIOLATION"; persist(run); return;
           }
@@ -133,7 +139,8 @@ async function processPackage(run, p, cfg, options) {
 
 export async function schedule(run, cfg, options = {}) {
   const active = new Map(), repositories = new Set();
-  const slots = run.mode === "planned" ? 1 : run.maxParallel;
+  const slots = run.maxParallel;
+  const slotPool = createWindowSlotPool(slots);
   let verifiers = 0;
   const verifierQueue = [];
   options = { ...options, withVerifier: async (work) => {
@@ -173,15 +180,17 @@ export async function schedule(run, cfg, options = {}) {
       .sort((a, b) => critical(b) - critical(a) || fanout.get(b.id) - fanout.get(a.id));
     for (const p of ready) {
       if (options.signal?.aborted || existsSync(path.join(run.dir, `cancel-${p.id}.json`))) { transition(run, p, "cancelled"); continue; }
-      if (active.size >= slots || repositories.has(p.repo.path)) continue;
-      repositories.add(p.repo.path);
+      const lockTarget = run.worktree ? `worktree:${p.id}` : p.repo.path;
+      if (active.size >= slots || repositories.has(lockTarget)) continue;
+      repositories.add(lockTarget);
+      const windowSlot = slotPool.acquire();
       const controller = new AbortController();
       const abort = () => controller.abort();
       options.signal?.addEventListener("abort", abort, { once: true });
       const cancelFile = path.join(run.dir, `cancel-${p.id}.json`);
       const timer = setInterval(() => { if (existsSync(cancelFile)) controller.abort(); }, 100);
-      const promise = processPackage(run, p, cfg, { ...options, signal: controller.signal })
-        .finally(() => { clearInterval(timer); options.signal?.removeEventListener("abort", abort); active.delete(p.id); repositories.delete(p.repo.path); });
+      const promise = processPackage(run, p, cfg, { ...options, windowSlot, signal: controller.signal })
+        .finally(() => { clearInterval(timer); options.signal?.removeEventListener("abort", abort); slotPool.release(windowSlot); active.delete(p.id); repositories.delete(lockTarget); });
       active.set(p.id, promise);
     }
     if (!active.size) break;

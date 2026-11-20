@@ -91,24 +91,32 @@ export function untrackedDiff(repo, changed, after) {
 }
 
 export async function gate(run, p, options) {
+  const repoPath = options?.repoPath || p.worktreePath || p.repo.path;
   const results = [];
   for (const cmd of [...new Set([p.commands.build, p.commands.test_targeted, p.commands.test_full])]) {
-    results.push(await evidence(run, p.repo.path, cmd, options));
+    results.push(await evidence(run, repoPath, cmd, options));
     if (options.signal?.aborted) break;
   }
-  const after = snapshot(p.repo.path);
+  const after = snapshot(repoPath);
   const changed = changedFiles(p.before, after);
   // p.before stays the recovery point; scope is judged only on what changed since this attempt began.
   const since = options.since ?? p.before;
   const ownChanges = changedFiles(since, after);
-  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)));
+  // external_paths: globs another writer (another session/tool) is editing concurrently in the same repo.
+  // They are never the worker's scope, so changes there are reported but not treated as a scope violation.
+  const external = Array.isArray(p.external_paths) ? p.external_paths : [];
+  const isExternal = (f) => external.some((g) => matches(f, g));
+  const outside = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)) && !isExternal(f));
+  const external_changes = ownChanges.filter((f) => !p.owns.some((g) => matches(f, g)) && isExternal(f));
   for (const key of ["head", "branch", "index", "stash"]) if (since[key] !== after[key]) outside.push(`.git/${key}`);
   const output = results.map((r) => r.output).join("\n");
   const names = testNames(output);
-  const unmapped = p.acceptance.filter((a) => {
-    const mapping = p.result.acceptance.find((x) => x.id === a.id);
-    return !mapping?.proof?.length || mapping.proof.some((proof) => typeof proof !== "string" || !names.has(proof.trim()));
-  }).map((a) => a.id);
+  const unmapped = p.interactiveSession
+    ? []
+    : p.acceptance.filter((a) => {
+        const mapping = p.result.acceptance.find((x) => x.id === a.id);
+        return !mapping?.proof?.length || mapping.proof.some((proof) => typeof proof !== "string" || !names.has(proof.trim()));
+      }).map((a) => a.id);
   const failures = results.filter((r) => !r.ok);
   const failureClass = outside.length ? "SCOPE_VIOLATION" : failures.some(looksLikeCommandEnvironmentFailure) ? "ENVIRONMENT_FAILURE" : failures.length ? "IMPLEMENTATION_FAILURE" : "";
   const test_changes = ownChanges.filter((f) => p.before.files[f] != null && /(?:test|spec)[^/]*\.(?:[cm]?[jt]sx?|cs|go|py)$/i.test(f));
@@ -116,14 +124,14 @@ export async function gate(run, p, options) {
   const diff_file = path.join(run.dir, `${attempt}.diff.txt`);
   const snapshots_file = path.join(run.dir, `${attempt}.snapshots.json`);
   const evidence_file = path.join(run.dir, `${attempt}.evidence.json`);
-  writeFileSync(diff_file, git(p.repo.path, "diff", "--binary", p.before.tracked, "--") + untrackedDiff(p.repo.path, changed, after));
+  writeFileSync(diff_file, git(repoPath, "diff", "--binary", p.before.tracked, "--") + untrackedDiff(repoPath, changed, after));
   save(snapshots_file, { before: p.before, after });
   // Tests ran and passed yet no names were printed: say why, or the Worker guesses CONTRACT_MISMATCH and a human must explain BAAN.
   const ranTests = results.some((r) => r.counts?.passed > 0);
   const unmapped_hint = unmapped.length && ranTests && !names.size ? `test runner ไม่พิมพ์ชื่อ test ราย test จึง map AC ไม่ได้ — ${commandWarnings(p).join(" ") || "ให้คำสั่ง test พิมพ์ชื่อ test ที่ผ่าน"}` : undefined;
   // Raw output (up to 4 MB per command) already lives in each output_file; keeping it here bloated run.json,
   // which is rewritten on every state change.
-  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
+  const result = { ok: !failureClass, failureClass, results: results.map(({ output, ...summary }) => summary), changed, outside, ...(external_changes.length ? { external_changes } : {}), unmapped, unmapped_hint, test_changes, snapshot: after.id, diff_file, snapshots_file, evidence_file };
   p.after = after;
   save(evidence_file, result);
   return result;

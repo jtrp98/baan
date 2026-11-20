@@ -62,6 +62,10 @@
   - งานที่เป็น `risk: "high"` **ห้าม** ตั้ง `worker_tier` ต่ำกว่า `t2` (หากตั้ง t3–t5 ระบบจะแจ้งเตือนและปรับกลับเป็น t2 เพื่อความปลอดภัย)
 - **Contract-Gated Step-down**:
   - อนุญาตให้ Step-down (เช่น `tier: "t2"` -> `worker_tier: "t3"`) ได้เฉพาะงานที่เป็น `risk: "low"` หรือ `"medium"` **และต้องมี `contracts` หรือสเปกที่ pin ชัดเจน** กำกับไว้เท่านั้น
+- **Verifier Tier ราย Packet (`verifier_tier`)**:
+  - ใบงานที่ต้องตรวจเข้มกว่าปกติ (เช่น Security / Auth / PII) ระบุ `"verifier_tier": "t1"` ได้โดยไม่กระทบ worker และใบงานอื่นในรันเดียวกัน
+  - ลำดับความสำคัญ: `--verifier-tier` > `--tier` > `verifier_tier` ใน packet > `defaults.verifier_tier` ของ workspace > default ของบทบาท
+  - ยกระดับได้อิสระ แต่ลดต่ำกว่าค่าฐานได้เฉพาะงานที่ไม่ใช่ `risk: "high"` · `baan run --dry-run` แสดง `verifier_route` ราย packet
 
 ---
 

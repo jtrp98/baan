@@ -57,6 +57,14 @@ export function snapshot(repo) {
 // Enough to identify and recover a snapshot (tracked = recovery commit); the full file map stays in *.snapshots.json.
 export const snapshotRef = (s) => s && { id: s.id, head: s.head, branch: s.branch, index: s.index, stash: s.stash, tracked: s.tracked };
 export function sameState(a, b) { return ["id", "head", "branch", "index", "stash"].every((key) => a[key] === b[key]); }
+// Same as sameState, except file changes confined to `external` globs (another writer's area) are tolerated.
+// Git state (head/branch/index/stash) must still match; without full file maps it falls back to sameState.
+export function sameStateOutside(a, b, external = []) {
+  if (sameState(a, b)) return true;
+  if (!external?.length || !a?.files || !b?.files) return false;
+  if (["head", "branch", "index", "stash"].some((key) => a[key] !== b[key])) return false;
+  return changedFiles(a, b).every((f) => external.some((g) => matches(f, g)));
+}
 export function changedFiles(before, after) {
   return [...new Set([...Object.keys(before.files), ...Object.keys(after.files)])].filter((f) => before.files[f] !== after.files[f]);
 }

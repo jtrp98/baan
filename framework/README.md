@@ -63,10 +63,11 @@ Provider/tier ใช้ [agents.json](agents.json); override ทั้งชุ�
 
 | ค่า | ค่าเริ่มต้น / ที่ตั้ง |
 |---|---|
-| Provider Routing | **Availability-Driven Specialist Routing** จาก `roles` ใน [agents.json](agents.json) อิงค่ายที่เปิดใช้งานจริงใน `local.json` (บังคับค่ายเดียวด้วย `--agent`) · **Strict No-Impersonation**: ติดลิมิต/โควตาระหว่างรันจะหยุดแจ้ง `waiting_human` (`PROVIDER_LIMIT`) ไม่แอบสลับค่ายหรือลดรุ่นแทน |
-| Role-Owned Tiers | แต่ละบทบาทมีบันได tier ของตัวเอง: `planner` (`t1`–`t4`, default `t3`) · `worker` (`t1`–`t4`, default `t3`) · `verifier` (`t1`–`t3`, default `t2`) · `docs` (`t1`–`t3`, default `t2`) · override ด้วย `--tier` / `--planner-tier` |
-| งานขนานสูงสุด | `defaults.max_parallel` (`3`); override ด้วย `--max-parallel` |
-| Timeout | `--timeout` → tier `_timeoutSec` (`t1` overdrive = `3600s`) → `defaults.timeout_sec` (`0` วินาที = unlimited) |
+| Provider Routing | **Availability-Driven Specialist Routing** จาก `roles` ใน [agents.json](agents.json) อิงค่ายที่เปิดใช้งานจริงใน `local.json` (`--agent` บังคับ Worker/Planner โดยปล่อย Verifier แยกค่ายอัตโนมัติ; ล็อก Verifier แยกด้วย `--verifier-agent`) · **Strict No-Impersonation**: ติดลิมิต/โควตาระหว่างรันจะหยุดแจ้ง `waiting_human` (`PROVIDER_LIMIT`) ไม่แอบสลับค่ายหรือลดรุ่นแทน |
+| โหมดรัน | `defaults.execution_mode` (**`interactive`** เปิด CLI แยก 4 หน้าต่าง 2×2 Grid บน Windows; ตั้ง `--headless` / `--execution-mode headless` เพื่อรัน background และ `--inline` เพื่อเปิดใน terminal เดิม) |
+| Role-Owned Tiers | แต่ละบทบาทมีบันได tier ของตัวเอง: `planner` (`t1`–`t4`, default `t3`) · `worker` (`t1`–`t4`, default `t3`) · `verifier` (`t1`–`t3`, default `t2`) · `docs` (`t1`–`t3`, default `t2`) · override ด้วย `--tier` / `--planner-tier` / `--verifier-tier` หรือ `verifier_tier` ราย packet (งาน `risk: high` ที่มี `contracts`/pinned `read_first` เริ่ม Worker ที่ `t3` ได้ แล้วค่อยไต่ tier เมื่อ rework) |
+| งานขนานสูงสุด | `defaults.max_parallel` (**`4`**); override ด้วย `--max-parallel` (ใช้ `--worktree` เมื่อรันหลาย package ใน repo เดียวกัน) |
+| Timeout & Budget | `--timeout` → tier `_timeoutSec` (`t1` overdrive = `3600s`) → `defaults.timeout_sec` (`0` = unlimited) · Headless budget: `budget.max_commands` / `--max-commands` (default `60` worker / `40` verifier, `0` = unlimited) |
 | นโยบายสิทธิ์ | `defaults.permission_policy` (`native-safe`); override ด้วย `--permission-policy` หรือ `--allow-bypass` |
 
 Execution Prompts แยกแบบ Hybrid 3 ค่าย (`prompts/_core/` + `prompts/{claude,codex,agy}/` + `models.json`) และส่งผ่าน native system-prompt channel ของแต่ละ CLI:
@@ -128,7 +129,7 @@ Acceptance approval ไม่เซ็นประตูอื่นแทน �
 ระบุ `"kind": "code" | "docs" | "bugfix"` ใน packet หรือ task (ไม่ระบุอนุมานจาก role):
 - งาน `bugfix`: บังคับเขียน Red Test พิสูจน์บั๊กก่อนแก้โค้ด และบันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/` ใน knowledge root
 - งาน `docs`: Worker สามารถใช้ tier ประหยัด (`worker_tier: "t4"|"t5"`) และใช้ Hybrid Verification (เอกสารทั่วไปตรวจผ่าน linter + human gate; เอกสารวิกฤต ADR/Contracts มี LLM Verifier)
-- งาน `code`: Worker ลด tier ได้ (`worker_tier: "t3"`) เฉพาะเมื่องานมี `contracts` ชัดเจน และห้ามลดสำหรับงาน `risk: high` เพื่อป้องกัน Rework Penalty ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
+- งาน `code`: งาน `risk: high` ที่มี `contracts` หรือ pinned `read_first` เริ่ม Worker ที่ `t3` (`gpt-6.2-sol/medium`) ได้ แล้วค่อยไต่ tier เมื่อ rework (`t2` จะยังไม่ขึ้น `t1` จนกว่า `rework >= 2`); งาน `risk: high` ที่ไม่มี contract ชัดยังคงเริ่มขั้นต่ำ `t2` ดูรายละเอียดใน [MIGRATION.md](MIGRATION.md)
 
 งานใหม่ใช้ `baan run --goal "..." --cwd <repo> --owns "src/**,tests/**" --build "npm run build" --test "npm test"`
 Core ใช้ข้อความ goal เป็น acceptance เริ่มต้นให้รอยืนยัน; กำหนดข้อความ/source เองด้วย `--acceptance`/`--source`
@@ -148,12 +149,12 @@ Core ใช้ข้อความ goal เป็น acceptance เริ่ม
 `gate_ids`, `gateIds`, `humanGate` และ human_gates ยังคงเป็นประตูที่ต้องยืนยัน ไม่ถูกทิ้งตอนรวม task
 แผนต้นฉบับและประวัติเดิมไม่ถูกแก้; task ที่รวม package เดียวกันต้องมี repo/scope/commands ตรงกัน
 
-หนึ่ง BAAN writer ต่อ Git repository รวมข้าม workspace/run/linked worktrees
-หลาย repo ที่มีอย่างน้อยสอง package ประมาณ ≥30 นาทีเลือก parallel; งานอื่น planned ทีละ package
+หนึ่ง BAAN writer ต่อ Git repository รวมข้าม workspace/run/linked worktrees (เปิดหลาย package ใน repo เดียวกันพร้อมกันได้ด้วย `--worktree`)
+หลาย package ที่อยู่คนละ repo หรือเปิด `--worktree` จะเลือก `parallel` อัตโนมัติ (สูงสุด 4 หน้าต่าง 2×2 Grid); งานอื่น planned ทีละ package
 Planner แตกได้เฉพาะ scope/AC/task ของ parent และสืบ approval ที่ตรวจแล้วจาก core
-`--agent`, `--tier` (default t2), `--planner-tier`, `--max-parallel` (1–64), `--timeout` (1–86400 วินาที)
+`--agent` (worker/planner), `--verifier-agent`, `--tier` (default t3 worker), `--planner-tier`, `--verifier-tier`, `--max-parallel` (1–64, default 4), `--max-commands` (0–500), `--timeout` (1–86400 วินาที), `--headless`, `--inline`, `--worktree`
 Timeout ที่ระบุเองชนะ tier._timeoutSec แล้วจึง defaults.timeout_sec; resume ใช้ค่าที่บันทึกไว้
-ห้ามส่ง `--agent`, `--tier`, `--planner-tier`, `--timeout` หรือ `--max-parallel` ใหม่พร้อม `--resume`
+ห้ามส่ง `--agent`, `--verifier-agent`, `--tier`, `--planner-tier`, `--verifier-tier`, `--timeout`, `--max-commands` หรือ `--max-parallel` ใหม่พร้อม `--resume`
 
 ```json
 {"packages": [], "integration": [{"packages": ["A", "B"], "command": "npm run test:contract"}]}
@@ -202,10 +203,22 @@ Scope gate เป็นการตรวจหลังแก้ ไม่ใ�
 Commands ใน packet/config เป็น trusted local shell commands ต้องตรวจเองก่อนอนุมัติ ไม่รับ commands ใหม่จาก LLM
 Read-only permissions ขึ้นกับ provider/การตั้งค่าของเครื่อง มีการตรวจ mutation อีกชั้นแต่ไม่ rollback อัตโนมัติ
 
-## ทีมสร้าง ทีมออกแบบ และความรู้
+## ทีมสร้าง ทีมออกแบบ และ `baan flow`
 
-`baan --init` ติดตั้งทีมสร้าง (`spec`, `arch`, `pm`, `build`, `check`) และทีมออกแบบ (`survey`, `ui`, `review`) แบบ native ครบ 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`) พร้อม root stubs (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) ที่ราก workspace เท่านั้น
-บทบาทเหล่านี้ทำงานแบบคุยสด วางแผนก่อนทำเสมอ (`/plan` first) และใช้ Subagents ของแต่ละ CLI ช่วยสำรวจและเขียน Docs ตาม 3-Step Workflow ใน [LEARNING.md](LEARNING.md)
+`baan --init` ติดตั้งทีมสร้าง 7 บทบาท (`spec`, `arch`, `dba`, `pm`, `build`, `testplan`, `check`) และทีมออกแบบ 3 บทบาท (`survey`, `ui`, `review`) แบบ native ครบ 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`) พร้อม root stubs (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และ skills (`feature-flow`, `req-grill`, `wave-plan`, `project-survey`, `bug-fix`, `web-design-guidelines`) ที่ราก workspace เท่านั้น
+
+### `baan flow` (7-Step Engineering Flow จากตัวกลางบน Desktop App)
+```sh
+baan flow status --module <project/module>
+baan flow start --module <project/module> [--goal "<เป้าหมาย>"] [--worktree] [--headless] [--dry-run]
+baan flow answer --module <project/module> --ticket <id> --answer "<คำตอบ>" --by user --source "<ref>"
+baan flow approve --module <project/module> --gate <G-SPEC|G-KB-RESTRUCTURE|G-ARCH-DBA|G-WAVES> --by user --decision "<มติ>" --source "<ref>"
+baan flow next --module <project/module> [--goal "<เป้าหมายรอบถัดไป>"]
+```
+- **Single Coordinator + Auto-Close Grid Windows**: สั่งจากแชทตัวกลางบน Desktop App (ใช้ skill `feature-flow`) แล้ว Core เปิดหน้าต่าง `cmd` ใหม่แบบ 2×2 Grid (สูงสุด 4 หน้าต่าง) ผ่าน `bin/flow-step-runner.mjs` ปิดหน้าต่างอัตโนมัติเมื่อจบ เพื่อล้าง Context และเก็บความจำทั้งหมดใน Knowledge (`build/flow.json`, `build/db/`, `build/waves/`, `build/test-plan/`)
+- **Ticket & Close + 3 Milestone Gates**: เมื่อมีคำถามจะเขียน Ticket ลง `shared/oq/` แล้วปิดหน้าต่างให้ตัวกลางถามคุณ; หยุดขออนุมัติที่ `G-SPEC`, `G-KB-RESTRUCTURE` (เมื่อกระทบโครงสร้าง Knowledge), `G-ARCH-DBA`, และ `G-WAVES`
+- **Immutable History Lock & QA Repair Loop**: ไฟล์ `wave-xxx.md` / `TP-xxx.md` ที่ `done` แล้วถูกล็อก SHA-256 ห้ามแก้ย้อนหลัง; เมื่อ QA Autotest พังจะสร้าง Repair Wave ส่งเฉพาะ test case ที่พังให้ Dev ซ่อมอัตโนมัติสูงสุด 2 รอบ
+บทบาทเหล่านี้ทำงานแบบคุยสดหรือผ่าน `baan flow` วางแผนก่อนทำเสมอ (`/plan` first) และใช้ Subagents ของแต่ละ CLI ช่วยสำรวจและเขียน Docs ตาม 3-Step Workflow ใน [LEARNING.md](LEARNING.md)
 `--module project/module[+module]` โหลด module context และ references; owns ยังคงเป็นขอบเขตเขียนของ packet
 `baan --index`, `--lint-knowledge`, `--lint-plan <tasks.json>`, `--repair-mojibake <file>`, `--sweep "term" [--sweep-in <dir>]`
 `baan --commit` เก็บเอกสารเฉพาะ knowledge/memory Git repos ที่ตั้งใน config ไม่มี auto commit ของ run

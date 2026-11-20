@@ -118,10 +118,11 @@ export function parseLiveActivity(ev, format) {
 }
 
 export function createStreamParser(format, opts = {}) {
-  const { onSessionId, onEvent, onActivity, streamLogFile } = opts;
+  const { onSessionId, onEvent, onActivity, onUsage, streamLogFile } = opts;
   let sessionId = null;
+  const startedCommandIds = new Set();
   // costUsd stays null unless the provider reports one: codex/agy publish no price, and 0 read as "free".
-  const usage = { inputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: 0, turns: 0, costUsd: null };
+  const usage = { inputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: 0, turns: 0, commands: 0, toolOutputBytes: 0, costUsd: null };
   const errors = [];
   let answer = null;
   let buffer = "";
@@ -177,6 +178,18 @@ export function createStreamParser(format, opts = {}) {
       if (ev.type === "error" || ev.type === "turn.failed") {
         errors.push(ev.message ?? ev.error?.message ?? JSON.stringify(ev));
       }
+      if (ev.type === "item.started" && ev.item && ["command_execution", "mcp_tool_call"].includes(ev.item.type)) {
+        if (ev.item.id) startedCommandIds.add(ev.item.id);
+        usage.commands++;
+      }
+      if (ev.type === "item.completed" && ev.item) {
+        if (ev.item.type === "command_execution" || ev.item.type === "mcp_tool_call") {
+          if (!ev.item.id || !startedCommandIds.has(ev.item.id)) usage.commands++;
+          if (ev.item.type === "command_execution") {
+            usage.toolOutputBytes += Buffer.byteLength(String(ev.item.aggregated_output ?? ""), "utf8");
+          }
+        }
+      }
     }
 
     // AGY stream format
@@ -202,8 +215,12 @@ export function createStreamParser(format, opts = {}) {
 
     const activity = parseLiveActivity(ev, format);
     if (activity) {
+      if (activity.type === "tool" && format !== "codex-jsonl") {
+        usage.commands++;
+      }
       onActivity?.(activity, { ...usage });
     }
+    onUsage?.({ ...usage });
   }
 
   function feed(chunk) {

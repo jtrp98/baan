@@ -50,6 +50,15 @@ test("init ครั้งแรก: สร้าง baan.config.json จาก�
 
     assert.ok(existsSync(path.join(dir, ".agents", "skills", "bug-fix", "SKILL.md")), "ต้องติดตั้ง skill ใน .agents/skills ด้วย");
     assert.ok(existsSync(path.join(dir, ".claude", "skills", "bug-fix", "SKILL.md")), "ต้องติดตั้ง skill ใน .claude/skills ด้วย");
+    for (const skillName of ["feature-flow", "req-grill", "wave-plan"]) {
+      assert.ok(existsSync(path.join(dir, ".agents", "skills", skillName, "SKILL.md")), `ต้องติดตั้ง skill ${skillName} ใน .agents/skills`);
+      assert.ok(existsSync(path.join(dir, ".claude", "skills", skillName, "SKILL.md")), `ต้องติดตั้ง skill ${skillName} ใน .claude/skills`);
+    }
+    for (const newRole of ["dba", "testplan"]) {
+      assert.ok(existsSync(path.join(dir, ".claude", "agents", `${newRole}.md`)), `ต้องสร้าง claude agent ${newRole}`);
+      assert.ok(existsSync(path.join(dir, ".agents", "agents", `${newRole}.md`)), `ต้องสร้าง agy agent ${newRole}`);
+      assert.ok(existsSync(path.join(dir, ".codex", "agents", `${newRole}.toml`)), `ต้องสร้าง codex agent ${newRole}`);
+    }
     assert.ok(logs.some((l) => l.includes("แก้ path")), "ต้องบอกผู้ใช้ให้แก้ config");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

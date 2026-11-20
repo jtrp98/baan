@@ -5,10 +5,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { git, snapshot, changedFiles, matches } from "../src/snapshot.mjs";
 import { repoLock } from "../src/repolock.mjs";
-import { cli, decide } from "../src/cli.mjs";
+import { cli, decide, report } from "../src/cli.mjs";
 import { fromPlan, validatePacket, schemaFor } from "../src/packet.mjs";
 import { schedule } from "../src/scheduler.mjs";
-import { callSession, resolveWorkerTier } from "../src/session.mjs";
+import { callSession, resolveWorkerTier, resolveVerifierTier } from "../src/session.mjs";
 import { evidence, counts, testNames } from "../src/gate.mjs";
 import { persist, loadRun, save } from "../src/store.mjs";
 import { verification } from "../src/triage.mjs";
@@ -71,6 +71,43 @@ test("engine scope violation is reworked, never automatically reverted", async (
   const { root, repo } = fixture(t); const run = runAt(root, [packet(repo, "A", { budget: { max_rework: 0 } })]);
   await schedule(run, cfg, { execute: passing, session: async () => { writeFileSync(path.join(repo, "outside.txt"), "keep"); return structuredClone(good); } });
   assert.equal(run.packages[0].failureClass, "SCOPE_VIOLATION"); assert.equal(run.packages[0].state, "waiting_human"); assert.equal(readFileSync(path.join(repo, "outside.txt"), "utf8"), "keep");
+});
+test("engine external_paths: concurrent writer outside owns is reported, not a scope violation", async (t) => {
+  const { root, repo } = fixture(t); const run = runAt(root, [packet(repo, "A", { external_paths: ["ext/**"], budget: { max_rework: 0 } })]);
+  await schedule(run, cfg, { execute: passing, session: async (r, p, role) => {
+    if (role === "worker") { mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "other.ts"), "other session"); }
+    return session(r, p, role);
+  } });
+  assert.equal(run.packages[0].state, "done");
+  assert.deepEqual(run.packages[0].gate.external_changes, ["ext/other.ts"]);
+  assert.deepEqual(run.packages[0].gate.outside, []);
+});
+test("engine external_paths: verifier call tolerates concurrent external writes but not its own", async (t) => {
+  const { root, repo } = fixture(t);
+  const localCfg = { agents: { codex: { command: "fake", promptVia: "stdin", readArgs: ["exec", "-"], writeArgs: [], answerFrom: "answerFile", usage: { args: [], format: "codex-jsonl" } } }, tiers: { t5: { codex: {} } } };
+  const pass = JSON.stringify({ verdict: "PASS", failure_class: "", findings: [], acceptance: [] });
+  const p = packet(repo, "A", { external_paths: ["ext/**"] }); const run = runAt(root, [p]);
+  await callSession(run, p, "verifier", localCfg, { runner: async () => {
+    mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "other.ts"), "other session");
+    return { ok: true, answer: pass, durationMs: 1 };
+  } });
+  await assert.rejects(callSession(run, p, "verifier", localCfg, { runner: async () => {
+    writeFileSync(path.join(repo, "code.mjs"), "verifier wrote this"); return { ok: true, answer: pass, durationMs: 1 };
+  } }), /verifier changed repository\/Git state: code\.mjs/);
+});
+test("engine external_paths: scheduler accepts verifier verdict when only external files moved meanwhile", async (t) => {
+  const { root, repo } = fixture(t); const run = runAt(root, [packet(repo, "A", { external_paths: ["ext/**"], budget: { max_rework: 0 } })]);
+  await schedule(run, cfg, { execute: passing, session: async (r, p, role) => {
+    if (role === "verifier") { mkdirSync(path.join(repo, "ext"), { recursive: true }); writeFileSync(path.join(repo, "ext", "late.ts"), "other session during verify"); }
+    return session(r, p, role);
+  } });
+  assert.equal(run.packages[0].state, "done");
+});
+test("engine external_paths must be relative and must not overlap owns", (t) => {
+  const { repo } = fixture(t);
+  assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["../x/**"] })), /external_paths/);
+  assert.throws(() => validatePacket(packet(repo, "A", { external_paths: ["*.mjs"] })), /overlap owns/);
+  assert.ok(validatePacket(packet(repo, "A", { external_paths: ["frontend/**"] })));
 });
 test("engine one writer per repo; cross-repo writers overlap; dependencies start after done", async (t) => {
   const { root, repo, makeRepo } = fixture(t), other = makeRepo("other");
@@ -334,6 +371,32 @@ test("engine resolveWorkerTier respects code vs docs tier rules", () => {
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4", contracts: [{ ref: "api.md" }] }), "t4");
 });
 
+test("engine resolveVerifierTier: packet raises freely, lowers only outside risk high, CLI flags win", () => {
+  const run = { tier: "t3", verifierTier: "t2" };
+  assert.equal(resolveVerifierTier(run, { risk: "high" }), "t2");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "t1" }), "t1");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifierTier: "T1" }), "t1");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "t3" }), "t2");
+  assert.equal(resolveVerifierTier(run, { risk: "low", verifier_tier: "t3" }), "t3");
+  assert.equal(resolveVerifierTier(run, { risk: "high", verifier_tier: "bogus" }), "t2");
+  assert.equal(resolveVerifierTier({ ...run, explicitTier: true }, { verifier_tier: "t1" }), "t3");
+  assert.equal(resolveVerifierTier({ ...run, verifierTier: "t3", explicitVerifierTier: true, explicitTier: true }, { verifier_tier: "t1" }), "t3");
+});
+
+test("engine dry-run shows per-package verifier route from packet verifier_tier", async (t) => {
+  const { root, repo } = fixture(t); const file = path.join(root, "plan.json");
+  save(file, { packages: [packet(repo, "A", { risk: "high", verifier_tier: "t1" }), packet(repo, "B", { risk: "high" })] });
+  const local = { agents: { codex: true, claude: false, agy: false } };
+  const result = await cli(["run", "--plan", file, "--workspace", root, "--dry-run"], { localConfig: local });
+  const byId = Object.fromEntries(result.packages.map((p) => [p.id, p.verifier_route]));
+  assert.equal(byId.A.role, "verifier"); assert.equal(byId.A.tier, "t1");
+  assert.equal(byId.B.tier, "t2");
+  const forced = await cli(["run", "--plan", file, "--workspace", root, "--verifier-tier", "t3", "--dry-run"], { localConfig: local });
+  assert.equal(forced.resolved_routes.verifier.tier, "t3");
+  assert.ok(forced.packages.every((p) => p.verifier_route.tier === "t3"));
+  assert.ok(!existsSync(path.join(root, ".baan", "runs")));
+});
+
 const commitFile = (repo, name, text) => { writeFileSync(path.join(repo, name), text); git(repo, "add", name); git(repo, "commit", "-m", `add ${name}`); };
 
 test("engine judges scope from the attempt start: a human fix made while the package waited is not the Worker's", async (t) => {
@@ -568,4 +631,71 @@ test("engine never picks an agent switched off in local.json as the independent 
     },
   });
   assert.equal(verifierCmd, "agy");
+});
+
+test("engine headless budget.max_commands aborts runaway tool loops and records partial telemetry", async (t) => {
+  const { root, repo } = fixture(t);
+  const p = packet(repo, "WP-CAP", { budget: { max_commands: 2 } });
+  const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { codex: {} } } };
+  await assert.rejects(
+    () => callSession(run, p, "worker", agents, {
+      runner: async (_def, _args, _via, _prompt, _cwd, _timeout, _ans, opts) => {
+        for (let i = 0; i < 3; i++) {
+          opts.onStdout(JSON.stringify({ type: "item.completed", item: { type: "command_execution", command: `cmd-${i}`, aggregated_output: "ok" } }) + "\n");
+        }
+        return { ok: false, exitCode: 1, answer: "", stdout: "", stderr: "", durationMs: 25 };
+      },
+    }),
+    (err) => err.failureClass === "BUDGET_EXCEEDED"
+  );
+  const rep = report(run);
+  assert.equal(rep.usage.calls, 1);
+  assert.equal(rep.usage.commands, 3);
+});
+
+test("engine fresh session reset clears bloated worker session (>1.5M cached tokens) while preserving crash recovery", async (t) => {
+  const { root, repo } = fixture(t);
+  const p = packet(repo, "WP-RESET", {
+    session: { agent: "codex", id: "bloated-thread", started: true },
+    lastWorkerUsage: { cacheReadTokens: 2_000_000 },
+  });
+  const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { codex: {} } } };
+  let capturedArgs = [];
+  await callSession(run, p, "worker", agents, {
+    runner: async (_def, args) => {
+      capturedArgs = args;
+      return { ok: true, answer: JSON.stringify(good), durationMs: 10, usage: { inputTokens: 100, cacheReadTokens: 0, outputTokens: 50, sessionId: "fresh-thread" } };
+    },
+  });
+  assert.ok(!capturedArgs.includes("resume"), "bloated session must start fresh instead of resuming");
+  assert.equal(p.session.id, "fresh-thread");
+});
+
+test("engine --worktree allows concurrent execution across packages targeting the same repository", async (t) => {
+  const { root, repo } = fixture(t);
+  const p1 = packet(repo, "W1", { owns: ["a.txt"] });
+  const p2 = packet(repo, "W2", { owns: ["b.txt"] });
+  const run = runAt(root, [p1, p2]);
+  run.worktree = true;
+  run.maxParallel = 4;
+  let activeCount = 0;
+  let peakActive = 0;
+  await schedule(run, cfg, {
+    execute: passing,
+    session: async (_r, p, role) => {
+      if (role === "verifier") return { verdict: "PASS", findings: [], failure_class: "", acceptance: p.acceptance.map((a) => ({ id: a.id, passed: true, proof: ["value test"] })) };
+      activeCount++;
+      peakActive = Math.max(peakActive, activeCount);
+      await new Promise((r) => setTimeout(r, 80));
+      writeFileSync(path.join(p.worktreePath, p.owns[0]), "done\n");
+      activeCount--;
+      return structuredClone(good);
+    },
+  });
+  assert.equal(peakActive, 2);
+  assert.equal(p1.state, "done");
+  assert.equal(p2.state, "done");
+  assert.ok(p1.worktreePath && p2.worktreePath && p1.worktreePath !== p2.worktreePath);
 });

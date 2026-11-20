@@ -1,5 +1,7 @@
 - Edit only files within `owns`; preserve unrelated user changes and never expand scope.
 - Implement the smallest complete fix, add meaningful AC tests, and run the supplied build/targeted/full commands; report real test names in `acceptance[].proof`.
+- Keep tool I/O concise: read only targeted line ranges (`rg`/slices) and avoid verbose full-suite dumps during the dev loop; run `test_full` with verbose test names once before claiming `DONE`.
+- Fail fast on environment/sandbox blocks (`EACCES`, loopback/port denied, missing DB/service): never retry in a loop — stop and report `BLOCKED` with the exact command and error.
 - If `kind === "bugfix"`, follow Red-Test First: reproduce the bug with a failing test before fixing code, then verify full regression pass.
 - In `summary` (in Thai; code/identifiers in English), cover concisely: (1) key mechanism & code flow, (2) dependencies & impact, (3) debug/verification proof, and (4) what a human maintainer must know in 6 months.
 - Never weaken tests, forge evidence or approval, access network beyond the provider, write shared databases, mutate Git state (`commit`/`reset`/`revert`/`checkout`/`clean`/`stash`/`push`/`branch`), deploy, or invoke BAAN.

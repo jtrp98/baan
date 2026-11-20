@@ -101,3 +101,78 @@ export function compileExecutionPrompt({
     },
   };
 }
+
+export function compileInteractiveBrief({
+  provider = "codex",
+  role = "worker",
+  model = "",
+  effort = "",
+  tier = "",
+  tierLabel = "",
+  packet = {},
+  answerFile = "",
+  teamDir = TEAM_DIR,
+} = {}) {
+  const corePath = path.join(teamDir, "prompts", "_core", `${role}.md`);
+  const coreContract = existsSync(corePath) ? readFileSync(corePath, "utf8").trim() : "";
+  const modelInfo = loadModelGuidance(NATIVE_PROVIDERS.has(provider) ? provider : "codex", model, teamDir);
+
+  const lines = [
+    `# BAAN Interactive Brief — ${packet.id || "WP"} (${role.toUpperCase()})`,
+    `- **Provider / Model**: \`${provider}\` / \`${model || "default"}\`${effort ? ` (effort: \`${effort}\`)` : ""}${tier ? ` · \`${tier}\`${tierLabel ? ` (${tierLabel})` : ""}` : ""}`,
+  ];
+  if (modelInfo.guidance) lines.push(`- **Model Guidance**: ${modelInfo.guidance}`);
+  if (packet.repo?.path) lines.push(`- **Repo**: \`${packet.repo.path}\``);
+  if (packet.goal) lines.push("", "## Goal", packet.goal);
+  if (Array.isArray(packet.owns) && packet.owns.length) {
+    lines.push("", `## Owns (${packet.owns.length})`, ...packet.owns.map((o) => `- \`${o}\``));
+  }
+  if (Array.isArray(packet.read_first) && packet.read_first.length) {
+    lines.push("", "## Read First", ...packet.read_first.map((r) => `- \`${r.path}\`${r.pin ? " *(pinned)*" : ""}`));
+  }
+  if (Array.isArray(packet.contracts) && packet.contracts.length) {
+    lines.push("", "## Contracts", ...packet.contracts.map((c) => `- \`${c.ref}\``));
+  }
+  if (Array.isArray(packet.acceptance) && packet.acceptance.length) {
+    lines.push("", "## Acceptance Criteria", ...packet.acceptance.map((a) => `- **${a.id}**: ${a.text} *(source: \`${a.source}\`)*`));
+  }
+  if (packet.commands) {
+    lines.push("", "## Verification Commands");
+    for (const k of ["setup", "build", "test_targeted", "test_full"]) {
+      if (packet.commands[k]) lines.push(`- **${k}**: \`${packet.commands[k]}\``);
+    }
+  }
+  if (packet.gate && !packet.gate.ok) {
+    lines.push("", "## Previous Gate Failure", `- **Failure Class**: \`${packet.gate.failureClass}\``);
+    if (packet.gate.outside?.length) lines.push(`- **Outside Owns**: ${packet.gate.outside.map((f) => `\`${f}\``).join(", ")}`);
+    if (packet.gate.unmapped?.length) lines.push(`- **Unmapped AC**: ${packet.gate.unmapped.join(", ")}`);
+    for (const r of packet.gate.results ?? []) {
+      if (!r.ok) lines.push(`- **Failed Command**: \`${r.command}\` → log: \`${r.output_file}\``);
+    }
+  }
+  if (packet.verdict && packet.verdict.verdict !== "PASS") {
+    lines.push("", "## Previous Verifier Findings");
+    for (const f of packet.verdict.findings ?? []) {
+      lines.push(`- ${typeof f === "string" ? f : JSON.stringify(f)}`);
+    }
+  }
+  if (role === "verifier" || role === "planner") {
+    lines.push("", "## Read-Only Evidence",
+      ...(packet.evidence?.diff_file ? [`- **diff_file**: \`${packet.evidence.diff_file}\``] : []),
+      ...(packet.evidence?.snapshots_file ? [`- **snapshots_file**: \`${packet.evidence.snapshots_file}\``] : []),
+      ...(packet.evidence?.evidence_file ? [`- **evidence_file**: \`${packet.evidence.evidence_file}\``] : []),
+      ...(packet.lenses?.length ? [`- **lenses**: ${packet.lenses.join(", ")}`] : []),
+    );
+  }
+  if (answerFile) {
+    lines.push(
+      "",
+      "## Output File (Optional for Interactive Exit)",
+      `When finished, write valid JSON matching the \`${role}.result\` schema to \`${answerFile}\`, then run \`/exit\` so BAAN Core can immediately evaluate the Machine Gate / next step.`
+    );
+  }
+  if (coreContract) {
+    lines.push("", "## Core Contract", coreContract);
+  }
+  return lines.join("\n") + "\n";
+}

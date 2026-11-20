@@ -1,6 +1,6 @@
 # CONVENTIONS — สัญญาร่วม
 
-ใช้กับ Orchestrator, ทีมสร้าง (5 บทบาท) และทีมออกแบบ (3 บทบาท) ที่คุยสด; execution roles ใช้ contract ใน `prompts/` และ structured schemas
+ใช้กับ Orchestrator, ทีมสร้าง (7 บทบาท: `spec`, `arch`, `dba`, `pm`, `build`, `testplan`, `check`) และทีมออกแบบ (3 บทบาท: `survey`, `ui`, `review`) ที่คุยสดหรือรันผ่าน `baan flow`; execution roles ของ `baan run` ใช้ contract ใน `prompts/` และ structured schemas
 ปฏิบัติตามสัญญาการเรียนรู้และการตัดสินใจทางวิศวกรรมใน [LEARNING.md](LEARNING.md)
 Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 
@@ -17,7 +17,7 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 - ไม่เปิด role อื่นหรือเรียก BAAN ซ้อนจาก execution role; หนึ่ง writer ต่อ repository รวม linked worktrees
 - ห้ามติดตั้งหรือเขียน config, stubs, telemetry hooks หรือ `.baan/` ลงใน `target/*` โดยตรง — ให้ติดตั้งที่ราก workspace เท่านั้น และอัปเดตทุก workspace ให้ตรงรุ่นเสมอด้วย `baan sync --all`
 - ขอบเขตเครื่องมือภายนอกและ ToS ของ 3 ค่าย (OpenAI, Anthropic, Google): เชื่อมต่อผ่าน official CLIs (`codex`, `claude`, `agy`) แบบ sanctioned subprocess adapters เท่านั้น ห้ามส่อง credentials/tokens ส่วนตัวของ CLI อื่น (เช่น `.credentials.json`, `auth.json`), ห้ามยิง private/internal web APIs (เช่น backend web chat APIs), ไม่ทำ User-Agent spoofing, ไม่ bypass rate limits/quotas, ไม่ทำ cross-provider distillation และยึดหลัก Account Safety First เสมอ
-- ใบงาน/Packet ระบุประเภทงานด้วย `"kind": "code"`, `"kind": "docs"`, หรือ `"kind": "bugfix"`: แต่ละบทบาทมีตาราง Role-Owned Tiers ของตัวเองใน `agents.json` และเลือกค่ายอัตโนมัติตามความพร้อมใช้งานใน `local.json` (Availability-Driven Specialist Routing) พร้อมกฎ **Strict No-Impersonation** (หากค่าย/โมเดลที่เลือกไว้ติดลิมิต/โควตา ให้หยุดแจ้ง `waiting_human` ทันที ห้ามแอบสลับค่ายหรือลดรุ่นแทน); งาน Docs วิ่งเข้าบทบาท `docs` (`t1` Critical ADR/Contracts · `t2` Standard Docs · `t3` Light/Micro) พร้อม Hybrid Verification; งาน Bugfix บังคับ Red Test First และบันทึกประวัติลง `<project>/shared/defects/`; งาน Code ควบคุมด้วย Contract-Gated Risk Policy (`risk: high` ล็อก `worker` ≥ `t2`, ลดไป `t4` ได้เฉพาะเมื่อมี contracts และ Rework ไต่ tier ขึ้นทีละขั้น)
+- ใบงาน/Packet ระบุประเภทงานด้วย `"kind": "code"`, `"kind": "docs"`, หรือ `"kind": "bugfix"`: แต่ละบทบาทมีตาราง Role-Owned Tiers ของตัวเองใน `agents.json` และเลือกค่ายอัตโนมัติตามความพร้อมใช้งานใน `local.json` (Availability-Driven Specialist Routing) โดย `--agent` บังคับเฉพาะ Worker/Planner เพื่อรักษาการแยกค่าย Verifier (ล็อก Verifier แยกด้วย `--verifier-agent`) พร้อมกฎ **Strict No-Impersonation** (หากค่าย/โมเดลที่เลือกไว้ติดลิมิต/โควตา ให้หยุดแจ้ง `waiting_human` ทันที ห้ามแอบสลับค่ายหรือลดรุ่นแทน); โหมดรันเริ่มต้นเป็น `interactive` (เปิด CLI แยกสูงสุด 4 หน้าต่าง 2×2 Grid, ใช้ `--headless` เมื่อต้องการ background พร้อม `budget.max_commands` guard); งาน Docs วิ่งเข้าบทบาท `docs` (`t1` Critical ADR/Contracts · `t2` Standard Docs · `t3` Light/Micro) พร้อม Hybrid Verification; งาน Bugfix บังคับ Red Test First และบันทึกประวัติลง `<project>/shared/defects/`; งาน Code ควบคุมด้วย Contract-Gated Risk Policy (`risk: high` ที่มี `contracts`/pinned `read_first` เริ่ม `worker` ที่ `t3` ได้ ส่วนที่ไม่มี contract ชัดล็อก ≥ `t2`, และ `t2` จะยังไม่ขึ้น `t1` จนกว่า `rework >= 2`)
 
 ## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 
@@ -54,9 +54,10 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 `layout: project`: 
 - **ระดับ Project (`<project>/`)**: เก็บเฉพาะสิ่งที่เป็น Cross-Cutting ทั้งโปรเจกต์ (`INDEX.md` เป็น Master Portal, `shared/` ความจริงร่วม/Glossary/ADR/ดัชนี REQ รวม, `design/` Design System กลาง/Brand Assets, `build/` สถาปัตยกรรมเชื่อมระบบรวม `build/architecture/` และ Shared DB `build/db/` — *ห้ามตั้งชื่อโฟลเดอร์ build/design ซ้ำซ้อนกับ design UX/UI*)
 - **ระดับ Module (`<project>/modules/<module>/`)**: ของโดเมนไหนต้องจบในโมดูลนั้นครบ 3 ช่อง (`shared/`, `design/`, `build/`) และมี `INDEX.md` ประจำโมดูล
-- **Folder-First & Progressive Disclosure**: เพื่อป้องกัน Context Bloat ของ AI ให้ใช้โฟลเดอร์ย่อยที่มี `INDEX.md` คุมหน้าบ้านเสมอ (`shared/requirements/`, `shared/oq/`, `design/feasibility/`, `design/screens/`, `build/contracts/`, `build/test-plan/`)
+- **Folder-First & Progressive Disclosure**: เพื่อป้องกัน Context Bloat ของ AI ให้ใช้โฟลเดอร์ย่อยที่มี `INDEX.md` คุมหน้าบ้านเสมอ (`shared/requirements/`, `shared/oq/`, `design/feasibility/`, `design/screens/`, `build/contracts/`, `build/db/`, `build/waves/`, `build/test-plan/`)
   - ไฟล์ `INDEX.md` ต้องสั้นกระชับ (ห้ามเกิน 20 KB) ห้ามใส่ประวัติยาวหรือบันทึก Canvas ย้อนหลังลงใน INDEX
   - ไฟล์ `.md` ทั่วไปไม่ควรเกิน 50 KB หากยาวให้แยกไฟล์ย่อย และคำถาม OQ ที่ตอบแล้วให้ย้ายไป `oq/resolved/`
+  - **Immutable History Lock**: ไฟล์ใน `build/waves/` และ `build/test-plan/` ที่สถานะ `done`, `superseded` หรือ `cancelled` ห้ามแก้ไขเด็ดขาด (`baan --lint-knowledge` และ `baan flow` ตรวจ SHA-256 อัตโนมัติ) หากกระทบแผนเดิมให้ mark รายการที่ยังไม่ `done` เป็น `superseded` แล้วสร้างไฟล์ใหม่ต่อท้ายเสมอ
 `shared` ระบุ owner ของเอกสาร, `design` เป็นทีมออกแบบ UX/UI, `build` เป็นสัญญา/หลักฐานส่งมอบด้านพัฒนา
 `shared/requirements/` (หรือ `shared/requirements.md`) จัด feature `F#` → requirement `R#` → AC; OQ อยู่ `shared/oq/` (หรือ `shared/oq.md`)
 หัว INDEX เป็นแหล่งจริงของ status/updated/depends_on/requested_by/target/platform/os

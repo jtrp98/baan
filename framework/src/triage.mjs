@@ -19,9 +19,9 @@ export function verification(p, packages = []) {
   if (needs && !lenses.size) lenses.add("acceptance");
   return [...lenses];
 }
-export function triage(packages, direct = false) {
+export function triage(packages, direct = false, { worktree = false } = {}) {
   const repositories = new Set(packages.map((p) => p.repo.path));
-  const parallel = repositories.size > 1 && packages.filter((p) => (p.budget?.expected_minutes ?? 0) >= 30).length >= 2;
+  const parallel = packages.length > 1 && (repositories.size > 1 || Boolean(worktree));
   const simple = packages.length === 1 && !packages[0].needs_planning && !(packages[0].contracts?.length) && (packages[0].budget?.expected_minutes ?? 0) <= 120;
   return { mode: (direct || simple) && packages.length === 1 ? "direct" : parallel ? "parallel" : "planned", needsPlanning: !direct && packages.some(needsPlanning),
     answers: { packages: packages.length, repositories: repositories.size, parallelWorthwhile: parallel } };

@@ -6,10 +6,10 @@ import path from "node:path";
 
 const cfg = JSON.parse(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "agents.json"), "utf8"));
 const AGENTS = ["claude", "codex", "agy"];
-const EXPECTED_ROLES = ["planner", "worker", "verifier", "docs", "arch", "spec", "pm", "build", "check", "survey", "ui", "review"];
+const EXPECTED_ROLES = ["planner", "worker", "verifier", "docs", "arch", "dba", "spec", "pm", "build", "testplan", "check", "survey", "ui", "review"];
 const NEON_PINNED_ROLES = ["planner", "arch", "survey", "ui", "review"];
 
-test("agents.json ใช้โครงสร้าง Role-Owned Tiers ครบ 12 บทบาท และทุก tier ประกาศครบทั้ง 3 ค่าย", () => {
+test("agents.json ใช้โครงสร้าง Role-Owned Tiers ครบ 14 บทบาท และทุก tier ประกาศครบทั้ง 3 ค่าย", () => {
   assert.equal(cfg.tiers, undefined, "เลิกใช้ global tiers กลางแล้ว — ทุกบทบาทต้องประกาศ tiers ของตัวเองใน roles");
   for (const role of EXPECTED_ROLES) {
     const def = cfg.roles?.[role];
@@ -55,7 +55,7 @@ test("Policy Guard: เฉพาะแพ็กเกจ $20/เดือน, �
   assert.match(policyText, /Risk & Verification/);
 
   const forbiddenModels = new Set(["fable", "gemini-4-carbon", "gpt-6-luna"]);
-  const allowedXhighRoles = new Set(["planner", "arch", "worker", "build", "verifier", "check"]);
+  const allowedXhighRoles = new Set(["planner", "arch", "dba", "worker", "build", "verifier", "check"]);
 
   for (const [role, def] of Object.entries(cfg.roles)) {
     for (const [tier, td] of Object.entries(def.tiers)) {

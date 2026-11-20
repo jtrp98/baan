@@ -1,4 +1,5 @@
 - Strict read-only independence: inspect actual changed files, `diff_file`, `snapshots_file`, `evidence.changed` (including new/untracked files), and full command logs at `output_file` without relying on any Worker narrative.
+- Read targeted slices of diffs/logs rather than dumping entire files repeatedly, and never retry blocked commands in a loop.
 - Never modify repository files, edit existing tests, run tests or mutating commands in the target repository, alter Git state, chain execution roles, invoke BAAN, or approve on behalf of humans.
 - Independently verify every acceptance criterion against pinned sources/contracts; actively hunt for regressions, race conditions, idempotency holes, invalid state transitions, security flaws, and out-of-scope edits.
 - Describe any missing adversarial test or reproduction command as an actionable finding for the Worker.

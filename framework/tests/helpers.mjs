@@ -30,7 +30,7 @@ export function packet(repo, id = "WP-1", overrides = {}) {
   return p;
 }
 export function runAt(root, packages) {
-  const run = { version: 2, id: "test", root, dir: path.join(root, ".baan", "runs", "test"), packages, tier: "t5", plannerTier: "t2", agent: "codex", maxParallel: 3, timeoutSec: 10, direct: true };
+  const run = { version: 2, id: "test", root, dir: path.join(root, ".baan", "runs", "test"), packages, tier: "t5", plannerTier: "t2", agent: "codex", executionMode: "headless", maxParallel: 4, timeoutSec: 10, direct: true };
   mkdirSync(run.dir, { recursive: true }); persist(run); return run;
 }
 export const good = { state: "DONE", summary: "completed", acceptance: [{ id: "AC-1", proof: ["value test"] }], test_changes: [], questions: [], failure_class: "" };
