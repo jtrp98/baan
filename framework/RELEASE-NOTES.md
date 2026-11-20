@@ -2,12 +2,32 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
-## Unreleased
+## 0.39.0 — 2026-11-20 · `baan flow` 7 ขั้นตอน, บทบาท `dba` & `testplan` (14 Roles), 3 Skills ใหม่ และ Immutable Wave/Test-Plan Lock
 
-- **Verifier tier ราย packet**: เพิ่มฟิลด์ `verifier_tier` ใน packet schema (และส่งต่อจาก plan tasks) กับ flag `--verifier-tier` ลำดับความสำคัญ `--verifier-tier` > `--tier` > packet > `defaults.verifier_tier` ยกได้อิสระ ลดได้เฉพาะงานที่ไม่ใช่ `risk: high` (`src/session.mjs` `resolveVerifierTier`, `src/cli.mjs`, `schemas/packet.schema.json`)
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **รีเฟรช stubs, subagent definitions และ skills ใน workspace**: หลังอัปเกรดให้รัน `baan sync` เพื่อติดตั้งบทบาทใหม่ (`dba`, `testplan`) และ 3 skills ใหม่ (`feature-flow`, `req-grill`, `wave-plan`) เข้า workspace
+
+### เพิ่ม
+
+- **ระบบ `baan flow` 7 ขั้นตอน (`src/flow.mjs`, `src/flow-state.mjs`, `src/flow-lock.mjs`, `bin/flow-step-runner.mjs`, `schemas/flow-step.result.json`)**:
+  - รองรับคำสั่ง `baan flow [start | status | answer | approve | next] --module <project/module>` สำหรับสั่งงานจากแชทตัวกลางบน Desktop App แล้วเปิดหน้าต่าง `cmd` ใหม่แบบ 2×2 Grid (สูงสุด 4 หน้าต่าง) พร้อมปิดหน้าต่างอัตโนมัติเมื่อจบเพื่อล้าง Context (`autoCloseBanner`)
+  - สื่อสารคำถามผ่านกลไก **Ticket & Close** (บันทึกลง `shared/oq/INDEX.md`), คุม 3 ประตูหลัก (`G-SPEC`, `G-ARCH-DBA`, `G-WAVES`) + `G-KB-RESTRUCTURE` เมื่อกระทบโครงสร้าง Knowledge, รวบคำถาม Logic จาก SA ส่งกลับ BA เป็น Ticket ชุดเดียว, และเปิด **Repair Wave** อัตโนมัติสูงสุด 2 รอบเมื่อ QA Autotest พัง
+- **บทบาทใหม่ (`roles/dba.md`, `roles/testplan.md`, `agents.json`, `src/role-compiler.mjs`)**:
+  - เพิ่ม **`dba`** (ช่างฐานราก — ตรวจ DBML และสร้าง SQL/Migration ลง `build/db/`) และ **`testplan`** (คนวางแผนทดสอบ — วางแผน System/E2E Test แบบ Folder-First ลง `build/test-plan/`) ขยายเป็น 14 Roles ภายใต้กรอบ \$20/เดือนและหลัก Pareto ใน `MODEL-POLICY.md`
+  - เพิ่มตัวละคร โต๊ะทำงาน และ telemetry ของ `dba` และ `testplan` ใน Pixel HQ (`src/monitor-ui/`)
+- **Skills ใหม่ 3 รายการ (`skills/feature-flow/`, `skills/req-grill/`, `skills/wave-plan/`)**:
+  - `feature-flow` สำหรับตัวกลางบน Desktop App, `req-grill` สำหรับ BA (`spec`) สัมภาษณ์แบบ `grill-me`, และ `wave-plan` สำหรับ `pm`/`testplan`
+- **Immutable History Lock & Knowledge Layout (`src/flow-lock.mjs`, `src/knowledge-scaffold.mjs`, `src/knowledge-index.mjs`)**:
+  - เพิ่ม `build/db/` และ `build/waves/` ใน `scaffoldKnowledgeModule()` และล็อกไฟล์ `wave-*.md` / `TP-*.md` ที่สถานะ `done` / `superseded` / `cancelled` ด้วย SHA-256 (ตรวจใน `baan --lint-knowledge` และ `baan flow`)
+- **Verifier tier ราย packet และ `external_paths`**:
+  - เพิ่มฟิลด์ `verifier_tier` ใน packet schema (และส่งต่อจาก plan tasks) กับ flag `--verifier-tier` (`--verifier-tier` > `--tier` > packet > `defaults.verifier_tier`) ยกได้อิสระ ลดได้เฉพาะงานที่ไม่ใช่ `risk: high` (`src/session.mjs`, `src/cli.mjs`, `schemas/packet.schema.json`)
+  - เพิ่ม `external_paths` ราย packet สำหรับส่วนที่ผู้เขียนคนอื่นกำลังแก้พร้อมกันใน repo เดียวกัน (ไม่นับเป็น `SCOPE_VIOLATION`, รายงานใน `gate.external_changes`, และรวมใน approval basis) (`src/gate.mjs`, `src/packet.mjs`)
+
+### ปรับปรุง / เปลี่ยนแปลง
+
 - **Dry-run**: แต่ละ package แสดง `verifier_route` ของตัวเอง
-- **`external_paths` ราย packet**: glob ของส่วนที่ผู้เขียนคนอื่น (session/เครื่องมืออื่น) กำลังแก้พร้อมกันใน repo เดียวกัน การเปลี่ยนแปลงตรงนั้นไม่นับเป็น `SCOPE_VIOLATION` แต่รายงานใน `gate.external_changes`; ต้องเป็น path สัมพัทธ์ ห้ามทับ `owns` และรวมอยู่ใน approval basis (เปลี่ยนแล้วต้องอนุมัติใหม่) (`src/gate.mjs`, `src/packet.mjs`)
-- **เอกสาร**: README รากไม่ระบุเลขรุ่นตายตัวแล้ว ให้ดูที่ `framework/package.json`
+- **เอกสาร**: อัปเดต `BAAN.md`, `CONVENTIONS.md`, `LEARNING.md`, `MODEL-POLICY.md`, `README.md` (และ README รากไม่ระบุเลขรุ่นตายตัวแล้ว ให้ดูที่ `framework/package.json`)
 
 ## 0.38.0 — 2026-11-19 · Role-Owned Tiers (12 บทบาท), Provider-Aware Prompt & Role Compilers, Live-Chat Telemetry Hooks, และ Monitor UI P0–P3
 
