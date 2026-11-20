@@ -1,14 +1,14 @@
 // Maps telemetry sessions onto engine characters. Rule: a character only does what a live session says;
 // anything telemetry does not state (provider, role, outcome) is shown as unknown, never guessed.
 
-const ROLE_IDS = ["orchestrator", "pm", "planner", "spec", "worker", "build", "verifier", "check", "review", "arch", "survey", "ui"];
+const ROLE_IDS = ["orchestrator", "pm", "planner", "spec", "worker", "build", "verifier", "check", "testplan", "review", "arch", "dba", "survey", "ui"];
 const EXEC_ROLES = ["planner", "worker", "verifier"];
 const PROVIDERS = ["claude", "codex", "agy"];
 const MAX_VISIBLE = 3;
 const ROLE_VERB = {
   planner: "PLANNING...", worker: "CODING...", verifier: "VERIFYING...",
-  spec: "GATHERING SPEC...", arch: "DESIGNING ARCH...", pm: "SCOPING...",
-  build: "BUILDING...", check: "CHECKING...", survey: "SURVEYING...",
+  spec: "GATHERING SPEC...", arch: "DESIGNING ARCH...", dba: "DESIGNING DB...", pm: "SCOPING...",
+  build: "BUILDING...", testplan: "PLANNING TESTS...", check: "CHECKING...", survey: "SURVEYING...",
   ui: "DESIGNING UI...", review: "REVIEWING...",
 };
 const UI_VERB = {
@@ -17,12 +17,12 @@ const UI_VERB = {
 };
 const ROLE_COLORS = {
   orchestrator: "#FACC15", planner: "#38BDF8", worker: "#F472B6", verifier: "#34D399",
-  spec: "#A3E635", arch: "#FB923C", pm: "#E879F9", build: "#60A5FA",
-  check: "#2DD4BF", survey: "#FCA5A5", ui: "#C084FC", review: "#FDE047",
+  spec: "#A3E635", arch: "#FB923C", dba: "#22D3EE", pm: "#E879F9", build: "#60A5FA",
+  testplan: "#F59E0B", check: "#2DD4BF", survey: "#FCA5A5", ui: "#C084FC", review: "#FDE047",
 };
 
 function roleAnim(role, s) {
-  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "ui" || role === "survey") {
+  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "dba" || role === "testplan" || role === "ui" || role === "survey") {
     return s.uiState === "READING" ? "read" : "write";
   }
   if (role === "worker" || role === "build") return s.uiState === "READING" ? "read" : s.uiState === "THINKING" ? "think" : "type";

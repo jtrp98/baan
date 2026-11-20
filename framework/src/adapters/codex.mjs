@@ -153,11 +153,9 @@ export class CodexAdapter extends BaseAdapter {
           args.push("--dangerously-bypass-approvals-and-sandbox");
           deviations.push("permission_policy: bypass active (--dangerously-bypass-approvals-and-sandbox)");
         } else {
-          // Native safe default
+          // Codex CLI rejects combining -s <mode> with --approve-for-me.
           args.push("-s", "workspace-write");
-          if (approvalPolicy === "auto-safe") {
-            args.push("--approve-for-me");
-          }
+          deviations.push("permission_policy: native-safe (-s workspace-write; Windows sandbox blocks loopback)");
         }
       } else {
         // Planner and verifier use native read-only sandbox.
@@ -255,27 +253,35 @@ export class CodexAdapter extends BaseAdapter {
   buildInteractive(spec) {
     const {
       def,
+      role = "worker",
       model = "",
       effort = "",
       permissionPolicy = "native-safe",
       workspaceRoot = "",
       addDirs = [],
       session,
+      initialPrompt = "",
       providerArgs = [],
     } = spec;
 
+    const isWorker = role === "worker";
     const deviations = [];
-    const isResume = Boolean(session?.id && session?.started);
+    const isResume = isWorker && Boolean(session?.id && session?.started);
     const args = isResume ? ["resume", session.id] : [];
 
     if (model) args.push("-m", model);
     if (effort) args.push("-c", `model_reasoning_effort=${effort}`);
 
-    if (permissionPolicy === "bypass") {
-      args.push("--dangerously-bypass-approvals-and-sandbox");
-      deviations.push("interactive permission_policy: bypass active");
+    if (isWorker) {
+      if (permissionPolicy === "bypass") {
+        args.push("--dangerously-bypass-approvals-and-sandbox");
+        deviations.push("interactive permission_policy: bypass active");
+      } else if (!isResume) {
+        args.push("-s", "workspace-write");
+      }
     } else if (!isResume) {
-      args.push("-s", "workspace-write");
+      args.push("-s", "read-only");
+      deviations.push(`interactive ${role} using read-only sandbox`);
     }
 
     if (!isResume) {
@@ -287,6 +293,10 @@ export class CodexAdapter extends BaseAdapter {
 
     if (Array.isArray(providerArgs) && providerArgs.length) {
       args.push(...providerArgs);
+    }
+
+    if (initialPrompt) {
+      args.push(initialPrompt);
     }
 
     return {

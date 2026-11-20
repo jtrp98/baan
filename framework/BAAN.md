@@ -50,15 +50,16 @@ Acceptance/source/scope/commands ไม่ครบ, approval stale, dirty file 
 สภาพแวดล้อมไม่พร้อม, scope/Git state ผิด, findings เกินเพดานแก้ หรือคำถามที่ต้องให้คนตัดสิน
 ใช้ `decide` บันทึกผู้ตัดสิน วันเวลา และ source; ห้ามข้ามประตูเพื่อให้ run จบ
 
-## การแบ่ง 2 ทีม (8 บทบาท) ใน workspace
+## การแบ่ง 2 ทีม (10 บทบาท) ใน workspace
 
-`baan --init` / `baan sync` ติดตั้ง 8 บทบาทแบบ native ครบทั้ง 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md` พร้อม root stubs `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และติดตั้ง live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ไว้ที่**ราก workspace เท่านั้น** (ห้ามติดตั้งลงใน `target/*`) เพื่อให้คุยสดได้โดยตรงและติดตามสถานะบน `baan monitor`:
-1. **ทีมสร้าง / วิศวกรรม (อ่าน Code, DB, API, Logs, Tests)**:
-   - `spec` (BA) เก็บ requirement → `arch` (SA) ออกแบบ API/DB และทำ ADR → `pm` (PM) คุม scope/risk/ROI →
-   - `build` (Dev / Worker) เขียนโค้ดและ tests → `check` (QA / Verifier) ตรวจสอบความถูกต้องและท้าทายระบบ
-2. **ทีมออกแบบ UX/UI (อ่าน Docs, UX Knowledge, Design System, Canvas/Artifact)**:
+`baan --init` / `baan sync` ติดตั้ง 10 บทบาทแบบ native ครบทั้ง 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md` พร้อม root stubs `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และติดตั้ง live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ไว้ที่**ราก workspace เท่านั้น** (ห้ามติดตั้งลงใน `target/*`) เพื่อให้คุยสดได้โดยตรง, ใช้กับ `baan flow`, และติดตามสถานะบน `baan monitor`:
+1. **ทีมสร้าง / วิศวกรรม 7 ขั้นตอน (อ่าน Code, DB, API, Logs, Tests)**:
+   - `spec` (BA) เก็บ requirement (`req-grill`) → `arch` (SA) สำรวจ+ออกแบบ 2 รอบ ทำ ADR/Contracts/DBML → `dba` (DBA) ตรวจ DBML/สร้าง SQL → `pm` (PM) แตก Wave (`wave-plan`) → `build` (Dev) เขียนโค้ด+unit test ทีละ Wave → `testplan` (Test Planner) วางแผน System/E2E Test → `check` (QA) เขียนและรัน Automated Tests
+2. **ทีมออกแบบ UX/UI 3 บทบาท (แยกต่างหากสำหรับคุยสด — อ่าน Docs, UX Knowledge, Design System, Canvas/Artifact)**:
    - `survey` (Arch for UX/UI) ตรวจ feasibility → `ui` (Builder for UX/UI) ออกแบบหน้าจอ →
    - `review` (QA for UX/UI) ตรวจ accessibility/handoff → คนเซ็น UX → implement โค้ด → review เทียบหน้าจอจริง
+
+สำหรับ flow พัฒนาฟีเจอร์แบบวนรอบ: ใช้คำสั่ง `baan flow [start | status | answer | approve | next] --module <project>/<module>` (หรือสั่งในแชทตัวกลางด้วย skill `feature-flow`) เพื่อเปิดหน้าต่าง `cmd` ใหม่แบบ 2×2 Grid (สูงสุด 4 หน้าต่าง, ปิดเมื่อจบ), สื่อสารคำถามผ่าน **Ticket & Close**, คุม 3 ประตูอนุมัติ (`G-SPEC`, `G-ARCH-DBA`, `G-WAVES`) + `G-KB-RESTRUCTURE`, ล็อกไฟล์ Wave/Test Plan ที่ `done` แล้ว, และวน Repair Wave อัตโนมัติสูงสุด 2 รอบเมื่อ Autotest พัง
 
 ทุกบทบาททำตาม [CONVENTIONS](CONVENTIONS.md), [LEARNING](LEARNING.md) และ contract ของตน
 

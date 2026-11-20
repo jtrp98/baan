@@ -172,24 +172,36 @@ export class ClaudeAdapter extends BaseAdapter {
   buildInteractive(spec) {
     const {
       def,
+      role = "worker",
       model = "",
       effort = "",
       permissionPolicy = "native-safe",
       workspaceRoot = "",
       addDirs = [],
       session,
+      systemPromptFile = "",
+      initialPrompt = "",
       providerArgs = [],
     } = spec;
 
+    const isWorker = role === "worker";
     const deviations = [];
     const args = [];
 
     if (model) args.push("--model", model);
     if (effort) args.push("--effort", effort);
+    if (systemPromptFile) args.push("--append-system-prompt-file", systemPromptFile);
 
-    if (permissionPolicy === "bypass") {
-      args.push("--permission-mode", "bypassPermissions");
-      deviations.push("interactive permission_policy: bypass active");
+    if (isWorker) {
+      if (permissionPolicy === "bypass") {
+        args.push("--permission-mode", "bypassPermissions");
+        deviations.push("interactive permission_policy: bypass active");
+      } else {
+        args.push("--permission-mode", "acceptEdits");
+      }
+    } else {
+      args.push("--permission-mode", "plan");
+      deviations.push(`interactive ${role} using native plan mode`);
     }
 
     const allDirs = [...new Set([workspaceRoot, ...addDirs].filter(Boolean))];
@@ -198,14 +210,20 @@ export class ClaudeAdapter extends BaseAdapter {
     }
 
     let sessionId = session?.id;
-    if (session?.started && sessionId) {
-      args.push("--resume", sessionId);
-    } else if (sessionId) {
-      args.push("--session-id", sessionId);
+    if (isWorker) {
+      if (session?.started && sessionId) {
+        args.push("--resume", sessionId);
+      } else if (sessionId) {
+        args.push("--session-id", sessionId);
+      }
     }
 
     if (Array.isArray(providerArgs) && providerArgs.length) {
       args.push(...providerArgs);
+    }
+
+    if (initialPrompt) {
+      args.push(initialPrompt);
     }
 
     return {

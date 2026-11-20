@@ -28,14 +28,15 @@ Target repository, Git Diff, Snapshots, Acceptance criteria, Test logs และ
 ## Allowed actions
 
 1. อ่านโค้ดที่เปลี่ยนแปลง (Diff), ไฟล์ทดสอบ, และ logs ผลการรันคำสั่งจริง
-2. ตั้งคำถามท้าทายสถาปัตยกรรมและโค้ด ค้นหาช่องโหว่ด้านความปลอดภัยและ Race Conditions
-3. กรณีตรวจรับงานแก้บั๊ก (Bugfix Verification): ตรวจสอบว่าชุดทดสอบจำลองบั๊กได้จริง (Red Test Proof) และรัน Full Regression Suite พิสูจน์ว่าไม่มีจุดพังแฝง
-4. ออกแบบ Adversarial Tests หรือการทดลองจำลองระบบล่มเพื่อพิสูจน์สมมติฐาน
-5. บันทึกและอัปเดต `<project>/shared/knowledge-gaps.md` เมื่อพบจุดที่ผู้ใช้ควรเรียนรู้เรื่องการทดสอบ
+2. **กรณีโหมด `baan flow` (Automated Test Authoring จาก `build/test-plan/`)**: เขียนและรันไฟล์ Automated Test ใหม่/เพิ่มเติมเฉพาะใน path ของ test suite ที่ `testplan` วางไว้ เพื่อตรวจรับตาม `TP-xxx.md` และส่งคืน `failed_tests` แบบเจาะจงหากมีเคสไม่ผ่าน *(ยังคงห้ามแก้โค้ด production โดยเด็ดขาด)*
+3. ตั้งคำถามท้าทายสถาปัตยกรรมและโค้ด ค้นหาช่องโหว่ด้านความปลอดภัยและ Race Conditions
+4. กรณีตรวจรับงานแก้บั๊ก (Bugfix Verification): ตรวจสอบว่าชุดทดสอบจำลองบั๊กได้จริง (Red Test Proof) และรัน Full Regression Suite พิสูจน์ว่าไม่มีจุดพังแฝง
+5. ออกแบบ Adversarial Tests หรือการทดลองจำลองระบบล่มเพื่อพิสูจน์สมมติฐาน
+6. บันทึกและอัปเดต `<project>/shared/knowledge-gaps.md` เมื่อพบจุดที่ผู้ใช้ควรเรียนรู้เรื่องการทดสอบ
 
 ## Forbidden actions
 
-ไม่แก้ไขโค้ดในโปรเจกต์เอง (อ่านอย่างเดียว)
+ไม่แก้ไขโค้ด production ในโปรเจกต์เอง (ในโหมด `check` ทั่วไปให้อ่านอย่างเดียว; ใน `baan flow` เขียนได้เฉพาะไฟล์ automated test ตาม Test Plan ที่อนุมัติ)
 ไม่อนุมัติงานแก้บั๊กที่ไม่มีหลักฐาน Red-Green Test Proof
 ไม่อนุมัติผลงานเพียงเพราะรันเทสต์เดิมผ่าน หรือเพราะ Agents ตัวอื่นบอกว่าผ่าน
 ไม่ลดมาตรฐานการตรวจรับเพื่อให้งานเสร็จทันเวลา

@@ -40,6 +40,8 @@ export function scaffoldKnowledgeModule(kr, projectName, moduleName, options = {
   mkdirSync(path.join(moduleDir, "design", "reviews"), { recursive: true });
   mkdirSync(path.join(moduleDir, "design", "handoff"), { recursive: true });
   mkdirSync(path.join(moduleDir, "build", "contracts"), { recursive: true });
+  mkdirSync(path.join(moduleDir, "build", "db"), { recursive: true });
+  mkdirSync(path.join(moduleDir, "build", "waves"), { recursive: true });
   mkdirSync(path.join(moduleDir, "build", "test-plan"), { recursive: true });
 
   const today = new Date().toISOString().slice(0, 10);
@@ -114,11 +116,13 @@ ${options.summary || `โมดูล ${moduleName} สำรวจพบจา�
 
   const buildIndexContent = `# สัญญาทางเทคนิคและผลทดสอบ: ${moduleName}
 
-สารบัญงานสถาปัตยกรรมระดับโค้ด สัญญา API/DB และแผนการทดสอบของโมดูลนี้
+สารบัญงานสถาปัตยกรรมระดับโค้ด สัญญา API/DB แผน Wave และแผนการทดสอบของโมดูลนี้
 
 ## สารบัญในช่อง build
 - [contracts/INDEX.md](contracts/INDEX.md) — สัญญาทางเทคนิค API, RPC, IPC, State Machine
-- [test-plan/INDEX.md](test-plan/INDEX.md) — กรณีทดสอบ (Test Cases) และ Traceability Matrix
+- [db/INDEX.md](db/INDEX.md) — DBML, SQL และ Migration Scripts (โดย dba)
+- [waves/INDEX.md](waves/INDEX.md) — แผนงานพัฒนาแบบ Wave (โดย pm, ห้ามแก้ไข wave ที่ done แล้ว)
+- [test-plan/INDEX.md](test-plan/INDEX.md) — กรณีทดสอบ (Test Cases) และ Traceability Matrix (โดย testplan)
 `;
 
   writeFileSync(path.join(moduleDir, "INDEX.md"), indexContent, "utf8");
@@ -135,7 +139,9 @@ ${options.summary || `โมดูล ${moduleName} สำรวจพบจา�
   writeFileSync(path.join(moduleDir, "build", "INDEX.md"), buildIndexContent, "utf8");
   writeFileSync(path.join(moduleDir, "build", "contract.md"), contractContent, "utf8");
   writeFileSync(path.join(moduleDir, "build", "contracts", "INDEX.md"), `# สัญญาทางเทคนิค: ${moduleName}\n\n- [contract.md](../contract.md)\n`, "utf8");
-  writeFileSync(path.join(moduleDir, "build", "test-plan", "INDEX.md"), `# แผนการทดสอบ: ${moduleName}\n\n| รหัส | ข้อกำหนด | ประเภท | สถานะ |\n|---|---|---|---|\n| TP001 | F1 / AC-01 | Automated Unit Test | draft |\n`, "utf8");
+  writeFileSync(path.join(moduleDir, "build", "db", "INDEX.md"), `# สารบัญฐานข้อมูล: ${moduleName}\n\n| ไฟล์ | ประเภท | คำอธิบาย | สถานะ |\n|---|---|---|---|\n`, "utf8");
+  writeFileSync(path.join(moduleDir, "build", "waves", "INDEX.md"), `# สารบัญ Waves: ${moduleName}\n\n> ห้ามแก้ไข wave ที่สถานะ \`done\` หรือ \`superseded\`\n\n| รหัส | รายการ | สถานะ | รอบ | หมายเหตุ |\n|---|---|---|---:|---|\n| - | ยังไม่มี wave | - | - | - |\n`, "utf8");
+  writeFileSync(path.join(moduleDir, "build", "test-plan", "INDEX.md"), `# สารบัญแผนทดสอบ (Test Plan): ${moduleName}\n\n> ห้ามแก้ไข Test Plan ที่สถานะ \`done\` หรือ \`superseded\`\n\n| รหัส | รายการ | สถานะ | รอบ | หมายเหตุ |\n|---|---|---|---:|---|\n| - | ยังไม่มี Test Plan | - | - | - |\n`, "utf8");
 
   // อัปเดตตารางโมดูลใน project INDEX.md อัตโนมัติ
   if (layoutOf(kr) === "project") {

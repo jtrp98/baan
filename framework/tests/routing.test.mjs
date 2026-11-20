@@ -140,10 +140,14 @@ test("เปิด 2 ค่าย (codex + agy, ปิด claude): verifier แ�
 test("High-Risk Guard, Contract-Gated Step-Down และ Rework Escalation ทำงานบน Role-Owned Tiers", () => {
   const run = { tier: "t3", plannerTier: "t3" };
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t4" }, realCfg), "t2");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t4", contracts: [{ ref: "c.md" }] }, realCfg), "t3");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", worker_tier: "t3", contracts: [{ ref: "c.md" }] }, realCfg), "t3");
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4" }, realCfg), "t3");
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", worker_tier: "t4", contracts: [{ ref: "c.md" }] }, realCfg), "t4");
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", rework: 1 }, realCfg), "t2");
   assert.equal(resolveWorkerTier(run, { kind: "code", risk: "low", rework: 2 }, realCfg), "t1");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", rework: 1 }, realCfg), "t2", "t2 rework=1 must stay t2 before jumping to xhigh");
+  assert.equal(resolveWorkerTier(run, { kind: "code", risk: "high", rework: 2 }, realCfg), "t1", "t2 rework=2 escalates to t1");
   assert.equal(escalateRoleTier(realCfg, "worker", "t4"), "t3");
   assert.equal(escalateRoleTier(realCfg, "worker", "t1"), "t1");
 });
@@ -191,7 +195,7 @@ test("Strict No-Impersonation (Runtime Rate Limit): ติดลิมิตร�
   assert.match(p2.questions[0], /PROVIDER_LIMIT/);
 });
 
-test("cli --dry-run แสดง resolved_routes ตาม local.json จริง และ formatRoleMatrix แสดงครบ 12 roles", async (t) => {
+test("cli --dry-run แสดง resolved_routes ตาม local.json จริง และ formatRoleMatrix แสดงครบ 14 roles", async (t) => {
   const { root, repo } = fixture(t);
   const file = path.join(root, "plan.json");
   save(file, { packages: [packet(repo)] });
@@ -216,7 +220,24 @@ test("cli --dry-run แสดง resolved_routes ตาม local.json จริ�
   assert.equal(dryClaude.resolved_routes.verifier.model, "opus");
 
   const matrix = formatRoleMatrix(realCfg, { agents: { agy: true, codex: true, claude: true } });
-  for (const role of ["planner", "worker", "verifier", "docs", "arch", "spec", "pm", "build", "check", "survey", "ui", "review"]) {
+  for (const role of ["planner", "worker", "verifier", "docs", "arch", "dba", "spec", "pm", "build", "testplan", "check", "survey", "ui", "review"]) {
     assert.ok(matrix.includes(`[${role}]`), `matrix ต้องมีบทบาท ${role}`);
   }
+
+  // --agent codex pins worker/planner but verifier remains cross-provider unless --verifier-agent is set.
+  const dryCodex = await cli(["run", "--plan", file, "--agent", "codex", "--workspace", root, "--dry-run"], {
+    cfg: realCfg,
+    localConfig: { agents: { agy: true, codex: true, claude: true } },
+  });
+  assert.equal(dryCodex.resolved_routes.worker.agent, "codex");
+  assert.equal(dryCodex.resolved_routes.planner.agent, "codex");
+  assert.equal(dryCodex.resolved_routes.verifier.agent, "claude");
+  assert.equal(dryCodex.packages[0].verifier_route.agent, "claude");
+
+  const dryExplicitVerifier = await cli(["run", "--plan", file, "--agent", "codex", "--verifier-agent", "agy", "--workspace", root, "--dry-run"], {
+    cfg: realCfg,
+    localConfig: { agents: { agy: true, codex: true, claude: true } },
+  });
+  assert.equal(dryExplicitVerifier.resolved_routes.verifier.agent, "agy");
+  assert.equal(dryExplicitVerifier.packages[0].verifier_route.agent, "agy");
 });

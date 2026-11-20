@@ -234,11 +234,11 @@ test("alias ชื่อเดิมของทีมออกแบบแล�
   assert.equal(LEGACY_ROLE_ALIASES.dev, "build");
 });
 
-test("init: วาง agents ของทีมสร้างและทีมออกแบบ (8 ตัว) + skill · ลบ pencil เดิม · รันซ้ำทับเฉพาะของ baan · ของผู้ใช้ไม่แตะ", () => {
+test("init: วาง agents ของทีมสร้างและทีมออกแบบ (10 ตัว) + skill · ลบ pencil เดิม · รันซ้ำทับเฉพาะของ baan · ของผู้ใช้ไม่แตะ", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "baan-init-design-"));
   try {
     const res = performInit(dir, TEAM_DIR, () => {});
-    for (const id of ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"]) {
+    for (const id of ["spec", "arch", "dba", "pm", "build", "testplan", "check", "survey", "ui", "review"]) {
       const f = path.join(dir, ".claude", "agents", `${id}.md`);
       assert.match(readFileSync(f, "utf8"), new RegExp(`^---\\nname: ${id}\\n`));
       assert.ok(readFileSync(f, "utf8").includes(path.join(TEAM_DIR, "roles", `${id}.md`)), "ชี้ role ตัวจริงใน package");

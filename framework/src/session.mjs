@@ -14,7 +14,8 @@ import { getAdapter } from "./adapters/registry.mjs";
 import { createStreamParser } from "./events.mjs";
 import { evaluateParity } from "./parity.mjs";
 import { resolveRoleRoute, effectiveRoutingRole, normalizeRoleTier, escalateRoleTier, isCriticalDocsPacket } from "./routing.mjs";
-import { compileExecutionPrompt } from "./prompt-compiler.mjs";
+import { compileExecutionPrompt, compileInteractiveBrief } from "./prompt-compiler.mjs";
+import { runInteractiveWindow } from "./window-launcher.mjs";
 
 export function nativeCommand(def, agent) {
   if (process.platform !== "win32" || !def.useShell) return { def: { ...def, useShell: false }, prefix: [] };
@@ -95,11 +96,12 @@ export function resolveWorkerTier(run, p, cfg = null) {
     const requested = explicit ?? (routingRole === "docs" ? (isCriticalDocsPacket(p) ? "t1" : (p?.tier || roleDef.defaultTier)) : baseTier);
     chosen = normalizeRoleTier(roleDef, requested, { routingRole, packet: p, baseTier }).tier;
   } else {
+    const hasContract = (p?.contracts?.length > 0) || Boolean(p?.read_first?.some((r) => r.pin));
     if (explicit) {
-      if ((p?.kind === "code" || p?.kind === "bugfix" || !p?.kind) && p?.risk === "high" && /^t[3-5]$/.test(explicit)) {
-        chosen = "t2";
+      if ((p?.kind === "code" || p?.kind === "bugfix" || !p?.kind) && p?.risk === "high") {
+        const floor = hasContract ? "t3" : "t2";
+        chosen = isTierLower(explicit, floor) ? floor : explicit;
       } else if ((p?.kind === "code" || p?.kind === "bugfix" || !p?.kind) && isTierLower(explicit, baseTier)) {
-        const hasContract = (p?.contracts?.length > 0) || (p?.read_first?.some((r) => r.pin));
         chosen = hasContract ? explicit : baseTier;
       } else {
         chosen = explicit;
@@ -111,10 +113,11 @@ export function resolveWorkerTier(run, p, cfg = null) {
     }
   }
 
-  // Rework escalation: step up 1 tier per rework cycle within this role's own ladder.
+  // Rework escalation: step up 1 tier per rework cycle, but hold at t2 until rework >= 2 so t1 xhigh is only for repeated failure.
   const reworkCount = Number(p?.rework ?? 0);
   if (cfg?.roles && reworkCount > 0) {
     for (let i = 0; i < reworkCount; i++) {
+      if (chosen === "t2" && reworkCount < 2) break;
       chosen = escalateRoleTier(cfg, "worker", chosen, p);
     }
   }
@@ -134,7 +137,7 @@ export function resolveVerifierTier(run, p, cfg = null) {
   return explicit;
 }
 
-export async function callSession(run, p, role, cfg, { runner = runCli, signal, context = {}, forceAgent, localConfig = null } = {}) {
+export async function callSession(run, p, role, cfg, { runner = runCli, interactiveRunner, signal, context = {}, forceAgent, localConfig = null, windowSlot = 0 } = {}) {
   if (!["worker", "planner", "verifier"].includes(role)) throw new Error(`unknown execution role: ${role}`);
   const requestedTier = role === "planner"
     ? (run.plannerTier || cfg?.roles?.planner?.defaultTier || "t3")
@@ -142,9 +145,10 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
       ? resolveWorkerTier(run, p, cfg)
       : resolveVerifierTier(run, p, cfg);
 
-  // Keep a worker bound to its resumed session provider rather than silently switching mid-session.
+  // Explicit --agent targets worker/planner unless --verifier-agent is also specified; verifier preserves cross-provider independence.
   const pinnedSessionAgent = role === "worker" && p.session?.agent ? p.session.agent : null;
-  const forcedAgent = forceAgent ?? pinnedSessionAgent ?? run.explicitAgent ?? null;
+  const roleExplicitAgent = role === "verifier" ? (run.explicitVerifierAgent ?? null) : (run.explicitAgent ?? null);
+  const forcedAgent = forceAgent ?? pinnedSessionAgent ?? roleExplicitAgent ?? null;
   const route = resolveRoleRoute(cfg, role, {
     forcedAgent,
     tier: requestedTier,
@@ -162,24 +166,37 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   const answer = path.join(run.dir, `${name}.answer.txt`);
   const schemaName = role === "worker" ? "worker.result" : role === "verifier" ? "verifier.result" : "plan.result";
   const schema = schemaFor(schemaName);
+  const executionMode = run.executionMode ?? (runner !== runCli && !interactiveRunner ? "headless" : "interactive");
+  const isInteractive = executionMode === "interactive" && (runner === runCli || Boolean(interactiveRunner)) && !forceAgent;
 
   let native;
   try {
-    native = runner === runCli ? nativeCommand(def, agent) : { def, prefix: [] };
-    if (runner === runCli && agent === "agy" && def.readArgs?.includes("--agent")) assertAgyReadonly(def);
+    native = (runner === runCli && !interactiveRunner) ? nativeCommand(def, agent) : { def, prefix: [] };
+    if (runner === runCli && !isInteractive && agent === "agy" && def.readArgs?.includes("--agent")) assertAgyReadonly(def);
   } catch (e) {
     event(run, "provider_setup_failed", { package: p.id, role, agent, model: route.model, effort: route.effort, reason: e.message });
     throw Object.assign(e, { failureClass: e.failureClass || "ENVIRONMENT_FAILURE" });
   }
 
+  // Fresh Session Reset Guard: reset bloated worker sessions (>1.5M cached tokens) or fresh rework cycles carrying gate/verdict context.
   if (role === "worker") {
     if (p.session?.agent !== agent) delete p.session;
+    else if (p.session?.id && ((p.lastWorkerUsage?.cacheReadTokens ?? 0) >= 1_500_000 || (Number(p.rework ?? 0) > 0 && ((p.gate && !p.gate.ok) || (p.verdict && p.verdict.verdict !== "PASS"))))) {
+      event(run, "session_reset_for_budget", {
+        package: p.id,
+        prevSessionId: p.session.id,
+        prevCacheRead: p.lastWorkerUsage?.cacheReadTokens ?? 0,
+        rework: p.rework ?? 0,
+      });
+      delete p.session;
+    }
     p.workerAgent = agent;
   }
 
+  const workRepo = p.worktreePath || p.repo.path;
   const addDirs = collectWorkspaceAddDirs(context.ws, p, run.root);
   const permissionPolicy = run.permissionPolicy ?? p.permissionPolicy ?? "native-safe";
-  const probeResult = await adapter.probe(native.def, { cwd: p.repo.path, workspaceRoot: run.root });
+  const probeResult = await adapter.probe(native.def, { cwd: workRepo, workspaceRoot: run.root });
 
   const packet = sessionInput(p, role, context);
   const nativeSchema = ["codex", "claude", "agy"].includes(agent);
@@ -200,6 +217,148 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   const systemPromptFile = path.join(run.dir, `${name}.system.md`);
   writeFileSync(systemPromptFile, compiled.systemPrompt + "\n", "utf8");
 
+  if (isInteractive) {
+    const briefFile = path.join(run.dir, `${name}.brief.md`);
+    const brief = compileInteractiveBrief({
+      provider: agent,
+      role,
+      model: resolvedModel,
+      effort: resolvedEffort,
+      tier,
+      tierLabel: route.tierLabel,
+      packet: role === "verifier" ? { ...packet, evidence: p.gate } : packet,
+      answerFile: answer,
+    });
+    writeFileSync(briefFile, brief, "utf8");
+    const initialPrompt = role === "worker"
+      ? `Read and execute the BAAN interactive brief at "${briefFile}" strictly within owns. When done, optionally write JSON to "${answer}" and run /exit.`
+      : `Read-only BAAN ${role} audit. Read "${briefFile}" and verify diffs/evidence without editing files. Write JSON result to "${answer}" and run /exit.`;
+
+    const inv = adapter.buildInteractive({
+      def: native.def,
+      role,
+      model: resolvedModel,
+      effort: resolvedEffort,
+      permissionPolicy,
+      workspaceRoot: run.root,
+      addDirs,
+      session: p.session,
+      systemPromptFile: agent === "claude" ? systemPromptFile : "",
+      initialPrompt,
+      providerArgs: run.providerArgs,
+    });
+
+    event(run, "call_start", {
+      package: p.id,
+      role,
+      routingRole: route.routingRole,
+      agent,
+      tier,
+      model: resolvedModel,
+      effort: resolvedEffort,
+      clamped: route.clamped,
+      interactive: true,
+      windowSlot,
+      briefFile,
+    });
+    save(path.join(run.dir, `${name}.input.json`), packet);
+    persist(run);
+
+    const beforeCall = snapshot(workRepo);
+    const launch = interactiveRunner ?? (async (spec) => {
+      if (run.interactiveWindow === "inline") {
+        const { runInteractiveCli } = await import("./runner.mjs");
+        return runInteractiveCli(spec.command, spec.args, spec.cwd, spec.env, { signal: spec.signal, onSpawn: spec.onSpawn });
+      }
+      return runInteractiveWindow(spec);
+    });
+    const r = await launch({
+      command: inv.command,
+      args: [...native.prefix, ...inv.args],
+      cwd: workRepo,
+      env: { ...inv.env, BAAN_READONLY: role === "worker" ? "0" : "1", BAAN_HEADLESS: "0" },
+      runDir: run.dir,
+      name,
+      slot: windowSlot,
+      title: `[BAAN #${windowSlot + 1}] ${p.id} (${role} · ${agent} ${resolvedModel || "default"}/${resolvedEffort || "default"})`,
+      briefFile,
+      bannerLines: [
+        `Package: ${p.id} | Role: ${role} (${tier}) | Agent: ${agent} (${resolvedModel || "default"}/${resolvedEffort || "default"})`,
+        `Repo: ${workRepo}`,
+        `Owns (${p.owns?.length ?? 0}): ${(p.owns ?? []).slice(0, 4).join(", ")}${(p.owns?.length ?? 0) > 4 ? " ..." : ""}`,
+        `Build: ${p.commands?.build || "-"} | Test: ${p.commands?.test_targeted || "-"}`,
+      ],
+      signal,
+      onSpawn: (pid) => { p.childPid = pid; persist(run); },
+    });
+    delete p.childPid;
+
+    event(run, "call_end", {
+      package: p.id,
+      role,
+      agent,
+      model: resolvedModel,
+      effort: resolvedEffort,
+      interactive: true,
+      durationMs: r.durationMs ?? 0,
+      ok: r.ok !== false,
+    });
+    persist(run);
+
+    const afterCall = snapshot(workRepo);
+    if (role !== "worker" && !sameState(beforeCall, afterCall)) {
+      const external = Array.isArray(p.external_paths) ? p.external_paths : [];
+      const gitMoved = ["head", "branch", "index", "stash"].some((key) => beforeCall[key] !== afterCall[key]);
+      const changed = changedFiles(beforeCall, afterCall);
+      const ownChange = changed.filter((f) => !external.some((g) => matches(f, g)));
+      if (gitMoved || ownChange.length) {
+        throw Object.assign(new Error(`${role} changed repository/Git state${ownChange.length ? `: ${ownChange.slice(0, 10).join(", ")}` : ""}`), { failureClass: "SCOPE_VIOLATION" });
+      }
+      if (changed.length) event(run, "external_changes", { package: p.id, role, files: changed.slice(0, 50) });
+    }
+    if (signal?.aborted) throw new Error("cancelled");
+
+    if (existsSync(answer)) {
+      try {
+        const text = readFileSync(answer, "utf8").trim();
+        if (text) {
+          const parsed = extractJson(text);
+          validateResult(parsed, role, p);
+          return parsed;
+        }
+      } catch { /* fall through to interactive exit handling */ }
+    }
+
+    if (role === "worker") {
+      const external = Array.isArray(p.external_paths) ? p.external_paths : [];
+      const changed = changedFiles(beforeCall, afterCall).filter((f) => !external.some((g) => matches(f, g)));
+      p.interactiveSession = true;
+      if (changed.length) {
+        return {
+          state: "DONE",
+          summary: `Interactive CLI session completed (${changed.length} changed file(s))`,
+          acceptance: p.acceptance.map((a) => ({ id: a.id, proof: ["interactive"] })),
+          test_changes: [],
+          questions: [],
+          failure_class: "",
+        };
+      }
+      return {
+        state: "NEEDS_HUMAN",
+        summary: "Interactive CLI session closed with no file changes",
+        acceptance: [],
+        test_changes: [],
+        questions: ["หน้าต่าง CLI ปิดลงโดยไม่มีการแก้ไขไฟล์ — ตรวจสอบผลแล้ว resume หรือ decide ต่อ"],
+        failure_class: "",
+      };
+    }
+
+    throw Object.assign(
+      new Error(`Interactive ${role} ปิดโดยไม่ได้เขียนผล JSON — ตรวจหลักฐาน/diff แล้วตัดสินด้วย baan decide`),
+      { failureClass: "INTERACTIVE_REVIEW" }
+    );
+  }
+
   const invocation = adapter.buildHeadless({
     def: native.def,
     role,
@@ -215,7 +374,7 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
     schemaFile: path.join(TEAM_DIR, "schemas", `${schemaName}.json`),
     systemPromptFile: agent === "claude" ? systemPromptFile : "",
     developerInstructions: agent === "codex" ? compiled.systemPrompt : "",
-    skipGitCheck: !existsSync(path.join(p.repo.path, ".git")),
+    skipGitCheck: !existsSync(path.join(workRepo, ".git")),
     providerArgs: run.providerArgs,
     worktree: p.worktree,
     strictMcpInReadonly: Boolean(run.strictMcpInReadonly),
@@ -292,7 +451,15 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
 
   writeActiveState();
 
-  const beforeCall = snapshot(p.repo.path);
+  const rawCap = run.maxCommands ?? p.budget?.max_commands;
+  const maxCommands = rawCap !== undefined && rawCap !== null ? Number(rawCap) : (role === "worker" ? 60 : role === "verifier" ? 40 : 0);
+  const callController = new AbortController();
+  const forwardAbort = () => callController.abort();
+  signal?.addEventListener("abort", forwardAbort, { once: true });
+  if (signal?.aborted) callController.abort();
+  let budgetExceeded = null;
+
+  const beforeCall = snapshot(workRepo);
   const streamLogFile = path.join(run.dir, "streams", `${p.id}-${role}-${Date.now()}.jsonl`);
   const streamParser = createStreamParser(invocation.streamFormat, {
     streamLogFile,
@@ -305,6 +472,12 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
     onActivity: (act, liveUsage) => {
       writeActiveState(act, liveUsage);
     },
+    onUsage: (liveUsage) => {
+      if (maxCommands > 0 && !budgetExceeded && (liveUsage?.commands ?? 0) > maxCommands) {
+        budgetExceeded = { commands: liveUsage.commands, limit: maxCommands };
+        callController.abort();
+      }
+    },
   });
 
   let r;
@@ -314,25 +487,33 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
       [...native.prefix, ...invocation.args, ...(invocation.promptVia === "arg" ? [prompt] : [])],
       invocation.promptVia,
       prompt,
-      p.repo.path,
+      workRepo,
       run.timeoutSec,
       invocation.answerFrom === "answerFile" ? answer : undefined,
       {
         usage: true,
-        signal,
+        signal: callController.signal,
         env: { ...invocation.env, BAAN_READONLY: role === "worker" ? "0" : "1", BAAN_HEADLESS: "1" },
         onSpawn: (pid) => { p.childPid = pid; persist(run); },
         onStdout: (chunk) => streamParser.feed(chunk),
       }
     );
   } finally {
+    signal?.removeEventListener("abort", forwardAbort);
     clearActiveState();
   }
 
   const parsedStream = streamParser.flush();
   delete p.childPid;
+  const finalUsage = {
+    ...(parsedStream.usage ?? {}),
+    ...(r.usage ?? {}),
+    commands: parsedStream.usage?.commands ?? r.usage?.commands ?? 0,
+    toolOutputBytes: parsedStream.usage?.toolOutputBytes ?? r.usage?.toolOutputBytes ?? 0,
+  };
 
   if (role === "worker") {
+    p.lastWorkerUsage = finalUsage;
     if (parsedStream.sessionId) p.session = { agent, id: parsedStream.sessionId, started: true };
     else if (r.usage?.sessionId) p.session = { agent, id: r.usage.sessionId, started: true };
     else if (invocation.sessionId) p.session = { agent, id: invocation.sessionId, started: true };
@@ -340,10 +521,21 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   }
 
   save(path.join(run.dir, `${name}.call.json`), r);
-  event(run, "call_end", { package: p.id, role, agent, durationMs: r.durationMs, usage: r.usage ?? parsedStream.usage, ok: r.ok });
+  event(run, "call_end", {
+    package: p.id,
+    role,
+    agent,
+    model: resolvedModel,
+    effort: resolvedEffort,
+    interactive: false,
+    durationMs: r.durationMs,
+    usage: finalUsage,
+    ok: r.ok && !budgetExceeded,
+    ...(budgetExceeded ? { budgetExceeded } : {}),
+  });
   persist(run);
 
-  const afterCall = snapshot(p.repo.path);
+  const afterCall = snapshot(workRepo);
   if (role !== "worker" && !sameState(beforeCall, afterCall)) {
     // Changes confined to external_paths come from another writer, not from this read-only role.
     const external = Array.isArray(p.external_paths) ? p.external_paths : [];
@@ -357,6 +549,13 @@ export async function callSession(run, p, role, cfg, { runner = runCli, signal, 
   }
 
   if (signal?.aborted) throw new Error("cancelled");
+
+  if (budgetExceeded) {
+    throw Object.assign(
+      new Error(`[BUDGET_EXCEEDED] ${role} ใช้คำสั่งเกินเพดาน (${budgetExceeded.commands}/${budgetExceeded.limit}) — หยุดเพื่อป้องกัน context snowball/เผาโควตา (แตก packet หรือปรับ budget.max_commands ได้)`),
+      { failureClass: "BUDGET_EXCEEDED" }
+    );
+  }
 
   if (!r.ok) {
     const isLimit = looksLikeLimitError(r) || looksLikeCapacityError(r);

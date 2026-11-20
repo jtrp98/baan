@@ -82,20 +82,22 @@ export function normalizeRoleTier(roleDef, requestedTier, { routingRole = "", pa
     }
   }
 
-  // Strict High-Risk Guard for code/bugfix workers: minimum t2 to prevent rework penalty.
+  // Contract-Gated High-Risk Guard for code/bugfix workers:
+  // high-risk with pinned contracts/read_first may start at t3 (gpt-6.2-sol/medium) and escalate on rework;
+  // uncontracted high-risk retains the t2 floor (gpt-6.2-astra/high) to prevent rework penalty.
   if (routingRole === "worker" && (packet?.kind === "code" || packet?.kind === "bugfix" || !packet?.kind)) {
-    if (packet?.risk === "high" && ordered.includes("t2") && tierNumber(target) > 2) {
-      target = "t2";
+    const hasContract = (packet?.contracts?.length > 0) || Boolean(packet?.read_first?.some((r) => r.pin));
+    const highRiskFloor = hasContract ? "t3" : "t2";
+    const highRiskFloorN = tierNumber(highRiskFloor);
+    if (packet?.risk === "high" && ordered.includes(highRiskFloor) && tierNumber(target) > highRiskFloorN) {
+      target = highRiskFloor;
       clamped = true;
     }
     const explicit = normalizeTierName(packet?.worker_tier ?? packet?.workerTier);
     const base = normalizeTierName(baseTier) || defaultTier;
-    if (explicit && isTierLower(target, base)) {
-      const hasContract = (packet?.contracts?.length > 0) || Boolean(packet?.read_first?.some((r) => r.pin));
-      if (!hasContract && ordered.includes(base)) {
-        target = base;
-        clamped = true;
-      }
+    if (explicit && isTierLower(target, base) && !hasContract && ordered.includes(base)) {
+      target = base;
+      clamped = true;
     }
   }
 

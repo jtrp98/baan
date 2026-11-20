@@ -4,7 +4,7 @@
 export const PROVIDERS = ["claude", "codex", "agy"];
 export const EXEC_ROLES = ["planner", "worker", "verifier"];
 // Live-chat roles from roles/*.md: tracked via workspace IDE/CLI hooks when configured.
-export const CHAT_ROLES = ["spec", "arch", "pm", "build", "check", "survey", "ui", "review"];
+export const CHAT_ROLES = ["spec", "arch", "dba", "pm", "build", "testplan", "check", "survey", "ui", "review"];
 export const ALL_ROLES = [...EXEC_ROLES, ...CHAT_ROLES];
 
 export const PROVIDER_META = {
@@ -20,9 +20,11 @@ export const ROLE_META = {
   verifier: { name: "Verifier", short: "VERIFIER", duty: "ตรวจหลักฐานผลงานตามความเสี่ยง (มีเงื่อนไข)" },
   spec: { name: "Spec", short: "SPEC", duty: "ทีมสร้าง: เก็บ requirement และ acceptance criteria" },
   arch: { name: "Architect", short: "ARCH", duty: "ทีมสร้าง: ออกแบบสถาปัตยกรรม" },
-  pm: { name: "PM", short: "PM", duty: "ทีมสร้าง: แตกงานและติดตาม milestone" },
-  build: { name: "Build", short: "BUILD", duty: "ทีมสร้าง: พัฒนาแบบคุยสด" },
-  check: { name: "Check", short: "CHECK", duty: "ทีมสร้าง: ตรวจคุณภาพแบบคุยสด" },
+  dba: { name: "DBA", short: "DBA", duty: "ทีมสร้าง: ตรวจ DBML ออกแบบ Index และเขียน SQL/Migration" },
+  pm: { name: "PM", short: "PM", duty: "ทีมสร้าง: แตกงาน Wave และติดตาม milestone" },
+  build: { name: "Build", short: "BUILD", duty: "ทีมสร้าง: พัฒนาโค้ดและ unit tests" },
+  testplan: { name: "Test Planner", short: "TPLAN", duty: "ทีมสร้าง: วางแผน System/E2E Test แบบ Folder-First" },
+  check: { name: "Check", short: "CHECK", duty: "ทีมสร้าง: เขียนและรัน Automated Tests ตรวจคุณภาพ" },
   survey: { name: "Survey", short: "SURVEY", duty: "ทีมออกแบบ: สำรวจโครงการ/โครงสร้าง repo" },
   ui: { name: "UI Designer", short: "UI", duty: "ทีมออกแบบ: ออกแบบหน้าจอ" },
   review: { name: "Review", short: "REVIEW", duty: "ทีมออกแบบ: รีวิวงานออกแบบและเอกสาร" },
@@ -72,7 +74,7 @@ export function activityToUiState(activity, thought, role) {
     if (READ_TOOLS.test(name)) return "READING";
   }
   if (thought && !name) return "THINKING";
-  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "ui" || role === "survey") return "PLANNING";
+  if (role === "planner" || role === "spec" || role === "pm" || role === "arch" || role === "dba" || role === "testplan" || role === "ui" || role === "survey") return "PLANNING";
   if (role === "verifier" || role === "check" || role === "review") return "VERIFYING";
   if (role === "worker" || role === "build") return "CODING";
   return "PROCESSING";

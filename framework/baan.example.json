@@ -18,7 +18,9 @@
     "worker_tier": "t3",
     "verifier_tier": "t2",
     "timeout_sec": 0,
-    "max_parallel": 3,
+    "max_parallel": 4,
+    "execution_mode": "interactive",
+    "interactive_window": "grid",
     "permission_policy": "native-safe"
   }
 }

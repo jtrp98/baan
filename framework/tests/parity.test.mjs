@@ -81,6 +81,7 @@ test("codex adapter: safe defaults vs opt-in bypass and resume grammar", () => {
   });
   assert.ok(safe.args.includes("-s"));
   assert.equal(safe.args[safe.args.indexOf("-s") + 1], "workspace-write");
+  assert.ok(!safe.args.includes("--approve-for-me"), "codex exec rejects --approve-for-me combined with -s");
   assert.ok(!safe.args.includes("--dangerously-bypass-approvals-and-sandbox"));
   assert.ok(safe.args.includes("--add-dir"));
   assert.ok(safe.args.includes("C:/src/knowledge"));
@@ -246,4 +247,27 @@ test("approval bridge: distinguishes safe read/write from escalations", () => {
 
   // Non-whitelisted command requires escalation
   assert.equal(evaluateApprovalRequest({ type: "command", command: "rm -rf /" }, packet, []).decision, "escalate");
+});
+
+test("interactive builders: role isolation (read-only/plan for verifier) and initialPrompt placement", () => {
+  const codex = new CodexAdapter();
+  const cWorker = codex.buildInteractive({ def: { command: "codex" }, role: "worker", model: "gpt-6.2-sol", effort: "medium", initialPrompt: "Do brief" });
+  assert.equal(cWorker.args[cWorker.args.indexOf("-s") + 1], "workspace-write");
+  assert.equal(cWorker.args.at(-1), "Do brief");
+
+  const cVerifier = codex.buildInteractive({ def: { command: "codex" }, role: "verifier", initialPrompt: "Audit brief" });
+  assert.equal(cVerifier.args[cVerifier.args.indexOf("-s") + 1], "read-only");
+  assert.equal(cVerifier.args.at(-1), "Audit brief");
+
+  const claude = new ClaudeAdapter();
+  const kVerifier = claude.buildInteractive({ def: { command: "claude" }, role: "verifier", systemPromptFile: "sys.md", initialPrompt: "Audit" });
+  assert.equal(kVerifier.args[kVerifier.args.indexOf("--permission-mode") + 1], "plan");
+  assert.equal(kVerifier.args[kVerifier.args.indexOf("--append-system-prompt-file") + 1], "sys.md");
+  assert.equal(kVerifier.args.at(-1), "Audit");
+
+  const agy = new AgyAdapter();
+  const aVerifier = agy.buildInteractive({ def: { command: "agy" }, role: "verifier", initialPrompt: "Audit" });
+  assert.equal(aVerifier.args[aVerifier.args.indexOf("--mode") + 1], "plan");
+  assert.ok(aVerifier.args.includes("--sandbox"));
+  assert.equal(aVerifier.args.at(-1), "Audit");
 });

@@ -143,15 +143,18 @@ export class AgyAdapter extends BaseAdapter {
   buildInteractive(spec) {
     const {
       def,
+      role = "worker",
       model = "",
       effort = "",
       permissionPolicy = "native-safe",
       workspaceRoot = "",
       addDirs = [],
       session,
+      initialPrompt = "",
       providerArgs = [],
     } = spec;
 
+    const isWorker = role === "worker";
     const deviations = [];
     const args = [];
 
@@ -163,19 +166,28 @@ export class AgyAdapter extends BaseAdapter {
       args.push("--add-dir", d);
     }
 
-    if (permissionPolicy === "bypass") {
-      args.push("--mode", "auto", "--dangerously-skip-permissions");
-      deviations.push("interactive permission_policy: bypass active");
+    if (isWorker) {
+      if (permissionPolicy === "bypass") {
+        args.push("--mode", "auto", "--dangerously-skip-permissions");
+        deviations.push("interactive permission_policy: bypass active");
+      } else {
+        args.push("--mode", "accept-edits");
+      }
     } else {
-      args.push("--mode", "accept-edits");
+      args.push("--mode", "plan", "--sandbox");
+      deviations.push(`interactive ${role} using native plan mode`);
     }
 
-    if (session?.id) {
+    if (isWorker && session?.id) {
       args.push("--conversation", session.id);
     }
 
     if (Array.isArray(providerArgs) && providerArgs.length) {
       args.push(...providerArgs);
+    }
+
+    if (initialPrompt) {
+      args.push(initialPrompt);
     }
 
     return {

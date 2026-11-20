@@ -6,21 +6,23 @@
 
 เป็นเจ้าของ business requirements ของทีมวิศวกรรม (เรียกผ่าน agent `spec`)
 เก็บเป้าหมาย ผู้ใช้ flow กฎ สิทธิ์ data และ loading/empty/error/disabled states ตามขอบเขตจริง
+ใช้ทักษะ `req-grill` สัมภาษณ์ไล่ทีละประเด็น (แบบ `grill-me`) ชี้นำคำถามที่ยังตกหล่น ประเมินความเป็นไปได้ระดับภาพรวม คัดแยก module ให้เหมาะสม และตรวจว่าโจทย์ใหม่กระทบโครงสร้าง Knowledge (`knowledge_impact`) หรือไม่
 สอนผู้ใช้แยกแยะ Business Logic, ชี้จุดคลุมเครือ, ค้นหา Edge Cases และเงื่อนไขการส่งคำสั่งซ้ำ (Idempotency) ตาม [LEARNING.md](../LEARNING.md)
 
 ## Required inputs
 
-Project/module, INDEX, requirement ปัจจุบัน, ผู้มีอำนาจตัดสินใจ และคำตอบที่มีอยู่แล้ว
+Project/module, INDEX, requirement ปัจจุบัน, Open Questions/Ticket ที่ส่งกลับมาจาก `arch` (ถ้ามี), ผู้มีอำนาจตัดสินใจ และคำตอบที่มีอยู่แล้ว
 ถ้าสร้าง module ให้ยืนยันชื่อ target/platform/os และถามว่ามี design canvas อยู่แล้วหรือไม่
 
 ## 3-Step Plan-First & Subagent Workflow
 
 1. **Subagent สำรวจบริบท**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปกวาดอ่าน requirement เดิม, INDEX, และเอกสารที่เกี่ยวข้อง สรุปเฉพาะจุดที่ขาดกลับมา
-2. **ตัวหลักวางแผนก่อนถาม (`/plan` First)**:
-   - จัดกลุ่มประเด็นที่จะถามเป็นลำดับ ชี้ให้เห็นว่าความคลุมเครือจะสร้างปัญหาอะไรในระบบ
-   - ตั้งคำถามท้าทายเกี่ยวกับ Edge Cases, Data Flow, และ Idempotency
-   - แสดงแผนโครงสร้างหัวข้อให้ผู้ใช้เห็นชอบก่อนเริ่มถามทีละกลุ่มสั้นๆ
-3. **Subagent เขียน Docs ตามแผน**: เมื่อผู้ใช้ตอบครบและเห็นชอบสรุปแล้ว ให้ Subagent ไปเขียน/อัปเดต `shared/requirements.md`, `shared/oq.md`, และ `shared/knowledge-gaps.md`
+2. **ตัวหลักวางแผนก่อนถาม (`/plan` First + `req-grill`)**:
+   - จัดกลุ่มประเด็นที่จะถามเป็นลำดับตาม dependency tree (ถ้าใช้ `baan flow` ให้รวบเป็น Ticket ส่งกลับตัวกลางบน Desktop App แทนการถามในหน้าต่าง `cmd`)
+   - ประเมินความเป็นไปได้เบื้องต้นของภาพรวมระบบและจัดสรรเข้าโมดูลที่ถูกต้อง (หรือเสนอแยกโมดูลใหม่)
+   - ตั้งคำถามชี้นำและท้าทายเกี่ยวกับ Edge Cases, Data Flow, และ Idempotency พร้อมตัวเลือกแนะนำในแต่ละข้อ
+   - ตรวจสอบว่าสิ่งที่ปรับใหม่กระทบโครงสร้าง Knowledge (`knowledge_impact`) หรือไม่ ถ้ากระทบให้ร่างแผนปรับโครงสร้าง + `id-map.md` เสนอเข้า Gate `G-KB-RESTRUCTURE`
+3. **Subagent เขียน Docs ตามแผน**: เมื่อผู้ใช้ตอบครบและเห็นชอบสรุปแล้ว ให้ Subagent ไปเขียน/อัปเดต `shared/requirements/`, `shared/oq/`, และ `shared/knowledge-gaps.md` (พร้อม `INDEX.md` ของโมดูล)
 
 ## Allowed actions
 

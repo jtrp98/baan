@@ -574,5 +574,22 @@ test("pixel-ui: 6 room signs, zone inspection, and canvas bubble clamping keep o
   }
   const archBubble = engine._placed[1];
   assert.ok(archBubble.x + archBubble.w <= 18 * world.TILE - 2, "left-side bubble stays inside left room");
+
+  // New flow roles (dba, testplan) exist in world, director, telemetry and sprites
+  assert.ok(engine.getCharacter("role:dba"));
+  assert.ok(engine.getCharacter("role:testplan"));
+  const flowSessions = telemetry.toSessions({
+    workspaceName: "ws",
+    activeRuns: [{
+      runId: "flow-1",
+      repoName: "school-bot",
+      activePackages: [
+        { packageId: "s1", role: "dba", agent: "codex", recentActivity: { type: "tool", name: "edit_file", detail: "build/db/schema.sql" } },
+        { packageId: "s2", role: "testplan", agent: "claude", recentActivity: { type: "tool", name: "read_file", detail: "build/waves/INDEX.md" } },
+      ],
+    }],
+    liveSessions: [],
+  });
+  assert.deepEqual(flowSessions.map((s) => [s.role, s.station]), [["dba", "dba"], ["testplan", "testplan"]]);
   engine.destroy();
 });

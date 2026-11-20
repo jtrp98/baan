@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "status": {
+      "enum": [
+        "done",
+        "needs_input",
+        "escalate_upstream",
+        "failed"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "artifacts_written": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tickets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "enum": [
+              "user",
+              "spec",
+              "arch"
+            ]
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "to",
+          "question"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "knowledge_impact": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "plan": {
+          "type": "string"
+        },
+        "affected_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "required",
+        "plan",
+        "affected_paths"
+      ],
+      "additionalProperties": false
+    },
+    "has_db_changes": {
+      "type": "boolean"
+    },
+    "failed_tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_id": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_id",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "upstream_issue": {
+      "type": "object",
+      "properties": {
+        "target_stage": {
+          "enum": [
+            "spec",
+            "arch",
+            "dba"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_stage",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "status",
+    "summary",
+    "artifacts_written",
+    "tickets",
+    "knowledge_impact",
+    "has_db_changes",
+    "failed_tests"
+  ],
+  "additionalProperties": false
+}

@@ -31,6 +31,9 @@ export function utility(o, ws, cfg, root, local) {
   baan --init [--workspace <dir>] [--knowledge-git <url>] [--memory-git <url>]
   baan target [list | check [<name>] | scan [<dir>] [--prune] [--pin-branch] [--update-branch] | add <dir> [--name <name>] [--branch <branch> | --pin-branch] | branch <name> [<branch> | --clear] | remove <name>] [--root <kr>] [--dry-run]
   baan sync [--all] [--stubs-only] [--pull-only] [--push] [--dry-run] [--no-self-update]
+  baan flow [start | status | answer | approve | next] --module <project/module>
+    [--goal <text>] [--ticket <id>] [--answer <text>] [--gate <id>] [--decision <text>] [--by user] [--source <ref>]
+    [--agent <name>] [--tier <tier>] [--max-parallel <1..4>] [--headless] [--worktree] [--round-new] [--dry-run]
   baan survey [--target <name>] [--project <name>] [--cwd <path>]
     [--scaffold-module <name>] [--scaffold-project <name>] [--json]
   baan --list | --version | --help
@@ -38,8 +41,8 @@ export function utility(o, ws, cfg, root, local) {
     [--cwd <repo>] [--workspace <dir>] [--config <file>] [--target <name>] [--module <project/module>]
     [--owns <glob,glob>] [--acceptance <text>] [--source <reference>]
     [--build <cmd>] [--test <cmd>] [--test-full <cmd>] [--setup <cmd>]
-    [--agent <name>] [--tier <tier>] [--planner-tier <tier>] [--verifier-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>]
-    [--execution-mode <headless|interactive>] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback] [--allow-branch-mismatch]
+    [--agent <name>] [--verifier-agent <name>] [--tier <tier>] [--planner-tier <tier>] [--verifier-tier <tier>] [--timeout <0..86400>] [--max-parallel <1..64>] [--max-commands <0..500>]
+    [--execution-mode <interactive|headless>] [--headless] [--interactive] [--inline] [--worktree] [--permission-policy <native-safe|bypass>] [--allow-bypass] [--allow-fallback] [--allow-branch-mismatch]
     [--direct] [--dry-run] [--select <id,id>]
   baan status | report | inbox [<run>] [--workspace <dir>]
   baan decide <package> --run <run> --by user --decision <text> --source <reference>

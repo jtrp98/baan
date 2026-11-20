@@ -47,12 +47,14 @@ export const FURNITURE = [
   // QA
   { type: "qa_console", x: 24, y: 11, w: 8, h: 1, layer: "object", block: true, station: "verifier" },
   { type: "test_desk", x: 34, y: 11, w: 3, h: 1, layer: "object", block: true, station: "check" },
+  { type: "testplan_desk", x: 25, y: 14, w: 3, h: 1, layer: "object", block: true, station: "testplan" },
   { type: "review_desk", x: 34, y: 14, w: 3, h: 1, layer: "object", block: true, station: "review" },
   { type: "server_rack", x: 38, y: 9, w: 1, h: 2, layer: "object", block: true },
   { type: "quality_board", x: 25, y: 8, w: 4, h: 1, layer: "wall", station: "verifier" },
   { type: "plant", x: 22, y: 15, w: 1, h: 1, layer: "object", block: true },
   // Design & Research
   { type: "arch_board", x: 2, y: 16, w: 5, h: 1, layer: "wall", station: "arch" },
+  { type: "dba_desk", x: 3, y: 21, w: 3, h: 1, layer: "object", block: true, station: "dba" },
   { type: "desk_map", x: 9, y: 20, w: 3, h: 1, layer: "object", block: true, station: "survey" },
   { type: "drawing_table", x: 14, y: 19, w: 3, h: 1, layer: "object", block: true, station: "ui" },
   { type: "shelves", x: 12, y: 22, w: 3, h: 1, layer: "object", block: true },
@@ -78,8 +80,10 @@ export const STATIONS = {
   build: { label: "BUILD STATION", zone: "development", roleSeat: { x: 14, y: 13, dir: "down" }, providerSeats: [{ x: 13, y: 13, dir: "down" }, { x: 15, y: 13, dir: "down" }] },
   verifier: { label: "QA CONSOLE", zone: "qa", roleSeat: { x: 27, y: 10, dir: "down" }, providerSeats: [{ x: 28, y: 10, dir: "down" }, { x: 29, y: 10, dir: "down" }, { x: 26, y: 10, dir: "down" }, { x: 30, y: 10, dir: "down" }, { x: 25, y: 10, dir: "down" }] },
   check: { label: "TEST DESK", zone: "qa", roleSeat: { x: 35, y: 10, dir: "down" }, providerSeats: [{ x: 34, y: 10, dir: "down" }, { x: 36, y: 10, dir: "down" }] },
+  testplan: { label: "TEST PLAN DESK", zone: "qa", roleSeat: { x: 26, y: 13, dir: "down" }, providerSeats: [{ x: 25, y: 13, dir: "down" }, { x: 27, y: 13, dir: "down" }] },
   review: { label: "REVIEW DESK", zone: "qa", roleSeat: { x: 35, y: 13, dir: "down" }, providerSeats: [{ x: 34, y: 13, dir: "down" }, { x: 36, y: 13, dir: "down" }] },
   arch: { label: "ARCHITECTURE BOARD", zone: "design", roleSeat: { x: 4, y: 17, dir: "up" }, providerSeats: [{ x: 3, y: 17, dir: "up" }, { x: 5, y: 17, dir: "up" }] },
+  dba: { label: "DB FOUNDATION DESK", zone: "design", roleSeat: { x: 4, y: 20, dir: "down" }, providerSeats: [{ x: 3, y: 20, dir: "down" }, { x: 5, y: 20, dir: "down" }] },
   survey: { label: "RESEARCH DESK", zone: "design", roleSeat: { x: 10, y: 19, dir: "down" }, providerSeats: [{ x: 9, y: 19, dir: "down" }, { x: 11, y: 19, dir: "down" }] },
   ui: { label: "DESIGN STUDIO", zone: "design", roleSeat: { x: 15, y: 18, dir: "down" }, providerSeats: [{ x: 14, y: 18, dir: "down" }, { x: 16, y: 18, dir: "down" }] },
   // ROLE UNKNOWN sessions: provider works here, no role character joins.
@@ -88,7 +92,7 @@ export const STATIONS = {
 
 // Role character homes = their own station seat; idle wandering stays inside the home zone.
 export const ROLE_HOME = Object.fromEntries(
-  ["orchestrator", "pm", "planner", "spec", "worker", "build", "verifier", "check", "review", "arch", "survey", "ui"]
+  ["orchestrator", "pm", "planner", "spec", "worker", "build", "verifier", "check", "testplan", "review", "arch", "dba", "survey", "ui"]
     .map((r) => [r, STATIONS[r].zone]),
 );
 

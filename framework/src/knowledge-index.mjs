@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { verifyLockedArtifacts } from "./flow-lock.mjs";
 
 export const TEAM_SLOTS = ["shared", "design", "build"];
 const PROJECT_EXTRAS = new Set(["INDEX.md", "index.md", "modules", "changelog", "archive"]);
@@ -230,6 +231,18 @@ export function lintKnowledge(root) {
       else {
         for (const o of m.os) {
           if (!PLATFORM_OS[m.platform][o]) errors.push(`${p.name}/${m.module}: os "${o}" ใช้กับ platform ${m.platform} ไม่ได้${Object.keys(PLATFORM_OS[m.platform]).length ? ` — ใช้ ${Object.keys(PLATFORM_OS[m.platform]).join(" · ")}` : " (web ไม่แยก os)"}`);
+        }
+      }
+      const flowFile = path.join(m.dir, "build", "flow.json");
+      if (existsSync(flowFile)) {
+        try {
+          const flowState = JSON.parse(readFileSync(flowFile, "utf8"));
+          const check = verifyLockedArtifacts(m.dir, flowState.lockedFiles);
+          for (const v of check.violations) {
+            errors.push(`${p.name}/${m.module}: ไฟล์ที่ล็อกไว้ถูก${v.reason === "missing" ? "ลบ" : "แก้ไข"} (${v.relPath}) — ห้ามแก้ wave/test-plan ที่ done แล้ว`);
+          }
+        } catch (e) {
+          errors.push(`${p.name}/${m.module}: อ่าน build/flow.json ไม่ได้ (${e.message})`);
         }
       }
     }

@@ -2,7 +2,7 @@
 // dependency-free and testable with a stub 2D context.
 
 export const CHAR_W = 16, CHAR_H = 24;
-export const CHARACTER_IDS = ["orchestrator", "planner", "worker", "verifier", "spec", "arch", "pm", "build", "check", "survey", "ui", "review", "claude", "codex", "agy"];
+export const CHARACTER_IDS = ["orchestrator", "planner", "worker", "verifier", "spec", "arch", "dba", "pm", "build", "testplan", "check", "survey", "ui", "review", "claude", "codex", "agy"];
 export const ANIMS = { walk_down: 4, walk_up: 4, walk_left: 4, walk_right: 4, stand_down: 2, stand_up: 2, stand_left: 2, stand_right: 2, sit: 2, type: 4, read: 2, think: 2, write: 4, drink: 2, success: 2, error: 2, warning: 2, offline: 1 };
 
 const OL = "#1b1b2a";
@@ -86,8 +86,10 @@ const SPECS = {
   verifier: { skin: SKINS[0], hair: "#2A2A2A", style: "short", top: "#F2F4F7", shade: "#C3CAD5", inner: "#5B8DEF", detail: "open", pants: "#3A3F4E", shoes: "#2A2A30", acc: ["glasses"], held: "magnifier" },
   spec: { skin: SKINS[1], hair: "#B5562B", style: "ponytail", top: "#3E9A57", shade: "#2B6E3E", inner: "#F1EEE6", sleeve: "#F1EEE6", detail: "vest", pants: "#4A3B2E", shoes: "#2E2219", held: "folder" },
   arch: { skin: SKINS[3], hair: "#B8BCC6", style: "short", top: "#22305A", shade: "#151F3D", detail: "turtleneck", pants: "#2A2A33", shoes: "#111118", held: "tube" },
+  dba: { skin: SKINS[2], hair: "#2B1D16", style: "short", top: "#0E7490", shade: "#155E75", detail: "vest", inner: "#E2E8F0", pants: "#1E293B", shoes: "#0F172A", acc: ["glasses"], held: "clipboard" },
   pm: { skin: SKINS[0], hair: "#2B1A14", style: "bun", top: "#8E2A3E", shade: "#621B2B", inner: "#F3E6E0", detail: "open", pants: "#2E2430", shoes: "#3A1A22", held: "tablet" },
   build: { skin: SKINS[2], hair: "#3A2414", style: "cap_back", cap: "#2E64C9", top: "#B8612A", shade: "#7E3F18", detail: "flannel", pants: "#3B4D6B", shoes: "#4A3020", held: "wrench" },
+  testplan: { skin: SKINS[0], hair: "#6A3E1F", style: "neat", top: "#D97706", shade: "#92400E", detail: "open", inner: "#FEF3C7", pants: "#292524", shoes: "#1C1917", held: "notebook" },
   check: { skin: SKINS[3], hair: "#1A1410", style: "curly", top: "#1FA39A", shade: "#147069", detail: "polo", pants: "#2C3442", shoes: "#EDEDED", held: "checklist" },
   survey: { skin: SKINS[1], hair: "#5A3A1E", style: "hat_explorer", hat: "#C9A867", top: "#A89060", shade: "#776640", inner: "#E9E1C8", detail: "open", pants: "#5B4A32", shoes: "#4A3220", held: "map" },
   ui: { skin: SKINS[0], hair: "#2E1F3A", style: "beret", hat: "#EC5FA5", top: "#F5F5F5", shade: "#BDBDBD", detail: "stripes", stripes: ["#F05A7E", "#FFC94A", "#4CC3F0"], pants: "#33334A", shoes: "#EC5FA5", held: "stylus" },
@@ -797,8 +799,10 @@ const DESK_DEFS = {
   build_station: { wood: "metal", slot: (i) => ["toolbox", "mon:build", "printer"][i] || "toolbox" },
   qa_console: { wood: "metal", accent: GREEN, slot: (i, w) => (i === 0 ? "serverbox" : i === w - 1 ? "printer" : "mon:tests") },
   test_desk: { wood: "white", slot: (i) => ["bugjar", "mon:tests", "clipboard"][i] || "papers" },
+  testplan_desk: { wood: "oak", slot: (i) => ["clipboard", "mon:kanban", "papers"][i] || "papers" },
   review_desk: { wood: "white", slot: (i) => ["papers_red", "mon:diff", "mug_pen"][i] || "papers" },
   desk_map: { wood: "oak", slot: (i) => ["map", "mon:radar", "globe"][i] || "map" },
+  dba_desk: { wood: "metal", accent: "#22D3EE", slot: (i) => ["serverbox", "mon:code", "folders"][i] || "papers" },
   drawing_table: { wood: "white", slot: (i) => ["palette", "drafting", "tablet"][i] || "palette" },
   cli_desk: { wood: "dark", rgb: true, accent: THEME.agy, slot: () => "mon:term" },
 };
@@ -1052,7 +1056,7 @@ function glyph(p, ch, x, y, c) {
   for (let i = 0; i < 15; i++) if (bits[i] === "1") p.p(x + (i % 3), y + ((i / 3) | 0), c);
 }
 
-export const FURNITURE_TYPES = ["taskboard", "status_display", "window", "command_desk", "desk_board", "plant", "bookshelf", "lamp", "whiteboard", "planning_table", "desk_docs", "code_desk", "build_station", "coffee_machine", "pixel_poster", "qa_console", "test_desk", "review_desk", "server_rack", "quality_board", "arch_board", "desk_map", "drawing_table", "shelves", "cli_desk", "couch", "robot", "lounge_sign"];
+export const FURNITURE_TYPES = ["taskboard", "status_display", "window", "command_desk", "desk_board", "plant", "bookshelf", "lamp", "whiteboard", "planning_table", "desk_docs", "code_desk", "build_station", "coffee_machine", "pixel_poster", "qa_console", "test_desk", "testplan_desk", "review_desk", "server_rack", "quality_board", "arch_board", "dba_desk", "desk_map", "drawing_table", "shelves", "cli_desk", "couch", "robot", "lounge_sign"];
 
 export function renderFurniture(type, w, h, opts = {}, doc = document) {
   w = Math.max(1, w | 0);

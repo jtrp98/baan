@@ -67,14 +67,16 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
    - `Cost per Task` บน Artificial Analysis คือ `Tokens Used × Compute Weight per Token` ซึ่งสะท้อนภาระโควตาและเวลาจริงได้ตรงกว่าราคาต่อ 1M Token เปล่าๆ
    - **ตัดตัวที่ถูกครอบงำ (Strictly Dominated)** ทิ้งทั้งหมด (`gemini-4-hydrogen` ระดับ `medium`–`xhigh`, `gpt-6.1-terra` ระดับ `medium`–`max`, `gpt-6-luna` ทุกระดับ, `sonnet` ระดับ `xhigh`–`max`)
    - **ตัด Effort ที่ผลตอบแทนตกหน้าผา** (ได้คะแนนเพิ่ม < ~10% แต่จ่าย Compute เพิ่ม +55%–75% หรือช้าลงหนัก): ห้ามใช้ `max` ทุกตัว, **ห้ามใช้ `gemini-4-neon / xhigh`** (+2.3% แลก +72% และรอ ~21.5 นาที → เพดาน AGY อยู่ที่ `high`), และ **ห้ามใช้ `gpt-6.2-sol / xhigh`** (+5.7% จาก `medium` แลก +59% → งานปกติใช้ `medium` / งานย่อยใช้ `low`)
-   - **ข้อยกเว้น `t1` Overdrive (`_timeoutSec: 3600`)**: อนุญาต `xhigh` เฉพาะ `gpt-6.2-astra` และ `claude opus` ใน `t1` ของสายวิศวกรรม/ตรวจรับ (`planner`, `arch`, `worker`, `build`, `verifier`, `check`) เท่านั้น ส่วน `agy` กดเพดานที่ `gemini-4-neon / high`
+   - **ข้อยกเว้น `t1` Overdrive (`_timeoutSec: 3600`)**: อนุญาต `xhigh` เฉพาะ `gpt-6.2-astra` และ `claude opus` ใน `t1` ของสายวิศวกรรม/ฐานข้อมูล/ตรวจรับ (`planner`, `arch`, `dba`, `worker`, `build`, `verifier`, `check`) เท่านั้น ส่วน `agy` กดเพดานที่ `gemini-4-neon / high`
 3. **Role-Owned Tiers (แต่ละบทบาทมีบันได Tier ของตัวเอง)**:
-   - แต่ละบทบาททั้ง 12 Roles ประกาศ `tiers` ตามความยาก ความเร็วที่ต้องการ และความเสี่ยงจริงของสายงาน (`t1` สูงสุด → `t3`/`t4` ต่ำสุด)
+   - แต่ละบทบาททั้ง 14 Roles ประกาศ `tiers` ตามความยาก ความเร็วที่ต้องการ และความเสี่ยงจริงของสายงาน (`t1` สูงสุด → `t3`/`t4` ต่ำสุด)
    - งานออกแบบระบบและ UX/UI (`planner`, `arch`, `survey`, `ui`, `review`) บน `agy` ยึด **`gemini-4-neon` ทุก tier** ปรับเฉพาะ `effort` (`high` → `medium` → `low`)
    - งาน `kind: "docs"` แยกเข้าบทบาท **`docs`** (`t1` Critical ADR/Contracts · `t2` Standard Docs · `t3` Light/Index/Subagent Explore)
 4. **Availability-Driven Specialist Routing (อิงความพร้อมใช้งานจาก `local.json` โดยตรง)**:
    - แต่ละ role (และแต่ละ tier เมื่อต่างกัน เช่น `docs.t1` vs `docs.t2`) ประกาศลำดับค่าย `preference` แล้วเลือกค่ายอันดับ 1 ที่เปิดใน `local.json` อัตโนมัติ
-   - `verifier` มี `mustDifferFromWorker: true` เพื่อแยกค่ายจาก `worker` อัตโนมัติเมื่อเปิด ≥2 ค่าย (เปิด 1 ค่ายใช้ fresh independent session)
+   - `verifier` มี `mustDifferFromWorker: true` เพื่อแยกค่ายจาก `worker` อัตโนมัติเมื่อเปิด ≥2 ค่าย (เปิด 1 ค่ายใช้ fresh independent session) และ `--agent` จะบังคับเฉพาะ Worker/Planner (ไม่ทับ Verifier เว้นแต่ระบุ `--verifier-agent`)
+   - **Contract-Gated High-Risk Worker & Rework Guard**: งาน `risk: "high"` ที่มี `contracts` หรือ pinned `read_first` เริ่ม `worker` ที่ `t3` (`gpt-6.2-sol / medium`) ได้ เพื่อถนอมโควตา `astra`; งานที่ไม่มี contract ชัดยังคงขั้นต่ำ `t2` และ `t2` จะยังไม่ขึ้น `t1` (`xhigh`) จนกว่า `rework >= 2`
+   - **Interactive-First & Headless Guardrails**: โหมดเริ่มต้นเป็น `interactive` (เปิด CLI แยก 4 หน้าต่าง 2×2 Grid) ส่วนโหมด `--headless` บังคับเพดาน `budget.max_commands` (default 60/40) และรีเซ็ต session ใหม่เมื่อ `cacheReadTokens >= 1.5M` หรือเข้าสู่ rework รอบใหม่
 5. **Strict No-Impersonation (ไม่สวมรอยเมื่อติดลิมิต)**:
    - หากเกิด rate limit / quota / capacity error ระหว่างรัน ระบบจะหยุดทันทีด้วย `waiting_human` (`PROVIDER_LIMIT`) ไม่แอบสลับค่ายหรือลดรุ่นแทน
    - หากผู้ใช้ระบุ `--agent <x>` ที่ปิดใน `local.json` จะ error ทันที
@@ -119,7 +121,7 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 
 ---
 
-## 4. ตาราง Role-Owned Tiers ปัจจุบันใน `agents.json` (12 Roles)
+## 4. ตาราง Role-Owned Tiers ปัจจุบันใน `agents.json` (14 Roles)
 
 ### 4.1 สถาปัตยกรรมและวางแผน (`planner` [default `t3`], `arch` [default `t2`]) — `pref: agy → codex → claude`
 
@@ -135,7 +137,7 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 | Tier | ลักษณะงาน (เทียบทีม Dev จริง) | `codex` | `agy` | `claude` |
 |---|---|---|---|---|
 | **`t1`** | Principal Dev: งานโคตรยาก / Concurrency / Security / Escalation (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `xhigh` (**57**, \$6.05) |
-| **`t2`** | Senior Dev: งานยาก / High-Risk Code / Complex Bugfix *(ขั้นต่ำ `risk: high`)* | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `high` (**52**, \$3.46) |
+| **`t2`** | Senior Dev: งานยาก / High-Risk Code (ไม่มี Contract ชัด) / Complex Bugfix *(ขั้นต่ำ `risk: high` แบบไม่มี contract)* | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `high` (**52**, \$3.46) |
 | **`t3`** | Standard Dev: งานปกติ / Multi-File Feature / Bugfix มาตรฐาน *(Default)* | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `gemini-4-neon` / `medium` (**55**, \$1.90) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
 | **`t4`** | Contracted Dev: งานมีสเปก+Contract ชัด / Unit Tests / Refactor เล็ก | `gpt-6.2-sol` / `low` (**40.6**, \$0.18) | `gemini-4-neon` / `low` (**44**, \$0.75) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
 
@@ -147,13 +149,21 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 | **`t2`** | Senior QA: ตรวจรับอิสระมาตรฐาน / High-Risk / Bugfix *(Default)* | `opus` / `high` (**52**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `high` (**60.1**) |
 | **`t3`** | Focused QA: งาน Low-Risk / Contracted Feature / Test-Mapping | `opus` / `medium` (**48**) | `gemini-4-neon` / `medium` (**55**) | `gpt-6.2-sol` / `medium` (**52.7**) |
 
-### 4.4 วิเคราะห์ธุรกิจและบริหารขอบเขต (`spec`, `pm` [default `t2`]) — `pref: claude → agy → codex`
+### 4.4 วิเคราะห์ธุรกิจ, บริหารขอบเขต และวางแผนทดสอบ (`spec`, `pm`, `testplan` [default `t2`]) — `pref: claude → agy → codex`
 
 | Tier | ลักษณะงาน | `claude` | `agy` | `codex` |
 |---|---|---|---|---|
-| **`t1`** | Lead BA/PM: โดเมนซับซ้อน / กฎธุรกิจข้ามโมดูล / Roadmap & Trade-offs ใหญ่ | `opus` / `high` (**52**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `high` (**60.1**) |
-| **`t2`** | Standard BA/PM: เก็บ Requirement/AC ฟีเจอร์มาตรฐาน / Scope & Priority *(Default)* | `sonnet` / `high` (**42**) | `gemini-4-neon` / `medium` (**55**) | `gpt-6.2-sol` / `medium` (**52.7**) |
-| **`t3`** | Quick Refinement: ปรับแก้ AC / เคลียร์ OQ ย่อย / จัด Backlog | `sonnet` / `high` (**42**) | `gemini-4-neon` / `low` (**44**) | `gpt-6.2-sol` / `low` (**40.6**) |
+| **`t1`** | Lead BA/PM/TestPlan: โดเมนซับซ้อน / กฎธุรกิจข้ามโมดูล / E2E ข้ามระบบ | `opus` / `high` (**52**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `high` (**60.1**) |
+| **`t2`** | Standard BA/PM/TestPlan: Requirement/AC, แตก Wave และ Test Plan ประจำโมดูล *(Default)* | `sonnet` / `high` (**42**) | `gemini-4-neon` / `medium` (**55**) | `gpt-6.2-sol` / `medium` (**52.7**) |
+| **`t3`** | Quick Refinement: ปรับแก้ AC / เคลียร์ OQ ย่อย / Delta Test Plan | `sonnet` / `high` (**42**) | `gemini-4-neon` / `low` (**44**) | `gpt-6.2-sol` / `low` (**40.6**) |
+
+### 4.4.1 สถาปนิกฐานข้อมูล (`dba` [default `t2`]) — `pref: codex → agy → claude`
+
+| Tier | ลักษณะงาน | `codex` | `agy` | `claude` |
+|---|---|---|---|---|
+| **`t1`** | Critical DB Migration / High-Concurrency Schema / Overdrive (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `xhigh` (**57**, \$6.05) |
+| **`t2`** | Standard DBA: ตรวจ DBML / Index / SQL Migration มาตรฐาน *(Default)* | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `high` (**52**, \$3.46) |
+| **`t3`** | Light Schema Check / Query Review ย่อย | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `gemini-4-neon` / `medium` (**55**, \$1.90) | `sonnet` / `high` (**42**, \$1.64) |
 
 ### 4.5 ทีมออกแบบหน้าจอ UX/UI (`survey`, `ui`, `review` [default `t2`]) — `pref: agy → claude → codex`
 
@@ -196,7 +206,7 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 
 1. **สิทธิ์แพ็กเกจ ~\$20/เดือน + โควตา 5 ชม./รายสัปดาห์**: ยืนยันทุกโมเดลว่าอยู่ใน ChatGPT Plus / Google AI Pro / Claude Pro และแยกต้นทุน API ออกจากโควตาแพ็กเกจจริง (ระวังรุ่นที่ล็อกโควตา 5 ชม. เร็วในงานประจำวัน)
 2. **ประเมินครบ 4 มิติ (Quality · Compute Cost/Task · Speed/Latency · Quota)**: ดึงข้อมูลล่าสุดจาก Artificial Analysis Intelligence Index (เวอร์ชันเดียวกันทุกค่าย + ระบุวันที่), Output Speed (tok/s), TTFT และ Time per Task — ตัดตัวที่ถูกครอบงำและ effort ที่ได้คะแนน < ~10% แต่จ่าย Compute/เวลาพุ่ง +50% ขึ้นไป
-3. **Role-Owned Tiers & Specialist Affinity**: ตรวจครบทั้ง 12 Roles (`planner`, `worker`, `verifier`, `docs`, `arch`, `spec`, `pm`, `build`, `check`, `survey`, `ui`, `review`) โดยชั่งน้ำหนัก Reliability/Retries, Context & Tool Efficiency, Cost per Successful Task และ Risk/Verification
+3. **Role-Owned Tiers & Specialist Affinity**: ตรวจครบทั้ง 14 Roles (`planner`, `worker`, `verifier`, `docs`, `arch`, `dba`, `spec`, `pm`, `build`, `testplan`, `check`, `survey`, `ui`, `review`) โดยชั่งน้ำหนัก Reliability/Retries, Context & Tool Efficiency, Cost per Successful Task และ Risk/Verification
 4. **ตรวจชื่อ `--model` และ `--effort` ที่ CLI รองรับจริง** และยืนยัน Strict No-Impersonation
 5. **Zero Drift**: อัปเดต `framework/agents.json`, ตารางใน `framework/MODEL-POLICY.md`, `framework/LEARNING.md` (ถ้าอ้างถึงรุ่น/effort), `framework/tests/agents-config.test.mjs`, `framework/tests/routing.test.mjs`, `framework/tests/init.test.mjs` พร้อมรัน `cd framework && npm test` ให้เขียวครบ และซิงค์ stubs ด้วย `node framework/bin/baan.mjs sync --all --stubs-only --no-self-update`
 ```
@@ -204,6 +214,8 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 ---
 
 ## 6. Change Log
+
+- **2026-11-20 (Add `dba` & `testplan` Roles for `baan flow`)**: เพิ่มบทบาท **`dba`** (`codex → agy → claude`, default `t2`) และ **`testplan`** (`claude → agy → codex`, default `t2`) เป็น 14 Roles ภายใต้กรอบแพ็ก \$20/เดือนและหลัก Pareto เหมือนเดิมทุกประการ
 
 - **2026-11-19 (11-Criteria + 4D Speed/Quota Lean Tuning)**: ผนวกเกณฑ์กลาง 11 ข้อ + ตารางเทียบ 4 มิติทุกโมเดลลงใน `MODEL-POLICY.md` และปรับจูน `agents.json` ให้คุ้มค่าบนแพ็ก \$20/เดือน — ลดเพดาน `agy` จาก `gemini-4-neon / xhigh` → `high` (ทุก `t1`), ลด `codex` งานปกติ `gpt-6.2-sol / xhigh` → `medium` และงานย่อย → `low`, และปรับ `claude` งานปกติ/คุยสดจาก `opus / medium` → `sonnet / high` เพื่อถนอมโควตา 5 ชม. และเพิ่มความเร็วตอบสนอง
 - **2026-11-19 (Role-Owned Tiers & 3-Provider Native Redesign)**: ยกเครื่อง `agents.json` จาก global `t0..t5` เป็น **Role-Owned Tiers ครบ 12 Roles** (`planner`, `worker`, `verifier`, `docs`, `arch`, `spec`, `pm`, `build`, `check`, `survey`, `ui`, `review`) พร้อม Availability-Driven Specialist Routing อิง `local.json`, Strict No-Impersonation (`PROVIDER_LIMIT` → `waiting_human`), และ 3-Provider Native Execution Prompts / Workspace Agents

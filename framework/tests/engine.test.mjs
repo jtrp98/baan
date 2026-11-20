@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { git, snapshot, changedFiles, matches } from "../src/snapshot.mjs";
 import { repoLock } from "../src/repolock.mjs";
-import { cli, decide } from "../src/cli.mjs";
+import { cli, decide, report } from "../src/cli.mjs";
 import { fromPlan, validatePacket, schemaFor } from "../src/packet.mjs";
 import { schedule } from "../src/scheduler.mjs";
 import { callSession, resolveWorkerTier, resolveVerifierTier } from "../src/session.mjs";
@@ -631,4 +631,71 @@ test("engine never picks an agent switched off in local.json as the independent 
     },
   });
   assert.equal(verifierCmd, "agy");
+});
+
+test("engine headless budget.max_commands aborts runaway tool loops and records partial telemetry", async (t) => {
+  const { root, repo } = fixture(t);
+  const p = packet(repo, "WP-CAP", { budget: { max_commands: 2 } });
+  const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { codex: {} } } };
+  await assert.rejects(
+    () => callSession(run, p, "worker", agents, {
+      runner: async (_def, _args, _via, _prompt, _cwd, _timeout, _ans, opts) => {
+        for (let i = 0; i < 3; i++) {
+          opts.onStdout(JSON.stringify({ type: "item.completed", item: { type: "command_execution", command: `cmd-${i}`, aggregated_output: "ok" } }) + "\n");
+        }
+        return { ok: false, exitCode: 1, answer: "", stdout: "", stderr: "", durationMs: 25 };
+      },
+    }),
+    (err) => err.failureClass === "BUDGET_EXCEEDED"
+  );
+  const rep = report(run);
+  assert.equal(rep.usage.calls, 1);
+  assert.equal(rep.usage.commands, 3);
+});
+
+test("engine fresh session reset clears bloated worker session (>1.5M cached tokens) while preserving crash recovery", async (t) => {
+  const { root, repo } = fixture(t);
+  const p = packet(repo, "WP-RESET", {
+    session: { agent: "codex", id: "bloated-thread", started: true },
+    lastWorkerUsage: { cacheReadTokens: 2_000_000 },
+  });
+  const run = runAt(root, [p]);
+  const agents = { agents: { codex: { promptVia: "stdin", writeArgs: ["exec", "-"], answerFrom: "stdout" } }, tiers: { t5: { codex: {} } } };
+  let capturedArgs = [];
+  await callSession(run, p, "worker", agents, {
+    runner: async (_def, args) => {
+      capturedArgs = args;
+      return { ok: true, answer: JSON.stringify(good), durationMs: 10, usage: { inputTokens: 100, cacheReadTokens: 0, outputTokens: 50, sessionId: "fresh-thread" } };
+    },
+  });
+  assert.ok(!capturedArgs.includes("resume"), "bloated session must start fresh instead of resuming");
+  assert.equal(p.session.id, "fresh-thread");
+});
+
+test("engine --worktree allows concurrent execution across packages targeting the same repository", async (t) => {
+  const { root, repo } = fixture(t);
+  const p1 = packet(repo, "W1", { owns: ["a.txt"] });
+  const p2 = packet(repo, "W2", { owns: ["b.txt"] });
+  const run = runAt(root, [p1, p2]);
+  run.worktree = true;
+  run.maxParallel = 4;
+  let activeCount = 0;
+  let peakActive = 0;
+  await schedule(run, cfg, {
+    execute: passing,
+    session: async (_r, p, role) => {
+      if (role === "verifier") return { verdict: "PASS", findings: [], failure_class: "", acceptance: p.acceptance.map((a) => ({ id: a.id, passed: true, proof: ["value test"] })) };
+      activeCount++;
+      peakActive = Math.max(peakActive, activeCount);
+      await new Promise((r) => setTimeout(r, 80));
+      writeFileSync(path.join(p.worktreePath, p.owns[0]), "done\n");
+      activeCount--;
+      return structuredClone(good);
+    },
+  });
+  assert.equal(peakActive, 2);
+  assert.equal(p1.state, "done");
+  assert.equal(p2.state, "done");
+  assert.ok(p1.worktreePath && p2.worktreePath && p1.worktreePath !== p2.worktreePath);
 });

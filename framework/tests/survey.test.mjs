@@ -107,6 +107,9 @@ test("survey: scaffoldKnowledgeModule สร้างไฟล์มาตรฐ
   assert.ok(readFileSync(path.join(modDir, "shared", "requirements.md"), "utf8").includes("F1: ระบบจัดการ Admin"));
   assert.ok(readFileSync(path.join(modDir, "design", "feasibility.md"), "utf8").includes("ผลสำรวจความเป็นไปได้ UX/UI"));
   assert.ok(readFileSync(path.join(modDir, "build", "contract.md"), "utf8").includes("สัญญาทางเทคนิค"));
+  assert.ok(readFileSync(path.join(modDir, "build", "db", "INDEX.md"), "utf8").includes("สารบัญฐานข้อมูล"));
+  assert.ok(readFileSync(path.join(modDir, "build", "waves", "INDEX.md"), "utf8").includes("สารบัญ Waves"));
+  assert.ok(readFileSync(path.join(modDir, "build", "test-plan", "INDEX.md"), "utf8").includes("สารบัญแผนทดสอบ"));
 
   // ตรวจสอบว่าตารางใน project INDEX.md ถูกอัปเดตอัตโนมัติ
   const projectIndex = readFileSync(path.join(projDir, "INDEX.md"), "utf8");

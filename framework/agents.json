@@ -903,6 +903,123 @@
           }
         }
       }
+    },
+    "dba": {
+      "label": "ช่างฐานราก (DBA — ตรวจ DBML & สร้าง SQL/Migration)",
+      "kind": "interactive",
+      "preference": [
+        "codex",
+        "agy",
+        "claude"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Critical DB Migration / High-Concurrency Schema / Overdrive",
+          "_timeoutSec": 3600,
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "xhigh"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "xhigh"
+          }
+        },
+        "t2": {
+          "label": "Standard DBA: ตรวจ DBML / Index / SQL Migration มาตรฐาน",
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          }
+        },
+        "t3": {
+          "label": "Light Schema Check / Query Review ย่อย",
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          }
+        }
+      }
+    },
+    "testplan": {
+      "label": "คนวางแผนทดสอบ (Test Planner — แตก Test Plan แบบ Folder-First)",
+      "kind": "interactive",
+      "preference": [
+        "claude",
+        "agy",
+        "codex"
+      ],
+      "defaultTier": "t2",
+      "strict": true,
+      "tiers": {
+        "t1": {
+          "label": "Lead Test Architect: แผนทดสอบข้ามระบบ / Concurrency / E2E ซับซ้อน",
+          "claude": {
+            "model": "opus",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "high"
+          },
+          "codex": {
+            "model": "gpt-6.2-astra",
+            "effort": "high"
+          }
+        },
+        "t2": {
+          "label": "Standard Test Plan: แผนทดสอบระบบประจำโมดูล",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "medium"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "medium"
+          }
+        },
+        "t3": {
+          "label": "Quick Test Plan Update / Delta Cases",
+          "claude": {
+            "model": "sonnet",
+            "effort": "high"
+          },
+          "agy": {
+            "model": "gemini-4-neon",
+            "effort": "low"
+          },
+          "codex": {
+            "model": "gpt-6.2-sol",
+            "effort": "low"
+          }
+        }
+      }
     }
   }
 }

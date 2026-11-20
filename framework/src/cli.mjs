@@ -3,7 +3,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { loadWorkspace, loadAgentsConfig, resolveWorkspaceConfig, resolveTarget, resolveModules, collectWorkspaceAddDirs, loadLocalConfig, isAgentEnabled, applyLocalAgents, TEAM_DIR } from "./config.mjs";
 import { fromPlan, validatePacket, assertId, readiness, documentBasis, approvalBasis } from "./packet.mjs";
-import { loadRun, save, persist, event, readJson, previousAttempt } from "./store.mjs";
+import { loadRun, save, persist, event, readJson, previousAttempt, summarizeRunUsage } from "./store.mjs";
 import { callSession, nativeCommand, resolveVerifierTier } from "./session.mjs";
 import { schedule } from "./scheduler.mjs";
 import { triage } from "./triage.mjs";
@@ -20,13 +20,14 @@ import { getAdapter } from "./adapters/registry.mjs";
 import { runParityCommand } from "./parity.mjs";
 import { runInteractiveCli } from "./runner.mjs";
 import { checkPackageBranches, checkTargets, formatBranchMismatchError, listTargets, registerTarget, removeTarget, scanTargets, setTargetBranch } from "./targets.mjs";
+import { runFlowCommand } from "./flow.mjs";
 
 export function parse(argv) {
-  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui", "target"].includes(argv[0]) ? argv.shift() : "run" };
+  const o = { command: ["run", "status", "report", "inbox", "decide", "sync", "survey", "scan", "parity", "attach", "update-clis", "monitor", "ui", "target", "flow"].includes(argv[0]) ? argv.shift() : "run" };
   if (o.command === "sync") o.sync = true;
   if (o.command === "survey" || o.command === "scan") o.survey = true;
-  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open", "prune", "pin-branch", "update-branch", "clear", "allow-branch-mismatch"]);
-  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "tier", "planner-tier", "verifier-tier", "timeout", "max-parallel", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root", "branch"]);
+  const flags = new Set(["direct", "dry-run", "approve", "allow-dirty", "help", "version", "init", "list", "commit", "index", "lint-knowledge", "sync", "pull-only", "push", "no-self-update", "all", "stubs-only", "survey", "scan", "json", "drift", "interactive", "headless", "inline", "allow-bypass", "allow-fallback", "native-defaults", "worktree", "tui", "no-open", "prune", "pin-branch", "update-branch", "clear", "allow-branch-mismatch", "round-new"]);
+  const values = new Set(["goal", "goal-file", "target", "cwd", "workspace", "config", "plan", "plan-file", "packet", "select", "resume", "run", "cancel", "owns", "acceptance", "source", "build", "test", "test-full", "setup", "agent", "verifier-agent", "tier", "planner-tier", "verifier-tier", "timeout", "max-parallel", "max-commands", "decision", "by", "module", "gate", "knowledge-git", "memory-git", "lint-plan", "repair-mojibake", "sweep", "sweep-in", "scaffold-module", "scaffold-project", "project", "execution-mode", "permission-policy", "approval-policy", "model", "effort", "idle-timeout", "provider-arg", "provider-env", "port", "eval", "evaluate", "name", "path", "root", "branch", "ticket", "answer"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (!a.startsWith("--")) {
@@ -58,19 +59,21 @@ export function parse(argv) {
   if (inputs.length > 1 || (o.resume && inputs.length) || (o.cancel && (inputs.length || o.resume))) throw new Error("choose one input: goal / plan / packet / resume / cancel");
   if (o.timeout !== undefined) validateTimeout(Number(o.timeout));
   if (o["max-parallel"] !== undefined && (!Number.isInteger(Number(o["max-parallel"])) || Number(o["max-parallel"]) < 1 || Number(o["max-parallel"]) > 64)) throw new Error("invalid --max-parallel (1–64)");
+  if (o["max-commands"] !== undefined && (!Number.isInteger(Number(o["max-commands"])) || Number(o["max-commands"]) < 0 || Number(o["max-commands"]) > 500)) throw new Error("invalid --max-commands (0–500)");
   if (o["dry-run"] && (o.cancel || o.command === "decide" || (utilityFlags.some((f) => o[f]) && !o.sync && !o["repair-mojibake"]))) throw new Error("--dry-run applies only to run/resume");
-  if (o.command !== "decide" && (o.approve || o["allow-dirty"] || o.gate)) throw new Error("approvals require decide");
+  if (!["decide", "flow"].includes(o.command) && (o.approve || o["allow-dirty"] || o.gate)) throw new Error("approvals require decide");
   if (["survey", "scan"].includes(o.command) && o.subject && !o.target) {
     o.target = o.subject;
     delete o.subject;
   }
-  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui", "target"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
+  if (o.subject && !["status", "report", "inbox", "decide", "attach", "monitor", "ui", "target", "flow"].includes(o.command)) throw new Error(`unexpected argument ${o.subject}`);
   return o;
 }
 
 export function report(run) {
-  return { id: run.id, dir: run.dir, mode: run.mode, executionMode: run.executionMode ?? "headless", permissionPolicy: run.permissionPolicy ?? "native-safe", ok: run.packages.length > 0 && run.packages.every((p) => p.state === "done") && (run.integration ?? []).every((check) => check.evidence?.ok), integration: run.integration ?? [],
-    packages: run.packages.map((p) => ({ id: p.id, tasks: p.tasks, state: p.state, failureClass: p.failureClass, durationMs: p.durationMs,
+  return { id: run.id, dir: run.dir, mode: run.mode, executionMode: run.executionMode ?? "interactive", interactiveWindow: run.interactiveWindow ?? "grid", permissionPolicy: run.permissionPolicy ?? "native-safe", ok: run.packages.length > 0 && run.packages.every((p) => p.state === "done") && (run.integration ?? []).every((check) => check.evidence?.ok), integration: run.integration ?? [],
+    usage: summarizeRunUsage(run.dir),
+    packages: run.packages.map((p) => ({ id: p.id, tasks: p.tasks, state: p.state, failureClass: p.failureClass, durationMs: p.durationMs, ...(p.worktreePath ? { worktreePath: p.worktreePath } : {}),
       evidence: p.gate?.evidence_file ?? (p.gate ? path.join(run.dir, `${p.id}.evidence.json`) : null), verdict: p.verdict, questions: p.questions ?? [], acceptance: p.acceptance })) };
 }
 
@@ -169,6 +172,10 @@ export async function cli(argv, options = {}) {
     throw new Error(`คำสั่งย่อยของ target ไม่ถูกต้อง: ${action} (ใช้ list | check | scan | add | branch | remove)`);
   }
 
+  if (o.command === "flow") {
+    return runFlowCommand(o, ws, cfg, root, local, options);
+  }
+
   if (o.command === "attach") {
     if (!o.subject) throw new Error("attach requires a package id");
     const run = loadRun(root, o.run || o.resume || "");
@@ -218,7 +225,7 @@ export async function cli(argv, options = {}) {
     }
     if (o.command === "inbox") return report(run).packages.filter((p) => p.questions.length || p.state === "waiting_human");
     if (!o.resume) return report(run);
-    for (const key of ["tier", "agent", "timeout", "max-parallel", "planner-tier", "verifier-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
+    for (const key of ["tier", "agent", "verifier-agent", "timeout", "max-parallel", "max-commands", "planner-tier", "verifier-tier"]) if (o[key] !== undefined) throw new Error(`resume retains saved configuration; ${key} is not supported`);
     if (!o["dry-run"] && !o["allow-branch-mismatch"] && !run.allowBranchMismatch) {
       const mismatches = checkPackageBranches(ws, run.packages);
       if (mismatches.length) throw new Error(formatBranchMismatchError(mismatches));
@@ -264,16 +271,19 @@ export async function cli(argv, options = {}) {
     }
   }
 
-  const executionMode = o["execution-mode"] || (o.interactive ? "interactive" : null) || ws.defaults.execution_mode || "headless";
+  const executionMode = o["execution-mode"] || (o.headless ? "headless" : null) || (o.interactive ? "interactive" : null) || ws.defaults.execution_mode || "interactive";
+  const interactiveWindow = o.inline ? "inline" : (ws.defaults.interactive_window || "grid");
   const permissionPolicy = o["permission-policy"] || (o["allow-bypass"] ? "bypass" : null) || ws.defaults.permission_policy || "native-safe";
   const allowFallback = Boolean(o["allow-fallback"] ?? ws.defaults.allow_fallback);
   const worktree = Boolean(o.worktree ?? ws.defaults.worktree);
 
   const explicitAgent = o.agent || null;
-  if (explicitAgent) {
-    if (!cfg.agents?.[explicitAgent]) throw new Error(`unknown agent ${explicitAgent}`);
-    if (!isAgentEnabled(explicitAgent, local)) {
-      throw new Error(`agent '${explicitAgent}' ถูกปิดการใช้งานใน local.json (close) — BAAN ไม่สวมรอยสลับค่ายแทน`);
+  const explicitVerifierAgent = o["verifier-agent"] || null;
+  for (const [label, chosen] of [["--agent", explicitAgent], ["--verifier-agent", explicitVerifierAgent]]) {
+    if (!chosen) continue;
+    if (!cfg.agents?.[chosen]) throw new Error(`unknown agent ${chosen} (${label})`);
+    if (!isAgentEnabled(chosen, local)) {
+      throw new Error(`agent '${chosen}' ถูกปิดการใช้งานใน local.json (close) — BAAN ไม่สวมรอยสลับค่ายแทน`);
     }
   }
 
@@ -288,13 +298,16 @@ export async function cli(argv, options = {}) {
 
   const workerRoute = resolveRoleRoute(cfg, "worker", { forcedAgent: explicitAgent, tier: workerTier, localConfig: local, packet: packages[0] });
   const plannerRoute = resolveRoleRoute(cfg, "planner", { forcedAgent: explicitAgent, tier: plannerTier, localConfig: local });
-  const verifierRoute = resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitAgent, tier: verifierTier, localConfig: local, workerAgent: workerRoute.agent });
+  const verifierRoute = resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitVerifierAgent, tier: verifierTier, localConfig: local, workerAgent: workerRoute.agent });
   const selectedAgent = workerRoute.agent;
+
+  const maxCommands = o["max-commands"] !== undefined ? Number(o["max-commands"]) : undefined;
 
   const run = { version: 2, id: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`, root,
     packages: packages.map((p) => ({ ...p, basis: { docs: documentBasis(p) }, state: "pending" })), tier: workerTier, explicitTier: Boolean(o.tier), plannerTier, verifierTier, explicitVerifierTier: Boolean(o["verifier-tier"]),
-    agent: selectedAgent, explicitAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, workerRoute.timeoutSec != null ? { _timeoutSec: workerRoute.timeoutSec } : undefined), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
-    direct: !!o.direct, executionMode, permissionPolicy, allowFallback, worktree, allowBranchMismatch: Boolean(o["allow-branch-mismatch"]),
+    agent: selectedAgent, explicitAgent, explicitVerifierAgent, timeoutSec: resolveTimeout({ timeoutSet: o.timeout !== undefined, timeoutSec: Number(o.timeout ?? ws.defaults.timeout_sec) }, workerRoute.timeoutSec != null ? { _timeoutSec: workerRoute.timeoutSec } : undefined), maxParallel: Number(o["max-parallel"] ?? ws.defaults.max_parallel),
+    ...(maxCommands !== undefined ? { maxCommands } : {}),
+    direct: !!o.direct, executionMode, interactiveWindow, permissionPolicy, allowFallback, worktree, allowBranchMismatch: Boolean(o["allow-branch-mismatch"]),
     model: o.model ?? ws.defaults.model ?? null, effort: o.effort ?? ws.defaults.effort ?? null,
     approvalPolicy: o["approval-policy"] ?? "auto-safe", providerArgs: o["provider-arg"] ?? [],
     integration, createdAt: new Date().toISOString() };
@@ -311,19 +324,43 @@ export async function cli(argv, options = {}) {
   run.dir = path.join(root, ".baan", "runs", run.id);
   if (o["dry-run"]) {
     const summarizeRoute = (r) => ({ agent: r.agent, role: r.routingRole, tier: r.tier, model: r.model, effort: r.effort, clamped: r.clamped, tierLabel: r.tierLabel });
+    const preflightWarnings = [];
+    const repoCounts = new Map();
+    for (const p of packages) {
+      repoCounts.set(p.repo.path, (repoCounts.get(p.repo.path) ?? 0) + 1);
+      if ((p.owns?.length ?? 0) > 15) {
+        preflightWarnings.push(`${p.id}: owns มี ${p.owns.length} รายการ (แนะนำ <= 15 เพื่อลด context bloat)`);
+      }
+      const cmdText = [p.commands?.setup, p.commands?.build, p.commands?.test_targeted, p.commands?.test_full].join(" ");
+      if (executionMode === "headless" && permissionPolicy === "native-safe" && /\b(?:playwright|localhost|127\.0\.0\.1)\b/i.test(cmdText)) {
+        preflightWarnings.push(`${p.id}: headless + native-safe คู่กับคำสั่ง loopback/browser อาจติด EACCES บน Windows sandbox (ใช้ interactive หรือ --allow-bypass)`);
+      }
+    }
+    if ([...repoCounts.values()].some((n) => n > 1) && !worktree) {
+      preflightWarnings.push("มีหลาย package ใน repo เดียวกันโดยไม่ได้เปิด --worktree — จะเปิดได้ทีละ 1 หน้าต่างต่อ repo (ส่ง --worktree เพื่อเปิดขนานสูงสุด 4 หน้าต่าง)");
+    }
     return {
-      ...triage(packages, run.direct),
+      ...triage(packages, run.direct, { worktree: run.worktree }),
+      executionMode: run.executionMode,
+      interactiveWindow: run.interactiveWindow,
+      maxParallel: run.maxParallel,
       enabled_providers: workerRoute.availablePool,
       resolved_routes: {
         planner: summarizeRoute(plannerRoute),
         worker: summarizeRoute(workerRoute),
         verifier: summarizeRoute(verifierRoute),
       },
+      ...(preflightWarnings.length ? { preflight_warnings: preflightWarnings } : {}),
       ...(branchMismatches.length ? { branch_warnings: branchMismatches } : {}),
-      packages: packages.map((p) => ({
-        ...p, readiness: readiness(p), warnings: commandWarnings(p),
-        verifier_route: summarizeRoute(resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitAgent, tier: resolveVerifierTier(run, p, cfg), localConfig: local, workerAgent: workerRoute.agent, packet: p })),
-      })),
+      packages: packages.map((p) => {
+        const pVerifier = resolveRoleRoute(cfg, "verifier", { forcedAgent: explicitVerifierAgent, tier: resolveVerifierTier(run, p, cfg), localConfig: local, workerAgent: workerRoute.agent, packet: p });
+        const pWorker = resolveRoleRoute(cfg, "worker", { forcedAgent: explicitAgent, tier: resolveRoleRoute(cfg, "worker", { forcedAgent: explicitAgent, tier: workerTier, localConfig: local, packet: p }).tier, localConfig: local, packet: p });
+        return {
+          ...p, readiness: readiness(p), warnings: commandWarnings(p),
+          worker_route: summarizeRoute(pWorker),
+          verifier_route: summarizeRoute(pVerifier),
+        };
+      }),
     };
   }
   mkdirSync(run.dir, { recursive: true }); persist(run);
@@ -347,7 +384,7 @@ async function executeRun(run, cfg, options, dry = false) {
           questions: ["completed scope/Git state changed since evidence; inspect and confirm with decide --allow-dirty"] });
       }
     }
-    const selection = triage(run.packages, run.direct); run.mode = selection.mode;
+    const selection = triage(run.packages, run.direct, { worktree: run.worktree }); run.mode = selection.mode;
     event(run, "triage", selection); persist(run);
     if (run.packages.some((p) => readiness(p).length)) { await schedule(run, cfg, { ...options, deferPlanning: selection.needsPlanning && !run.planned }); return report(run); }
     if (run.mode !== "direct" && selection.needsPlanning && !run.planned) {
