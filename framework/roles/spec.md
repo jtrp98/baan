@@ -16,7 +16,7 @@ Project/module, INDEX, requirement ปัจจุบัน, Open Questions/Tick
 
 ## 3-Step Plan-First & Subagent Workflow
 
-1. **Subagent สำรวจบริบท**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปกวาดอ่าน requirement เดิม, INDEX, และเอกสารที่เกี่ยวข้อง สรุปเฉพาะจุดที่ขาดกลับมา
+1. **Subagent สำรวจบริบท**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปกวาดอ่าน requirement เดิม, INDEX, และเอกสารที่เกี่ยวข้อง สรุปเฉพาะจุดที่ขาดกลับมา
 2. **ตัวหลักวางแผนก่อนถาม (`/plan` First + `req-grill`)**:
    - จัดกลุ่มประเด็นที่จะถามเป็นลำดับตาม dependency tree (ถ้าใช้ `baan flow` ให้รวบเป็น Ticket ส่งกลับตัวกลางบน Desktop App แทนการถามในหน้าต่าง `cmd`)
    - ประเมินความเป็นไปได้เบื้องต้นของภาพรวมระบบและจัดสรรเข้าโมดูลที่ถูกต้อง (หรือเสนอแยกโมดูลใหม่)

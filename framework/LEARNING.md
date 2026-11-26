@@ -127,7 +127,7 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
 ```
 
 1. **ขั้นที่ 1 — Subagent สำรวจบริบท (Explore)**:
-   - ตัวหลักส่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet`/`haiku` บน Claude Code, `flash`/`flash_lite` บน agy) ไปกวาดอ่านไฟล์ โค้ด หรือสัญญาทีละหลายไฟล์ขนานกัน
+   - ตัวหลักส่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet`/`haiku` บน Claude Code, `hydrogen` บน agy) ไปกวาดอ่านไฟล์ โค้ด หรือสัญญาทีละหลายไฟล์ขนานกัน
    - Subagent สรุปเฉพาะข้อเท็จจริงและจุดที่ขัดแย้งกลับมาให้ตัวหลัก โดยไม่ดึงเนื้อหาไฟล์ดิบเข้า Context หลัก
 2. **ขั้นที่ 2 — ตัวหลักวางแผนก่อนถามหรือก่อนทำ (`/plan` First)**:
    - ตัวหลักนำข้อมูลมาวิเคราะห์และจัดทำแผนการทำงาน (`/plan`) ร่วมกับผู้ใช้เสมอ:
@@ -146,7 +146,7 @@ AI Team ต้องช่วยเพิ่มความรู้ด้าน
 
 1. **งาน Docs (`kind: "docs"`) — Role `docs` (3 Tiers)**:
    - ขั้นคิดและวางแผน (Plan): ใช้ตัวหลักของสายงาน (`arch`/`planner`/`spec` บน `gemini-4-neon` / `opus` / `gpt-6.2-astra`) วิเคราะห์และเคาะโครงร่าง
-   - ขั้นเขียนเอกสาร (Work): วิ่งเข้าตารางบทบาท `docs` (`t1` Critical ADR/Contracts/Security → `opus`/`neon`/`sol medium`; `t2` Standard Docs ตามโครงร่างที่อนุมัติ → `gpt-6.2-sol low` / `haiku high` / `gemini-4-hydrogen low`; `t3` Light/Index/Subagent Explore → `gpt-6.1-terra low` / `haiku low` / `gemini-3.8-flash low`)
+   - ขั้นเขียนเอกสาร (Work): วิ่งเข้าตารางบทบาท `docs` (`t1` Critical ADR/Contracts/Security → `opus`/`neon`/`sol medium`; `t2` Standard Docs ตามโครงร่างที่อนุมัติ → `gpt-6.2-sol low` / `haiku high` / `gemini-4-hydrogen low`; `t3` Light/Index/Subagent Explore → `gpt-6.1-terra low` / `haiku low` / `gemini-4-hydrogen low`)
    - **Hybrid Verification Policy**: เอกสารทั่วไปตรวจรับผ่าน `baan --lint-knowledge` ร่วมกับประตูคนเซ็น (`decide --approve`) โดยข้าม LLM Verifier เพื่อประหยัด Token และเวลา; ยกเว้นเอกสารระดับวิกฤต (ADR, Contracts สัญญาร่วม, Security) ที่ยังคงมี LLM Verifier ตรวจทานเนื้อหาเชิงลึก
 2. **งาน Code (`kind: "code"`) — Role `worker` (4 Tiers) + Contract-Gated Risk Policy**:
    - **Strict High-Risk Guard**: งานที่เป็น `risk: "high"` บังคับใช้ `worker` ระดับ **`t2`** (Senior Dev) ขึ้นไปเสมอ ห้ามลดไป `t3`/`t4` เพื่อป้องกัน Rework Penalty

@@ -23,7 +23,7 @@ metadata:
    - ใช้ `image-generator` เฉพาะเมื่อต้องสร้างภาพ/ไอคอนประกอบ
    - ให้ผู้ใช้ตรวจและอนุมัติ UX ก่อนลงมือเขียนโค้ดจริง (ห้ามสมมติว่าอนุมัติเอง)
 3. **ตรวจความถูกต้องหลังแก้โค้ด (Visual & A11y Verification)**:
-   - ใช้ `browser` subagent (`Model: "flash"`) เปิดหน้าจอจริง (เมื่อมี dev/preview server) ตรวจ:
+   - ใช้ `browser` subagent เปิดหน้าจอจริง (เมื่อมี dev/preview server) ตรวจ:
      - Layout, overflow และ responsive viewports (desktop / mobile)
      - Console/runtime errors ต้องเป็น 0
      - Keyboard navigation, focus-visible, contrast (WCAG AA), touch target, และครบ 5 UI states

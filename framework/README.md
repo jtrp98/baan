@@ -74,7 +74,7 @@ Execution Prompts แยกแบบ Hybrid 3 ค่าย (`prompts/_core/` + `
 BAAN ยึดหลัก **Native First, Orchestrate Outside, Preserve Inside**:
 - **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ native `exec`, `-c developer_instructions=...` (4-Part Action-Biased), structured schema, native read-only sandbox สำหรับ Planner/Verifier และ native session resume สำหรับ Worker
 - **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ `--append-system-prompt-file` (XML + Positive Rationale), native `plan` mode สำหรับ Planner/Verifier โดยรักษา MCP, Skills และ Subagents; ใช้ `acceptEdits` หรือ Approval Bridge ใน Worker; prompts สั่งให้อ่าน Neutral Knowledge (`repo-map.md`, `coding-pattern.md`, `ui-design-system.md`) และส่ง subagent สำรวจด้วย `model: "haiku"`; `baan parity` ตรวจ hooks จาก `.claude/settings.json` และ skills/agents ทั้งใน cwd และราก workspace
-- **agy**: ลงชื่อเข้าใช้ CLI หรือใช้ Antigravity 2.0 App; ทำงานแบบ Antigravity-Native Harness (`GEMINI.md` + 9 Common Skills ใน `.agents/skills/` + `research`/`browser`/`generative_ui`/`run_workflow`) พร้อม CLI flags `--mode plan|accept-edits|auto` และโมเดล `Orchestrator` / `Carbon` / `Neon` / `Hydrogen` / `Flash` (ไม่ส่ง `--effort` เมื่อเป็นรุ่น `gemini-pro-orchestrator*`)
+- **agy**: ลงชื่อเข้าใช้ CLI หรือใช้ Antigravity 2.0 App; ทำงานแบบ Antigravity-Native Harness (`GEMINI.md` + 9 Common Skills ใน `.agents/skills/` + `research`/`browser`/`generative_ui`/`run_workflow`) พร้อม CLI flags `--mode plan|accept-edits|auto` และโมเดล `Orchestrator` / `Carbon` / `Neon` / `Hydrogen` (ไม่ส่ง `--effort` เมื่อเป็นรุ่น `gemini-pro-orchestrator*`)
 
 บน Windows core เรียก native executable หรือ Node entry ของ npm Codex โดยไม่ผ่าน shell
 ตรวจความพร้อมและ Parity ของเครื่องด้วย `baan parity` ก่อนเริ่มงานจริง

@@ -14,7 +14,7 @@ metadata:
 ## ขั้นตอนปฏิบัติ (Antigravity-Native 4 จังหวะ)
 
 1. **Parallel Explore (รักษา Context ตัวหลักให้สะอาด)**:
-   - ใช้ `invoke_subagent` (`TypeName: "research"` หรือ `Model: "flash"`) อ่านเอกสารกลาง (`<project>/INDEX.md`, `repo-map.md`, `coding-pattern.md`, `ui-design-system.md`) และโค้ดจริงใน `target/` พร้อมกัน
+   - ใช้ `invoke_subagent` (`TypeName: "research"`) อ่านเอกสารกลาง (`<project>/INDEX.md`, `repo-map.md`, `coding-pattern.md`, `ui-design-system.md`) และโค้ดจริงใน `target/` พร้อมกัน
    - หากยังไม่มี `repo-map.md` หรือพบว่าล้าสมัย ให้เรียก `repo-map` (หรือ `baan survey --target <name> --json`) ก่อน
 2. **Clarify & Challenge (อย่าเดาและอย่าเออออตาม)**:
    - ใช้ `ask_question` ถามจุดที่ยังคลุมเครือ (Goal & Out-of-Scope, Actors & Permissions, Edge Cases, Idempotency, Failure States)

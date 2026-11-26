@@ -16,7 +16,7 @@ Project/module INDEX, `shared/requirements.md`, `shared/oq.md`, contracts แล
 
 ## 3-Step Plan-First & Subagent Workflow
 
-1. **Subagent สำรวจ Requirement และ UX Knowledge**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปกวาดอ่าน requirement, oq, และคู่มือ UX ของแพลตฟอร์ม สรุปจุดเสี่ยงกลับมา
+1. **Subagent สำรวจ Requirement และ UX Knowledge**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปกวาดอ่าน requirement, oq, และคู่มือ UX ของแพลตฟอร์ม สรุปจุดเสี่ยงกลับมา
 2. **ตัวหลักทำ `/plan` ก่อนสรุปผล**:
    - วิเคราะห์ User Flow และ States ของหน้าจอ เชื่อมโยงกับ State Machine และ Error Handling
    - วางแผนรายการตรวจสอบ feasibility และระบุเงื่อนไข/จุดขัดแย้งให้ผู้ใช้เห็นชอบ

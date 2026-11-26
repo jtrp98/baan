@@ -14,7 +14,7 @@ metadata:
 ## ขั้นตอนปฏิบัติ (Antigravity-Native)
 
 1. **สำรวจ Producer / Consumer และ Schema จริงแบบขนาน**:
-   - ใช้ `invoke_subagent` (`TypeName: "research"` หรือ `Model: "flash"`) กวาดหาทั้ง **ผู้ส่ง (producer)** และ **ผู้เรียกใช้ (consumer)** ทุก target repo ที่เกี่ยวข้อง (เช่น Gateway, Microservice, Frontend/App) รวมถึง migration/schema ล่าสุด
+   - ใช้ `invoke_subagent` (`TypeName: "research"`) กวาดหาทั้ง **ผู้ส่ง (producer)** และ **ผู้เรียกใช้ (consumer)** ทุก target repo ที่เกี่ยวข้อง (เช่น Gateway, Microservice, Frontend/App) รวมถึง migration/schema ล่าสุด
 2. **ตรวจเช็กลิสต์วิกฤต 6 แกน**:
    - **Contract Compatibility**: ฟิลด์ใหม่ optional หรือไม่? มี versioning หรือ backward-compat สำหรับ client เก่าหรือไม่?
    - **Normalization & Indexing**: Primary/Foreign keys, composite indexes ตรง query pattern จริง, avoid full-table scan

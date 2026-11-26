@@ -124,7 +124,7 @@ test("fallbackChainFor: คัด agent ที่ปิดออกจาก fal
         _fallback: ["codex", "agy", "claude"],
         claude: { model: "opus" },
         codex: { model: "sol" },
-        agy: { model: "argon" },
+        agy: { model: "gemini-4-neon" },
       },
     },
   };
@@ -149,7 +149,7 @@ test("fallbackChainFor: เคารพ localConfig ที่ส่งตรง�
         _fallback: ["codex", "agy", "claude"],
         claude: { model: "opus" },
         codex: { model: "sol" },
-        agy: { model: "argon" },
+        agy: { model: "gemini-4-neon" },
       },
     },
   };

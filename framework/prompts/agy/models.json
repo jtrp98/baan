@@ -14,9 +14,5 @@
   "gemini-4-hydrogen": {
     "label": "Gemini 4 Hydrogen",
     "guidance": "Operate as a fast, deterministic executor following the approved outline and pinned contracts strictly. Keep edits focused and avoid speculative refactors."
-  },
-  "gemini-3.8-flash": {
-    "label": "Gemini 3.8 Flash",
-    "guidance": "Perform lightweight summaries, indexing, or strictly bounded mechanical documentation updates without exceeding the provided outline."
   }
 }

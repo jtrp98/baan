@@ -22,7 +22,7 @@ metadata:
 
 ## โหมด 2 — Capture / Refresh (สกัดจากโค้ดจริงลง `<project>/coding-pattern.md`)
 
-1. ใช้ `invoke_subagent` (`TypeName: "research"` หรือ `Model: "flash"`) อ่านไฟล์ตัวอย่างจริง 2–3 ไฟล์ต่อเลเยอร์ (API route, service, data access, UI component, test file) พร้อมกัน
+1. ใช้ `invoke_subagent` (`TypeName: "research"`) อ่านไฟล์ตัวอย่างจริง 2–3 ไฟล์ต่อเลเยอร์ (API route, service, data access, UI component, test file) พร้อมกัน
 2. สกัดออกมาเป็นกฎ **Do / Don't + Canonical File Path** ลง `<project>/coding-pattern.md` (บังคับ ≤ 15 KB):
    - โครงสร้างโฟลเดอร์และ Naming Convention
    - Canonical Examples (ชี้ไฟล์อ้างอิงจริงที่ดีที่สุดใน repo)

@@ -17,7 +17,6 @@ test("resolveModelFamily maps provider models across all 3 providers", () => {
   assert.equal(resolveModelFamily("agy", "gemini-pro-orchestrator"), "gemini-pro-orchestrator");
   assert.equal(resolveModelFamily("agy", "gemini-pro-orchestrator-neon"), "gemini-pro-orchestrator");
   assert.equal(resolveModelFamily("agy", "gemini-4-hydrogen"), "gemini-4-hydrogen");
-  assert.equal(resolveModelFamily("agy", "gemini-3.8-flash"), "gemini-3.8-flash");
 });
 
 test("compileExecutionPrompt compiles all 3 providers x 3 execution roles with zero unresolved placeholders", () => {

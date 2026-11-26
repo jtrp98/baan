@@ -17,7 +17,7 @@ metadata:
 
 ## ขั้นที่ 1 — สำรวจบริบท, หา Root Cause และประเมินสังกัดโมดูล
 
-1. **Reproduce & Trace**: อ่าน Error Stack Trace, logs, และไฟล์ต้นเหตุ (บน Antigravity ส่ง `invoke_subagent` `research` / `flash` ไล่ call path ขนานกันได้)
+1. **Reproduce & Trace**: อ่าน Error Stack Trace, logs, และไฟล์ต้นเหตุ (บน Antigravity ส่ง `invoke_subagent` `research` ไล่ call path ขนานกันได้)
 2. **Root Cause Investigation (Five Whys)**: ห้ามแก้แค่อาการปลายเหตุ ตรวจ data flow ตั้งแต่ input → business logic → DB/API response เพื่อระบุต้นตอจริง (ถ้ามี `<project>/coding-pattern.md` ให้เทียบกับ pattern ที่ควรจะเป็นด้วย)
 3. **ประเมินสังกัดโมดูลผ่าน BAAN Core**:
    ```bash

@@ -21,7 +21,6 @@ export function resolveModelFamily(provider, model = "") {
     if (m.includes("carbon")) return "gemini-4-carbon";
     if (m.includes("neon")) return "gemini-4-neon";
     if (m.includes("hydrogen")) return "gemini-4-hydrogen";
-    if (m.includes("flash")) return "gemini-3.8-flash";
   }
   return m;
 }

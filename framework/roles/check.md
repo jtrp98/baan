@@ -19,7 +19,7 @@ Target repository, Git Diff, Snapshots, Acceptance criteria, Test logs และ
    - ระบุมุมมองความเสี่ยงที่ต้องตรวจสอบ (Risk Lenses: Concurrency, Error Handling, Idempotency, Edge Cases)
    - วางแผนการทดลองหรือ Adversarial Tests เพื่อพิสูจน์สมมติฐาน
 2. **Subagents ตรวจสอบหลายมิติขนานกัน**:
-   - สั่ง Subagents (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปตรวจสอบ diff และ tests แยกตามเลนส์ขนานกัน
+   - สั่ง Subagents (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปตรวจสอบ diff และ tests แยกตามเลนส์ขนานกัน
    - **กฎเหล็ก**: ส่งให้ Subagent เฉพาะ AC, สัญญา และ path เท่านั้น — **ห้ามส่งคำอธิบายหรือข้อแก้ตัวของคนเขียนโค้ดไปให้** เพื่อป้องกัน Shared-Assumption Bias
 3. **ตัวหลักสรุปผลและรายงานหลักฐาน**:
    - นำผลตรวจจริงมาวิเคราะห์ แยกข้อเท็จจริงออกจากคำกล่าวอ้าง

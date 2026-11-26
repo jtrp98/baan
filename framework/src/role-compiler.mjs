@@ -297,7 +297,7 @@ ${rules}
    - \`gemini-pro-orchestrator\` / \`gemini-pro-orchestrator-neon\`: คุมงานหลายส่วน แตกงาน สำรวจและประสาน subagents/workflows
    - \`gemini-4-carbon\`: งานสถาปัตยกรรมซับซ้อน, concurrency/security, DB migration และ critical audit
    - \`gemini-4-neon\`: งานพัฒนาโค้ดมาตรฐาน, State Machine และงานออกแบบ/ตรวจ UI
-   - \`gemini-4-hydrogen\` / \`gemini-3.8-flash\`: งานสำรวจ read-only (\`research\` / \`browser\`) และเขียน/อัปเดตเอกสารตามโครงร่าง
+   - \`gemini-4-hydrogen\`: งานสำรวจ read-only (\`research\` / \`browser\`) และเขียน/อัปเดตเอกสารตามโครงร่าง
 4. **Strict No-Impersonation & Safety**: ห้ามสร้าง approval แทนคน, ห้ามแก้/commit/push/reset \`target/*\` โดยพลการ, หากติดลิมิต/โควตาให้หยุดแจ้งผู้ใช้ทันที, และ **ห้ามติดตั้งลงใน \`target/\`** (\`.agents/\`, \`.claude/\`, \`.codex/\`, \`.baan/\` อยู่ที่ราก workspace เท่านั้น)
 5. **เมื่อสั่งซิงค์ / ส่งงาน**: ใช้ \`baan sync\` (หรือ \`baan sync --all\`) และ \`baan --index\` / \`baan --lint-knowledge\` หลังแก้ Knowledge
 

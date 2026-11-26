@@ -24,7 +24,7 @@ metadata:
    - ส่งต่อให้ `code-review` ผ่าน `invoke_subagent` (หรือ `run_workflow` parallel lenses) โดยส่ง **เฉพาะ AC, contracts, diff และ file paths** (ห้ามส่งคำอธิบายของคนทำ)
    - แก้ประเด็น `Critical`/`High` ทั้งหมดแล้วรัน verification commands ใหม่อีกครั้ง
 4. **UI & Visual Verification (เมื่อแตะหน้าจอ)**:
-   - ตรวจด้วย `browser` subagent (`Model: "flash"`) และกฎ `ui-design-system` ว่าครบ 5 states (`loading/empty/error/disabled/success`) และไม่มี console error
+   - ตรวจด้วย `browser` subagent และกฎ `ui-design-system` ว่าครบ 5 states (`loading/empty/error/disabled/success`) และไม่มี console error
 5. **Knowledge & Defect Sync**:
    - งานบั๊ก: บันทึกผลลง `<project>/defects/BUG-xxx.md` (หรือ `<project>/shared/defects/BUG-xxx.md` ในโปรเจกต์เดิม)
    - งานที่เปลี่ยนโครงสร้าง/คำสั่ง: อัปเดต `repo-map.md` / `plan.md` แล้วรัน `baan --index` และ `baan --lint-knowledge`

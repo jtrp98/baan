@@ -126,7 +126,7 @@ test("เปิดแค่ agy ใน local.json: planner ใช้ Orchestrato
   assert.equal(docsStd.effort, "low");
 
   const docsLight = resolveRoleRoute(realCfg, "docs", { localConfig: agyOnly, tier: "t3" });
-  assert.equal(docsLight.model, "gemini-3.8-flash");
+  assert.equal(docsLight.model, "gemini-4-hydrogen");
 });
 
 test("เปิด 2 ค่าย (codex + agy, ปิด claude): verifier แยกคนละค่ายกับ worker อัตโนมัติ", () => {

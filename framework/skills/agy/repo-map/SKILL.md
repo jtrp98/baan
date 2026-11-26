@@ -19,7 +19,7 @@ metadata:
    ```
    ตรวจ `stacks`, `components`, `entrypoints`, `commands`, `branchStatus` และ `drift`
 2. **สำรวจเชิงลึกแบบขนาน (Read-Only)**:
-   - ใช้ `invoke_subagent` (`TypeName: "research"` หรือ `Model: "flash"`) — หรือ `run_workflow` (`parallel`) เมื่อมีหลาย repo/monorepo — เพื่อสแกน entrypoints, domain modules, dependencies ระหว่าง service/package, จุดเชื่อมต่อ DB/External API, และคำสั่ง build/test จริง
+   - ใช้ `invoke_subagent` (`TypeName: "research"`) — หรือ `run_workflow` (`parallel`) เมื่อมีหลาย repo/monorepo — เพื่อสแกน entrypoints, domain modules, dependencies ระหว่าง service/package, จุดเชื่อมต่อ DB/External API, และคำสั่ง build/test จริง
    - หากมีไฟล์เดิมใน `<project>/INDEX.md` หรือ `modules/` ให้ตรวจสอบเทียบกับโค้ดจริงเพื่อระบุ drift
 3. **เขียน `<project>/repo-map.md` ให้กระชับ (บังคับ ≤ 15 KB)**:
    - ใช้ตารางและ exact paths เท่านั้น หลีกเลี่ยงข้อความบรรยายยาว:

@@ -274,7 +274,6 @@ export function quotaWindows(quota) {
     agy: g?.available ? [
       win("5-HOUR", null, g.gemini5hRemainingPct, g.gemini5hResetsAt),
       win("WEEKLY", null, g.geminiWeeklyRemainingPct, g.geminiWeeklyResetsAt),
-      win("ARGON WEEKLY", null, g.argonWeeklyRemainingPct, g.argonWeeklyResetsAt),
     ] : [],
   };
 }
