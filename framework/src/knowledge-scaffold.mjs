@@ -23,9 +23,50 @@ export function scaffoldKnowledgeModule(kr, projectName, moduleName, options = {
     throw new Error(`ไม่พบโฟลเดอร์ project "${projectName}" ที่ ${projectDir}`);
   }
 
-  const moduleDir = path.join(projectDir, "modules", moduleName);
+  const moduleDir = path.join(projectDir, options.container === "features" ? "features" : "modules", moduleName);
   if (existsSync(moduleDir)) {
     return { ok: false, reason: "already_exists", dir: moduleDir };
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const targetName = options.targetName || projectName;
+  const platform = options.platform || "web";
+  const os = osLine(options.os);
+
+  if (options.lean) {
+    mkdirSync(moduleDir, { recursive: true });
+    const leanIndex = `---
+module: ${moduleName}
+updated: ${today}
+status: draft
+target: ${targetName}
+platform: ${platform}
+os: ${os}
+---
+# ${options.title || moduleName}
+
+${options.summary || `ขอบเขตและแผนงานของ ${moduleName} (Neutral Knowledge)`}
+
+- [plan.md](plan.md) — แผนงาน, Acceptance Criteria และสถานะ
+`;
+    const leanPlan = `# แผนงาน: ${options.title || moduleName}
+
+- **สถานะ:** draft (${today})
+- **Target:** \`${targetName}\`
+
+## Acceptance Criteria
+- **AC-01**: ตรวจสอบพฤติกรรมให้ตรงกับความต้องการและผลทดสอบจริง
+`;
+    writeFileSync(path.join(moduleDir, "INDEX.md"), leanIndex, "utf8");
+    writeFileSync(path.join(moduleDir, "plan.md"), leanPlan, "utf8");
+    if (layoutOf(kr) === "project") updateIndexes(kr.path);
+    return {
+      ok: true,
+      module: moduleName,
+      dir: moduleDir,
+      lean: true,
+      files: [path.join(moduleDir, "INDEX.md"), path.join(moduleDir, "plan.md")],
+    };
   }
 
   for (const slot of ["shared", "design", "build"]) {
@@ -43,11 +84,6 @@ export function scaffoldKnowledgeModule(kr, projectName, moduleName, options = {
   mkdirSync(path.join(moduleDir, "build", "db"), { recursive: true });
   mkdirSync(path.join(moduleDir, "build", "waves"), { recursive: true });
   mkdirSync(path.join(moduleDir, "build", "test-plan"), { recursive: true });
-
-  const today = new Date().toISOString().slice(0, 10);
-  const targetName = options.targetName || projectName;
-  const platform = options.platform || "web";
-  const os = osLine(options.os);
 
   const indexContent = `---
 module: ${moduleName}
@@ -161,6 +197,10 @@ ${options.summary || `โมดูล ${moduleName} สำรวจพบจา�
   };
 }
 
+export function scaffoldKnowledgeFeature(kr, projectName, featureName, options = {}) {
+  return scaffoldKnowledgeModule(kr, projectName, featureName, { ...options, container: "features", lean: true });
+}
+
 export function scaffoldKnowledgeProject(kr, projectName, targetName, options = {}) {
   if (!kr || !kr.path) throw new Error("ต้องระบุ knowledge root");
   if (!projectName || !/^[a-zA-Z0-9_-]+$/.test(projectName)) {
@@ -172,6 +212,47 @@ export function scaffoldKnowledgeProject(kr, projectName, targetName, options = 
     return { ok: false, reason: "already_exists", dir: projectDir };
   }
 
+  const target = targetName || projectName;
+  const platform = options.platform || "web";
+  const os = osLine(options.os);
+
+  if (options.layout === "neutral") {
+    mkdirSync(path.join(projectDir, "features"), { recursive: true });
+    mkdirSync(path.join(projectDir, "decisions"), { recursive: true });
+    mkdirSync(path.join(projectDir, "defects"), { recursive: true });
+    const neutralIndex = `---
+project: ${projectName}
+platform: ${platform}
+os: ${os}
+target: ${target}
+status: draft
+---
+# ${projectName} — Knowledge Hub (3-Provider Neutral)
+
+| เอกสารกลาง | หน้าที่ |
+|---|---|
+| [repo-map.md](repo-map.md) | โครงสร้าง repo, entrypoints, dependencies และคำสั่ง build/test จริง |
+| [coding-pattern.md](coding-pattern.md) | แบบแผนโค้ด, layering, error handling และมาตรฐานการทดสอบ |
+| [ui-design-system.md](ui-design-system.md) | Design System tokens, component rules และ 5 UI states |
+| [decisions/INDEX.md](decisions/INDEX.md) | มติสถาปัตยกรรม (ADR) และบันทึกช่องว่างความรู้ |
+| [defects/INDEX.md](defects/INDEX.md) | ประวัติข้อบกพร่องและ Red-Green test proofs |
+
+## Modules
+
+<!-- baan:modules:start -->
+<!-- baan:modules:end -->
+`;
+    writeFileSync(path.join(projectDir, "INDEX.md"), neutralIndex, "utf8");
+    writeFileSync(path.join(projectDir, "repo-map.md"), `# Repo Map: ${projectName}\n\n- **Target:** \`${target}\`\n\n## Verified Commands\n- \`build\`: -\n- \`test_targeted\`: -\n- \`test_full\`: -\n`, "utf8");
+    writeFileSync(path.join(projectDir, "coding-pattern.md"), `# Coding Pattern: ${projectName}\n\n## Do / Don't\n- ระบุแบบแผนจากไฟล์ต้นแบบจริงใน repo\n`, "utf8");
+    writeFileSync(path.join(projectDir, "ui-design-system.md"), `# UI Design System: ${projectName}\n\n- **Platform:** ${platform}\n`, "utf8");
+    writeFileSync(path.join(projectDir, "decisions", "INDEX.md"), `# Architecture Decisions & Knowledge Gaps: ${projectName}\n`, "utf8");
+    writeFileSync(path.join(projectDir, "defects", "INDEX.md"), `# Defect History Index: ${projectName}\n\n| รหัส | วันที่ | โมดูล | อาการ | สถานะ |\n|---|---|---|---|---|\n`, "utf8");
+    writeFileSync(path.join(projectDir, "features", ".gitkeep"), "", "utf8");
+    if (layoutOf(kr) === "project") updateIndexes(kr.path);
+    return { ok: true, project: projectName, dir: projectDir, layout: "neutral" };
+  }
+
   mkdirSync(path.join(projectDir, "modules"), { recursive: true });
   mkdirSync(path.join(projectDir, "shared", "adr"), { recursive: true });
   mkdirSync(path.join(projectDir, "shared", "oq"), { recursive: true });
@@ -181,10 +262,6 @@ export function scaffoldKnowledgeProject(kr, projectName, targetName, options = 
   mkdirSync(path.join(projectDir, "build", "db"), { recursive: true });
   mkdirSync(path.join(projectDir, "build", "security"), { recursive: true });
   mkdirSync(path.join(projectDir, "build", "plan"), { recursive: true });
-
-  const target = targetName || projectName;
-  const platform = options.platform || "web";
-  const os = osLine(options.os);
 
   const indexContent = `---
 project: ${projectName}

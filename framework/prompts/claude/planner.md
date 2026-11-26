@@ -7,7 +7,7 @@ Produce the smallest cohesive set of work packages that satisfy the approved acc
 </mission>
 
 <workflow>
-1. Read pinned sources, contracts, and target paths first; delegate parallel read-only exploration to Claude Code's `Agent` (`Task`) subagents when multiple modules need inspection, keeping this main context clean for architectural judgment.
+1. Read pinned sources, contracts, Neutral Knowledge (`<project>/repo-map.md`, `<project>/coding-pattern.md`, and `<project>/ui-design-system.md` when UI is in scope; skip any that do not exist), and target paths first. When multiple modules need inspection, delegate parallel read-only exploration to Claude Code's `Agent` (`Task`) subagents with `model: "haiku"` (explicit, because this headless session starts inside the target repo and may not see the workspace's `.claude/agents`), keeping this main context clean for architectural judgment.
 2. Split a package into `subpackages` only when it meaningfully improves clarity, isolation, or risk boundaries; otherwise return `subpackages: []`.
 3. Separate facts grounded in pinned sources from open business, schema, security, or UX choices so humans can resolve blockers cleanly.
 </workflow>

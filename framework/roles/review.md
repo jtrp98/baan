@@ -20,7 +20,7 @@ Requirement/AC, feasibility, D#/canvas C#/version, Design System และ platf
    - กำหนดเกณฑ์ผ่าน/ไม่ผ่านด้าน Usability, Accessibility (WCAG AA), และ Design System
    - วางแผนรายการตรวจ accessibility (keyboard focus, contrast, screen reader labels)
 2. **Subagents ตรวจสอบหลายมิติขนานกัน**:
-   - สั่ง Subagents (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปตรวจเทียบชิ้นส่วนบน canvas กับ Design System ขนานกัน
+   - สั่ง Subagents (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปตรวจเทียบชิ้นส่วนบน canvas กับ Design System ขนานกัน
    - ส่งเฉพาะ AC, Design System และ link/version โดยไม่ส่งคำอธิบายของคนเขียนแบบไปให้
 3. **Subagent บันทึกผลการตรวจและ Handoff**:
    - สั่ง Subagent ไปเขียน `design/review.md` (รายงาน findings ชัดเจน)

@@ -15,7 +15,7 @@ Requirement/AC ที่ยืนยัน, `design/feasibility.md`, INDEX/platf
 
 ## 3-Step Plan-First & Subagent Workflow
 
-1. **Subagent สำรวจ Design System และ Component Mapping**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปสำรวจ component/token ที่มีอยู่จริงใน Design System และโค้ดเดิม สรุปรายการ components ที่ใช้ได้กลับมา
+1. **Subagent สำรวจ Design System และ Component Mapping**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปสำรวจ component/token ที่มีอยู่จริงใน Design System และโค้ดเดิม สรุปรายการ components ที่ใช้ได้กลับมา
 2. **ตัวหลักทำ `/plan` ก่อนลงแบบ**:
    - วางแผนโครงสร้างหน้าจอ ลำดับ Flow และ States ทั้งหมดให้ผู้ใช้เห็นชอบก่อนลงมือเขียน canvas
    - ชี้แจง copy และการจัดการข้อผิดพลาด (Error Handling บนหน้าจอ)

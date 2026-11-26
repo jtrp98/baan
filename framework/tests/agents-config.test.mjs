@@ -32,20 +32,26 @@ test("agents.json ใช้โครงสร้าง Role-Owned Tiers คร�
   assert.equal(cfg.roles.verifier.mustDifferFromWorker, true, "verifier ต้องตั้ง mustDifferFromWorker: true");
 });
 
-test("งานออกแบบระบบและ UX/UI บน agy ยึด gemini-4-neon ทุก tier (ปรับเฉพาะ effort) และ docs t2 ใช้ hydrogen low", () => {
-  for (const role of NEON_PINNED_ROLES) {
-    for (const [tier, td] of Object.entries(cfg.roles[role].tiers)) {
-      assert.equal(td.agy.model, "gemini-4-neon", `${role}/${tier}/agy ต้องยึด gemini-4-neon เสมอ`);
-    }
+test("งานออกแบบระบบและ UX/UI บน agy ใช้ Orchestrator/Carbon/Neon ตาม tier และ docs t2–t3 ใช้ hydrogen low", () => {
+  assert.equal(cfg.roles.planner.tiers.t1.agy.model, "gemini-pro-orchestrator");
+  assert.equal(cfg.roles.planner.tiers.t1.agy.effort, "");
+  assert.equal(cfg.roles.planner.tiers.t3.agy.model, "gemini-pro-orchestrator-neon");
+  assert.equal(cfg.roles.planner.tiers.t3.agy.effort, "");
+  assert.equal(cfg.roles.planner.preference[0], "agy");
+
+  for (const role of ["arch", "survey", "ui", "review"]) {
     assert.equal(cfg.roles[role].preference[0], "agy", `${role} ต้องมี agy เป็น specialist อันดับ 1`);
+    assert.equal(cfg.roles[role].tiers.t1.agy.model, "gemini-4-carbon", `${role}/t1/agy ใช้ gemini-4-carbon`);
+    assert.equal(cfg.roles[role].tiers.t2.agy.model, "gemini-4-neon", `${role}/t2/agy ใช้ gemini-4-neon`);
+    assert.equal(cfg.roles[role].tiers.t3.agy.model, "gemini-4-neon", `${role}/t3/agy ใช้ gemini-4-neon`);
   }
   assert.deepEqual(cfg.roles.docs.tiers.t2.agy, { model: "gemini-4-hydrogen", effort: "low" });
-  assert.deepEqual(cfg.roles.docs.tiers.t3.agy, { model: "gemini-3.8-flash", effort: "low" });
+  assert.deepEqual(cfg.roles.docs.tiers.t3.agy, { model: "gemini-4-hydrogen", effort: "low" });
   assert.deepEqual(cfg.roles.docs.tiers.t1.preference, ["claude", "agy", "codex"]);
   assert.deepEqual(cfg.roles.docs.tiers.t2.preference, ["codex", "claude", "agy"]);
 });
 
-test("Policy Guard: เฉพาะแพ็กเกจ $20/เดือน, ห้าม effort ที่ตกหน้าผาความคุ้มค่า, และต้องมี MODEL-POLICY.md ครบ 11 เกณฑ์", () => {
+test("Policy Guard: เฉพาะแพ็กเกจ $20/เดือน สำหรับ claude/codex, agy ใช้ entitled lineup, ห้าม effort ที่ตกหน้าผาความคุ้มค่า, และต้องมี MODEL-POLICY.md ครบ 11 เกณฑ์", () => {
   const policyPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "MODEL-POLICY.md");
   assert.ok(existsSync(policyPath), "ต้องมี framework/MODEL-POLICY.md คู่กับ agents.json");
   const policyText = readFileSync(policyPath, "utf8");
@@ -54,7 +60,7 @@ test("Policy Guard: เฉพาะแพ็กเกจ $20/เดือน, �
   assert.match(policyText, /Cost per Successful Task/);
   assert.match(policyText, /Risk & Verification/);
 
-  const forbiddenModels = new Set(["fable", "gemini-4-carbon", "gpt-6-luna"]);
+  const forbiddenModels = new Set(["fable", "gpt-6-luna", "gemini-3.8-flash", "gemini-4-argon"]);
   const allowedXhighRoles = new Set(["planner", "arch", "dba", "worker", "build", "verifier", "check"]);
 
   for (const [role, def] of Object.entries(cfg.roles)) {

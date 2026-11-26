@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { getAdapter, listSupportedAdapters, isNativeAdapter } from "../src/adapters/registry.mjs";
 import { ClaudeAdapter } from "../src/adapters/claude.mjs";
 import { CodexAdapter } from "../src/adapters/codex.mjs";
@@ -65,6 +68,39 @@ test("claude adapter: safe defaults vs opt-in bypass", () => {
   assert.equal(readOnly.args[readOnly.args.indexOf("--append-system-prompt-file") + 1], "C:/ws/.baan/runs/r1/WP-1-verifier.system.md");
   assert.equal(readOnly.usesSystemPromptChannel, true);
   assert.ok(!readOnly.args.includes("--strict-mcp-config"));
+});
+
+test("claude adapter: probe reads hooks from .claude/settings.json and workspace-root skills/agents", async () => {
+  const ws = mkdtempSync(path.join(tmpdir(), "baan-claude-probe-"));
+  try {
+    const target = path.join(ws, "target", "app");
+    mkdirSync(path.join(target, ".claude", "hooks"), { recursive: true });
+    const def = { command: "nonexistent-claude-binary-xyz" };
+    const adapter = new ClaudeAdapter();
+
+    const bare = await adapter.probe(def, { cwd: target });
+    assert.equal(bare.hooks, false, "a .claude/hooks/ folder is not where Claude Code reads hooks");
+    assert.equal(bare.skills, false);
+    assert.equal(bare.customInstructions, false);
+
+    mkdirSync(path.join(ws, ".claude", "skills", "bug-fix"), { recursive: true });
+    mkdirSync(path.join(ws, ".claude", "agents"), { recursive: true });
+    writeFileSync(path.join(ws, ".claude", "agents", "scout.md"), "---\nname: scout\n---\n", "utf8");
+    writeFileSync(path.join(ws, "CLAUDE.md"), "# ws\n", "utf8");
+    writeFileSync(path.join(ws, ".claude", "settings.json"), JSON.stringify({
+      hooks: { Stop: [{ matcher: ".*", hooks: [{ type: "command", command: "node .baan/hooks/baan-live-telemetry.mjs claude" }] }] },
+    }), "utf8");
+
+    const res = await adapter.probe(def, { cwd: target, workspaceRoot: ws });
+    assert.equal(res.hooks, true);
+    assert.equal(res.details.baanTelemetryHook, true);
+    assert.equal(res.skills, true);
+    assert.equal(res.customInstructions, true);
+    assert.deepEqual(res.details.skills, ["bug-fix"]);
+    assert.deepEqual(res.details.agents, ["scout"]);
+  } finally {
+    rmSync(ws, { recursive: true, force: true });
+  }
 });
 
 test("codex adapter: safe defaults vs opt-in bypass and resume grammar", () => {

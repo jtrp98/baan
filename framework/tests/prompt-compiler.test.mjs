@@ -13,8 +13,10 @@ test("resolveModelFamily maps provider models across all 3 providers", () => {
   assert.equal(resolveModelFamily("codex", "gpt-6.2-sol"), "gpt-6.2-sol");
   assert.equal(resolveModelFamily("codex", "gpt-6.1-terra"), "gpt-6.1-terra");
   assert.equal(resolveModelFamily("agy", "gemini-4-neon"), "gemini-4-neon");
+  assert.equal(resolveModelFamily("agy", "gemini-4-carbon"), "gemini-4-carbon");
+  assert.equal(resolveModelFamily("agy", "gemini-pro-orchestrator"), "gemini-pro-orchestrator");
+  assert.equal(resolveModelFamily("agy", "gemini-pro-orchestrator-neon"), "gemini-pro-orchestrator");
   assert.equal(resolveModelFamily("agy", "gemini-4-hydrogen"), "gemini-4-hydrogen");
-  assert.equal(resolveModelFamily("agy", "gemini-3.8-flash"), "gemini-3.8-flash");
 });
 
 test("compileExecutionPrompt compiles all 3 providers x 3 execution roles with zero unresolved placeholders", () => {
@@ -84,10 +86,15 @@ test("Core Contract Zero-Drift Guard: non-negotiable BAAN invariants appear in a
 
 test("Model-Family Overlay injects distinct model guidance within the same provider", () => {
   const neon = compileExecutionPrompt({ provider: "agy", role: "worker", model: "gemini-4-neon", effort: "high", packet: {} });
+  const carbon = compileExecutionPrompt({ provider: "agy", role: "worker", model: "gemini-4-carbon", effort: "high", packet: {} });
+  const orch = compileExecutionPrompt({ provider: "agy", role: "planner", model: "gemini-pro-orchestrator", effort: "", packet: {} });
   const hydrogen = compileExecutionPrompt({ provider: "agy", role: "worker", model: "gemini-4-hydrogen", effort: "low", packet: {} });
   assert.match(neon.systemPrompt, /Gemini 4 Neon/);
+  assert.match(carbon.systemPrompt, /Gemini 4 Carbon/);
+  assert.match(orch.systemPrompt, /Antigravity Orchestrator/);
   assert.match(hydrogen.systemPrompt, /Gemini 4 Hydrogen/);
   assert.notEqual(neon.systemPrompt, hydrogen.systemPrompt);
+  assert.notEqual(carbon.systemPrompt, neon.systemPrompt);
 
   const astra = compileExecutionPrompt({ provider: "codex", role: "worker", model: "gpt-6.2-astra", effort: "high", packet: {} });
   const sol = compileExecutionPrompt({ provider: "codex", role: "worker", model: "gpt-6.2-sol", effort: "xhigh", packet: {} });

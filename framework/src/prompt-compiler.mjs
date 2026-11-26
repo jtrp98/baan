@@ -17,9 +17,10 @@ export function resolveModelFamily(provider, model = "") {
     if (m.includes("sol")) return "gpt-6.2-sol";
     if (m.includes("terra")) return "gpt-6.1-terra";
   } else if (provider === "agy") {
+    if (m.includes("orchestrator")) return "gemini-pro-orchestrator";
+    if (m.includes("carbon")) return "gemini-4-carbon";
     if (m.includes("neon")) return "gemini-4-neon";
     if (m.includes("hydrogen")) return "gemini-4-hydrogen";
-    if (m.includes("flash")) return "gemini-3.8-flash";
   }
   return m;
 }

@@ -5,8 +5,10 @@ import {
   STUB_MARKER,
   TOML_STUB_MARKER,
   TEAM_AGENTS,
+  CLAUDE_HELPER_AGENTS,
   compileWorkspaceStub,
   compileClaudeAgent,
+  compileClaudeHelperAgent,
   compileAgyAgent,
   compileCodexAgentToml,
 } from "./role-compiler.mjs";
@@ -80,15 +82,56 @@ function writeManaged(file, content, results, log, opts = {}) {
 
 const SKILL_MARKER = ".baan-managed";
 
+export const PROVIDER_SKILLS = {
+  agy: [
+    "repo-map",
+    "coding-pattern",
+    "ui-design-system",
+    "api-db-contract",
+    "plan",
+    "bug-fix",
+    "code-review",
+    "verify-before-done",
+    "knowledge-handoff",
+  ],
+  claude: [
+    "repo-map",
+    "coding-pattern",
+    "ui-design-system",
+    "api-db-contract",
+    "knowledge-handoff",
+    "bug-fix",
+    "feature-flow",
+    "req-grill",
+    "wave-plan",
+  ],
+};
+
+// Shared with every provider (baan flow reads them by absolute path); Claude installs these from skills/ root, the rest from skills/claude.
+export const CLAUDE_SHARED_SKILLS = ["bug-fix", "feature-flow", "req-grill", "wave-plan"];
+
 function installSkills(teamDir, targetDir, results, log) {
   const src = path.join(teamDir, "skills");
   if (!existsSync(src)) return;
-  const roots = [
-    path.join(targetDir, ".claude", "skills"),
-    path.join(targetDir, ".agents", "skills"),
+  const targets = [
+    { root: path.join(targetDir, ".agents", "skills"), srcDir: path.join(src, "agy"), names: PROVIDER_SKILLS.agy },
+    { root: path.join(targetDir, ".claude", "skills"), srcDir: path.join(src, "claude"), names: PROVIDER_SKILLS.claude, shared: new Set(CLAUDE_SHARED_SKILLS) },
   ];
-  for (const name of readdirSync(src)) {
-    for (const root of roots) {
+  for (const { root, srcDir, names, shared } of targets) {
+    const allowed = new Set(names);
+    if (existsSync(root)) {
+      for (const existingName of readdirSync(root)) {
+        if (allowed.has(existingName)) continue;
+        const staleDir = path.join(root, existingName);
+        if (existsSync(path.join(staleDir, SKILL_MARKER))) {
+          rmSync(staleDir, { recursive: true, force: true });
+          log(`ลบ skill รุ่นเก่าของ baan ออกจาก ${root}: ${existingName}`);
+        }
+      }
+    }
+    for (const name of names) {
+      const skillSrc = shared?.has(name) ? path.join(src, name) : path.join(srcDir, name);
+      if (!existsSync(skillSrc)) continue;
       const dest = path.join(root, name);
       if (existsSync(dest) && !existsSync(path.join(dest, SKILL_MARKER))) {
         results.skipped.push(dest);
@@ -96,11 +139,31 @@ function installSkills(teamDir, targetDir, results, log) {
         continue;
       }
       rmSync(dest, { recursive: true, force: true });
-      cpSync(path.join(src, name), dest, { recursive: true });
-      writeFileSync(path.join(dest, SKILL_MARKER), `ติดตั้งโดย baan --init จาก ${path.join(src, name)} — รัน baan --init ซ้ำเพื่ออัปเดต\n`, "utf8");
+      cpSync(skillSrc, dest, { recursive: true });
+      writeFileSync(path.join(dest, SKILL_MARKER), `ติดตั้งโดย baan --init จาก ${skillSrc} — รัน baan --init ซ้ำเพื่ออัปเดต\n`, "utf8");
       results.design.push(dest);
     }
   }
+}
+
+// Antigravity uses native Orchestrator + built-in/dynamic subagents instead of static 10-role .agents/agents/*.md stubs.
+function cleanupObsoleteAgyAgents(targetDir, log) {
+  const dir = path.join(targetDir, ".agents", "agents");
+  if (!existsSync(dir)) return;
+  let removed = 0;
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry);
+    try {
+      if (entry.endsWith(".md") && readFileSync(full, "utf8").includes(STUB_MARKER)) {
+        rmSync(full, { force: true });
+        removed++;
+      }
+    } catch { /* ignore */ }
+  }
+  if (removed) log(`ลบ .agents/agents/*.md รุ่นเก่าของ baan ${removed} ไฟล์ (ฝั่ง Antigravity ใช้ Native Orchestrator + Common Skills แล้ว)`);
+  try {
+    if (readdirSync(dir).length === 0) rmSync(dir, { recursive: true, force: true });
+  } catch { /* ignore */ }
 }
 
 function removeObsoletePencil(targetDir, log) {
@@ -180,7 +243,7 @@ export function installTelemetryHooks(workspaceDir, teamDir, results = { hooks: 
   const agyHook = {
     SessionStart: [{ type: "command", command: agyCmd, timeout: 5 }],
     PreInvocation: [{ type: "command", command: agyCmd, timeout: 5 }],
-    PreToolUse: [{ matcher: "invoke_subagent", hooks: [{ type: "command", command: agyCmd, timeout: 5 }] }],
+    PreToolUse: [{ matcher: "invoke_subagent|run_workflow|define_subagent", hooks: [{ type: "command", command: agyCmd, timeout: 5 }] }],
     PostToolUse: [{ matcher: ".*", hooks: [{ type: "command", command: agyCmd, timeout: 5 }] }],
     Stop: [{ type: "command", command: agyCmd, timeout: 5 }],
   };
@@ -196,11 +259,14 @@ export function installTelemetryHooks(workspaceDir, teamDir, results = { hooks: 
     [path.join(workspaceDir, ".agents", "hooks.json"), (cur) => ({ ...cur, "baan-live-telemetry": agyHook })],
     [path.join(workspaceDir, ".claude", "settings.json"), (cur) => mergeHookEvents(cur, {
       SessionStart: [makeEntry(claudeCmd)],
-      PreToolUse: [makeEntry(claudeCmd, ".*")],
+      UserPromptSubmit: [makeEntry(claudeCmd)],
+      // Only subagent launches need PreToolUse; a node process per tool call would add latency to every step.
+      PreToolUse: [makeEntry(claudeCmd, "Agent|Task")],
       PostToolUse: [makeEntry(claudeCmd, ".*")],
       SubagentStart: [makeEntry(claudeCmd)],
       SubagentStop: [makeEntry(claudeCmd)],
       Stop: [makeEntry(claudeCmd)],
+      SessionEnd: [makeEntry(claudeCmd)],
     })],
     [path.join(workspaceDir, ".codex", "hooks.json"), (cur) => mergeHookEvents(cur, {
       SessionStart: [makeEntry(codexCmd)],
@@ -251,7 +317,6 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
 
   for (const id of Object.keys(TEAM_AGENTS)) {
     writeManaged(path.join(targetDir, ".claude", "agents", `${id}.md`), compileClaudeAgent(id, teamDir), results, log);
-    writeManaged(path.join(targetDir, ".agents", "agents", `${id}.md`), compileAgyAgent(id, teamDir), results, log);
     writeManaged(
       path.join(targetDir, ".codex", "agents", `${id}.toml`),
       compileCodexAgentToml(id, teamDir),
@@ -260,11 +325,15 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
       { marker: TOML_STUB_MARKER, endMarker: TOML_END_MARKER }
     );
   }
+  for (const id of Object.keys(CLAUDE_HELPER_AGENTS)) {
+    writeManaged(path.join(targetDir, ".claude", "agents", `${id}.md`), compileClaudeHelperAgent(id, teamDir), results, log);
+  }
+  cleanupObsoleteAgyAgents(targetDir, log);
   removeObsoletePencil(targetDir, log);
   removeObsoleteBaanCmd(targetDir, log);
   installSkills(teamDir, targetDir, results, log);
   installTelemetryHooks(targetDir, teamDir, results, log);
-  if (results.design.length) log(`วาง native agents ครบ 3 ค่ายและ skills ${results.design.length} รายการ (.claude/agents · .codex/agents · .agents/agents · skills)`);
+  if (results.design.length) log(`วาง native agents (claude: 10 บทบาท + scout/scribe/auditor · codex) และ skills แยกตามค่าย ${results.design.length} รายการ (.claude · .codex · .agents/skills)`);
   if (results.hooks.length) log(`ติดตั้ง/อัปเดต live telemetry hooks ${results.hooks.length} ไฟล์ที่ราก workspace (agy · claude · codex)`);
 
   const charterPath = path.join(teamDir, "BAAN.md");

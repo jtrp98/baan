@@ -10,7 +10,7 @@
 <workspace-root>/
 ├── baan.config.json       # ไฟล์ตั้งค่าระบุ knowledge_roots, memory_root และ targets
 ├── AGENTS.md / CLAUDE.md  # สร้างอัตโนมัติด้วย `baan --init` (ชี้ไปที่ charter ของ BAAN)
-├── .claude/               # เก็บ Interactive Roles และ Skills ที่ติดตั้งด้วย `baan --init`
+├── .claude/               # Interactive Roles + helper agents (scout/scribe/auditor), Skills และ hooks (settings.json) ที่ติดตั้งด้วย `baan --init`
 ├── knowledge/             # [Git repo แยก] สำหรับเก็บ Architecture, Requirements, Specs, ADR
 ├── memory/                # [Git repo แยก] สำหรับเก็บประวัติการรันและ audit trail
 └── target/                # [Git repos แยก] สำหรับเก็บโค้ดจริง (API, Web, Mobile ฯลฯ)

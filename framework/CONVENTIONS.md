@@ -22,7 +22,8 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 ## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 
 Subagents ของแต่ละ CLI (codex: `collaboration.spawn_agent` + `collaboration.wait_agent` · Claude Code: the `Agent` (`Task`) tool · agy: `invoke_subagent`) ได้รับอนุญาตทั้งในโหมดอ่านและโหมดเขียน เพื่อช่วยให้งานเสร็จเร็วขึ้นตาม 3-Step Workflow:
-- **ขั้นที่ 1 — สำรวจบริบท**: ใช้ Subagent (รุ่นเร็ว/ประหยัด เช่น sonnet/haiku บน Claude, flash บน agy) ค้นหาโค้ดหรือเอกสารขนานกัน แล้วส่งกลับเฉพาะข้อสรุปเพื่อรักษา Context ตัวหลักให้สะอาด
+- **ขั้นที่ 1 — สำรวจบริบท**: ใช้ Subagent (รุ่นเร็ว/ประหยัด เช่น `scout` (haiku) บน Claude แทน built-in `Explore` ที่รันบน opus เมื่อใช้แพ็ก subscription, hydrogen บน agy) ค้นหาโค้ดหรือเอกสารขนานกัน แล้วส่งกลับเฉพาะข้อสรุปเพื่อรักษา Context ตัวหลักให้สะอาด
+- **Claude Code helper agents**: `scout` (haiku, read-only สำรวจ), `scribe` (haiku, เขียน knowledge ตามโครงที่อนุมัติ) และ `auditor` (opus, ตรวจอิสระ read-only รับเฉพาะ AC/สัญญา/diff/path) — โมเดลอ้างจาก `agents.json` (`docs.t3` / `docs.t2` / `verifier.t3`); role agents ใน `.claude/agents/` preload สกิลประจำบทบาทผ่าน frontmatter `skills:` และมี `Agent` ในเครื่องมือจึงส่ง subagent ซ้อนต่อได้
 - **ขั้นที่ 2 — ตัวหลักวางแผน (/plan first)**: ตัวหลักวิเคราะห์และทำข้อตกลง/สอน/ท้าทายกับผู้ใช้จนได้ Approved Plan
 - **ขั้นที่ 3 — เขียนเอกสาร/ลงมือทำ**: สั่ง Subagent ไปเขียน Docs ยาวๆ (`requirements.md`, `adr/`, `feasibility.md` ฯลฯ) หรือทำงานย่อยตามแผน
 - **กฎเหล็กการเขียน**: หนึ่ง writer ต่อ repository เสมอ — Subagent เขียนได้เฉพาะไฟล์ที่ไม่มีใครแตะ และ Subagent ที่ใช้ตรวจงานต้องได้รับเฉพาะ AC/สัญญา/path เท่านั้น ห้ามส่งคำอธิบายของคนทำไปให้ (ป้องกัน Shared-Assumption Bias)
@@ -51,9 +52,16 @@ Rework สูงสุดตาม budget (default 2) แล้วถามค�
 
 ## Layout และเจ้าของ
 
-`layout: project`: 
-- **ระดับ Project (`<project>/`)**: เก็บเฉพาะสิ่งที่เป็น Cross-Cutting ทั้งโปรเจกต์ (`INDEX.md` เป็น Master Portal, `shared/` ความจริงร่วม/Glossary/ADR/ดัชนี REQ รวม, `design/` Design System กลาง/Brand Assets, `build/` สถาปัตยกรรมเชื่อมระบบรวม `build/architecture/` และ Shared DB `build/db/` — *ห้ามตั้งชื่อโฟลเดอร์ build/design ซ้ำซ้อนกับ design UX/UI*)
-- **ระดับ Module (`<project>/modules/<module>/`)**: ของโดเมนไหนต้องจบในโมดูลนั้นครบ 3 ช่อง (`shared/`, `design/`, `build/`) และมี `INDEX.md` ประจำโมดูล
+`layout: project` รองรับทั้ง **3-Provider Neutral Knowledge v2** และ **โครงสร้าง 3-slot เดิม** ควบคู่กัน (Backward-Compatible):
+- **Neutral Knowledge v2 (แนะนำสำหรับโปรเจกต์ใหม่และทำงานข้าม 3 ค่าย)**:
+  - `<project>/INDEX.md` — ทางเข้าและตาราง module/feature จาก `baan --index`
+  - `<project>/repo-map.md` (≤ 25 KB) — โครงสร้าง repo, entrypoints, dependencies, และคำสั่ง build/test จริง
+  - `<project>/coding-pattern.md` (≤ 25 KB) — แบบแผนโค้ด, layering, error handling, DB/concurrency และ test patterns
+  - `<project>/ui-design-system.md` (≤ 25 KB) — Design tokens, component rules และ 5 UI states
+  - `<project>/decisions/` (ADR + Knowledge Gaps) · `<project>/defects/` (ประวัติบั๊ก) · `<project>/features/<feature>/` (`INDEX.md` + `plan.md` + `contracts/`/`screens/`)
+- **โครงสร้าง 3-slot เดิม (`<project>/` และ `<project>/modules/<module>/`)**:
+  - **ระดับ Project (`<project>/`)**: เก็บเฉพาะสิ่งที่เป็น Cross-Cutting ทั้งโปรเจกต์ (`INDEX.md` เป็น Master Portal, `shared/` ความจริงร่วม/Glossary/ADR/ดัชนี REQ รวม, `design/` Design System กลาง/Brand Assets, `build/` สถาปัตยกรรมเชื่อมระบบรวม `build/architecture/` และ Shared DB `build/db/` — *ห้ามตั้งชื่อโฟลเดอร์ build/design ซ้ำซ้อนกับ design UX/UI*)
+  - **ระดับ Module (`<project>/modules/<module>/`)**: ของโดเมนไหนต้องจบในโมดูลนั้นครบ 3 ช่อง (`shared/`, `design/`, `build/`) และมี `INDEX.md` ประจำโมดูล
 - **Folder-First & Progressive Disclosure**: เพื่อป้องกัน Context Bloat ของ AI ให้ใช้โฟลเดอร์ย่อยที่มี `INDEX.md` คุมหน้าบ้านเสมอ (`shared/requirements/`, `shared/oq/`, `design/feasibility/`, `design/screens/`, `build/contracts/`, `build/db/`, `build/waves/`, `build/test-plan/`)
   - ไฟล์ `INDEX.md` ต้องสั้นกระชับ (ห้ามเกิน 20 KB) ห้ามใส่ประวัติยาวหรือบันทึก Canvas ย้อนหลังลงใน INDEX
   - ไฟล์ `.md` ทั่วไปไม่ควรเกิน 50 KB หากยาวให้แยกไฟล์ย่อย และคำถาม OQ ที่ตอบแล้วให้ย้ายไป `oq/resolved/`

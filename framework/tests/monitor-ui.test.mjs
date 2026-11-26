@@ -113,7 +113,7 @@ test("pixel-ui: quota warning levels and missing quota is unavailable, not zero"
   const q = {
     claude: { available: true, sessionUsedPct: 95, sessionRemainingPct: 5, weeklyUsedPct: 40, weeklyRemainingPct: 60 },
     codex: { available: false },
-    agy: { available: true, gemini5hRemainingPct: null, geminiWeeklyRemainingPct: 80, argonWeeklyRemainingPct: null },
+    agy: { available: true, gemini5hRemainingPct: null, geminiWeeklyRemainingPct: 80 },
   };
   const w = quotaWindows(q);
   assert.equal(w.claude[0].remainingPct, 5);
@@ -211,7 +211,7 @@ test("pixel-ui: liveSessions (live-chat + nested subagents) route CHAT_ROLES ont
       },
       {
         source: "hook", isSubagent: true, parentSessionId: "conv-parent", sessionId: "conv-child",
-        provider: "agy", model: "gemini-3.8-flash", role: "spec", roleLabel: "spec: standalone",
+        provider: "agy", model: "gemini-4-hydrogen", role: "spec", roleLabel: "spec: standalone",
         title: "Survey auth flow", repoName: "sb-web-school-robot", repoPath: "C:/src/schoolbright/target/sb-web-school-robot",
         startedAt: T0, updatedAt: T0, recentActivity: { type: "tool", name: "read_file", detail: "auth.ts" },
       },

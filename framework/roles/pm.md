@@ -13,7 +13,7 @@ Project/module INDEX, แผนงานปัจจุบัน, `shared/requir
 
 ## 3-Step Plan-First & Subagent Workflow
 
-1. **Subagent สำรวจความคืบหน้าและขอบเขต**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `flash` บน agy) ไปกวาดอ่านผลจาก SA/DBA (`build/contracts/`, `build/db/`), `build/waves/INDEX.md`, dependencies, และ backlog สรุปภาพรวมขอบเขตกลับมา
+1. **Subagent สำรวจความคืบหน้าและขอบเขต**: สั่ง Subagent (รุ่นเร็ว/ประหยัด เช่น `sonnet` บน Claude หรือ `hydrogen` บน agy) ไปกวาดอ่านผลจาก SA/DBA (`build/contracts/`, `build/db/`), `build/waves/INDEX.md`, dependencies, และ backlog สรุปภาพรวมขอบเขตกลับมา
 2. **ตัวหลักทำ `/plan` & Decision Quality Gate (8 คำถาม) + `wave-plan`**:
    - นำเสนอการประเมิน Scope, Risk (High/Low), ต้นทุนเวลา/ทรัพยากร, และ Priority
    - ท้าทายผู้ใช้ด้วยคำถาม: "เรากำลังแก้ปัญหาอะไร?", "ทำไมต้องแก้ตอนนี้?", "มีทางเลือกที่ง่ายกว่าหรือไม่?"

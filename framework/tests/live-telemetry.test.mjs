@@ -57,6 +57,8 @@ test("live-telemetry: infers explicit BAAN roles only, never guesses ambiguous t
   assert.equal(inferBaanRole({ agentType: "survey" }), "survey");
   assert.equal(inferBaanRole({ roleLabel: "spec: standalone login" }), "spec");
   assert.equal(inferBaanRole({ roleLabel: "arch - API design" }), "arch");
+  assert.equal(inferBaanRole({ agentType: "research" }), "research");
+  assert.equal(inferBaanRole({ agentType: "browser" }), "browser");
   assert.equal(inferBaanRole({ roleLabel: "Survey current auth flow" }), null);
   assert.equal(inferBaanRole({ roleLabel: "Inventory features by role" }), null);
 });
@@ -140,6 +142,19 @@ test("live-telemetry: Antigravity parent + nested subagent upgrade & Stop(fullyI
     assert.equal(child.parentSessionId, "parent-1");
     assert.equal(child.role, "spec");
 
+    processHookEvent({
+      hookEventName: "PreToolUse",
+      conversationId: "parent-1",
+      workspacePaths: [ws],
+      toolCall: {
+        id: "call-wf-1",
+        name: "run_workflow",
+        args: { Description: "Parallel lens audit" },
+      },
+      cwd: ws,
+    }, { providerHint: "agy", now: t0 });
+    assert.equal(scanLiveSessions(ws, { now: Date.parse(t0) }).some((s) => s.isSubagent && s.title === "Parallel lens audit"), true);
+
     // Child completes, then parent finishes fullyIdle.
     processHookEvent({ hookEventName: "Stop", conversationId: "child-conv-1", workspacePaths: [ws], fullyIdle: true, cwd: ws }, { providerHint: "agy", now: t2 });
     processHookEvent({ hookEventName: "Stop", conversationId: "parent-1", workspacePaths: [ws], fullyIdle: true, cwd: ws }, { providerHint: "agy", now: t2 });
@@ -168,6 +183,70 @@ test("live-telemetry: Claude SubagentStart/SubagentStop and Codex spawn_agent li
     processHookEvent({ hook_event_name: "Stop", session_id: "c1", cwd: ws }, { providerHint: "claude", now: t0 });
     processHookEvent({ hook_event_name: "Stop", session_id: "x1", cwd: ws }, { providerHint: "codex", now: t0 });
     assert.deepEqual(scanLiveSessions(ws, { now: Date.parse(t0) }), []);
+  } finally {
+    rmSync(ws, { recursive: true, force: true });
+  }
+});
+
+test("live-telemetry: Claude Agent launch + SubagentStart is one record, child tools stay off the parent, background survives PostToolUse", () => {
+  const ws = mkdtempSync(path.join(tmpdir(), "baan-live-claude-agent-"));
+  try {
+    writeFileSync(path.join(ws, "baan.config.json"), "{}", "utf8");
+    const t0 = "2026-11-26T10:00:00.000Z";
+    const opts = { providerHint: "claude", now: t0 };
+    processHookEvent({ hook_event_name: "UserPromptSubmit", session_id: "p1", cwd: ws, prompt: "[baan: arch]\nออกแบบ API ใหม่" }, opts);
+    let live = scanLiveSessions(ws, { now: Date.parse(t0) });
+    assert.equal(live.length, 1);
+    assert.equal(live[0].role, "arch");
+    assert.match(live[0].title, /ออกแบบ API/);
+
+    processHookEvent({
+      hook_event_name: "PreToolUse", session_id: "p1", cwd: ws, tool_use_id: "tu1", tool_name: "Agent",
+      tool_input: { description: "scan auth module", prompt: "อ่าน src/auth", subagent_type: "scout" },
+    }, opts);
+    const start = processHookEvent({ hook_event_name: "SubagentStart", session_id: "p1", cwd: ws, agent_id: "ag1", agent_type: "scout" }, opts);
+    assert.equal(start.adopted, true);
+    live = scanLiveSessions(ws, { now: Date.parse(t0) });
+    assert.equal(live.length, 2, "launch stub and SubagentStart must collapse into one child record");
+    const child = live.find((s) => s.isSubagent);
+    assert.equal(child.sessionId, "ag1");
+    assert.equal(child.role, "scout");
+
+    processHookEvent({
+      hook_event_name: "PostToolUse", session_id: "p1", cwd: ws, agent_id: "ag1", agent_type: "scout",
+      tool_use_id: "tu2", tool_name: "Grep", tool_input: { pattern: "authorize" },
+    }, opts);
+    live = scanLiveSessions(ws, { now: Date.parse(t0) });
+    assert.equal(live.find((s) => s.isSubagent).recentActivity.name, "Grep");
+    assert.notEqual(live.find((s) => !s.isSubagent).recentActivity?.name, "Grep", "child tool activity must not overwrite the parent chat");
+
+    // Background launch returns at once; the child must stay live until SubagentStop.
+    processHookEvent({
+      hook_event_name: "PostToolUse", session_id: "p1", cwd: ws, tool_use_id: "tu1", tool_name: "Agent",
+      tool_input: { subagent_type: "scout" }, tool_response: { status: "async_launched", agentId: "ag1" },
+    }, opts);
+    assert.equal(scanLiveSessions(ws, { now: Date.parse(t0) }).filter((s) => s.isSubagent).length, 1);
+
+    processHookEvent({ hook_event_name: "SubagentStop", session_id: "p1", cwd: ws, agent_id: "ag1", agent_type: "scout" }, opts);
+    processHookEvent({ hook_event_name: "SessionEnd", session_id: "p1", cwd: ws }, opts);
+    assert.deepEqual(scanLiveSessions(ws, { now: Date.parse(t0) }), []);
+  } finally {
+    rmSync(ws, { recursive: true, force: true });
+  }
+});
+
+test("live-telemetry: Claude built-in Explore maps to research; general-purpose adopts an untyped Agent launch", () => {
+  assert.equal(inferBaanRole({ agentType: "Explore" }), "research");
+  const ws = mkdtempSync(path.join(tmpdir(), "baan-live-claude-gp-"));
+  try {
+    writeFileSync(path.join(ws, "baan.config.json"), "{}", "utf8");
+    const opts = { providerHint: "claude", now: "2026-11-26T10:00:00.000Z" };
+    processHookEvent({ hook_event_name: "PreToolUse", session_id: "p2", cwd: ws, tool_use_id: "tu9", tool_name: "Agent", tool_input: { description: "check: run tests", prompt: "รันเทสต์" } }, opts);
+    const start = processHookEvent({ hook_event_name: "SubagentStart", session_id: "p2", cwd: ws, agent_id: "ag9", agent_type: "general-purpose" }, opts);
+    assert.equal(start.adopted, true);
+    const kids = scanLiveSessions(ws, { now: Date.parse(opts.now) }).filter((s) => s.isSubagent);
+    assert.equal(kids.length, 1);
+    assert.equal(kids[0].role, "check");
   } finally {
     rmSync(ws, { recursive: true, force: true });
   }

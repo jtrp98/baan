@@ -6,6 +6,31 @@ import { BaseAdapter } from "./base.mjs";
 import { extractJson } from "../plan.mjs";
 
 let cachedVersion = null;
+let cachedAgyCommand = null;
+
+export function isOrchestratorModel(model = "") {
+  return /^gemini-pro-orchestrator/i.test(String(model ?? "").trim());
+}
+
+export function resolveAgyCommand(def) {
+  const configured = def?.command || "agy";
+  if (configured !== "agy") return configured;
+  if (cachedAgyCommand) return cachedAgyCommand;
+  if (process.platform === "win32") {
+    try {
+      execFileSync("where.exe", ["agy"], { stdio: "ignore", windowsHide: true });
+      cachedAgyCommand = "agy";
+      return cachedAgyCommand;
+    } catch {
+      const localAgy = path.join(process.env.LOCALAPPDATA || "", "agy", "bin", "agy.exe");
+      if (existsSync(localAgy)) {
+        cachedAgyCommand = localAgy;
+        return cachedAgyCommand;
+      }
+    }
+  }
+  return configured;
+}
 
 export class AgyAdapter extends BaseAdapter {
   constructor() {
@@ -13,11 +38,12 @@ export class AgyAdapter extends BaseAdapter {
   }
 
   async probe(def, opts = {}) {
+    const agyCmd = resolveAgyCommand(def);
     let cliVersion = cachedVersion;
     let available = false;
     if (!cliVersion) {
       try {
-        const out = execFileSync(def?.command || "agy", ["--version"], { encoding: "utf8", windowsHide: true });
+        const out = execFileSync(agyCmd, ["--version"], { encoding: "utf8", windowsHide: true });
         cliVersion = out.trim().split(/\r?\n/)[0];
         cachedVersion = cliVersion;
         available = true;
@@ -30,6 +56,8 @@ export class AgyAdapter extends BaseAdapter {
 
     const homeSettingsPath = path.join(homedir(), ".gemini", "antigravity-cli", "settings.json");
     let entitledModels = null;
+    let orchestratorModels = [];
+    let baseModels = [];
     let settings = {};
     if (existsSync(homeSettingsPath)) {
       try { settings = JSON.parse(readFileSync(homeSettingsPath, "utf8")); } catch {}
@@ -37,17 +65,25 @@ export class AgyAdapter extends BaseAdapter {
 
     if (available) {
       try {
-        const modelsOut = execFileSync(def?.command || "agy", ["models"], { encoding: "utf8", windowsHide: true });
+        const modelsOut = execFileSync(agyCmd, ["models"], { encoding: "utf8", windowsHide: true });
         entitledModels = modelsOut
           .split(/\r?\n/)
           .map((l) => l.trim())
-          .filter((l) => l && !l.startsWith("Available") && !l.startsWith("---"));
+          .filter((l) => l && !l.startsWith("Available") && !l.startsWith("---") && !l.startsWith("Fetching"))
+          .map((l) => l.split(/\t/)[0].trim())
+          .filter(Boolean);
+        orchestratorModels = entitledModels.filter((m) => isOrchestratorModel(m));
+        baseModels = entitledModels.filter((m) => !isOrchestratorModel(m));
       } catch {}
     }
 
-    const hooksFile = path.join(homedir(), ".gemini", "config", "hooks.json");
     const cwd = opts.cwd || process.cwd();
-    const hasInstructions = existsSync(path.join(cwd, "AGENTS.md")) || (opts.workspaceRoot && existsSync(path.join(opts.workspaceRoot, "AGENTS.md")));
+    const wsRoot = opts.workspaceRoot || "";
+    const checkRoots = [...new Set([cwd, wsRoot].filter(Boolean))];
+    const hasInstructions = checkRoots.some((d) => existsSync(path.join(d, "GEMINI.md")) || existsSync(path.join(d, "AGENTS.md")));
+    const hooksFile = path.join(homedir(), ".gemini", "config", "hooks.json");
+    const hasWorkspaceHooks = checkRoots.some((d) => existsSync(path.join(d, ".agents", "hooks.json")));
+    const hasSkills = checkRoots.some((d) => existsSync(path.join(d, ".agents", "skills")));
 
     return {
       cliVersion,
@@ -55,9 +91,9 @@ export class AgyAdapter extends BaseAdapter {
       entitledModels,
       supportedReasoningLevels: ["low", "medium", "high", "xhigh", "max"],
       customInstructions: hasInstructions,
-      skills: true,
+      skills: hasSkills || true,
       mcpServers: true,
-      hooks: existsSync(hooksFile),
+      hooks: existsSync(hooksFile) || hasWorkspaceHooks,
       subagents: true,
       parentSandbox: {
         detected: false,
@@ -65,7 +101,10 @@ export class AgyAdapter extends BaseAdapter {
         warning: null,
       },
       details: {
+        command: agyCmd,
         modelFromConfig: settings.model ?? null,
+        orchestratorModels,
+        baseModels,
       },
     };
   }
@@ -91,7 +130,8 @@ export class AgyAdapter extends BaseAdapter {
 
     if (agentProfile) args.push("--agent", agentProfile);
     if (model) args.push("--model", model);
-    if (effort) args.push("--effort", effort);
+    // Orchestrator models do not accept a separate --effort flag.
+    if (effort && !isOrchestratorModel(model)) args.push("--effort", effort);
 
     const allDirs = [...new Set([workspaceRoot, ...addDirs].filter(Boolean))];
     for (const d of allDirs) {
@@ -127,7 +167,7 @@ export class AgyAdapter extends BaseAdapter {
     args.push("--print");
 
     return {
-      command: def?.command || "agy",
+      command: resolveAgyCommand(def),
       prefix: [],
       args,
       promptVia: "stdin",
@@ -159,7 +199,7 @@ export class AgyAdapter extends BaseAdapter {
     const args = [];
 
     if (model) args.push("--model", model);
-    if (effort) args.push("--effort", effort);
+    if (effort && !isOrchestratorModel(model)) args.push("--effort", effort);
 
     const allDirs = [...new Set([workspaceRoot, ...addDirs].filter(Boolean))];
     for (const d of allDirs) {
@@ -191,7 +231,7 @@ export class AgyAdapter extends BaseAdapter {
     }
 
     return {
-      command: def?.command || "agy",
+      command: resolveAgyCommand(def),
       prefix: [],
       args,
       env: {},

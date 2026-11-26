@@ -2,6 +2,28 @@
 
 ใหม่สุดไว้บนสุด · เวอร์ชันอยู่ที่ `package.json`
 
+## 0.40.0 — 2026-11-26 · Native Harness รายค่าย (Antigravity + Claude Code), Neutral Knowledge v2 และถอดโมเดล flash/argon
+
+### ⚠ ต้องทำตอนอัปเกรด
+
+- **รีเฟรช stubs, skills, subagents และ hooks ใน workspace**: หลังอัปเกรดให้รัน `baan sync` เพื่อติดตั้ง `GEMINI.md` + 9 Common Skills (`.agents/skills/`) ของ agy, `CLAUDE.md` แบบ Native + `.claude/skills/` (5 native + 4 สกิลกลาง) + helper agents `scout`/`scribe`/`auditor` ของ Claude Code และ telemetry hooks รุ่นใหม่
+- **หากเคย override `agents.json` / `baan.config.json` ให้ใช้ `gemini-3.8-flash` หรือ `gemini-4-argon`**: เปลี่ยนเป็น `gemini-4-hydrogen` (effort `low`) เพราะทั้งสองโมเดลถูกถอดจากแพลตฟอร์มสิ้นเดือน 2026-11 — workspace ที่ไม่ได้ override ไม่ต้องทำอะไร
+
+### เพิ่ม
+
+- **Antigravity Native Harness (`src/adapters/agy.mjs`, `prompts/agy/`, `roles/providers/agy/`, `skills/agy/`)**: ฝั่ง agy ใช้ Orchestrator/Carbon/Neon/Hydrogen ตาม `agents.json` พร้อม 9 Common Skills (`api-db-contract`, `bug-fix`, `code-review`, `coding-pattern`, `knowledge-handoff`, `plan`, `repo-map`, `ui-design-system`, `verify-before-done`)
+- **Claude Code Native Harness (`src/adapters/claude.mjs`, `src/role-compiler.mjs`, `skills/claude/`)**:
+  - 5 native skills (`repo-map`, `coding-pattern`, `ui-design-system`, `api-db-contract`, `knowledge-handoff`) + สกิลกลาง `bug-fix`/`feature-flow`/`req-grill`/`wave-plan` จาก `skills/` ราก (ไฟล์เดียวกับ `baan flow` จึงไม่ drift); วางแผน/รีวิว/ตรวจผลใช้ built-in `/plan`, `/code-review`, `/verify`
+  - helper agents `scout`/`scribe`/`auditor` อ้างโมเดลจาก `agents.json` (`docs.t3`/`docs.t2`/`verifier.t3`) และ role agents preload สกิลผ่าน `skills:`
+- **Neutral Knowledge v2 (`src/knowledge-scaffold.mjs`, `src/knowledge-index.mjs`)**: โครงสร้างความรู้ชุดเดียวที่ทั้ง 3 ค่ายอ่านได้ (`repo-map.md`, `coding-pattern.md`, `ui-design-system.md`, `decisions/`, `defects/`, `features/`) ใช้ควบคู่กับโครงสร้าง 3-slot เดิมได้ (backward-compatible) · `baan survey --scaffold-module <name> --lean` สร้างโมดูลแบบ `INDEX.md` + `plan.md` · `--lint-knowledge` เตือนไฟล์ Neutral Knowledge ที่เกิน 25 KB
+
+### ปรับปรุง / เปลี่ยนแปลง
+
+- **Live telemetry (`setup/hooks/baan-live-telemetry.mjs`)**: จับคู่ `PreToolUse(Agent)` กับ `SubagentStart` เป็น record เดียว, tool ใน subagent ไม่ทับแชทหลัก, background agent อยู่จนถึง `SubagentStop`, เพิ่ม `UserPromptSubmit`/`SessionEnd` และจำกัด `PreToolUse` เป็น `Agent|Task`
+- **`baan parity`**: ตรวจ hooks ของ Claude จาก `.claude/settings.json` และ skills/agents ทั้งใน cwd และราก workspace
+- **ถอด `gemini-3.8-flash` และ `gemini-4-argon`** (รวม ARGON WEEKLY ใน Monitor UI) — `docs.t3` และงานสำรวจ/เอกสารเบาของ agy ย้ายไป `gemini-4-hydrogen` / `low`
+- **เอกสาร**: อัปเดต `BAAN.md`, `CONVENTIONS.md`, `LEARNING.md`, `MODEL-POLICY.md`, `README.md`
+
 ## 0.39.0 — 2026-11-20 · `baan flow` 7 ขั้นตอน, บทบาท `dba` & `testplan` (14 Roles), 3 Skills ใหม่ และ Immutable Wave/Test-Plan Lock
 
 ### ⚠ ต้องทำตอนอัปเกรด
