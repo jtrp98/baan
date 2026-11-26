@@ -5,8 +5,10 @@ import {
   STUB_MARKER,
   TOML_STUB_MARKER,
   TEAM_AGENTS,
+  CLAUDE_HELPER_AGENTS,
   compileWorkspaceStub,
   compileClaudeAgent,
+  compileClaudeHelperAgent,
   compileAgyAgent,
   compileCodexAgentToml,
 } from "./role-compiler.mjs";
@@ -93,23 +95,29 @@ export const PROVIDER_SKILLS = {
     "knowledge-handoff",
   ],
   claude: [
+    "repo-map",
+    "coding-pattern",
+    "ui-design-system",
+    "api-db-contract",
+    "knowledge-handoff",
     "bug-fix",
     "feature-flow",
-    "project-survey",
     "req-grill",
     "wave-plan",
-    "web-design-guidelines",
   ],
 };
+
+// Shared with every provider (baan flow reads them by absolute path); Claude installs these from skills/ root, the rest from skills/claude.
+export const CLAUDE_SHARED_SKILLS = ["bug-fix", "feature-flow", "req-grill", "wave-plan"];
 
 function installSkills(teamDir, targetDir, results, log) {
   const src = path.join(teamDir, "skills");
   if (!existsSync(src)) return;
   const targets = [
     { root: path.join(targetDir, ".agents", "skills"), srcDir: path.join(src, "agy"), names: PROVIDER_SKILLS.agy },
-    { root: path.join(targetDir, ".claude", "skills"), srcDir: src, names: PROVIDER_SKILLS.claude },
+    { root: path.join(targetDir, ".claude", "skills"), srcDir: path.join(src, "claude"), names: PROVIDER_SKILLS.claude, shared: new Set(CLAUDE_SHARED_SKILLS) },
   ];
-  for (const { root, srcDir, names } of targets) {
+  for (const { root, srcDir, names, shared } of targets) {
     const allowed = new Set(names);
     if (existsSync(root)) {
       for (const existingName of readdirSync(root)) {
@@ -122,7 +130,7 @@ function installSkills(teamDir, targetDir, results, log) {
       }
     }
     for (const name of names) {
-      const skillSrc = path.join(srcDir, name);
+      const skillSrc = shared?.has(name) ? path.join(src, name) : path.join(srcDir, name);
       if (!existsSync(skillSrc)) continue;
       const dest = path.join(root, name);
       if (existsSync(dest) && !existsSync(path.join(dest, SKILL_MARKER))) {
@@ -251,11 +259,14 @@ export function installTelemetryHooks(workspaceDir, teamDir, results = { hooks: 
     [path.join(workspaceDir, ".agents", "hooks.json"), (cur) => ({ ...cur, "baan-live-telemetry": agyHook })],
     [path.join(workspaceDir, ".claude", "settings.json"), (cur) => mergeHookEvents(cur, {
       SessionStart: [makeEntry(claudeCmd)],
-      PreToolUse: [makeEntry(claudeCmd, ".*")],
+      UserPromptSubmit: [makeEntry(claudeCmd)],
+      // Only subagent launches need PreToolUse; a node process per tool call would add latency to every step.
+      PreToolUse: [makeEntry(claudeCmd, "Agent|Task")],
       PostToolUse: [makeEntry(claudeCmd, ".*")],
       SubagentStart: [makeEntry(claudeCmd)],
       SubagentStop: [makeEntry(claudeCmd)],
       Stop: [makeEntry(claudeCmd)],
+      SessionEnd: [makeEntry(claudeCmd)],
     })],
     [path.join(workspaceDir, ".codex", "hooks.json"), (cur) => mergeHookEvents(cur, {
       SessionStart: [makeEntry(codexCmd)],
@@ -314,12 +325,15 @@ export function performInit(targetDir, teamDir, log = console.log, opts = {}) {
       { marker: TOML_STUB_MARKER, endMarker: TOML_END_MARKER }
     );
   }
+  for (const id of Object.keys(CLAUDE_HELPER_AGENTS)) {
+    writeManaged(path.join(targetDir, ".claude", "agents", `${id}.md`), compileClaudeHelperAgent(id, teamDir), results, log);
+  }
   cleanupObsoleteAgyAgents(targetDir, log);
   removeObsoletePencil(targetDir, log);
   removeObsoleteBaanCmd(targetDir, log);
   installSkills(teamDir, targetDir, results, log);
   installTelemetryHooks(targetDir, teamDir, results, log);
-  if (results.design.length) log(`วาง native agents (claude · codex) และ skills แยกตามค่าย ${results.design.length} รายการ (.claude · .codex · .agents/skills)`);
+  if (results.design.length) log(`วาง native agents (claude: 10 บทบาท + scout/scribe/auditor · codex) และ skills แยกตามค่าย ${results.design.length} รายการ (.claude · .codex · .agents/skills)`);
   if (results.hooks.length) log(`ติดตั้ง/อัปเดต live telemetry hooks ${results.hooks.length} ไฟล์ที่ราก workspace (agy · claude · codex)`);
 
   const charterPath = path.join(teamDir, "BAAN.md");

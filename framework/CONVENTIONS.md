@@ -22,7 +22,8 @@ Core ไม่แนบเอกสารนี้ซ้ำในทุก call
 ## การใช้ Subagents ภายใน Role (ทุก Role และทุก Tier)
 
 Subagents ของแต่ละ CLI (codex: `collaboration.spawn_agent` + `collaboration.wait_agent` · Claude Code: the `Agent` (`Task`) tool · agy: `invoke_subagent`) ได้รับอนุญาตทั้งในโหมดอ่านและโหมดเขียน เพื่อช่วยให้งานเสร็จเร็วขึ้นตาม 3-Step Workflow:
-- **ขั้นที่ 1 — สำรวจบริบท**: ใช้ Subagent (รุ่นเร็ว/ประหยัด เช่น sonnet/haiku บน Claude, flash บน agy) ค้นหาโค้ดหรือเอกสารขนานกัน แล้วส่งกลับเฉพาะข้อสรุปเพื่อรักษา Context ตัวหลักให้สะอาด
+- **ขั้นที่ 1 — สำรวจบริบท**: ใช้ Subagent (รุ่นเร็ว/ประหยัด เช่น `scout` (haiku) บน Claude แทน built-in `Explore` ที่รันบน opus เมื่อใช้แพ็ก subscription, hydrogen บน agy) ค้นหาโค้ดหรือเอกสารขนานกัน แล้วส่งกลับเฉพาะข้อสรุปเพื่อรักษา Context ตัวหลักให้สะอาด
+- **Claude Code helper agents**: `scout` (haiku, read-only สำรวจ), `scribe` (haiku, เขียน knowledge ตามโครงที่อนุมัติ) และ `auditor` (opus, ตรวจอิสระ read-only รับเฉพาะ AC/สัญญา/diff/path) — โมเดลอ้างจาก `agents.json` (`docs.t3` / `docs.t2` / `verifier.t3`); role agents ใน `.claude/agents/` preload สกิลประจำบทบาทผ่าน frontmatter `skills:` และมี `Agent` ในเครื่องมือจึงส่ง subagent ซ้อนต่อได้
 - **ขั้นที่ 2 — ตัวหลักวางแผน (/plan first)**: ตัวหลักวิเคราะห์และทำข้อตกลง/สอน/ท้าทายกับผู้ใช้จนได้ Approved Plan
 - **ขั้นที่ 3 — เขียนเอกสาร/ลงมือทำ**: สั่ง Subagent ไปเขียน Docs ยาวๆ (`requirements.md`, `adr/`, `feasibility.md` ฯลฯ) หรือทำงานย่อยตามแผน
 - **กฎเหล็กการเขียน**: หนึ่ง writer ต่อ repository เสมอ — Subagent เขียนได้เฉพาะไฟล์ที่ไม่มีใครแตะ และ Subagent ที่ใช้ตรวจงานต้องได้รับเฉพาะ AC/สัญญา/path เท่านั้น ห้ามส่งคำอธิบายของคนทำไปให้ (ป้องกัน Shared-Assumption Bias)

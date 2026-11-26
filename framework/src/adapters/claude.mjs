@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { homedir } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -7,6 +7,27 @@ import { BaseAdapter } from "./base.mjs";
 import { extractJson } from "../plan.mjs";
 
 let cachedVersion = null;
+
+function listEntries(dir, keep) {
+  try {
+    return readdirSync(dir, { withFileTypes: true }).filter(keep).map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
+
+function settingsHookCommands(file) {
+  let hooks;
+  try {
+    hooks = JSON.parse(readFileSync(file, "utf8"))?.hooks;
+  } catch {
+    return [];
+  }
+  if (!hooks || typeof hooks !== "object") return [];
+  return Object.values(hooks).flatMap((groups) => (Array.isArray(groups) ? groups : []))
+    .flatMap((group) => (Array.isArray(group?.hooks) ? group.hooks : []))
+    .map((hook) => String(hook?.command ?? ""));
+}
 
 export class ClaudeAdapter extends BaseAdapter {
   constructor() {
@@ -54,10 +75,16 @@ export class ClaudeAdapter extends BaseAdapter {
       try { settings = JSON.parse(readFileSync(homeSettings, "utf8")); } catch {}
     }
 
-    const hasClaudeMd = existsSync(path.join(cwd, "CLAUDE.md")) || (opts.workspaceRoot && existsSync(path.join(opts.workspaceRoot, "CLAUDE.md")));
-    const dotClaude = path.join(cwd, ".claude");
-    const hasDotClaude = existsSync(dotClaude);
-    const hasMcp = existsSync(path.join(cwd, ".mcp.json")) || (opts.workspaceRoot && existsSync(path.join(opts.workspaceRoot, ".mcp.json")));
+    // Headless runs start inside target/*, while BAAN installs CLAUDE.md/.claude only at the workspace root.
+    const roots = [...new Set([cwd, opts.workspaceRoot].filter(Boolean))];
+    const hasClaudeMd = roots.some((d) => existsSync(path.join(d, "CLAUDE.md")));
+    const hasMcp = roots.some((d) => existsSync(path.join(d, ".mcp.json")));
+    const skills = [...new Set(roots.flatMap((d) => listEntries(path.join(d, ".claude", "skills"), (e) => e.isDirectory())))].sort();
+    const agents = [...new Set(roots.flatMap((d) => listEntries(path.join(d, ".claude", "agents"), (e) => e.isFile() && e.name.endsWith(".md"))
+      .map((name) => name.slice(0, -3))))].sort();
+    // Claude Code reads hooks from settings files, not from a `.claude/hooks/` folder.
+    const hookCommands = roots.flatMap((d) => ["settings.json", "settings.local.json"]
+      .flatMap((f) => settingsHookCommands(path.join(d, ".claude", f))));
 
     return {
       cliVersion,
@@ -65,9 +92,9 @@ export class ClaudeAdapter extends BaseAdapter {
       entitledModels: null,
       supportedReasoningLevels: ["low", "medium", "high", "xhigh", "max"],
       customInstructions: hasClaudeMd,
-      skills: hasDotClaude && existsSync(path.join(dotClaude, "skills")),
+      skills: skills.length > 0,
       mcpServers: hasMcp || (settings.mcpServers && Object.keys(settings.mcpServers).length > 0),
-      hooks: hasDotClaude && existsSync(path.join(dotClaude, "hooks")),
+      hooks: hookCommands.length > 0,
       subagents: true,
       parentSandbox: {
         detected: false,
@@ -77,6 +104,9 @@ export class ClaudeAdapter extends BaseAdapter {
       details: {
         modelFromConfig: settings.model ?? null,
         effortFromConfig: settings.effortLevel ?? null,
+        baanTelemetryHook: hookCommands.some((c) => c.includes("baan-live-telemetry")),
+        agents,
+        skills,
       },
     };
   }

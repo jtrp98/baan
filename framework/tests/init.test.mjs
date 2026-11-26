@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { performInit } from "../src/init.mjs";
+import { performInit, PROVIDER_SKILLS } from "../src/init.mjs";
 
 const TEAM_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -52,7 +52,7 @@ test("init ครั้งแรก: สร้าง baan.config.json จาก�
       assert.ok(existsSync(path.join(dir, ".agents", "skills", skillName, "SKILL.md")), `ต้องติดตั้ง common skill ${skillName} ใน .agents/skills`);
     }
     assert.equal(existsSync(path.join(dir, ".agents", "skills", "feature-flow")), false, "skill เฉพาะ Claude ต้องไม่อยู่ใน .agents/skills");
-    for (const skillName of ["bug-fix", "feature-flow", "req-grill", "wave-plan", "project-survey", "web-design-guidelines"]) {
+    for (const skillName of PROVIDER_SKILLS.claude) {
       assert.ok(existsSync(path.join(dir, ".claude", "skills", skillName, "SKILL.md")), `ต้องติดตั้ง skill ${skillName} ใน .claude/skills`);
     }
     for (const newRole of ["dba", "testplan"]) {

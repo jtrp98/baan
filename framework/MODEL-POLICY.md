@@ -216,6 +216,10 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 
 ## 6. Change Log
 
+- **2026-11-26 (Claude Code Native Harness — helper agents)**: เพิ่ม helper subagents ฝั่ง `claude` ใน `.claude/agents/` โดย**ไม่แก้ `agents.json`**: `scout` อ้าง `docs.t3` (`haiku / low`) สำหรับสำรวจ read-only, `scribe` อ้าง `docs.t2` (`haiku / high`) สำหรับเขียน knowledge และ `auditor` อ้าง `verifier.t3` (`opus / medium`) สำหรับตรวจอิสระ — เหตุผล: built-in `Explore` ของ Claude Code รันบนโมเดลที่ `opus` ชี้เมื่อใช้แพ็ก subscription จึงกินโควตา Pro \$20 โดยไม่จำเป็น ส่วน `codex` และ `agy` ไม่เปลี่ยน
+
+- **2026-11-26 (Remove `flash` & `argon` from `agy`)**: ถอด `gemini-3.8-flash` และ `gemini-4-argon` ออกจาก `agents.json`, `prompts/agy/models.json`, `prompt-compiler.mjs`, `monitor-ui/telemetry.js` (`ARGON WEEKLY`), roles และ skills ทั้งหมดก่อนปลดรุ่นสิ้นเดือน โดยย้าย `docs.t3` และงานสำรวจ/เอกสารเบาของ `agy` ไปใช้ `gemini-4-hydrogen / low` แทน
+
 - **2026-11-26 (Antigravity-Native Harness + Entitled Model Lineup)**: ปรับเฉพาะฝั่ง `agy` ให้ใช้สิทธิ์โมเดลจริงบน Antigravity (`gemini-pro-orchestrator` / `gemini-pro-orchestrator-neon`, `gemini-4-carbon`, `gemini-4-neon`, `gemini-4-hydrogen`, `gemini-3.8-flash`) ควบคู่ Native Orchestrator + 9 Common Skills ใน `.agents/skills/` โดยคงผัง \$20/เดือนและ Pareto ของ `claude` และ `codex` ไว้เหมือนเดิมทั้งหมด
 
 - **2026-11-20 (Add `dba` & `testplan` Roles for `baan flow`)**: เพิ่มบทบาท **`dba`** (`codex → agy → claude`, default `t2`) และ **`testplan`** (`claude → agy → codex`, default `t2`) เป็น 14 Roles ภายใต้กรอบแพ็ก \$20/เดือนและหลัก Pareto เหมือนเดิมทุกประการ

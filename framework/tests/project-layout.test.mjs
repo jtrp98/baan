@@ -245,15 +245,15 @@ test("init: วาง agents ของทีมสร้างและทีม
       assert.ok(readFileSync(f, "utf8").includes(path.join(TEAM_DIR, "LEARNING.md")), "ชี้ LEARNING.md");
     }
     assert.equal(existsSync(path.join(dir, ".claude", "commands", "pencil.md")), false, "ต้องไม่มี pencil.md");
-    assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", "references", "rules.md")));
-    assert.ok(existsSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed")));
+    assert.ok(existsSync(path.join(dir, ".claude", "skills", "ui-design-system", "references", "web-rules.md")));
+    assert.ok(existsSync(path.join(dir, ".claude", "skills", "ui-design-system", ".baan-managed")));
     assert.ok(res.design.length >= 8);
     writeFileSync(path.join(dir, ".claude", "agents", "ui.md"), "ของผู้ใช้\n", "utf8");
-    rmSync(path.join(dir, ".claude", "skills", "web-design-guidelines", ".baan-managed"));
+    rmSync(path.join(dir, ".claude", "skills", "ui-design-system", ".baan-managed"));
     const again = performInit(dir, TEAM_DIR, () => {});
     assert.equal(readFileSync(path.join(dir, ".claude", "agents", "ui.md"), "utf8"), "ของผู้ใช้\n");
     assert.ok(again.skipped.some((f) => f.endsWith(`agents${path.sep}ui.md`)));
-    assert.ok(again.skipped.some((f) => f.endsWith(`skills${path.sep}web-design-guidelines`)));
+    assert.ok(again.skipped.some((f) => f.endsWith(`skills${path.sep}ui-design-system`)));
     assert.ok(again.design.some((f) => f.endsWith(`agents${path.sep}survey.md`)), "ของ baan เขียนใหม่ได้");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

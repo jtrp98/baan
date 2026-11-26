@@ -86,7 +86,12 @@ test("init: cleans up obsolete BAAN .agents/agents/*.md & old managed skills whi
     }
     assert.ok(existsSync(path.join(ws, ".agents", "skills", "ui-design-system", "references", "web-rules.md")));
     assert.equal(existsSync(path.join(ws, ".claude", "skills", "agy")), false, "provider-specific agy/ dir must never leak into .claude/skills");
-    assert.equal(existsSync(path.join(ws, ".claude", "skills", "repo-map")), false, "agy skills must not be installed into .claude/skills");
+    // Claude has its own repo-map; it must come from skills/claude, never from skills/agy.
+    assert.equal(
+      readFileSync(path.join(ws, ".claude", "skills", "repo-map", "SKILL.md"), "utf8"),
+      readFileSync(path.join(TEAM_DIR, "skills", "claude", "repo-map", "SKILL.md"), "utf8"),
+      "agy skills must not be installed into .claude/skills",
+    );
   } finally {
     rmSync(ws, { recursive: true, force: true });
   }
