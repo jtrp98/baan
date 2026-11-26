@@ -3,8 +3,10 @@ import path from "node:path";
 import { verifyLockedArtifacts } from "./flow-lock.mjs";
 
 export const TEAM_SLOTS = ["shared", "design", "build"];
-const PROJECT_EXTRAS = new Set(["INDEX.md", "index.md", "modules", "changelog", "archive"]);
-const MODULE_EXTRAS = new Set(["INDEX.md", "index.md", "changelog", "archive", "features"]);
+export const NEUTRAL_PROJECT_ENTRIES = ["repo-map.md", "coding-pattern.md", "ui-design-system.md", "decisions", "defects", "features"];
+export const NEUTRAL_MODULE_ENTRIES = ["plan.md", "contracts", "screens", "repo-map.md", "defects"];
+const PROJECT_EXTRAS = new Set(["INDEX.md", "index.md", "modules", "changelog", "archive", ...NEUTRAL_PROJECT_ENTRIES]);
+const MODULE_EXTRAS = new Set(["INDEX.md", "index.md", "changelog", "archive", "features", ...NEUTRAL_MODULE_ENTRIES]);
 const START = "<!-- baan:modules:start -->";
 const END = "<!-- baan:modules:end -->";
 
@@ -64,23 +66,33 @@ export function uxKnowledgeDirs(teamDir, platform, os = []) {
 
 export function scanProjects(root) {
   if (!isDir(root)) return [];
-  return readdirSync(root).filter((n) => !/^[_.]/.test(n) && isDir(path.join(root, n, "modules"))).sort().map((name) => {
+  const isProjectDir = (n) => {
+    if (/^[_.]/.test(n)) return false;
+    const base = path.join(root, n);
+    return isDir(path.join(base, "modules")) || isDir(path.join(base, "features")) || existsSync(path.join(base, "repo-map.md"));
+  };
+  return readdirSync(root).filter(isProjectDir).sort().map((name) => {
     const dir = path.join(root, name);
     const idx = indexFileOf(dir);
     const header = idx ? readFrontMatter(readText(idx)) : {};
-    const modules = readdirSync(path.join(dir, "modules")).filter((m) => !/^[_.]/.test(m) && isDir(path.join(dir, "modules", m))).sort().map((m) => {
-      const mdir = path.join(dir, "modules", m);
-      const file = indexFileOf(mdir);
-      const text = file ? readText(file) : "";
-      const fm = readFrontMatter(text);
-      return {
-        project: name, module: m, dir: mdir, indexFile: file,
-        summary: fm.summary || firstHeading(text),
-        status: fm.status || "", updated: fm.updated || "",
-        dependsOn: asList(fm.depends_on), requestedBy: asList(fm.requested_by), target: fm.target || "",
-        platform: fm.platform || header.platform || "", os: asList(fm.os ?? header.os),
-      };
-    });
+    const scanContainer = (relBase, kind) => {
+      const containerDir = path.join(dir, relBase);
+      if (!isDir(containerDir)) return [];
+      return readdirSync(containerDir).filter((m) => !/^[_.]/.test(m) && isDir(path.join(containerDir, m))).sort().map((m) => {
+        const mdir = path.join(containerDir, m);
+        const file = indexFileOf(mdir);
+        const text = file ? readText(file) : "";
+        const fm = readFrontMatter(text);
+        return {
+          project: name, module: m, dir: mdir, indexFile: file, relBase, kind,
+          summary: fm.summary || firstHeading(text),
+          status: fm.status || "", updated: fm.updated || "",
+          dependsOn: asList(fm.depends_on), requestedBy: asList(fm.requested_by), target: fm.target || "",
+          platform: fm.platform || header.platform || "", os: asList(fm.os ?? header.os),
+        };
+      });
+    };
+    const modules = [...scanContainer("modules", "module"), ...scanContainer("features", "feature")];
     return { name, dir, indexFile: idx, header, modules };
   });
 }
@@ -96,21 +108,23 @@ function relLink(fromDir, toFile) {
 export function renderModuleTable(project, projects) {
   const cell = (s) => String(s || "-").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
   const own = project.modules.map((m) => {
+    const base = m.relBase || "modules";
     const deps = m.dependsOn.length ? m.dependsOn.join(", ") : "-";
     const from = m.requestedBy.length ? ` · ขอโดย ${m.requestedBy.join(", ")}` : "";
-    const link = m.indexFile ? `[modules/${m.module}](${relLink(project.dir, m.indexFile)})` : `modules/${m.module}`;
+    const link = m.indexFile ? `[${base}/${m.module}](${relLink(project.dir, m.indexFile)})` : `${base}/${m.module}`;
     return `| ${m.module} | ${cell(m.summary)}${from} | ${cell(m.status)} | ${cell(m.updated)} | ${cell(deps)} | ${link} |`;
   });
   const foreign = [];
   for (const p of projects) {
     if (p.name === project.name) continue;
     for (const m of p.modules) {
+      const base = m.relBase || "modules";
       const why = [];
       if (m.requestedBy.includes(project.name)) why.push(`ขอโดย ${project.name}`);
       const deps = m.dependsOn.map((d) => qualify(d, p.name)).filter((d) => d.startsWith(`${project.name}/`));
       if (deps.length) why.push(`พึ่ง ${deps.join(", ")}`);
       if (!why.length) continue;
-      const link = m.indexFile ? `[${p.name}/modules/${m.module}](${relLink(project.dir, m.indexFile)})` : `${p.name}/modules/${m.module}`;
+      const link = m.indexFile ? `[${p.name}/${base}/${m.module}](${relLink(project.dir, m.indexFile)})` : `${p.name}/${base}/${m.module}`;
       foreign.push(`| ${m.module} | ${cell(m.summary)} | ${cell(m.status)} | ${cell(m.updated)} | ${why.join(" · ")} | ${link} |`);
     }
   }
@@ -208,16 +222,17 @@ export function lintKnowledge(root) {
       }
     }
     for (const m of p.modules) {
-      if (!m.indexFile) errors.push(`${p.name}/modules/${m.module}: ไม่มี INDEX.md`);
+      const base = m.relBase || "modules";
+      if (!m.indexFile) errors.push(`${p.name}/${base}/${m.module}: ไม่มี INDEX.md`);
       for (const n of readdirSync(m.dir)) {
-        if (!TEAM_SLOTS.includes(n) && !MODULE_EXTRAS.has(n)) warnings.push(`${p.name}/modules/${m.module}/${n}: อยู่นอกช่อง shared/design/build ของ module`);
+        if (!TEAM_SLOTS.includes(n) && !MODULE_EXTRAS.has(n)) warnings.push(`${p.name}/${base}/${m.module}/${n}: อยู่นอกช่อง shared/design/build หรือ Neutral Knowledge ของ ${m.kind || "module"}`);
       }
       if (existsSync(path.join(m.dir, "build", "design"))) {
-        warnings.push(`${p.name}/modules/${m.module}/build/design: พบ build/design ในโมดูล — สัญญาโค้ดควรอยู่ใน build/contracts/`);
+        warnings.push(`${p.name}/${base}/${m.module}/build/design: พบ build/design ในโมดูล — สัญญาโค้ดควรอยู่ใน build/contracts/`);
       }
       for (const u of ["legacy-ux", "uxui", "ux-ui"]) {
         if (existsSync(path.join(m.dir, "build", u))) {
-          warnings.push(`${p.name}/modules/${m.module}/build/${u}: พบเอกสาร UX ในช่อง build ของโมดูล — ควรอยู่ใน design/legacy-ux/`);
+          warnings.push(`${p.name}/${base}/${m.module}/build/${u}: พบเอกสาร UX ในช่อง build ของโมดูล — ควรอยู่ใน design/legacy-ux/`);
         }
       }
       for (const d of m.dependsOn) {
@@ -226,7 +241,7 @@ export function lintKnowledge(root) {
       for (const r of m.requestedBy) {
         if (!projectNames.has(r)) errors.push(`${p.name}/${m.module}: requested_by "${r}" ไม่มี project นี้`);
       }
-      if (!m.platform) warnings.push(`${p.name}/${m.module}: ยังไม่ระบุ platform (web · desktop · mobile) — ทีมออกแบบจะอ่านแค่ความรู้ UX กลาง`);
+      if (!m.platform && m.kind !== "feature") warnings.push(`${p.name}/${m.module}: ยังไม่ระบุ platform (web · desktop · mobile) — ทีมออกแบบจะอ่านแค่ความรู้ UX กลาง`);
       else if (!PLATFORM_OS[m.platform]) errors.push(`${p.name}/${m.module}: platform "${m.platform}" ไม่รู้จัก — ใช้ ${Object.keys(PLATFORM_OS).join(" · ")}`);
       else {
         for (const o of m.os) {
@@ -261,6 +276,8 @@ export function lintKnowledge(root) {
         const base = path.basename(f).toLowerCase();
         if (base === "index.md") {
           if (sz > 20 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 20 KB (${Math.round(sz / 1024)} KB) — สารบัญต้องสั้นกระชับ ห้ามเก็บประวัติยาวหรือเนื้อหาลงใน INDEX`);
+        } else if (["repo-map.md", "coding-pattern.md", "ui-design-system.md"].includes(base)) {
+          if (sz > 25 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 25 KB (${Math.round(sz / 1024)} KB) — ควรสรุปไฟล์ Neutral Knowledge ให้กระชับเพื่อให้ทุกค่าย AI อ่านจบในรอบเดียว`);
         } else if (!parts.includes("changelog") && !parts.includes("resolved")) {
           if (sz > 50 * 1024) warnings.push(`${rel(f)}: ขนาดใหญ่เกิน 50 KB (${Math.round(sz / 1024)} KB) เสี่ยงทำให้ AI อ่านเกินความจำเป็น — ควรแยกเป็นไฟล์ย่อยในโฟลเดอร์ หรือย้ายประวัติที่จบแล้วไป resolved/ หรือ archive/`);
         }

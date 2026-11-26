@@ -295,8 +295,10 @@ test("lintKnowledge: ตรวจพบ anti-patterns (build/design, build/legac
     // 2. ตรวจพบไฟล์บวม
     const bigIndex = "# Big\n" + "x".repeat(25 * 1024);
     const bigDoc = "# Doc\n" + "y".repeat(55 * 1024);
+    const bigRepoMap = "# Map\n" + "z".repeat(26 * 1024);
     write(root, "school-bot/modules/quiz/INDEX.md", "---\nstatus: approved\nupdated: 2026-11-01\ndepends_on: [app-shell]\n---\n" + bigIndex);
     write(root, "school-bot/modules/app-shell/shared/requirements.md", bigDoc);
+    write(root, "school-bot/repo-map.md", bigRepoMap);
 
     const r = lintKnowledge(root);
     assert.ok(r.warnings.some((w) => w.includes("พบ build/design ซึ่งชื่อซ้ำกับช่อง design")));
@@ -304,6 +306,7 @@ test("lintKnowledge: ตรวจพบ anti-patterns (build/design, build/legac
     assert.ok(r.warnings.some((w) => w.includes("พบ build/design ในโมดูล")));
     assert.ok(r.warnings.some((w) => w.includes("พบเอกสาร UX ในช่อง build ของโมดูล")));
     assert.ok(r.warnings.some((w) => w.includes("ขนาดใหญ่เกิน 20 KB")));
+    assert.ok(r.warnings.some((w) => w.includes("ขนาดใหญ่เกิน 25 KB")));
     assert.ok(r.warnings.some((w) => w.includes("ขนาดใหญ่เกิน 50 KB")));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

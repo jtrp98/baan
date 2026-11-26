@@ -141,8 +141,8 @@
           "label": "สถาปัตยกรรมข้ามระบบ / Critical / Overdrive",
           "_timeoutSec": 3600,
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "high"
+            "model": "gemini-pro-orchestrator",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-astra",
@@ -156,8 +156,8 @@
         "t2": {
           "label": "วางแผนโมดูลใหญ่ / Multi-Repo / Contracts ซับซ้อน",
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "high"
+            "model": "gemini-pro-orchestrator-neon",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-astra",
@@ -171,8 +171,8 @@
         "t3": {
           "label": "วางแผนฟีเจอร์มาตรฐาน / API Contract โมดูลเดียว",
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "medium"
+            "model": "gemini-pro-orchestrator-neon",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-sol",
@@ -219,7 +219,7 @@
             "effort": "xhigh"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -264,7 +264,7 @@
             "effort": "low"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-hydrogen",
             "effort": "low"
           },
           "claude": {
@@ -294,7 +294,7 @@
             "effort": "xhigh"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "codex": {
@@ -422,7 +422,7 @@
           "label": "สถาปัตยกรรมข้ามระบบ / Core Foundation / Overdrive",
           "_timeoutSec": 3600,
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "codex": {
@@ -499,8 +499,8 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "high"
+            "model": "gemini-pro-orchestrator",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-astra",
@@ -529,7 +529,7 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-hydrogen",
             "effort": "low"
           },
           "codex": {
@@ -557,8 +557,8 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "high"
+            "model": "gemini-pro-orchestrator",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-astra",
@@ -587,7 +587,7 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-hydrogen",
             "effort": "low"
           },
           "codex": {
@@ -616,7 +616,7 @@
             "effort": "xhigh"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -661,7 +661,7 @@
             "effort": "low"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-hydrogen",
             "effort": "low"
           },
           "claude": {
@@ -690,7 +690,7 @@
             "effort": "xhigh"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "codex": {
@@ -744,7 +744,7 @@
         "t1": {
           "label": "Lead UX Arch: Flow ซับซ้อนข้ามหลายหน้าจอ / Role-Permission สูง",
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -802,7 +802,7 @@
         "t1": {
           "label": "Lead Designer: วาง Design System / หน้าจอหลักซับซ้อน / Multi-State Flow",
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -860,7 +860,7 @@
         "t1": {
           "label": "Lead UX QA: Full Visual Diff + WCAG AA Audit ก่อน Release",
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -923,7 +923,7 @@
             "effort": "xhigh"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-carbon",
             "effort": "high"
           },
           "claude": {
@@ -981,8 +981,8 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
-            "effort": "high"
+            "model": "gemini-pro-orchestrator",
+            "effort": ""
           },
           "codex": {
             "model": "gpt-6.2-astra",
@@ -1011,7 +1011,7 @@
             "effort": "high"
           },
           "agy": {
-            "model": "gemini-4-neon",
+            "model": "gemini-4-hydrogen",
             "effort": "low"
           },
           "codex": {

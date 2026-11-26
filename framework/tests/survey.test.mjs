@@ -19,6 +19,8 @@ test("survey: scanTargetCodebase ตรวจจับ stack และ component
 
   writeFileSync(path.join(dir, "frontend", "package.json"), JSON.stringify({
     name: "my-frontend",
+    main: "src/index.ts",
+    scripts: { build: "next build", test: "vitest run" },
     dependencies: { next: "14.0.0", react: "18.0.0", tailwindcss: "3.0.0" },
     devDependencies: { typescript: "5.0.0", vitest: "1.0.0" },
   }), "utf8");
@@ -49,6 +51,11 @@ test("survey: scanTargetCodebase ตรวจจับ stack และ component
   assert.ok(compNames.includes("admin"));
   assert.ok(compNames.includes("OrderService.API"));
   assert.ok(compNames.includes("simulator"));
+
+  // ตรวจสอบ Commands และ Entrypoints ที่สกัดได้
+  assert.ok(result.commands.some((c) => c.scope === "frontend" && c.name === "test" && c.command === "vitest run"));
+  assert.ok(result.commands.some((c) => c.name === "test" && c.command.includes('verbosity=normal')));
+  assert.ok(result.entrypoints.includes("frontend/src/index.ts"));
 });
 
 test("survey: detectKnowledgeDrift แยกแยะ mapped, unmappedCode, และ unmappedModules ได้แม่นยำ", () => {

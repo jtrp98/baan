@@ -42,7 +42,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 
 `baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
 1. ตรวจสอบและอัปเดตตัวแม่ BAAN อัตโนมัติ (Self-Update) เมื่อมี commit หรือเวอร์ชันใหม่ใน Git
-2. รีเฟรชไฟล์ stubs ครบทั้ง 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`, skills, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และ live telemetry hooks (`.agents/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`) ที่ราก workspace ให้ตรงกับ BAAN รุ่นล่าสุด (ไม่ติดตั้งลงใน `target/*`)
+2. รีเฟรชไฟล์ตามจุดแข็งแต่ละค่าย: Antigravity (`GEMINI.md` + 9 Common Skills ใน `.agents/skills/` + `.agents/hooks.json`), Claude Code (`CLAUDE.md` + `.claude/agents/*.md` + `.claude/skills/` + `.claude/settings.json`), และ Codex (`AGENTS.md` + `.codex/agents/*.toml` + `.codex/hooks.json`) ที่ราก workspace ให้ตรงกับ BAAN รุ่นล่าสุด (ไม่ติดตั้งลงใน `target/*`)
 3. ทำ Safe Auto-Commit สำหรับการแก้ไขค้างใน `knowledge_roots` และ `memory`
 4. ดึงข้อมูลล่าสุดด้วย `git pull --rebase --autostash` และส่งงานขึ้น remote ด้วย `git push`
 5. รีเฟรช `knowledge-index.json` อัตโนมัติ
@@ -74,7 +74,7 @@ Execution Prompts แยกแบบ Hybrid 3 ค่าย (`prompts/_core/` + `
 BAAN ยึดหลัก **Native First, Orchestrate Outside, Preserve Inside**:
 - **Codex**: ลงชื่อเข้าใช้ CLI; ใช้ native `exec`, `-c developer_instructions=...` (4-Part Action-Biased), structured schema, native read-only sandbox สำหรับ Planner/Verifier และ native session resume สำหรับ Worker
 - **Claude**: ลงชื่อเข้าใช้ CLI; ใช้ `--append-system-prompt-file` (XML + Positive Rationale), native `plan` mode สำหรับ Planner/Verifier โดยรักษา MCP, Skills และ Subagents; ใช้ `acceptEdits` หรือ Approval Bridge ใน Worker
-- **agy**: ลงชื่อเข้าใช้ CLI; ใช้ Explore→Plan→Execute prompt + native `plan` mode และรองรับ `invoke_subagent` สำหรับ Planner/Verifier; Worker รองรับ `accept-edits` ใน safe mode และ opt-in bypass เมื่อต้องการ; งานออกแบบระบบ/UX-UI ยึด `gemini-4-neon` ทุก tier
+- **agy**: ลงชื่อเข้าใช้ CLI หรือใช้ Antigravity 2.0 App; ทำงานแบบ Antigravity-Native Harness (`GEMINI.md` + 9 Common Skills ใน `.agents/skills/` + `research`/`browser`/`generative_ui`/`run_workflow`) พร้อม CLI flags `--mode plan|accept-edits|auto` และโมเดล `Orchestrator` / `Carbon` / `Neon` / `Hydrogen` / `Flash` (ไม่ส่ง `--effort` เมื่อเป็นรุ่น `gemini-pro-orchestrator*`)
 
 บน Windows core เรียก native executable หรือ Node entry ของ npm Codex โดยไม่ผ่าน shell
 ตรวจความพร้อมและ Parity ของเครื่องด้วย `baan parity` ก่อนเริ่มงานจริง
@@ -205,7 +205,9 @@ Read-only permissions ขึ้นกับ provider/การตั้งค่
 
 ## ทีมสร้าง ทีมออกแบบ และ `baan flow`
 
-`baan --init` ติดตั้งทีมสร้าง 7 บทบาท (`spec`, `arch`, `dba`, `pm`, `build`, `testplan`, `check`) และทีมออกแบบ 3 บทบาท (`survey`, `ui`, `review`) แบบ native ครบ 3 ค่าย (`.claude/agents/*.md`, `.codex/agents/*.toml`, `.agents/agents/*.md`) พร้อม root stubs (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) และ skills (`feature-flow`, `req-grill`, `wave-plan`, `project-survey`, `bug-fix`, `web-design-guidelines`) ที่ราก workspace เท่านั้น
+`baan --init` ติดตั้ง harness แยกตามจุดแข็งของแต่ละค่ายที่ราก workspace เท่านั้น:
+- **Antigravity (`agy`)**: `GEMINI.md` + 9 Common Skills (`repo-map`, `coding-pattern`, `ui-design-system`, `api-db-contract`, `plan`, `bug-fix`, `code-review`, `verify-before-done`, `knowledge-handoff`)
+- **Claude Code & Codex**: 10 บทบาท (`spec`, `arch`, `dba`, `pm`, `build`, `testplan`, `check`, `survey`, `ui`, `review`) ใน `.claude/agents/*.md` และ `.codex/agents/*.toml` พร้อม `CLAUDE.md` / `AGENTS.md` และ `.claude/skills/` (`feature-flow`, `req-grill`, `wave-plan`, `project-survey`, `bug-fix`, `web-design-guidelines`)
 
 ### `baan flow` (7-Step Engineering Flow จากตัวกลางบน Desktop App)
 ```sh

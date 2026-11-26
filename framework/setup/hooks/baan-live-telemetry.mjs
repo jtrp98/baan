@@ -7,9 +7,13 @@ import { pathToFileURL } from "node:url";
 const PROVIDERS = new Set(["agy", "claude", "codex"]);
 const KNOWN_ROLES = new Set([
   "orchestrator", "planner", "worker", "verifier",
-  "spec", "arch", "pm", "build", "check", "survey", "ui", "review",
+  "spec", "arch", "dba", "pm", "build", "testplan", "check", "survey", "ui", "review",
+  "research", "browser", "workflow",
 ]);
-const SUBAGENT_TOOLS = new Set(["invoke_subagent", "agent", "task", "spawn_agent", "collaboration.spawn_agent"]);
+const SUBAGENT_TOOLS = new Set([
+  "invoke_subagent", "define_subagent", "run_workflow",
+  "agent", "task", "spawn_agent", "collaboration.spawn_agent",
+]);
 const STALE_PENDING_MS = 10 * 60 * 1000;
 
 function hashKey(...parts) {
@@ -34,7 +38,7 @@ export function inferBaanRole({ prompt = "", roleLabel = "", agentType = "" } = 
   const tag = String(prompt ?? "").match(/\[baan:\s*([a-z0-9_-]+)\]/i);
   if (tag && KNOWN_ROLES.has(tag[1].toLowerCase())) return tag[1].toLowerCase();
 
-  for (const raw of [agentType, roleLabel]) {
+  for (const raw of [roleLabel, agentType]) {
     const clean = String(raw ?? "").trim().toLowerCase().replace(/^baan[-:]/, "");
     if (KNOWN_ROLES.has(clean)) return clean;
     const prefix = clean.match(/^([a-z]+)\s*(?::|-|\||\]|\()/);
@@ -243,7 +247,7 @@ export function processHookEvent(payload, { providerHint = null, workspaceRoot =
   if (ev.event === "PreToolUse" && isSubagentTool) {
     const args = ev.tool.args || {};
     const subPrompt = String(args.Prompt ?? args.prompt ?? "");
-    const subRoleLabel = String(args.Role ?? args.role ?? args.description ?? args.TypeName ?? args.subagent_type ?? "").trim();
+    const subRoleLabel = String(args.Role ?? args.role ?? args.Description ?? args.description ?? args.Name ?? args.TypeName ?? args.subagent_type ?? "").trim();
     const subAgentType = String(args.TypeName ?? args.subagent_type ?? args.agent_type ?? "").trim();
     const subRole = inferBaanRole({ prompt: subPrompt, roleLabel: subRoleLabel, agentType: subAgentType });
     const callKey = ev.tool.id || `${ev.sessionId}-${Date.now()}`;

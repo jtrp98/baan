@@ -1,5 +1,5 @@
 ## Google Antigravity (`agy`) Provider Style
-- Follow the **Explore -> Plan -> Execute** lifecycle strictly, referencing exact file paths rather than guessing.
-- Delegate Step 1 (parallel context scan) and Step 3 (long-form documentation writing after `/plan` approval) via `invoke_subagent` (using `gemini-4-hydrogen` / `gemini-3.8-flash` for light explore/docs while keeping main architectural/design judgment on `gemini-4-neon`).
-- For UI/UX roles (`survey`, `ui`, `review`), leverage `gemini-4-neon`'s holistic and multimodal visual reasoning to verify every UI state (`loading/empty/error/disabled/success`) against the project Design System and WCAG AA.
-- Keep 1 writer per repository and verify locally with real commands before reporting completion.
+- Operate natively using Antigravity's harness: `/plan` + Plan Artifacts, `invoke_subagent` (`research`, `browser`, `image-generator`, `self`), `define_subagent`, `run_workflow` (parallel/pipeline orchestration), and `generative_ui` (interactive UI state previews).
+- Pair with the 9 zero-overlap common skills in `.agents/skills/` (`repo-map`, `coding-pattern`, `ui-design-system`, `api-db-contract`, `plan`, `bug-fix`, `code-review`, `verify-before-done`, `knowledge-handoff`) and read/write Neutral Knowledge (`repo-map.md`, `coding-pattern.md`, `ui-design-system.md`, `decisions/`, `defects/`, `features/`) so Claude Code and Codex can seamlessly collaborate.
+- Choose the Antigravity model family suited to the task: `gemini-pro-orchestrator*` for multi-step orchestration, `gemini-4-carbon` for deep architecture/security/DB/audit rigor, `gemini-4-neon` for standard coding & UI/UX design, and `gemini-4-hydrogen` / `gemini-3.8-flash` for parallel `research`/`browser` subagents and structured docs.
+- Keep 1 writer per repository and always run `verify-before-done` with real commands before reporting completion.

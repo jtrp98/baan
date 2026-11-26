@@ -18,8 +18,8 @@ test("เปิดครบ 3 ค่าย: แต่ละ role เลือก
   const planner = resolveRoleRoute(realCfg, "planner", { localConfig: localAll });
   assert.equal(planner.agent, "agy");
   assert.equal(planner.tier, "t3");
-  assert.equal(planner.model, "gemini-4-neon");
-  assert.equal(planner.effort, "medium");
+  assert.equal(planner.model, "gemini-pro-orchestrator-neon");
+  assert.equal(planner.effort, "");
 
   const arch = resolveRoleRoute(realCfg, "arch", { localConfig: localAll });
   assert.equal(arch.agent, "agy");
@@ -103,16 +103,19 @@ test("เปิดแค่ claude ใน local.json: ทุก role ใช้ c
   assert.equal(verifier.independentCrossProvider, false);
 });
 
-test("เปิดแค่ agy ใน local.json: งานออกแบบ/สถาปัตยกรรม/UX-UI ยึด gemini-4-neon ทุก tier และ docs t2 ใช้ hydrogen low", () => {
+test("เปิดแค่ agy ใน local.json: planner ใช้ Orchestrator, arch/ui ใช้ Carbon/Neon, worker t4 ใช้ Hydrogen, docs t2 ใช้ hydrogen low", () => {
   const agyOnly = { agents: { agy: true, codex: false, claude: false } };
 
-  for (const role of ["planner", "arch"]) {
-    for (const tier of ["t1", "t2", "t3", "t4", "t5"]) {
-      const r = resolveRoleRoute(realCfg, role, { localConfig: agyOnly, tier });
-      assert.equal(r.agent, "agy");
-      assert.equal(r.model, "gemini-4-neon", `${role}/${tier} บน agy ต้องยังคงใช้ gemini-4-neon`);
-    }
-  }
+  assert.equal(resolveRoleRoute(realCfg, "planner", { localConfig: agyOnly, tier: "t1" }).model, "gemini-pro-orchestrator");
+  assert.equal(resolveRoleRoute(realCfg, "planner", { localConfig: agyOnly, tier: "t2" }).model, "gemini-pro-orchestrator-neon");
+  assert.equal(resolveRoleRoute(realCfg, "planner", { localConfig: agyOnly, tier: "t3" }).model, "gemini-pro-orchestrator-neon");
+  assert.equal(resolveRoleRoute(realCfg, "planner", { localConfig: agyOnly, tier: "t4" }).model, "gemini-4-neon");
+
+  assert.equal(resolveRoleRoute(realCfg, "arch", { localConfig: agyOnly, tier: "t1" }).model, "gemini-4-carbon");
+  assert.equal(resolveRoleRoute(realCfg, "arch", { localConfig: agyOnly, tier: "t2" }).model, "gemini-4-neon");
+  assert.equal(resolveRoleRoute(realCfg, "worker", { localConfig: agyOnly, tier: "t1" }).model, "gemini-4-carbon");
+  assert.equal(resolveRoleRoute(realCfg, "worker", { localConfig: agyOnly, tier: "t4", packet: { kind: "code", risk: "low", contracts: [{ ref: "c.md" }] } }).model, "gemini-4-hydrogen");
+
   const clamped = resolveRoleRoute(realCfg, "arch", { localConfig: agyOnly, tier: "t5" });
   assert.equal(clamped.tier, "t4");
   assert.equal(clamped.clamped, true);
@@ -205,7 +208,7 @@ test("cli --dry-run แสดง resolved_routes ตาม local.json จริ�
     localConfig: { agents: { agy: true, codex: true, claude: true } },
   });
   assert.equal(dryAll.resolved_routes.planner.agent, "agy");
-  assert.equal(dryAll.resolved_routes.planner.model, "gemini-4-neon");
+  assert.equal(dryAll.resolved_routes.planner.model, "gemini-pro-orchestrator-neon");
   assert.equal(dryAll.resolved_routes.worker.agent, "codex");
   assert.equal(dryAll.resolved_routes.verifier.agent, "claude");
 

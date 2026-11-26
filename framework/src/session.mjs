@@ -29,6 +29,10 @@ export function nativeCommand(def, agent) {
       if (existsSync(js)) return { def: { ...def, command: process.execPath, useShell: false }, prefix: [js] };
     }
   }
+  if (agent === "agy") {
+    const localAgy = path.join(process.env.LOCALAPPDATA || "", "agy", "bin", "agy.exe");
+    if (existsSync(localAgy)) return { def: { ...def, command: localAgy, useShell: false }, prefix: [] };
+  }
   throw new Error(`missing native CLI: ${agent}; shell wrappers are not supported`);
 }
 

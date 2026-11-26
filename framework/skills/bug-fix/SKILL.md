@@ -1,108 +1,72 @@
 ---
 name: bug-fix
-description: วินิจฉัย ประเมินสังกัดโมดูล และแก้ไขข้อบกพร่อง (Defect Remediation & Bug Fixing) อย่างเป็นระบบตามหลัก Plan-First, Red-Green Test Proof และบันทึกประวัติลง <project>/shared/defects/ ใน knowledge root
+description: วินิจฉัย ประเมินสังกัดโมดูล และแก้ไขข้อบกพร่อง (Defect Remediation & Bug Fixing) อย่างเป็นระบบตามหลัก Systematic Root Cause Analysis, Plan-First, Red-Green Test Proof และบันทึกประวัติลง defects ของโปรเจกต์
 metadata:
   author: baan
-  version: "1.0.0"
+  version: "1.1.0"
   argument-hint: "[คำอธิบายบั๊ก / ไฟล์ที่พบปัญหา]"
 ---
 
-# 🛠️ คู่มือปฏิบัติการ AI: การวินิจฉัยและแก้บั๊กระบบ (Defect Remediation & Bug Fixing)
+# 🛠️ `bug-fix` — วินิจฉัยและแก้บั๊กอย่างเป็นระบบ (Systematic Debugging + Red-Green Proof)
 
-ทักษะนี้ใช้เมื่อผู้ใช้แจ้งบั๊กในแชท เช่น **"ตรงนี้บั๊ก ในนี้ ก็ไปแก้"**, **"ช่วยแก้บั๊กนี้หน่อย"**, **"พบข้อผิดพลาดที่..."**, หรือ **"fix bug"**
+ใช้เมื่อผู้ใช้แจ้งบั๊กในแชท เช่น **"ตรงนี้บั๊ก"**, **"ช่วยแก้บั๊กนี้หน่อย"**, **"401 / 500 / test พัง"**, หรือ **"fix bug"**
 
-หน้าที่ของคุณ (AI นายช่าง / ช่างก่อสร้าง build / ช่างตรวจรับ check) คือการเข้าแก้ปัญหาอย่างเป็นระบบ ไม่แตะโค้ดโดยไม่วางแผน ไม่แก้แบบเดา และมีชุดทดสอบพิสูจน์ผลจริงเสมอ
+กฎเหล็ก: **หา Root Cause ก่อนแก้ · Red Test First (fail ก่อนแก้) · Minimal Blast Radius · บันทึกประวัติบั๊กเสมอ**
 
 ---
 
-## 3-Step Plan-First & Subagent Workflow
+## ขั้นที่ 1 — สำรวจบริบท, หา Root Cause และประเมินสังกัดโมดูล
 
-### ขั้นที่ 1 — สำรวจบริบทและประเมินสังกัดโมดูล (Triage & Module Assessment)
-
-1. **ดึงข้อมูลอาการและไฟล์ที่เกี่ยวข้อง**: อ่าน Error Stack Trace, ข้อความอาการ, หรือไฟล์ที่ผู้ใช้ชี้เป้า
-2. **ประเมินสังกัดโมดูลอัตโนมัติ**:
-   เรียกใช้คำสั่งประเมินสังกัดโมดูลใน Core:
+1. **Reproduce & Trace**: อ่าน Error Stack Trace, logs, และไฟล์ต้นเหตุ (บน Antigravity ส่ง `invoke_subagent` `research` / `flash` ไล่ call path ขนานกันได้)
+2. **Root Cause Investigation (Five Whys)**: ห้ามแก้แค่อาการปลายเหตุ ตรวจ data flow ตั้งแต่ input → business logic → DB/API response เพื่อระบุต้นตอจริง (ถ้ามี `<project>/coding-pattern.md` ให้เทียบกับ pattern ที่ควรจะเป็นด้วย)
+3. **ประเมินสังกัดโมดูลผ่าน BAAN Core**:
    ```bash
    baan survey [--target <targetName>] --eval <filePath> --json
    ```
-   *(หรือใส่ได้หลายไฟล์คั่นด้วยคอมมา)*
-3. **พิจารณาผลการประเมิน 3 กรณี**:
-   - 📦 **อยู่ในโมดูลเดิม (In-Module)**: ไฟล์สังกัดโมดูลที่มีอยู่แล้วใน Knowledge (เช่น `auth`, `billing`) → ให้ผูกใบงานกับโมดูลนั้น (`module: "<name>"`) และดึงเอกสาร `modules/<name>/build/contract.md` มาอ่านเป็นบริบท
-   - 🌐 **งานนอกโมดูล / ส่วนกลาง (Cross-Cutting)**: ไฟล์อยู่ในโฟลเดอร์ส่วนกลาง โครงสร้างพื้นฐาน config หรือ shared utilities (เช่น `src/utils/`, `gateway/`, `database/migrations/`) → กำหนดเป็นงานข้ามระบบ (`module: "_cross"` หรือ `cross_cutting: true`) **ไม่ต้องฝืนยัดเข้าโมดูลฟีเจอร์**
-   - ⚠️ **โค้ดยังไม่มีโมดูลรองรับ (Unmapped Code)**: ไฟล์อยู่ในคอมโพเนนต์โค้ดจริงที่ยังไม่ได้ทำ Knowledge (Drift) → ชี้แจงผู้ใช้ว่าสามารถสั่ง `baan survey --scaffold-module <name>` เพื่อสร้างโมดูลใหม่ หรือจะแก้แบบ `_cross` ชั่วคราวไปก่อน
+   - 📦 **In-Module**: ผูกใบงานกับโมดูลนั้นและอ่าน contract/pattern ที่เกี่ยวข้อง
+   - 🌐 **Cross-Cutting (`_cross`)**: งานส่วนกลาง/infra เช่น `src/utils/`, `gateway/`, `migrations/` ไม่ต้องฝืนยัดเข้าโมดูลฟีเจอร์
+   - ⚠️ **Unmapped Code**: แจ้งผู้ใช้ว่ามีโค้ดที่ยังไม่มีโมดูลใน Knowledge (เลือกแก้แบบ `_cross` หรือทำ `repo-map` / `--scaffold-module` เพิ่ม)
 
 ---
 
-### ขั้นที่ 2 — วางแผนก่อนแตะโค้ด (`/plan` First)
+## ขั้นที่ 2 — วางแผนก่อนแตะโค้ด (`/plan` First)
 
-นำเสนอแผนงานแก้บั๊กในแชทให้ผู้ใช้เห็นชอบก่อนแตะโค้ดเสมอ โดยครอบคลุม 5 หัวข้อ:
-1. **สมมติฐานสาเหตุ (Root Cause Hypothesis)**: วิเคราะห์ว่าทำไมถึงเกิดบั๊ก ปัญหาอยู่ที่จุดใด
-2. **เงื่อนไขตรวจรับ (AC-BUG)**: กำหนดพฤติกรรมที่ถูกต้อง เช่น `AC-BUG-01: เมื่อส่ง request แบบ X ระบบต้องตอบกลับ 200 พร้อมผลลัพธ์ Y แทนที่จะโยน 500`
-3. **กลยุทธ์การทดสอบ (Test Strategy)**:
-   - `test_targeted`: คำสั่งรันเทสต์เฉพาะจุดที่ใช้จำลองบั๊ก
-   - `test_full`: คำสั่งรัน Regression Test ทั้งระบบ
-4. **ตีกรอบขอบเขตแคบที่สุด (`owns`)**: ระบุเฉพาะไฟล์โค้ดและไฟล์เทสต์ที่จำเป็นต้องแก้ ห้ามแตะไฟล์นอกขอบเขตและห้ามทำ refactor โดยไม่จำเป็น (Minimal Blast Radius)
-5. **สังกัดโมดูล**: ระบุชัดเจนว่างานนี้เป็นของโมดูลใด หรือเป็น `_cross`
+นำเสนอแผนแก้บั๊กให้ผู้ใช้เห็นชอบก่อนแก้ไขไฟล์จริง:
+1. **Root Cause Hypothesis**: ต้นตอที่แท้จริงและเหตุผลที่เกิด (อ้างอิง `file:line`)
+2. **AC-BUG**: เงื่อนไขตรวจรับที่วัดผลได้ เช่น `AC-BUG-01: ...`
+3. **Red-Green Test Strategy**: คำสั่ง `test_targeted` ที่จะใช้พิสูจน์ Red Test และ `test_full` สำหรับ Regression
+4. **Minimal `owns`**: เฉพาะไฟล์ที่จำเป็นต้องแก้ (ห้ามทำ unrelated refactor)
 
 ---
 
-### ขั้นที่ 3 — ลงมือแก้และตรวจรับ (Fix & Verification)
+## ขั้นที่ 3 — Red → Green → Verify → Record
 
-เมื่อผู้ใช้อนุมัติแผน:
-1. **เขียน Red Test เสมอ (กติกาบังคับ)**:
-   - เขียน Unit/Integration Test ที่จำลองสถานการณ์บั๊ก และสั่งรันเพื่อยืนยันว่า **Test ล้มเหลว (Red)** ตามที่คาดไว้จริง
-   - *ห้ามแก้โค้ดโดยเด็ดขาดหากยังไม่สามารถพิสูจน์ผล Red Test ได้*
-2. **แก้ไขโค้ดเฉพาะใน `owns` ให้ Test ผ่าน (Green)**:
-   - แก้ไขโค้ดที่จุดต้นตอ จนกระทั่ง Red Test เปลี่ยนเป็นผ่าน (Green)
-3. **รัน Regression Suite ป้องกันผลข้างเคียง**:
-   - รันคำสั่ง `test_full` ของโปรเจกต์ ต้องเขียวทั้งหมด 100%
-4. **ช่างตรวจรับ (check / QA) ท้าทายและตรวจทาน**:
-   - ตรวจสอบว่า Test ที่เขียนครอบคลุม Boundary Conditions และไม่มี Flaky Test
-5. **บันทึกประวัติข้อบกพร่องลง `<project>/shared/defects/`**:
-   - `<project>` คือโฟลเดอร์ project ใน knowledge root (เช่น `knowledge/school-bot/`) ไม่ใช่ `shared/` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
-   - สร้างไฟล์บันทึก `<project>/shared/defects/BUG-xxx.md` (นับรหัสถัดไป เช่น `BUG-001.md`)
-   - อัปเดตตารางสรุปใน `<project>/shared/defects/INDEX.md`
+1. **เขียน Red Test ก่อนแก้โค้ด (บังคับ)**:
+   - เขียน automated test ที่จำลองบั๊กและรันให้เห็นว่า **ล้มเหลว (Red)** ตรงอาการจริง
+   - *ห้ามแก้โค้ด production หากยังพิสูจน์ Red Test ไม่ได้* (กรณีแก้บั๊ก UI หรือ environment พิเศษ ให้ระบุเหตุผลและหลักฐานการจำลองอาการชัดเจน)
+2. **แก้ไขโค้ดเฉพาะใน `owns` ให้ผ่าน (Green)**: แก้ที่จุดต้นตอจน Red Test ผ่าน
+3. **ตรวจ Regression & Fresh-Eyes Audit**: รัน `test_full` จริงทั้งหมด (และผ่าน `verify-before-done` / `code-review` หากมีความเสี่ยงสูง)
+4. **บันทึกประวัติข้อบกพร่องลง Knowledge Project**:
+   - หากโปรเจกต์ใช้ Neutral Knowledge v2 ให้บันทึกที่ `<project>/defects/BUG-xxx.md` (และ `<project>/defects/INDEX.md`)
+   - หากโปรเจกต์ใช้โครงสร้าง 3-slot เดิม ให้บันทึกที่ `<project>/shared/defects/BUG-xxx.md` (และ `<project>/shared/defects/INDEX.md`) ใน knowledge root — ไม่ใช่ `shared/` ที่ราก workspace ซึ่งไม่ได้อยู่ใน git
 
 ---
 
-## รูปแบบเอกสารบันทึกประวัติบั๊ก (`<project>/shared/defects/`)
+## รูปแบบไฟล์บันทึกบั๊ก (`BUG-xxx.md`)
 
-### 1. โครงสร้างไฟล์ `<project>/shared/defects/BUG-xxx.md`
 ```markdown
 # BUG-xxx: [ชื่ออาการของบั๊กสั้นๆ]
 
 - **วันที่แก้ไข:** YYYY-MM-DD
 - **โมดูลที่เกี่ยวข้อง:** [ชื่อโมดูล หรือ _cross]
-- **ระดับความรุนแรง:** [high / low]
+- **ระดับความรุนแรง:** [high / medium / low]
 - **ไฟล์ที่แก้ไข (owns):** `[path/to/file]`, `[path/to/test]`
 
 ## 1. อาการที่พบ (Symptom)
-[อธิบายสิ่งที่เกิดขึ้นจริง เปรียบเทียบกับสิ่งที่ควรจะเป็น]
-
 ## 2. สาเหตุที่แท้จริง (Root Cause)
-[อธิบายกลไกที่ทำให้เกิดข้อผิดพลาด]
-
 ## 3. วิธีการแก้ไข (Resolution)
-[อธิบายว่าปรับปรุงโค้ดอย่างไร พร้อมแนวคิด]
-
 ## 4. ชุดทดสอบที่ใช้พิสูจน์ (Verification Proof)
-- **Red Test:** `[คำสั่งรัน test ที่ fail ก่อนแก้]`
+- **Red Test:** `[คำสั่งและชื่อ test ที่ fail ก่อนแก้]`
 - **Green Proof:** `[คำสั่งและชื่อ test ที่ผ่านหลังแก้]`
 - **Regression:** `[คำสั่ง test_full ที่ผ่านทั้งหมด]`
 ```
-
-### 2. โครงสร้างไฟล์สารบัญ `<project>/shared/defects/INDEX.md`
-```markdown
-# 🐞 สารบัญประวัติข้อบกพร่อง (Defect History Index)
-
-| รหัส | วันที่ | โมดูล | อาการ / ปัญหา | สาเหตุย่อ | สถานะ |
-|---|---|---|---|---|---|
-| [BUG-001](BUG-001.md) | 2026-11-09 | auth | Login ค้างเมื่อ network ช้า | ขาด timeout ใน client | resolved |
-```
-
----
-
-## กฎเหล็กสำหรับการแก้บั๊ก
-- **Red Test First**: ต้องพิสูจน์ว่า Test แดงก่อนลงมือแก้เสมอ ห้ามอ้างว่าแก้เสร็จแล้วโดยไม่มี Test Proof
-- **Minimal Blast Radius**: แก้เฉพาะไฟล์ที่จำเป็นใน `owns` ไม่ปรับแต่งโค้ดส่วนอื่นโดยไม่เกี่ยวข้อง
-- **Preserve Knowledge Integrity**: ทุกครั้งที่มีการแก้บั๊ก ต้องบันทึกลง `<project>/shared/defects/` เสมอ เพื่อให้ทีมและ AI รุ่นต่อไปเรียนรู้

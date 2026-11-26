@@ -59,18 +59,18 @@
 
 BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนที่ 1 ให้ทำงานแบบ deterministic ผ่าน [agents.json](agents.json) + `src/routing.mjs` (**0 Token Overhead ตอนรันงานจริง**) ภายใต้กรอบแพ็กเกจ ~\$20/เดือน:
 
-1. **เฉพาะแพ็กเกจมาตรฐาน ~\$20/เดือนเท่านั้น (แยกโควตา 5 ชม./รายสัปดาห์ออกจากราคา API)**:
+1. **ขอบเขตแพ็กเกจและสิทธิ์โมเดลของแต่ละค่าย (แยกโควตา 5 ชม./รายสัปดาห์ออกจากราคา API)**:
    - **OpenAI (`codex`)**: เฉพาะโมเดลใน **ChatGPT Plus (\$20/เดือน)** (`gpt-6.2-astra`, `gpt-6.2-sol`, `gpt-6.1-terra`) — โควตา 5 ชม. + รายสัปดาห์ (`astra` ~5–45 msg/5ชม. vs `sol` ~15–160 msg/5ชม.)
-   - **Google (`agy`)**: เฉพาะโมเดลใน **Google AI Pro (\$19.99/เดือน)** (`gemini-4-neon`, `gemini-4-hydrogen`, `gemini-3.8-flash`) — โควตา 5 ชม. + รายสัปดาห์แบบแชร์บ่อข้ามรุ่น; ห้ามใส่รุ่น Ultra (เช่น `gemini-4-carbon`)
+   - **Google (`agy`)**: ใช้สิทธิ์โมเดลที่เปิดใช้งานได้จริงใน Antigravity (`agy models`) — **`gemini-pro-orchestrator` / `gemini-pro-orchestrator-neon`** (Native Orchestrator สำหรับ `planner`, `spec.t1`, `pm.t1`, `testplan.t1`; ไม่ส่ง `--effort`), **`gemini-4-carbon`** (`high` สำหรับ `t1` งานสถาปัตยกรรมซับซ้อน/ความปลอดภัย/DB Migration/Critical Audit), **`gemini-4-neon`** (`high`/`medium`/`low` งานมาตรฐานและ UI/UX), **`gemini-4-hydrogen`** (`low` สำหรับงานเร็ว/Contracted/Docs `t2`), และ **`gemini-3.8-flash`** (`low` สำหรับ Docs `t3` / subagent สำรวจ)
    - **Anthropic (`claude`)**: เฉพาะโมเดลใน **Claude Pro (\$20/เดือน)** (`opus`, `sonnet`, `haiku`) — โควตา 5 ชม. + รายสัปดาห์คิดตาม Compute (`sonnet` ~10–45 msg/5ชม. เป็นฐานประจำวัน; สงวน `opus` ไว้เฉพาะงานยาก/ตรวจรับเพื่อไม่ให้ล็อกโควตา); ห้ามใส่รุ่นที่หัก credits แยกหรือจำกัด Max/Ultra (เช่น `fable`)
-2. **หลัก Pareto Efficiency 4 มิติ (Quality · Compute Cost/Task · Speed/Latency · \$20 Quota)**:
+2. **หลัก Pareto Efficiency 4 มิติ (Quality · Compute Cost/Task · Speed/Latency · Quota)**:
    - `Cost per Task` บน Artificial Analysis คือ `Tokens Used × Compute Weight per Token` ซึ่งสะท้อนภาระโควตาและเวลาจริงได้ตรงกว่าราคาต่อ 1M Token เปล่าๆ
    - **ตัดตัวที่ถูกครอบงำ (Strictly Dominated)** ทิ้งทั้งหมด (`gemini-4-hydrogen` ระดับ `medium`–`xhigh`, `gpt-6.1-terra` ระดับ `medium`–`max`, `gpt-6-luna` ทุกระดับ, `sonnet` ระดับ `xhigh`–`max`)
-   - **ตัด Effort ที่ผลตอบแทนตกหน้าผา** (ได้คะแนนเพิ่ม < ~10% แต่จ่าย Compute เพิ่ม +55%–75% หรือช้าลงหนัก): ห้ามใช้ `max` ทุกตัว, **ห้ามใช้ `gemini-4-neon / xhigh`** (+2.3% แลก +72% และรอ ~21.5 นาที → เพดาน AGY อยู่ที่ `high`), และ **ห้ามใช้ `gpt-6.2-sol / xhigh`** (+5.7% จาก `medium` แลก +59% → งานปกติใช้ `medium` / งานย่อยใช้ `low`)
-   - **ข้อยกเว้น `t1` Overdrive (`_timeoutSec: 3600`)**: อนุญาต `xhigh` เฉพาะ `gpt-6.2-astra` และ `claude opus` ใน `t1` ของสายวิศวกรรม/ฐานข้อมูล/ตรวจรับ (`planner`, `arch`, `dba`, `worker`, `build`, `verifier`, `check`) เท่านั้น ส่วน `agy` กดเพดานที่ `gemini-4-neon / high`
-3. **Role-Owned Tiers (แต่ละบทบาทมีบันได Tier ของตัวเอง)**:
+   - **ตัด Effort ที่ผลตอบแทนตกหน้าผา** (ได้คะแนนเพิ่ม < ~10% แต่จ่าย Compute เพิ่ม +55%–75% หรือช้าลงหนัก): ห้ามใช้ `max` ทุกตัว, **ห้ามใช้ `gemini-4-neon / xhigh`** (+2.3% แลก +72% และรอ ~21.5 นาที → เพดาน `neon` อยู่ที่ `high`), และ **ห้ามใช้ `gpt-6.2-sol / xhigh`** (+5.7% จาก `medium` แลก +59% → งานปกติใช้ `medium` / งานย่อยใช้ `low`)
+   - **ข้อยกเว้น `t1` Overdrive (`_timeoutSec: 3600`)**: อนุญาต `xhigh` เฉพาะ `gpt-6.2-astra` และ `claude opus` ใน `t1` ของสายวิศวกรรม/ฐานข้อมูล/ตรวจรับ (`planner`, `arch`, `dba`, `worker`, `build`, `verifier`, `check`) เท่านั้น ส่วน `agy` ใช้ `gemini-pro-orchestrator` (สำหรับ planning/orchestration) หรือ `gemini-4-carbon / high` (สำหรับ deep code/arch/audit)
+3. **Role-Owned Tiers & Provider-Native Harness (แต่ละบทบาทมีบันได Tier ของตัวเอง)**:
    - แต่ละบทบาททั้ง 14 Roles ประกาศ `tiers` ตามความยาก ความเร็วที่ต้องการ และความเสี่ยงจริงของสายงาน (`t1` สูงสุด → `t3`/`t4` ต่ำสุด)
-   - งานออกแบบระบบและ UX/UI (`planner`, `arch`, `survey`, `ui`, `review`) บน `agy` ยึด **`gemini-4-neon` ทุก tier** ปรับเฉพาะ `effort` (`high` → `medium` → `low`)
+   - ฝั่ง **`agy` ทำงานแบบ Antigravity-Native** (Orchestrator + 9 Common Skills + built-in/dynamic subagents) จึงเลือกโมเดลตามลักษณะงานจริง: `Orchestrator` วางแผน/แตกงาน · `Carbon` งานคิดลึก/audit วิกฤต · `Neon` งานมาตรฐาน/UI · `Hydrogen`/`Flash` งานเร็วและเอกสาร
    - งาน `kind: "docs"` แยกเข้าบทบาท **`docs`** (`t1` Critical ADR/Contracts · `t2` Standard Docs · `t3` Light/Index/Subagent Explore)
 4. **Availability-Driven Specialist Routing (อิงความพร้อมใช้งานจาก `local.json` โดยตรง)**:
    - แต่ละ role (และแต่ละ tier เมื่อต่างกัน เช่น `docs.t1` vs `docs.t2`) ประกาศลำดับค่าย `preference` แล้วเลือกค่ายอันดับ 1 ที่เปิดใน `local.json` อัตโนมัติ
@@ -94,12 +94,14 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 | ค่าย | รุ่น / Effort | AA v5.0.1 | Cost/Task | ความเร็วพ่น / เวลาโดยประมาณ | สถานะใน BAAN |
 |---|---|---:|---:|---|---|
 | `agy` | `gemini-3.8-flash` / `low` | 22–23 | \$0.24 | ~116 tok/s · สั้นมาก | ใช้ (`docs.t3`) |
-| `agy` | `gemini-4-hydrogen` / `low` | 27 | \$0.29 | ~185 tok/s · TTFT ~5.6s · ~1.3 นาที | ใช้ (`docs.t2`) — ระดับเดียวของ `hydrogen` ที่คุ้ม |
+| `agy` | `gemini-4-hydrogen` / `low` | 27 | \$0.29 | ~185 tok/s · TTFT ~5.6s · ~1.3 นาที | ใช้ (`t4` / `t3` งานย่อย / `docs.t2`) — ระดับเดียวของ `hydrogen` ที่คุ้ม |
 | `agy` | `gemini-4-hydrogen` / `medium`–`xhigh` | 41–54 | \$0.80–3.16 | ~185 tok/s แต่คิดยาว (~3.7–13.7 นาที) | **ตัดออก** — แพ้ `neon low/medium` ทั้งคะแนน ราคา และเวลา |
-| `agy` | `gemini-4-neon` / `low` | 44 | \$0.75 | ~105 tok/s · ~3.7 นาที | ใช้ (`t4` / `t3` งานย่อย) |
-| `agy` | `gemini-4-neon` / `medium` | 55 | \$1.90 | ~105 tok/s · ~8.3 นาที | ใช้ (**Sweet Spot** งานมาตรฐาน) |
-| `agy` | `gemini-4-neon` / `high` | 60 | \$3.74 | ~101 tok/s · TTFT ~40.6s · ~14.8 นาที | ใช้ (**เพดานสูงสุดของ AGY** `t1`–`t2`) |
+| `agy` | `gemini-4-neon` / `low` | 44 | \$0.75 | ~105 tok/s · ~3.7 นาที | ใช้ (`t4` / `t3` งานย่อย UI/Arch) |
+| `agy` | `gemini-4-neon` / `medium` | 55 | \$1.90 | ~105 tok/s · ~8.3 นาที | ใช้ (**Sweet Spot** งานมาตรฐาน & UI) |
+| `agy` | `gemini-4-neon` / `high` | 60 | \$3.74 | ~101 tok/s · TTFT ~40.6s · ~14.8 นาที | ใช้ (`t2` งานยาก / Design System) |
 | `agy` | `gemini-4-neon` / `xhigh` | 61.4 | \$6.44 | ~110 tok/s · TTFT ~56.5s · ~21.5 นาที | **ตัดออก** (+2.3% แลก +72% และช้า ~21.5 นาที) |
+| `agy` | `gemini-4-carbon` / `high` | 60+ | \$4.90–7.76 | Deep Reasoning | ใช้ (เฉพาะ `t1` Critical Arch / Security / DB / Audit) |
+| `agy` | `gemini-pro-orchestrator` / `orchestrator-neon` | Native | — | Multi-step Orchestration | ใช้ (`planner.t1–t3`, `spec.t1`, `pm.t1`, `testplan.t1` — ไม่ส่ง `--effort`) |
 | `codex` | `gpt-6-luna` / ทุกระดับ | 10–28 | \$0.07–0.15 | เร็วมาก | **ตัดออก** — โดน `terra low` ทับ |
 | `codex` | `gpt-6.1-terra` / `low` | 29 | \$0.07 | เร็ว · TTFT ~2.3s *(non-reasoning)* · ~1.2 นาที | ใช้ (`docs.t3` / subagent) |
 | `codex` | `gpt-6.1-terra` / `medium`–`max` | 38–51 | \$0.25–0.96 | เร็ว–กลาง | **ตัดออก** — โดน `sol low/medium` ทับ |
@@ -125,27 +127,27 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 
 ### 4.1 สถาปัตยกรรมและวางแผน (`planner` [default `t3`], `arch` [default `t2`]) — `pref: agy → codex → claude`
 
-| Tier | ลักษณะงาน | `agy` (ยึด `neon` · เพดาน `high`) | `codex` | `claude` |
+| Tier | ลักษณะงาน | `agy` (`Orchestrator` / `Carbon` / `Neon`) | `codex` | `claude` |
 |---|---|---|---|---|
-| **`t1`** | สถาปัตยกรรมข้ามระบบ / Core Foundation / Overdrive (`3600s`) | `gemini-4-neon` / `high` (**60**, \$3.74) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `opus` / `xhigh` (**57**, \$6.05) |
-| **`t2`** | ออกแบบโมดูลใหญ่ / ADR / Multi-Repo Plan | `gemini-4-neon` / `high` (**60**, \$3.74) | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `opus` / `high` (**52**, \$3.46) |
-| **`t3`** | วางแผนฟีเจอร์มาตรฐาน / API & DB Contract โมดูลเดียว | `gemini-4-neon` / `medium` (**55**, \$1.90) | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
+| **`t1`** | สถาปัตยกรรมข้ามระบบ / Core Foundation / Overdrive (`3600s`) | `planner`: `gemini-pro-orchestrator` · `arch`: `gemini-4-carbon` / `high` | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `opus` / `xhigh` (**57**, \$6.05) |
+| **`t2`** | ออกแบบโมดูลใหญ่ / ADR / Multi-Repo Plan | `planner`: `gemini-pro-orchestrator-neon` · `arch`: `gemini-4-neon` / `high` | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `opus` / `high` (**52**, \$3.46) |
+| **`t3`** | วางแผนฟีเจอร์มาตรฐาน / API & DB Contract โมดูลเดียว | `planner`: `gemini-pro-orchestrator-neon` · `arch`: `gemini-4-neon` / `medium` | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
 | **`t4`** | ปรับโครงสร้างเล็ก / แตกงานย่อยในโมดูลเดิม | `gemini-4-neon` / `low` (**44**, \$0.75) | `gpt-6.2-sol` / `low` (**40.6**, \$0.18) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
 
 ### 4.2 พัฒนาโค้ดและแก้บั๊ก (`worker` [default `t3`], `build` [default `t3`]) — `pref: codex → agy → claude`
 
 | Tier | ลักษณะงาน (เทียบทีม Dev จริง) | `codex` | `agy` | `claude` |
 |---|---|---|---|---|
-| **`t1`** | Principal Dev: งานโคตรยาก / Concurrency / Security / Escalation (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `xhigh` (**57**, \$6.05) |
+| **`t1`** | Principal Dev: งานโคตรยาก / Concurrency / Security / Escalation (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-carbon` / `high` | `opus` / `xhigh` (**57**, \$6.05) |
 | **`t2`** | Senior Dev: งานยาก / High-Risk Code (ไม่มี Contract ชัด) / Complex Bugfix *(ขั้นต่ำ `risk: high` แบบไม่มี contract)* | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `high` (**52**, \$3.46) |
 | **`t3`** | Standard Dev: งานปกติ / Multi-File Feature / Bugfix มาตรฐาน *(Default)* | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `gemini-4-neon` / `medium` (**55**, \$1.90) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
-| **`t4`** | Contracted Dev: งานมีสเปก+Contract ชัด / Unit Tests / Refactor เล็ก | `gpt-6.2-sol` / `low` (**40.6**, \$0.18) | `gemini-4-neon` / `low` (**44**, \$0.75) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
+| **`t4`** | Contracted Dev: งานมีสเปก+Contract ชัด / Unit Tests / Refactor เล็ก | `gpt-6.2-sol` / `low` (**40.6**, \$0.18) | `gemini-4-hydrogen` / `low` (**27**, \$0.29) | `sonnet` / `high` (**42** · TB 70.6%, \$1.64) |
 
 ### 4.3 ตรวจรับอิสระและท้าทายระบบ (`verifier` [default `t2`], `check` [default `t2`]) — `pref: claude → agy → codex`
 
 | Tier | ลักษณะงาน | `claude` | `agy` | `codex` |
 |---|---|---|---|---|
-| **`t1`** | Critical Audit: Security / Auth / PII / DB Migration / Money / Release (`3600s`) | `opus` / `xhigh` (**57**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `xhigh` (**61.6**) |
+| **`t1`** | Critical Audit: Security / Auth / PII / DB Migration / Money / Release (`3600s`) | `opus` / `xhigh` (**57**) | `gemini-4-carbon` / `high` | `gpt-6.2-astra` / `xhigh` (**61.6**) |
 | **`t2`** | Senior QA: ตรวจรับอิสระมาตรฐาน / High-Risk / Bugfix *(Default)* | `opus` / `high` (**52**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `high` (**60.1**) |
 | **`t3`** | Focused QA: งาน Low-Risk / Contracted Feature / Test-Mapping | `opus` / `medium` (**48**) | `gemini-4-neon` / `medium` (**55**) | `gpt-6.2-sol` / `medium` (**52.7**) |
 
@@ -153,23 +155,23 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 
 | Tier | ลักษณะงาน | `claude` | `agy` | `codex` |
 |---|---|---|---|---|
-| **`t1`** | Lead BA/PM/TestPlan: โดเมนซับซ้อน / กฎธุรกิจข้ามโมดูล / E2E ข้ามระบบ | `opus` / `high` (**52**) | `gemini-4-neon` / `high` (**60**) | `gpt-6.2-astra` / `high` (**60.1**) |
+| **`t1`** | Lead BA/PM/TestPlan: โดเมนซับซ้อน / กฎธุรกิจข้ามโมดูล / E2E ข้ามระบบ | `opus` / `high` (**52**) | `gemini-pro-orchestrator` | `gpt-6.2-astra` / `high` (**60.1**) |
 | **`t2`** | Standard BA/PM/TestPlan: Requirement/AC, แตก Wave และ Test Plan ประจำโมดูล *(Default)* | `sonnet` / `high` (**42**) | `gemini-4-neon` / `medium` (**55**) | `gpt-6.2-sol` / `medium` (**52.7**) |
-| **`t3`** | Quick Refinement: ปรับแก้ AC / เคลียร์ OQ ย่อย / Delta Test Plan | `sonnet` / `high` (**42**) | `gemini-4-neon` / `low` (**44**) | `gpt-6.2-sol` / `low` (**40.6**) |
+| **`t3`** | Quick Refinement: ปรับแก้ AC / เคลียร์ OQ ย่อย / Delta Test Plan | `sonnet` / `high` (**42**) | `gemini-4-hydrogen` / `low` (**27**) | `gpt-6.2-sol` / `low` (**40.6**) |
 
 ### 4.4.1 สถาปนิกฐานข้อมูล (`dba` [default `t2`]) — `pref: codex → agy → claude`
 
 | Tier | ลักษณะงาน | `codex` | `agy` | `claude` |
 |---|---|---|---|---|
-| **`t1`** | Critical DB Migration / High-Concurrency Schema / Overdrive (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `xhigh` (**57**, \$6.05) |
+| **`t1`** | Critical DB Migration / High-Concurrency Schema / Overdrive (`3600s`) | `gpt-6.2-astra` / `xhigh` (**61.6**, \$2.52) | `gemini-4-carbon` / `high` | `opus` / `xhigh` (**57**, \$6.05) |
 | **`t2`** | Standard DBA: ตรวจ DBML / Index / SQL Migration มาตรฐาน *(Default)* | `gpt-6.2-astra` / `high` (**60.1**, \$2.07) | `gemini-4-neon` / `high` (**60**, \$3.74) | `opus` / `high` (**52**, \$3.46) |
 | **`t3`** | Light Schema Check / Query Review ย่อย | `gpt-6.2-sol` / `medium` (**52.7**, \$0.41) | `gemini-4-neon` / `medium` (**55**, \$1.90) | `sonnet` / `high` (**42**, \$1.64) |
 
 ### 4.5 ทีมออกแบบหน้าจอ UX/UI (`survey`, `ui`, `review` [default `t2`]) — `pref: agy → claude → codex`
 
-| Tier | ลักษณะงาน | `agy` (ยึด `neon` ทุก tier) | `claude` | `codex` |
+| Tier | ลักษณะงาน | `agy` (`Carbon` / `Neon`) | `claude` | `codex` |
 |---|---|---|---|---|
-| **`t1`** | Lead UX/UI: วาง Design System / Multi-Step Flow / Full Visual & WCAG Audit | `gemini-4-neon` / `high` (**60**) | `opus` / `high` (**52**) | `gpt-6.2-astra` / `high` (**60.1**) |
+| **`t1`** | Lead UX/UI: วาง Design System / Multi-Step Flow / Full Visual & WCAG Audit | `gemini-4-carbon` / `high` | `opus` / `high` (**52**) | `gpt-6.2-astra` / `high` (**60.1**) |
 | **`t2`** | Standard UX/UI: ออกแบบหน้าจอ / Feasibility / Handoff *(Default)* | `gemini-4-neon` / `medium` (**55**) | `sonnet` / `high` (**42**) | `gpt-6.2-sol` / `medium` (**52.7**) |
 | **`t3`** | UI Polish: ปรับ Component ย่อย / Copy / State / Quick WCAG Check | `gemini-4-neon` / `low` (**44**) | `sonnet` / `high` (**42**) | `gpt-6.2-sol` / `low` (**40.6**) |
 
@@ -189,8 +191,7 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 | `codex` | `gpt-6.2-sol` / `xhigh`–`max` | 55.7–57.3 / \$0.65–1.01 | `xhigh` ได้แค่ +5.7% จาก `medium` (52.7 @ \$0.41) แต่จ่ายเพิ่ม +59% · `max` ตกหน้าผา +55% |
 | `codex` | `gpt-6.1-terra` / `medium`–`max` | 38–51 / \$0.25–0.96 | ถูกครอบงำโดย `gpt-6.2-sol` (`low` 40.6 @ \$0.18, `medium` 52.7 @ \$0.41) |
 | `codex` | `gpt-6-luna` / ทุกระดับ | 10–28 / \$0.07–0.15 | ถูกครอบงำโดย `gpt-6.1-terra low` (29 @ \$0.07) |
-| `agy` | `gemini-4-carbon` | 60 / \$4.90–7.76 | นอกแพ็กเกจ \$20 และถูกครอบงำโดย `gemini-4-neon high` (60 @ \$3.74) |
-| `agy` | `gemini-4-neon` / `xhigh` (ทุกบทบาท) | 61.4 / \$6.44 | ได้แค่ +2.3% จาก `high` (60 @ \$3.74) แต่แพงขึ้น +72% และช้าลงเป็น ~21.5 นาที (ลดเพดาน AGY ลงมาที่ `high`) |
+| `agy` | `gemini-4-neon` / `xhigh` (ทุกบทบาท) | 61.4 / \$6.44 | ได้แค่ +2.3% จาก `high` (60 @ \$3.74) แต่แพงขึ้น +72% และช้าลงเป็น ~21.5 นาที (ใช้ `gemini-4-carbon` หรือ `gemini-pro-orchestrator` สำหรับ `t1` แทน) |
 | `agy` | `gemini-4-hydrogen` / `medium`–`xhigh` | 41–54 / \$0.80–3.16 | พ่น thinking tokens ยาวกว่า 2–3.3× ทำให้กินโควตาเท่า/แพงกว่า `neon` และจบงานช้าพอๆ กันหรือช้ากว่า ขณะคะแนนต่ำกว่า |
 | `claude` | `fable` (5.2) ทุกระดับ | 54–65 / \$3.10–26.54 | ไม่รวมในแพ็กเกจ Claude Pro \$20 (ต้องใช้ usage credits หรือ Max/Ultra) |
 | `claude` | `opus` (5.5) / `max` | 58–59 / \$10.04 | ได้ +2–3% จาก `xhigh` (57) แต่แพงขึ้น +66% และ TTFT ~345s+ (~6× ช้ากว่า) |
@@ -214,6 +215,8 @@ BAAN แปลงเกณฑ์กลาง 11 ข้อในส่วนท�
 ---
 
 ## 6. Change Log
+
+- **2026-11-26 (Antigravity-Native Harness + Entitled Model Lineup)**: ปรับเฉพาะฝั่ง `agy` ให้ใช้สิทธิ์โมเดลจริงบน Antigravity (`gemini-pro-orchestrator` / `gemini-pro-orchestrator-neon`, `gemini-4-carbon`, `gemini-4-neon`, `gemini-4-hydrogen`, `gemini-3.8-flash`) ควบคู่ Native Orchestrator + 9 Common Skills ใน `.agents/skills/` โดยคงผัง \$20/เดือนและ Pareto ของ `claude` และ `codex` ไว้เหมือนเดิมทั้งหมด
 
 - **2026-11-20 (Add `dba` & `testplan` Roles for `baan flow`)**: เพิ่มบทบาท **`dba`** (`codex → agy → claude`, default `t2`) และ **`testplan`** (`claude → agy → codex`, default `t2`) เป็น 14 Roles ภายใต้กรอบแพ็ก \$20/เดือนและหลัก Pareto เหมือนเดิมทุกประการ
 

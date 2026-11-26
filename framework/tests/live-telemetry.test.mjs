@@ -57,6 +57,8 @@ test("live-telemetry: infers explicit BAAN roles only, never guesses ambiguous t
   assert.equal(inferBaanRole({ agentType: "survey" }), "survey");
   assert.equal(inferBaanRole({ roleLabel: "spec: standalone login" }), "spec");
   assert.equal(inferBaanRole({ roleLabel: "arch - API design" }), "arch");
+  assert.equal(inferBaanRole({ agentType: "research" }), "research");
+  assert.equal(inferBaanRole({ agentType: "browser" }), "browser");
   assert.equal(inferBaanRole({ roleLabel: "Survey current auth flow" }), null);
   assert.equal(inferBaanRole({ roleLabel: "Inventory features by role" }), null);
 });
@@ -139,6 +141,19 @@ test("live-telemetry: Antigravity parent + nested subagent upgrade & Stop(fullyI
     assert.equal(child.isSubagent, true);
     assert.equal(child.parentSessionId, "parent-1");
     assert.equal(child.role, "spec");
+
+    processHookEvent({
+      hookEventName: "PreToolUse",
+      conversationId: "parent-1",
+      workspacePaths: [ws],
+      toolCall: {
+        id: "call-wf-1",
+        name: "run_workflow",
+        args: { Description: "Parallel lens audit" },
+      },
+      cwd: ws,
+    }, { providerHint: "agy", now: t0 });
+    assert.equal(scanLiveSessions(ws, { now: Date.parse(t0) }).some((s) => s.isSubagent && s.title === "Parallel lens audit"), true);
 
     // Child completes, then parent finishes fullyIdle.
     processHookEvent({ hookEventName: "Stop", conversationId: "child-conv-1", workspacePaths: [ws], fullyIdle: true, cwd: ws }, { providerHint: "agy", now: t2 });

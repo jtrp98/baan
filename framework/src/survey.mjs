@@ -17,7 +17,9 @@ export function scanTargetCodebase(targetDir) {
 
   const stacks = [];
   const components = [];
-  const metadata = { path: resolved, git: null, stacks: [], components: [] };
+  const commands = [];
+  const entrypoints = [];
+  const metadata = { path: resolved, git: null, stacks: [], components: [], commands: [], entrypoints: [] };
 
   // 1. ตรวจสอบ Git commit ล่าสุด
   const gitCheck = gitIn(resolved, ["rev-parse", "--is-inside-work-tree"]);
@@ -65,6 +67,21 @@ export function scanTargetCodebase(targetDir) {
       location: rel,
       frameworks: detected.length ? detected : ["Node.js"],
     });
+
+    const pkgDirRel = path.dirname(rel);
+    const prefix = pkgDirRel === "." ? "" : `${pkgDirRel}/`;
+    const scripts = pkg.scripts && typeof pkg.scripts === "object" ? pkg.scripts : {};
+    for (const key of ["dev", "build", "test", "test:unit", "test:e2e", "lint", "typecheck"]) {
+      if (typeof scripts[key] === "string" && scripts[key].trim()) {
+        commands.push({ scope: pkgDirRel, name: key, command: scripts[key].trim() });
+      }
+    }
+    if (typeof pkg.main === "string" && pkg.main.trim()) entrypoints.push(`${prefix}${pkg.main.trim()}`);
+    if (pkg.bin && typeof pkg.bin === "object") {
+      for (const b of Object.values(pkg.bin)) {
+        if (typeof b === "string" && b.trim()) entrypoints.push(`${prefix}${b.trim()}`);
+      }
+    }
   }
 
   // 2.2 .NET / C# ecosystem
@@ -98,6 +115,11 @@ export function scanTargetCodebase(targetDir) {
       frameworks: [".NET Solution", ...(csprojs.length ? [`Projects: ${csprojs.length}`] : [])],
       projects: csprojs,
     });
+    const dotNetScope = dotNetFiles[0].startsWith("backend") ? "backend" : ".";
+    commands.push(
+      { scope: dotNetScope, name: "build", command: `dotnet build ${dotNetFiles[0]}` },
+      { scope: dotNetScope, name: "test", command: `dotnet test ${dotNetFiles[0]} --logger "console;verbosity=normal"` },
+    );
   }
 
   // 2.3 Go ecosystem
@@ -108,6 +130,7 @@ export function scanTargetCodebase(targetDir) {
       location: rootEntries.includes("go.work") ? "go.work" : "go.mod",
       frameworks: ["Go"],
     });
+    commands.push({ scope: ".", name: "test", command: "go test ./..." });
   }
 
   // 2.4 Python ecosystem
@@ -197,6 +220,8 @@ export function scanTargetCodebase(targetDir) {
 
   metadata.stacks = stacks;
   metadata.components = components;
+  metadata.commands = commands;
+  metadata.entrypoints = [...new Set(entrypoints)];
   return metadata;
 }
 
@@ -330,6 +355,7 @@ export function surveyProject(o, ws, root, log = () => {}) {
       targetName,
       platform: project?.header?.platform || "web",
       os: project?.header?.os || [],
+      lean: Boolean(o.lean),
     });
     if (o.json) return res;
     return res.ok ? `✅ สร้างโมดูล ${o["scaffold-module"]} ใน ${res.dir} เรียบร้อยแล้ว (อัปเดตตาราง INDEX.md แล้ว)`
@@ -382,6 +408,8 @@ export function surveyProject(o, ws, root, log = () => {}) {
     branchStatus,
     stacks: surveyData.stacks,
     components: surveyData.components,
+    commands: surveyData.commands,
+    entrypoints: surveyData.entrypoints,
     git: surveyData.git,
     drift,
   };
