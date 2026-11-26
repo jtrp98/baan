@@ -37,7 +37,7 @@ baan monitor [--port 3456] [--no-open] [--tui]
 - ตรวจจับ Tech Stacks (.NET, Next.js, Go, Python, React, ฯลฯ) และ Architecture Components (`features/`, `backend/src/`, `engines/`)
 - วิเคราะห์ Drift: โค้ดที่เดินหน้าไปไกลกว่า Knowledge (Unmapped Code) หรือโมดูลใน Knowledge ที่หาโค้ดจริงไม่พบ
 - ประเมินสังกัดโมดูล (`--eval <path>`): วิเคราะห์ไฟล์หรือตำแหน่งบั๊กอัตโนมัติว่าสังกัดโมดูลใด หรือเป็นงานส่วนกลางนอกโมดูล (Cross-Cutting / `_cross`)
-- สร้างโครงสร้างโมดูล (`--scaffold-module <name>`) หรือโปรเจค (`--scaffold-project <name>`) ครบสัญญา 3-slot พร้อมอัปเดตสารบัญ `INDEX.md` อัตโนมัติ
+- สร้างโครงสร้างโมดูล (`--scaffold-module <name>`) หรือโปรเจค (`--scaffold-project <name>`) ครบสัญญา 3-slot พร้อมอัปเดตสารบัญ `INDEX.md` อัตโนมัติ · เพิ่ม `--lean` กับ `--scaffold-module` เพื่อสร้างแบบ Neutral Knowledge (มีแค่ `INDEX.md` + `plan.md`)
 - **สั่งผ่าน AI ในแชทได้โดยตรง**: ผู้ใช้ไม่ต้องพิมพ์ CLI เอง สามารถสั่ง AI ในแชท (เช่น บทบาท `arch` หรือนายช่าง) AI จะใช้ skill `project-survey` สำรวจ วิเคราะห์ และสร้างโมดูลให้ทั้งหมด
 
 `baan sync` ทำงานครบวงจรสำหรับการซิงค์และอัปเดตระบบ:
